@@ -1411,6 +1411,68 @@ class SwipeableTest {
         }
     }
 
+    /**
+     * Tests that the [SwipeableState] is updated if the anchors change.
+     */
+    @Test
+    fun swipeable_anchorsUpdated() {
+        lateinit var swipeableState: SwipeableState<String>
+        lateinit var anchors: MutableState<Map<Float, String>>
+        setSwipeableContent {
+            swipeableState = rememberSwipeableState("A")
+            anchors = remember { mutableStateOf(mapOf(0f to "A")) }
+            Modifier.swipeable(
+                state = swipeableState,
+                anchors = anchors.value,
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+            assertThat(swipeableState.offset.value).isEqualTo(0f)
+        }
+
+        anchors.value = mapOf(50f to "A")
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+            assertThat(swipeableState.offset.value).isEqualTo(50f)
+        }
+    }
+
+    /**
+     * Tests that the [SwipeableState] is updated if the anchors change.
+     */
+    @Test
+    fun swipeable_anchorsUpdated_currentAnchorRemoved() {
+        lateinit var swipeableState: SwipeableState<String>
+        lateinit var anchors: MutableState<Map<Float, String>>
+        setSwipeableContent {
+            swipeableState = rememberSwipeableState("A")
+            anchors = remember { mutableStateOf(mapOf(0f to "A")) }
+            Modifier.swipeable(
+                state = swipeableState,
+                anchors = anchors.value,
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+            assertThat(swipeableState.offset.value).isEqualTo(0f)
+        }
+
+        anchors.value = mapOf(50f to "B", 100f to "C")
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("B")
+            assertThat(swipeableState.offset.value).isEqualTo(50f)
+        }
+    }
+
     private fun swipeRight(
         offset: Float = 100f,
         velocity: Float? = null
