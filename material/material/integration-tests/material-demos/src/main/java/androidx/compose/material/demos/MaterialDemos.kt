@@ -24,6 +24,7 @@ import androidx.compose.material.samples.BackdropSample
 import androidx.compose.material.samples.BottomDrawerSample
 import androidx.compose.material.samples.CustomAlertDialogSample
 import androidx.compose.material.samples.EmphasisSample
+import androidx.compose.material.samples.ModalBottomSheetSample
 import androidx.compose.material.samples.ModalDrawerSample
 import androidx.compose.material.samples.ScaffoldWithBottomBarAndCutout
 import androidx.compose.material.samples.ScaffoldWithCoroutinesSnackbar
@@ -55,6 +56,7 @@ val MaterialDemos = DemoCategory("Material", listOf(
             ActivityDemo("Dynamic Theme", DynamicThemeActivity::class)
         )
     ),
+    ComposableDemo("Modal bottom sheet") { ModalBottomSheetSample() },
     ComposableDemo("Progress Indicators") { ProgressIndicatorDemo() },
     ComposableDemo("Scaffold") { ScaffoldWithBottomBarAndCutout() },
     ComposableDemo("Selection Controls") { SelectionControlsDemo() },
