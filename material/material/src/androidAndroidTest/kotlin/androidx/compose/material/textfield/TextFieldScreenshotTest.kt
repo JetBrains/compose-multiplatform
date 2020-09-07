@@ -125,6 +125,41 @@ class TextFieldScreenshotTest {
         assertAgainstGolden("filled_textField_focused_rtl")
     }
 
+    @Test
+    fun textField_error_focused() {
+        rule.setMaterialContent {
+            TextField(
+                value = "Input",
+                onValueChange = {},
+                label = { Text("Label") },
+                isErrorValue = true,
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag)
+            // split click into (down) and (move, up) to enforce a composition in between
+            .performGesture { down(center) }
+            .performGesture { move(); up() }
+
+        assertAgainstGolden("filled_textField_focused_errorState")
+    }
+
+    @Test
+    fun textField_error_notFocused() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                isErrorValue = true,
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("filled_textField_notFocused_errorState")
+    }
+
     private fun assertAgainstGolden(goldenIdentifier: String) {
         rule.onNodeWithTag(TextFieldTag)
             .captureToBitmap()

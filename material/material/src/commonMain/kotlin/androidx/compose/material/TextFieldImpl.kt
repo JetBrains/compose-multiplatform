@@ -181,8 +181,17 @@ internal fun TextFieldImpl(
         } else {
             emphasisLevels.high.applyEmphasis(activeColor)
         },
-        labelInactiveColor = emphasisLevels.medium.applyEmphasis(inactiveColor),
-        indicatorInactiveColor = inactiveColor.applyAlpha(alpha = IndicatorInactiveAlpha)
+        labelInactiveColor = if (isErrorValue) {
+            errorColor
+        } else {
+            emphasisLevels.medium.applyEmphasis(inactiveColor)
+        },
+        indicatorInactiveColor = when {
+            isErrorValue -> errorColor
+            type == TextFieldType.Filled -> inactiveColor.applyAlpha(alpha = IndicatorInactiveAlpha)
+            else -> emphasisLevels.disabled.applyEmphasis(inactiveColor)
+        }
+
     ) { labelProgress, animatedLabelColor, indicatorWidth, indicatorColor, placeholderOpacity ->
 
         val leadingColor = inactiveColor.applyAlpha(alpha = TrailingLeadingAlpha)
@@ -534,12 +543,14 @@ private const val PlaceholderAnimationDelayOrDuration = 67
 
 private val IndicatorUnfocusedWidth = 1.dp
 private val IndicatorFocusedWidth = 2.dp
-private const val IndicatorInactiveAlpha = 0.42f
 private const val TrailingLeadingAlpha = 0.54f
 private val TextFieldMinHeight = 56.dp
 private val TextFieldMinWidth = 280.dp
 internal val TextFieldPadding = 16.dp
 internal val HorizontalIconPadding = 12.dp
+
+// Filled text field uses 42% opacity to meet the contrast requirements for accessibility reasons
+private const val IndicatorInactiveAlpha = 0.42f
 
 /*
 This padding is used to allow label not overlap with the content above it. This 8.dp will work

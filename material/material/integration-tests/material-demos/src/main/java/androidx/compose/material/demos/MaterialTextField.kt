@@ -223,7 +223,7 @@ private fun TextFieldWithMessage(
     }
 
     Column {
-        Box(modifier = Modifier.weight(1f), children = textField)
+        Box(modifier = Modifier.weight(1f, fill = false), children = textField)
         Text(
             text = "Helper message",
             style = typography.copy(color = color),
