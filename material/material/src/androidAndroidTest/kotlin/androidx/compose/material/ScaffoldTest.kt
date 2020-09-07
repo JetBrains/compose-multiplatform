@@ -21,7 +21,6 @@ import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.foundation.layout.InnerPadding
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -72,7 +71,8 @@ class ScaffoldTest {
     @Test
     fun scaffold_onlyContent_takesWholeScreen() {
         rule.setMaterialContentForSizeAssertions(
-            parentConstraints = DpConstraints(maxWidth = 100.dp, maxHeight = 100.dp)
+            parentMaxWidth = 100.dp,
+            parentMaxHeight = 100.dp
         ) {
             Scaffold {
                 Text("Scaffold body")
