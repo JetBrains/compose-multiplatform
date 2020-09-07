@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImageViewer</string>
+    <string name="loading">Загружаем изображения...</string>
+    <string name="repo_empty">Репозиторий пуст.</string>
+    <string name="no_internet">Нет доступа в интернет.</string>
+    <string name="repo_invalid">Список изображений в репозитории пуст или имеет неверный формат.</string>
+    <string name="refresh_unavailable">Невозможно обновить изображения.</string>
+    <string name="load_image_unavailable">Невозможно загузить полное изображение.</string>
+    <string name="last_image">Это последнее изображение.</string>
+    <string name="first_image">Это первое изображение.</string>
+    <string name="picture">Изображение:</string>
+    <string name="size">Размеры:</string>
+    <string name="pixels">пикселей.</string>
+</resources>

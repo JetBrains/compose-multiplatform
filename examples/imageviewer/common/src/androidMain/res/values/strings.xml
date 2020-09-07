@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">ImageViewer</string>
+    <string name="loading">Loading images...</string>
+    <string name="repo_empty">Repository is empty.</string>
+    <string name="no_internet">No internet access.</string>
+    <string name="repo_invalid">List of images in current repository is invalid or empty.</string>
+    <string name="refresh_unavailable">Cannot refresh images.</string>
+    <string name="load_image_unavailable">Cannot load full size image.</string>
+    <string name="last_image">This is last image.</string>
+    <string name="first_image">This is first image.</string>
+    <string name="picture">Picture:</string>
+    <string name="size">Size:</string>
+    <string name="pixels">pixels.</string>
+</resources>
