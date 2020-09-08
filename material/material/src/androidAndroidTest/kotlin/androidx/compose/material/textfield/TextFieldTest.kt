@@ -43,7 +43,6 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.onPositioned
@@ -697,7 +696,7 @@ class TextFieldTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testTextField_alphaNotSet_toBackgroundColorAndTransparentColors() {
+    fun testTextField_alphaNotApplied_toCustomBackgroundColorAndTransparentColors() {
         val latch = CountDownLatch(1)
 
         rule.setMaterialContent {
@@ -717,14 +716,12 @@ class TextFieldTest {
             }
         }
 
-        val expectedColor = Color.Blue.copy(alpha = 0.12f).compositeOver(Color.White)
-
         rule.onNodeWithTag(TextfieldTag)
             .captureToBitmap()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,
-                shapeColor = expectedColor,
+                shapeColor = Color.Blue,
                 shape = RectangleShape,
                 // avoid elevation artifacts
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
@@ -738,7 +735,7 @@ class TextFieldTest {
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,
-                shapeColor = expectedColor,
+                shapeColor = Color.Blue,
                 shape = RectangleShape,
                 // avoid elevation artifacts
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
