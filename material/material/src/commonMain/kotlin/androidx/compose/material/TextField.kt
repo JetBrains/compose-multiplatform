@@ -134,8 +134,7 @@ import kotlin.math.roundToInt
  * focus, and the color of the label and bottom indicator when the text field is not in focus
  * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
  * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container. To the color provided
- * here there will be applied a transparency alpha defined by Material Design specifications
+ * @param backgroundColor the background color of the text field's container
  * @param shape the shape of the text field's container
  */
 @Composable
@@ -157,7 +156,7 @@ fun TextField(
     activeColor: Color = MaterialTheme.colors.primary,
     inactiveColor: Color = MaterialTheme.colors.onSurface,
     errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface,
+    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
     shape: Shape =
         MaterialTheme.shapes.small.copy(bottomLeft = ZeroCornerSize, bottomRight = ZeroCornerSize)
 ) {
@@ -254,8 +253,7 @@ fun TextField(
  * focus, and the color of the label and bottom indicator when the text field is not in focus
  * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
  * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container. To the color provided
- * here there will be applied a transparency alpha defined by Material Design specifications
+ * @param backgroundColor the background color of the text field's container
  * @param shape the shape of the text field's container
  */
 @Composable
@@ -277,7 +275,7 @@ fun TextField(
     activeColor: Color = MaterialTheme.colors.primary,
     inactiveColor: Color = MaterialTheme.colors.onSurface,
     errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface,
+    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
     shape: Shape =
         MaterialTheme.shapes.small.copy(bottomLeft = ZeroCornerSize, bottomRight = ZeroCornerSize)
 ) {
@@ -325,7 +323,7 @@ internal fun TextFieldLayout(
     IconsWithTextFieldLayout(
         modifier = modifier
             .background(
-                color = backgroundColor.applyAlpha(alpha = ContainerAlpha),
+                color = backgroundColor,
                 shape = shape
             )
             .drawIndicatorLine(
@@ -623,4 +621,4 @@ private fun Modifier.drawIndicatorLine(lineWidth: Dp, color: Color): Modifier {
 private val FirstBaselineOffset = 20.dp
 private val LastBaselineOffset = 10.dp
 private val TextFieldTopPadding = 4.dp
-private const val ContainerAlpha = 0.12f
+const val ContainerAlpha = 0.12f
