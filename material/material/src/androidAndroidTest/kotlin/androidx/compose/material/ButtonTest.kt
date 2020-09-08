@@ -397,7 +397,10 @@ class ButtonTest {
                     Button(
                         onClick = {},
                         enabled = false,
-                        backgroundColor = Color.Red,
+                        backgroundColor = ButtonConstants.defaultButtonBackgroundColor(
+                            enabled = false,
+                            defaultColor = Color.Red
+                        ),
                         shape = RectangleShape
                     ) {}
                 }
