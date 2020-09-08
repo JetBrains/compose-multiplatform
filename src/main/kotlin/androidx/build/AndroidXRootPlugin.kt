@@ -60,6 +60,7 @@ class AndroidXRootPlugin : Plugin<Project> {
         tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
 
         project.validateAllAndroidxArgumentsAreRecognized()
+        tasks.register("listAndroidXProperties", ListAndroidXPropertiesTask::class.java)
         setDependencyVersions()
         configureKtlintCheckFile()
         configureCheckInvalidSuppress()
