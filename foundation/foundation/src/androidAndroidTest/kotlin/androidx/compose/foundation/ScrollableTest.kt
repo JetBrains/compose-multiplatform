@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.ManualFrameClock
 import androidx.compose.animation.core.advanceClockMillis
@@ -98,7 +98,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
@@ -154,7 +154,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
@@ -212,7 +212,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
@@ -257,7 +257,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
@@ -303,7 +303,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
@@ -350,7 +350,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
@@ -395,7 +395,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
@@ -433,7 +433,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
@@ -460,7 +460,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
@@ -501,7 +501,7 @@ class ScrollableTest {
                 outerDrag += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
         val innerState = ScrollableController(
@@ -509,7 +509,7 @@ class ScrollableTest {
                 innerDrag += it / 2
                 it / 2
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
 
@@ -570,7 +570,7 @@ class ScrollableTest {
                 outerDrag += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
         val innerState = ScrollableController(
@@ -578,7 +578,7 @@ class ScrollableTest {
                 innerDrag += it / 2
                 it / 2
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
 
@@ -645,7 +645,7 @@ class ScrollableTest {
                     value += it
                     it
                 },
-                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
                 animationClock = animationClock
             )
             val preConsumingParent = object : NestedScrollConnection {
@@ -713,7 +713,7 @@ class ScrollableTest {
                     expectedLeft = it - toConsume
                     toConsume
                 },
-                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
                 animationClock = animationClock
             )
             val parent = object : NestedScrollConnection {
@@ -788,7 +788,7 @@ class ScrollableTest {
                     value += expectedConsumed
                     expectedConsumed
                 },
-                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
                 animationClock = animationClock
             )
             val child = object : NestedScrollConnection {}
@@ -857,7 +857,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext),
             interactionState = interactionState
         )
@@ -904,7 +904,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext),
             interactionState = interactionState
         )
@@ -953,7 +953,7 @@ class ScrollableTest {
     fun testInspectorValue() {
         val controller = ScrollableController(
             consumeScrollDelta = { it },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         rule.setContent {

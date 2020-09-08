@@ -41,9 +41,9 @@ class RepeatableAnimationTest {
 
         val animationWrapper = TargetBasedAnimation(
             repeat,
+            Float.VectorConverter,
             0f,
-            0f,
-            Float.VectorConverter
+            0f
         )
 
         assertThat(repeat.at(0)).isEqualTo(0f)
@@ -84,9 +84,9 @@ class RepeatableAnimationTest {
 
         val repeatAnim = TargetBasedAnimation(
             repeat,
+            Float.VectorConverter,
             0f,
-            100f,
-            Float.VectorConverter
+            100f
         )
 
         for (playtime in 0..100L) {

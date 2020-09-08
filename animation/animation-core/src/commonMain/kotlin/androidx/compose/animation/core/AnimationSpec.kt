@@ -19,6 +19,7 @@ package androidx.compose.animation.core
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.annotation.IntRange
 
 object AnimationConstants {
@@ -41,12 +42,12 @@ object AnimationConstants {
 /**
  * [AnimationSpec] stores the specification of an animation, including 1) the data type to be
  * animated, and 2) the animation configuration (i.e. [VectorizedAnimationSpec]) that will be used
- * to once the data (of type [T]) has been converted to [AnimationVector].
+ * once the data (of type [T]) has been converted to [AnimationVector].
  *
  * Any type [T] can be animated by the system as long as a [TwoWayConverter] is supplied to convert
  * the data type [T] from and to an [AnimationVector]. There are a number of converters
  * available out of the box. For example, to animate [androidx.compose.ui.unit.IntOffset] the system
- * uses [androidx.compose.animation.IntOffset.VectorConverter] to convert the object to
+ * uses [IntOffset.VectorConverter][IntOffset.Companion.VectorConverter] to convert the object to
  * [AnimationVector2D], so that both x and y dimensions are animated independently with separate
  * velocity tracking. This enables multidimensional objects to be animated in a true
  * multi-dimensional way. It is particularly useful for smoothly handling animation interruptions

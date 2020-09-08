@@ -17,7 +17,7 @@
 package androidx.compose.foundation.textfield
 
 import android.os.Build
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
@@ -536,7 +536,7 @@ class TextFieldScrollTest {
         val textFieldScrollPosition = TextFieldScrollerPosition()
         val scrollerPosition = ScrollState(
             0f,
-            FlingConfig(ExponentialDecay()),
+            FlingConfig(FloatExponentialDecaySpec()),
             ManualAnimationClock(0)
         )
 

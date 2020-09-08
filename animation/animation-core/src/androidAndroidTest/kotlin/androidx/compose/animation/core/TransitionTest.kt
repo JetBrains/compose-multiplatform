@@ -45,28 +45,28 @@ class TransitionTest {
         val target = mutableStateOf(AnimStates.From)
         val floatAnim1 = TargetBasedAnimation(
             spring(dampingRatio = Spring.DampingRatioHighBouncy),
+            Float.VectorConverter,
             0f,
-            1f,
-            Float.VectorConverter
+            1f
         )
         val floatAnim2 = TargetBasedAnimation(
             spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
+            Float.VectorConverter,
             1f,
-            0f,
-            Float.VectorConverter
+            0f
         )
 
         val colorAnim1 = TargetBasedAnimation(
             tween(1000),
+            Color.VectorConverter(Color.Red.colorSpace),
             Color.Red,
-            Color.Green,
-            Color.VectorConverter(Color.Red.colorSpace)
+            Color.Green
         )
         val colorAnim2 = TargetBasedAnimation(
             tween(1000),
+            Color.VectorConverter(Color.Red.colorSpace),
             Color.Green,
             Color.Red,
-            Color.VectorConverter(Color.Red.colorSpace)
         )
 
         // Animate from 0f to 0f for 1000ms
@@ -86,15 +86,15 @@ class TransitionTest {
 
         val keyframesAnim1 = TargetBasedAnimation(
             keyframes1,
+            Float.VectorConverter,
             0f,
-            0f,
-            Float.VectorConverter
+            0f
         )
         val keyframesAnim2 = TargetBasedAnimation(
             keyframes2,
+            Float.VectorConverter,
             0f,
-            0f,
-            Float.VectorConverter
+            0f
         )
         val animFloat = mutableStateOf(-1f)
         val animColor = mutableStateOf(Color.Gray)

@@ -18,7 +18,7 @@ package androidx.compose.foundation
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
@@ -120,7 +120,7 @@ class ScrollTest {
     fun verticalScroller_SmallContent_Unscrollable() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -146,7 +146,7 @@ class ScrollTest {
     fun verticalScroller_LargeContent_ScrollToEnd() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val height = 30
@@ -170,7 +170,7 @@ class ScrollTest {
     fun verticalScroller_Reversed() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val height = 30
@@ -186,7 +186,7 @@ class ScrollTest {
     fun verticalScroller_LargeContent_Reversed_ScrollToEnd() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val height = 20
@@ -251,7 +251,7 @@ class ScrollTest {
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -276,7 +276,7 @@ class ScrollTest {
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -298,7 +298,7 @@ class ScrollTest {
     fun horizontalScroller_reversed() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val width = 30
@@ -314,7 +314,7 @@ class ScrollTest {
     fun horizontalScroller_rtl_reversed() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val width = 30
@@ -333,7 +333,7 @@ class ScrollTest {
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -357,7 +357,7 @@ class ScrollTest {
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -411,7 +411,7 @@ class ScrollTest {
             isVertical = true,
             scrollState = ScrollState(
                 initial = 0f,
-                flingConfig = FlingConfig(ExponentialDecay()),
+                flingConfig = FlingConfig(FloatExponentialDecaySpec()),
                 animationClock = ManualAnimationClock(0)
             ),
             isReversed = true
@@ -430,7 +430,7 @@ class ScrollTest {
             isVertical = false,
             scrollState = ScrollState(
                 initial = 0f,
-                flingConfig = FlingConfig(ExponentialDecay()),
+                flingConfig = FlingConfig(FloatExponentialDecaySpec()),
                 animationClock = ManualAnimationClock(0)
             ),
             isReversed = true
@@ -502,7 +502,7 @@ class ScrollTest {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
@@ -549,7 +549,7 @@ class ScrollTest {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
         val itemCount = mutableStateOf(100)
@@ -590,7 +590,7 @@ class ScrollTest {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
@@ -627,7 +627,7 @@ class ScrollTest {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
@@ -709,7 +709,7 @@ class ScrollTest {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
@@ -752,7 +752,7 @@ class ScrollTest {
     private fun composeVerticalScroller(
         scrollState: ScrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         ),
         isReversed: Boolean = false,
@@ -787,7 +787,7 @@ class ScrollTest {
     private fun composeHorizontalScroller(
         scrollState: ScrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         ),
         isReversed: Boolean = false,
@@ -862,7 +862,7 @@ class ScrollTest {
         isReversed: Boolean = false,
         scrollState: ScrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         ),
         isRtl: Boolean = false
@@ -926,7 +926,7 @@ class ScrollTest {
     fun testInspectorValue() {
         val state = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         rule.setContent {

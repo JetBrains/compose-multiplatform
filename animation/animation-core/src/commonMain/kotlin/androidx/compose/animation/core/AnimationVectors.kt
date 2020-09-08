@@ -78,6 +78,20 @@ internal fun <T : AnimationVector> T.newInstance(): T {
     return this.newVector() as T
 }
 
+internal fun <T : AnimationVector> T.copy(): T {
+    val newVector = newInstance()
+    for (i in 0 until newVector.size) {
+        newVector[i] = this[i]
+    }
+    return newVector
+}
+
+internal fun <T : AnimationVector> T.copyFrom(source: T) {
+    for (i in 0 until size) {
+        this[i] = source[i]
+    }
+}
+
 /**
  * This class defines a 1D vector. It contains only one Float value that is initialized in the
  * constructor.
@@ -135,6 +149,7 @@ class AnimationVector2D(v1: Float, v2: Float) : AnimationVector() {
      */
     var v1: Float = v1
         internal set
+
     /**
      * Float value field for the second dimension of the 2D vector.
      */
@@ -189,11 +204,13 @@ class AnimationVector3D(v1: Float, v2: Float, v3: Float) : AnimationVector() {
      */
     var v1: Float = v1
         internal set
+
     /**
      * Float value field for the second dimension of the 3D vector.
      */
     var v2: Float = v2
         internal set
+
     /**
      * Float value field for the third dimension of the 3D vector.
      */
@@ -253,16 +270,19 @@ class AnimationVector4D(v1: Float, v2: Float, v3: Float, v4: Float) : AnimationV
      */
     var v1: Float = v1
         internal set
+
     /**
      * Float value field for the second dimension of the 4D vector.
      */
     var v2: Float = v2
         internal set
+
     /**
      * Float value field for the third dimension of the 4D vector.
      */
     var v3: Float = v3
         internal set
+
     /**
      * Float value field for the fourth dimension of the 4D vector.
      */

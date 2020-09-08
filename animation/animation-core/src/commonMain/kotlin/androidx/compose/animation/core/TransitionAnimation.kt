@@ -315,7 +315,7 @@ internal fun <T, V : AnimationVector> PropKey<T, V>.createAnimationWrapper(
     startVelocity: V?,
     end: T
 ): Animation<T, V> =
-    TargetBasedAnimation(anim, start, end, typeConverter, startVelocity)
+    TargetBasedAnimation(anim, typeConverter, start, end, startVelocity)
 
 /**
  * Private class allows mutation on the prop values.

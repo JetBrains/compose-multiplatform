@@ -18,7 +18,7 @@ package androidx.compose.ui.test.gesturescope
 
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.animation.FlingConfig
@@ -167,7 +167,7 @@ class SendSwipeTest {
         val touchSlop = with(rule.density) { TouchSlop.toPx() }
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = object : AnimationClockObservable {
                 // Use a "broken" clock, we just want response to input, not to time
                 override fun subscribe(observer: AnimationClockObserver) {}
