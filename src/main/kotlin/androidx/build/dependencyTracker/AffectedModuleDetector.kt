@@ -86,9 +86,9 @@ abstract class AffectedModuleDetector {
     companion object {
         private const val ROOT_PROP_NAME = "affectedModuleDetector"
         private const val LOG_FILE_NAME = "affected_module_detector_log.txt"
-        private const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
-        private const val DEPENDENT_PROJECTS_ARG = "androidx.dependentProjects"
-        private const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
+        public const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
+        public const val DEPENDENT_PROJECTS_ARG = "androidx.dependentProjects"
+        public const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
             val enabled = rootProject.hasProperty(ENABLE_ARG)

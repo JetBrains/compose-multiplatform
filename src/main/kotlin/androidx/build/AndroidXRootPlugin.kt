@@ -59,6 +59,7 @@ class AndroidXRootPlugin : Plugin<Project> {
         // TODO have the normal license check run here so it catches the buildscript classpath.
         tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
 
+        project.validateAllAndroidxArgumentsAreRecognized()
         setDependencyVersions()
         configureKtlintCheckFile()
         configureCheckInvalidSuppress()
