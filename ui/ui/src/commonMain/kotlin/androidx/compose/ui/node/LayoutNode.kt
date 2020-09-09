@@ -528,10 +528,19 @@ class LayoutNode : Measurable, Remeasurement {
     internal val mDrawScope: LayoutNodeDrawScope = sharedDrawScope
 
     /**
-     * Whether or not this has been placed in the hierarchy.
+     * Whether or not this LayoutNode and all of its parents have been placed in the hierarchy.
      */
     var isPlaced = false
         internal set
+
+    /**
+     * Whether or not this LayoutNode was placed by its parent during the last layout.
+     * It is possible that this value is not equals to [isPlaced] when:
+     * 1) The node was placed by the parent, but the grandparent didn't place the parent
+     * 2) This value is set to false before the start of the layout pass to be able to detect the
+     * nodes which were placed previously but not placed during this pass
+     */
+    private var isPlacedByParent = false
 
     /**
      * Remembers how the node was measured by the parent.
@@ -838,7 +847,28 @@ class LayoutNode : Measurable, Remeasurement {
         }
     }
 
-    internal fun layoutChildren() {
+    /**
+     * Invoked when the parent placed the node. It will trigger the layout.
+     */
+    internal fun onNodePlaced() {
+        if (!isPlaced) {
+            isPlaced = true
+            // when the visibility of a child has been changed we need to invalidate
+            // parents inner layer - the layer in which this child will be drawn
+            parent?.invalidateLayer()
+            // plus all the inner layers that were invalidated while the node was not placed
+            forEachDelegate {
+                if (it is LayerWrapper && it.lastDrawingWasSkipped) {
+                    it.layer.invalidate()
+                }
+            }
+            markSubtreeAsPlaced()
+        }
+        isPlacedByParent = true
+        layoutChildren()
+    }
+
+    private fun layoutChildren() {
         if (layoutState == NeedsRelayout) {
             onBeforeLayoutChildren()
         }
@@ -849,7 +879,7 @@ class LayoutNode : Measurable, Remeasurement {
             val owner = requireOwner()
             owner.observeLayoutModelReads(this) {
                 _children.forEach { child ->
-                    child.isPlaced = false
+                    child.isPlacedByParent = false
                     if (alignmentLinesRequired && child.layoutState == Ready &&
                         !child.alignmentLinesCalculatedDuringLastLayout
                     ) {
@@ -862,6 +892,12 @@ class LayoutNode : Measurable, Remeasurement {
                 }
                 innerLayoutNodeWrapper.measureResult.placeChildren()
                 _children.forEach { child ->
+                    // we set `isPlacedByParent` to false for all the children, then
+                    // during the placeChildren() invocation it will be set to true for all
+                    // the placed children.
+                    if (!child.isPlacedByParent) {
+                        child.markSubtreeAsNotPlaced()
+                    }
                     child.alignmentLinesRead = child.alignmentLinesQueriedSinceLastLayout
                 }
             }
@@ -893,6 +929,25 @@ class LayoutNode : Measurable, Remeasurement {
                 }
             }
             layoutState = Ready
+        }
+    }
+
+    private fun markSubtreeAsPlaced() {
+        _children.forEach {
+            // if the layout state is not Ready then isPlaced will be set during the layout
+            if (it.layoutState == Ready && it.isPlacedByParent) {
+                it.isPlaced = true
+                it.markSubtreeAsPlaced()
+            }
+        }
+    }
+
+    private fun markSubtreeAsNotPlaced() {
+        if (isPlaced) {
+            isPlaced = false
+            _children.forEach {
+                markSubtreeAsNotPlaced()
+            }
         }
     }
 

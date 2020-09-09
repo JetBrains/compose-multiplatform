@@ -48,6 +48,13 @@ internal class LayerWrapper(
         wrappedBy?.invalidateLayer()
     }
 
+    /**
+     * True when the last drawing of this layer didn't draw the real content as the LayoutNode
+     * containing this layer was not placed by the parent.
+     */
+    internal var lastDrawingWasSkipped = false
+        private set
+
     val layer: OwnedLayer
         get() = _layer!!
 
@@ -154,7 +161,19 @@ internal class LayerWrapper(
         _layer?.invalidate()
     }
 
+    @ExperimentalLayoutNodeApi
     override fun invoke(canvas: Canvas) {
-        wrapped.draw(canvas)
+        if (layoutNode.isPlaced) {
+            require(layoutNode.layoutState == LayoutNode.LayoutState.Ready) {
+                "Layer is redrawn for LayoutNode in state ${layoutNode.layoutState} [$layoutNode]"
+            }
+            wrapped.draw(canvas)
+            lastDrawingWasSkipped = false
+        } else {
+            // The invalidation is requested even for nodes which are not placed. As we are not
+            // going to display them we skip the drawing. It is safe to just draw nothing as the
+            // layer will be invalidated again when the node will be finally placed.
+            lastDrawingWasSkipped = true
+        }
     }
 }

@@ -116,8 +116,7 @@ internal class InnerPlaceable(
         // our position in order ot know how to offset the value we provided).
         if (wrappedBy?.isShallowPlacing == true) return
 
-        layoutNode.isPlaced = true
-        layoutNode.layoutChildren()
+        layoutNode.onNodePlaced()
     }
 
     override operator fun get(line: AlignmentLine): Int {
