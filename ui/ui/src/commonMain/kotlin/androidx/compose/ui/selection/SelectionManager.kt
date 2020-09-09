@@ -24,7 +24,6 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -98,14 +97,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     private var dragTotalDistance = Offset.Zero
 
     /**
-     * A flag to check if the selection start or end handle is being dragged.
-     * If this value is true, then onPress will not select any text.
-     * This value will be set to true when either handle is being dragged, and be reset to false
-     * when the dragging is stopped.
-     */
-    private var draggingHandle = false
-
-    /**
      * The calculated position of the start handle in the [SelectionContainer] coordinates. It
      * is null when handle shouldn't be displayed.
      * It is a [State] so reading it during the composition will cause recomposition every time
@@ -134,6 +125,15 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             updateHandleOffsets()
             hideSelectionToolbar()
         }
+        selectionRegistrar.onUpdateSelectionCallback =
+            { layoutCoordinates, startPosition, endPosition ->
+                updateSelection(
+                    startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
+                    endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
+                    isStartHandle = true,
+                    longPress = true
+                )
+            }
     }
 
     private fun updateHandleOffsets() {
@@ -359,46 +359,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         if (selection != null) onSelectionChange(null)
     }
 
-    val longPressDragObserver = object : LongPressDragObserver {
-        override fun onLongPress(pxPosition: Offset) {
-            if (draggingHandle) return
-            val coordinates = containerLayoutCoordinates
-            if (coordinates == null || !coordinates.isAttached) return
-            val newSelection = mergeSelections(
-                startPosition = pxPosition,
-                endPosition = pxPosition,
-                longPress = true,
-                previousSelection = selection
-            )
-            if (newSelection != selection) onSelectionChange(newSelection)
-            dragBeginPosition = pxPosition
-        }
-
-        override fun onDragStart() {
-            super.onDragStart()
-            // selection never started
-            if (selection == null) return
-            // Zero out the total distance that being dragged.
-            dragTotalDistance = Offset.Zero
-        }
-
-        override fun onDrag(dragDistance: Offset): Offset {
-            // selection never started, did not consume any drag
-            if (selection == null) return Offset.Zero
-
-            dragTotalDistance += dragDistance
-            val newSelection = mergeSelections(
-                startPosition = dragBeginPosition,
-                endPosition = dragBeginPosition + dragTotalDistance,
-                longPress = true,
-                previousSelection = selection
-            )
-
-            if (newSelection != selection) onSelectionChange(newSelection)
-            return dragDistance
-        }
-    }
-
     fun handleDragObserver(isStartHandle: Boolean): DragObserver {
         return object : DragObserver {
             override fun onStart(downPosition: Offset) {
@@ -433,7 +393,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
                 // Zero out the total distance that being dragged.
                 dragTotalDistance = Offset.Zero
-                draggingHandle = true
             }
 
             override fun onDrag(dragDistance: Offset): Offset {
@@ -468,21 +427,40 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     dragBeginPosition + dragTotalDistance
                 }
 
-                val finalSelection = mergeSelections(
+                updateSelection(
                     startPosition = currentStart,
                     endPosition = currentEnd,
-                    previousSelection = selection,
                     isStartHandle = isStartHandle
                 )
-                onSelectionChange(finalSelection)
                 return dragDistance
             }
-
-            override fun onStop(velocity: Offset) {
-                super.onStop(velocity)
-                draggingHandle = false
-            }
         }
+    }
+
+    private fun convertToContainerCoordinates(
+        layoutCoordinates: LayoutCoordinates,
+        offset: Offset
+    ): Offset? {
+        val coordinates = containerLayoutCoordinates
+        if (coordinates == null || !coordinates.isAttached) return null
+        return requireContainerCoordinates().childToLocal(layoutCoordinates, offset)
+    }
+
+    private fun updateSelection(
+        startPosition: Offset?,
+        endPosition: Offset?,
+        longPress: Boolean = false,
+        isStartHandle: Boolean = true
+    ) {
+        if (startPosition == null || endPosition == null) return
+        val newSelection = mergeSelections(
+            startPosition = startPosition,
+            endPosition = endPosition,
+            longPress = longPress,
+            isStartHandle = isStartHandle,
+            previousSelection = selection
+        )
+        if (newSelection != selection) onSelectionChange(newSelection)
     }
 }
 

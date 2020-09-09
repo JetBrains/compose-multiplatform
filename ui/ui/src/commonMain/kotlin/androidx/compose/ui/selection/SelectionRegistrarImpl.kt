@@ -93,4 +93,21 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
         sorted = false
         onPositionChangeCallback?.invoke()
     }
+
+    /**
+     * The callback to be invoked when the selection change was triggered.
+     */
+    internal var onUpdateSelectionCallback: ((LayoutCoordinates, Offset, Offset) -> Unit)? = null
+
+    override fun onUpdateSelection(
+        layoutCoordinates: LayoutCoordinates,
+        startPosition: Offset,
+        endPosition: Offset
+    ) {
+        onUpdateSelectionCallback?.invoke(
+            layoutCoordinates,
+            startPosition,
+            endPosition
+        )
+    }
 }

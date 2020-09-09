@@ -30,6 +30,7 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
         get() = _selectables
 
     internal var onPositionChangeCallback: (() -> Unit)? = null
+    internal var onUpdateSelectionCallback: ((LayoutCoordinates, Offset, Offset) -> Unit)? = null
 
     override fun subscribe(selectable: Selectable): Selectable {
         _selectables.add(selectable)
@@ -73,5 +74,17 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
     override fun onPositionChange() {
         sorted = false
         onPositionChangeCallback?.invoke()
+    }
+
+    override fun onUpdateSelection(
+        layoutCoordinates: LayoutCoordinates,
+        startPosition: Offset,
+        endPosition: Offset
+    ) {
+        onUpdateSelectionCallback?.invoke(
+            layoutCoordinates,
+            startPosition,
+            endPosition
+        )
     }
 }

@@ -205,33 +205,6 @@ class SelectionContainerTest {
         }
     }
 
-    @Test
-    @SdkSuppress(minSdkVersion = 27)
-    fun long_press_and_drag_select_text_range() {
-        // Setup. Want to selection "Dem".
-        val startOffset = textContent.indexOf('D')
-        val endOffset = textContent.indexOf('m') + 1
-        val characterSize = with(rule.density) { fontSize.toPx() }
-
-        // Act.
-        longPressAndDrag(
-            startX = startOffset * characterSize,
-            startY = 0.5f * characterSize,
-            endX = endOffset * characterSize,
-            endY = 0.5f * characterSize
-        )
-
-        // Assert.
-        rule.runOnIdle {
-            assertThat(selection.value!!.start.offset).isEqualTo(startOffset)
-            assertThat(selection.value!!.end.offset).isEqualTo("Text Demo".length)
-            verify(
-                hapticFeedback,
-                times(1)
-            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-        }
-    }
-
     private fun longPress(x: Float, y: Float) {
         waitForLongPress {
             view.dispatchTouchEvent(getDownEvent(x, y))

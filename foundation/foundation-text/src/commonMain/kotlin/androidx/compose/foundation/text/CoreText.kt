@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 @file:Suppress("DEPRECATION_ERROR")
+
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
@@ -33,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.LongPressDragObserver
+import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -61,6 +64,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.subSequence
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
 import kotlin.math.max
@@ -70,7 +74,8 @@ import kotlin.math.roundToInt
 /** The default selection color if none is specified. */
 internal val DefaultSelectionColor = Color(0x6633B5E5)
 internal typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
-internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (String)->Unit>
+internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (String) -> Unit>
+
 /**
  * CoreText is a low level element that displays text with multiple different styles. The text to
  * display is described using a [AnnotatedString]. Typically you will instead want to use
@@ -155,7 +160,20 @@ fun CoreText(
         } else {
             { InlineChildren(text, inlineComposables) }
         },
-        modifier = modifier.then(controller.modifiers),
+        modifier = modifier
+            .then(controller.modifiers)
+            .then(
+                if (selectionRegistrar != null) {
+                    Modifier.longPressDragGestureFilter(
+                        longPressDragObserver(
+                            state = state,
+                            selectionRegistrar = selectionRegistrar
+                        )
+                    )
+                } else {
+                    Modifier
+                }
+            ),
         minIntrinsicWidthMeasureBlock = controller.minIntrinsicWidth,
         minIntrinsicHeightMeasureBlock = controller.minIntrinsicHeight,
         maxIntrinsicWidthMeasureBlock = controller.maxIntrinsicWidth,
@@ -336,7 +354,8 @@ val FirstBaseline = HorizontalAlignmentLine(::min)
 val LastBaseline = HorizontalAlignmentLine(::max)
 
 @OptIn(InternalTextApi::class)
-private class TextState(
+@VisibleForTesting
+internal class TextState(
     var textDelegate: TextDelegate
 ) {
     var onTextLayout: (TextLayoutResult) -> Unit = {}
@@ -409,9 +428,9 @@ internal fun resolveInlineContent(
     val inlineContentAnnotations = text.getStringAnnotations(INLINE_CONTENT_TAG, 0, text.length)
 
     val placeholders = mutableListOf<AnnotatedString.Range<Placeholder>>()
-    val inlineComposables = mutableListOf<AnnotatedString.Range<@Composable (String) ->Unit>>()
+    val inlineComposables = mutableListOf<AnnotatedString.Range<@Composable (String) -> Unit>>()
     inlineContentAnnotations.fastForEach { annotation ->
-        inlineContent[annotation.item]?. let { inlineTextContent ->
+        inlineContent[annotation.item]?.let { inlineTextContent ->
             placeholders.add(
                 AnnotatedString.Range(
                     inlineTextContent.placeholder,
@@ -429,4 +448,63 @@ internal fun resolveInlineContent(
         }
     }
     return Pair(placeholders, inlineComposables)
+}
+
+@OptIn(InternalTextApi::class)
+@VisibleForTesting
+internal fun longPressDragObserver(
+    state: TextState,
+    selectionRegistrar: SelectionRegistrar?
+): LongPressDragObserver {
+    /**
+     * The beginning position of the drag gesture. Every time a new drag gesture starts, it wil be
+     * recalculated.
+     */
+    var dragBeginPosition = Offset.Zero
+
+    /**
+     * The total distance being dragged of the drag gesture. Every time a new drag gesture starts,
+     * it will be zeroed out.
+     */
+    var dragTotalDistance = Offset.Zero
+    return object : LongPressDragObserver {
+        override fun onLongPress(pxPosition: Offset) {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return
+
+                selectionRegistrar?.onUpdateSelection(
+                    layoutCoordinates = it,
+                    startPosition = pxPosition,
+                    endPosition = pxPosition
+                )
+
+                dragBeginPosition = pxPosition
+            }
+        }
+
+        override fun onDragStart() {
+            super.onDragStart()
+            // selection never started
+            if (state.selectionRange == null) return
+            // Zero out the total distance that being dragged.
+            dragTotalDistance = Offset.Zero
+        }
+
+        override fun onDrag(dragDistance: Offset): Offset {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return Offset.Zero
+                // selection never started, did not consume any drag
+                if (state.selectionRange == null) return Offset.Zero
+
+                dragTotalDistance += dragDistance
+
+                selectionRegistrar?.onUpdateSelection(
+                    layoutCoordinates = it,
+                    startPosition = dragBeginPosition,
+                    endPosition = dragBeginPosition + dragTotalDistance
+                )
+            }
+            return dragDistance
+        }
+    }
 }

@@ -2385,6 +2385,7 @@ package androidx.compose.ui.selection {
 
   public interface SelectionRegistrar {
     method public void onPositionChange();
+    method public void onUpdateSelection-rULFVbc(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition, long endPosition);
     method public androidx.compose.ui.selection.Selectable subscribe(androidx.compose.ui.selection.Selectable selectable);
     method public void unsubscribe(androidx.compose.ui.selection.Selectable selectable);
   }
