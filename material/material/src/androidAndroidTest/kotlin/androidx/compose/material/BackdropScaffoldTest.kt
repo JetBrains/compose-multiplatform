@@ -18,12 +18,14 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.BackdropValue.Concealed
 import androidx.compose.material.BackdropValue.Revealed
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
@@ -224,6 +226,7 @@ class BackdropScaffoldTest {
                 backdropScaffoldState = backdropState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
+                frontLayerScrimColor = Color.Red,
                 appBar = { Box(Modifier.preferredHeight(peekHeight)) },
                 backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
@@ -241,6 +244,42 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(backdropState.value).isEqualTo(Concealed)
+        }
+    }
+
+    @Test
+    fun backdropScaffold_scrimIsDisabledWhenTransparent() {
+        var frontLayerClicks = 0
+        val backdropState = BackdropScaffoldState(Revealed, clock)
+        rule.setContent {
+            BackdropScaffold(
+                backdropScaffoldState = backdropState,
+                peekHeight = peekHeight,
+                headerHeight = headerHeight,
+                frontLayerScrimColor = Color.Transparent,
+                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
+                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                frontLayerContent = {
+                    Box(Modifier.fillMaxSize().testTag(frontLayer).clickable {
+                        frontLayerClicks += 1
+                    })
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(frontLayerClicks).isEqualTo(0)
+            assertThat(backdropState.value).isEqualTo(Revealed)
+        }
+
+        rule.onNodeWithTag(frontLayer)
+            .performGesture { click() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(frontLayerClicks).isEqualTo(1)
+            assertThat(backdropState.value).isEqualTo(Revealed)
         }
     }
 }

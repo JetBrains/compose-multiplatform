@@ -242,7 +242,9 @@ fun rememberBackdropState(
  * @param frontLayerContentColor The preferred content color provided by the back front to its
  * children. Defaults to the matching `onFoo` color for [frontLayerBackgroundColor], or if that
  * is not a color from the theme, this will keep the same content color set above the front layer.
- * @param frontLayerScrimColor The color of the scrim applied to the front layer when inactive.
+ * @param frontLayerScrimColor The color of the scrim applied to the front layer when the back
+ * layer is revealed. If you set this to `Color.Transparent`, then a scrim will not be applied
+ * and interaction with the front layer will not be blocked when the back layer is revealed.
  * @param snackbarHost The component hosting the snackbars shown inside the backdrop.
  * @param appBar App bar for the back layer. Make sure that the [peekHeight] is equal to the
  * height of the app bar, so that the app bar is fully visible. Consider using [TopAppBar] but
@@ -354,15 +356,17 @@ private fun Scrim(
     onDismiss: () -> Unit,
     visible: Boolean
 ) {
-    val alpha = animate(target = if (visible) 1f else 0f, animSpec = TweenSpec())
-    val dismissModifier = if (visible) Modifier.tapGestureFilter { onDismiss() } else Modifier
+    if (color != Color.Transparent) {
+        val alpha = animate(target = if (visible) 1f else 0f, animSpec = TweenSpec())
+        val dismissModifier = if (visible) Modifier.tapGestureFilter { onDismiss() } else Modifier
 
-    Canvas(
-        Modifier
-            .fillMaxSize()
-            .then(dismissModifier)
-    ) {
-        drawRect(color = color, alpha = alpha)
+        Canvas(
+            Modifier
+                .fillMaxSize()
+                .then(dismissModifier)
+        ) {
+            drawRect(color = color, alpha = alpha)
+        }
     }
 }
 
