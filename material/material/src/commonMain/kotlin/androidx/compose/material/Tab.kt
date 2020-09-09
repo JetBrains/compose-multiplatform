@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.foundation.text.LastBaseline
+import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
@@ -73,7 +74,8 @@ import kotlin.math.max
  * @param modifier optional [Modifier] for this tab
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
- * @param selectedContentColor the color for the content of this tab when selected
+ * @param selectedContentColor the color for the content of this tab when selected, and the color
+ * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
  */
 @Composable
@@ -92,7 +94,13 @@ fun Tab(
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
         ProvideTextStyle(style, children = text)
     }
-    Tab(selected, onClick, modifier, selectedContentColor, unselectedContentColor) {
+    Tab(
+        selected,
+        onClick,
+        modifier,
+        selectedContentColor,
+        unselectedContentColor
+    ) {
         TabBaselineLayout(icon = icon, text = styledText)
     }
 }
@@ -109,7 +117,8 @@ fun Tab(
  * @param selected whether this tab is selected or not
  * @param onClick the callback to be invoked when this tab is selected
  * @param modifier optional [Modifier] for this tab
- * @param selectedContentColor the color for the content of this tab when selected
+ * @param selectedContentColor the color for the content of this tab when selected, and the color
+ * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
  * @param content the content of this tab
  */
@@ -124,10 +133,19 @@ fun Tab(
     ),
     content: @Composable ColumnScope.() -> Unit
 ) {
+    // The color of the Ripple should always the selected color, as we want to show the color
+    // before the item is considered selected, and hence before the new contentColor is
+    // provided by TabTransition.
+    val ripple = RippleIndication(bounded = false, color = selectedContentColor)
+
     TabTransition(selectedContentColor, unselectedContentColor, selected) {
         Column(
             modifier = modifier
-                .selectable(selected = selected, onClick = onClick)
+                .selectable(
+                    selected = selected,
+                    onClick = onClick,
+                    indication = ripple
+                )
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
