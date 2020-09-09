@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.paragraph.Paragraph
 import kotlin.math.ceil
 
-@Suppress("UNUSED_PARAMETER")
 internal actual fun ActualParagraphIntrinsics(
     text: String,
     style: TextStyle,
@@ -55,9 +54,16 @@ internal class DesktopParagraphIntrinsics(
 
     val fontLoader = resourceLoader as FontLoader
     val builder: ParagraphBuilder
-    val para: Paragraph
+    var para: Paragraph
     init {
-        builder = ParagraphBuilder(fontLoader, text, style, spanStyles, placeholders, density)
+        builder = ParagraphBuilder(
+            fontLoader = fontLoader,
+            text = text,
+            textStyle = style,
+            spanStyles = spanStyles,
+            placeholders = placeholders,
+            density = density
+        )
         para = builder.build()
 
         para.layout(Float.POSITIVE_INFINITY)
