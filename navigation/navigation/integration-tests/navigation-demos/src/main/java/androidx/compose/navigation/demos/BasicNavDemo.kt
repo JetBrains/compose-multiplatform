@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation
+package androidx.compose.navigation.demos
 
-import androidx.compose.runtime.ambientOf
-import androidx.navigation.NavHostController
+import androidx.compose.navigation.samples.BasicNav
+import androidx.compose.runtime.Composable
 
-/**
- * Ambient for access to the navController
- *
- * @sample androidx.compose.navigation.samples.NavigateButton
- */
-val AmbientNavController = ambientOf<NavHostController>()
+@Composable
+fun BasicNavDemo() {
+    BasicNav()
+}

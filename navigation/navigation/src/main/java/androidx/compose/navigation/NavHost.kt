@@ -36,6 +36,8 @@ import androidx.navigation.NavHostController
  * Once this is called, any Composable with in given [NavGraphBuilder] can be navigated to from the
  * [AmbientNavController].
  *
+ * @sample androidx.compose.navigation.samples.BasicNav
+ *
  * @param id the id to set on the graph
  * @param startDestination an object to identify a destination
  * @param builder the builder used to construct the graph
