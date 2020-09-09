@@ -17,6 +17,7 @@
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
+import androidx.build.RunApiTasks
 
 plugins {
     id("AndroidXPlugin")
@@ -31,4 +32,5 @@ androidx {
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Fonts designed for testing text capabilities"
+    runApiTasks = new RunApiTasks.Yes()
 }
