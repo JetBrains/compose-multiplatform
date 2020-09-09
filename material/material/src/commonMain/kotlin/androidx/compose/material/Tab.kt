@@ -25,6 +25,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ContentColorAmbient
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.contentColor
@@ -74,6 +76,10 @@ import kotlin.math.max
  * @param modifier optional [Modifier] for this tab
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Tab. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
+ * in different [Interaction]s.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -85,6 +91,7 @@ fun Tab(
     modifier: Modifier = Modifier,
     text: @Composable () -> Unit = emptyContent(),
     icon: @Composable () -> Unit = emptyContent(),
+    interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = contentColor(),
     unselectedContentColor: Color = EmphasisAmbient.current.medium.applyEmphasis(
         selectedContentColor
@@ -98,6 +105,7 @@ fun Tab(
         selected,
         onClick,
         modifier,
+        interactionState,
         selectedContentColor,
         unselectedContentColor
     ) {
@@ -117,6 +125,10 @@ fun Tab(
  * @param selected whether this tab is selected or not
  * @param onClick the callback to be invoked when this tab is selected
  * @param modifier optional [Modifier] for this tab
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Tab. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
+ * in different [Interaction]s.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -127,6 +139,7 @@ fun Tab(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = contentColor(),
     unselectedContentColor: Color = EmphasisAmbient.current.medium.applyEmphasis(
         selectedContentColor
@@ -144,6 +157,7 @@ fun Tab(
                 .selectable(
                     selected = selected,
                     onClick = onClick,
+                    interactionState = interactionState,
                     indication = ripple
                 )
                 .fillMaxWidth(),
