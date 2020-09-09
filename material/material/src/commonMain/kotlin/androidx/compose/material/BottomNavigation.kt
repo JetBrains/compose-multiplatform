@@ -123,7 +123,7 @@ fun BottomNavigation(
  *
  * @param icon icon for this item, typically this will be a [androidx.compose.foundation.Icon]
  * @param selected whether this item is selected
- * @param onSelect the callback to be invoked when this item is selected
+ * @param onClick the callback to be invoked when this item is selected
  * @param modifier optional [Modifier] for this item
  * @param label optional text label for this item
  * @param alwaysShowLabels whether to always show labels for this item. If false, labels will
@@ -140,7 +140,7 @@ fun BottomNavigation(
 fun BottomNavigationItem(
     icon: @Composable () -> Unit,
     selected: Boolean,
-    onSelect: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable () -> Unit = emptyContent(),
     alwaysShowLabels: Boolean = true,
@@ -164,7 +164,7 @@ fun BottomNavigationItem(
         modifier
             .selectable(
                 selected = selected,
-                onClick = onSelect,
+                onClick = onClick,
                 interactionState = interactionState,
                 indication = ripple
             )
