@@ -37,6 +37,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
                 ComposableDemo("TextField in Scroller") { TextFieldWithScrollerDemo() }
             )
-        )
+        ),
+        ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }
     )
 )

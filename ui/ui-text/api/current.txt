@@ -898,6 +898,10 @@ package androidx.compose.ui.text.intl {
 
 package androidx.compose.ui.text.platform {
 
+  public final class AndroidAccessibilitySpannableStringKt {
+    method @androidx.compose.ui.text.InternalTextApi public static android.text.SpannableString toAccessibilitySpannableString(androidx.compose.ui.text.AnnotatedString);
+  }
+
   public final class AndroidParagraphHelperKt {
   }
 
