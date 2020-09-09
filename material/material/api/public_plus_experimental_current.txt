@@ -82,7 +82,7 @@ package androidx.compose.material {
 
   public final class BottomNavigationKt {
     method @androidx.compose.runtime.Composable public static void BottomNavigation-ye6PvEY(androidx.compose.ui.Modifier modifier = Modifier, long backgroundColor = MaterialTheme.colors.primarySurface, long contentColor = contentColorFor(backgroundColor), float elevation = androidx.compose.material.BottomNavigationKt.BottomNavigationElevation, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void BottomNavigationItem-S1l6qvI(kotlin.jvm.functions.Function0<kotlin.Unit> icon, boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onSelect, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> label = emptyContent(), boolean alwaysShowLabels = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
+    method @androidx.compose.runtime.Composable public static void BottomNavigationItem-S1l6qvI(kotlin.jvm.functions.Function0<kotlin.Unit> icon, boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> label = emptyContent(), boolean alwaysShowLabels = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
 }), long selectedContentColor = contentColor(), long unselectedContentColor = EmphasisAmbient.current.medium.applyEmphasis(selectedContentColor));
   }

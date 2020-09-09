@@ -318,18 +318,18 @@ private fun DefaultBottomNavigation(
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },
                 selected = true,
-                onSelect = {},
+                onClick = {},
                 interactionState = interactionState
             )
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },
                 selected = false,
-                onSelect = {}
+                onClick = {}
             )
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },
                 selected = false,
-                onSelect = {}
+                onClick = {}
             )
         }
     }
@@ -362,7 +362,7 @@ private fun CustomBottomNavigation(
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },
                 selected = true,
-                onSelect = {},
+                onClick = {},
                 interactionState = interactionState,
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor
@@ -370,14 +370,14 @@ private fun CustomBottomNavigation(
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },
                 selected = false,
-                onSelect = {},
+                onClick = {},
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor
             )
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },
                 selected = false,
-                onSelect = {},
+                onClick = {},
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor
             )

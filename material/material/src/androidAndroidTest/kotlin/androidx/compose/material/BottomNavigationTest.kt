@@ -83,7 +83,7 @@ class BottomNavigationTest {
                             icon = { Icon(Icons.Filled.Favorite) },
                             label = { Text("Item $index") },
                             selected = index == 0,
-                            onSelect = {},
+                            onClick = {},
                             modifier = Modifier.onPositioned { coords: LayoutCoordinates ->
                                 itemCoords[index] = coords
                             }
@@ -126,7 +126,7 @@ class BottomNavigationTest {
                             Text("ItemText")
                         },
                         selected = true,
-                        onSelect = {}
+                        onClick = {}
                     )
                 }
             }
@@ -173,7 +173,7 @@ class BottomNavigationTest {
                             Text("ItemText")
                         },
                         selected = false,
-                        onSelect = {},
+                        onClick = {},
                         alwaysShowLabels = false
                     )
                 }
@@ -207,7 +207,7 @@ class BottomNavigationTest {
                         },
                         label = {},
                         selected = false,
-                        onSelect = {}
+                        onClick = {}
                     )
                 }
             }
