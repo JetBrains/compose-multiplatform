@@ -25,6 +25,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ContentColorAmbient
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.contentColor
@@ -39,6 +41,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.foundation.text.LastBaseline
+import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
@@ -73,7 +76,12 @@ import kotlin.math.max
  * @param modifier optional [Modifier] for this tab
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
- * @param selectedContentColor the color for the content of this tab when selected
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Tab. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
+ * in different [Interaction]s.
+ * @param selectedContentColor the color for the content of this tab when selected, and the color
+ * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
  */
 @Composable
@@ -83,6 +91,7 @@ fun Tab(
     modifier: Modifier = Modifier,
     text: @Composable () -> Unit = emptyContent(),
     icon: @Composable () -> Unit = emptyContent(),
+    interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = contentColor(),
     unselectedContentColor: Color = EmphasisAmbient.current.medium.applyEmphasis(
         selectedContentColor
@@ -92,7 +101,14 @@ fun Tab(
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
         ProvideTextStyle(style, children = text)
     }
-    Tab(selected, onClick, modifier, selectedContentColor, unselectedContentColor) {
+    Tab(
+        selected,
+        onClick,
+        modifier,
+        interactionState,
+        selectedContentColor,
+        unselectedContentColor
+    ) {
         TabBaselineLayout(icon = icon, text = styledText)
     }
 }
@@ -109,7 +125,12 @@ fun Tab(
  * @param selected whether this tab is selected or not
  * @param onClick the callback to be invoked when this tab is selected
  * @param modifier optional [Modifier] for this tab
- * @param selectedContentColor the color for the content of this tab when selected
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Tab. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
+ * in different [Interaction]s.
+ * @param selectedContentColor the color for the content of this tab when selected, and the color
+ * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
  * @param content the content of this tab
  */
@@ -118,16 +139,27 @@ fun Tab(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = contentColor(),
     unselectedContentColor: Color = EmphasisAmbient.current.medium.applyEmphasis(
         selectedContentColor
     ),
     content: @Composable ColumnScope.() -> Unit
 ) {
+    // The color of the Ripple should always the selected color, as we want to show the color
+    // before the item is considered selected, and hence before the new contentColor is
+    // provided by TabTransition.
+    val ripple = RippleIndication(bounded = false, color = selectedContentColor)
+
     TabTransition(selectedContentColor, unselectedContentColor, selected) {
         Column(
             modifier = modifier
-                .selectable(selected = selected, onClick = onClick)
+                .selectable(
+                    selected = selected,
+                    onClick = onClick,
+                    interactionState = interactionState,
+                    indication = ripple
+                )
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
