@@ -71,7 +71,7 @@ class BackdropScaffoldTest {
     fun backdropScaffold_testOffset_whenConcealed() {
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = rememberBackdropState(Concealed),
+                scaffoldState = rememberBackdropScaffoldState(Concealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 appBar = { Box(Modifier.preferredHeight(peekHeight)) },
@@ -88,7 +88,7 @@ class BackdropScaffoldTest {
     fun backdropScaffold_testOffset_whenRevealed() {
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = rememberBackdropState(Revealed),
+                scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 appBar = { Box(Modifier.preferredHeight(peekHeight)) },
@@ -105,7 +105,7 @@ class BackdropScaffoldTest {
     fun backdropScaffold_testOffset_whenRevealed_backContentTooLarge() {
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = rememberBackdropState(Revealed),
+                scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 appBar = { Box(Modifier.preferredHeight(peekHeight)) },
@@ -122,7 +122,7 @@ class BackdropScaffoldTest {
     fun backdropScaffold_testOffset_whenRevealed_nonPersistentAppBar() {
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = rememberBackdropState(Revealed),
+                scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 persistentAppBar = false,
@@ -140,7 +140,7 @@ class BackdropScaffoldTest {
     fun backdropScaffold_testOffset_whenRevealed_nonStickyFrontLayer() {
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = rememberBackdropState(Revealed),
+                scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 stickyFrontLayer = false,
@@ -156,10 +156,10 @@ class BackdropScaffoldTest {
 
     @Test
     fun backdropScaffold_revealAndConceal_manually() {
-        val backdropState = BackdropScaffoldState(Concealed, clock = clock)
+        val scaffoldState = BackdropScaffoldState(Concealed, clock = clock)
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = backdropState,
+                scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 appBar = { Box(Modifier.preferredHeight(peekHeight)) },
@@ -172,7 +172,7 @@ class BackdropScaffoldTest {
             .assertTopPositionInRootIsEqualTo(peekHeight)
 
         rule.runOnIdle {
-            backdropState.reveal()
+            scaffoldState.reveal()
         }
 
         advanceClock()
@@ -181,7 +181,7 @@ class BackdropScaffoldTest {
             .assertTopPositionInRootIsEqualTo(peekHeight + contentHeight)
 
         rule.runOnIdle {
-            backdropState.conceal()
+            scaffoldState.conceal()
         }
 
         advanceClock()
@@ -192,10 +192,10 @@ class BackdropScaffoldTest {
 
     @Test
     fun backdropScaffold_revealBySwiping() {
-        val backdropState = BackdropScaffoldState(Concealed, clock)
+        val scaffoldState = BackdropScaffoldState(Concealed, clock)
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = backdropState,
+                scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 appBar = { Box(Modifier.preferredHeight(peekHeight)) },
@@ -205,7 +205,7 @@ class BackdropScaffoldTest {
         }
 
         rule.runOnIdle {
-            assertThat(backdropState.value).isEqualTo(Concealed)
+            assertThat(scaffoldState.value).isEqualTo(Concealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -214,16 +214,16 @@ class BackdropScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(backdropState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.value).isEqualTo(Revealed)
         }
     }
 
     @Test
     fun backdropScaffold_concealByTapingOnFrontLayer() {
-        val backdropState = BackdropScaffoldState(Revealed, clock)
+        val scaffoldState = BackdropScaffoldState(Revealed, clock)
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = backdropState,
+                scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 frontLayerScrimColor = Color.Red,
@@ -234,7 +234,7 @@ class BackdropScaffoldTest {
         }
 
         rule.runOnIdle {
-            assertThat(backdropState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.value).isEqualTo(Revealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -243,17 +243,17 @@ class BackdropScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(backdropState.value).isEqualTo(Concealed)
+            assertThat(scaffoldState.value).isEqualTo(Concealed)
         }
     }
 
     @Test
     fun backdropScaffold_scrimIsDisabledWhenTransparent() {
         var frontLayerClicks = 0
-        val backdropState = BackdropScaffoldState(Revealed, clock)
+        val scaffoldState = BackdropScaffoldState(Revealed, clock)
         rule.setContent {
             BackdropScaffold(
-                backdropScaffoldState = backdropState,
+                scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 frontLayerScrimColor = Color.Transparent,
@@ -269,7 +269,7 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(frontLayerClicks).isEqualTo(0)
-            assertThat(backdropState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.value).isEqualTo(Revealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -279,7 +279,7 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(frontLayerClicks).isEqualTo(1)
-            assertThat(backdropState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.value).isEqualTo(Revealed)
         }
     }
 }
