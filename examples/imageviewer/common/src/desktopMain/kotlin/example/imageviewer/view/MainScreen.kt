@@ -153,8 +153,7 @@ fun setPreviewImageUI(content: ContentState) {
                 if (content.isMainImageEmpty())
                     icEmpty()
                 else Image.makeFromEncoded(
-                    toByteArray(content.getSelectedImage()),
-                    IRect(0, 0, content.getSelectedImage().width, content.getSelectedImage().height)
+                    toByteArray(content.getSelectedImage())
                 ).asImageAsset(),
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
@@ -189,8 +188,7 @@ fun setMiniatureUI(
             ) {
                 Image(
                     Image.makeFromEncoded(
-                        toByteArray(picture.image),
-                        IRect(0, 0, picture.image.width, picture.image.height)
+                        toByteArray(picture.image)
                     ).asImageAsset(),
                     modifier = Modifier.preferredHeight(70.dp)
                         .preferredWidth(90.dp)

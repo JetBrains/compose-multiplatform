@@ -196,7 +196,7 @@ fun imageByGesture(
     drag: DragHandler
 ): Image {
     val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)
-    val image = Image.makeFromEncoded(toByteArray(bitmap), IRect(0, 0, bitmap.width, bitmap.height))
+    val image = Image.makeFromEncoded(toByteArray(bitmap))
     if (scale.factor.value > 1f)
         return image
 
