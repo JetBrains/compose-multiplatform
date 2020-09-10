@@ -146,6 +146,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private var semanticsRoot = SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode)
     private var checkingForSemanticsChanges = false
 
+    var clipBoardManagerText: AnnotatedString? = null
+
     init {
         // Remove callbacks that rely on view being attached to a window when we become detached.
         view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -284,6 +286,40 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 )
             )
         }
+
+        // The config will contain this action only if there is a text selection at the moment.
+        semanticsNode.config.getOrNull(SemanticsActions.CopyText)?.let {
+            info.addAction(
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_COPY,
+                    it.label
+                )
+            )
+        }
+
+        // The config will contain this action only if there is a text selection at the moment.
+        semanticsNode.config.getOrNull(SemanticsActions.CutText)?.let {
+            info.addAction(
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_CUT,
+                    it.label
+                )
+            )
+        }
+
+        // The config will contain the action anyway, therefore we check the clipboard text to
+        // decide whether to add the action to the node or not.
+        semanticsNode.config.getOrNull(SemanticsActions.PasteText)?.let {
+            if (!clipBoardManagerText?.text.isNullOrEmpty()) {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_PASTE,
+                        it.label
+                    )
+                )
+            }
+        }
+
         val text = getIterableTextForAccessibility(semanticsNode)
         if (!text.isNullOrEmpty()) {
             info.setTextSelection(
@@ -816,7 +852,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SELECTION_END_INT, -1
                 ) ?: -1
                 // Note: This is a little different from current android framework implementation.
-                val success = setAccessibilitySelection(node, start, end)
+                val success = setAccessibilitySelection(node, start, end, false)
                 // Text selection changed event already updates the cache. so this may not be
                 // necessary.
                 if (success) {
@@ -826,6 +862,29 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     )
                 }
                 return success
+            }
+            AccessibilityNodeInfoCompat.ACTION_SET_TEXT -> {
+                val text = arguments?.getString(
+                    AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE
+                )
+                return node.config.getOrNull(SemanticsActions.SetText)?.let {
+                    it.action(AnnotatedString(text ?: ""))
+                } ?: false
+            }
+            AccessibilityNodeInfoCompat.ACTION_COPY -> {
+                return node.config.getOrNull(SemanticsActions.CopyText)?.let {
+                    it.action()
+                } ?: false
+            }
+            AccessibilityNodeInfoCompat.ACTION_PASTE -> {
+                return node.config.getOrNull(SemanticsActions.PasteText)?.let {
+                    it.action()
+                } ?: false
+            }
+            AccessibilityNodeInfoCompat.ACTION_CUT -> {
+                return node.config.getOrNull(SemanticsActions.CutText)?.let {
+                    it.action()
+                } ?: false
             }
             // TODO: handling for other system actions
             else -> {
@@ -1329,7 +1388,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             selectionStart = if (forward) segmentEnd else segmentStart
             selectionEnd = selectionStart
         }
-        setAccessibilitySelection(node, selectionStart, selectionEnd)
+        setAccessibilitySelection(node, selectionStart, selectionEnd, true)
         val action =
             if (forward)
                 AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
@@ -1357,14 +1416,23 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         sendEvent(event)
     }
 
-    private fun setAccessibilitySelection(node: SemanticsNode, start: Int, end: Int): Boolean {
+    private fun setAccessibilitySelection(
+        node: SemanticsNode,
+        start: Int,
+        end: Int,
+        traversalMode: Boolean
+    ): Boolean {
         // Any widget which has custom action_set_selection needs to provide cursor
         // positions, so events will be sent when cursor position change.
         if (node.config.contains(SemanticsActions.SetSelection)) {
             // Hide all selection controllers used for adjusting selection
             // since we are doing so explicitly by other means and these
             // controllers interact with how selection behaves. From TextView.java.
-            return node.config[SemanticsActions.SetSelection].action(start, end, false)
+            return node.config[SemanticsActions.SetSelection].action(
+                start,
+                end,
+                traversalMode
+            )
         }
         if (start == end && end == accessibilityCursorPosition) {
             return false
@@ -1400,7 +1468,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         ) {
             return node.config[SemanticsProperties.TextSelectionRange].end
         }
-        return getAccessibilitySelectionStart(node)
+        return accessibilityCursorPosition
     }
 
     private fun isAccessibilitySelectionExtendable(node: SemanticsNode): Boolean {

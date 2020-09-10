@@ -187,6 +187,11 @@ internal class AndroidComposeView constructor(
 
     private var observationClearRequested = false
 
+    /**
+     * Provide clipboard manager to the user. Use the Android version of clipboard manager.
+     */
+    override val clipboardManager = AndroidClipboardManager(context)
+
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         Log.d(FOCUS_TAG, "Owner FocusChanged($gainFocus)")
@@ -201,6 +206,14 @@ internal class AndroidComposeView constructor(
 
     override fun dispatchKeyEvent(event: AndroidKeyEvent): Boolean {
         return sendKeyEvent(KeyEventAndroid(event))
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+
+        if (hasWindowFocus) {
+            accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
+        }
     }
 
     private val snapshotObserver = SnapshotStateObserver { command ->
@@ -248,6 +261,9 @@ internal class AndroidComposeView constructor(
         isFocusableInTouchMode = true
         clipChildren = false
         root.isPlaced = true
+        clipboardManager.addChangeListener {
+            accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
+        }
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
         AndroidOwner.onAndroidOwnerCreatedCallback?.invoke(this)
     }
@@ -659,11 +675,6 @@ internal class AndroidComposeView constructor(
      */
     override val hapticFeedBack: HapticFeedback =
         AndroidHapticFeedback(this)
-
-    /**
-     * Provide clipboard manager to the user. Use the Android version of clipboard manager.
-     */
-    override val clipboardManager: ClipboardManager = AndroidClipboardManager(context)
 
     /**
      * Provide textToolbar to the user, for text-related operation. Use the Android version of

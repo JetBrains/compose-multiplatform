@@ -545,6 +545,72 @@ class TextFieldTest {
     }
 
     @Test
+    fun semantics_copyTextAction() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
+
+        rule.setContent {
+            CoreTextField(
+                modifier = Modifier.testTag("textField"),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.CopyText) { it() }
+
+        rule.runOnIdle {
+            assertThat(value.selection).isEqualTo(TextRange(5, 5))
+        }
+    }
+
+    @Test
+    fun semantics_pasteTextAction() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
+
+        rule.setContent {
+            CoreTextField(
+                modifier = Modifier.testTag("textField"),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.CopyText) { it() }
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.PasteText) { it() }
+
+        rule.runOnIdle {
+            assertThat(value.text).isEqualTo("HelloHello World")
+        }
+    }
+
+    @Test
+    fun semantics_cutTextAction() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 6)))
+
+        rule.setContent {
+            CoreTextField(
+                modifier = Modifier.testTag("textField"),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.CutText) { it() }
+
+        rule.runOnIdle {
+            assertThat(value.text).isEqualTo("World")
+            assertThat(value.selection).isEqualTo(TextRange(0, 0))
+        }
+    }
+
+    @Test
     fun stringOverrideTextField_canDeleteLastSymbol() {
         var lastSeenText = ""
         rule.setContent {
