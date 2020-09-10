@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -55,7 +57,10 @@ internal inline class DataIndex(val value: Int) {
 }
 
 @OptIn(ExperimentalSubcomposeLayoutApi::class)
-internal class LazyForState(val isVertical: Boolean) {
+internal class LazyForState(
+    flingConfig: FlingConfig,
+    animationClock: AnimationClockObservable
+) {
     /**
      * The index of the first item that is composed into the layout tree
      */
@@ -84,16 +89,14 @@ internal class LazyForState(val isVertical: Boolean) {
     private val measuredThisPass: MutableMap<DataIndex, List<Placeable>> = mutableMapOf()
 
     /**
-     * The listener to be passed to onScrollDeltaConsumptionRequested.
-     * Cached to avoid recreations
-     */
-    val onScrollDelta: (Float) -> Float = { onScroll(it) }
-
-    /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
      * we reached the end of the list.
      */
-    var scrollableController: ScrollableController? = null
+    internal val scrollableController =
+        ScrollableController(
+            flingConfig = flingConfig,
+            animationClock = animationClock,
+            consumeScrollDelta = { onScroll(it) })
 
     /**
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
@@ -104,7 +107,7 @@ internal class LazyForState(val isVertical: Boolean) {
     /**
      * The modifier which provides [remeasurement].
      */
-    val remeasurementModifier = object : RemeasurementModifier {
+    internal val remeasurementModifier = object : RemeasurementModifier {
         override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
             this@LazyForState.remeasurement = remeasurement
         }
@@ -114,9 +117,6 @@ internal class LazyForState(val isVertical: Boolean) {
      * The cached instance of the scope to be used for composing items.
      */
     private var itemScope = InitialLazyItemsScopeImpl
-
-    private val Placeable.mainAxisSize get() = if (isVertical) height else width
-    private val Placeable.crossAxisSize get() = if (!isVertical) height else width
 
     // TODO: really want an Int here
     private fun onScroll(distance: Float): Float {
@@ -135,13 +135,14 @@ internal class LazyForState(val isVertical: Boolean) {
             // We did not consume all of it - return the rest to be consumed elsewhere (e.g.,
             // nested scrolling)
             scrollToBeConsumed = 0f // We're not consuming the rest, give it back
-            scrollableController!!.stopAnimation()
+            scrollableController.stopAnimation()
             return scrollConsumed
         }
     }
 
     private fun SubcomposeMeasureScope<DataIndex>.consumePendingScroll(
         childConstraints: Constraints,
+        isVertical: Boolean,
         itemsCount: Int,
         itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
     ) {
@@ -159,6 +160,7 @@ internal class LazyForState(val isVertical: Boolean) {
                 // We need to bring another item onscreen. Can we?
                 if (!composeAndMeasureNextItem(
                         childConstraints,
+                        isVertical,
                         scrollDirection,
                         itemsCount,
                         itemContentFactory
@@ -219,6 +221,7 @@ internal class LazyForState(val isVertical: Boolean) {
      */
     private fun SubcomposeMeasureScope<DataIndex>.composeAndMeasureNextItem(
         childConstraints: Constraints,
+        isVertical: Boolean,
         scrollDirection: ScrollDirection,
         itemsCount: Int,
         itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
@@ -243,7 +246,7 @@ internal class LazyForState(val isVertical: Boolean) {
 
         measuredThisPass[nextItemIndex] = nextItems
 
-        val childSize = nextItems.fastSumBy { it.mainAxisSize }
+        val childSize = nextItems.fastSumBy { if (isVertical) it.height else it.width }
 
         // Add in our newly composed space so that it may be consumed
         if (scrollDirection.isForward) {
@@ -283,6 +286,7 @@ internal class LazyForState(val isVertical: Boolean) {
     fun measure(
         scope: SubcomposeMeasureScope<DataIndex>,
         constraints: Constraints,
+        isVertical: Boolean,
         horizontalAlignment: Alignment.Horizontal,
         verticalAlignment: Alignment.Vertical,
         itemsCount: Int,
@@ -303,7 +307,7 @@ internal class LazyForState(val isVertical: Boolean) {
             // discard anything off the start of the viewport, because we know we can fill
             // it, assuming nothing has shrunken on us (which has to be handled separately
             // anyway)
-            consumePendingScroll(childConstraints, itemsCount, itemContentFactory)
+            consumePendingScroll(childConstraints, isVertical, itemsCount, itemContentFactory)
         }
 
         var mainAxisUsed = (-firstItemScrollOffset).roundToInt()
@@ -324,8 +328,8 @@ internal class LazyForState(val isVertical: Boolean) {
             }
             var size = 0
             placeables.fastForEach {
-                size += it.mainAxisSize
-                maxCrossAxis = maxOf(maxCrossAxis, it.crossAxisSize)
+                size += if (isVertical) it.height else it.width
+                maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
             }
             mainAxisUsed += size
 

@@ -16,7 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.animation.asDisposableClock
+import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -271,16 +273,16 @@ internal inline fun LazyFor(
     isVertical: Boolean,
     noinline itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
-    val state = remember { LazyForState(isVertical = isVertical) }
-    val scrollController = rememberScrollableController(consumeScrollDelta = state.onScrollDelta)
-    state.scrollableController = scrollController
+    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val config = defaultFlingConfig()
+    val state = remember(clock, config) { LazyForState(config, clock) }
     val reverseDirection = LayoutDirectionAmbient.current == LayoutDirection.Rtl && !isVertical
     SubcomposeLayout<DataIndex>(
         modifier
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
                 reverseDirection = reverseDirection,
-                controller = scrollController
+                controller = state.scrollableController
             )
             .clipToBounds()
             .padding(contentPadding)
@@ -289,6 +291,7 @@ internal inline fun LazyFor(
         state.measure(
             this,
             constraints,
+            isVertical,
             horizontalAlignment,
             verticalAlignment,
             itemsCount,
