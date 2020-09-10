@@ -88,7 +88,7 @@ package androidx.compose.material {
   }
 
   public final class ButtonConstants {
-    method @androidx.compose.runtime.Composable public androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> defaultAnimatedElevation-qDazgog(androidx.compose.foundation.InteractionState interactionState, boolean enabled, float defaultElevation = 2.dp, float pressedElevation = 8.dp, float disabledElevation = 0.dp);
+    method @androidx.compose.runtime.Composable public float animateDefaultElevation-qDazgog(androidx.compose.foundation.InteractionState interactionState, boolean enabled, float defaultElevation = 2.dp, float pressedElevation = 8.dp, float disabledElevation = 0.dp);
     method @androidx.compose.runtime.Composable public long defaultButtonBackgroundColor-Q31_wr0(boolean enabled, long defaultColor = MaterialTheme.colors.primary, long disabledColor = defaultDisabledBackgroundColor);
     method @androidx.compose.runtime.Composable public long defaultButtonContentColor-Q31_wr0(boolean enabled, long defaultColor, long disabledColor = defaultDisabledContentColor);
     method @androidx.compose.runtime.Composable public long defaultOutlinedButtonContentColor-Q31_wr0(boolean enabled, long defaultColor = MaterialTheme.colors.primary, long disabledColor = defaultDisabledContentColor);
@@ -120,7 +120,7 @@ package androidx.compose.material {
   public final class ButtonKt {
     method @androidx.compose.runtime.Composable public static void Button-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), float elevation = ButtonConstants.defaultAnimatedElevation(interactionState, enabled).value, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = null, long backgroundColor = ButtonConstants.defaultButtonBackgroundColor(enabled), long contentColor = ButtonConstants.defaultButtonContentColor(enabled, contentColorFor(backgroundColor)), androidx.compose.foundation.layout.PaddingValues contentPadding = ButtonConstants.DefaultContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+}), float elevation = ButtonConstants.animateDefaultElevation(interactionState, enabled), androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = null, long backgroundColor = ButtonConstants.defaultButtonBackgroundColor(enabled), long contentColor = ButtonConstants.defaultButtonContentColor(enabled, contentColorFor(backgroundColor)), androidx.compose.foundation.layout.PaddingValues contentPadding = ButtonConstants.DefaultContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static inline void OutlinedButton-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
 }), float elevation = 0.dp, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = ButtonConstants.defaultOutlinedBorder, long backgroundColor = MaterialTheme.colors.surface, long contentColor = ButtonConstants.defaultOutlinedButtonContentColor(enabled), androidx.compose.foundation.layout.PaddingValues contentPadding = ButtonConstants.DefaultContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
@@ -288,17 +288,17 @@ package androidx.compose.material {
   }
 
   public final class FloatingActionButtonConstants {
-    method @androidx.compose.runtime.Composable public androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> defaultAnimatedElevation-PzTOHyI(androidx.compose.foundation.InteractionState interactionState, float defaultElevation = 6.dp, float pressedElevation = 12.dp);
+    method @androidx.compose.runtime.Composable public float animateDefaultElevation-PzTOHyI(androidx.compose.foundation.InteractionState interactionState, float defaultElevation = 6.dp, float pressedElevation = 12.dp);
     field public static final androidx.compose.material.FloatingActionButtonConstants INSTANCE;
   }
 
   public final class FloatingActionButtonKt {
     method @androidx.compose.runtime.Composable public static void ExtendedFloatingActionButton-SrDf79w(kotlin.jvm.functions.Function0<kotlin.Unit> text, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function0<kotlin.Unit>? icon = null, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.ui.graphics.Shape shape = MaterialTheme.shapes.small.copy(CornerSize(50)), long backgroundColor = MaterialTheme.colors.secondary, long contentColor = contentColorFor(backgroundColor), float elevation = FloatingActionButtonConstants.defaultAnimatedElevation(interactionState).value);
+}), androidx.compose.ui.graphics.Shape shape = MaterialTheme.shapes.small.copy(CornerSize(50)), long backgroundColor = MaterialTheme.colors.secondary, long contentColor = contentColorFor(backgroundColor), float elevation = FloatingActionButtonConstants.animateDefaultElevation(interactionState));
     method @androidx.compose.runtime.Composable public static void FloatingActionButton-pvsAfIA(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.ui.graphics.Shape shape = MaterialTheme.shapes.small.copy(CornerSize(50)), long backgroundColor = MaterialTheme.colors.secondary, long contentColor = contentColorFor(backgroundColor), float elevation = FloatingActionButtonConstants.defaultAnimatedElevation(interactionState).value, kotlin.jvm.functions.Function0<kotlin.Unit> icon);
+}), androidx.compose.ui.graphics.Shape shape = MaterialTheme.shapes.small.copy(CornerSize(50)), long backgroundColor = MaterialTheme.colors.secondary, long contentColor = contentColorFor(backgroundColor), float elevation = FloatingActionButtonConstants.animateDefaultElevation(interactionState), kotlin.jvm.functions.Function0<kotlin.Unit> icon);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public final class FractionalThreshold implements androidx.compose.material.ThresholdConfig {
