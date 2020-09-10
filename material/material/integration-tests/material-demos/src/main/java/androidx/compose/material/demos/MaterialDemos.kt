@@ -25,6 +25,7 @@ import androidx.compose.material.samples.BottomDrawerSample
 import androidx.compose.material.samples.CustomAlertDialogSample
 import androidx.compose.material.samples.EmphasisSample
 import androidx.compose.material.samples.ModalDrawerSample
+import androidx.compose.material.samples.BottomSheetScaffoldSample
 import androidx.compose.material.samples.ScaffoldWithBottomBarAndCutout
 import androidx.compose.material.samples.ScaffoldWithCoroutinesSnackbar
 
@@ -36,6 +37,7 @@ val MaterialDemos = DemoCategory("Material", listOf(
     ComposableDemo("App Bars") { AppBarDemo() },
     ComposableDemo("Backdrop") { BackdropSample() },
     ComposableDemo("Bottom Navigation") { BottomNavigationDemo() },
+    ComposableDemo("Bottom Sheet") { BottomSheetScaffoldSample() },
     ComposableDemo("Buttons & FABs") { ButtonDemo() },
     DemoCategory("Navigation drawer", listOf(
         ComposableDemo("Modal drawer") { ModalDrawerSample() },

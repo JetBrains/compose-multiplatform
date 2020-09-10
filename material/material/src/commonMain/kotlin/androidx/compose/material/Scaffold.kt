@@ -127,8 +127,9 @@ enum class FabPosition {
  * screen, by ensuring proper layout strategy for them and collecting necessary data so these
  * components will work together correctly.
  *
- * For a similar API which uses a backdrop as the centerpiece of the screen, use the experimental
- * [BackdropScaffold] component.
+ * For similar components that implement different layout structures, see [BackdropScaffold],
+ * which uses a backdrop as the centerpiece of the screen, and [BottomSheetScaffold], which uses
+ * a persistent bottom sheet as the centerpiece of the screen.
  *
  * Simple example of a Scaffold with [TopAppBar], [FloatingActionButton] and drawer:
  *
@@ -193,8 +194,7 @@ fun Scaffold(
     drawerElevation: Dp = DrawerConstants.DefaultElevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    drawerScrimColor: Color = MaterialTheme.colors.onSurface
-        .copy(alpha = DrawerConstants.ScrimDefaultOpacity),
+    drawerScrimColor: Color = DrawerConstants.defaultScrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
     bodyContent: @Composable (PaddingValues) -> Unit

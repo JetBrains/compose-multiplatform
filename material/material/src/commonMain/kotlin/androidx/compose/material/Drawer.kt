@@ -326,8 +326,7 @@ fun ModalDrawerLayout(
     drawerElevation: Dp = DrawerConstants.DefaultElevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    scrimColor: Color = MaterialTheme.colors.onSurface
-        .copy(alpha = DrawerConstants.ScrimDefaultOpacity),
+    scrimColor: Color = DrawerConstants.defaultScrimColor,
     bodyContent: @Composable () -> Unit
 ) {
     WithConstraints(modifier.fillMaxSize()) {
@@ -422,8 +421,7 @@ fun BottomDrawerLayout(
     drawerElevation: Dp = DrawerConstants.DefaultElevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    scrimColor: Color = MaterialTheme.colors.onSurface
-        .copy(alpha = DrawerConstants.ScrimDefaultOpacity),
+    scrimColor: Color = DrawerConstants.defaultScrimColor,
     bodyContent: @Composable () -> Unit
 ) {
     WithConstraints(modifier.fillMaxSize()) {
@@ -506,6 +504,10 @@ object DrawerConstants {
      * Default Elevation for drawer sheet as specified in material specs
      */
     val DefaultElevation = 16.dp
+
+    @Composable
+    val defaultScrimColor: Color
+        get() = MaterialTheme.colors.onSurface.copy(alpha = ScrimDefaultOpacity)
 
     /**
      * Default alpha for scrim color

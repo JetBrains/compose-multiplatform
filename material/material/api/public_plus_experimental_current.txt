@@ -87,6 +87,49 @@ package androidx.compose.material {
 }), long selectedContentColor = contentColor(), long unselectedContentColor = EmphasisAmbient.current.medium.applyEmphasis(selectedContentColor));
   }
 
+  public final class BottomSheetScaffoldConstants {
+    method public float getDefaultSheetElevation();
+    method public float getDefaultSheetPeekHeight();
+    property public final float DefaultSheetElevation;
+    property public final float DefaultSheetPeekHeight;
+    field public static final androidx.compose.material.BottomSheetScaffoldConstants INSTANCE;
+  }
+
+  public final class BottomSheetScaffoldKt {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void BottomSheetScaffold-0Ttp7_s(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> sheetContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BottomSheetScaffoldState scaffoldState = rememberBottomSheetScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean sheetGesturesEnabled = true, androidx.compose.ui.graphics.Shape sheetShape = large, float sheetElevation = BottomSheetScaffoldConstants.DefaultSheetElevation, long sheetBackgroundColor = MaterialTheme.colors.surface, long sheetContentColor = contentColorFor(sheetBackgroundColor), float sheetPeekHeight = BottomSheetScaffoldConstants.DefaultSheetPeekHeight, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, boolean drawerGesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = DrawerConstants.defaultScrimColor, long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BottomSheetScaffoldState rememberBottomSheetScaffoldState(androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), androidx.compose.material.BottomSheetState bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed), androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState());
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BottomSheetState rememberBottomSheetState(androidx.compose.material.BottomSheetValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock = AnimationClockAmbient.current, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange = { return true });
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public final class BottomSheetScaffoldState {
+    ctor public BottomSheetScaffoldState(androidx.compose.material.DrawerState drawerState, androidx.compose.material.BottomSheetState bottomSheetState, androidx.compose.material.SnackbarHostState snackbarHostState);
+    method public androidx.compose.material.BottomSheetState getBottomSheetState();
+    method public androidx.compose.material.DrawerState getDrawerState();
+    method public androidx.compose.material.SnackbarHostState getSnackbarHostState();
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public final class BottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomSheetValue> {
+    ctor public BottomSheetState(androidx.compose.material.BottomSheetValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange);
+    method public void collapse(kotlin.jvm.functions.Function0<kotlin.Unit>? onCollapsed = null);
+    method public void expand(kotlin.jvm.functions.Function0<kotlin.Unit>? onExpanded = null);
+    method public boolean isCollapsed();
+    method public boolean isExpanded();
+    property public final boolean isCollapsed;
+    property public final boolean isExpanded;
+    field public static final androidx.compose.material.BottomSheetState.Companion Companion;
+  }
+
+  public static final class BottomSheetState.Companion {
+    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.BottomSheetState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange);
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public enum BottomSheetValue {
+    method public static androidx.compose.material.BottomSheetValue valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.material.BottomSheetValue[] values();
+    enum_constant public static final androidx.compose.material.BottomSheetValue Collapsed;
+    enum_constant public static final androidx.compose.material.BottomSheetValue Expanded;
+  }
+
   public final class ButtonConstants {
     method @androidx.compose.runtime.Composable public androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> defaultAnimatedElevation-qDazgog(androidx.compose.foundation.InteractionState interactionState, boolean enabled, float defaultElevation = 2.dp, float pressedElevation = 8.dp, float disabledElevation = 0.dp);
     method @androidx.compose.runtime.Composable public long defaultButtonBackgroundColor-Q31_wr0(boolean enabled, long defaultColor = MaterialTheme.colors.primary, long disabledColor = defaultDisabledBackgroundColor);
@@ -210,14 +253,16 @@ package androidx.compose.material {
 
   public final class DrawerConstants {
     method public float getDefaultElevation();
+    method public long getDefaultScrimColor();
     property public final float DefaultElevation;
+    property public final long defaultScrimColor;
     field public static final androidx.compose.material.DrawerConstants INSTANCE;
     field public static final float ScrimDefaultOpacity = 0.32f;
   }
 
   public final class DrawerKt {
-    method @androidx.compose.runtime.Composable public static void BottomDrawerLayout--6CoO6E(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> drawerContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BottomDrawerState drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed), boolean gesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long scrimColor = MaterialTheme.colors.onSurface.copy(DrawerConstants.ScrimDefaultOpacity), kotlin.jvm.functions.Function0<kotlin.Unit> bodyContent);
-    method @androidx.compose.runtime.Composable public static void ModalDrawerLayout-TlzqArY(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> drawerContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), boolean gesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long scrimColor = MaterialTheme.colors.onSurface.copy(DrawerConstants.ScrimDefaultOpacity), kotlin.jvm.functions.Function0<kotlin.Unit> bodyContent);
+    method @androidx.compose.runtime.Composable public static void BottomDrawerLayout--6CoO6E(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> drawerContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BottomDrawerState drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed), boolean gesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long scrimColor = DrawerConstants.defaultScrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> bodyContent);
+    method @androidx.compose.runtime.Composable public static void ModalDrawerLayout-TlzqArY(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> drawerContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), boolean gesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long scrimColor = DrawerConstants.defaultScrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> bodyContent);
     method @androidx.compose.runtime.Composable public static androidx.compose.material.BottomDrawerState rememberBottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange = { return true });
     method @androidx.compose.runtime.Composable public static androidx.compose.material.DrawerState rememberDrawerState(androidx.compose.material.DrawerValue initialValue, kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange = { return true });
   }
@@ -381,7 +426,7 @@ package androidx.compose.material {
   }
 
   public final class ScaffoldKt {
-    method @androidx.compose.runtime.Composable public static void Scaffold-6SxdeRQ(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ScaffoldState scaffoldState = rememberScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function0<kotlin.Unit>? bottomBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean isFloatingActionButtonDocked = false, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = MaterialTheme.colors.onSurface.copy(DrawerConstants.ScrimDefaultOpacity), long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
+    method @androidx.compose.runtime.Composable public static void Scaffold-6SxdeRQ(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ScaffoldState scaffoldState = rememberScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function0<kotlin.Unit>? bottomBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean isFloatingActionButtonDocked = false, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = DrawerConstants.defaultScrimColor, long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
     method @androidx.compose.runtime.Composable public static androidx.compose.material.ScaffoldState rememberScaffoldState(androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState(), boolean isDrawerGesturesEnabled = true);
   }
 
