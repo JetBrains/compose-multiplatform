@@ -126,7 +126,7 @@ class ContentState(
     // application content initialization
     @Composable
     fun initData() {
-
+        println("app")
         if (isAppUIReady.value)
             return
 
@@ -197,13 +197,15 @@ class ContentState(
         if (mainImageWrapper.getId() == picture.id)
             return
 
+        isAppUIReady.value = false
+        AppState.screenState(ScreenType.FullscreenImage)
+
         executor.execute {
             if (isInternetAvailable()) {
 
-                val fullSizePicture = loadFullImage(picture.source)
-                fullSizePicture.id = picture.id
-
                 invokeLater {
+                    val fullSizePicture = loadFullImage(picture.source)
+                    fullSizePicture.id = picture.id
                     wrapPictureIntoMainImage(fullSizePicture)
                 }
             } else {

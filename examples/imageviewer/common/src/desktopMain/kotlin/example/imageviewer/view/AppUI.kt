@@ -40,11 +40,7 @@ fun BuildAppUI(content: ContentState) {
     ) {
         when (AppState.screenState()) {
             ScreenType.Main -> {
-                if (content.isContentReady()) {
-                    setMainScreen(content)
-                } else {
-                    setLoadingScreen(content)
-                }
+                setMainScreen(content)
             }
             ScreenType.FullscreenImage -> {
                 setImageFullScreen(content)
