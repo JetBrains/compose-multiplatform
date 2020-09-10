@@ -187,7 +187,7 @@ fun setMiniatureUI(
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Clickable(
                 onClick = {
-                    content.setMainImage(picture)
+                    content.fullscreen(picture)
                 }
             ) {
                 Image(

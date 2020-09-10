@@ -124,9 +124,7 @@ class ContentState(
     }
 
     // application content initialization
-    @Composable
     fun initData() {
-        println("app")
         if (isAppUIReady.value)
             return
 
@@ -193,12 +191,18 @@ class ContentState(
         return mainImageWrapper.isEmpty()
     }
 
-    fun setMainImage(picture: Picture) {
-        if (mainImageWrapper.getId() == picture.id)
-            return
-
+    fun fullscreen(picture: Picture) {
         isAppUIReady.value = false
         AppState.screenState(ScreenType.FullscreenImage)
+        setMainImage(picture)
+    }
+
+    fun setMainImage(picture: Picture) {
+        if (mainImageWrapper.getId() == picture.id) {
+            if (!isContentReady())
+                isAppUIReady.value = true
+            return
+        }
 
         executor.execute {
             if (isInternetAvailable()) {

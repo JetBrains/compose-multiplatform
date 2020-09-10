@@ -159,7 +159,6 @@ object ContentState {
     }
 
     // application content initialization
-    // @Composable
     fun initData() {
         if (isAppUIReady.value)
             return
@@ -228,9 +227,18 @@ object ContentState {
         return MainImageWrapper.isEmpty()
     }
 
+    fun fullscreen(picture: Picture) {
+        isAppUIReady.value = false
+        AppState.screenState(ScreenType.FullscreenImage)
+        setMainImage(picture)
+    }
+
     fun setMainImage(picture: Picture) {
-        if (MainImageWrapper.getId() == picture.id)
+        if (MainImageWrapper.getId() == picture.id) {
+            if (!isContentReady())
+                isAppUIReady.value = true
             return
+        }
 
         executor.execute {
             if (isInternetAvailable()) {
@@ -240,6 +248,7 @@ object ContentState {
 
                 handler.post {
                     wrapPictureIntoMainImage(fullSizePicture)
+                    isAppUIReady.value = true
                 }
             } else {
                 handler.post {

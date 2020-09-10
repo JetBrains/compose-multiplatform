@@ -65,9 +65,13 @@ import example.imageviewer.R
 
 @Composable
 fun setMainScreen(content: ContentState) {
-    Column {
-        setTopContent(content)
-        setScrollableArea(content)
+    if (content.isContentReady()) {
+        Column {
+            setTopContent(content)
+            setScrollableArea(content)
+        }
+    } else {
+        setLoadingScreen(content)
     }
 }
 
@@ -78,7 +82,7 @@ fun setLoadingScreen(content: ContentState) {
         Column {
             setTopContent(content)
         }
-        Box(modifier = Modifier.gravity(Alignment.Center)) {
+        Box(modifier = Modifier.align(Alignment.Center)) {
             Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
                 CircularProgressIndicator(
                     modifier = Modifier.preferredSize(50.dp).padding(4.dp),
@@ -88,7 +92,7 @@ fun setLoadingScreen(content: ContentState) {
         }
         Text(
             text = content.getString(R.string.loading),
-            modifier = Modifier.gravity(Alignment.Center).offset(0.dp, 70.dp),
+            modifier = Modifier.align(Alignment.Center).offset(0.dp, 70.dp),
             style = MaterialTheme.typography.body1,
             color = Foreground
         )
@@ -117,11 +121,11 @@ fun setTitleBar(text: String, content: ContentState) {
             Text(
                 text,
                 color = Foreground,
-                modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically)
+                modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
             )
             Surface(
                 color = Transparent,
-                modifier = Modifier.padding(end = 20.dp).gravity(Alignment.CenterVertically),
+                modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
                 Clickable(
@@ -185,8 +189,7 @@ fun setMiniatureUI(
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Clickable(
                 onClick = {
-                    content.setMainImage(picture)
-                    AppState.screenState(ScreenType.FullscreenImage)
+                    content.fullscreen(picture)
                 }
             ) {
                 Image(
@@ -200,7 +203,7 @@ fun setMiniatureUI(
             Text(
                 text = picture.name,
                 color = Foreground,
-                modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically).padding(start = 16.dp),
+                modifier = Modifier.weight(1f).align(Alignment.CenterVertically).padding(start = 16.dp),
                 style = MaterialTheme.typography.body1
             )
                 

@@ -30,11 +30,11 @@ import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Stack
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredHeight
@@ -47,6 +47,7 @@ import example.imageviewer.core.FilterType
 import example.imageviewer.model.AppState
 import example.imageviewer.model.ContentState
 import example.imageviewer.model.ScreenType
+import example.imageviewer.style.DarkGray
 import example.imageviewer.style.DarkGreen
 import example.imageviewer.style.Foreground
 import example.imageviewer.style.MiniatureColor
@@ -59,7 +60,6 @@ import example.imageviewer.style.icFilterPixelOff
 import example.imageviewer.style.icFilterBlurOn
 import example.imageviewer.style.icFilterBlurOff
 import example.imageviewer.style.icFilterUnknown
-import example.imageviewer.style.DarkGray
 import example.imageviewer.utils.displayHeight
 import example.imageviewer.utils.displayWidth
 import example.imageviewer.utils.getDisplayBounds
