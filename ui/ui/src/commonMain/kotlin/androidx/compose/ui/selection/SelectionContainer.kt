@@ -18,7 +18,6 @@ package androidx.compose.ui.selection
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.dragGestureFilter
@@ -29,20 +28,6 @@ import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.platform.TextToolbarAmbient
 import androidx.compose.ui.text.InternalTextApi
-
-/**
- * Default SelectionContainer to be used in order to make composables selectable by default.
- */
-@Composable
-internal fun SelectionContainer(modifier: Modifier, children: @Composable () -> Unit) {
-    val selection = remember { mutableStateOf<Selection?>(null) }
-    SelectionContainer(
-        modifier = modifier,
-        selection = selection.value,
-        onSelectionChange = { selection.value = it },
-        children = children
-    )
-}
 
 /**
  * Selection Composable.

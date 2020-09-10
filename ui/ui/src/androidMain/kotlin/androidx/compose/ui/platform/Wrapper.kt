@@ -35,6 +35,7 @@ import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.tooling.InspectionTables
+import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -42,12 +43,12 @@ import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.selection.SelectionContainer
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import java.util.Collections
 import java.util.WeakHashMap
+import kotlin.math.max
 
 /**
  * Composes the children of the view with the passed in [composable].
@@ -271,7 +272,9 @@ private class WrappedComposition(
                         }
                         Providers(InspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner) {
-                                SelectionContainer(
+                                // TODO(ralu): Please move the modifier to the root layout and
+                                //  remove the [simpleLayout].
+                                simpleLayout(
                                     modifier = Modifier.noConsumptionTapGestureFilter {
                                         @OptIn(ExperimentalFocus::class)
                                         owner.focusManager.clearFocus()
@@ -304,6 +307,29 @@ private class WrappedComposition(
             if (!disposed) {
                 setContent(contentWaitingForCreated)
                 contentWaitingForCreated = emptyContent()
+            }
+        }
+    }
+}
+
+@Composable
+private fun simpleLayout(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
+    Layout(modifier = modifier, children = children) { measurables, constraints ->
+        val placeables = measurables.map { measurable ->
+            measurable.measure(constraints)
+        }
+
+        val width = placeables.fold(0) { maxWidth, placeable ->
+            max(maxWidth, (placeable.width))
+        }
+
+        val height = placeables.fold(0) { minWidth, placeable ->
+            max(minWidth, (placeable.height))
+        }
+
+        layout(width, height) {
+            placeables.forEach { placeable ->
+                placeable.place(0, 0)
             }
         }
     }
