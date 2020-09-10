@@ -31,6 +31,7 @@ const val TEST_FAILURES_DO_NOT_FAIL_TEST_TASK = "androidx.ignoreTestFailures"
  * Setting this property to false makes test tasks not display detailed output to stdout.
  */
 const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
+
 /**
  * Setting this property turns javac and kotlinc warnings into errors that fail the build.
  */
@@ -40,6 +41,11 @@ const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
  * Setting this property enables calculating the fraction of code covered by tests
  */
 const val COVERAGE_ENABLED = "androidx.coverageEnabled"
+
+/**
+ * Returns whether the project should generate documentation.
+ */
+const val ENABLE_DOCUMENTATION = "androidx.enableDocumentation"
 
 /**
  * Setting this property puts a summary of the relevant failure messages into standard error
@@ -56,10 +62,26 @@ const val WRITE_VERSIONED_API_FILES = "androidx.writeVersionedApiFiles"
  */
 const val STUDIO_TYPE = "androidx.studio.type"
 
+/**
+ * Build id used to pull SNAPSHOT versions to substitute project dependencies in Playground projects
+ */
+const val PLAYGROUND_SNAPSHOT_BUILD_ID = "androidx.playground.snapshotBuildId"
+
+/**
+ * Build Id used to pull SNAPSHOT version of Metalava for Playground projects
+ */
+const val PLAYGROUND_METALAVA_BUILD_ID = "androidx.playground.metalavaBuildId"
+
+/**
+ * Build Id used to pull SNAPSHOT version of Dokka for Playground projects
+ */
+const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     COVERAGE_ENABLED,
     DISPLAY_TEST_OUTPUT,
+    ENABLE_DOCUMENTATION,
     STUDIO_TYPE,
     SUMMARIZE_STANDARD_ERROR,
     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK,
@@ -67,7 +89,10 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     AffectedModuleDetector.CHANGED_PROJECTS_ARG,
     AffectedModuleDetector.ENABLE_ARG,
     AffectedModuleDetector.DEPENDENT_PROJECTS_ARG,
-    AffectedModuleDetector.CHANGED_PROJECTS_ARG
+    AffectedModuleDetector.CHANGED_PROJECTS_ARG,
+    PLAYGROUND_SNAPSHOT_BUILD_ID,
+    PLAYGROUND_METALAVA_BUILD_ID,
+    PLAYGROUND_DOKKA_BUILD_ID
 )
 
 /**
@@ -110,7 +135,7 @@ fun Project.isWriteVersionedApiFilesEnabled(): Boolean =
  * Returns whether the project should generate documentation.
  */
 fun Project.isDocumentationEnabled(): Boolean =
-    (project.findProperty("androidx.enableDocumentation") as? String)?.toBoolean() ?: true
+    (project.findProperty(ENABLE_DOCUMENTATION) as? String)?.toBoolean() ?: true
 
 /**
  * Returns whether the project has coverage enabled.
