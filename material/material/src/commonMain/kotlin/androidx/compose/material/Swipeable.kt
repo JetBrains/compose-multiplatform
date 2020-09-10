@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.lerp
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.math.sin
 
@@ -90,8 +91,9 @@ open class SwipeableState<T>(
     var isAnimationRunning: Boolean by mutableStateOf(false)
         private set
 
-    private val offsetState = mutableStateOf(0f)
-    private val overflowState = mutableStateOf(0f)
+    // Use `Float.NaN` as a placeholder while the state is uninitialised.
+    private val offsetState = mutableStateOf(Float.NaN)
+    private val overflowState = mutableStateOf(Float.NaN)
 
     /**
      * The current position (in pixels) of the [swipeable].
@@ -106,8 +108,8 @@ open class SwipeableState<T>(
      */
     val overflow: State<Float> get() = overflowState
 
-    private var minBound = 0f
-    private var maxBound = 0f
+    private var minBound = Float.NEGATIVE_INFINITY
+    private var maxBound = Float.POSITIVE_INFINITY
 
     private val anchorsState = mutableStateOf(emptyMap<Float, T>())
 
@@ -129,12 +131,34 @@ open class SwipeableState<T>(
             return anchorsState.value
         }
         set(anchors) {
-            if (anchors != anchorsState.value) {
-                anchorsState.value = anchors
+            if (anchorsState.value.isEmpty()) {
+                // If this is the first time that we receive anchors, then we need to initialise
+                // the state so we snap to the offset associated to the initial value.
                 minBound = anchors.keys.minOrNull()!!
                 maxBound = anchors.keys.maxOrNull()!!
-                anchors.getOffset(value)?.let { holder.snapTo(it) }
+                val initialOffset = anchors.getOffset(value)
+                requireNotNull(initialOffset) {
+                    "The initial value must have an associated anchor."
+                }
+                holder.snapTo(initialOffset)
+            } else if (anchors != anchorsState.value) {
+                // If we have received new anchors, then the offset of the current value might
+                // have changed, so we need to animate to the new offset. If the current value
+                // has been removed from the anchors then we animate to the closest anchor
+                // instead. Note that this stops any ongoing animation.
+                minBound = Float.NEGATIVE_INFINITY
+                maxBound = Float.POSITIVE_INFINITY
+                val targetOffset = anchors.getOffset(value)
+                    ?: anchors.keys.minByOrNull { abs(it - offset.value) }!!
+                holder.animateTo(targetOffset, animationSpec, onEnd = { endReason, _ ->
+                    value = anchors.getValue(targetOffset)
+                    minBound = anchors.keys.minOrNull()!!
+                    maxBound = anchors.keys.maxOrNull()!!
+                    // If the animation was interrupted for any reason, snap as a last resort.
+                    if (endReason == AnimationEndReason.Interrupted) holder.snapTo(targetOffset)
+                })
             }
+            anchorsState.value = anchors
         }
 
     internal var thresholds: (Float, Float) -> Float by mutableStateOf({ _, _ -> 0f })
