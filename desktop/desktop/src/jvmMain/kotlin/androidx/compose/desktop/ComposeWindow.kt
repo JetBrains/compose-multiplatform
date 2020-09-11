@@ -41,6 +41,7 @@ class ComposeWindow : JFrame {
 
     val parent: AppFrame
     private val layer = FrameSkiaLayer()
+    private val events = AWTDebounceEventQueue()
 
     var owners: DesktopOwners? = null
         set(value) {
@@ -75,6 +76,7 @@ class ComposeWindow : JFrame {
     }
 
     override fun dispose() {
+        events.cancel()
         layer.dispose()
         super.dispose()
     }
@@ -85,7 +87,7 @@ class ComposeWindow : JFrame {
                 TODO("Implement input method caret change")
             }
 
-            override fun inputMethodTextChanged(event: InputMethodEvent) {
+            override fun inputMethodTextChanged(event: InputMethodEvent) = events.post {
                 owners?.onInputMethodTextChanged(event)
             }
         })
@@ -93,32 +95,34 @@ class ComposeWindow : JFrame {
         layer.wrapped.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(event: MouseEvent) = Unit
 
-            override fun mousePressed(event: MouseEvent) {
+            override fun mousePressed(event: MouseEvent) = events.post {
                 owners?.onMousePressed(event.x, event.y)
             }
 
-            override fun mouseReleased(event: MouseEvent) {
+            override fun mouseReleased(event: MouseEvent) = events.post {
                 owners?.onMouseReleased(event.x, event.y)
             }
         })
         layer.wrapped.addMouseMotionListener(object : MouseMotionAdapter() {
-            override fun mouseDragged(event: MouseEvent) {
+            override fun mouseDragged(event: MouseEvent) = events.post {
                 owners?.onMouseDragged(event.x, event.y)
             }
         })
         layer.wrapped.addMouseWheelListener { event ->
-            owners?.onMouseScroll(event.x, event.y, event.toComposeEvent())
+            events.post {
+                owners?.onMouseScroll(event.x, event.y, event.toComposeEvent())
+            }
         }
         layer.wrapped.addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(event: KeyEvent) {
+            override fun keyPressed(event: KeyEvent) = events.post {
                 owners?.onKeyPressed(event.keyCode, event.keyChar)
             }
 
-            override fun keyReleased(event: KeyEvent) {
+            override fun keyReleased(event: KeyEvent) = events.post {
                 owners?.onKeyReleased(event.keyCode, event.keyChar)
             }
 
-            override fun keyTyped(event: KeyEvent) {
+            override fun keyTyped(event: KeyEvent) = events.post {
                 owners?.onKeyTyped(event.keyChar)
             }
         })

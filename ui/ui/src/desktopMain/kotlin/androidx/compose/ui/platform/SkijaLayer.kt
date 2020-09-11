@@ -21,10 +21,15 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import org.jetbrains.skija.Matrix33
+import org.jetbrains.skija.Picture
+import org.jetbrains.skija.PictureRecorder
+import org.jetbrains.skija.Rect
 
 class SkijaLayer(
     density: Density,
@@ -35,20 +40,36 @@ class SkijaLayer(
     private var size = IntSize.Zero
     private var position = IntOffset.Zero
     private var outlineCache = OutlineCache(density, size, modifier.shape)
+    private val pictureRecorder = PictureRecorder()
+    private var picture: Picture? = null
 
     override var modifier: DrawLayerModifier = modifier
         set(value) {
             field = value
             outlineCache.shape = value.shape
+            invalidate()
         }
 
     override val layerId = 0L
 
-    override fun destroy() = Unit
+    override fun destroy() {
+        picture?.close()
+        pictureRecorder.close()
+    }
 
     override fun resize(size: IntSize) {
-        this.size = size
-        outlineCache.size = size
+        if (size != this.size) {
+            this.size = size
+            outlineCache.size = size
+            invalidate()
+        }
+    }
+
+    override fun move(position: IntOffset) {
+        if (position != this.position) {
+            this.position = position
+            invalidateParentLayer()
+        }
     }
 
     // TODO(demin): calculate matrix
@@ -57,22 +78,35 @@ class SkijaLayer(
     }
 
     override fun invalidate() {
+        picture = null
         invalidateParentLayer()
     }
 
-    override fun move(position: IntOffset) {
-        this.position = position
+    override fun drawLayer(canvas: Canvas) {
+        if (picture == null) {
+            val pictureCanvas = pictureRecorder.beginRecording(
+                Rect.makeWH(
+                    size.width.toFloat(),
+                    size.height.toFloat()
+                )
+            )
+            performDrawLayer(DesktopCanvas(pictureCanvas))
+            picture = pictureRecorder.finishRecordingAsPicture()
+        }
+        canvas.nativeCanvas.drawPicture(
+            picture,
+            Matrix33.makeTranslate(position.x.toFloat(), position.y.toFloat()),
+            null
+        )
     }
 
     // TODO(demin): implement alpha, rotationX, rotationY, shadowElevation
-    override fun drawLayer(canvas: Canvas) {
-        canvas as DesktopCanvas
+    private fun performDrawLayer(canvas: DesktopCanvas) {
         canvas.save()
 
         val pivotX = modifier.transformOrigin.pivotFractionX * size.width
         val pivotY = modifier.transformOrigin.pivotFractionY * size.height
 
-        canvas.translate(position.x.toFloat(), position.y.toFloat())
         canvas.translate(modifier.translationX, modifier.translationY)
         canvas.translate(pivotX, pivotY)
 
