@@ -16,7 +16,9 @@
 
 package androidx.compose.runtime
 
-import androidx.compose.runtime.dispatch.DesktopUiDispatcher
+import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
@@ -29,7 +31,7 @@ class SwingEmbeddingContext : EmbeddingContext {
     }
 
     override fun mainThreadCompositionContext(): CoroutineContext {
-        return DesktopUiDispatcher.Main
+        return Dispatchers.Swing + DefaultMonotonicFrameClock
     }
 }
 

@@ -19,6 +19,8 @@ package androidx.compose.ui.platform
 import android.content.Context
 import android.content.res.Configuration
 import android.view.View
+import androidx.compose.animation.core.InternalAnimationApi
+import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
@@ -64,9 +66,11 @@ val ViewAmbient = staticAmbientOf<View>()
 val ViewModelStoreOwnerAmbient = staticAmbientOf<ViewModelStoreOwner>()
 
 @Composable
+@OptIn(InternalAnimationApi::class)
 internal fun ProvideAndroidAmbients(owner: AndroidOwner, content: @Composable () -> Unit) {
     val view = owner.view
     val context = view.context
+    val rootAnimationClock = remember { rootAnimationClockFactory() }
 
     var configuration by remember {
         mutableStateOf(
@@ -100,6 +104,7 @@ internal fun ProvideAndroidAmbients(owner: AndroidOwner, content: @Composable ()
     ) {
         ProvideCommonAmbients(
             owner = owner,
+            animationClock = rootAnimationClock,
             uriHandler = uriHandler,
             content = content
         )

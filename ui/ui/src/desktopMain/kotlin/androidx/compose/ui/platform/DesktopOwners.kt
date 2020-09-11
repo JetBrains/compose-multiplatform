@@ -15,8 +15,6 @@
  */
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.dispatch.DesktopUiDispatcher
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.mouse.MouseScrollEvent
@@ -36,16 +34,14 @@ val DesktopOwnersAmbient = staticAmbientOf<DesktopOwners>()
 @OptIn(InternalCoreApi::class)
 class DesktopOwners(
     component: Component,
-    private val redraw: () -> Unit
+    val invalidate: () -> Unit
 ) {
     val list = LinkedHashSet<DesktopOwner>()
-
-    // Optimization: we don't need more than one redrawing per tick
-    private var redrawingScheduled = false
 
     private var pointerId = 0L
     private var isMousePressed = false
 
+    internal val animationClock = DesktopAnimationClock(invalidate)
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
 
     fun register(desktopOwner: DesktopOwner) {
@@ -58,7 +54,8 @@ class DesktopOwners(
         invalidate()
     }
 
-    fun onRender(canvas: Canvas, width: Int, height: Int) {
+    fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        animationClock.onFrame(nanoTime)
         for (owner in list) {
             owner.setSize(width, height)
             owner.draw(canvas)
@@ -120,19 +117,5 @@ class DesktopOwners(
                 )
             )
         )
-    }
-
-    fun invalidate() {
-        if (!redrawingScheduled) {
-            DesktopUiDispatcher.Dispatcher.scheduleCallback {
-                redrawingScheduled = false
-                if (Recomposer.current().hasPendingChanges()) {
-                    invalidate()
-                } else {
-                    redraw()
-                }
-            }
-            redrawingScheduled = true
-        }
     }
 }

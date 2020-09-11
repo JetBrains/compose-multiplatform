@@ -47,6 +47,7 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
     ) {
         ProvideCommonAmbients(
             owner = owner,
+            animationClock = owner.container.animationClock,
             uriHandler = DesktopUriHandler(),
             content = content
         )

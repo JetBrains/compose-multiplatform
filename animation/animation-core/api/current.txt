@@ -1,6 +1,10 @@
 // Signature format: 3.0
 package androidx.compose.animation.core {
 
+  public final class AndroidAnimationClockKt {
+    method public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function0<? extends androidx.compose.animation.core.AnimationClockObservable> p);
+  }
+
   public abstract class AnimatedFloat extends androidx.compose.animation.core.BaseAnimatedValue<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
     ctor public AnimatedFloat(androidx.compose.animation.core.AnimationClockObservable clock, float visibilityThreshold);
     method public final float getMax();
@@ -25,10 +29,6 @@ package androidx.compose.animation.core {
     method public static <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<V,V> AnimatedVector(V initVal, androidx.compose.animation.core.AnimationClockObservable clock, V visibilityThreshold = initVal.newInstanceOfValue(Spring.DefaultDisplacementThreshold));
     method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = androidx.compose.animation.core.ExponentialDecay(), kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
     method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = androidx.compose.animation.core.ExponentialDecay(), kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
-  }
-
-  public final class AnimationClockKt {
-    method public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function0<? extends androidx.compose.animation.core.AnimationClockObservable> p);
   }
 
   public interface AnimationClockObservable {

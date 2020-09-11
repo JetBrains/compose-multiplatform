@@ -15,7 +15,11 @@
  */
 package androidx.compose.desktop.examples.example1
 
+import androidx.compose.animation.animate
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.Window
+import androidx.compose.foundation.Box
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
@@ -26,16 +30,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
 import androidx.compose.material.TextField
@@ -55,8 +60,6 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
-import androidx.compose.ui.text.font.fontFamily
-import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.unit.IntSize
@@ -66,10 +69,8 @@ import androidx.compose.ui.unit.sp
 
 private const val title = "Desktop Compose Elements"
 
-val italicFont = fontFamily(font("Noto Italic", "NotoSans-Italic.ttf"))
-
 fun main() {
-    AppWindow(title, IntSize(1024, 768)).show {
+    AppWindow(title, IntSize(1024, 850)).show {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -116,7 +117,9 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
         Text(
             text = annotatedString {
                 append("The quick ")
-                appendInlineContent(inlineIndicatorId)
+                if (animation.value) {
+                    appendInlineContent(inlineIndicatorId)
+                }
                 pushStyle(SpanStyle(
                     color = Color(0xff964B00),
                     shadow = Shadow(Color.Green, offset = Offset(1f, 1f))
@@ -195,11 +198,10 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                     "    smaller.quickSort() + pivot + greater.quickSort()\n" +
                     "   }\n" +
                     "}",
-            modifier = Modifier.padding(10.dp),
-            fontFamily = italicFont
+            modifier = Modifier.padding(10.dp)
         )
 
-        Button(onClick = {
+        Button(modifier = Modifier.padding(4.dp), onClick = {
             amount.value++
         }) {
             Text("Base")
@@ -209,16 +211,27 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             modifier = Modifier.padding(vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                onClick = {
-                    animation.value = !animation.value
-                }) {
-                Text("Toggle")
+            Row {
+                Button(
+                    modifier = Modifier.padding(4.dp),
+                    onClick = {
+                        animation.value = !animation.value
+                    }) {
+                    Text("Toggle")
+                }
+
+                Button(
+                    modifier = Modifier.padding(4.dp),
+                    onClick = {
+                        Window(size = IntSize(400, 200)) {
+                            Animations(isCircularEnabled = animation.value)
+                        }
+                    }) {
+                    Text("Window")
+                }
             }
 
-            if (animation.value) {
-                CircularProgressIndicator()
-            }
+            Animations(isCircularEnabled = animation.value)
         }
 
         Slider(value = amount.value.toFloat() / 100f,
@@ -238,15 +251,30 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
     }
 }
 
+@Composable
+fun Animations(isCircularEnabled: Boolean) = Row {
+    if (isCircularEnabled) {
+        CircularProgressIndicator(Modifier.padding(10.dp))
+    }
+
+    val enabled = remember { mutableStateOf(true) }
+    val color = animate(
+        if (enabled.value) Color.Green else Color.Red,
+        animSpec = TweenSpec(durationMillis = 2000)
+    )
+
+    MaterialTheme {
+        Box(
+            Modifier.size(70.dp).clickable { enabled.value = !enabled.value },
+            backgroundColor = color
+        )
+    }
+}
+
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 private fun RightColumn(modifier: Modifier) = LazyColumn(modifier) {
-    items((1..100).toList()) { x ->
-        LazyRow {
-            items((0..23).toList()) { y ->
-                val str = if (y == 0) x.toString() else ('a' + y).toString()
-                Text("$str ")
-            }
-        }
+    items((1..10000).toList()) { x ->
+        Text(x.toString())
     }
 }

@@ -22,6 +22,12 @@ import android.os.Looper
 import android.view.Choreographer
 import java.util.concurrent.CountDownLatch
 
+/** @suppress */
+@InternalAnimationApi
+var rootAnimationClockFactory: () -> AnimationClockObservable = { DefaultAnimationClock() }
+    // @TestOnly
+    set
+
 /**
  * Default Choreographer based clock that pushes a new frame to all subscribers on each
  * Choreographer tick, until all subscribers have unsubscribed. An instance of this clock will be
@@ -32,7 +38,7 @@ import java.util.concurrent.CountDownLatch
  * synchronously on the main thread. If this poses a problem, consider initializing this clock on
  * the main thread itself.
  */
-actual class DefaultAnimationClock actual constructor() : BaseAnimationClock() {
+class DefaultAnimationClock : BaseAnimationClock() {
 
     private val mainChoreographer: Choreographer
 

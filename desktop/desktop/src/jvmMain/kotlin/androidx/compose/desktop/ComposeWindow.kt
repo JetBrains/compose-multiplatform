@@ -15,14 +15,11 @@
  */
 package androidx.compose.desktop
 
-import androidx.compose.runtime.dispatch.DesktopUiDispatcher
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopOwners
 import org.jetbrains.skija.Canvas
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaRenderer
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.InputMethodEvent
@@ -43,7 +40,7 @@ class ComposeWindow : JFrame {
     }
 
     val parent: AppFrame
-    private val layer: SkiaLayer = SkiaLayer()
+    private val layer = FrameSkiaLayer()
 
     var owners: DesktopOwners? = null
         set(value) {
@@ -53,7 +50,7 @@ class ComposeWindow : JFrame {
 
     constructor(parent: AppFrame) : super() {
         this.parent = parent
-        contentPane.add(layer)
+        contentPane.add(layer.wrapped)
 
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
@@ -63,104 +60,83 @@ class ComposeWindow : JFrame {
         initCanvas()
     }
 
-    fun updateLayer() {
+    private fun updateLayer() {
         if (!isVisible) {
             return
         }
         layer.updateLayer()
     }
 
-    fun redrawLayer() {
+    fun needRedrawLayer() {
         if (!isVisible) {
             return
         }
-        layer.redrawLayer()
+        layer.needRedrawLayer()
+    }
+
+    override fun dispose() {
+        layer.dispose()
+        super.dispose()
     }
 
     private fun initCanvas() {
-        layer.addInputMethodListener(object : InputMethodListener {
+        layer.wrapped.addInputMethodListener(object : InputMethodListener {
             override fun caretPositionChanged(p0: InputMethodEvent?) {
                 TODO("Implement input method caret change")
             }
 
-            override fun inputMethodTextChanged(
-                event: InputMethodEvent
-            ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
+            override fun inputMethodTextChanged(event: InputMethodEvent) {
                 owners?.onInputMethodTextChanged(event)
             }
         })
 
-        layer.addMouseListener(object : MouseAdapter() {
+        layer.wrapped.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(event: MouseEvent) = Unit
 
-            override fun mousePressed(
-                event: MouseEvent
-            ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
+            override fun mousePressed(event: MouseEvent) {
                 owners?.onMousePressed(event.x, event.y)
             }
 
-            override fun mouseReleased(
-                event: MouseEvent
-            ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
+            override fun mouseReleased(event: MouseEvent) {
                 owners?.onMouseReleased(event.x, event.y)
             }
         })
-        layer.addMouseMotionListener(object : MouseMotionAdapter() {
-            override fun mouseDragged(
-                event: MouseEvent
-            ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
+        layer.wrapped.addMouseMotionListener(object : MouseMotionAdapter() {
+            override fun mouseDragged(event: MouseEvent) {
                 owners?.onMouseDragged(event.x, event.y)
             }
         })
-        layer.addMouseWheelListener { event ->
-            DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                owners?.onMouseScroll(event.x, event.y, event.toComposeEvent())
-            }
+        layer.wrapped.addMouseWheelListener { event ->
+            owners?.onMouseScroll(event.x, event.y, event.toComposeEvent())
         }
-        layer.addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(
-                event: KeyEvent
-            ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
+        layer.wrapped.addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(event: KeyEvent) {
                 owners?.onKeyPressed(event.keyCode, event.keyChar)
             }
 
-            override fun keyReleased(
-                event: KeyEvent
-            ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
+            override fun keyReleased(event: KeyEvent) {
                 owners?.onKeyReleased(event.keyCode, event.keyChar)
             }
 
-            override fun keyTyped(
-                event: KeyEvent
-            ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
+            override fun keyTyped(event: KeyEvent) {
                 owners?.onKeyTyped(event.keyChar)
             }
         })
     }
 
-    fun disposeCanvas() {
-        layer.disposeLayer()
-        layer.updateLayer()
-        layer.renderer!!.onDispose()
-    }
-
     override fun setVisible(value: Boolean) {
-        super.setVisible(value)
-        updateLayer()
+        if (value != isVisible) {
+            super.setVisible(value)
+            updateLayer()
+            needRedrawLayer()
+        }
     }
 }
 
-private class OwnersRenderer(private val owners: DesktopOwners) : SkiaRenderer {
-    override fun onDispose() = Unit
-    override fun onInit() = Unit
-    override fun onReshape(width: Int, height: Int) = Unit
-
-    override fun onRender(canvas: Canvas, width: Int, height: Int) {
+private class OwnersRenderer(private val owners: DesktopOwners) : FrameSkiaLayer.Renderer {
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         try {
-            Thread.currentThread().contextClassLoader = ClassLoader.getSystemClassLoader()
-            DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                owners.onRender(canvas, width, height)
-            }
+            owners.onRender(canvas, width, height, nanoTime)
         } catch (e: Throwable) {
             e.printStackTrace(System.err)
             if (System.getProperty("compose.desktop.ignore.errors") == null) {
