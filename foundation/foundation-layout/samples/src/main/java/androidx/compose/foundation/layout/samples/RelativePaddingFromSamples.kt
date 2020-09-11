@@ -22,13 +22,21 @@ import androidx.compose.foundation.layout.relativePaddingFrom
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.unit.sp
 
 @Sampled
 @Composable
 fun RelativePaddingFromSample() {
+    // We want to have 30.sp distance from the top of the layout box to the baseline of the
+    // first line of text.
+    val distanceToBaseline = 30.sp
+    // We convert the 30.sp value to dps, which is required for the relativePaddingFrom API.
+    val distanceToBaselineDp = with(DensityAmbient.current) { distanceToBaseline.toDp() }
+    // The result will be a layout with 30.sp distance from the top of the layout box to the
+    // baseline of the first line of text.
     Text(
         text = "This is an example.",
-        modifier = Modifier.relativePaddingFrom(FirstBaseline, before = 30.dp)
+        modifier = Modifier.relativePaddingFrom(FirstBaseline, before = distanceToBaselineDp)
     )
 }
