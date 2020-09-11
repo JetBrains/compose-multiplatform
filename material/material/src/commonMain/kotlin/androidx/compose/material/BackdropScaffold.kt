@@ -203,6 +203,8 @@ fun rememberBackdropScaffoldState(
  * This component provides an API to put together several material components to construct your
  * screen. For a similar component which implements the basic material design layout strategy
  * with app bars, floating action buttons and navigation drawers, use the standard [Scaffold].
+ * For similar component that uses a bottom sheet as the centerpiece of the screen, use
+ * [BottomSheetScaffold].
  *
  * Either the back layer or front layer can be active at a time. When the front layer is active,
  * it sits at an offset below the top of the screen. This is the [peekHeight] and defaults to
