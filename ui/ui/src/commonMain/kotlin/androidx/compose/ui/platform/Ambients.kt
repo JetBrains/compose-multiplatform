@@ -17,11 +17,8 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.InternalAnimationApi
-import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -98,20 +95,17 @@ val UriHandlerAmbient = staticAmbientOf<UriHandler>()
 val LayoutDirectionAmbient = staticAmbientOf<LayoutDirection>()
 
 @Composable
-@OptIn(InternalAnimationApi::class)
 internal fun ProvideCommonAmbients(
     owner: Owner,
+    animationClock: AnimationClockObservable,
     uriHandler: UriHandler,
     content: @Composable () -> Unit
 ) {
-    val rootAnimationClock = remember { rootAnimationClockFactory() }
-
     Providers(
-        AnimationClockAmbient provides rootAnimationClock,
+        AnimationClockAmbient provides animationClock,
         AutofillAmbient provides owner.autofill,
         AutofillTreeAmbient provides owner.autofillTree,
         ClipboardManagerAmbient provides owner.clipboardManager,
-        @Suppress("DEPRECATION")
         DensityAmbient provides owner.density,
         FontLoaderAmbient provides owner.fontLoader,
         HapticFeedBackAmbient provides owner.hapticFeedBack,

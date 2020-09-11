@@ -16,6 +16,18 @@
 
 package androidx.compose.runtime.dispatch
 
+import kotlinx.coroutines.yield
+
+// TODO(demin): how to implement this clock in case we have multiple windows on different
+//  monitors? This clock is using by Recomposer to sync composition with frame rendering.
+//  Also this clock is available to use in coroutines in client code.
 actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
-    DesktopUiDispatcher.Dispatcher.frameClock
+    object : MonotonicFrameClock {
+        override suspend fun <R> withFrameNanos(
+            onFrame: (Long) -> R
+        ): R {
+            yield()
+            return onFrame(System.nanoTime())
+        }
+    }
 }

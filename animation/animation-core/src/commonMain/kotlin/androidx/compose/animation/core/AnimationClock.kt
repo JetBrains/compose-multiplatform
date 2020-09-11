@@ -18,14 +18,6 @@ package androidx.compose.animation.core
 
 import androidx.compose.ui.util.annotation.CallSuper
 
-expect class DefaultAnimationClock() : BaseAnimationClock
-
-/** @suppress */
-@InternalAnimationApi
-var rootAnimationClockFactory: () -> AnimationClockObservable = { DefaultAnimationClock() }
-    // @TestOnly
-    set
-
 /**
  * A custom clock whose frame time can be manually updated via mutating [clockTimeMillis].
  * Observers will be called immediately with the current time when they are subscribed. Use

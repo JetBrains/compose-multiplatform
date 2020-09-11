@@ -37,7 +37,7 @@ internal class TestComposeWindow(
     val surface = Surface.makeRasterN32Premul(width, height)
     val canvas = surface.canvas
     val component = object : Component() {}
-    val owners = DesktopOwners(component = component, redraw = {})
+    val owners = DesktopOwners(component = component, invalidate = {})
 
     fun setContent(content: @Composable () -> Unit): DesktopOwners {
         val owner = DesktopOwner(owners, density)

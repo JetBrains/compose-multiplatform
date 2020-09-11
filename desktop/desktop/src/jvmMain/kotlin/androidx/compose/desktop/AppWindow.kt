@@ -61,6 +61,7 @@ class AppWindow : AppFrame {
                     if (defaultCloseOperation != WindowConstants.DO_NOTHING_ON_CLOSE) {
                         onDismissEvents.forEach { it.invoke() }
                         AppManager.removeWindow(parent)
+                        isClosed = true
                     }
                 }
             })
@@ -166,15 +167,11 @@ class AppWindow : AppFrame {
         window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
     }
 
-    internal override fun dispose() {
-        window.apply {
-            disposeCanvas()
-            dispose()
-        }
+    override fun dispose() {
         invoker?.unlockWindow()
     }
 
-    internal override fun lockWindow() {
+    override fun lockWindow() {
         window.apply {
             defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
             setFocusableWindowState(false)
@@ -184,7 +181,7 @@ class AppWindow : AppFrame {
         invoker?.connectPair(this)
     }
 
-    internal override fun unlockWindow() {
+    override fun unlockWindow() {
         window.apply {
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             setFocusableWindowState(true)

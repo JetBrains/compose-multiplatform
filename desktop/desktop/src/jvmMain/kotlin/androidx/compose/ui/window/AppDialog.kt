@@ -53,6 +53,8 @@ fun Dialog(
     }
 
     onDispose {
-        dialog.dispose()
+        if (!dialog.isClosed) {
+            dialog.close()
+        }
     }
 }
