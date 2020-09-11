@@ -834,8 +834,7 @@ package androidx.compose.ui.text.input {
   }
 
   public final class TextInputServiceKt {
-    method @Deprecated public static kotlin.jvm.functions.Function1<androidx.compose.ui.text.input.PlatformTextInputService,androidx.compose.ui.text.input.TextInputService> getTextInputServiceFactory();
-    method @Deprecated public static void setTextInputServiceFactory(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.PlatformTextInputService,? extends androidx.compose.ui.text.input.TextInputService> p);
+    method @Deprecated @VisibleForTesting public static void setTextInputServiceFactory(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.PlatformTextInputService,? extends androidx.compose.ui.text.input.TextInputService> p);
     field public static final int INVALID_SESSION = -1; // 0xffffffff
     field public static final int NO_SESSION = 0; // 0x0
   }

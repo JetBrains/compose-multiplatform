@@ -31,6 +31,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * [transition] composable creates a state-based transition using the animation configuration
@@ -102,8 +103,12 @@ fun <T> transition(
 /**
  * Stores the enabled state for [transition] animations. Useful for tests to disable
  * animations and have reliable screenshot tests.
+ * @suppress
  */
+@InternalAnimationApi
 var transitionsEnabled = true
+    @VisibleForTesting
+    set
 
 // TODO(Doris): Use Clock idea instead of TransitionModel with pulse
 /**

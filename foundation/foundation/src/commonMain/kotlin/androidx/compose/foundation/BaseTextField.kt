@@ -52,11 +52,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.annotation.VisibleForTesting
 
 // TODO(b/151940543): Remove this variable when we have a solution for idling animations
 /** @suppress */
 @InternalFoundationApi
 var blinkingCursorEnabled: Boolean = true
+    @VisibleForTesting
     set
 
 /**

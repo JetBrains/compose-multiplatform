@@ -69,6 +69,7 @@ import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputServiceAndroid
 import androidx.compose.ui.text.input.textInputServiceFactory
@@ -607,6 +608,7 @@ internal class AndroidComposeView constructor(
     private val textInputServiceAndroid = TextInputServiceAndroid(this)
 
     override val textInputService =
+        @OptIn(InternalTextApi::class)
         @Suppress("DEPRECATION_ERROR")
         textInputServiceFactory(textInputServiceAndroid)
 
