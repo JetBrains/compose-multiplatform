@@ -80,7 +80,7 @@ enum class BackdropValue {
  * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
- * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the backdrop.
+ * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
  */
 @ExperimentalMaterialApi
 class BackdropScaffoldState(
@@ -161,23 +161,25 @@ class BackdropScaffoldState(
  * Create and [remember] a [BackdropScaffoldState] with the default animation clock.
  *
  * @param initialValue The initial value of the state.
+ * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
- * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the backdrop.
+ * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
  */
 @Composable
 @ExperimentalMaterialApi
-fun rememberBackdropState(
+fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
+    clock: AnimationClockObservable = AnimationClockAmbient.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     snackbarHostState: SnackbarHostState = SnackbarHostState()
 ): BackdropScaffoldState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val disposableClock = clock.asDisposableClock()
     return rememberSavedInstanceState(
-        clock,
+        disposableClock,
         saver = BackdropScaffoldState.Saver(
-            clock = clock,
+            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange,
             snackbarHostState = snackbarHostState
@@ -185,7 +187,7 @@ fun rememberBackdropState(
     ) {
         BackdropScaffoldState(
             initialValue = initialValue,
-            clock = clock,
+            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange,
             snackbarHostState = snackbarHostState
@@ -210,21 +212,18 @@ fun rememberBackdropState(
  * To switch between the back layer and front layer, you can either swipe on the front layer if
  * [gesturesEnabled] is set to `true` or use any of the methods in [BackdropScaffoldState].
  *
- * The backdrop also contains an app bar, which by default is placed above the back layer's
+ * The scaffold also contains an app bar, which by default is placed above the back layer's
  * content. If [persistentAppBar] is set to `false`, then the backdrop will not show the app bar
  * when the back layer is revealed; instead it will switch between the app bar and the provided
  * content with an animation. For best results, the [peekHeight] should match the app bar height.
+ * To show a snackbar, use the method `showSnackbar` of [BackdropScaffoldState.snackbarHostState].
  *
- * A simple example of a backdrop looks like this:
+ * A simple example of a backdrop scaffold looks like this:
  *
- * @sample androidx.compose.material.samples.BackdropSample
+ * @sample androidx.compose.material.samples.BackdropScaffoldSample
  *
- * To show a snackbar, use [BackdropScaffoldState.snackbarHostState]:
- *
- * @sample androidx.compose.material.samples.BackdropWithSnackbarSample
- *
- * @param modifier Optional [Modifier] for the entire backdrop.
- * @param backdropScaffoldState The state of the backdrop.
+ * @param modifier Optional [Modifier] for the root of the scaffold.
+ * @param scaffoldState The state of the scaffold.
  * @param gesturesEnabled Whether or not the backdrop can be interacted with by gestures.
  * @param peekHeight The height of the visible part of the back layer when it is concealed.
  * @param headerHeight The minimum height of the front layer when it is inactive.
@@ -245,7 +244,7 @@ fun rememberBackdropState(
  * @param frontLayerScrimColor The color of the scrim applied to the front layer when the back
  * layer is revealed. If you set this to `Color.Transparent`, then a scrim will not be applied
  * and interaction with the front layer will not be blocked when the back layer is revealed.
- * @param snackbarHost The component hosting the snackbars shown inside the backdrop.
+ * @param snackbarHost The component hosting the snackbars shown inside the scaffold.
  * @param appBar App bar for the back layer. Make sure that the [peekHeight] is equal to the
  * height of the app bar, so that the app bar is fully visible. Consider using [TopAppBar] but
  * set the elevation to 0dp and background color to transparent as a surface is already provided.
@@ -256,19 +255,19 @@ fun rememberBackdropState(
 @ExperimentalMaterialApi
 fun BackdropScaffold(
     modifier: Modifier = Modifier,
-    backdropScaffoldState: BackdropScaffoldState = rememberBackdropState(Concealed),
+    scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(Concealed),
     gesturesEnabled: Boolean = true,
-    peekHeight: Dp = BackdropConstants.DefaultPeekHeight,
-    headerHeight: Dp = BackdropConstants.DefaultHeaderHeight,
+    peekHeight: Dp = BackdropScaffoldConstants.DefaultPeekHeight,
+    headerHeight: Dp = BackdropScaffoldConstants.DefaultHeaderHeight,
     persistentAppBar: Boolean = true,
     stickyFrontLayer: Boolean = true,
     backLayerBackgroundColor: Color = MaterialTheme.colors.primary,
     backLayerContentColor: Color = contentColorFor(backLayerBackgroundColor),
-    frontLayerShape: Shape = BackdropConstants.DefaultFrontLayerShape,
-    frontLayerElevation: Dp = BackdropConstants.DefaultFrontLayerElevation,
+    frontLayerShape: Shape = BackdropScaffoldConstants.DefaultFrontLayerShape,
+    frontLayerElevation: Dp = BackdropScaffoldConstants.DefaultFrontLayerElevation,
     frontLayerBackgroundColor: Color = MaterialTheme.colors.surface,
     frontLayerContentColor: Color = contentColorFor(frontLayerBackgroundColor),
-    frontLayerScrimColor: Color = BackdropConstants.DefaultFrontLayerScrimColor,
+    frontLayerScrimColor: Color = BackdropScaffoldConstants.DefaultFrontLayerScrimColor,
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     appBar: @Composable () -> Unit,
     backLayerContent: @Composable () -> Unit,
@@ -284,7 +283,7 @@ fun BackdropScaffold(
                 backLayerContent()
             }
         } else {
-            BackLayerTransition(backdropScaffoldState.targetValue, appBar, backLayerContent)
+            BackLayerTransition(scaffoldState.targetValue, appBar, backLayerContent)
         }
     }
     val calculateBackLayerConstraints: (Constraints) -> Constraints = {
@@ -296,7 +295,7 @@ fun BackdropScaffold(
         color = backLayerBackgroundColor,
         contentColor = backLayerContentColor
     ) {
-        WithBackLayerHeight(
+        BackdropStack(
             modifier.fillMaxSize(),
             backLayer,
             calculateBackLayerConstraints
@@ -308,7 +307,7 @@ fun BackdropScaffold(
             }
 
             val swipeable = Modifier.swipeable(
-                state = backdropScaffoldState,
+                state = scaffoldState,
                 anchors = mapOf(
                     peekHeightPx to Concealed,
                     revealedHeight to Revealed
@@ -320,7 +319,7 @@ fun BackdropScaffold(
 
             // Front layer
             Surface(
-                Modifier.offsetPx(y = backdropScaffoldState.offset).then(swipeable),
+                Modifier.offsetPx(y = scaffoldState.offset).then(swipeable),
                 shape = frontLayerShape,
                 elevation = frontLayerElevation,
                 color = frontLayerBackgroundColor,
@@ -331,8 +330,8 @@ fun BackdropScaffold(
 
                     Scrim(
                         color = frontLayerScrimColor,
-                        onDismiss = { backdropScaffoldState.conceal() },
-                        visible = backdropScaffoldState.targetValue == Revealed
+                        onDismiss = { scaffoldState.conceal() },
+                        visible = scaffoldState.targetValue == Revealed
                     )
                 }
             }
@@ -341,10 +340,10 @@ fun BackdropScaffold(
             Box(
                 Modifier.zIndex(Float.POSITIVE_INFINITY),
                 gravity = ContentGravity.BottomCenter,
-                paddingBottom = if (backdropScaffoldState.isRevealed &&
+                paddingBottom = if (scaffoldState.isRevealed &&
                     revealedHeight == fullHeight - headerHeightPx) headerHeight else 0.dp
             ) {
-                snackbarHost(backdropScaffoldState.snackbarHostState)
+                snackbarHost(scaffoldState.snackbarHostState)
             }
         }
     }
@@ -409,12 +408,9 @@ private fun BackLayerTransition(
     }
 }
 
-/**
- * A composable that defines its own content according to the height of one of its children.
- */
 @Composable
 @OptIn(ExperimentalSubcomposeLayoutApi::class)
-private fun WithBackLayerHeight(
+private fun BackdropStack(
     modifier: Modifier,
     backLayer: @Composable () -> Unit,
     calculateBackLayerConstraints: (Constraints) -> Constraints,
@@ -451,7 +447,7 @@ private enum class BackdropLayers { Back, Front }
 /**
  * Contains useful constants for [BackdropScaffold].
  */
-object BackdropConstants {
+object BackdropScaffoldConstants {
 
     /**
      * The default peek height of the back layer.
