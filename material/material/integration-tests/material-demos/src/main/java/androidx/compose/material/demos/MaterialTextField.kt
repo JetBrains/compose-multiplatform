@@ -21,7 +21,7 @@ import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope.align
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -233,7 +233,7 @@ private fun TextFieldWithMessage(
 }
 
 @Composable
-private fun Title(title: String) {
+private fun ColumnScope.Title(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.body1,
