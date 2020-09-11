@@ -16,9 +16,16 @@
 
 package androidx.compose.ui
 
+import android.graphics.RectF
+import android.os.Build
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK
+import android.view.accessibility.AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
+import android.view.accessibility.AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
+import android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_SELECTION
 import android.view.accessibility.AccessibilityNodeProvider
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
@@ -33,17 +40,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.core.os.BuildCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.ui.test.SemanticsMatcher
+import androidx.ui.test.assert
 import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertIsOff
 import androidx.ui.test.assertIsOn
@@ -58,6 +72,8 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -73,6 +89,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 @MediumTest
 @RunWith(JUnit4::class)
 @OptIn(ExperimentalFoundationApi::class)
+@ExperimentalLayoutNodeApi
 class AndroidAccessibilityTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>(false, true)
@@ -80,6 +97,8 @@ class AndroidAccessibilityTest {
     private lateinit var androidComposeView: AndroidComposeView
     private lateinit var container: ViewGroup
     private lateinit var delegate: AndroidComposeViewAccessibilityDelegateCompat
+    private lateinit var provider: AccessibilityNodeProvider
+    private lateinit var textLayoutResult: TextLayoutResult
 
     private val argument = ArgumentCaptor.forClass(AccessibilityEvent::class.java)
     private var isTextFieldVisible by mutableStateOf(true)
@@ -123,7 +142,8 @@ class AndroidAccessibilityTest {
                         BaseTextField(
                             modifier = Modifier.testTag(TextFieldTag),
                             value = value,
-                            onValueChange = { value = it }
+                            onValueChange = { value = it },
+                            onTextLayout = { textLayoutResult = it }
                         )
                     }
                 }
@@ -131,7 +151,143 @@ class AndroidAccessibilityTest {
             androidComposeView = container.getChildAt(0) as AndroidComposeView
             delegate = ViewCompat.getAccessibilityDelegate(androidComposeView) as
                     AndroidComposeViewAccessibilityDelegateCompat
+            provider = delegate.getAccessibilityNodeProvider(androidComposeView).provider
+                        as AccessibilityNodeProvider
         }
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo() {
+        val toggleableNode = rule.onNodeWithTag(ToggleableTag)
+            .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
+        var accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
+        assertEquals("android.view.View", accessibilityNodeInfo.className)
+        val stateDescription = when {
+            BuildCompat.isAtLeastR() -> {
+                accessibilityNodeInfo.stateDescription
+            }
+            Build.VERSION.SDK_INT >= 19 -> {
+                accessibilityNodeInfo.extras.getCharSequence(
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY")
+            }
+            else -> {
+                null
+            }
+        }
+        assertEquals("Checked", stateDescription)
+        assertTrue(accessibilityNodeInfo.isClickable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertTrue(accessibilityNodeInfo.actionList.contains(
+            AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)))
+
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+        accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+        assertEquals("android.widget.EditText", accessibilityNodeInfo.className)
+        assertEquals(InitialText, accessibilityNodeInfo.text)
+        assertTrue(accessibilityNodeInfo.isFocusable)
+        assertFalse(accessibilityNodeInfo.isFocused)
+        assertTrue(accessibilityNodeInfo.isEditable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertTrue(accessibilityNodeInfo.actionList.contains(
+            AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)))
+        assertTrue(accessibilityNodeInfo.actionList.contains(
+            AccessibilityNodeInfo.AccessibilityAction(ACTION_SET_SELECTION, null)))
+        assertTrue(accessibilityNodeInfo.actionList.contains(
+            AccessibilityNodeInfo.AccessibilityAction(ACTION_NEXT_AT_MOVEMENT_GRANULARITY, null)))
+        assertTrue(accessibilityNodeInfo.actionList.contains(
+            AccessibilityNodeInfo.AccessibilityAction(
+                ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, null)))
+        assertEquals(
+            AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER or
+                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD or
+                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PARAGRAPH or
+                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE or
+                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PAGE,
+            accessibilityNodeInfo.movementGranularities
+        )
+        if (Build.VERSION.SDK_INT >= 26) {
+            assertEquals(
+                listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
+                accessibilityNodeInfo.availableExtraData
+            )
+        }
+    }
+
+    @Test
+    fun testPerformAction() {
+        val toggleableNode = rule.onNodeWithTag(ToggleableTag)
+            .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
+        rule.runOnUiThread {
+            provider.performAction(toggleableNode.id, ACTION_CLICK, null)
+        }
+        rule.onNodeWithTag(ToggleableTag)
+            .assertIsOff()
+
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+        rule.runOnUiThread {
+            provider.performAction(textFieldNode.id, ACTION_CLICK, null)
+        }
+        rule.onNodeWithTag(TextFieldTag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
+        var argument = Bundle()
+        argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 1)
+        argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 1)
+        rule.runOnUiThread {
+            provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument)
+        }
+        rule.onNodeWithTag(TextFieldTag)
+            .assert(SemanticsMatcher.expectValue(
+                SemanticsProperties.TextSelectionRange,
+                TextRange(1)
+            ))
+        argument = Bundle()
+        argument.putInt(
+            AccessibilityNodeInfo.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
+            AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
+        )
+        argument.putBoolean(
+            AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN,
+            false
+        )
+        rule.runOnUiThread {
+            provider.performAction(
+                textFieldNode.id,
+                ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY,
+                argument
+            )
+        }
+        rule.onNodeWithTag(TextFieldTag)
+            .assert(SemanticsMatcher.expectValue(
+                SemanticsProperties.TextSelectionRange,
+                TextRange(0)
+            ))
+    }
+
+    @Test
+    fun testAddExtraDataToAccessibilityNodeInfo() {
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+        val info = AccessibilityNodeInfo.obtain()
+        val argument = Bundle()
+        argument.putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX, 0)
+        argument.putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH, 1)
+        provider.addExtraDataToAccessibilityNodeInfo(
+            textFieldNode.id,
+            info,
+            AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY,
+            argument
+        )
+        val data = info.extras
+            .getParcelableArray(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
+        assertEquals(1, data!!.size)
+        val rectF = data[0] as RectF
+        val expectedRect = textLayoutResult.getBoundingBox(0).shift(textFieldNode.globalPosition)
+        assertEquals(expectedRect.left, rectF.left)
+        assertEquals(expectedRect.top, rectF.top)
+        assertEquals(expectedRect.right, rectF.right)
+        assertEquals(expectedRect.bottom, rectF.bottom)
     }
 
     @Test
