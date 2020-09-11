@@ -7,6 +7,7 @@ at https://android.googlesource.com/platform/frameworks/support.
 ## Repository organization ##
 
    * `ci` - Continuous Integration helpers
+   * `cef` - CEF integration in Jetpack Compose
    * `examples` - examples of multiplatform Compose applications for Desktop and Android
        * `imageviewer` - Image Viewer application for Android and Desktop
        * `issues` - GitHub issue tracker with an adaptive UI and ktor-client
