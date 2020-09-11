@@ -229,8 +229,8 @@ private fun Flow(
 
         layout(layoutWidth, layoutHeight) {
             sequences.fastForEachIndexed { i, placeables ->
-                val childrenMainAxisSizes = placeables.mapIndexed { j, placeable ->
-                    placeable.mainAxisSize() +
+                val childrenMainAxisSizes = IntArray(placeables.size) { j ->
+                    placeables[j].mainAxisSize() +
                         if (j < placeables.lastIndex) mainAxisSpacing.toIntPx() else 0
                 }
                 val arrangement = if (i < sequences.lastIndex) {
@@ -240,7 +240,7 @@ private fun Flow(
                 }
                 // TODO(soboleva): rtl support
                 // Handle vertical direction
-                val mainAxisPositions = MutableList(childrenMainAxisSizes.size) { 0 }
+                val mainAxisPositions = IntArray(childrenMainAxisSizes.size) { 0 }
                 arrangement.arrange(
                     mainAxisLayoutSize,
                     childrenMainAxisSizes,
