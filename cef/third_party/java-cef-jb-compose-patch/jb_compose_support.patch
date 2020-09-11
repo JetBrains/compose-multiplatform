@@ -1,0 +1,483 @@
+diff --git a/build.xml b/build.xml
+index ce2d8d7..d0afff6 100644
+--- a/build.xml
++++ b/build.xml
+@@ -18,6 +18,10 @@
+       <include name="gluegen-rt-natives-macosx-universal.jar"/>
+       <include name="jogl-all.jar"/>
+       <include name="jogl-all-natives-macosx-universal.jar"/>
++      <!-- SKIKO: copy skiko and kotlin-stdlib artifacts to "third_party/jogamp/jar" directory -->
++      <include name="skiko-jvm-0.1.6.jar"/>
++      <include name="kotlin-stdlib-1.4.0.jar"/>
++      <!-- SKIKO -->
+     </fileset>
+     <fileset dir="third_party/junit" includes="junit*.jar"/>
+   </path>
+@@ -71,6 +75,10 @@
+         <include name="gluegen-rt-natives-macosx-universal.jar" />
+         <include name="jogl-all.jar" />
+         <include name="jogl-all-natives-macosx-universal.jar" />
++        <!-- SKIKO: copy skiko and kotlin-stdlib artifacts to "third_party/jogamp/jar" directory -->
++        <include name="skiko-jvm-0.1.6.jar"/>
++        <include name="kotlin-stdlib-1.4.0.jar"/>
++        <!-- SKIKO -->
+       </classpath>
+       <classpath dir="third_party/junit" includes="junit*.jar"/>
+       <option value="-Djava.library.path=$APP_ROOT/Contents/Java/:$APP_ROOT/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries" />
+diff --git a/java/org/cef/browser/BrowserDropTargetListener.java b/java/org/cef/browser/BrowserDropTargetListener.java
+new file mode 100644
+index 0000000..5baaa86
+--- /dev/null
++++ b/java/org/cef/browser/BrowserDropTargetListener.java
+@@ -0,0 +1,123 @@
++// Copyright (c) 2019 The Chromium Embedded Framework Authors. All rights
++// reserved. Use of this source code is governed by a BSD-style license that
++// can be found in the LICENSE file.
++
++package org.cef.browser;
++
++import org.cef.callback.CefDragData;
++import org.cef.misc.EventFlags;
++
++import java.awt.datatransfer.DataFlavor;
++import java.awt.datatransfer.Transferable;
++import java.awt.dnd.DnDConstants;
++import java.awt.dnd.DropTargetDragEvent;
++import java.awt.dnd.DropTargetDropEvent;
++import java.awt.dnd.DropTargetEvent;
++import java.awt.dnd.DropTargetListener;
++import java.io.File;
++import java.util.List;
++
++class BrowserDropTargetListener implements DropTargetListener {
++    private BrowserView browser_;
++    private CefDragData dragData_ = null;
++    private int dragOperations_ = CefDragData.DragOperations.DRAG_OPERATION_COPY;
++    private int dragModifiers_ = EventFlags.EVENTFLAG_NONE;
++    private int acceptOperations_ = DnDConstants.ACTION_COPY;
++
++    BrowserDropTargetListener(BrowserView browser) {
++        browser_ = browser;
++    }
++
++    @Override
++    public void dragEnter(DropTargetDragEvent event) {
++        CreateDragData(event);
++        browser_.dragTargetDragEnter(
++                dragData_, event.getLocation(), dragModifiers_, dragOperations_);
++    }
++
++    @Override
++    public void dragExit(DropTargetEvent event) {
++        AssertDragData();
++        browser_.dragTargetDragLeave();
++        ClearDragData();
++    }
++
++    @Override
++    public void dragOver(DropTargetDragEvent event) {
++        AssertDragData();
++        browser_.dragTargetDragOver(event.getLocation(), dragModifiers_, dragOperations_);
++    }
++
++    @Override
++    public void dropActionChanged(DropTargetDragEvent event) {
++        AssertDragData();
++        acceptOperations_ = event.getDropAction();
++        switch (acceptOperations_) {
++            case DnDConstants.ACTION_LINK:
++                dragOperations_ = CefDragData.DragOperations.DRAG_OPERATION_LINK;
++                dragModifiers_ =
++                        EventFlags.EVENTFLAG_CONTROL_DOWN | EventFlags.EVENTFLAG_SHIFT_DOWN;
++                break;
++            case DnDConstants.ACTION_COPY:
++                dragOperations_ = CefDragData.DragOperations.DRAG_OPERATION_COPY;
++                dragModifiers_ = EventFlags.EVENTFLAG_CONTROL_DOWN;
++                break;
++            case DnDConstants.ACTION_MOVE:
++                dragOperations_ = CefDragData.DragOperations.DRAG_OPERATION_MOVE;
++                dragModifiers_ = EventFlags.EVENTFLAG_SHIFT_DOWN;
++                break;
++            case DnDConstants.ACTION_NONE:
++                // The user did not select an action, so use COPY as the default.
++                dragOperations_ = CefDragData.DragOperations.DRAG_OPERATION_COPY;
++                dragModifiers_ = EventFlags.EVENTFLAG_NONE;
++                acceptOperations_ = DnDConstants.ACTION_COPY;
++                break;
++        }
++    }
++
++    @Override
++    public void drop(DropTargetDropEvent event) {
++        AssertDragData();
++        browser_.dragTargetDrop(event.getLocation(), dragModifiers_);
++        event.acceptDrop(acceptOperations_);
++        event.dropComplete(true);
++        ClearDragData();
++    }
++
++    private void CreateDragData(DropTargetDragEvent event) {
++        assert dragData_ == null;
++        dragData_ = createDragData(event);
++        dropActionChanged(event);
++    }
++
++    private void AssertDragData() {
++        assert dragData_ != null;
++    }
++
++    private void ClearDragData() {
++        dragData_ = null;
++    }
++
++    private static CefDragData createDragData(DropTargetDragEvent event) {
++        CefDragData dragData = CefDragData.create();
++
++        Transferable transferable = event.getTransferable();
++        DataFlavor[] flavors = transferable.getTransferDataFlavors();
++        for (DataFlavor flavor : flavors) {
++            try {
++                // TODO(JCEF): Add support for other flavor types.
++                if (flavor.isFlavorJavaFileListType()) {
++                    List<File> files = (List<File>) transferable.getTransferData(flavor);
++                    for (File file : files) {
++                        dragData.addFile(file.getPath(), file.getName());
++                    }
++                }
++            } catch (Exception e) {
++                // Data is no longer available or of unsupported flavor.
++                e.printStackTrace();
++            }
++        }
++
++        return dragData;
++    }
++}
+diff --git a/java/org/cef/browser/BrowserView.java b/java/org/cef/browser/BrowserView.java
+new file mode 100644
+index 0000000..fdc44ac
+--- /dev/null
++++ b/java/org/cef/browser/BrowserView.java
+@@ -0,0 +1,209 @@
++package org.cef.browser;
++
++import org.cef.CefClient;
++import org.cef.callback.CefDragData;
++import org.cef.handler.CefRenderHandler;
++import org.cef.handler.CefScreenInfo;
++
++import java.awt.Component;
++import java.awt.Cursor;
++import java.awt.Graphics;
++import java.awt.Point;
++import java.awt.Rectangle;
++import java.awt.dnd.DropTarget;
++import java.awt.event.FocusEvent;
++import java.awt.event.FocusListener;
++import java.awt.event.KeyEvent;
++import java.awt.event.KeyListener;
++import java.awt.event.MouseEvent;
++import java.awt.event.MouseListener;
++import java.awt.event.MouseMotionListener;
++import java.awt.event.MouseWheelEvent;
++import java.awt.event.MouseWheelListener;
++import java.awt.image.BufferedImage;
++import java.util.concurrent.CompletableFuture;
++import java.nio.ByteBuffer;
++import java.util.concurrent.locks.Lock;
++import java.util.concurrent.locks.ReentrantLock;
++
++import javax.swing.MenuSelectionManager;
++import javax.swing.SwingUtilities;
++import javax.swing.JFrame;
++
++import org.jetbrains.skija.Bitmap;
++import org.jetbrains.skiko.OpenGLApi;
++import org.jetbrains.skiko.HardwareLayer;
++
++public class BrowserView extends CefBrowser_N implements CefRenderHandler {
++    private BrowserViewBitmap bitmapHandler;
++    private HardwareLayer canvas;
++    private long windowHandle = 0;
++    private Rectangle browserRect = new Rectangle(0, 0, 1, 1); // Work around CEF issue #1437.
++    private Point screenPoint = new Point(0, 0);
++    private Lock locker = new ReentrantLock();
++
++    public BrowserView(HardwareLayer canvas, CefClient client, String url, CefRequestContext context) {
++        this(canvas, client, url, context, null, null);
++    }
++
++    private BrowserView(HardwareLayer canvas, CefClient client, String url, CefRequestContext context,
++            BrowserView parent, Point inspectAt) {
++        super(client, url, context, parent, inspectAt);
++        this.canvas = canvas;
++        bitmapHandler = new BrowserViewBitmap();
++        new DropTarget(canvas, new BrowserDropTargetListener(this));
++    }
++
++    @Override
++    public void createImmediately() {
++        createBrowserIfRequired(false);
++    }
++
++    @Override
++    public Component getUIComponent() {
++        return canvas;
++    }
++
++    @Override
++    public CefRenderHandler getRenderHandler() {
++        return this;
++    }
++
++    @Override
++    protected CefBrowser_N createDevToolsBrowser(CefClient client, String url, CefRequestContext context,
++            CefBrowser_N parent, Point inspectAt) {
++        return new BrowserView(canvas, client, url, context, (BrowserView) this, inspectAt);
++    }
++
++    @Override
++    public Rectangle getViewRect(CefBrowser browser) {
++        return browserRect;
++    }
++
++    @Override
++    public Point getScreenPoint(CefBrowser browser, Point viewPoint) {
++        Point sp = new Point(screenPoint);
++        sp.translate(viewPoint.x, viewPoint.y);
++        return sp;
++    }
++
++    @Override
++    public void onPopupShow(CefBrowser browser, boolean show) {
++        if (!show) {
++            bitmapHandler.clearPopupRects();
++            invalidate();
++        }
++    }
++
++    @Override
++    public void onPopupSize(CefBrowser browser, Rectangle size) {
++        bitmapHandler.onPopupSize(size);
++    }
++
++    @Override
++    public void onPaint(CefBrowser browser, boolean popup, Rectangle[] dirtyRects, ByteBuffer buffer, int width,
++            int height) {
++        onBitmapChanged(popup, buffer, width, height);
++    }
++
++    public void onBitmapChanged(boolean popup, ByteBuffer buffer, int width, int height) {
++        bitmapHandler.setBitmapData(popup, buffer, width, height);
++    }
++
++    @Override
++    public void onCursorChange(CefBrowser browser, final int cursorType) {
++        SwingUtilities.invokeLater(() -> {
++            canvas.setCursor(new Cursor(cursorType));
++        });
++    }
++
++    @Override
++    public boolean startDragging(CefBrowser browser, CefDragData dragData, int mask, int x, int y) {
++        return false;
++    }
++
++    @Override
++    public void updateDragCursor(CefBrowser browser, int operation) {
++    }
++
++    public void onMouseEvent(MouseEvent event) {
++        event.translatePoint(-browserRect.x, -browserRect.y);
++        sendMouseEvent(event);
++    }
++
++    public void onMouseScrollEvent(MouseWheelEvent event) {
++        event.translatePoint(browserRect.x, browserRect.y);
++        sendMouseWheelEvent(event);
++    }
++
++    public void onKeyEvent(KeyEvent event) {
++        sendKeyEvent(event);
++    }
++
++    public void onResized(int x, int y, int width, int height) {
++        browserRect.setBounds(x, y, width, height);
++        screenPoint = canvas.getLocationOnScreen();
++        wasResized(width, height);
++    }
++
++    public void onFocusGained() {
++        if (windowHandle != 0) {
++            MenuSelectionManager.defaultManager().clearSelectedPath();
++            setFocus(true);
++        }
++    }
++
++    public void onFocusLost() {
++        if (windowHandle != 0) {
++            setFocus(false);
++        }
++    }
++
++    public void dispose() {
++        bitmapHandler.clean();
++    }
++
++    public void onStart() {
++        SwingUtilities.invokeLater(() -> {
++            createBrowserIfRequired(true);
++        });
++    }
++
++    public Bitmap getBitmap() {
++        return bitmapHandler.getBitmap();
++    }
++
++    private void createBrowserIfRequired(boolean hasParent) {
++        long windowHandle = 0;
++        if (hasParent) {
++            windowHandle = getWindowHandle();
++        }
++        if (getNativeRef("CefBrowser") == 0) {
++            if (getParentBrowser() != null) {
++                createDevTools(getParentBrowser(), getClient(), windowHandle, true, false, null, getInspectAt());
++            } else {
++                createBrowser(getClient(), windowHandle, getUrl(), true, false, null, getRequestContext());
++            }
++        } else {
++            setFocus(true);
++        }
++    }
++
++    private synchronized long getWindowHandle() {
++        if (windowHandle == 0) {
++            windowHandle = canvas.getWindowHandle();
++        }
++        return windowHandle;
++    }
++
++    @Override
++    public CompletableFuture<BufferedImage> createScreenshot(boolean nativeResolution) {
++        throw new UnsupportedOperationException("BrowserView:createScreenshot - Not implemented, yet.\n");
++    }
++
++    @Override
++    public boolean getScreenInfo(CefBrowser browser, CefScreenInfo screenInfo) {
++        // TODO Auto-generated method stub
++        return false;
++    }
++}
+diff --git a/java/org/cef/browser/BrowserViewBitmap.java b/java/org/cef/browser/BrowserViewBitmap.java
+new file mode 100644
+index 0000000..036075b
+--- /dev/null
++++ b/java/org/cef/browser/BrowserViewBitmap.java
+@@ -0,0 +1,107 @@
++package org.cef.browser;
++
++import java.awt.Rectangle;
++import java.nio.ByteBuffer;
++import java.util.concurrent.locks.Lock;
++import java.util.concurrent.locks.ReentrantLock;
++
++import org.jetbrains.skija.ColorAlphaType;
++import org.jetbrains.skija.Bitmap;
++import org.jetbrains.skija.ImageInfo;
++
++class BrowserViewBitmap {
++
++    private Bitmap bitmap = null;
++    private byte[] pixels = null;
++    private int width = 0;
++    private int height = 0;
++    private Rectangle popupRect = new Rectangle(0, 0, 0, 0);
++    private Rectangle popupOriginRect = new Rectangle(0, 0, 0, 0);
++    private boolean popup = false;
++
++    private Lock lock = new ReentrantLock();
++
++    void clean() {
++        width = height = 0;
++    }
++
++    private byte[] getBytes(ByteBuffer buffer, int width, int height) {
++        byte[] pixels = new byte[buffer.capacity()];
++        int index = 0;
++        for (int y = 0; y < height; y++) {
++            for (int x = 0; x < width; x++) {
++                pixels[index++] = buffer.get((x + y * width) * 4 + 0);
++                pixels[index++] = buffer.get((x + y * width) * 4 + 1);
++                pixels[index++] = buffer.get((x + y * width) * 4 + 2);
++                pixels[index++] = buffer.get((x + y * width) * 4 + 3);
++            }
++        }
++        return pixels;
++    }
++
++    Bitmap getBitmap() {
++        lock.lock();
++        try {
++            if (bitmap == null) {
++                init();
++            }
++            return bitmap;
++        } finally {
++            lock.unlock();
++        }
++    }
++
++    void init() {
++        bitmap = new Bitmap();
++        bitmap.allocPixels(ImageInfo.makeS32((int) width, (int) height, ColorAlphaType.PREMUL));
++    }
++
++    void setBitmapData(boolean popup, ByteBuffer buffer, int width, int height) {
++        lock.lock();
++        try {
++            this.popup = popup;
++            if (this.width != width || this.height != height) {
++                this.height = height;
++                this.width = width;
++                init();
++            }
++            pixels = getBytes(buffer, width, height);
++            bitmap.installPixels(bitmap.getImageInfo(), pixels, width * 4);
++        } finally {
++            lock.unlock();
++        }
++    }
++
++    void onPopupSize(Rectangle rect) {
++        if (rect.width <= 0 || rect.height <= 0)
++            return;
++        popupOriginRect = rect;
++        popupRect = getPopupRectInWebView(popupOriginRect);
++    }
++
++    Rectangle getPopupRect() {
++        return (Rectangle) popupRect.clone();
++    }
++
++    Rectangle getPopupRectInWebView(Rectangle originalRect) {
++        Rectangle rc = originalRect;
++        if (rc.x < 0)
++            rc.x = 0;
++        if (rc.y < 0)
++            rc.y = 0;
++        if (rc.x + rc.width > width)
++            rc.x = width - rc.width;
++        if (rc.y + rc.height > height)
++            rc.y = height - rc.height;
++        if (rc.x < 0)
++            rc.x = 0;
++        if (rc.y < 0)
++            rc.y = 0;
++        return rc;
++    }
++
++    void clearPopupRects() {
++        popupRect.setBounds(0, 0, 0, 0);
++        popupOriginRect.setBounds(0, 0, 0, 0);
++    }
++}
