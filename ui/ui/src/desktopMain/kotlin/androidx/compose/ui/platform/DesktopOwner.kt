@@ -179,6 +179,10 @@ class DesktopOwner(
         snapshotObserver.observeReads(node, onCommitAffectingMeasure, block)
     }
 
+    override fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+        snapshotObserver.observeReads(target, onChanged, block)
+    }
+
     private fun observeDrawModelReads(layer: SkijaLayer, block: () -> Unit) {
         snapshotObserver.observeReads(layer, onCommitAffectingLayer, block)
     }

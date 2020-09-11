@@ -89,6 +89,16 @@ package androidx.compose.ui {
     method public static int merge(androidx.compose.ui.AlignmentLine, int position1, int position2);
   }
 
+  public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
+    method public float getDensity();
+    method public float getFontScale();
+    method public long getSize();
+    method public androidx.compose.ui.DrawResult onDraw(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    property public float density;
+    property public float fontScale;
+    property public final long size;
+  }
+
   public final class CombinedModifier implements androidx.compose.ui.Modifier {
     ctor public CombinedModifier(androidx.compose.ui.Modifier outer, androidx.compose.ui.Modifier inner);
     method public boolean all(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
@@ -155,11 +165,17 @@ package androidx.compose.ui {
 
   public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
     method public void draw(androidx.compose.ui.ContentDrawScope);
+    method public default kotlin.jvm.functions.Function2<androidx.compose.ui.geometry.Size,androidx.compose.ui.unit.Density,kotlin.Unit>? getBuildCache();
+    property public default kotlin.jvm.functions.Function2<androidx.compose.ui.geometry.Size,androidx.compose.ui.unit.Density,kotlin.Unit>? buildCache;
   }
 
   public final class DrawModifierKt {
     method public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
+    method public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.CacheDrawScope,androidx.compose.ui.DrawResult> onBuildDrawCache);
     method public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> onDraw);
+  }
+
+  public final class DrawResult {
   }
 
   public final class FocusModifierKt {
@@ -1923,6 +1939,7 @@ package androidx.compose.ui.node {
     method public void measureAndLayout();
     method public void observeLayoutModelReads(androidx.compose.ui.node.LayoutNode node, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void observeMeasureModelReads(androidx.compose.ui.node.LayoutNode node, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public <T> void observeReads(T target, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onChanged, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void onAttach(androidx.compose.ui.node.LayoutNode node);
     method public void onDetach(androidx.compose.ui.node.LayoutNode node);
     method public void onRequestMeasure(androidx.compose.ui.node.LayoutNode layoutNode);
