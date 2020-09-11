@@ -25,7 +25,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.BackdropScaffold
-import androidx.compose.material.BackdropValue.Concealed
+import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -34,7 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.rememberBackdropState
+import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,70 +49,22 @@ import kotlinx.coroutines.launch
 @Sampled
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
-fun BackdropSample() {
-    val selection = remember { mutableStateOf(1) }
-    val backdropScaffoldState = rememberBackdropState(Concealed)
-    BackdropScaffold(
-        backdropScaffoldState = backdropScaffoldState,
-        appBar = {
-            TopAppBar(
-                title = { Text("Backdrop") },
-                navigationIcon = {
-                    if (backdropScaffoldState.isConcealed) {
-                        IconButton(onClick = { backdropScaffoldState.reveal() }) {
-                            Icon(Icons.Default.Menu)
-                        }
-                    } else {
-                        IconButton(onClick = { backdropScaffoldState.conceal() }) {
-                            Icon(Icons.Default.Close)
-                        }
-                    }
-                },
-                elevation = 0.dp,
-                backgroundColor = Color.Transparent
-            )
-        },
-        backLayerContent = {
-            LazyColumnFor((1..5).toList()) {
-                ListItem(
-                    Modifier.clickable {
-                        selection.value = it
-                        backdropScaffoldState.conceal()
-                    },
-                    text = { Text("Select $it") }
-                )
-            }
-        },
-        frontLayerContent = {
-            Box(
-                Modifier.fillMaxSize(),
-                gravity = ContentGravity.Center
-            ) {
-                Text("Selection: ${selection.value}")
-            }
-        }
-    )
-}
-
-@Sampled
-@Composable
-@OptIn(ExperimentalMaterialApi::class)
-fun BackdropWithSnackbarSample() {
+fun BackdropScaffoldSample() {
     val scope = rememberCoroutineScope()
     val selection = remember { mutableStateOf(1) }
-    val backdropScaffoldState = rememberBackdropState(Concealed)
+    val scaffoldState = rememberBackdropScaffoldState(BackdropValue.Concealed)
     BackdropScaffold(
-        backdropScaffoldState = backdropScaffoldState,
+        scaffoldState = scaffoldState,
         appBar = {
             TopAppBar(
-                title = { Text("Backdrop") },
+                title = { Text("Backdrop scaffold") },
                 navigationIcon = {
-                    if (backdropScaffoldState.isConcealed) {
-                        IconButton(onClick = { backdropScaffoldState.reveal() }) {
+                    if (scaffoldState.isConcealed) {
+                        IconButton(onClick = { scaffoldState.reveal() }) {
                             Icon(Icons.Default.Menu)
                         }
                     } else {
-                        IconButton(onClick = { backdropScaffoldState.conceal() }) {
+                        IconButton(onClick = { scaffoldState.conceal() }) {
                             Icon(Icons.Default.Close)
                         }
                     }
@@ -122,7 +74,7 @@ fun BackdropWithSnackbarSample() {
                     IconButton(onClick = {
                         // show snackbar as a suspend function
                         scope.launch {
-                            backdropScaffoldState.snackbarHostState
+                            scaffoldState.snackbarHostState
                                 .showSnackbar("Snackbar #${++clickCount}")
                         }
                     }) {
@@ -138,7 +90,7 @@ fun BackdropWithSnackbarSample() {
                 ListItem(
                     Modifier.clickable {
                         selection.value = it
-                        backdropScaffoldState.conceal()
+                        scaffoldState.conceal()
                     },
                     text = { Text("Select $it") }
                 )

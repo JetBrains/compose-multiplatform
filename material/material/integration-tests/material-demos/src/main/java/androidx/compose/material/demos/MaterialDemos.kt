@@ -20,7 +20,7 @@ import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.samples.AlertDialogSample
-import androidx.compose.material.samples.BackdropSample
+import androidx.compose.material.samples.BackdropScaffoldSample
 import androidx.compose.material.samples.BottomDrawerSample
 import androidx.compose.material.samples.CustomAlertDialogSample
 import androidx.compose.material.samples.EmphasisSample
@@ -34,7 +34,7 @@ val MaterialDemos = DemoCategory("Material", listOf(
         ComposableDemo("Custom buttons") { CustomAlertDialogSample() }
     )),
     ComposableDemo("App Bars") { AppBarDemo() },
-    ComposableDemo("Backdrop") { BackdropSample() },
+    ComposableDemo("Backdrop") { BackdropScaffoldSample() },
     ComposableDemo("Bottom Navigation") { BottomNavigationDemo() },
     ComposableDemo("Buttons & FABs") { ButtonDemo() },
     DemoCategory("Navigation drawer", listOf(
