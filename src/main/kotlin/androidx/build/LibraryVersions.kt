@@ -38,6 +38,7 @@ object LibraryVersions {
     val CAMERA = Version("1.0.0-beta09")
     val CAMERA_EXTENSIONS = Version("1.0.0-alpha16")
     val CAMERA_PIPE = Version("1.0.0-alpha01")
+    val CAMERA_VIDEO = Version("1.0.0-alpha01")
     val CAMERA_VIEW = Version("1.0.0-alpha16")
     val CARDVIEW = Version("1.1.0-alpha01")
     val COLLECTION = Version("1.2.0-alpha01")
