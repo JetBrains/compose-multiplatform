@@ -99,7 +99,7 @@ fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
     // Only verify configurations that are exported to POM. In an ideal world, this would be an
     // inclusion derived from the mappings used by the Maven Publish Plugin; however, since we
     // don't have direct access to those, this should remain an exclusion list.
-    var name = configuration.name
+    val name = configuration.name
 
     // Don't check any Android-specific variants of Java plugin configurations -- releaseApi for
     // api, debugImplementation for implementation, etc. -- or test configurations.
@@ -108,10 +108,11 @@ fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
     if (name.startsWith("release")) return false
     if (name.startsWith("test")) return false
 
-    // Don't check any tooling configurations (except lint!).
+    // Don't check any tooling configurations.
     if (name == "annotationProcessor") return false
     if (name == "errorprone") return false
     if (name.startsWith("jacoco")) return false
+    if (name.startsWith("lint")) return false
     if (name == "metalava") return false
 
     return true
