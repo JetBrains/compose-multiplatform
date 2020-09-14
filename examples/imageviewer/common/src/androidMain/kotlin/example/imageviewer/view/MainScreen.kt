@@ -15,7 +15,6 @@
  */
 package example.imageviewer.view
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape

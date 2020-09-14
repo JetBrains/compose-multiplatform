@@ -203,8 +203,9 @@ fun setImage(content: ContentState) {
     ) {
         Draggable(onDrag = drag, modifier = Modifier.fillMaxSize()) {
             Scalable(onScale = scale, modifier = Modifier.fillMaxSize()) {
+                val bitmap = imageByGesture(content, scale, drag)
                 Image(
-                    asset = imageByGesture(content, scale, drag).asImageAsset(),
+                    asset = bitmap.asImageAsset(),
                     contentScale = ContentScale.Fit
                 )
             }
