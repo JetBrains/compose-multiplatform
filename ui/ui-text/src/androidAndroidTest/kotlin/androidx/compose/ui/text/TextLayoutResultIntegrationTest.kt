@@ -31,6 +31,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import kotlin.math.floor
 
 @OptIn(InternalTextApi::class)
 @RunWith(JUnit4::class)
@@ -184,5 +185,113 @@ class TextLayoutResultIntegrationTest {
 
         // paint should not throw exception
         TextDelegate.paint(Canvas(android.graphics.Canvas()), layoutResult)
+    }
+
+    @Test
+    fun didOverflowHeight_isTrue_when_maxLines_exceeded() {
+        val text = "HelloHellowHelloHello"
+        val spanStyle = SpanStyle(fontSize = 20.sp, fontFamily = fontFamily)
+        val annotatedString = AnnotatedString(text, spanStyle)
+        val maxLines = 3
+
+        val textDelegate = TextDelegate(
+            text = annotatedString,
+            style = TextStyle.Default,
+            maxLines = maxLines,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        textDelegate.layoutIntrinsics(layoutDirection)
+        // Tries to make 5 lines of text, which exceeds the given maxLines(3).
+        val maxWidth = textDelegate.maxIntrinsicWidth / 5
+        val layoutResult = textDelegate.layout(
+            Constraints(maxWidth = maxWidth),
+            layoutDirection
+        )
+
+        assertThat(layoutResult.didOverflowHeight).isTrue()
+    }
+
+    @Test
+    fun didOverflowHeight_isFalse_when_maxLines_notExceeded() {
+        val text = "HelloHellowHelloHello"
+        val spanStyle = SpanStyle(fontSize = 20.sp, fontFamily = fontFamily)
+        val annotatedString = AnnotatedString(text, spanStyle)
+        val maxLines = 10
+
+        val textDelegate = TextDelegate(
+            text = annotatedString,
+            style = TextStyle.Default,
+            maxLines = maxLines,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        textDelegate.layoutIntrinsics(layoutDirection)
+        // Tries to make 5 lines of text, which doesn't exceed the given maxLines(10).
+        val maxWidth = textDelegate.maxIntrinsicWidth / 5
+        val layoutResult = textDelegate.layout(
+            Constraints(maxWidth = maxWidth),
+            layoutDirection
+        )
+
+        assertThat(layoutResult.didOverflowHeight).isFalse()
+    }
+
+    @Test
+    fun didOverflowHeight_isTrue_when_maxHeight_exceeded() {
+        val text = "HelloHellowHelloHello"
+        val spanStyle = SpanStyle(fontSize = 20.sp, fontFamily = fontFamily)
+        val annotatedString = AnnotatedString(text, spanStyle)
+
+        val textDelegate = TextDelegate(
+            text = annotatedString,
+            style = TextStyle.Default,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        val maxIntrinsicsHeight = textDelegate.layout(
+            Constraints(),
+            layoutDirection
+        ).multiParagraph.height
+
+        // Make maxHeight smaller than needed.
+        val maxHeight = floor(maxIntrinsicsHeight / 2).toInt()
+        val layoutResult = textDelegate.layout(
+            Constraints(maxHeight = maxHeight),
+            layoutDirection
+        )
+
+        assertThat(layoutResult.didOverflowHeight).isTrue()
+    }
+
+    @Test
+    fun didOverflowHeight_isFalse_when_maxHeight_notExceeded() {
+        val text = "HelloHellowHelloHello"
+        val spanStyle = SpanStyle(fontSize = 20.sp, fontFamily = fontFamily)
+        val annotatedString = AnnotatedString(text, spanStyle)
+
+        val textDelegate = TextDelegate(
+            text = annotatedString,
+            style = TextStyle.Default,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        val maxIntrinsicsHeight = textDelegate.layout(
+            Constraints(),
+            layoutDirection
+        ).multiParagraph.height
+
+        // Make max height larger than the needed.
+        val maxHeight = floor(maxIntrinsicsHeight * 2).toInt()
+        val layoutResult = textDelegate.layout(
+            Constraints(maxHeight = maxHeight),
+            layoutDirection
+        )
+
+        assertThat(layoutResult.didOverflowHeight).isFalse()
     }
 }
