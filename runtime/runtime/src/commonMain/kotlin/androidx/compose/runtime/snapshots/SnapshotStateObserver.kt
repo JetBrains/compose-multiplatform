@@ -18,6 +18,7 @@ package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.ObserverMap
+import androidx.compose.runtime.TestOnly
 
 @ExperimentalComposeApi
 @Suppress("DEPRECATION_ERROR")
@@ -175,6 +176,15 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
             applyUnsubscribe?.invoke()
             null
         }
+    }
+
+    /**
+     * This method is only used for testing. It notifies that [changes] have been made on
+     * [snapshot].
+     */
+    @TestOnly
+    fun notifyChanges(changes: Set<Any>, snapshot: Snapshot) {
+        applyObserver(changes, snapshot)
     }
 
     /**
