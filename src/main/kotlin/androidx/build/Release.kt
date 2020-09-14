@@ -273,8 +273,8 @@ object Release {
             name = taskName,
             onConfigure = {
                 GMavenZipTask.ConfigAction(
-                    getParams(project, File(project.getDistributionDirectory(),
-                        PROJECT_ZIPS_FOLDER), project.projectZipPrefix()).copy(
+                    getParams(project = project, distDir = File(project.getDistributionDirectory(),
+                        PROJECT_ZIPS_FOLDER), fileNamePrefix = project.projectZipPrefix()).copy(
                         includeMetadata = true
                     )
                 ).execute(it)
@@ -337,7 +337,9 @@ private fun getZipName(fileNamePrefix: String, mavenGroup: String): String {
 fun Project.getProjectZipPath():
         String {
     return distSubdir() + Release.PROJECT_ZIPS_FOLDER + "/" +
-            getZipName(projectZipPrefix(), project.group.toString()) + ".zip"
+            // We pass in a "" because that mimics not passing the group to getParams() inside
+            // the getProjectZipTask function
+            getZipName(projectZipPrefix(), "") + "-${project.version}.zip"
 }
 
 fun Project.getGroupZipPath():
