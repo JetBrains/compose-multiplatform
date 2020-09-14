@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.nativeClass
 
 /**
@@ -93,12 +92,11 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         // our position in order ot know how to offset the value we provided).
         if (wrappedBy?.isShallowPlacing == true) return
 
-        with(InnerPlacementScope) {
-            val previousParentWidth = this.parentWidth
-            val previousLayoutDirection = this.parentLayoutDirection
-            updateValuesForRtlMirroring(measureScope.layoutDirection, measuredSize.width)
+        PlacementScope.executeWithRtlMirroringValues(
+            measuredSize.width,
+            measureScope.layoutDirection
+        ) {
             measureResult.placeChildren()
-            updateValuesForRtlMirroring(previousLayoutDirection, previousParentWidth)
         }
     }
 
@@ -109,7 +107,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
             override val height: Int = wrapped.measureResult.height
             override val alignmentLines: Map<AlignmentLine, Int> = emptyMap()
             override fun placeChildren() {
-                with(InnerPlacementScope) {
+                with(PlacementScope) {
                     placeable.place(-apparentToRealOffset)
                 }
             }
@@ -163,17 +161,5 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override fun detach() {
         _isAttached = false
-    }
-}
-
-internal object InnerPlacementScope : Placeable.PlacementScope() {
-    override var parentLayoutDirection = LayoutDirection.Ltr
-        private set
-    override var parentWidth = 0
-        private set
-
-    fun updateValuesForRtlMirroring(parentLayoutDirection: LayoutDirection, parentWidth: Int) {
-        this.parentLayoutDirection = parentLayoutDirection
-        this.parentWidth = parentWidth
     }
 }
