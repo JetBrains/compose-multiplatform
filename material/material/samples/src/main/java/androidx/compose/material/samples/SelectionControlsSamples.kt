@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxConstants
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Switch
@@ -37,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -64,7 +64,16 @@ fun TriStateCheckboxSample() {
         TriStateCheckbox(
             state = parentState,
             onClick = onParentClick,
-            checkedColor = MaterialTheme.colors.primary
+            boxColor = CheckboxConstants.animateDefaultBoxColor(
+                state = parentState,
+                enabled = true,
+                checkedColor = MaterialTheme.colors.primary
+            ),
+            borderColor = CheckboxConstants.animateDefaultBorderColor(
+                state = parentState,
+                enabled = true,
+                checkedColor = MaterialTheme.colors.primary
+            )
         )
         Column(Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
             Checkbox(state, onStateChange)
@@ -96,19 +105,16 @@ fun SwitchSample() {
 @Sampled
 @Composable
 fun RadioButtonSample() {
-    // we have two radio buttons and only one can be selected
-    // let's emulate binary choice here
-    var enterTheMatrix by remember { mutableStateOf(true) }
+    // We have two radio buttons and only one can be selected
+    var state by remember { mutableStateOf(true) }
     Row {
         RadioButton(
-            selected = enterTheMatrix,
-            onClick = { enterTheMatrix = true },
-            selectedColor = Color.Red
+            selected = state,
+            onClick = { state = true }
         )
         RadioButton(
-            selected = !enterTheMatrix,
-            onClick = { enterTheMatrix = false },
-            selectedColor = Color.Blue
+            selected = !state,
+            onClick = { state = false }
         )
     }
 }

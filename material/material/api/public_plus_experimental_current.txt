@@ -176,9 +176,21 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void Card-IHU7g64(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.graphics.Shape shape = medium, long backgroundColor = MaterialTheme.colors.surface, long contentColor = contentColorFor(backgroundColor), androidx.compose.foundation.BorderStroke? border = null, float elevation = 1.dp, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
+  public final class CheckboxConstants {
+    method @androidx.compose.runtime.Composable public long animateDefaultBorderColor-xAuy4YE(androidx.compose.foundation.selection.ToggleableState state, boolean enabled, long checkedColor = MaterialTheme.colors.secondary, long uncheckedColor = defaultUncheckedColor, long disabledColor = defaultDisabledColor, long disabledIndeterminateColor = defaultDisabledIndeterminateColor(checkedColor));
+    method @androidx.compose.runtime.Composable public long animateDefaultBoxColor-4eRnVYk(androidx.compose.foundation.selection.ToggleableState state, boolean enabled, long checkedColor = MaterialTheme.colors.secondary, long uncheckedColor = checkedColor.copy(0.0), long disabledCheckedColor = defaultDisabledColor, long disabledUncheckedColor = Color.Transparent, long disabledIndeterminateColor = defaultDisabledIndeterminateColor(checkedColor));
+    method @androidx.compose.runtime.Composable public long animateDefaultCheckmarkColor-9THJUkw(androidx.compose.foundation.selection.ToggleableState state, long checkedColor = MaterialTheme.colors.surface, long uncheckedColor = checkedColor.copy(0.0));
+    method @androidx.compose.runtime.Composable public long defaultDisabledIndeterminateColor-8_81llA(long checkedColor);
+    method public long getDefaultDisabledColor();
+    method public long getDefaultUncheckedColor();
+    property public final long defaultDisabledColor;
+    property public final long defaultUncheckedColor;
+    field public static final androidx.compose.material.CheckboxConstants INSTANCE;
+  }
+
   public final class CheckboxKt {
-    method @androidx.compose.runtime.Composable public static void Checkbox-p4uo5cA(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, long checkedColor = MaterialTheme.colors.secondary, long uncheckedColor = MaterialTheme.colors.onSurface, long disabledColor = MaterialTheme.colors.onSurface, long checkMarkColor = MaterialTheme.colors.surface);
-    method @androidx.compose.runtime.Composable public static void TriStateCheckbox-mcs78Zg(androidx.compose.foundation.selection.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, long checkedColor = MaterialTheme.colors.secondary, long uncheckedColor = MaterialTheme.colors.onSurface, long disabledColor = MaterialTheme.colors.onSurface, long checkMarkColor = MaterialTheme.colors.surface);
+    method @androidx.compose.runtime.Composable public static void Checkbox-D3vZVBM(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, long checkedColor = MaterialTheme.colors.secondary, long uncheckedColor = CheckboxConstants.defaultUncheckedColor);
+    method @androidx.compose.runtime.Composable public static void TriStateCheckbox-w6h9dZI(androidx.compose.foundation.selection.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, long checkMarkColor = CheckboxConstants.animateDefaultCheckmarkColor(state), long boxColor = CheckboxConstants.animateDefaultBoxColor(state, enabled), long borderColor = CheckboxConstants.animateDefaultBorderColor(state, enabled));
   }
 
   @androidx.compose.runtime.Stable public final class Colors {
@@ -436,6 +448,7 @@ package androidx.compose.material {
   }
 
   public final class RadioButtonConstants {
+    method @androidx.compose.runtime.Composable public long animateDefaultColor-tRWe6DU(boolean selected, boolean enabled, long selectedColor = MaterialTheme.colors.secondary, long unselectedColor = defaultUnselectedColor, long disabledColor = defaultDisabledColor);
     method public long getDefaultDisabledColor();
     method public long getDefaultUnselectedColor();
     property public final long defaultDisabledColor;
@@ -444,7 +457,7 @@ package androidx.compose.material {
   }
 
   public final class RadioButtonKt {
-    method @androidx.compose.runtime.Composable public static void RadioButton-PKiHyag(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, long selectedColor = MaterialTheme.colors.secondary, long unselectedColor = RadioButtonConstants.defaultUnselectedColor, long disabledColor = RadioButtonConstants.defaultDisabledColor);
+    method @androidx.compose.runtime.Composable public static void RadioButton-5r5xgFI(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, long color = RadioButtonConstants.animateDefaultColor(selected, enabled));
   }
 
   @androidx.compose.runtime.Immutable public final class ResistanceConfig {
