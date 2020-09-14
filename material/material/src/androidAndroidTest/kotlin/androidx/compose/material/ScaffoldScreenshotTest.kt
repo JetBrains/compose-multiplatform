@@ -616,18 +616,22 @@ private fun ScreenshotScaffold(
     fabPosition: FabPosition = FabPosition.End,
     rtl: Boolean = false
 ) {
-    val topAppBar = (@Composable {
-        TopAppBar(title = { Text("Scaffold") })
-    }).takeIf { showTopAppBar }
+    val topAppBar = @Composable {
+        if (showTopAppBar) {
+            TopAppBar(title = { Text("Scaffold") })
+        }
+    }
 
-    val bottomAppBar = (@Composable {
-        val cutoutShape = if (fabCutout) CircleShape else null
-        BottomAppBar(cutoutShape = cutoutShape) {
-            IconButton(onClick = {}) {
-                Icon(Icons.Filled.Menu)
+    val bottomAppBar = @Composable {
+        if (showBottomAppBar) {
+            val cutoutShape = if (fabCutout) CircleShape else null
+            BottomAppBar(cutoutShape = cutoutShape) {
+                IconButton(onClick = {}) {
+                    Icon(Icons.Filled.Menu)
+                }
             }
         }
-    }).takeIf { showBottomAppBar }
+    }
 
     val snackbar = @Composable {
         if (showSnackbar) {
@@ -642,12 +646,14 @@ private fun ScreenshotScaffold(
         }
     }
 
-    val fab = (@Composable {
-        FloatingActionButton(
-            icon = { Icon(Icons.Filled.Favorite) },
-            onClick = {}
-        )
-    }).takeIf { showFab }
+    val fab = @Composable {
+        if (showFab) {
+            FloatingActionButton(
+                icon = { Icon(Icons.Filled.Favorite) },
+                onClick = {}
+            )
+        }
+    }
 
     val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 

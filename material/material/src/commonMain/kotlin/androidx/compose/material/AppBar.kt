@@ -174,10 +174,9 @@ fun BottomAppBar(
     elevation: Dp = BottomAppBarElevation,
     content: @Composable RowScope.() -> Unit
 ) {
-    val scaffoldGeometry = AmbientScaffoldGeometry.current
-    val fabBounds = scaffoldGeometry.fabBounds
-    val shape = if (cutoutShape != null && scaffoldGeometry.isFabDocked && fabBounds != null) {
-        BottomAppBarCutoutShape(cutoutShape, fabBounds)
+    val fabPlacement = AmbientFabPlacement.current
+    val shape = if (cutoutShape != null && fabPlacement?.isDocked == true) {
+        BottomAppBarCutoutShape(cutoutShape, fabPlacement)
     } else {
         RectangleShape
     }
@@ -199,7 +198,7 @@ fun BottomAppBar(
  */
 private data class BottomAppBarCutoutShape(
     val cutoutShape: Shape,
-    val fabBounds: Rect
+    val fabPlacement: FabPlacement
 ) : Shape {
 
     override fun createOutline(size: Size, density: Density): Outline {
@@ -223,11 +222,11 @@ private data class BottomAppBarCutoutShape(
         val cutoutOffset = with(density) { BottomAppBarCutoutOffset.toPx() }
 
         val cutoutSize = Size(
-            width = fabBounds.width + (cutoutOffset * 2),
-            height = fabBounds.height + (cutoutOffset * 2)
+            width = fabPlacement.width + (cutoutOffset * 2),
+            height = fabPlacement.height + (cutoutOffset * 2)
         )
 
-        val cutoutStartX = fabBounds.left - cutoutOffset
+        val cutoutStartX = fabPlacement.left - cutoutOffset
         val cutoutEndX = cutoutStartX + cutoutSize.width
 
         val cutoutRadius = cutoutSize.height / 2f

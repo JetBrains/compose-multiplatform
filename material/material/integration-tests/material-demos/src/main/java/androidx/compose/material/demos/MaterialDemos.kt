@@ -29,6 +29,8 @@ import androidx.compose.material.samples.ModalDrawerSample
 import androidx.compose.material.samples.BottomSheetScaffoldSample
 import androidx.compose.material.samples.ScaffoldWithBottomBarAndCutout
 import androidx.compose.material.samples.ScaffoldWithCoroutinesSnackbar
+import androidx.compose.material.samples.ScaffoldWithSimpleSnackbar
+import androidx.compose.material.samples.SimpleScaffoldWithTopBar
 
 val MaterialDemos = DemoCategory(
     "Material",
@@ -72,7 +74,14 @@ val MaterialDemos = DemoCategory(
         ),
         ComposableDemo("Modal bottom sheet") { ModalBottomSheetSample() },
         ComposableDemo("Progress Indicators") { ProgressIndicatorDemo() },
-        ComposableDemo("Scaffold") { ScaffoldWithBottomBarAndCutout() },
+        DemoCategory(
+            "Scaffold",
+            listOf(
+                ComposableDemo("Scaffold with top bar") { SimpleScaffoldWithTopBar() },
+                ComposableDemo("Scaffold with docked FAB") { ScaffoldWithBottomBarAndCutout() },
+                ComposableDemo("Scaffold with snackbar") { ScaffoldWithSimpleSnackbar() }
+            )
+        ),
         ComposableDemo("Selection Controls") { SelectionControlsDemo() },
         ComposableDemo("Slider") { SliderDemo() },
         ComposableDemo("Snackbar") { ScaffoldWithCoroutinesSnackbar() },
