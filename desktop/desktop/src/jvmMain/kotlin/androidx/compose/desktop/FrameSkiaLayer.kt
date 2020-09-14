@@ -34,7 +34,7 @@ internal class FrameSkiaLayer {
         framesPerSecond = ::getFramesPerSecond
     )
 
-    @Volatile private var picture: Picture? = null
+    private val picture = MutableResource<Picture>()
     private val pictureRecorder = PictureRecorder()
 
     private fun onFrame(nanoTime: Long) {
@@ -52,8 +52,8 @@ internal class FrameSkiaLayer {
     init {
         wrapped.renderer = object : SkiaRenderer {
             override fun onRender(canvas: Canvas, width: Int, height: Int) {
-                if (picture != null) {
-                    canvas.drawPicture(picture)
+                picture.useWithoutClosing {
+                    it?.also(canvas::drawPicture)
                 }
             }
 
@@ -70,8 +70,7 @@ internal class FrameSkiaLayer {
         val bounds = Rect.makeWH(wrapped.width.toFloat(), wrapped.height.toFloat())
         val pictureCanvas = pictureRecorder.beginRecording(bounds)
         renderer?.onRender(pictureCanvas, wrapped.width, wrapped.height, frameTimeNanos)
-        picture?.close()
-        picture = pictureRecorder.finishRecordingAsPicture()
+        picture.set(pictureRecorder.finishRecordingAsPicture())
     }
 
     fun reinit() {
@@ -94,7 +93,7 @@ internal class FrameSkiaLayer {
         frameDispatcher.cancel()
         wrapped.disposeLayer()
         wrapped.updateLayer()
-        picture?.close()
+        picture.close()
         pictureRecorder.close()
         isDisposed = true
     }
