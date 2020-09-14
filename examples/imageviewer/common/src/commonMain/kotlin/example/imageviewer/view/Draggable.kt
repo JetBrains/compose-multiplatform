@@ -24,7 +24,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.runtime.mutableStateOf
 import example.imageviewer.core.EventLocker
 import example.imageviewer.style.Transparent
@@ -37,8 +37,9 @@ fun Draggable(
 ) {
     Surface(
         color = Transparent,
-        modifier = modifier.dragGestureFilter(
-            dragObserver = onDrag
+        modifier = modifier.rawDragGestureFilter(
+            dragObserver = onDrag,
+            canStartDragging = { true }
         )
     ) {
         children()

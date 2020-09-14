@@ -37,7 +37,8 @@ fun Scalable(
     Surface(
         color = Transparent,
         modifier = modifier.rawScaleGestureFilter(
-            scaleObserver = onScale
+            scaleObserver = onScale,
+            canStartScaling = { true }
         ).doubleTapGestureFilter(onDoubleTap = { onScale.resetFactor() }),
     ) {
         children()
