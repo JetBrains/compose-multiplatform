@@ -20,12 +20,13 @@ package androidx.compose.animation.core
 import android.os.Handler
 import android.os.Looper
 import android.view.Choreographer
+import androidx.compose.ui.util.annotation.VisibleForTesting
 import java.util.concurrent.CountDownLatch
 
 /** @suppress */
 @InternalAnimationApi
 var rootAnimationClockFactory: () -> AnimationClockObservable = { DefaultAnimationClock() }
-    // @TestOnly
+    @VisibleForTesting
     set
 
 /**
