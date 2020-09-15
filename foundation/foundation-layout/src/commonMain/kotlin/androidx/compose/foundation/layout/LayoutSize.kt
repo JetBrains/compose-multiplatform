@@ -347,48 +347,69 @@ fun Modifier.fillMaxSize(@FloatRange(from = 0.0, to = 1.0) fraction: Float = 1f)
 
 /**
  * Allow the content to measure at its desired width without regard for the incoming measurement
- * [minimum width constraint][Constraints.minWidth]. If the content's measured size is smaller
- * than the minimum width constraint, [align] it within that minimum width space.
+ * [minimum width constraint][Constraints.minWidth], and, if [unbounded] is true, also without
+ * regard for the incoming measurement [maximum width constraint][Constraints.maxWidth]. If
+ * the content's measured size is smaller than the minimum width constraint, [align]
+ * it within that minimum width space. If the content's measured size is larger than the maximum
+ * width constraint (only possible when [unbounded] is true), [align] over the maximum
+ * width space.
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleWrapContentHorizontallyAlignedModifier
  */
 @Stable
 // TODO(popam): avoid recreating modifier for common align
-fun Modifier.wrapContentWidth(align: Alignment.Horizontal = Alignment.CenterHorizontally) =
-    this.then(AlignmentModifier(Direction.Horizontal, align) { size, layoutDirection ->
+fun Modifier.wrapContentWidth(
+    align: Alignment.Horizontal = Alignment.CenterHorizontally,
+    unbounded: Boolean = false
+) = this.then(
+    WrapContentModifier(Direction.Horizontal, align, unbounded) { size, layoutDirection ->
         IntOffset(align.align(size.width, layoutDirection), 0)
-    })
+    }
+)
 
 /**
  * Allow the content to measure at its desired height without regard for the incoming measurement
- * [minimum height constraint][Constraints.minHeight]. If the content's measured size is smaller
- * than the minimum height constraint, [align] it within that minimum height space.
+ * [minimum height constraint][Constraints.minHeight], and, if [unbounded] is true, also without
+ * regard for the incoming measurement [maximum height constraint][Constraints.maxHeight]. If the
+ * content's measured size is smaller than the minimum height constraint, [align] it within
+ * that minimum height space. If the content's measured size is larger than the maximum height
+ * constraint (only possible when [unbounded] is true), [align] over the maximum height space.
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleWrapContentVerticallyAlignedModifier
  */
 // TODO(popam): avoid recreating modifier for common align
 @Stable
-fun Modifier.wrapContentHeight(align: Alignment.Vertical = Alignment.CenterVertically) =
-    this.then(AlignmentModifier(Direction.Vertical, align) { size, _ ->
+fun Modifier.wrapContentHeight(
+    align: Alignment.Vertical = Alignment.CenterVertically,
+    unbounded: Boolean = false
+) = this.then(
+    WrapContentModifier(Direction.Vertical, align, unbounded) { size, _ ->
         IntOffset(0, align.align(size.height))
-    })
+    }
+)
 
 /**
  * Allow the content to measure at its desired size without regard for the incoming measurement
- * [minimum width][Constraints.minWidth] or [minimum height][Constraints.minHeight] constraints.
+ * [minimum width][Constraints.minWidth] or [minimum height][Constraints.minHeight] constraints,
+ * and, if [unbounded] is true, also without regard for the incoming maximum constraints.
  * If the content's measured size is smaller than the minimum size constraint, [align] it
- * within that minimum sized space.
+ * within that minimum sized space. If the content's measured size is larger than the maximum
+ * size constraint (only possible when [unbounded] is true), [align] within the maximum space.
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleWrapContentAlignedModifier
  */
 @Stable
-fun Modifier.wrapContentSize(align: Alignment = Alignment.Center) =
-    this.then(AlignmentModifier(Direction.Both, align) { size, layoutDirection ->
+fun Modifier.wrapContentSize(
+    align: Alignment = Alignment.Center,
+    unbounded: Boolean = false
+) = this.then(
+    WrapContentModifier(Direction.Both, align, unbounded) { size, layoutDirection ->
         align.align(size, layoutDirection)
-    })
+    }
+)
 
 /**
  * Constrain the size of the wrapped layout only when it would be otherwise unconstrained:
@@ -605,23 +626,33 @@ private data class SizeModifier(
         }
 }
 
-private data class AlignmentModifier(
+private data class WrapContentModifier(
     private val direction: Direction,
     private val alignment: Any,
+    private val unbounded: Boolean,
     private val alignmentCallback: (IntSize, LayoutDirection) -> IntOffset
 ) : LayoutModifier, InspectableParameter {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureScope.MeasureResult {
-        val wrappedConstraints = when (direction) {
-            Direction.Both -> constraints.copy(minWidth = 0, minHeight = 0)
-            Direction.Horizontal -> constraints.copy(minWidth = 0)
-            Direction.Vertical -> constraints.copy(minHeight = 0)
-        }
+        val wrappedConstraints = Constraints(
+            minWidth = if (direction != Direction.Vertical) 0 else constraints.minWidth,
+            minHeight = if (direction != Direction.Horizontal) 0 else constraints.minHeight,
+            maxWidth = if (direction != Direction.Vertical && unbounded) {
+                Constraints.Infinity
+            } else {
+                constraints.maxWidth
+            },
+            maxHeight = if (direction != Direction.Horizontal && unbounded) {
+                Constraints.Infinity
+            } else {
+                constraints.maxHeight
+            }
+        )
         val placeable = measurable.measure(wrappedConstraints)
-        val wrapperWidth = max(constraints.minWidth, placeable.width)
-        val wrapperHeight = max(constraints.minHeight, placeable.height)
+        val wrapperWidth = placeable.width.coerceIn(constraints.minWidth, constraints.maxWidth)
+        val wrapperHeight = placeable.height.coerceIn(constraints.minHeight, constraints.maxHeight)
         return layout(
             wrapperWidth,
             wrapperHeight
