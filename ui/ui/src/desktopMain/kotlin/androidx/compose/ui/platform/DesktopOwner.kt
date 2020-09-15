@@ -39,6 +39,7 @@ import androidx.compose.ui.input.mouse.MouseScrollEventFilter
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.input.pointer.PointerMoveEventFilter
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
@@ -234,5 +235,46 @@ class DesktopOwner(
             val isConsumed = filter.onMouseScroll(event)
             if (isConsumed) break
         }
+    }
+
+    private var oldMoveFilters = listOf<PointerMoveEventFilter>()
+    private var newMoveFilters = mutableListOf<PointerInputFilter>()
+
+    internal fun onPointerMove(position: Offset) {
+        // TODO: do we actually need that?
+        measureAndLayout()
+
+        root.hitTest(position, newMoveFilters)
+        // Optimize fastpath, where no pointer move event listeners are there.
+        if (newMoveFilters.isEmpty() && oldMoveFilters.isEmpty()) return
+
+        // For elements in `newMoveFilters` we call on `onMoveHandler`.
+        // For elements in `oldMoveFilters` but not in `newMoveFilters` we call `onExitHandler`.
+        // For elements not in `oldMoveFilters` but in `newMoveFilters` we call `onEnterHandler`.
+
+        var onMoveConsumed = false
+        var onEnterConsumed = false
+        var onExitConsumed = false
+
+        for (filter in newMoveFilters
+            .asReversed()
+            .asSequence()
+            .filterIsInstance<PointerMoveEventFilter>()
+        ) {
+            if (!onMoveConsumed)
+                onMoveConsumed = filter.onMoveHandler(position)
+            if (!onEnterConsumed && !oldMoveFilters.contains(filter))
+                onEnterConsumed = filter.onEnterHandler()
+        }
+
+        // TODO: is this quadratic algorithm (by number of matching filters) a problem?
+        //  Unlikely we'll have significant number of filters.
+        for (filter in oldMoveFilters.asReversed()) {
+            if (!onExitConsumed && !newMoveFilters.contains(filter))
+                onExitConsumed = filter.onExitHandler()
+        }
+
+        oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
+        newMoveFilters = mutableListOf()
     }
 }

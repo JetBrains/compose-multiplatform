@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -206,7 +207,21 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                     "    smaller.quickSort() + pivot + greater.quickSort()\n" +
                     "   }\n" +
                     "}",
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(10.dp).pointerMoveFilter(
+                onMove = { position ->
+                    println("MOVE: $position")
+                    false
+                },
+                onEnter = {
+                    println("HOVER!")
+                    text.value = "HOVER ${amount.value}"
+                    false
+                },
+                onExit = {
+                    println("UNHOVER!")
+                    text.value = "UNHOVER ${amount.value}"
+                    false
+                })
         )
 
         Button(modifier = Modifier.padding(4.dp), onClick = {
