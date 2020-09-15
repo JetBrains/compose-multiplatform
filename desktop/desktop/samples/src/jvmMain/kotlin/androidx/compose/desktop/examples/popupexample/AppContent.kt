@@ -160,7 +160,7 @@ fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
         gravity = ContentGravity.Center
     ) {
         Box(
-            Modifier.preferredSize(300.dp, 150.dp).align(Alignment.CenterHorizontally),
+            Modifier.preferredSize(300.dp, 150.dp),
             backgroundColor = Color.Gray,
             shape = RoundedCornerShape(4.dp),
             gravity = ContentGravity.Center
