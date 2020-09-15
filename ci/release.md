@@ -37,11 +37,7 @@ configuration.
     * Set "Skiko Release Version" on "Parameters" tab to a *new release version*;
     * Choose a branch/commit on "Changes" tab;
     * (Tip) If you're in a hurry, consider checking "put the build to the queue top" on "General" tab.
-3. [Create a release on GitHub](https://github.com/JetBrains/skiko/releases/new)
-    * Use `v<RELEASE_VERSION>` pattern for the tag version (e.g. `v0.1.6`)
-    * Attach artifacts from the finished build in 
-    [Publish Release](https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Compose_Skiko_PublishRelease) 
-    configuration.
+3. [Check new release on GitHub](https://github.com/JetBrains/skiko/releases)
 
 ### Updating Skiko in Compose
 
