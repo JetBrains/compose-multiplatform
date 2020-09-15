@@ -21,7 +21,7 @@ import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition

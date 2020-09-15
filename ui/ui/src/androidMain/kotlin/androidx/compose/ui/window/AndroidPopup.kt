@@ -129,7 +129,7 @@ internal actual fun ActualPopup(
 }
 
 // TODO(soboleva): Look at module dependencies so that we can get code reuse between
-// Popup's SimpleStack and Stack.
+// Popup's SimpleStack and Box.
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 private inline fun SimpleStack(modifier: Modifier, noinline children: @Composable () -> Unit) {

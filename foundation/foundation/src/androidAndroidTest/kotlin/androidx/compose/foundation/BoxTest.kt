@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import android.os.Build
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
@@ -392,7 +392,7 @@ class BoxTest {
 
     @Composable
     private fun SemanticsParent(children: @Composable Density.() -> Unit) {
-        Stack(
+        Box(
             Modifier
                 .testTag(contentTag)
                 .wrapContentSize(Alignment.TopStart)

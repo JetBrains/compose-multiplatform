@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -88,7 +88,7 @@ class ButtonTest {
     @Test
     fun defaultSemantics() {
         rule.setMaterialContent {
-            Stack {
+            Box {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}) {
                     Text("myButton")
                 }
@@ -102,7 +102,7 @@ class ButtonTest {
     @Test
     fun disabledSemantics() {
         rule.setMaterialContent {
-            Stack {
+            Box {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, enabled = false) {
                     Text("myButton")
                 }
@@ -120,7 +120,7 @@ class ButtonTest {
         val text = "myButton"
 
         rule.setMaterialContent {
-            Stack {
+            Box {
                 Button(onClick = onClick) {
                     Text(text)
                 }
@@ -145,7 +145,7 @@ class ButtonTest {
         rule.setMaterialContent {
             var enabled by remember { mutableStateOf(true) }
             val onClick = { enabled = false }
-            Stack {
+            Box {
                 Button(modifier = Modifier.testTag(tag), onClick = onClick, enabled = enabled) {
                     Text("Hello")
                 }
@@ -361,7 +361,7 @@ class ButtonTest {
             onSurface = MaterialTheme.colors.onSurface
             Box(Modifier.testTag("myButton")) {
                 // stack allows to verify there is no shadow
-                Stack(Modifier.padding(padding)) {
+                Box(Modifier.padding(padding)) {
                     Button(
                         onClick = {},
                         enabled = false,
@@ -393,7 +393,7 @@ class ButtonTest {
             onSurface = MaterialTheme.colors.onSurface
             Box(Modifier.testTag("myButton")) {
                 // stack allows to verify there is no shadow
-                Stack(Modifier.padding(padding)) {
+                Box(Modifier.padding(padding)) {
                     Button(
                         onClick = {},
                         enabled = false,
@@ -426,7 +426,7 @@ class ButtonTest {
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             // stack allows to verify there is no shadow
-            Stack(Modifier.padding(padding)) {
+            Box(Modifier.padding(padding)) {
                 OutlinedButton(
                     modifier = Modifier.testTag("myButton"),
                     onClick = {},
@@ -454,7 +454,7 @@ class ButtonTest {
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             // stack allows to verify there is no shadow
-            Stack(Modifier.padding(8.dp)) {
+            Box(Modifier.padding(8.dp)) {
                 TextButton(
                     modifier = Modifier.testTag("myButton"),
                     onClick = {},
@@ -527,7 +527,7 @@ class ButtonTest {
         var buttonCoordinates: LayoutCoordinates? = null
         var contentCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
-            Stack {
+            Box {
                 Button({}, Modifier.onPositioned { buttonCoordinates = it }) {
                     Box(
                         Modifier.preferredSize(2.dp)
@@ -554,7 +554,7 @@ class ButtonTest {
     @Test
     fun zOrderingBasedOnElevationIsApplied() {
         rule.setMaterialContent {
-            Stack(
+            Box(
                 Modifier.semantics(mergeAllDescendants = true) {}
                     .testTag("stack")
                     .preferredSize(10.dp, 10.dp)
@@ -660,7 +660,7 @@ class ButtonTest {
         var parentCoordinates: LayoutCoordinates? = null
         var childCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
-            Stack {
+            Box {
                 button(Modifier.onPositioned { parentCoordinates = it }) {
                     Text("Test button",
                         Modifier.onPositioned { childCoordinates = it }

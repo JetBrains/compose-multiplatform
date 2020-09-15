@@ -22,7 +22,7 @@ import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.size
@@ -343,7 +343,7 @@ class ScaffoldTest {
     @Test
     fun scaffold_topAppBarIsDrawnOnTopOfContent() {
         rule.setContent {
-            Stack(
+            Box(
                 Modifier
                     .size(10.dp, 20.dp)
                     .semantics(mergeAllDescendants = true) {}

@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -272,7 +272,7 @@ class DraggableTest {
         var innerDrag = 0f
         var outerDrag = 0f
         rule.setContent {
-            Stack {
+            Box {
                 Box(alignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(draggableBoxTag)
@@ -345,7 +345,7 @@ class DraggableTest {
         var emitDraggableBox by mutableStateOf(true)
 
         rule.setContent {
-            Stack {
+            Box {
                 if (emitDraggableBox) {
                     Box(modifier = Modifier
                         .testTag(draggableBoxTag)
@@ -385,7 +385,7 @@ class DraggableTest {
 
     private fun setDraggableContent(draggableFactory: @Composable () -> Modifier) {
         rule.setContent {
-            Stack {
+            Box {
                 val draggable = draggableFactory()
                 Box(
                     modifier = Modifier

@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import android.os.Build
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -160,7 +160,7 @@ class BackgroundTest {
 
     @Composable
     private fun SemanticParent(children: @Composable Density.() -> Unit) {
-        Stack(Modifier.testTag(contentTag)) {
+        Box(Modifier.testTag(contentTag)) {
             DensityAmbient.current.children()
         }
     }

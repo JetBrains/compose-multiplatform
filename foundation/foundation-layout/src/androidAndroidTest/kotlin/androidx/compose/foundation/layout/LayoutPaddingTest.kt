@@ -246,7 +246,7 @@ class LayoutPaddingTest : LayoutTest() {
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
-                    Stack(
+                    Box(
                         Modifier.padding(start = padding1Dp, end = padding2Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -257,7 +257,7 @@ class LayoutPaddingTest : LayoutTest() {
                     ) {
                     }
 
-                    Stack(
+                    Box(
                         Modifier.padding(end = padding3Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -268,7 +268,7 @@ class LayoutPaddingTest : LayoutTest() {
                     ) {
                     }
 
-                    Stack(
+                    Box(
                         Modifier.padding(start = padding1Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -322,7 +322,7 @@ class LayoutPaddingTest : LayoutTest() {
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
-                    Stack(
+                    Box(
                         Modifier.absolutePadding(left = padding1Dp, right = padding2Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -331,7 +331,7 @@ class LayoutPaddingTest : LayoutTest() {
                             }
                     ) {
                     }
-                    Stack(
+                    Box(
                         Modifier.absolutePadding(right = padding3Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -402,7 +402,7 @@ class LayoutPaddingTest : LayoutTest() {
         var childSize = IntSize(-1, -1)
         var childPosition = Offset(-1f, -1f)
         show {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)
@@ -448,7 +448,7 @@ class LayoutPaddingTest : LayoutTest() {
         var childSize = IntSize(-1, -1)
         var childPosition = Offset(-1f, -1f)
         show {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)
@@ -501,7 +501,7 @@ class LayoutPaddingTest : LayoutTest() {
         var childSize = IntSize(-1, -1)
         var childPosition = Offset(-1f, -1f)
         show {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)

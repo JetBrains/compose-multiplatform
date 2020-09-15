@@ -23,7 +23,6 @@ import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
@@ -31,7 +30,7 @@ import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -115,7 +114,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
             onDragStateChange = { isDragging = it }
         )
 
-        Stack(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize()) {
             Image(modifier = inputModifier, asset = colorWheel.image)
             val color = colorWheel.colorForPosition(position)
             if (color.isSet) {

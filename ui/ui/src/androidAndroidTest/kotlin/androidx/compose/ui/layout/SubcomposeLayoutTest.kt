@@ -19,7 +19,7 @@ package androidx.compose.ui.layout
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -154,7 +154,7 @@ class SubcomposeLayoutTest {
                 measuresCount++
                 val placeable = subcompose(Unit) {
                     recompositionsCount1++
-                    Stack(Modifier.size(20.dp)) {
+                    Box(Modifier.size(20.dp)) {
                         model.value // model read
                         recompositionsCount2++
                     }

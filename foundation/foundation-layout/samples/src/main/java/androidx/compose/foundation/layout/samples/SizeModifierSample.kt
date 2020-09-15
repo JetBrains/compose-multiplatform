@@ -17,9 +17,8 @@
 package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -89,7 +88,7 @@ fun SimpleHeightModifier() {
 @Sampled
 @Composable
 fun SimplePreferredSizeModifier() {
-    Stack {
+    Box {
         Box(Modifier.preferredSize(100.dp, 100.dp).background(Color.Red))
     }
 }
@@ -97,7 +96,7 @@ fun SimplePreferredSizeModifier() {
 @Sampled
 @Composable
 fun SimplePreferredWidthModifier() {
-    Stack {
+    Box {
         Box(Modifier.preferredWidth(100.dp).aspectRatio(1f).background(Color.Magenta))
     }
 }
@@ -105,7 +104,7 @@ fun SimplePreferredWidthModifier() {
 @Sampled
 @Composable
 fun SimplePreferredHeightModifier() {
-    Stack {
+    Box {
         Box(Modifier.preferredHeight(100.dp).aspectRatio(1f).background(Color.Blue))
     }
 }

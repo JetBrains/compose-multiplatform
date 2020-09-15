@@ -18,7 +18,7 @@ package androidx.compose.ui.gesture
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -264,7 +264,7 @@ class TouchSlopDragGestureFilterTest {
         val setupLatch = CountDownLatch(2)
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                Stack {
+                Box {
                     touchSlop = with(DensityAmbient.current) { TouchSlop.toPx() }
                     Layout(
                         modifier = Modifier.dragGestureFilter(

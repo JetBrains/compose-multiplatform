@@ -23,7 +23,7 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.padding
@@ -340,7 +340,7 @@ fun ModalDrawerLayout(
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
         val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
-        Stack(
+        Box(
             Modifier.swipeable(
                 state = drawerState,
                 anchors = anchors,
@@ -351,7 +351,7 @@ fun ModalDrawerLayout(
                 velocityThreshold = DrawerVelocityThreshold,
                 resistance = null
         )) {
-            Stack {
+            Box {
                 bodyContent()
             }
             Scrim(
@@ -453,7 +453,7 @@ fun BottomDrawerLayout(
                     minValue to BottomDrawerValue.Expanded
                 )
             }
-        Stack(
+        Box(
             Modifier.swipeable(
                 state = drawerState,
                 anchors = anchors,
@@ -463,7 +463,7 @@ fun BottomDrawerLayout(
                 resistance = null
             )
         ) {
-            Stack {
+            Box {
                 bodyContent()
             }
             Scrim(

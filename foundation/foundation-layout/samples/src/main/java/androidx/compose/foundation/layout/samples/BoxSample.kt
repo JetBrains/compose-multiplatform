@@ -17,9 +17,8 @@
 package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
@@ -31,8 +30,8 @@ import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
-fun SimpleStack() {
-    Stack {
+fun SimpleBox() {
+    Box {
         Box(Modifier.fillMaxSize().background(Color.Cyan))
         Box(
             Modifier.matchParentSize()

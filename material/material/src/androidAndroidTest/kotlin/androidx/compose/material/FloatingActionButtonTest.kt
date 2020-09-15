@@ -22,7 +22,6 @@ import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
@@ -65,7 +64,7 @@ class FloatingActionButtonTest {
     @Test
     fun fabDefaultSemantics() {
         rule.setMaterialContent {
-            Stack {
+            Box {
                 FloatingActionButton(modifier = Modifier.testTag("myButton"), onClick = {}) {
                     Icon(Icons.Filled.Favorite)
                 }
@@ -83,7 +82,7 @@ class FloatingActionButtonTest {
         val text = "myButton"
 
         rule.setMaterialContent {
-            Stack {
+            Box {
                 ExtendedFloatingActionButton(text = { Text(text) }, onClick = onClick)
             }
         }
@@ -170,7 +169,7 @@ class FloatingActionButtonTest {
         var surface = Color.Transparent
         var fabColor = Color.Transparent
         rule.setMaterialContent {
-            Stack {
+            Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
                 Providers(ShapesAmbient provides Shapes(small = themeShape)) {
@@ -204,7 +203,7 @@ class FloatingActionButtonTest {
         var surface = Color.Transparent
         var fabColor = Color.Transparent
         rule.setMaterialContent {
-            Stack {
+            Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
                 Providers(ShapesAmbient provides Shapes(small = themeShape)) {
@@ -234,7 +233,7 @@ class FloatingActionButtonTest {
         var buttonCoordinates: LayoutCoordinates? = null
         var contentCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
-            Stack {
+            Box {
                 FloatingActionButton({}, Modifier.onPositioned { buttonCoordinates = it }) {
                     Box(Modifier.preferredSize(2.dp)
                         .onPositioned { contentCoordinates = it }
@@ -261,7 +260,7 @@ class FloatingActionButtonTest {
         var buttonCoordinates: LayoutCoordinates? = null
         var contentCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
-            Stack {
+            Box {
                 ExtendedFloatingActionButton(
                     text = {
                         Box(Modifier.preferredSize(2.dp)
@@ -293,7 +292,7 @@ class FloatingActionButtonTest {
         var textCoordinates: LayoutCoordinates? = null
         var iconCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
-            Stack {
+            Box {
                 ExtendedFloatingActionButton(
                     text = {
                         Box(Modifier.preferredSize(2.dp)

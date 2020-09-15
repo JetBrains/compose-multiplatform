@@ -75,7 +75,7 @@ class SpacerTest : LayoutTest() {
         val containerWidth = 5.dp
         val containerHeight = 7.dp
         show {
-            Stack {
+            Box {
                 Container(
                     constraints = DpConstraints(
                         maxWidth = containerWidth,
@@ -131,7 +131,7 @@ class SpacerTest : LayoutTest() {
         val containerWidth = 5.dp
         val containerHeight = 7.dp
         show {
-            Stack {
+            Box {
                 Container(
                     constraints = DpConstraints(
                         maxWidth = containerWidth,
@@ -186,7 +186,7 @@ class SpacerTest : LayoutTest() {
         val containerWidth = 5.dp
         val containerHeight = 7.dp
         show {
-            Stack {
+            Box {
                 Container(
                     constraints = DpConstraints(
                         maxWidth = containerWidth,

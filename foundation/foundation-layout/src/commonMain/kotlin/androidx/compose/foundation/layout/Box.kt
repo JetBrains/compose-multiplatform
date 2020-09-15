@@ -33,34 +33,34 @@ import kotlin.math.max
 /**
  * A layout composable that positions its children relative to its edges.
  * The component is useful for drawing children that overlap. The children will always be
- * drawn in the order they are specified in the body of the [Stack].
- * When children are smaller than the parent, by default they will be positioned inside the [Stack]
+ * drawn in the order they are specified in the body of the [Box].
+ * When children are smaller than the parent, by default they will be positioned inside the [Box]
  * according to the [alignment]. If individual alignment of the children is needed, apply the
- * [StackScope.align] modifier to a child to specify its alignment.
+ * [BoxScope.align] modifier to a child to specify its alignment.
  *
  * Example usage:
  *
- * @sample androidx.compose.foundation.layout.samples.SimpleStack
+ * @sample androidx.compose.foundation.layout.samples.SimpleBox
  *
  * @param modifier The modifier to be applied to the layout.
- * @param alignment The default alignment inside the Stack.
+ * @param alignment The default alignment inside the Box.
  */
 @Composable
-fun Stack(
+fun Box(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.TopStart,
-    children: @Composable StackScope.() -> Unit
+    children: @Composable BoxScope.() -> Unit
 ) {
-    val stackChildren: @Composable () -> Unit = { StackScope.children() }
+    val boxChildren: @Composable () -> Unit = { BoxScope.children() }
 
-    Layout(stackChildren, modifier = modifier) { measurables, constraints ->
+    Layout(boxChildren, modifier = modifier) { measurables, constraints ->
         val placeables = arrayOfNulls<Placeable>(measurables.size)
         // First measure aligned children to get the size of the layout.
         val childConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         (0 until measurables.size).filter { i -> !measurables[i].stretch }.forEach { i ->
             placeables[i] = measurables[i].measure(childConstraints)
         }
-        val (stackWidth, stackHeight) = with(placeables.filterNotNull()) {
+        val (boxWidth, boxHeight) = with(placeables.filterNotNull()) {
             Pair(
                 max(maxByOrNull { it.width }?.width ?: 0, constraints.minWidth),
                 max(maxByOrNull { it.height }?.height ?: 0, constraints.minHeight)
@@ -70,24 +70,24 @@ fun Stack(
         // Now measure stretch children.
         (0 until measurables.size).filter { i -> measurables[i].stretch }.forEach { i ->
             // infinity check is needed for intrinsic measurements
-            val minWidth = if (stackWidth != Constraints.Infinity) stackWidth else 0
-            val minHeight = if (stackHeight != Constraints.Infinity) stackHeight else 0
+            val minWidth = if (boxWidth != Constraints.Infinity) boxWidth else 0
+            val minHeight = if (boxHeight != Constraints.Infinity) boxHeight else 0
             placeables[i] = measurables[i].measure(
-                Constraints(minWidth, stackWidth, minHeight, stackHeight)
+                Constraints(minWidth, boxWidth, minHeight, boxHeight)
             )
         }
 
         // Position the children.
-        layout(stackWidth, stackHeight) {
+        layout(boxWidth, boxHeight) {
             (0 until measurables.size).forEach { i ->
                 val measurable = measurables[i]
-                val childAlignment = measurable.stackChildData?.alignment ?: alignment
+                val childAlignment = measurable.boxChildData?.alignment ?: alignment
                 val placeable = placeables[i]!!
 
                 val position = childAlignment.align(
                     IntSize(
-                        stackWidth - placeable.width,
-                        stackHeight - placeable.height
+                        boxWidth - placeable.width,
+                        boxHeight - placeable.height
                     ),
                     layoutDirection
                 )
@@ -98,49 +98,83 @@ fun Stack(
 }
 
 /**
- * A StackScope provides a scope for the children of a [Stack].
+ * A convenience box with no content that can participate in layout, drawing, pointer input
+ * due to the [modifier] applied to it.
+ *
+ * Example usage:
+ *
+ * @sample androidx.compose.foundation.layout.samples.SimpleBox
+ *
+ * @param modifier The modifier to be applied to the layout.
+ */
+@Composable
+fun Box(modifier: Modifier) {
+    Layout({}, modifier = modifier) { _, constraints ->
+        layout(constraints.minWidth, constraints.minHeight) {}
+    }
+}
+
+@Composable
+@Deprecated(
+    "Stack was renamed to Box.",
+    ReplaceWith("Box", "androidx.compose.foundation.layout.Box")
+)
+fun Stack(
+    modifier: Modifier = Modifier,
+    alignment: Alignment = Alignment.TopStart,
+    children: @Composable BoxScope.() -> Unit
+) = Box(modifier, alignment, children)
+
+/**
+ * A BoxScope provides a scope for the children of a [Box].
  */
 @LayoutScopeMarker
 @Immutable
-interface StackScope {
+interface BoxScope {
     /**
-     * Pull the content element to a specific [Alignment] within the [Stack]. This alignment will
-     * have priority over the [Stack]'s `alignment` parameter.
+     * Pull the content element to a specific [Alignment] within the [Box]. This alignment will
+     * have priority over the [Box]'s `alignment` parameter.
      */
     @Stable
-    fun Modifier.align(alignment: Alignment) = this.then(StackChildData(alignment, false))
+    fun Modifier.align(alignment: Alignment) = this.then(BoxChildData(alignment, false))
 
     @Stable
     @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment) = this.then(StackChildData(align, false))
+    fun Modifier.gravity(align: Alignment) = this.then(BoxChildData(align, false))
 
     /**
-     * Size the element to match the size of the [Stack] after all other content elements have
+     * Size the element to match the size of the [Box] after all other content elements have
      * been measured.
      *
-     * The element using this modifier does not take part in defining the size of the [Stack].
-     * Instead, it matches the size of the [Stack] after all other children (not using
-     * matchParentSize() modifier) have been measured to obtain the [Stack]'s size.
+     * The element using this modifier does not take part in defining the size of the [Box].
+     * Instead, it matches the size of the [Box] after all other children (not using
+     * matchParentSize() modifier) have been measured to obtain the [Box]'s size.
      * In contrast, a general-purpose [Modifier.fillMaxSize] modifier, which makes an element
-     * occupy all available space, will take part in defining the size of the [Stack]. Consequently,
-     * using it for an element inside a [Stack] will make the [Stack] itself always fill the
+     * occupy all available space, will take part in defining the size of the [Box]. Consequently,
+     * using it for an element inside a [Box] will make the [Box] itself always fill the
      * available space.
      */
     @Stable
     fun Modifier.matchParentSize() = this.then(StretchAlignModifier)
 
-    companion object : StackScope
+    companion object : BoxScope
 }
 
+@Deprecated(
+    "Stack was renamed to Box.",
+    ReplaceWith("BoxScope", "androidx.compose.foundation.layout.BoxScope")
+)
+typealias StackScope = BoxScope
+
 @Stable
-private val StretchAlignModifier: ParentDataModifier = StackChildData(Alignment.Center, true)
+private val StretchAlignModifier: ParentDataModifier = BoxChildData(Alignment.Center, true)
 
-private val Measurable.stackChildData: StackChildData? get() = parentData as? StackChildData
-private val Measurable.stretch: Boolean get() = stackChildData?.stretch ?: false
+private val Measurable.boxChildData: BoxChildData? get() = parentData as? BoxChildData
+private val Measurable.stretch: Boolean get() = boxChildData?.stretch ?: false
 
-private data class StackChildData(
+private data class BoxChildData(
     var alignment: Alignment,
     var stretch: Boolean = false
 ) : ParentDataModifier {
-    override fun Density.modifyParentData(parentData: Any?) = this@StackChildData
+    override fun Density.modifyParentData(parentData: Any?) = this@BoxChildData
 }

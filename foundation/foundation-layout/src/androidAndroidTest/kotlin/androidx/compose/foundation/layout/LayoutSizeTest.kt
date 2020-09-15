@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
@@ -55,7 +54,7 @@ class LayoutSizeTest : LayoutTest() {
         val size = MutableList(6) { Ref<IntSize>() }
         val position = MutableList(6) { Ref<Offset>() }
         show {
-            Stack {
+            Box {
                 Column {
                     Container(
                         Modifier.preferredWidthIn(min = sizeDp, max = sizeDp * 2)
@@ -127,7 +126,7 @@ class LayoutSizeTest : LayoutTest() {
         val size = MutableList(6) { Ref<IntSize>() }
         val position = MutableList(6) { Ref<Offset>() }
         show {
-            Stack {
+            Box {
                 Row {
                     Container(
                         Modifier.preferredHeightIn(min = sizeDp, max = sizeDp * 2)
@@ -200,7 +199,7 @@ class LayoutSizeTest : LayoutTest() {
         val size = MutableList(5) { Ref<IntSize>() }
         val position = MutableList(5) { Ref<Offset>() }
         show {
-            Stack {
+            Box {
                 Row {
                     val maxSize = sizeDp * 2
                     Container(
@@ -265,7 +264,7 @@ class LayoutSizeTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 Container(width = sizeDp, height = sizeDp) {
                     Container(
                         Modifier.preferredWidth(sizeDp * 2)
@@ -303,7 +302,7 @@ class LayoutSizeTest : LayoutTest() {
         val size = MutableList(4) { Ref<IntSize>() }
         val position = MutableList(4) { Ref<Offset>() }
         show {
-            Stack {
+            Box {
                 Row {
                     Container(Modifier.preferredWidthIn(max = Dp.Infinity)) {
                         Container(width = sizeDp, height = sizeDp,

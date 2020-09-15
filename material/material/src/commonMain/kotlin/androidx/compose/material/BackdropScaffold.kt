@@ -22,10 +22,9 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.padding
@@ -327,7 +326,7 @@ fun BackdropScaffold(
                 color = frontLayerBackgroundColor,
                 contentColor = frontLayerContentColor
             ) {
-                Stack(Modifier.padding(bottom = peekHeight)) {
+                Box(Modifier.padding(bottom = peekHeight)) {
                     frontLayerContent()
 
                     Scrim(
@@ -393,21 +392,23 @@ private fun BackLayerTransition(
     val appBarFloat = (animationProgress - 1).coerceIn(0f, 1f)
     val contentFloat = (1 - animationProgress).coerceIn(0f, 1f)
 
-    Stack {
+    Box {
         Box(
             Modifier.zIndex(appBarFloat).drawLayer(
                 alpha = appBarFloat,
                 translationY = (1 - appBarFloat) * animationSlideOffset
-            ),
-            children = appBar
-        )
+            )
+        ) {
+            appBar()
+        }
         Box(
             Modifier.zIndex(contentFloat).drawLayer(
                 alpha = contentFloat,
                 translationY = (1 - contentFloat) * -animationSlideOffset
-            ),
-            children = content
-        )
+            )
+        ) {
+            content()
+        }
     }
 }
 

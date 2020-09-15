@@ -19,7 +19,7 @@ package androidx.compose.animation
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,11 +74,17 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
+<<<<<<< HEAD
                 Stack(
                     Modifier.onPositioned {
                         offset = it.localToRoot(Offset.Zero)
                     }.size(100.dp, 100.dp)
                 ) {
+=======
+                Box(Modifier.onPositioned {
+                    offset = it.localToRoot(Offset.Zero)
+                }.size(100.dp, 100.dp)) {
+>>>>>>> aa63e9410a (Rename Stack to Box)
                     onDispose {
                         disposed = true
                     }
@@ -178,11 +184,17 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
+<<<<<<< HEAD
                 Stack(
                     Modifier.onPositioned {
                         offset = it.localToRoot(Offset.Zero)
                     }.size(100.dp, 100.dp)
                 ) {
+=======
+                Box(Modifier.onPositioned {
+                    offset = it.localToRoot(Offset.Zero)
+                }.size(100.dp, 100.dp)) {
+>>>>>>> aa63e9410a (Rename Stack to Box)
                     onDispose {
                         disposed = true
                     }

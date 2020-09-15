@@ -20,7 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.TextFieldScroller
 import androidx.compose.material.TextFieldScrollerPosition
@@ -68,7 +68,7 @@ class TextFieldImplTest {
     fun testTextField_scrollable_withLongInput() {
         val scrollerPosition = TextFieldScrollerPosition()
         rule.setContent {
-            Stack {
+            Box {
                 TextFieldScroller(
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp)
@@ -92,7 +92,7 @@ class TextFieldImplTest {
         val text = "text"
         val scrollerPosition = TextFieldScrollerPosition()
         rule.setContent {
-            Stack {
+            Box {
                 TextFieldScroller(
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp)
@@ -120,7 +120,7 @@ class TextFieldImplTest {
 
         with(rule.density) {
             rule.setContent {
-                Stack(
+                Box(
                     Modifier
                         .preferredSize(parentSize.toDp())
                         .background(color = Color.White)
@@ -153,7 +153,7 @@ class TextFieldImplTest {
         val scrollerPosition = TextFieldScrollerPosition()
 
         rule.setContent {
-            Stack {
+            Box {
                 TextFieldScroller(
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp).testTag(TextfieldTag)
