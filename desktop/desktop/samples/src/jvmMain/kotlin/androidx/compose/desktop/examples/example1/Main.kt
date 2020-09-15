@@ -62,6 +62,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -162,16 +163,17 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             TextDecoration.Underline,
             TextDecoration.LineThrough
         )
+        val lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do" +
+                " eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad" +
+                " minim veniam, quis nostrud exercitation ullamco laboris nisi ut" +
+                " aliquipex ea commodo consequat. Duis aute irure dolor in reprehenderit" +
+                " in voluptate velit esse cillum dolore eu fugiat nulla pariatur." +
+                " Excepteur" +
+                " sint occaecat cupidatat non proident, sunt in culpa qui officia" +
+                " deserunt mollit anim id est laborum."
         var loremDecoration by remember { mutableStateOf(0) }
         Text(
-            text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do" +
-                    " eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad" +
-                    " minim veniam, quis nostrud exercitation ullamco laboris nisi ut" +
-                    " aliquipex ea commodo consequat. Duis aute irure dolor in reprehenderit" +
-                    " in voluptate velit esse cillum dolore eu fugiat nulla pariatur." +
-                    " Excepteur" +
-                    " sint occaecat cupidatat non proident, sunt in culpa qui officia" +
-                    " deserunt mollit anim id est laborum.",
+            text = lorem,
             color = loremColors[loremColor],
             textDecoration = loremDecorations[loremDecoration],
             modifier = Modifier.clickable {
@@ -187,6 +189,12 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                     loremDecoration = 0
                 }
             }
+        )
+
+        Text(
+            text = lorem,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Text(
