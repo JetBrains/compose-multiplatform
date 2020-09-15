@@ -283,6 +283,9 @@ package androidx.compose.foundation.lazy {
   public final class LazyForStateKt {
   }
 
+  public final class LazyGridKt {
+  }
+
   @androidx.compose.runtime.Stable public interface LazyItemScope {
     method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier);
     method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier);
