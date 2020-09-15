@@ -20,8 +20,6 @@ package androidx.compose.material
 
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animatedValue
-import androidx.compose.animation.core.AnimatedValue
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.IndicationAmbient
 import androidx.compose.foundation.Interaction
@@ -79,7 +77,7 @@ import androidx.compose.ui.unit.dp
  * in different [Interaction]s, such as customizing how the [elevation] of this Button changes when
  * it is [Interaction.Pressed].
  * @param elevation The z-coordinate at which to place this button. This controls the size
- * of the shadow below the button. See [ButtonConstants.defaultAnimatedElevation] for the default
+ * of the shadow below the button. See [ButtonConstants.animateDefaultElevation] for the default
  * elevation that animates between [Interaction]s.
  * @param shape Defines the button's shape as well as its shadow
  * @param border Border to draw around the button
@@ -93,7 +91,7 @@ fun Button(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    elevation: Dp = ButtonConstants.defaultAnimatedElevation(interactionState, enabled).value,
+    elevation: Dp = ButtonConstants.animateDefaultElevation(interactionState, enabled),
     shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = null,
     backgroundColor: Color = ButtonConstants.defaultButtonBackgroundColor(enabled),
@@ -307,14 +305,6 @@ object ButtonConstants {
      */
     val DefaultIconSpacing = 8.dp
 
-    /**
-     * Value holder class to cache the last [Interaction], so we can calculate which outgoing
-     * [AnimationSpec] to use.
-     *
-     * @see defaultAnimatedElevation
-     */
-    private class InteractionHolder(var interaction: Interaction?)
-
     // TODO: b/152525426 add support for focused and hovered states
     /**
      * Represents the default elevation for a button in different [Interaction]s, and how the
@@ -331,7 +321,7 @@ object ButtonConstants {
      * @param disabledElevation the elevation to use when the [Button] is not [enabled].
      */
     @Composable
-    fun defaultAnimatedElevation(
+    fun animateDefaultElevation(
         interactionState: InteractionState,
         enabled: Boolean,
         defaultElevation: Dp = 2.dp,
@@ -339,7 +329,9 @@ object ButtonConstants {
         // focused: Dp = 4.dp,
         // hovered: Dp = 4.dp,
         disabledElevation: Dp = 0.dp
-    ): AnimatedValue<Dp, AnimationVector1D> {
+    ): Dp {
+        class InteractionHolder(var interaction: Interaction?)
+
         val interaction = interactionState.value.lastOrNull {
             it is Interaction.Pressed
         }
@@ -374,7 +366,7 @@ object ButtonConstants {
             previousInteractionHolder.interaction = interaction
         }
 
-        return animatedElevation
+        return animatedElevation.value
     }
 
     /**
