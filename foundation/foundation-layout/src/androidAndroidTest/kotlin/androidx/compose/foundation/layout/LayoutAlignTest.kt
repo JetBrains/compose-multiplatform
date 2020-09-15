@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.foundation.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.onPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
@@ -46,7 +48,7 @@ import kotlin.math.roundToInt
 @RunWith(JUnit4::class)
 class LayoutAlignTest : LayoutTest() {
     @Test
-    fun test2DAlignedModifier() = with(density) {
+    fun test2DWrapContentSize() = with(density) {
         val sizeDp = 50.dp
         val size = sizeDp.toIntPx()
 
@@ -81,7 +83,7 @@ class LayoutAlignTest : LayoutTest() {
     }
 
     @Test
-    fun test1DAlignedModifier() = with(density) {
+    fun test1DWrapContentSize() = with(density) {
         val sizeDp = 50.dp
         val size = sizeDp.toIntPx()
 
@@ -119,7 +121,7 @@ class LayoutAlignTest : LayoutTest() {
     }
 
     @Test
-    fun testAlignedModifier_rtl() = with(density) {
+    fun testWrapContentSize_rtl() = with(density) {
         val sizeDp = 200.toDp()
         val size = sizeDp.toIntPx()
 
@@ -196,7 +198,7 @@ class LayoutAlignTest : LayoutTest() {
     }
 
     @Test
-    fun testAlignedModifier_wrapsContent_whenMeasuredWithInfiniteConstraints() = with(density) {
+    fun testWrapContentSize_wrapsContent_whenMeasuredWithInfiniteConstraints() = with(density) {
         val sizeDp = 50.dp
         val size = sizeDp.toIntPx()
 
@@ -239,7 +241,7 @@ class LayoutAlignTest : LayoutTest() {
     }
 
     @Test
-    fun testLayoutAlignModifier_respectsMinConstraints() = with(density) {
+    fun testWrapContentSize_respectsMinConstraints() = with(density) {
         val sizeDp = 50.dp
         val size = sizeDp.toIntPx()
         val doubleSizeDp = sizeDp * 2
@@ -289,6 +291,52 @@ class LayoutAlignTest : LayoutTest() {
             ),
             childPosition.value
         )
+    }
+
+    @Test
+    fun testWrapContentSize_unbounded() = with(density) {
+        val outerSize = 10f
+        val innerSize = 20f
+
+        val positionedLatch = CountDownLatch(4)
+        show {
+            Box(
+                Modifier.size(outerSize.toDp())
+                    .onPositioned {
+                        assertEquals(outerSize, it.size.width.toFloat())
+                        positionedLatch.countDown()
+                    }
+            ) {
+                Box(
+                    Modifier.wrapContentSize(Alignment.BottomEnd, unbounded = true)
+                        .size(innerSize.toDp())
+                        .onPositioned {
+                            assertEquals(
+                                Offset(outerSize - innerSize, outerSize - innerSize),
+                                it.positionInParent
+                            )
+                            positionedLatch.countDown()
+                        }
+                )
+                Box(
+                    Modifier.wrapContentWidth(Alignment.End, unbounded = true)
+                        .size(innerSize.toDp())
+                        .onPositioned {
+                            assertEquals(outerSize - innerSize, it.positionInParent.x)
+                            positionedLatch.countDown()
+                        }
+                )
+                Box(
+                    Modifier.wrapContentHeight(Alignment.Bottom, unbounded = true)
+                        .size(innerSize.toDp())
+                        .onPositioned {
+                            assertEquals(outerSize - innerSize, it.positionInParent.y)
+                            positionedLatch.countDown()
+                        }
+                )
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
     }
 
     // TODO(popam): this should be unit test instead
