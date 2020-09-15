@@ -2,7 +2,7 @@
 package androidx.compose.animation.core {
 
   public final class AndroidAnimationClockKt {
-    method public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function0<? extends androidx.compose.animation.core.AnimationClockObservable> p);
+    method @VisibleForTesting public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function0<? extends androidx.compose.animation.core.AnimationClockObservable> p);
   }
 
   public abstract class AnimatedFloat extends androidx.compose.animation.core.BaseAnimatedValue<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
