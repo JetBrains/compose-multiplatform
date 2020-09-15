@@ -39,11 +39,12 @@ actual fun EmbeddingContext(): EmbeddingContext =
     EmbeddingContextFactory?.let { it() } ?: SwingEmbeddingContext()
 
 internal actual object Trace {
-    actual fun beginSection(name: String) {
+    actual fun beginSection(name: String): Any? {
         // Do nothing.
+        return null
     }
 
-    actual fun endSection() {
+    actual fun endSection(token: Any?) {
         // Do nothing.
     }
 }
