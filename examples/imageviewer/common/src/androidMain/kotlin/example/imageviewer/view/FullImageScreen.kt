@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.RowScope.align
 import androidx.compose.material.Surface
 import androidx.compose.ui.unit.dp
 import example.imageviewer.core.FilterType
@@ -88,7 +87,7 @@ private fun setLoadingScreen() {
 
     Stack {
         Surface(color = MiniatureColor, modifier = Modifier.preferredHeight(44.dp)) {}
-        Box(modifier = Modifier.align(Alignment.Center)) {
+        Box() {
             Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
                 CircularProgressIndicator(
                     modifier = Modifier.preferredSize(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),

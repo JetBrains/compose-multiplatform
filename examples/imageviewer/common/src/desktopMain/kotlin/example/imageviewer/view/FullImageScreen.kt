@@ -40,7 +40,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.RowScope.align
 import androidx.compose.material.Surface
 import androidx.compose.ui.unit.dp
 import example.imageviewer.core.FilterType
@@ -163,7 +162,6 @@ fun FilterButton(
 ) {
     Surface(
         color = Transparent,
-        modifier = Modifier.align(Alignment.CenterVertically),
         shape = CircleShape
     ) {
         Clickable(
