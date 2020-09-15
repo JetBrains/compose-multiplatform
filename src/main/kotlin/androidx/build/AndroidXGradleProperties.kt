@@ -77,6 +77,12 @@ const val PLAYGROUND_METALAVA_BUILD_ID = "androidx.playground.metalavaBuildId"
  */
 const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
 
+/**
+ * Specifies to validate that the build doesn't generate any unrecognized messages
+ * This prevents developers from inadvertently adding new warnings to the build output
+ */
+const val VALIDATE_NO_EXTRA_MESSAGES = "androidx.validateNoExtraMessages"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     COVERAGE_ENABLED,
@@ -85,6 +91,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     STUDIO_TYPE,
     SUMMARIZE_STANDARD_ERROR,
     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK,
+    VALIDATE_NO_EXTRA_MESSAGES,
     WRITE_VERSIONED_API_FILES,
     AffectedModuleDetector.CHANGED_PROJECTS_ARG,
     AffectedModuleDetector.ENABLE_ARG,
