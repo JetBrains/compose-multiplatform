@@ -82,6 +82,11 @@ class DesktopOwners(
         list.lastOrNull()?.onMouseScroll(position, event)
     }
 
+    fun onMouseMoved(x: Int, y: Int) {
+        val position = Offset(x.toFloat(), y.toFloat())
+        list.lastOrNull()?.onPointerMove(position)
+    }
+
     fun onKeyPressed(code: Int, char: Char) {
         platformInputService.onKeyPressed(code, char)
     }

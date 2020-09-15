@@ -107,6 +107,9 @@ class ComposeWindow : JFrame {
             override fun mouseDragged(event: MouseEvent) = events.post {
                 owners?.onMouseDragged(event.x, event.y)
             }
+            override fun mouseMoved(event: MouseEvent) = events.post {
+                owners?.onMouseMoved(event.x, event.y)
+            }
         })
         layer.wrapped.addMouseWheelListener { event ->
             events.post {
