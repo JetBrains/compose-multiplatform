@@ -459,7 +459,7 @@ private fun createDistDocsTask(
         description = "Zips $ruleName Java documentation (generated via Doclava in the " +
             "style of d.android.com) into $destinationFile"
         doLast {
-            logger.lifecycle("'Wrote API reference to $destinationFile")
+            logger.quiet("'Wrote API reference to $destinationFile")
         }
     }
 }
