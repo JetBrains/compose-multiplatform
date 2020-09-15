@@ -121,7 +121,7 @@ fun copy(
         ""
     }
     val overwriting = (dest.exists() && sourceText != dest.readText())
-    val changing = overwriting || !dest.exists()
+    val changing = overwriting || (dest.exists() != source.exists())
     if (changing) {
         if (overwriting && !permitOverwriting) {
             val message = "Modifying the API definition for a previously released artifact " +
