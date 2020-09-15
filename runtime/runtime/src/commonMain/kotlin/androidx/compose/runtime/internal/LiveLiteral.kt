@@ -51,6 +51,9 @@ annotation class LiveLiteralFileInfo(
 private val liveLiteralCache = HashMap<String, MutableState<Any?>>()
 
 @InternalComposeApi
+val isLiveLiteralsEnabled: Boolean = false
+
+@InternalComposeApi
 fun <T> liveLiteral(key: String, value: T): State<T> {
     @Suppress("UNCHECKED_CAST")
     return liveLiteralCache.getOrPut(key) {
