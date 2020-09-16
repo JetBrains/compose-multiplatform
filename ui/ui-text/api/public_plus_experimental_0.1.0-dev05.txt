@@ -1,0 +1,863 @@
+// Signature format: 3.0
+package androidx.ui.input {
+
+  public final class BackspaceKeyEditOp implements androidx.ui.input.EditOperation {
+    ctor public BackspaceKeyEditOp();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public final class CommitTextEditOp implements androidx.ui.input.EditOperation {
+    ctor public CommitTextEditOp(String text, int newCursorPosition);
+    method public String component1();
+    method public int component2();
+    method public androidx.ui.input.CommitTextEditOp copy(String text, int newCursorPosition);
+    method public int getNewCursorPosition();
+    method public String getText();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public final class DeleteSurroundingTextEditOp implements androidx.ui.input.EditOperation {
+    ctor public DeleteSurroundingTextEditOp(int beforeLength, int afterLength);
+    method public int component1();
+    method public int component2();
+    method public androidx.ui.input.DeleteSurroundingTextEditOp copy(int beforeLength, int afterLength);
+    method public int getAfterLength();
+    method public int getBeforeLength();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public final class DeleteSurroundingTextInCodePointsEditOp implements androidx.ui.input.EditOperation {
+    ctor public DeleteSurroundingTextInCodePointsEditOp(int beforeLength, int afterLength);
+    method public int component1();
+    method public int component2();
+    method public androidx.ui.input.DeleteSurroundingTextInCodePointsEditOp copy(int beforeLength, int afterLength);
+    method public int getAfterLength();
+    method public int getBeforeLength();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public interface EditOperation {
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public final class EditingBuffer {
+    ctor public EditingBuffer(String initialText, androidx.ui.text.TextRange initialSelection);
+    field public static final int NOWHERE = -1; // 0xffffffff
+  }
+
+  public final class FinishComposingTextEditOp implements androidx.ui.input.EditOperation {
+    ctor public FinishComposingTextEditOp();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public enum ImeAction {
+    enum_constant public static final androidx.ui.input.ImeAction Done;
+    enum_constant public static final androidx.ui.input.ImeAction Go;
+    enum_constant public static final androidx.ui.input.ImeAction Next;
+    enum_constant public static final androidx.ui.input.ImeAction NoAction;
+    enum_constant public static final androidx.ui.input.ImeAction Previous;
+    enum_constant public static final androidx.ui.input.ImeAction Search;
+    enum_constant public static final androidx.ui.input.ImeAction Send;
+    enum_constant public static final androidx.ui.input.ImeAction Unspecified;
+  }
+
+  public interface InputEventListener {
+    method public void onEditOperations(java.util.List<? extends androidx.ui.input.EditOperation> editOps);
+    method public void onImeAction(androidx.ui.input.ImeAction imeAction);
+  }
+
+  public final class InputState {
+    ctor public InputState(String text, androidx.ui.text.TextRange selection, androidx.ui.text.TextRange? composition);
+    ctor public InputState();
+    method public String component1();
+    method public androidx.ui.text.TextRange component2();
+    method public androidx.ui.text.TextRange? component3();
+    method public androidx.ui.input.InputState copy(String text, androidx.ui.text.TextRange selection, androidx.ui.text.TextRange? composition);
+    method public androidx.ui.text.TextRange? getComposition();
+    method public String getSelectedText();
+    method public androidx.ui.text.TextRange getSelection();
+    method public String getText();
+    method public String getTextAfterSelection(int maxChars);
+    method public String getTextBeforeSelection(int maxChars);
+  }
+
+  public enum KeyboardType {
+    enum_constant public static final androidx.ui.input.KeyboardType Ascii;
+    enum_constant public static final androidx.ui.input.KeyboardType Email;
+    enum_constant public static final androidx.ui.input.KeyboardType Number;
+    enum_constant public static final androidx.ui.input.KeyboardType NumberPassword;
+    enum_constant public static final androidx.ui.input.KeyboardType Password;
+    enum_constant public static final androidx.ui.input.KeyboardType Phone;
+    enum_constant public static final androidx.ui.input.KeyboardType Text;
+    enum_constant public static final androidx.ui.input.KeyboardType Uri;
+  }
+
+  public final class MoveCursorEditOp implements androidx.ui.input.EditOperation {
+    ctor public MoveCursorEditOp(int amount);
+    method public int component1();
+    method public androidx.ui.input.MoveCursorEditOp copy(int amount);
+    method public int getAmount();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public interface OffsetMap {
+    method public int originalToTransformed(int offset);
+    method public int transformedToOriginal(int offset);
+    field public static final androidx.ui.input.OffsetMap.Companion! Companion;
+  }
+
+  public static final class OffsetMap.Companion {
+    method public androidx.ui.input.OffsetMap getIdentityOffsetMap();
+    property public final androidx.ui.input.OffsetMap identityOffsetMap;
+  }
+
+  public final class PasswordVisualTransformation implements androidx.ui.input.VisualTransformation {
+    ctor public PasswordVisualTransformation(char mask);
+    ctor public PasswordVisualTransformation();
+    method public androidx.ui.input.TransformedText filter(androidx.ui.text.AnnotatedString text);
+    method public char getMask();
+  }
+
+  public interface PlatformTextInputService {
+    method public void notifyFocusedRect(androidx.ui.geometry.Rect rect);
+    method public void onStateUpdated(androidx.ui.input.InputState model);
+    method public void showSoftwareKeyboard();
+    method public void startInput(androidx.ui.input.InputState initModel, androidx.ui.input.KeyboardType keyboardType, androidx.ui.input.ImeAction imeAction, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.ui.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.ui.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public void stopInput();
+  }
+
+  public final class SetComposingRegionEditOp implements androidx.ui.input.EditOperation {
+    ctor public SetComposingRegionEditOp(int start, int end);
+    method public int component1();
+    method public int component2();
+    method public androidx.ui.input.SetComposingRegionEditOp copy(int start, int end);
+    method public int getEnd();
+    method public int getStart();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public final class SetComposingTextEditOp implements androidx.ui.input.EditOperation {
+    ctor public SetComposingTextEditOp(String text, int newCursorPosition);
+    method public String component1();
+    method public int component2();
+    method public androidx.ui.input.SetComposingTextEditOp copy(String text, int newCursorPosition);
+    method public int getNewCursorPosition();
+    method public String getText();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public final class SetSelectionEditOp implements androidx.ui.input.EditOperation {
+    ctor public SetSelectionEditOp(int start, int end);
+    method public int component1();
+    method public int component2();
+    method public androidx.ui.input.SetSelectionEditOp copy(int start, int end);
+    method public int getEnd();
+    method public int getStart();
+    method public void process(androidx.ui.input.EditingBuffer buffer);
+  }
+
+  public class TextInputService {
+    ctor public TextInputService(androidx.ui.input.PlatformTextInputService platformTextInputService);
+    method public void notifyFocusedRect(int token, androidx.ui.geometry.Rect rect);
+    method public void onStateUpdated(int token, androidx.ui.input.InputState model);
+    method public void showSoftwareKeyboard(int token);
+    method public int startInput(androidx.ui.input.InputState initModel, androidx.ui.input.KeyboardType keyboardType, androidx.ui.input.ImeAction imeAction, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.ui.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.ui.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public void stopInput(int token);
+  }
+
+  public final class TextInputServiceKt {
+    field public static final int INVALID_SESSION = -1; // 0xffffffff
+    field public static final int NO_SESSION = 0; // 0x0
+  }
+
+  public final class TransformedText {
+    ctor public TransformedText(androidx.ui.text.AnnotatedString transformedText, androidx.ui.input.OffsetMap offsetMap);
+    method public androidx.ui.text.AnnotatedString component1();
+    method public androidx.ui.input.OffsetMap component2();
+    method public androidx.ui.input.TransformedText copy(androidx.ui.text.AnnotatedString transformedText, androidx.ui.input.OffsetMap offsetMap);
+    method public androidx.ui.input.OffsetMap getOffsetMap();
+    method public androidx.ui.text.AnnotatedString getTransformedText();
+  }
+
+  public interface VisualTransformation {
+    method public androidx.ui.input.TransformedText filter(androidx.ui.text.AnnotatedString text);
+  }
+
+}
+
+package androidx.ui.text {
+
+  public final class AnnotatedString {
+    ctor public AnnotatedString(String text, java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.SpanStyle>> spanStyles, java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.ParagraphStyle>> paragraphStyles);
+    method public String component1();
+    method public java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.SpanStyle>> component2();
+    method public java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.ParagraphStyle>> component3();
+    method public androidx.ui.text.AnnotatedString copy(String text, java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.SpanStyle>> spanStyles, java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.ParagraphStyle>> paragraphStyles);
+    method public java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.ParagraphStyle>> getParagraphStyles();
+    method public java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.SpanStyle>> getSpanStyles();
+    method public String getText();
+    method public operator androidx.ui.text.AnnotatedString plus(androidx.ui.text.AnnotatedString other);
+  }
+
+  public static final class AnnotatedString.Builder {
+    ctor public AnnotatedString.Builder(int capacity);
+    ctor public AnnotatedString.Builder();
+    ctor public AnnotatedString.Builder(String text);
+    ctor public AnnotatedString.Builder(androidx.ui.text.AnnotatedString text);
+    method public void addStyle(androidx.ui.text.SpanStyle style, int start, int end);
+    method public void addStyle(androidx.ui.text.ParagraphStyle style, int start, int end);
+    method public void append(String text);
+    method public void append(char p);
+    method public void append(androidx.ui.text.AnnotatedString text);
+    method public int getLength();
+    method public void popStyle();
+    method public void popStyle(int index);
+    method public int pushStyle(androidx.ui.text.SpanStyle style);
+    method public int pushStyle(androidx.ui.text.ParagraphStyle style);
+    method public androidx.ui.text.AnnotatedString toAnnotatedString();
+    property public final int length;
+  }
+
+  public static final class AnnotatedString.Item<T> {
+    ctor public AnnotatedString.Item(T! item, int start, int end);
+    method public T! component1();
+    method public int component2();
+    method public int component3();
+    method public androidx.ui.text.AnnotatedString.Item<T> copy(T! item, int start, int end);
+    method public int getEnd();
+    method public T! getItem();
+    method public int getStart();
+  }
+
+  public final class AnnotatedStringKt {
+    method public static androidx.ui.text.AnnotatedString AnnotatedString(String text, androidx.ui.text.SpanStyle spanStyle, androidx.ui.text.ParagraphStyle? paragraphStyle = null);
+    method public static androidx.ui.text.AnnotatedString AnnotatedString(String text, androidx.ui.text.ParagraphStyle paragraphStyle);
+    method public static inline androidx.ui.text.AnnotatedString AnnotatedString(kotlin.jvm.functions.Function1<? super androidx.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
+    method public static androidx.ui.text.AnnotatedString capitalize(androidx.ui.text.AnnotatedString, androidx.ui.text.LocaleList localeList = LocaleList.current);
+    method public static androidx.ui.text.AnnotatedString decapitalize(androidx.ui.text.AnnotatedString, androidx.ui.text.LocaleList localeList = LocaleList.current);
+    method public static int getLength(androidx.ui.text.AnnotatedString);
+    method public static androidx.ui.text.AnnotatedString subSequence(androidx.ui.text.AnnotatedString, int start, int end);
+    method public static androidx.ui.text.AnnotatedString toLowerCase(androidx.ui.text.AnnotatedString, androidx.ui.text.LocaleList localeList = LocaleList.current);
+    method public static androidx.ui.text.AnnotatedString toUpperCase(androidx.ui.text.AnnotatedString, androidx.ui.text.LocaleList localeList = LocaleList.current);
+    method public static inline <R> R withStyle(androidx.ui.text.AnnotatedString.Builder, androidx.ui.text.SpanStyle style, kotlin.jvm.functions.Function1<? super androidx.ui.text.AnnotatedString.Builder,? extends R> block);
+    method public static inline <R> R withStyle(androidx.ui.text.AnnotatedString.Builder, androidx.ui.text.ParagraphStyle style, kotlin.jvm.functions.Function1<? super androidx.ui.text.AnnotatedString.Builder,? extends R> block);
+  }
+
+  public final class Locale {
+    ctor public Locale(String languageTag);
+    method public String getLanguage();
+    method public String getRegion();
+    method public String getScript();
+    method public String toLanguageTag();
+    property public final String language;
+    property public final String region;
+    property public final String script;
+    field public static final androidx.ui.text.Locale.Companion! Companion;
+  }
+
+  public static final class Locale.Companion {
+    method public androidx.ui.text.Locale getCurrent();
+    property public final androidx.ui.text.Locale current;
+  }
+
+  public final class LocaleList implements java.util.Collection<androidx.ui.text.Locale> kotlin.jvm.internal.markers.KMappedMarker {
+    ctor public LocaleList(java.util.List<androidx.ui.text.Locale> localeList);
+    ctor public LocaleList(String languageTags);
+    ctor public LocaleList(androidx.ui.text.Locale... locales);
+    method public java.util.List<androidx.ui.text.Locale> component1();
+    method public operator boolean contains(androidx.ui.text.Locale element);
+    method public boolean containsAll(java.util.Collection<?> elements);
+    method public androidx.ui.text.LocaleList copy(java.util.List<androidx.ui.text.Locale> localeList);
+    method public operator androidx.ui.text.Locale get(int i);
+    method public java.util.List<androidx.ui.text.Locale> getLocaleList();
+    method public int getSize();
+    method public boolean isEmpty();
+    method public java.util.Iterator<androidx.ui.text.Locale> iterator();
+    property public int size;
+    field public static final androidx.ui.text.LocaleList.Companion! Companion;
+  }
+
+  public static final class LocaleList.Companion {
+    method public androidx.ui.text.LocaleList getCurrent();
+    property public final androidx.ui.text.LocaleList current;
+  }
+
+  public final class MultiParagraph {
+    ctor public MultiParagraph(androidx.ui.text.MultiParagraphIntrinsics intrinsics, int maxLines, boolean ellipsis, androidx.ui.text.ParagraphConstraints constraints);
+    ctor public MultiParagraph(androidx.ui.text.AnnotatedString annotatedString, androidx.ui.text.TextStyle style, int maxLines, boolean ellipsis, androidx.ui.text.ParagraphConstraints constraints, androidx.ui.unit.Density density, androidx.ui.text.font.Font.ResourceLoader resourceLoader);
+    method public androidx.ui.text.style.TextDirection getBidiRunDirection(int offset);
+    method public androidx.ui.geometry.Rect getBoundingBox(int offset);
+    method public androidx.ui.geometry.Rect getCursorRect(int offset);
+    method public boolean getDidExceedMaxLines();
+    method public float getFirstBaseline();
+    method public float getHeight();
+    method public float getHorizontalPosition(int offset, boolean usePrimaryDirection);
+    method public androidx.ui.text.MultiParagraphIntrinsics getIntrinsics();
+    method public float getLastBaseline();
+    method public float getLineBottom(int lineIndex);
+    method public int getLineCount();
+    method public int getLineForOffset(int offset);
+    method public float getLineHeight(int lineIndex);
+    method public float getLineLeft(int lineIndex);
+    method public float getLineRight(int lineIndex);
+    method public float getLineTop(int lineIndex);
+    method public float getLineWidth(int lineIndex);
+    method public float getMaxIntrinsicWidth();
+    method public int getMaxLines();
+    method public float getMinIntrinsicWidth();
+    method public int getOffsetForPosition(androidx.ui.unit.PxPosition position);
+    method public androidx.ui.text.style.TextDirection getParagraphDirection(int offset);
+    method public androidx.ui.graphics.Path getPathForRange(int start, int end);
+    method public float getWidth();
+    method public androidx.ui.text.TextRange getWordBoundary(int offset);
+    method public void paint(androidx.ui.graphics.Canvas canvas);
+    property public final boolean didExceedMaxLines;
+    property public final float firstBaseline;
+    property public final float height;
+    property public final float lastBaseline;
+    property public final int lineCount;
+    property public final float maxIntrinsicWidth;
+    property public final float minIntrinsicWidth;
+    property public final float width;
+  }
+
+  public final class MultiParagraphIntrinsics implements androidx.ui.text.ParagraphIntrinsics {
+    ctor public MultiParagraphIntrinsics(androidx.ui.text.AnnotatedString annotatedString, androidx.ui.text.TextStyle style, androidx.ui.unit.Density density, androidx.ui.text.font.Font.ResourceLoader resourceLoader);
+    method public androidx.ui.text.AnnotatedString getAnnotatedString();
+    method public float getMaxIntrinsicWidth();
+    method public float getMinIntrinsicWidth();
+    property public float maxIntrinsicWidth;
+    property public float minIntrinsicWidth;
+  }
+
+  public final class MultiParagraphKt {
+  }
+
+  public interface Paragraph {
+    method public androidx.ui.text.style.TextDirection getBidiRunDirection(int offset);
+    method public androidx.ui.geometry.Rect getBoundingBox(int offset);
+    method public androidx.ui.geometry.Rect getCursorRect(int offset);
+    method public boolean getDidExceedMaxLines();
+    method public float getFirstBaseline();
+    method public float getHeight();
+    method public float getHorizontalPosition(int offset, boolean usePrimaryDirection);
+    method public float getLastBaseline();
+    method public float getLineBottom(int lineIndex);
+    method public int getLineCount();
+    method public int getLineForOffset(int offset);
+    method public float getLineHeight(int lineIndex);
+    method public float getLineLeft(int lineIndex);
+    method public float getLineRight(int lineIndex);
+    method public float getLineTop(int lineIndex);
+    method public float getLineWidth(int lineIndex);
+    method public float getMaxIntrinsicWidth();
+    method public float getMinIntrinsicWidth();
+    method public int getOffsetForPosition(androidx.ui.unit.PxPosition position);
+    method public androidx.ui.text.style.TextDirection getParagraphDirection(int offset);
+    method public androidx.ui.graphics.Path getPathForRange(int start, int end);
+    method public float getWidth();
+    method public androidx.ui.text.TextRange getWordBoundary(int offset);
+    method public void paint(androidx.ui.graphics.Canvas canvas);
+    property public abstract boolean didExceedMaxLines;
+    property public abstract float firstBaseline;
+    property public abstract float height;
+    property public abstract float lastBaseline;
+    property public abstract int lineCount;
+    property public abstract float maxIntrinsicWidth;
+    property public abstract float minIntrinsicWidth;
+    property public abstract float width;
+  }
+
+  public final class ParagraphConstraints {
+    ctor public ParagraphConstraints(float width);
+    method public float component1();
+    method public androidx.ui.text.ParagraphConstraints copy(float width);
+    method public float getWidth();
+  }
+
+  public interface ParagraphIntrinsics {
+    method public float getMaxIntrinsicWidth();
+    method public float getMinIntrinsicWidth();
+    property public abstract float maxIntrinsicWidth;
+    property public abstract float minIntrinsicWidth;
+  }
+
+  public final class ParagraphIntrinsicsKt {
+    method public static androidx.ui.text.ParagraphIntrinsics ParagraphIntrinsics(String text, androidx.ui.text.TextStyle style, java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.SpanStyle>> spanStyles = listOf(), androidx.ui.unit.Density density, androidx.ui.text.font.Font.ResourceLoader resourceLoader);
+  }
+
+  public final class ParagraphKt {
+    method public static androidx.ui.text.Paragraph Paragraph(String text, androidx.ui.text.TextStyle style, java.util.List<androidx.ui.text.AnnotatedString.Item<androidx.ui.text.SpanStyle>> spanStyles = listOf(), int maxLines = 2147483647, boolean ellipsis = false, androidx.ui.text.ParagraphConstraints constraints, androidx.ui.unit.Density density, androidx.ui.text.font.Font.ResourceLoader resourceLoader);
+    method public static androidx.ui.text.Paragraph Paragraph(androidx.ui.text.ParagraphIntrinsics paragraphIntrinsics, int maxLines = 2147483647, boolean ellipsis = false, androidx.ui.text.ParagraphConstraints constraints);
+  }
+
+  public final class ParagraphStyle {
+    ctor public ParagraphStyle(androidx.ui.text.style.TextAlign? textAlign, androidx.ui.text.style.TextDirectionAlgorithm? textDirectionAlgorithm, androidx.ui.unit.TextUnit lineHeight, androidx.ui.text.style.TextIndent? textIndent);
+    ctor public ParagraphStyle();
+    method public androidx.ui.text.style.TextAlign? component1();
+    method public androidx.ui.text.style.TextDirectionAlgorithm? component2();
+    method public androidx.ui.unit.TextUnit component3();
+    method public androidx.ui.text.style.TextIndent? component4();
+    method public androidx.ui.text.ParagraphStyle copy(androidx.ui.text.style.TextAlign? textAlign, androidx.ui.text.style.TextDirectionAlgorithm? textDirectionAlgorithm, androidx.ui.unit.TextUnit lineHeight, androidx.ui.text.style.TextIndent? textIndent);
+    method public androidx.ui.unit.TextUnit getLineHeight();
+    method public androidx.ui.text.style.TextAlign? getTextAlign();
+    method public androidx.ui.text.style.TextDirectionAlgorithm? getTextDirectionAlgorithm();
+    method public androidx.ui.text.style.TextIndent? getTextIndent();
+    method public androidx.ui.text.ParagraphStyle merge(androidx.ui.text.ParagraphStyle? other = null);
+  }
+
+  public final class ParagraphStyleKt {
+    method public static androidx.ui.text.ParagraphStyle lerp(androidx.ui.text.ParagraphStyle start, androidx.ui.text.ParagraphStyle stop, float fraction);
+  }
+
+  public final class SpanStyle {
+    ctor public SpanStyle(androidx.ui.graphics.Color? color, androidx.ui.unit.TextUnit fontSize, androidx.ui.text.font.FontWeight? fontWeight, androidx.ui.text.font.FontStyle? fontStyle, androidx.ui.text.font.FontSynthesis? fontSynthesis, androidx.ui.text.font.FontFamily? fontFamily, String? fontFeatureSettings, androidx.ui.unit.TextUnit letterSpacing, androidx.ui.text.style.BaselineShift? baselineShift, androidx.ui.text.style.TextGeometricTransform? textGeometricTransform, androidx.ui.text.LocaleList? localeList, androidx.ui.graphics.Color? background, androidx.ui.text.style.TextDecoration? textDecoration, androidx.ui.graphics.Shadow? shadow);
+    ctor public SpanStyle();
+    method public androidx.ui.graphics.Color? component1();
+    method public androidx.ui.text.style.TextGeometricTransform? component10();
+    method public androidx.ui.text.LocaleList? component11();
+    method public androidx.ui.graphics.Color? component12();
+    method public androidx.ui.text.style.TextDecoration? component13();
+    method public androidx.ui.graphics.Shadow? component14();
+    method public androidx.ui.unit.TextUnit component2();
+    method public androidx.ui.text.font.FontWeight? component3();
+    method public androidx.ui.text.font.FontStyle? component4();
+    method public androidx.ui.text.font.FontSynthesis? component5();
+    method public androidx.ui.text.font.FontFamily? component6();
+    method public String? component7();
+    method public androidx.ui.unit.TextUnit component8();
+    method public androidx.ui.text.style.BaselineShift? component9();
+    method public androidx.ui.text.SpanStyle copy(androidx.ui.graphics.Color? color, androidx.ui.unit.TextUnit fontSize, androidx.ui.text.font.FontWeight? fontWeight, androidx.ui.text.font.FontStyle? fontStyle, androidx.ui.text.font.FontSynthesis? fontSynthesis, androidx.ui.text.font.FontFamily? fontFamily, String? fontFeatureSettings, androidx.ui.unit.TextUnit letterSpacing, androidx.ui.text.style.BaselineShift? baselineShift, androidx.ui.text.style.TextGeometricTransform? textGeometricTransform, androidx.ui.text.LocaleList? localeList, androidx.ui.graphics.Color? background, androidx.ui.text.style.TextDecoration? textDecoration, androidx.ui.graphics.Shadow? shadow);
+    method public androidx.ui.graphics.Color? getBackground();
+    method public androidx.ui.text.style.BaselineShift? getBaselineShift();
+    method public androidx.ui.graphics.Color? getColor();
+    method public androidx.ui.text.font.FontFamily? getFontFamily();
+    method public String? getFontFeatureSettings();
+    method public androidx.ui.unit.TextUnit getFontSize();
+    method public androidx.ui.text.font.FontStyle? getFontStyle();
+    method public androidx.ui.text.font.FontSynthesis? getFontSynthesis();
+    method public androidx.ui.text.font.FontWeight? getFontWeight();
+    method public androidx.ui.unit.TextUnit getLetterSpacing();
+    method public androidx.ui.text.LocaleList? getLocaleList();
+    method public androidx.ui.graphics.Shadow? getShadow();
+    method public androidx.ui.text.style.TextDecoration? getTextDecoration();
+    method public androidx.ui.text.style.TextGeometricTransform? getTextGeometricTransform();
+    method public androidx.ui.text.SpanStyle merge(androidx.ui.text.SpanStyle? other = null);
+  }
+
+  public final class SpanStyleKt {
+    method public static androidx.ui.text.SpanStyle lerp(androidx.ui.text.SpanStyle start, androidx.ui.text.SpanStyle stop, float fraction);
+  }
+
+  public final class StringKt {
+    method public static String capitalize(String, androidx.ui.text.Locale locale);
+    method public static String capitalize(String, androidx.ui.text.LocaleList localeList);
+    method public static String decapitalize(String, androidx.ui.text.Locale locale);
+    method public static String decapitalize(String, androidx.ui.text.LocaleList localeList);
+    method public static String toLowerCase(String, androidx.ui.text.Locale locale);
+    method public static String toLowerCase(String, androidx.ui.text.LocaleList localeList);
+    method public static String toUpperCase(String, androidx.ui.text.Locale locale);
+    method public static String toUpperCase(String, androidx.ui.text.LocaleList localeList);
+  }
+
+  public final class TextFieldValue {
+    ctor public TextFieldValue(String text, androidx.ui.text.TextRange selection);
+    ctor public TextFieldValue();
+    method public String component1();
+    method public androidx.ui.text.TextRange component2();
+    method public androidx.ui.text.TextFieldValue copy(String text, androidx.ui.text.TextRange selection);
+    method public androidx.ui.text.TextRange getSelection();
+    method public String getText();
+  }
+
+  public final class TextLayoutHelperKt {
+  }
+
+  public final class TextLayoutInput {
+    ctor public TextLayoutInput(androidx.ui.text.AnnotatedString text, androidx.ui.text.TextStyle style, int maxLines, boolean softWrap, androidx.ui.text.style.TextOverflow overflow, androidx.ui.unit.Density density, androidx.ui.core.LayoutDirection layoutDirection, androidx.ui.text.font.Font.ResourceLoader resourceLoader, androidx.ui.core.Constraints constraints);
+    method public androidx.ui.text.AnnotatedString component1();
+    method public androidx.ui.text.TextStyle component2();
+    method public int component3();
+    method public boolean component4();
+    method public androidx.ui.text.style.TextOverflow component5();
+    method public androidx.ui.unit.Density component6();
+    method public androidx.ui.core.LayoutDirection component7();
+    method public androidx.ui.text.font.Font.ResourceLoader component8();
+    method public androidx.ui.core.Constraints component9();
+    method public androidx.ui.text.TextLayoutInput copy(androidx.ui.text.AnnotatedString text, androidx.ui.text.TextStyle style, int maxLines, boolean softWrap, androidx.ui.text.style.TextOverflow overflow, androidx.ui.unit.Density density, androidx.ui.core.LayoutDirection layoutDirection, androidx.ui.text.font.Font.ResourceLoader resourceLoader, androidx.ui.core.Constraints constraints);
+    method public androidx.ui.core.Constraints getConstraints();
+    method public androidx.ui.unit.Density getDensity();
+    method public androidx.ui.core.LayoutDirection getLayoutDirection();
+    method public int getMaxLines();
+    method public androidx.ui.text.style.TextOverflow getOverflow();
+    method public androidx.ui.text.font.Font.ResourceLoader getResourceLoader();
+    method public boolean getSoftWrap();
+    method public androidx.ui.text.TextStyle getStyle();
+    method public androidx.ui.text.AnnotatedString getText();
+  }
+
+  public final class TextLayoutResult {
+    method public androidx.ui.text.TextLayoutInput component1();
+    method public androidx.ui.unit.IntPxSize component3();
+    method public androidx.ui.text.TextLayoutResult copy(androidx.ui.text.TextLayoutInput layoutInput, androidx.ui.text.MultiParagraph multiParagraph, androidx.ui.unit.IntPxSize size);
+    method public androidx.ui.text.style.TextDirection getBidiRunDirection(int offset);
+    method public androidx.ui.geometry.Rect getBoundingBox(int offset);
+    method public androidx.ui.geometry.Rect getCursorRect(int offset);
+    method public boolean getDidOverflowHeight();
+    method public boolean getDidOverflowWidth();
+    method public androidx.ui.unit.Px getFirstBaseline();
+    method public boolean getHasVisualOverflow();
+    method public androidx.ui.unit.Px getHorizontalPosition(int offset, boolean usePrimaryDirection);
+    method public androidx.ui.unit.Px getLastBaseline();
+    method public androidx.ui.text.TextLayoutInput getLayoutInput();
+    method public androidx.ui.unit.Px getLineBottom(int lineIndex);
+    method public int getLineForOffset(int offset);
+    method public int getOffsetForPosition(androidx.ui.unit.PxPosition position);
+    method public androidx.ui.text.style.TextDirection getParagraphDirection(int offset);
+    method public androidx.ui.graphics.Path getPathForRange(int start, int end);
+    method public androidx.ui.unit.IntPxSize getSize();
+    method public androidx.ui.text.TextRange getWordBoundary(int offset);
+    property public final boolean didOverflowHeight;
+    property public final boolean didOverflowWidth;
+    property public final androidx.ui.unit.Px firstBaseline;
+    property public final boolean hasVisualOverflow;
+    property public final androidx.ui.unit.Px lastBaseline;
+  }
+
+  public final class TextPainter {
+    method public void paint(androidx.ui.graphics.Canvas canvas, androidx.ui.text.TextLayoutResult textLayoutResult);
+    field public static final androidx.ui.text.TextPainter! INSTANCE;
+  }
+
+  public final class TextRange {
+    ctor public TextRange(int start, int end);
+    method public int component1();
+    method public int component2();
+    method public operator boolean contains(androidx.ui.text.TextRange other);
+    method public operator boolean contains(int offset);
+    method public androidx.ui.text.TextRange copy(int start, int end);
+    method public boolean getCollapsed();
+    method public int getEnd();
+    method public int getLength();
+    method public int getMax();
+    method public int getMin();
+    method public int getStart();
+    method public boolean intersects(androidx.ui.text.TextRange other);
+    property public final boolean collapsed;
+    property public final int length;
+    property public final int max;
+    property public final int min;
+  }
+
+  public final class TextRangeKt {
+    method public static String substring(CharSequence, androidx.ui.text.TextRange range);
+  }
+
+  public final class TextStyle {
+    ctor public TextStyle(androidx.ui.graphics.Color? color, androidx.ui.unit.TextUnit fontSize, androidx.ui.text.font.FontWeight? fontWeight, androidx.ui.text.font.FontStyle? fontStyle, androidx.ui.text.font.FontSynthesis? fontSynthesis, androidx.ui.text.font.FontFamily? fontFamily, String? fontFeatureSettings, androidx.ui.unit.TextUnit letterSpacing, androidx.ui.text.style.BaselineShift? baselineShift, androidx.ui.text.style.TextGeometricTransform? textGeometricTransform, androidx.ui.text.LocaleList? localeList, androidx.ui.graphics.Color? background, androidx.ui.text.style.TextDecoration? textDecoration, androidx.ui.graphics.Shadow? shadow, androidx.ui.text.style.TextAlign? textAlign, androidx.ui.text.style.TextDirectionAlgorithm? textDirectionAlgorithm, androidx.ui.unit.TextUnit lineHeight, androidx.ui.text.style.TextIndent? textIndent);
+    ctor public TextStyle();
+    method public androidx.ui.graphics.Color? component1();
+    method public androidx.ui.text.style.TextGeometricTransform? component10();
+    method public androidx.ui.text.LocaleList? component11();
+    method public androidx.ui.graphics.Color? component12();
+    method public androidx.ui.text.style.TextDecoration? component13();
+    method public androidx.ui.graphics.Shadow? component14();
+    method public androidx.ui.text.style.TextAlign? component15();
+    method public androidx.ui.text.style.TextDirectionAlgorithm? component16();
+    method public androidx.ui.unit.TextUnit component17();
+    method public androidx.ui.text.style.TextIndent? component18();
+    method public androidx.ui.unit.TextUnit component2();
+    method public androidx.ui.text.font.FontWeight? component3();
+    method public androidx.ui.text.font.FontStyle? component4();
+    method public androidx.ui.text.font.FontSynthesis? component5();
+    method public androidx.ui.text.font.FontFamily? component6();
+    method public String? component7();
+    method public androidx.ui.unit.TextUnit component8();
+    method public androidx.ui.text.style.BaselineShift? component9();
+    method public androidx.ui.text.TextStyle copy(androidx.ui.graphics.Color? color, androidx.ui.unit.TextUnit fontSize, androidx.ui.text.font.FontWeight? fontWeight, androidx.ui.text.font.FontStyle? fontStyle, androidx.ui.text.font.FontSynthesis? fontSynthesis, androidx.ui.text.font.FontFamily? fontFamily, String? fontFeatureSettings, androidx.ui.unit.TextUnit letterSpacing, androidx.ui.text.style.BaselineShift? baselineShift, androidx.ui.text.style.TextGeometricTransform? textGeometricTransform, androidx.ui.text.LocaleList? localeList, androidx.ui.graphics.Color? background, androidx.ui.text.style.TextDecoration? textDecoration, androidx.ui.graphics.Shadow? shadow, androidx.ui.text.style.TextAlign? textAlign, androidx.ui.text.style.TextDirectionAlgorithm? textDirectionAlgorithm, androidx.ui.unit.TextUnit lineHeight, androidx.ui.text.style.TextIndent? textIndent);
+    method public androidx.ui.graphics.Color? getBackground();
+    method public androidx.ui.text.style.BaselineShift? getBaselineShift();
+    method public androidx.ui.graphics.Color? getColor();
+    method public androidx.ui.text.font.FontFamily? getFontFamily();
+    method public String? getFontFeatureSettings();
+    method public androidx.ui.unit.TextUnit getFontSize();
+    method public androidx.ui.text.font.FontStyle? getFontStyle();
+    method public androidx.ui.text.font.FontSynthesis? getFontSynthesis();
+    method public androidx.ui.text.font.FontWeight? getFontWeight();
+    method public androidx.ui.unit.TextUnit getLetterSpacing();
+    method public androidx.ui.unit.TextUnit getLineHeight();
+    method public androidx.ui.text.LocaleList? getLocaleList();
+    method public androidx.ui.graphics.Shadow? getShadow();
+    method public androidx.ui.text.style.TextAlign? getTextAlign();
+    method public androidx.ui.text.style.TextDecoration? getTextDecoration();
+    method public androidx.ui.text.style.TextDirectionAlgorithm? getTextDirectionAlgorithm();
+    method public androidx.ui.text.style.TextGeometricTransform? getTextGeometricTransform();
+    method public androidx.ui.text.style.TextIndent? getTextIndent();
+    method public androidx.ui.text.TextStyle merge(androidx.ui.text.TextStyle? other = null);
+    method public androidx.ui.text.TextStyle merge(androidx.ui.text.SpanStyle other);
+    method public androidx.ui.text.TextStyle merge(androidx.ui.text.ParagraphStyle other);
+    method public androidx.ui.text.ParagraphStyle toParagraphStyle();
+    method public androidx.ui.text.SpanStyle toSpanStyle();
+    field public static final androidx.ui.text.TextStyle.Companion! Companion;
+  }
+
+  public static final class TextStyle.Companion {
+    method public androidx.ui.text.TextStyle getEmpty();
+    property public final androidx.ui.text.TextStyle Empty;
+  }
+
+  public final class TextStyleKt {
+    method public static androidx.ui.text.TextStyle lerp(androidx.ui.text.TextStyle start, androidx.ui.text.TextStyle stop, float fraction);
+    method public static androidx.ui.text.TextStyle resolveDefaults(androidx.ui.text.TextStyle style, androidx.ui.core.LayoutDirection direction);
+  }
+
+}
+
+package androidx.ui.text.font {
+
+  public abstract sealed class FileBasedFontFamily extends androidx.ui.text.font.FontFamily {
+  }
+
+  public interface Font {
+    method public androidx.ui.text.font.FontStyle getStyle();
+    method public androidx.ui.text.font.FontWeight getWeight();
+    property public abstract androidx.ui.text.font.FontStyle style;
+    property public abstract androidx.ui.text.font.FontWeight weight;
+  }
+
+  public static interface Font.ResourceLoader {
+    method public Object load(androidx.ui.text.font.Font font);
+  }
+
+  public abstract sealed class FontFamily {
+    field public static final androidx.ui.text.font.FontFamily.Companion! Companion;
+  }
+
+  public static final class FontFamily.Companion {
+    method public androidx.ui.text.font.GenericFontFamily getCursive();
+    method public androidx.ui.text.font.SystemFontFamily getDefault();
+    method public androidx.ui.text.font.GenericFontFamily getMonospace();
+    method public androidx.ui.text.font.GenericFontFamily getSansSerif();
+    method public androidx.ui.text.font.GenericFontFamily getSerif();
+    property public final androidx.ui.text.font.GenericFontFamily Cursive;
+    property public final androidx.ui.text.font.SystemFontFamily Default;
+    property public final androidx.ui.text.font.GenericFontFamily Monospace;
+    property public final androidx.ui.text.font.GenericFontFamily SansSerif;
+    property public final androidx.ui.text.font.GenericFontFamily Serif;
+  }
+
+  public final class FontFamilyKt {
+    method public static androidx.ui.text.font.FontListFontFamily fontFamily(java.util.List<? extends androidx.ui.text.font.Font> fonts);
+    method public static androidx.ui.text.font.FontListFontFamily fontFamily(androidx.ui.text.font.Font... fonts);
+  }
+
+  public final class FontKt {
+    method public static androidx.ui.text.font.FontListFontFamily asFontFamily(androidx.ui.text.font.Font);
+    method public static androidx.ui.text.font.Font font(int resId, androidx.ui.text.font.FontWeight weight = FontWeight.Normal, androidx.ui.text.font.FontStyle style = androidx.ui.text.font.FontStyle.Normal);
+  }
+
+  public final class FontListFontFamily extends androidx.ui.text.font.FileBasedFontFamily implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.ui.text.font.Font> {
+    ctor public FontListFontFamily(java.util.List<? extends androidx.ui.text.font.Font> fonts);
+    method public java.util.List<androidx.ui.text.font.Font> component1();
+    method public boolean contains(androidx.ui.text.font.Font element);
+    method public boolean containsAll(java.util.Collection<?> elements);
+    method public androidx.ui.text.font.FontListFontFamily copy(java.util.List<? extends androidx.ui.text.font.Font> fonts);
+    method public androidx.ui.text.font.Font get(int index);
+    method public java.util.List<androidx.ui.text.font.Font> getFonts();
+    method public int getSize();
+    method public int indexOf(androidx.ui.text.font.Font element);
+    method public boolean isEmpty();
+    method public java.util.Iterator<androidx.ui.text.font.Font> iterator();
+    method public int lastIndexOf(androidx.ui.text.font.Font element);
+    method public java.util.ListIterator<androidx.ui.text.font.Font> listIterator();
+    method public java.util.ListIterator<androidx.ui.text.font.Font> listIterator(int index);
+    method public java.util.List<androidx.ui.text.font.Font> subList(int fromIndex, int toIndex);
+  }
+
+  public enum FontStyle {
+    enum_constant public static final androidx.ui.text.font.FontStyle Italic;
+    enum_constant public static final androidx.ui.text.font.FontStyle Normal;
+  }
+
+  public enum FontSynthesis {
+    enum_constant public static final androidx.ui.text.font.FontSynthesis All;
+    enum_constant public static final androidx.ui.text.font.FontSynthesis None;
+    enum_constant public static final androidx.ui.text.font.FontSynthesis Style;
+    enum_constant public static final androidx.ui.text.font.FontSynthesis Weight;
+  }
+
+  public final class FontWeight implements java.lang.Comparable<androidx.ui.text.font.FontWeight> {
+    method public int compareTo(androidx.ui.text.font.FontWeight other);
+    method public androidx.ui.text.font.FontWeight copy(int weight);
+    field public static final androidx.ui.text.font.FontWeight.Companion! Companion;
+  }
+
+  public static final class FontWeight.Companion {
+    method public androidx.ui.text.font.FontWeight getBold();
+    method public androidx.ui.text.font.FontWeight getNormal();
+    method public androidx.ui.text.font.FontWeight getW100();
+    method public androidx.ui.text.font.FontWeight getW200();
+    method public androidx.ui.text.font.FontWeight getW300();
+    method public androidx.ui.text.font.FontWeight getW400();
+    method public androidx.ui.text.font.FontWeight getW500();
+    method public androidx.ui.text.font.FontWeight getW600();
+    method public androidx.ui.text.font.FontWeight getW700();
+    method public androidx.ui.text.font.FontWeight getW800();
+    method public androidx.ui.text.font.FontWeight getW900();
+    property public final androidx.ui.text.font.FontWeight Bold;
+    property public final androidx.ui.text.font.FontWeight Normal;
+    property public final androidx.ui.text.font.FontWeight W100;
+    property public final androidx.ui.text.font.FontWeight W200;
+    property public final androidx.ui.text.font.FontWeight W300;
+    property public final androidx.ui.text.font.FontWeight W400;
+    property public final androidx.ui.text.font.FontWeight W500;
+    property public final androidx.ui.text.font.FontWeight W600;
+    property public final androidx.ui.text.font.FontWeight W700;
+    property public final androidx.ui.text.font.FontWeight W800;
+    property public final androidx.ui.text.font.FontWeight W900;
+  }
+
+  public final class FontWeightKt {
+    method public static androidx.ui.text.font.FontWeight lerp(androidx.ui.text.font.FontWeight start, androidx.ui.text.font.FontWeight stop, float fraction);
+  }
+
+  public final class GenericFontFamily extends androidx.ui.text.font.SystemFontFamily {
+    method public String getName();
+  }
+
+  public final class ResourceFont implements androidx.ui.text.font.Font {
+    ctor public ResourceFont(int resId, androidx.ui.text.font.FontWeight weight, androidx.ui.text.font.FontStyle style);
+    method public int component1();
+    method public androidx.ui.text.font.FontWeight component2();
+    method public androidx.ui.text.font.FontStyle component3();
+    method public androidx.ui.text.font.ResourceFont copy(int resId, androidx.ui.text.font.FontWeight weight, androidx.ui.text.font.FontStyle style);
+    method public int getResId();
+    method public androidx.ui.text.font.FontStyle getStyle();
+    method public androidx.ui.text.font.FontWeight getWeight();
+  }
+
+  public abstract sealed class SystemFontFamily extends androidx.ui.text.font.FontFamily {
+  }
+
+}
+
+package androidx.ui.text.platform {
+
+  public final class AndroidParagraphHelperKt {
+  }
+
+  public final class AndroidParagraphKt {
+  }
+
+  public final class PlatformLocaleKt {
+  }
+
+}
+
+package androidx.ui.text.style {
+
+  public final class BaselineShift {
+    ctor public BaselineShift(float multiplier);
+    method public float component1();
+    method public androidx.ui.text.style.BaselineShift copy(float multiplier);
+    method public float getMultiplier();
+    field public static final androidx.ui.text.style.BaselineShift.Companion! Companion;
+  }
+
+  public static final class BaselineShift.Companion {
+    method public androidx.ui.text.style.BaselineShift getNone();
+    method public androidx.ui.text.style.BaselineShift getSubscript();
+    method public androidx.ui.text.style.BaselineShift getSuperscript();
+    property public final androidx.ui.text.style.BaselineShift None;
+    property public final androidx.ui.text.style.BaselineShift Subscript;
+    property public final androidx.ui.text.style.BaselineShift Superscript;
+  }
+
+  public final class BaselineShiftKt {
+    method public static androidx.ui.text.style.BaselineShift lerp(androidx.ui.text.style.BaselineShift start, androidx.ui.text.style.BaselineShift stop, float fraction);
+  }
+
+  public enum TextAlign {
+    enum_constant public static final androidx.ui.text.style.TextAlign Center;
+    enum_constant public static final androidx.ui.text.style.TextAlign End;
+    enum_constant public static final androidx.ui.text.style.TextAlign Justify;
+    enum_constant public static final androidx.ui.text.style.TextAlign Left;
+    enum_constant public static final androidx.ui.text.style.TextAlign Right;
+    enum_constant public static final androidx.ui.text.style.TextAlign Start;
+  }
+
+  public final class TextDecoration {
+    method public int component1();
+    method public boolean contains(androidx.ui.text.style.TextDecoration other);
+    method public androidx.ui.text.style.TextDecoration copy(int mask);
+    method public int getMask();
+    field public static final androidx.ui.text.style.TextDecoration.Companion! Companion;
+  }
+
+  public static final class TextDecoration.Companion {
+    method public androidx.ui.text.style.TextDecoration combine(java.util.List<androidx.ui.text.style.TextDecoration> decorations);
+    method public androidx.ui.text.style.TextDecoration getLineThrough();
+    method public androidx.ui.text.style.TextDecoration getNone();
+    method public androidx.ui.text.style.TextDecoration getUnderline();
+    property public final androidx.ui.text.style.TextDecoration LineThrough;
+    property public final androidx.ui.text.style.TextDecoration None;
+    property public final androidx.ui.text.style.TextDecoration Underline;
+  }
+
+  public enum TextDirection {
+    enum_constant public static final androidx.ui.text.style.TextDirection Ltr;
+    enum_constant public static final androidx.ui.text.style.TextDirection Rtl;
+  }
+
+  public enum TextDirectionAlgorithm {
+    enum_constant public static final androidx.ui.text.style.TextDirectionAlgorithm ContentOrLtr;
+    enum_constant public static final androidx.ui.text.style.TextDirectionAlgorithm ContentOrRtl;
+    enum_constant public static final androidx.ui.text.style.TextDirectionAlgorithm ForceLtr;
+    enum_constant public static final androidx.ui.text.style.TextDirectionAlgorithm ForceRtl;
+  }
+
+  public final class TextGeometricTransform {
+    ctor public TextGeometricTransform(float scaleX, float skewX);
+    ctor public TextGeometricTransform();
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.text.style.TextGeometricTransform copy(float scaleX, float skewX);
+    method public float getScaleX();
+    method public float getSkewX();
+    field public static final androidx.ui.text.style.TextGeometricTransform.Companion! Companion;
+  }
+
+  public static final class TextGeometricTransform.Companion {
+  }
+
+  public final class TextGeometricTransformKt {
+    method public static androidx.ui.text.style.TextGeometricTransform lerp(androidx.ui.text.style.TextGeometricTransform start, androidx.ui.text.style.TextGeometricTransform stop, float fraction);
+  }
+
+  public final class TextIndent {
+    ctor public TextIndent(androidx.ui.unit.TextUnit firstLine, androidx.ui.unit.TextUnit restLine);
+    ctor public TextIndent();
+    method public androidx.ui.unit.TextUnit component1();
+    method public androidx.ui.unit.TextUnit component2();
+    method public androidx.ui.text.style.TextIndent copy(androidx.ui.unit.TextUnit firstLine, androidx.ui.unit.TextUnit restLine);
+    method public androidx.ui.unit.TextUnit getFirstLine();
+    method public androidx.ui.unit.TextUnit getRestLine();
+    field public static final androidx.ui.text.style.TextIndent.Companion! Companion;
+  }
+
+  public static final class TextIndent.Companion {
+    method public androidx.ui.text.style.TextIndent getNone();
+    property public final androidx.ui.text.style.TextIndent None;
+  }
+
+  public final class TextIndentKt {
+    method public static androidx.ui.text.style.TextIndent lerp(androidx.ui.text.style.TextIndent start, androidx.ui.text.style.TextIndent stop, float fraction);
+  }
+
+  public enum TextOverflow {
+    enum_constant public static final androidx.ui.text.style.TextOverflow Clip;
+    enum_constant public static final androidx.ui.text.style.TextOverflow Ellipsis;
+  }
+
+}
+

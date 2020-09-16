@@ -1,0 +1,177 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.compose.ui.res
+
+import androidx.compose.runtime.Providers
+import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.test.R
+import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.ui.test.createComposeRule
+import com.google.common.truth.Truth.assertThat
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
+import java.util.Locale
+
+@RunWith(JUnit4::class)
+@SmallTest
+class StringResourcesTest {
+
+    // Constants defined in strings.xml
+    private val NotLocalizedText = "NotLocalizedText"
+    private val DefaultLocalizedText = "DefaultLocaleText"
+    private val SpanishLocalizedText = "SpanishText"
+
+    // Constants defined in strings.xml with formatting with integer 100.
+    private val NotLocalizedFormatText = "NotLocalizedFormatText:100"
+    private val DefaultLocalizedFormatText = "DefaultLocaleFormatText:100"
+    private val SpanishLocalizedFormatText = "SpanishFormatText:100"
+
+    // Constant used for formatting string in test.
+    private val FormatValue = 100
+
+    @get:Rule
+    val rule = createComposeRule()
+
+    @Test
+    fun stringResource_not_localized_defaultLocale() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        rule.setContent {
+            Providers(ContextAmbient provides context) {
+                assertThat(stringResource(R.string.not_localized)).isEqualTo(NotLocalizedText)
+            }
+        }
+    }
+
+    @Test
+    fun stringResource_not_localized() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val spanishContext = context.createConfigurationContext(
+            context.resources.configuration.apply {
+                setLocale(Locale.forLanguageTag("es-ES"))
+            }
+        )
+
+        rule.setContent {
+            Providers(ContextAmbient provides spanishContext) {
+                assertThat(stringResource(R.string.not_localized)).isEqualTo(NotLocalizedText)
+            }
+        }
+    }
+
+    @Test
+    fun stringResource_localized_defaultLocale() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        rule.setContent {
+            Providers(ContextAmbient provides context) {
+                assertThat(stringResource(R.string.localized))
+                    .isEqualTo(DefaultLocalizedText)
+            }
+        }
+    }
+
+    @Test
+    fun stringResource_localized() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val spanishContext = context.createConfigurationContext(
+            context.resources.configuration.apply {
+                setLocale(Locale.forLanguageTag("es-ES"))
+            }
+        )
+
+        rule.setContent {
+            Providers(ContextAmbient provides spanishContext) {
+                assertThat(stringResource(R.string.localized))
+                    .isEqualTo(SpanishLocalizedText)
+            }
+        }
+    }
+
+    @Test
+    fun stringResource_not_localized_format_defaultLocale() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        rule.setContent {
+            Providers(ContextAmbient provides context) {
+                assertThat(stringResource(R.string.not_localized_format, FormatValue))
+                    .isEqualTo(NotLocalizedFormatText)
+            }
+        }
+    }
+
+    @Test
+    fun stringResource_not_localized_format() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val spanishContext = context.createConfigurationContext(
+            context.resources.configuration.apply {
+                setLocale(Locale.forLanguageTag("es-ES"))
+            }
+        )
+
+        rule.setContent {
+            Providers(ContextAmbient provides spanishContext) {
+                assertThat(stringResource(R.string.not_localized_format, FormatValue))
+                    .isEqualTo(NotLocalizedFormatText)
+            }
+        }
+    }
+
+    @Test
+    fun stringResource_localized_format_defaultLocale() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        rule.setContent {
+            Providers(ContextAmbient provides context) {
+                assertThat(stringResource(R.string.localized_format, FormatValue))
+                    .isEqualTo(DefaultLocalizedFormatText)
+            }
+        }
+    }
+
+    @Test
+    fun stringResource_localized_format() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val spanishContext = context.createConfigurationContext(
+            context.resources.configuration.apply {
+                setLocale(Locale.forLanguageTag("es-ES"))
+            }
+        )
+
+        rule.setContent {
+            Providers(ContextAmbient provides spanishContext) {
+                assertThat(stringResource(R.string.localized_format, FormatValue))
+                    .isEqualTo(SpanishLocalizedFormatText)
+            }
+        }
+    }
+
+    @Test
+    fun stringArrayResource() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        rule.setContent {
+            Providers(ContextAmbient provides context) {
+                assertThat(stringArrayResource(R.array.string_array))
+                    .isEqualTo(arrayOf("string1", "string2"))
+            }
+        }
+    }
+}

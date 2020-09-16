@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -29,7 +27,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compose-compiler")
+    kotlinPlugin project(path: ":compose:compiler:compiler")
 }
 
 kotlin {
@@ -45,6 +43,9 @@ kotlin {
 
         androidMain.dependencies {
             api "androidx.activity:activity:1.2.0-alpha02"
+            // This has stub APIs for access to legacy Android APIs, so we don't want
+            // any dependency on this module.
+            compileOnly project(":compose:ui:ui-android-stubs")
             implementation(ANDROIDX_TEST_RULES)
         }
 

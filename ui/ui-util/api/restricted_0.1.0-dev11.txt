@@ -1,0 +1,35 @@
+// Signature format: 3.0
+package androidx.ui.util {
+
+  public final class InlineClassHelperKt {
+    method public static inline long packFloats(float val1, float val2);
+    method public static inline long packInts(int val1, int val2);
+    method public static inline float unpackFloat1(long value);
+    method public static inline float unpackFloat2(long value);
+    method public static inline int unpackInt1(long value);
+    method public static inline int unpackInt2(long value);
+  }
+
+  public final class ListUtilsKt {
+    method public static inline <T> boolean fastAny(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public static inline <T> void fastForEach(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> action);
+  }
+
+  public final class MathHelpersKt {
+    method public static float lerp(float start, float stop, float fraction);
+    method public static int lerp(int start, int stop, float fraction);
+    method public static long lerp(long start, long stop, float fraction);
+    method public static String toHexString(int);
+    method public static String toStringAsFixed(float, int digits);
+  }
+
+  public final class SynchronizationHelperKt {
+    method public static <T> T! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends T> block);
+  }
+
+  public final class TraceKt {
+    method public static inline <T> T! trace(String sectionName, kotlin.jvm.functions.Function0<? extends T> block);
+  }
+
+}
+

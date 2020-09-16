@@ -1,0 +1,298 @@
+// Signature format: 3.0
+package androidx.compose.ui.geometry {
+
+  public final class MutableRect {
+    ctor public MutableRect(float left, float top, float right, float bottom);
+    method public boolean contains-k-4lQ0M(long offset);
+    method public float getBottom();
+    method public inline float getHeight();
+    method public float getLeft();
+    method public float getRight();
+    method public long getSize();
+    method public float getTop();
+    method public inline float getWidth();
+    method @androidx.compose.runtime.Stable public void intersect(float left, float top, float right, float bottom);
+    method public boolean isEmpty();
+    method public void set(float left, float top, float right, float bottom);
+    method public void setBottom(float p);
+    method public void setLeft(float p);
+    method public void setRight(float p);
+    method public void setTop(float p);
+    property public final inline float height;
+    property public final boolean isEmpty;
+    property public final long size;
+    property public final inline float width;
+  }
+
+  public final class MutableRectKt {
+    method public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.geometry.MutableRect);
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class Offset {
+    ctor public Offset();
+    method @androidx.compose.runtime.Stable public static operator float component1-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator float component2-impl(long $this);
+    method public static long constructor-impl(long packedValue);
+    method public static long copy-impl(long $this, float x = this.x, float y = this.y);
+    method @androidx.compose.runtime.Stable public static operator long div-impl(long $this, float operand);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method @androidx.compose.runtime.Stable public static float getDistance-impl(long $this);
+    method @androidx.compose.runtime.Stable public static float getDistanceSquared-impl(long $this);
+    method public long getPackedValue();
+    method public static float getX-impl(long $this);
+    method public static float getY-impl(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Stable public static boolean isValid-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator long minus-k-4lQ0M(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long plus-k-4lQ0M(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long rem-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long times-impl(long $this, float operand);
+    method public static String toString-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator long unaryMinus-impl(long $this);
+    field public static final androidx.compose.ui.geometry.Offset.Companion Companion;
+  }
+
+  public static final class Offset.Companion {
+    method public long getInfinite();
+    method public long getZero();
+    property public final long Infinite;
+    property public final long Zero;
+  }
+
+  public final class OffsetKt {
+    method @androidx.compose.runtime.Stable public static inline long Offset(float x, float y);
+    method @androidx.compose.runtime.Stable public static long lerp-tX6QBWo(long start, long stop, float fraction);
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class Radius {
+    ctor public Radius();
+    method public static long constructor-impl(internal long packedValue);
+    method public static long copy-impl(long $this, float x = this.x, float y = this.y);
+    method @androidx.compose.runtime.Stable public static operator long div-impl(long $this, float operand);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static float getX-impl(long $this);
+    method public static float getY-impl(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Stable public static operator long minus-OoK_8eo(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long plus-OoK_8eo(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long rem-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long times-impl(long $this, float operand);
+    method public static String toString-impl(long $this);
+    method public static long truncDiv-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long unaryMinus-impl(long $this);
+    field public static final androidx.compose.ui.geometry.Radius.Companion Companion;
+  }
+
+  public static final class Radius.Companion {
+    method public long getZero();
+    property public final long Zero;
+  }
+
+  public final class RadiusKt {
+    method @androidx.compose.runtime.Stable public static inline long Radius(float x, float y = x);
+    method @androidx.compose.runtime.Stable public static long lerp-dD-ENU0(long start, long stop, float fraction);
+  }
+
+  @androidx.compose.runtime.Immutable public final class Rect {
+    ctor public Rect(@androidx.compose.runtime.Stable float left, @androidx.compose.runtime.Stable float top, @androidx.compose.runtime.Stable float right, @androidx.compose.runtime.Stable float bottom);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public boolean contains-k-4lQ0M(long offset);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.geometry.Rect copy(float left, float top, float right, float bottom);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect deflate(float delta);
+    method public float getBottom();
+    method public long getBottomCenter();
+    method public long getBottomLeft();
+    method public long getBottomRight();
+    method public long getCenter();
+    method public long getCenterLeft();
+    method public long getCenterRight();
+    method public float getHeight();
+    method public float getLeft();
+    method public float getMaxDimension();
+    method public float getMinDimension();
+    method public float getRight();
+    method public long getSize();
+    method public float getTop();
+    method public long getTopCenter();
+    method public long getTopLeft();
+    method public long getTopRight();
+    method public float getWidth();
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect inflate(float delta);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect intersect(androidx.compose.ui.geometry.Rect other);
+    method public boolean isEmpty();
+    method public boolean isFinite();
+    method public boolean isInfinite();
+    method public boolean overlaps(androidx.compose.ui.geometry.Rect other);
+    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect shift-k-4lQ0M(long offset);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate(float translateX, float translateY);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate-k-4lQ0M(long offset);
+    property public final long bottomCenter;
+    property public final long bottomLeft;
+    property public final long bottomRight;
+    property public final long center;
+    property public final long centerLeft;
+    property public final long centerRight;
+    property public final float height;
+    property public final boolean isEmpty;
+    property public final boolean isFinite;
+    property public final boolean isInfinite;
+    property public final float maxDimension;
+    property public final float minDimension;
+    property public final long size;
+    property public final long topCenter;
+    property public final long topLeft;
+    property public final long topRight;
+    property public final float width;
+    field public static final androidx.compose.ui.geometry.Rect.Companion Companion;
+  }
+
+  public static final class Rect.Companion {
+    method public androidx.compose.ui.geometry.Rect getZero();
+    property public final androidx.compose.ui.geometry.Rect Zero;
+  }
+
+  public final class RectKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect Rect-FZVz7gs(long topLeft, long bottomRight);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect Rect-MQFEXWE(long center, float radius);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect Rect-MrV732k(long offset, long size);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect lerp(androidx.compose.ui.geometry.Rect start, androidx.compose.ui.geometry.Rect stop, float fraction);
+  }
+
+  @androidx.compose.runtime.Immutable public final class RoundRect {
+    ctor public RoundRect(float left, float top, float right, float bottom, float topLeftRadiusX, float topLeftRadiusY, float topRightRadiusX, float topRightRadiusY, float bottomRightRadiusX, float bottomRightRadiusY, float bottomLeftRadiusX, float bottomLeftRadiusY);
+    method public float component1();
+    method public float component10();
+    method public float component11();
+    method public float component12();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public float component5();
+    method public float component6();
+    method public float component7();
+    method public float component8();
+    method public float component9();
+    method public boolean contains-k-4lQ0M(long point);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.geometry.RoundRect copy(float left, float top, float right, float bottom, float topLeftRadiusX, float topLeftRadiusY, float topRightRadiusX, float topRightRadiusY, float bottomRightRadiusX, float bottomRightRadiusY, float bottomLeftRadiusX, float bottomLeftRadiusY);
+    method public float getBottom();
+    method public float getBottomLeftRadiusX();
+    method public float getBottomLeftRadiusY();
+    method public float getBottomRightRadiusX();
+    method public float getBottomRightRadiusY();
+    method public float getHeight();
+    method public float getLeft();
+    method public float getRight();
+    method public float getTop();
+    method public float getTopLeftRadiusX();
+    method public float getTopLeftRadiusY();
+    method public float getTopRightRadiusX();
+    method public float getTopRightRadiusY();
+    method public float getWidth();
+    method public static androidx.compose.ui.geometry.RoundRect getZero();
+    property public final float height;
+    property public final float width;
+    field public static final androidx.compose.ui.geometry.RoundRect.Companion Companion;
+  }
+
+  public static final class RoundRect.Companion {
+    method public androidx.compose.ui.geometry.RoundRect getZero();
+    property public final androidx.compose.ui.geometry.RoundRect Zero;
+  }
+
+  public final class RoundRectKt {
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect RRect(float left, float top, float right, float bottom, float topLeftRadiusX, float topLeftRadiusY, float topRightRadiusX, float topRightRadiusY, float bottomRightRadiusX, float bottomRightRadiusY, float bottomLeftRadiusX, float bottomLeftRadiusY);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect RRect(float left, float top, float right, float bottom, float radiusX, float radiusY);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect RRect(androidx.compose.ui.geometry.Rect rect, float radiusX, float radiusY);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect RRect-9kgzNNk(androidx.compose.ui.geometry.Rect rect, long topLeft = Radius.Zero, long topRight = Radius.Zero, long bottomRight = Radius.Zero, long bottomLeft = Radius.Zero);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect RRect-FXlJaX8(androidx.compose.ui.geometry.Rect rect, long radius);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect RRect-HepwI24(float left, float top, float right, float bottom, long topLeft = Radius.Zero, long topRight = Radius.Zero, long bottomRight = Radius.Zero, long bottomLeft = Radius.Zero);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect RRect-TZLOQlQ(float left, float top, float right, float bottom, long radius);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect(float left, float top, float right, float bottom, float radiusX, float radiusY);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect(androidx.compose.ui.geometry.Rect rect, float radiusX, float radiusY);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect-9kgzNNk(androidx.compose.ui.geometry.Rect rect, long topLeft = Radius.Zero, long topRight = Radius.Zero, long bottomRight = Radius.Zero, long bottomLeft = Radius.Zero);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect-FXlJaX8(androidx.compose.ui.geometry.Rect rect, long radius);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect-HepwI24(float left, float top, float right, float bottom, long topLeft = Radius.Zero, long topRight = Radius.Zero, long bottomRight = Radius.Zero, long bottomLeft = Radius.Zero);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect-TZLOQlQ(float left, float top, float right, float bottom, long radius);
+    method public static long bottomLeftRadius(androidx.compose.ui.geometry.RoundRect);
+    method public static long bottomRightRadius(androidx.compose.ui.geometry.RoundRect);
+    method public static long center(androidx.compose.ui.geometry.RoundRect);
+    method public static float getLongestSide(androidx.compose.ui.geometry.RoundRect);
+    method public static float getShortestSide(androidx.compose.ui.geometry.RoundRect);
+    method public static androidx.compose.ui.geometry.RoundRect grow(androidx.compose.ui.geometry.RoundRect, float delta);
+    method public static boolean isCircle(androidx.compose.ui.geometry.RoundRect);
+    method public static boolean isEllipse(androidx.compose.ui.geometry.RoundRect);
+    method public static boolean isEmpty(androidx.compose.ui.geometry.RoundRect);
+    method public static boolean isFinite(androidx.compose.ui.geometry.RoundRect);
+    method public static boolean isRect(androidx.compose.ui.geometry.RoundRect);
+    method public static boolean isSimple(androidx.compose.ui.geometry.RoundRect);
+    method public static boolean isStadium(androidx.compose.ui.geometry.RoundRect);
+    method public static androidx.compose.ui.geometry.RoundRect lerp(androidx.compose.ui.geometry.RoundRect start, androidx.compose.ui.geometry.RoundRect stop, float fraction);
+    method public static androidx.compose.ui.geometry.Rect middleRect(androidx.compose.ui.geometry.RoundRect);
+    method public static androidx.compose.ui.geometry.Rect outerRect(androidx.compose.ui.geometry.RoundRect);
+    method public static androidx.compose.ui.geometry.Rect safeInnerRect(androidx.compose.ui.geometry.RoundRect);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect shift-cBI5anY(androidx.compose.ui.geometry.RoundRect, long offset);
+    method public static androidx.compose.ui.geometry.RoundRect shrink(androidx.compose.ui.geometry.RoundRect, float delta);
+    method public static androidx.compose.ui.geometry.Rect tallMiddleRect(androidx.compose.ui.geometry.RoundRect);
+    method public static long topLeftRadius(androidx.compose.ui.geometry.RoundRect);
+    method public static long topRightRadius(androidx.compose.ui.geometry.RoundRect);
+    method public static androidx.compose.ui.geometry.RoundRect translate-cBI5anY(androidx.compose.ui.geometry.RoundRect, long offset);
+    method public static androidx.compose.ui.geometry.Rect wideMiddleRect(androidx.compose.ui.geometry.RoundRect);
+    method public static androidx.compose.ui.geometry.RoundRect withRadius-Z0w6hBY(androidx.compose.ui.geometry.RoundRect, long radius);
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class Size {
+    ctor public Size();
+    method @androidx.compose.runtime.Stable public static long bottomCenter-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static long bottomLeft-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static long bottomRight-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static long center-k-4lQ0M(long $this, long origin = Offset.Zero);
+    method @androidx.compose.runtime.Stable public static long centerLeft-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static long centerRight-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
+    method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
+    method public static long constructor-impl(internal long packedValue);
+    method @androidx.compose.runtime.Stable public static boolean contains-k-4lQ0M(long $this, long offset);
+    method public static long copy-impl(long $this, float width = this.width, float height = this.height);
+    method @androidx.compose.runtime.Stable public static operator long div-impl(long $this, float operand);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method @androidx.compose.runtime.Stable public static long getFlipped-impl(long $this);
+    method public static float getHeight-impl(long $this);
+    method public static float getMaxDimension-impl(long $this);
+    method public static float getMinDimension-impl(long $this);
+    method public static float getWidth-impl(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Stable public static boolean isEmpty-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator long rem-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long times-impl(long $this, float operand);
+    method public static String toString-impl(long $this);
+    method @androidx.compose.runtime.Stable public static long topCenter-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static long topLeft-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static long topRight-k-4lQ0M(long $this, long origin);
+    method @androidx.compose.runtime.Stable public static long truncDiv-impl(long $this, float operand);
+    field public static final androidx.compose.ui.geometry.Size.Companion Companion;
+  }
+
+  public static final class Size.Companion {
+    method public long getUnspecified();
+    method public long getZero();
+    property public final long Unspecified;
+    property public final long Zero;
+  }
+
+  public final class SizeKt {
+    method @androidx.compose.runtime.Stable public static long Size(float width, float height);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Size? lerp-3tf5JpU(long start, long stop, float fraction);
+    method @androidx.compose.runtime.Stable public static inline operator long times-2DtskRk(float, long size);
+    method @androidx.compose.runtime.Stable public static inline operator long times-B9jgaKk(double, long size);
+    method @androidx.compose.runtime.Stable public static inline operator long times-cEP68aU(int, long size);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect-uvyYCjk(long);
+  }
+
+}
+

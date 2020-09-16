@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+    <!-- We use px instead of dip so that the benchmark is independent of
+         density -->
+    <View android:id="@+id/item_image"
+          android:layout_width="350px"
+          android:layout_height="350px"
+          android:background="#808"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Some title"
+              android:textSize="60px"/>
+    <LinearLayout android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal">
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center"
+                  android:text="3.5 ★" android:textSize="40px"/>
+        <View android:layout_width="40px"
+              android:layout_height="40px"
+              android:layout_gravity="center"
+              android:background="#008"/>
+    </LinearLayout>
+</LinearLayout>

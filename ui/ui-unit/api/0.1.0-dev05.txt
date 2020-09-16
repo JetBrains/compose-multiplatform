@@ -1,0 +1,628 @@
+// Signature format: 3.0
+package androidx.ui.unit {
+
+  public final class Bounds {
+    ctor public Bounds(androidx.ui.unit.Dp left, androidx.ui.unit.Dp top, androidx.ui.unit.Dp right, androidx.ui.unit.Dp bottom);
+    method public androidx.ui.unit.Dp component1();
+    method public androidx.ui.unit.Dp component2();
+    method public androidx.ui.unit.Dp component3();
+    method public androidx.ui.unit.Dp component4();
+    method public androidx.ui.unit.Bounds copy(androidx.ui.unit.Dp left, androidx.ui.unit.Dp top, androidx.ui.unit.Dp right, androidx.ui.unit.Dp bottom);
+    method public androidx.ui.unit.Dp getBottom();
+    method public androidx.ui.unit.Dp getLeft();
+    method public androidx.ui.unit.Dp getRight();
+    method public androidx.ui.unit.Dp getTop();
+  }
+
+  public interface Density {
+    method public float getDensity();
+    method public float getFontScale();
+    method public default androidx.ui.unit.Dp toDp(androidx.ui.unit.TextUnit);
+    method public default androidx.ui.unit.Dp toDp(androidx.ui.unit.Px);
+    method public default androidx.ui.unit.Dp toDp(androidx.ui.unit.IntPx);
+    method public default androidx.ui.unit.Dp toDp(float);
+    method public default androidx.ui.unit.Dp toDp(int);
+    method public default androidx.ui.unit.IntPx toIntPx(androidx.ui.unit.Dp);
+    method public default androidx.ui.unit.IntPx toIntPx(androidx.ui.unit.TextUnit);
+    method public default androidx.ui.unit.Px toPx(androidx.ui.unit.Dp);
+    method public default androidx.ui.unit.Px toPx(androidx.ui.unit.TextUnit);
+    method public default androidx.ui.unit.PxSize toPx-kAYDl8w(long);
+    method public default androidx.ui.geometry.Rect toRect(androidx.ui.unit.Bounds);
+    method public default androidx.ui.unit.TextUnit toSp(androidx.ui.unit.Dp);
+    method public default androidx.ui.unit.TextUnit toSp(androidx.ui.unit.Px);
+    method public default androidx.ui.unit.TextUnit toSp(androidx.ui.unit.IntPx);
+    method public default androidx.ui.unit.TextUnit toSp(float);
+    method public default androidx.ui.unit.TextUnit toSp(int);
+    property public abstract float density;
+    property public abstract float fontScale;
+  }
+
+  public final class DensityKt {
+    method public static androidx.ui.unit.Density Density(android.content.Context context);
+    method public static androidx.ui.unit.Density Density(float density, float fontScale = 1f);
+  }
+
+  public final class Dp implements java.lang.Comparable<androidx.ui.unit.Dp> {
+    ctor public Dp(float value);
+    method public operator int compareTo(androidx.ui.unit.Dp other);
+    method public float component1();
+    method public androidx.ui.unit.Dp copy(float value);
+    method public inline operator androidx.ui.unit.Dp div(float other);
+    method public inline operator androidx.ui.unit.Dp div(int other);
+    method public inline operator float div(androidx.ui.unit.Dp other);
+    method public inline operator float div-x8crYZs(float other);
+    method public float getValue();
+    method public inline operator androidx.ui.unit.Dp minus(androidx.ui.unit.Dp other);
+    method public inline operator androidx.ui.unit.Dp plus(androidx.ui.unit.Dp other);
+    method public inline operator androidx.ui.unit.Dp times(float other);
+    method public inline operator androidx.ui.unit.Dp times(int other);
+    method public inline operator float times(androidx.ui.unit.Dp other);
+    method public inline operator float times-x8crYZs(float other);
+    method public inline operator androidx.ui.unit.Dp unaryMinus();
+    field public static final androidx.ui.unit.Dp.Companion! Companion;
+  }
+
+  public static final class Dp.Companion {
+    method public androidx.ui.unit.Dp getHairline();
+    method public androidx.ui.unit.Dp getInfinity();
+    method public androidx.ui.unit.Dp getUnspecified();
+    property public final androidx.ui.unit.Dp Hairline;
+    property public final androidx.ui.unit.Dp Infinity;
+    property public final androidx.ui.unit.Dp Unspecified;
+  }
+
+  public final inline class DpCubed implements java.lang.Comparable<androidx.ui.unit.DpCubed> {
+    ctor public DpCubed();
+    method public operator int compareTo-JDqhs2g(float p);
+    method public static operator int compareTo-JDqhs2g(float $this, float other);
+    method public static float constructor-impl(float value);
+    method public static inline operator float div-JDqhs2g(float $this, float other);
+    method public static inline operator float div-impl(float $this, float other);
+    method public static inline operator float div-impl(float $this, androidx.ui.unit.Dp other);
+    method public static inline operator androidx.ui.unit.Dp div-x8crYZs(float $this, float other);
+    method public static boolean equals-impl(float p, Object? p1);
+    method public static boolean equals-impl0(float p1, float p2);
+    method public float getValue();
+    method public static int hashCode-impl(float p);
+    method public static inline operator float minus-JDqhs2g(float $this, float dimension);
+    method public static inline operator float plus-JDqhs2g(float $this, float dimension);
+    method public static inline operator float times-impl(float $this, float other);
+    method public static String toString-impl(float $this);
+  }
+
+  public final inline class DpInverse implements java.lang.Comparable<androidx.ui.unit.DpInverse> {
+    ctor public DpInverse();
+    method public operator int compareTo-_K2iRR8(float p);
+    method public static operator int compareTo-_K2iRR8(float $this, float other);
+    method public static float constructor-impl(float value);
+    method public static inline operator float div-impl(float $this, float other);
+    method public static boolean equals-impl(float p, Object? p1);
+    method public static boolean equals-impl0(float p1, float p2);
+    method public float getValue();
+    method public static int hashCode-impl(float p);
+    method public static inline operator float minus-_K2iRR8(float $this, float dimension);
+    method public static inline operator float plus-_K2iRR8(float $this, float dimension);
+    method public static inline operator float times-JDqhs2g(float $this, float other);
+    method public static inline operator float times-impl(float $this, float other);
+    method public static inline operator float times-impl(float $this, androidx.ui.unit.Dp other);
+    method public static inline operator androidx.ui.unit.Dp times-x8crYZs(float $this, float other);
+    method public static String toString-impl(float $this);
+  }
+
+  public final class DpKt {
+    method public static inline long Position(androidx.ui.unit.Dp x, androidx.ui.unit.Dp y);
+    method public static inline long Size(androidx.ui.unit.Dp width, androidx.ui.unit.Dp height);
+    method public static long center-kAYDl8w(long);
+    method public static inline androidx.ui.unit.Dp coerceAtLeast(androidx.ui.unit.Dp, androidx.ui.unit.Dp minimumValue);
+    method public static inline androidx.ui.unit.Dp coerceAtMost(androidx.ui.unit.Dp, androidx.ui.unit.Dp maximumValue);
+    method public static inline androidx.ui.unit.Dp coerceIn(androidx.ui.unit.Dp, androidx.ui.unit.Dp minimumValue, androidx.ui.unit.Dp maximumValue);
+    method public static inline operator float div(float, androidx.ui.unit.Dp other);
+    method public static inline operator float div(double, androidx.ui.unit.Dp other);
+    method public static inline operator float div(int, androidx.ui.unit.Dp other);
+    method public static androidx.ui.unit.Dp getDistance-T8eBu-w(long);
+    method public static inline androidx.ui.unit.Dp getDp(int);
+    method public static inline androidx.ui.unit.Dp getDp(double);
+    method public static inline androidx.ui.unit.Dp getDp(float);
+    method public static inline androidx.ui.unit.Dp getHeight(androidx.ui.unit.Bounds);
+    method public static inline androidx.ui.unit.Dp getWidth(androidx.ui.unit.Bounds);
+    method public static inline boolean isFinite(androidx.ui.unit.Dp);
+    method public static androidx.ui.unit.Dp lerp(androidx.ui.unit.Dp start, androidx.ui.unit.Dp stop, float fraction);
+    method public static long lerp-d5NHFfI(long start, long stop, float fraction);
+    method public static inline androidx.ui.unit.Dp max(androidx.ui.unit.Dp a, androidx.ui.unit.Dp b);
+    method public static inline androidx.ui.unit.Dp min(androidx.ui.unit.Dp a, androidx.ui.unit.Dp b);
+    method public static inline operator androidx.ui.unit.Dp times(float, androidx.ui.unit.Dp other);
+    method public static inline operator androidx.ui.unit.Dp times(double, androidx.ui.unit.Dp other);
+    method public static inline operator androidx.ui.unit.Dp times(int, androidx.ui.unit.Dp other);
+    method public static inline operator long times--D0i1nw(float, long size);
+    method public static inline operator long times-DdskrAE(int, long size);
+    method public static inline operator long times-l9Tz9ww(double, long size);
+    method public static androidx.ui.unit.Bounds toBounds-kAYDl8w(long);
+    method public static inline long toSize(androidx.ui.unit.Bounds);
+  }
+
+  public final inline class DpSquared implements java.lang.Comparable<androidx.ui.unit.DpSquared> {
+    ctor public DpSquared();
+    method public operator int compareTo-x8crYZs(float p);
+    method public static operator int compareTo-x8crYZs(float $this, float other);
+    method public static float constructor-impl(float value);
+    method public static inline operator float div-JDqhs2g(float $this, float other);
+    method public static inline operator float div-impl(float $this, float other);
+    method public static inline operator androidx.ui.unit.Dp div-impl(float $this, androidx.ui.unit.Dp other);
+    method public static inline operator float div-x8crYZs(float $this, float other);
+    method public static boolean equals-impl(float p, Object? p1);
+    method public static boolean equals-impl0(float p1, float p2);
+    method public float getValue();
+    method public static int hashCode-impl(float p);
+    method public static inline operator float minus-x8crYZs(float $this, float other);
+    method public static inline operator float plus-x8crYZs(float $this, float other);
+    method public static inline operator float times-impl(float $this, float other);
+    method public static inline operator float times-impl(float $this, androidx.ui.unit.Dp other);
+    method public static String toString-impl(float $this);
+  }
+
+  public final class Duration implements java.lang.Comparable<androidx.ui.unit.Duration> {
+    ctor public Duration(long nanoseconds);
+    method public int compareTo(androidx.ui.unit.Duration other);
+    method public long component1();
+    method public androidx.ui.unit.Duration copy(long nanoseconds);
+    method public operator androidx.ui.unit.Duration div(int quotient);
+    method public operator androidx.ui.unit.Duration div(double quotient);
+    method public long getNanoseconds();
+    method public operator androidx.ui.unit.Duration minus(androidx.ui.unit.Duration other);
+    method public operator androidx.ui.unit.Duration plus(androidx.ui.unit.Duration other);
+    method public operator androidx.ui.unit.Duration times(int factor);
+    method public operator androidx.ui.unit.Duration times(double factor);
+    field public static final androidx.ui.unit.Duration.Companion! Companion;
+  }
+
+  public static final class Duration.Companion {
+    method public androidx.ui.unit.Duration getZero();
+    property public final androidx.ui.unit.Duration Zero;
+  }
+
+  public final class Durations {
+    method public static androidx.ui.unit.Duration Duration(long days = 0, long hours = 0, long minutes = 0, long seconds = 0, long milliseconds = 0, long microseconds = 0, long nanoseconds = 0);
+    method public static androidx.ui.unit.Duration getDays(long);
+    method public static androidx.ui.unit.Duration getDays(int);
+    method public static androidx.ui.unit.Duration getHours(long);
+    method public static androidx.ui.unit.Duration getHours(int);
+    method public static androidx.ui.unit.Duration getMicroseconds(long);
+    method public static androidx.ui.unit.Duration getMicroseconds(int);
+    method public static androidx.ui.unit.Duration getMilliseconds(long);
+    method public static androidx.ui.unit.Duration getMilliseconds(int);
+    method public static androidx.ui.unit.Duration getMinutes(long);
+    method public static androidx.ui.unit.Duration getMinutes(int);
+    method public static androidx.ui.unit.Duration getNanoseconds(long);
+    method public static androidx.ui.unit.Duration getNanoseconds(int);
+    method public static long getNanosecondsPerDay();
+    method public static long getNanosecondsPerHour();
+    method public static long getNanosecondsPerMillisecond();
+    method public static long getNanosecondsPerMinute();
+    method public static long getNanosecondsPerSecond();
+    method public static androidx.ui.unit.Duration getSeconds(long);
+    method public static androidx.ui.unit.Duration getSeconds(int);
+    method public static long inDays(androidx.ui.unit.Duration);
+    method public static long inHours(androidx.ui.unit.Duration);
+    method public static long inMicroseconds(androidx.ui.unit.Duration);
+    method public static long inMilliseconds(androidx.ui.unit.Duration);
+    method public static long inMinutes(androidx.ui.unit.Duration);
+    method public static long inSeconds(androidx.ui.unit.Duration);
+    field public static final long HoursPerDay = 24L; // 0x18L
+    field public static final long MicrosecondsPerMillisecond = 1000L; // 0x3e8L
+    field public static final long MillisecondsPerSecond = 1000L; // 0x3e8L
+    field public static final long MinutesPerHour = 60L; // 0x3cL
+    field public static final long NanosecondsPerMicrosecond = 1000L; // 0x3e8L
+    field public static final long SecondsPerMinute = 60L; // 0x3cL
+  }
+
+  public final class IntPx implements java.lang.Comparable<androidx.ui.unit.IntPx> {
+    ctor public IntPx(int value);
+    method public operator int compareTo(androidx.ui.unit.IntPx other);
+    method public inline operator int compareTo(androidx.ui.unit.Px other);
+    method public int component1();
+    method public androidx.ui.unit.IntPx copy(int value);
+    method public operator androidx.ui.unit.IntPx div(float other);
+    method public operator androidx.ui.unit.IntPx div(double other);
+    method public operator androidx.ui.unit.IntPx div(int other);
+    method public int getValue();
+    method public operator androidx.ui.unit.IntPx minus(androidx.ui.unit.IntPx other);
+    method public operator androidx.ui.unit.IntPx plus(androidx.ui.unit.IntPx other);
+    method public inline operator androidx.ui.unit.IntPx rem(int other);
+    method public operator androidx.ui.unit.IntPx times(float other);
+    method public operator androidx.ui.unit.IntPx times(double other);
+    method public operator androidx.ui.unit.IntPx times(int other);
+    method public operator androidx.ui.unit.IntPx unaryMinus();
+    field public static final androidx.ui.unit.IntPx.Companion! Companion;
+  }
+
+  public static final class IntPx.Companion {
+    method public androidx.ui.unit.IntPx getInfinity();
+    method public androidx.ui.unit.IntPx getZero();
+    property public final androidx.ui.unit.IntPx Infinity;
+    property public final androidx.ui.unit.IntPx Zero;
+  }
+
+  public final class IntPxBounds {
+    ctor public IntPxBounds(androidx.ui.unit.IntPx left, androidx.ui.unit.IntPx top, androidx.ui.unit.IntPx right, androidx.ui.unit.IntPx bottom);
+    method public androidx.ui.unit.IntPx component1();
+    method public androidx.ui.unit.IntPx component2();
+    method public androidx.ui.unit.IntPx component3();
+    method public androidx.ui.unit.IntPx component4();
+    method public androidx.ui.unit.IntPxBounds copy(androidx.ui.unit.IntPx left, androidx.ui.unit.IntPx top, androidx.ui.unit.IntPx right, androidx.ui.unit.IntPx bottom);
+    method public androidx.ui.unit.IntPx getBottom();
+    method public androidx.ui.unit.IntPx getLeft();
+    method public androidx.ui.unit.IntPx getRight();
+    method public androidx.ui.unit.IntPx getTop();
+  }
+
+  public final class IntPxKt {
+    method public static inline androidx.ui.unit.IntPxPosition IntPxPosition(androidx.ui.unit.IntPx x, androidx.ui.unit.IntPx y);
+    method public static inline androidx.ui.unit.IntPxSize IntPxSize(androidx.ui.unit.IntPx width, androidx.ui.unit.IntPx height);
+    method public static inline androidx.ui.unit.PxPosition PxPosition(androidx.ui.unit.IntPx x, androidx.ui.unit.IntPx y);
+    method public static inline androidx.ui.unit.PxSize PxSize(androidx.ui.unit.IntPx width, androidx.ui.unit.IntPx height);
+    method public static inline androidx.ui.unit.IntPx ceil(androidx.ui.unit.Px);
+    method public static androidx.ui.unit.IntPxPosition center(androidx.ui.unit.IntPxSize);
+    method public static inline androidx.ui.unit.IntPx coerceAtLeast(androidx.ui.unit.IntPx, androidx.ui.unit.IntPx minimumValue);
+    method public static inline androidx.ui.unit.IntPx coerceAtMost(androidx.ui.unit.IntPx, androidx.ui.unit.IntPx maximumValue);
+    method public static inline androidx.ui.unit.IntPx coerceIn(androidx.ui.unit.IntPx, androidx.ui.unit.IntPx minimumValue, androidx.ui.unit.IntPx maximumValue);
+    method public static inline androidx.ui.unit.IntPx getHeight(androidx.ui.unit.IntPxBounds);
+    method public static inline androidx.ui.unit.IntPx getIpx(int);
+    method public static inline androidx.ui.unit.IntPx getWidth(androidx.ui.unit.IntPxBounds);
+    method public static inline boolean isFinite(androidx.ui.unit.IntPx);
+    method public static androidx.ui.unit.IntPx lerp(androidx.ui.unit.IntPx start, androidx.ui.unit.IntPx stop, float fraction);
+    method public static androidx.ui.unit.IntPxPosition lerp(androidx.ui.unit.IntPxPosition start, androidx.ui.unit.IntPxPosition stop, float fraction);
+    method public static inline androidx.ui.unit.IntPx max(androidx.ui.unit.IntPx a, androidx.ui.unit.IntPx b);
+    method public static inline androidx.ui.unit.IntPx min(androidx.ui.unit.IntPx a, androidx.ui.unit.IntPx b);
+    method public static inline androidx.ui.unit.IntPx round(androidx.ui.unit.Px);
+    method public static inline operator androidx.ui.unit.IntPx times(float, androidx.ui.unit.IntPx other);
+    method public static inline operator androidx.ui.unit.IntPx times(double, androidx.ui.unit.IntPx other);
+    method public static inline operator androidx.ui.unit.IntPx times(int, androidx.ui.unit.IntPx other);
+    method public static inline operator androidx.ui.unit.IntPxSize times(int, androidx.ui.unit.IntPxSize size);
+    method public static inline androidx.ui.unit.Px toPx(androidx.ui.unit.IntPx);
+    method public static inline androidx.ui.unit.PxPosition toPxPosition(androidx.ui.unit.IntPxPosition);
+    method public static inline androidx.ui.unit.PxSize toPxSize(androidx.ui.unit.IntPxSize);
+    method public static inline androidx.ui.unit.IntPxSize toSize(androidx.ui.unit.IntPxBounds);
+  }
+
+  public final class IntPxPosition {
+    method public androidx.ui.unit.IntPxPosition copy(long value);
+    method public inline androidx.ui.unit.IntPx getX();
+    method public inline androidx.ui.unit.IntPx getY();
+    method public inline operator androidx.ui.unit.IntPxPosition minus(androidx.ui.unit.IntPxPosition other);
+    method public inline operator androidx.ui.unit.IntPxPosition plus(androidx.ui.unit.IntPxPosition other);
+    method public inline operator androidx.ui.unit.IntPxPosition unaryMinus();
+    property public final inline androidx.ui.unit.IntPx x;
+    property public final inline androidx.ui.unit.IntPx y;
+    field public static final androidx.ui.unit.IntPxPosition.Companion! Companion;
+  }
+
+  public static final class IntPxPosition.Companion {
+    method public androidx.ui.unit.IntPxPosition getOrigin();
+    property public final androidx.ui.unit.IntPxPosition Origin;
+  }
+
+  public final class IntPxSize {
+    method public androidx.ui.unit.IntPxSize copy(long value);
+    method public inline operator androidx.ui.unit.IntPxSize div(int other);
+    method public inline androidx.ui.unit.IntPx getHeight();
+    method public inline androidx.ui.unit.IntPx getWidth();
+    method public inline operator androidx.ui.unit.IntPxSize times(int other);
+    property public final inline androidx.ui.unit.IntPx height;
+    property public final inline androidx.ui.unit.IntPx width;
+  }
+
+  public final inline class Position {
+    ctor public Position();
+    method public static long constructor-impl(internal long value);
+    method public static boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static androidx.ui.unit.Dp getX-impl(long $this);
+    method public static androidx.ui.unit.Dp getY-impl(long $this);
+    method public static int hashCode-impl(long p);
+    method public static inline operator long minus-T8eBu-w(long $this, long other);
+    method public static inline operator long plus-T8eBu-w(long $this, long other);
+    method public static String toString-impl(long $this);
+  }
+
+  public final class Px implements java.lang.Comparable<androidx.ui.unit.Px> {
+    ctor public Px(float value);
+    method public operator int compareTo(androidx.ui.unit.Px other);
+    method public inline operator int compareTo(androidx.ui.unit.IntPx other);
+    method public float component1();
+    method public androidx.ui.unit.Px copy(float value);
+    method public inline operator androidx.ui.unit.Px div(float other);
+    method public inline operator androidx.ui.unit.Px div(int other);
+    method public inline operator float div(androidx.ui.unit.Px other);
+    method public inline operator float div-RjPF0Mw(float other);
+    method public float getValue();
+    method public inline operator androidx.ui.unit.Px minus(androidx.ui.unit.Px other);
+    method public inline operator androidx.ui.unit.Px minus(androidx.ui.unit.IntPx other);
+    method public inline operator androidx.ui.unit.Px plus(androidx.ui.unit.Px other);
+    method public inline operator androidx.ui.unit.Px plus(androidx.ui.unit.IntPx other);
+    method public inline operator androidx.ui.unit.Px times(float other);
+    method public inline operator androidx.ui.unit.Px times(int other);
+    method public inline operator float times(androidx.ui.unit.Px other);
+    method public inline operator float times-RjPF0Mw(float other);
+    method public inline operator androidx.ui.unit.Px unaryMinus();
+    field public static final androidx.ui.unit.Px.Companion! Companion;
+  }
+
+  public static final class Px.Companion {
+    method public androidx.ui.unit.Px getInfinity();
+    method public androidx.ui.unit.Px getZero();
+    property public final androidx.ui.unit.Px Infinity;
+    property public final androidx.ui.unit.Px Zero;
+  }
+
+  public final class PxBounds {
+    ctor public PxBounds(androidx.ui.unit.Px left, androidx.ui.unit.Px top, androidx.ui.unit.Px right, androidx.ui.unit.Px bottom);
+    method public androidx.ui.unit.Px component1();
+    method public androidx.ui.unit.Px component2();
+    method public androidx.ui.unit.Px component3();
+    method public androidx.ui.unit.Px component4();
+    method public androidx.ui.unit.PxBounds copy(androidx.ui.unit.Px left, androidx.ui.unit.Px top, androidx.ui.unit.Px right, androidx.ui.unit.Px bottom);
+    method public androidx.ui.unit.Px getBottom();
+    method public androidx.ui.unit.Px getLeft();
+    method public androidx.ui.unit.Px getRight();
+    method public androidx.ui.unit.Px getTop();
+  }
+
+  public final inline class PxCubed implements java.lang.Comparable<androidx.ui.unit.PxCubed> {
+    ctor public PxCubed();
+    method public operator int compareTo-bji3ab4(float p);
+    method public static operator int compareTo-bji3ab4(float $this, float other);
+    method public static float constructor-impl(float value);
+    method public static inline operator androidx.ui.unit.Px div-RjPF0Mw(float $this, float other);
+    method public static inline operator float div-bji3ab4(float $this, float other);
+    method public static inline operator float div-impl(float $this, float other);
+    method public static inline operator float div-impl(float $this, androidx.ui.unit.Px other);
+    method public static boolean equals-impl(float p, Object? p1);
+    method public static boolean equals-impl0(float p1, float p2);
+    method public float getValue();
+    method public static int hashCode-impl(float p);
+    method public static inline operator float minus-bji3ab4(float $this, float dimension);
+    method public static inline operator float plus-bji3ab4(float $this, float dimension);
+    method public static inline operator float times-impl(float $this, float other);
+    method public static String toString-impl(float $this);
+  }
+
+  public final inline class PxInverse implements java.lang.Comparable<androidx.ui.unit.PxInverse> {
+    ctor public PxInverse();
+    method public operator int compareTo-KGV0gLo(float p);
+    method public static operator int compareTo-KGV0gLo(float $this, float other);
+    method public static float constructor-impl(float value);
+    method public static inline operator float div-impl(float $this, float other);
+    method public static boolean equals-impl(float p, Object? p1);
+    method public static boolean equals-impl0(float p1, float p2);
+    method public float getValue();
+    method public static int hashCode-impl(float p);
+    method public static inline operator float minus-KGV0gLo(float $this, float dimension);
+    method public static inline operator float plus-KGV0gLo(float $this, float dimension);
+    method public static inline operator androidx.ui.unit.Px times-RjPF0Mw(float $this, float other);
+    method public static inline operator float times-bji3ab4(float $this, float other);
+    method public static inline operator float times-impl(float $this, float other);
+    method public static inline operator float times-impl(float $this, androidx.ui.unit.Px other);
+    method public static String toString-impl(float $this);
+  }
+
+  public final class PxKt {
+    method public static inline androidx.ui.unit.PxBounds PxBounds(androidx.ui.unit.PxPosition topLeft, androidx.ui.unit.PxSize size);
+    method public static inline androidx.ui.unit.PxPosition PxPosition(androidx.ui.unit.Px x, androidx.ui.unit.Px y);
+    method public static inline androidx.ui.unit.PxSize PxSize(androidx.ui.unit.Px width, androidx.ui.unit.Px height);
+    method public static inline androidx.ui.unit.Px abs(androidx.ui.unit.Px x);
+    method public static androidx.ui.unit.PxPosition center(androidx.ui.unit.PxSize);
+    method public static inline androidx.ui.unit.Px coerceAtLeast(androidx.ui.unit.Px, androidx.ui.unit.Px minimumValue);
+    method public static inline androidx.ui.unit.Px coerceAtMost(androidx.ui.unit.Px, androidx.ui.unit.Px maximumValue);
+    method public static inline androidx.ui.unit.Px coerceIn(androidx.ui.unit.Px, androidx.ui.unit.Px minimumValue, androidx.ui.unit.Px maximumValue);
+    method public static inline operator float div(float, androidx.ui.unit.Px other);
+    method public static inline operator float div(double, androidx.ui.unit.Px other);
+    method public static inline operator float div(int, androidx.ui.unit.Px other);
+    method public static androidx.ui.unit.Px getDistance(androidx.ui.unit.PxPosition);
+    method public static inline androidx.ui.unit.Px getHeight(androidx.ui.unit.PxBounds);
+    method public static androidx.ui.unit.Px! getMinDimension(androidx.ui.unit.PxSize);
+    method public static inline androidx.ui.unit.Px getPx(int);
+    method public static inline androidx.ui.unit.Px getPx(double);
+    method public static inline androidx.ui.unit.Px getPx(float);
+    method public static inline androidx.ui.unit.Px getWidth(androidx.ui.unit.PxBounds);
+    method public static androidx.ui.unit.Px lerp(androidx.ui.unit.Px start, androidx.ui.unit.Px stop, float fraction);
+    method public static androidx.ui.unit.PxPosition lerp(androidx.ui.unit.PxPosition start, androidx.ui.unit.PxPosition stop, float fraction);
+    method public static inline androidx.ui.unit.Px max(androidx.ui.unit.Px a, androidx.ui.unit.Px b);
+    method public static inline androidx.ui.unit.Px min(androidx.ui.unit.Px a, androidx.ui.unit.Px b);
+    method public static inline androidx.ui.unit.IntPxPosition round(androidx.ui.unit.PxPosition);
+    method public static inline operator androidx.ui.unit.Px times(float, androidx.ui.unit.Px other);
+    method public static inline operator androidx.ui.unit.Px times(double, androidx.ui.unit.Px other);
+    method public static inline operator androidx.ui.unit.Px times(int, androidx.ui.unit.Px other);
+    method public static inline operator androidx.ui.unit.PxSize times(int, androidx.ui.unit.PxSize size);
+    method public static inline operator androidx.ui.unit.PxSize times(float, androidx.ui.unit.PxSize size);
+    method public static inline operator androidx.ui.unit.PxSize times(double, androidx.ui.unit.PxSize size);
+    method public static androidx.ui.unit.PxBounds toBounds(androidx.ui.unit.PxSize);
+    method public static inline androidx.ui.geometry.Offset toOffset(androidx.ui.unit.PxPosition);
+    method public static androidx.ui.geometry.Rect toRect(androidx.ui.unit.PxBounds);
+    method public static androidx.ui.geometry.Rect toRect(androidx.ui.unit.PxSize);
+    method public static androidx.ui.unit.PxSize toSize(androidx.ui.unit.PxBounds);
+  }
+
+  public final class PxPosition {
+    method public androidx.ui.unit.PxPosition copy(long value);
+    method public inline androidx.ui.unit.Px getX();
+    method public inline androidx.ui.unit.Px getY();
+    method public inline operator androidx.ui.unit.PxPosition minus(androidx.ui.unit.PxPosition other);
+    method public inline operator androidx.ui.unit.PxPosition minus(androidx.ui.unit.IntPxPosition other);
+    method public inline operator androidx.ui.unit.PxPosition plus(androidx.ui.unit.PxPosition other);
+    method public inline operator androidx.ui.unit.PxPosition plus(androidx.ui.unit.IntPxPosition other);
+    method public inline operator androidx.ui.unit.PxPosition unaryMinus();
+    property public final inline androidx.ui.unit.Px x;
+    property public final inline androidx.ui.unit.Px y;
+    field public static final androidx.ui.unit.PxPosition.Companion! Companion;
+  }
+
+  public static final class PxPosition.Companion {
+    method public androidx.ui.unit.PxPosition getOrigin();
+    property public final androidx.ui.unit.PxPosition Origin;
+  }
+
+  public final class PxSize {
+    method public androidx.ui.unit.PxSize copy(long value);
+    method public inline operator androidx.ui.unit.PxSize div(int other);
+    method public inline operator androidx.ui.unit.PxSize div(float other);
+    method public inline operator androidx.ui.unit.PxSize div(double other);
+    method public inline androidx.ui.unit.Px getHeight();
+    method public inline androidx.ui.unit.Px getWidth();
+    method public inline operator androidx.ui.unit.PxSize times(int other);
+    method public inline operator androidx.ui.unit.PxSize times(float other);
+    method public inline operator androidx.ui.unit.PxSize times(double other);
+    property public final inline androidx.ui.unit.Px height;
+    property public final inline androidx.ui.unit.Px width;
+    field public static final androidx.ui.unit.PxSize.Companion! Companion;
+  }
+
+  public static final class PxSize.Companion {
+    method public androidx.ui.unit.PxSize getUnspecifiedSize();
+    method public androidx.ui.unit.PxSize getZero();
+    property public final androidx.ui.unit.PxSize UnspecifiedSize;
+    property public final androidx.ui.unit.PxSize Zero;
+  }
+
+  public final inline class PxSquared implements java.lang.Comparable<androidx.ui.unit.PxSquared> {
+    ctor public PxSquared();
+    method public operator int compareTo-RjPF0Mw(float p);
+    method public static operator int compareTo-RjPF0Mw(float $this, float other);
+    method public static float constructor-impl(float value);
+    method public static inline operator float div-RjPF0Mw(float $this, float other);
+    method public static inline operator float div-bji3ab4(float $this, float other);
+    method public static inline operator float div-impl(float $this, float other);
+    method public static inline operator androidx.ui.unit.Px div-impl(float $this, androidx.ui.unit.Px other);
+    method public static boolean equals-impl(float p, Object? p1);
+    method public static boolean equals-impl0(float p1, float p2);
+    method public float getValue();
+    method public static int hashCode-impl(float p);
+    method public static inline operator float minus-RjPF0Mw(float $this, float other);
+    method public static inline operator float plus-RjPF0Mw(float $this, float other);
+    method public static inline operator float times-impl(float $this, float other);
+    method public static inline operator float times-impl(float $this, androidx.ui.unit.Px other);
+    method public static String toString-impl(float $this);
+  }
+
+  public final inline class Size {
+    ctor public Size();
+    method public static long constructor-impl(internal long value);
+    method public static inline operator long div-impl(long $this, int other);
+    method public static inline operator long div-impl(long $this, float other);
+    method public static inline operator long div-impl(long $this, double other);
+    method public static boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static androidx.ui.unit.Dp getHeight-impl(long $this);
+    method public static androidx.ui.unit.Dp getWidth-impl(long $this);
+    method public static int hashCode-impl(long p);
+    method public static inline operator long times-impl(long $this, int other);
+    method public static inline operator long times-impl(long $this, float other);
+    method public static inline operator long times-impl(long $this, double other);
+    method public static String toString-impl(long $this);
+  }
+
+  public final class TextUnit {
+    ctor public TextUnit(long packedValue);
+    method public inline operator int compareTo(androidx.ui.unit.TextUnit other);
+    method public long component1();
+    method public androidx.ui.unit.TextUnit copy(long packedValue);
+    method public inline operator androidx.ui.unit.TextUnit div(float other);
+    method public inline operator androidx.ui.unit.TextUnit div(double other);
+    method public inline operator androidx.ui.unit.TextUnit div(int other);
+    method public inline operator float div(androidx.ui.unit.TextUnit other);
+    method public long getPackedValue();
+    method public androidx.ui.unit.TextUnitType getType();
+    method public float getValue();
+    method public boolean isEm();
+    method public boolean isInherit();
+    method public boolean isSp();
+    method public inline operator androidx.ui.unit.TextUnit minus(androidx.ui.unit.TextUnit other);
+    method public inline operator androidx.ui.unit.TextUnit plus(androidx.ui.unit.TextUnit other);
+    method public inline operator androidx.ui.unit.TextUnit times(float other);
+    method public inline operator androidx.ui.unit.TextUnit times(double other);
+    method public inline operator androidx.ui.unit.TextUnit times(int other);
+    method public inline operator androidx.ui.unit.TextUnit unaryMinus();
+    property public final boolean isEm;
+    property public final boolean isInherit;
+    property public final boolean isSp;
+    property public final androidx.ui.unit.TextUnitType type;
+    property public final float value;
+    field public static final androidx.ui.unit.TextUnit.Companion! Companion;
+  }
+
+  public static final class TextUnit.Companion {
+    method public androidx.ui.unit.TextUnit Em(int value);
+    method public androidx.ui.unit.TextUnit Em(float value);
+    method public androidx.ui.unit.TextUnit Em(double value);
+    method public androidx.ui.unit.TextUnit Sp(int value);
+    method public androidx.ui.unit.TextUnit Sp(float value);
+    method public androidx.ui.unit.TextUnit Sp(double value);
+    method public androidx.ui.unit.TextUnit getInherit();
+    property public final androidx.ui.unit.TextUnit Inherit;
+  }
+
+  public final class TextUnitKt {
+    method public static inline androidx.ui.unit.TextUnit coerceAtLeast(androidx.ui.unit.TextUnit, androidx.ui.unit.TextUnit minimumValue);
+    method public static inline androidx.ui.unit.TextUnit coerceAtMost(androidx.ui.unit.TextUnit, androidx.ui.unit.TextUnit maximumValue);
+    method public static inline androidx.ui.unit.TextUnit coerceIn(androidx.ui.unit.TextUnit, androidx.ui.unit.TextUnit minimumValue, androidx.ui.unit.TextUnit maximumValue);
+    method public static androidx.ui.unit.TextUnit getEm(float);
+    method public static androidx.ui.unit.TextUnit getEm(double);
+    method public static androidx.ui.unit.TextUnit getEm(int);
+    method public static androidx.ui.unit.TextUnit getSp(float);
+    method public static androidx.ui.unit.TextUnit getSp(double);
+    method public static androidx.ui.unit.TextUnit getSp(int);
+    method public static androidx.ui.unit.TextUnit lerp(androidx.ui.unit.TextUnit a, androidx.ui.unit.TextUnit b, float t);
+    method public static inline androidx.ui.unit.TextUnit max(androidx.ui.unit.TextUnit a, androidx.ui.unit.TextUnit b);
+    method public static inline androidx.ui.unit.TextUnit min(androidx.ui.unit.TextUnit a, androidx.ui.unit.TextUnit b);
+    method public static inline operator androidx.ui.unit.TextUnit times(float, androidx.ui.unit.TextUnit other);
+    method public static inline operator androidx.ui.unit.TextUnit times(double, androidx.ui.unit.TextUnit other);
+    method public static inline operator androidx.ui.unit.TextUnit times(int, androidx.ui.unit.TextUnit other);
+  }
+
+  public enum TextUnitType {
+    enum_constant public static final androidx.ui.unit.TextUnitType Em;
+    enum_constant public static final androidx.ui.unit.TextUnitType Inherit;
+    enum_constant public static final androidx.ui.unit.TextUnitType Sp;
+  }
+
+  public final class Uptime implements java.lang.Comparable<androidx.ui.unit.Uptime> {
+    ctor public Uptime(long nanoseconds);
+    method public int compareTo(androidx.ui.unit.Uptime other);
+    method public long component1();
+    method public androidx.ui.unit.Uptime copy(long nanoseconds);
+    method public long getNanoseconds();
+    method public operator androidx.ui.unit.Uptime minus(androidx.ui.unit.Duration duration);
+    method public operator androidx.ui.unit.Duration minus(androidx.ui.unit.Uptime other);
+    method public operator androidx.ui.unit.Uptime plus(androidx.ui.unit.Duration duration);
+    field public static final androidx.ui.unit.Uptime.Companion! Companion;
+  }
+
+  public static final class Uptime.Companion {
+    method public androidx.ui.unit.Uptime getBoot();
+    property public final androidx.ui.unit.Uptime Boot;
+  }
+
+  public final class UptimeKt {
+    method public static operator androidx.ui.unit.Uptime plus(androidx.ui.unit.Duration, androidx.ui.unit.Uptime uptime);
+  }
+
+  public final class Velocity {
+    ctor public Velocity(androidx.ui.unit.PxPosition pixelsPerSecond);
+    method public androidx.ui.unit.PxPosition component1();
+    method public androidx.ui.unit.Velocity copy(androidx.ui.unit.PxPosition pixelsPerSecond);
+    method public androidx.ui.unit.PxPosition getPixelsPerSecond();
+    method public operator androidx.ui.unit.Velocity unaryMinus();
+    field public static final androidx.ui.unit.Velocity.Companion! Companion;
+  }
+
+  public static final class Velocity.Companion {
+    method public androidx.ui.unit.Velocity getZero();
+    property public final androidx.ui.unit.Velocity Zero;
+  }
+
+  public final class VelocityKt {
+    method public static operator androidx.ui.unit.Velocity minus(androidx.ui.unit.Velocity, androidx.ui.unit.Velocity other);
+    method public static operator androidx.ui.unit.Velocity plus(androidx.ui.unit.Velocity, androidx.ui.unit.Velocity other);
+  }
+
+}
+
