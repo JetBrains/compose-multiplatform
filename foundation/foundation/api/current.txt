@@ -124,6 +124,20 @@ package androidx.compose.foundation {
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER}) public @interface InternalFoundationApi {
   }
 
+  public enum MutatePriority {
+    method public static androidx.compose.foundation.MutatePriority valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.foundation.MutatePriority[] values();
+    enum_constant public static final androidx.compose.foundation.MutatePriority Default;
+    enum_constant public static final androidx.compose.foundation.MutatePriority PreventUserInput;
+    enum_constant public static final androidx.compose.foundation.MutatePriority UserInput;
+  }
+
+  @androidx.compose.runtime.Stable public final class MutatorMutex {
+    ctor public MutatorMutex();
+    method public suspend <R> Object? mutate(androidx.compose.foundation.MutatePriority priority = androidx.compose.foundation.MutatePriority.Default, kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
+    method public suspend <T, R> Object? mutateWith(T? receiver, androidx.compose.foundation.MutatePriority priority = androidx.compose.foundation.MutatePriority.Default, kotlin.jvm.functions.Function2<? super T,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
+  }
+
   public final class ProgressSemanticsKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float progress);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier);
