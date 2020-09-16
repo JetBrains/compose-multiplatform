@@ -263,7 +263,7 @@ interface Paragraph {
  * be left blank to leave space for inline elements.
  * @param maxLines the maximum number of lines that the text can have
  * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
- * @param constraints how wide the text is allowed to be
+ * @param width how wide the text is allowed to be
  * @param density density of the device
  * @param resourceLoader [Font.ResourceLoader] to be used to load the font given in [SpanStyle]s
  *
@@ -276,7 +276,7 @@ fun Paragraph(
     placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
     maxLines: Int = DefaultMaxLines,
     ellipsis: Boolean = false,
-    constraints: ParagraphConstraints,
+    width: Float,
     density: Density,
     resourceLoader: Font.ResourceLoader
 ): Paragraph = ActualParagraph(
@@ -286,7 +286,7 @@ fun Paragraph(
     placeholders,
     maxLines,
     ellipsis,
-    constraints,
+    width,
     density,
     resourceLoader
 )
@@ -298,16 +298,16 @@ fun Paragraph(
  * @param paragraphIntrinsics [ParagraphIntrinsics] instance
  * @param maxLines the maximum number of lines that the text can have
  * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
- * @param constraints how wide the text is allowed to be
+ * @param width how wide the text is allowed to be
  */
 fun Paragraph(
     paragraphIntrinsics: ParagraphIntrinsics,
     maxLines: Int = DefaultMaxLines,
     ellipsis: Boolean = false,
-    constraints: ParagraphConstraints
+    width: Float
 ): Paragraph = ActualParagraph(
     paragraphIntrinsics,
     maxLines,
     ellipsis,
-    constraints
+    width
 )

@@ -156,7 +156,7 @@ class TextDelegate(
             intrinsics = nonNullIntrinsics,
             maxLines = maxLines,
             ellipsis = overflow == TextOverflow.Ellipsis,
-            constraints = ParagraphConstraints(width = width)
+            width = width
         )
     }
 

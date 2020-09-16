@@ -17,7 +17,6 @@ package androidx.compose.ui.text.platform
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
-import androidx.compose.ui.text.ParagraphConstraints
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
@@ -33,7 +32,7 @@ internal expect fun ActualParagraph(
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     maxLines: Int,
     ellipsis: Boolean,
-    constraints: ParagraphConstraints,
+    width: Float,
     density: Density,
     resourceLoader: Font.ResourceLoader
 ): Paragraph
@@ -43,7 +42,7 @@ internal expect fun ActualParagraph(
     paragraphIntrinsics: ParagraphIntrinsics,
     maxLines: Int,
     ellipsis: Boolean,
-    constraints: ParagraphConstraints
+    width: Float
 ): Paragraph
 
 // TODO(b/157854677): remove after fixing.

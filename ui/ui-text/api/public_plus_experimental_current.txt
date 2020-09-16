@@ -72,8 +72,8 @@ package androidx.compose.ui.text {
   }
 
   public final class MultiParagraph {
-    ctor public MultiParagraph(androidx.compose.ui.text.MultiParagraphIntrinsics intrinsics, int maxLines, boolean ellipsis, androidx.compose.ui.text.ParagraphConstraints constraints);
-    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean ellipsis, androidx.compose.ui.text.ParagraphConstraints constraints, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    ctor public MultiParagraph(androidx.compose.ui.text.MultiParagraphIntrinsics intrinsics, int maxLines, boolean ellipsis, float width);
+    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
@@ -175,13 +175,6 @@ package androidx.compose.ui.text {
     property public abstract float width;
   }
 
-  public final class ParagraphConstraints {
-    ctor public ParagraphConstraints(float width);
-    method public float component1();
-    method public androidx.compose.ui.text.ParagraphConstraints copy(float width);
-    method public float getWidth();
-  }
-
   public interface ParagraphIntrinsics {
     method public float getMaxIntrinsicWidth();
     method public float getMinIntrinsicWidth();
@@ -194,8 +187,8 @@ package androidx.compose.ui.text {
   }
 
   public final class ParagraphKt {
-    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles = listOf(), java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders = listOf(), int maxLines = 2147483647, boolean ellipsis = false, androidx.compose.ui.text.ParagraphConstraints constraints, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
-    method public static androidx.compose.ui.text.Paragraph Paragraph(androidx.compose.ui.text.ParagraphIntrinsics paragraphIntrinsics, int maxLines = 2147483647, boolean ellipsis = false, androidx.compose.ui.text.ParagraphConstraints constraints);
+    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles = listOf(), java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders = listOf(), int maxLines = 2147483647, boolean ellipsis = false, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    method public static androidx.compose.ui.text.Paragraph Paragraph(androidx.compose.ui.text.ParagraphIntrinsics paragraphIntrinsics, int maxLines = 2147483647, boolean ellipsis = false, float width);
   }
 
   @androidx.compose.runtime.Immutable public final class ParagraphStyle {
@@ -362,7 +355,7 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutResultKt {
-    method @VisibleForTesting public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(androidx.compose.ui.text.TextLayoutInput layoutInput = androidx.compose.ui.text.TextLayoutInput(androidx.compose.ui.text.AnnotatedString(""), androidx.compose.ui.text.TextStyle(), emptyList(), 1, false, androidx.compose.ui.text.style.TextOverflow.Clip, Density(1.0), LayoutDirection.Ltr, null(), Constraints()), androidx.compose.ui.text.MultiParagraph multiParagraph = androidx.compose.ui.text.MultiParagraph(text, style, androidx.compose.ui.text.ParagraphConstraints(0.0), density, resourceLoader), long size = IntSize.Zero);
+    method @VisibleForTesting public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(androidx.compose.ui.text.TextLayoutInput layoutInput = androidx.compose.ui.text.TextLayoutInput(androidx.compose.ui.text.AnnotatedString(""), androidx.compose.ui.text.TextStyle(), emptyList(), 1, false, androidx.compose.ui.text.style.TextOverflow.Clip, Density(1.0), LayoutDirection.Ltr, null(), Constraints()), androidx.compose.ui.text.MultiParagraph multiParagraph = androidx.compose.ui.text.MultiParagraph(text, style, 0.0, density, resourceLoader), long size = IntSize.Zero);
   }
 
   public final class TextPainter {

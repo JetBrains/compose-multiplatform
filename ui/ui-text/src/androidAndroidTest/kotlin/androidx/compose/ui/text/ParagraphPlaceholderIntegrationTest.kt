@@ -521,7 +521,7 @@ class ParagraphPlaceholderIntegrationTest {
             placeholders = placeholders,
             maxLines = maxLines,
             ellipsis = ellipsis,
-            constraints = ParagraphConstraints(width = width),
+            width = width,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )

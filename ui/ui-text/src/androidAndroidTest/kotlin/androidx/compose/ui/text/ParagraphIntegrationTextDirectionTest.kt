@@ -59,7 +59,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null),
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = resourceLoader
         )
@@ -74,7 +74,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null),
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = resourceLoader
         )
@@ -87,7 +87,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null, localeList = ltrLocaleList),
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = resourceLoader
         )
@@ -100,7 +100,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null, localeList = rtlLocaleList),
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = resourceLoader
         )
