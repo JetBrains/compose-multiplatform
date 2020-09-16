@@ -99,6 +99,10 @@ import kotlin.math.roundToInt
  * @param onValueChangeEnd lambda to be invoked when value change has ended. This callback
  * shouldn't be used to update the slider value (use [onValueChange] for that), but rather to
  * know when the user has completed selecting a new value by ending a drag or a click.
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Slider. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this Slider in different [Interaction]s.
  * @param thumbColor color of thumb of the slider
  * @param activeTrackColor color of the track in the part that is "active", meaning that the
  * thumb is ahead of it
@@ -117,6 +121,7 @@ fun Slider(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     @IntRange(from = 0) steps: Int = 0,
     onValueChangeEnd: () -> Unit = {},
+    interactionState: InteractionState = remember { InteractionState() },
     thumbColor: Color = MaterialTheme.colors.primary,
     activeTrackColor: Color = MaterialTheme.colors.primary,
     inactiveTrackColor: Color = activeTrackColor.copy(alpha = InactiveTrackColorAlpha),
@@ -148,8 +153,6 @@ fun Slider(
                 onValueChangeEnd()
             }
         }
-
-        val interactionState = remember { InteractionState() }
 
         val press = Modifier.pressIndicatorGestureFilter(
             onStart = { pos ->
