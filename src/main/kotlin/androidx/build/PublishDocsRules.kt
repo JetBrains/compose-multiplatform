@@ -172,7 +172,9 @@ val RELEASE_RULE = docsRules("public", false) {
  * Rule set used to generate tip-of-tree documentation, typically for local and pre-submit use.
  */
 val TIP_OF_TREE = docsRules("tipOfTree", true) {
-    ignore(LibraryGroups.COMPOSE.group)
+    // Doclava breaks when generating docs for the Compiler due to some missing (?) Kotlin
+    // classes - this can probably be removed after we remove Doclava support.
+    ignore(LibraryGroups.Compose.COMPILER.group)
     default(TipOfTree)
 }
 
