@@ -28,34 +28,26 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.runners.JUnit4
+import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 @LargeTest
-@RunWith(Parameterized::class)
+@RunWith(JUnit4::class)
 @OptIn(ExperimentalComposeApi::class)
-class SnapshotStateObserverBenchmark(
-    private val numberOfModels: Int,
-    private val numberOfNodes: Int
-) : ComposeBenchmarkBase() {
+class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
     companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "states = {0}, nodes = {1}")
-        fun initParameters(): Array<Any> = arrayOf(
-            arrayOf(1000, 1000),
-            arrayOf(10000, 100),
-            arrayOf(100000, 10),
-            arrayOf(100, 1000)
-        )
+        private const val ScopeCount = 1000
+        private const val StateCount = 1000
     }
 
     private val doNothing: (Int) -> Unit = { _ -> }
 
     private lateinit var stateObserver: SnapshotStateObserver
-    private val models = List(numberOfModels) { mutableStateOf(0) }
-    private val nodes = List(numberOfNodes) { it }
+    private val models = List(StateCount) { mutableStateOf(0) }
+    private val nodes = List(ScopeCount) { it }
     private lateinit var random: Random
-    private val numObservations = numberOfModels / 10
 
     @Before
     fun setup() {
@@ -86,9 +78,13 @@ class SnapshotStateObserverBenchmark(
     fun modelObservation() {
         runOnUiThread {
             benchmarkRule.measureRepeated {
-                random = Random(0)
-                val node = nodes[random.nextInt(numberOfNodes)]
-                observeForNode(node)
+                runWithTimingDisabled {
+                    nodes.forEach { node ->
+                        stateObserver.clear(node)
+                    }
+                    random = Random(0)
+                }
+                setupObservations()
             }
         }
     }
@@ -96,11 +92,21 @@ class SnapshotStateObserverBenchmark(
     @Test
     fun nestedModelObservation() {
         runOnUiThread {
-            stateObserver.observeReads(nodes[0], doNothing) {
-                benchmarkRule.measureRepeated {
+            val list = mutableListOf<Int>()
+            repeat(10) {
+                list += nodes[random.nextInt(ScopeCount)]
+            }
+            benchmarkRule.measureRepeated {
+                runWithTimingDisabled {
                     random = Random(0)
-                    val node = nodes[random.nextInt(numberOfNodes)]
-                    observeForNode(node)
+                    nodes.forEach { node ->
+                        stateObserver.clear(node)
+                    }
+                }
+                stateObserver.observeReads(nodes[0], doNothing) {
+                    list.forEach { node ->
+                        observeForNode(node)
+                    }
                 }
             }
         }
@@ -110,12 +116,28 @@ class SnapshotStateObserverBenchmark(
     fun modelClear() {
         runOnUiThread {
             benchmarkRule.measureRepeated {
-                random = Random(0)
-                val node = nodes[random.nextInt(numberOfNodes)]
-                stateObserver.clear(node)
-                runWithTimingDisabled {
-                    observeForNode(node)
+                nodes.forEach { node ->
+                    stateObserver.clear(node)
                 }
+                random = Random(0)
+                runWithTimingDisabled {
+                    setupObservations()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun notifyChanges() {
+        runOnUiThread {
+            val states = mutableSetOf<Int>()
+            repeat(50) {
+                states += random.nextInt(StateCount)
+            }
+            val snapshot: Snapshot = Snapshot.current
+            benchmarkRule.measureRepeated {
+                random = Random(0)
+                stateObserver.notifyChanges(states, snapshot)
             }
         }
     }
@@ -125,9 +147,11 @@ class SnapshotStateObserverBenchmark(
 
     private fun observeForNode(node: Int) {
         stateObserver.observeReads(node, doNothing) {
+            // we want between 0-10, with the cluster near 0, but some outliers
+            val numObservations = (10.0.pow(random.nextDouble(2.0)) / 10).roundToInt()
             repeat(numObservations) {
                 // just access the value
-                models[random.nextInt(numberOfModels)].value
+                models[random.nextInt(StateCount)].value
             }
         }
     }

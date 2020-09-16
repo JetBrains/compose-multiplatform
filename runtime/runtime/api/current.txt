@@ -976,6 +976,7 @@ package androidx.compose.runtime.snapshots {
     method public void clear(Object target);
     method public void dispose();
     method public void enableStateUpdatesObserving(boolean enabled);
+    method @org.jetbrains.annotations.TestOnly public void notifyChanges(java.util.Set<?> changes, androidx.compose.runtime.snapshots.Snapshot snapshot);
     method public <T> void observeReads(T target, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onChanged, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void pauseObservingReads(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
