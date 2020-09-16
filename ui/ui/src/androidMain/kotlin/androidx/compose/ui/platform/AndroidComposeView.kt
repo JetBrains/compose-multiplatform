@@ -417,6 +417,10 @@ internal class AndroidComposeView constructor(
         snapshotObserver.observeReads(node, onCommitAffectingMeasure, block)
     }
 
+    override fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+        snapshotObserver.observeReads(target, onChanged, block)
+    }
+
     fun observeLayerModelReads(layer: OwnedLayer, block: () -> Unit) {
         snapshotObserver.observeReads(layer, onCommitAffectingLayer, block)
     }
