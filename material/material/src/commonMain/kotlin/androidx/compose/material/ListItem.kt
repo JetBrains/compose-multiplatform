@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Row
@@ -144,24 +144,21 @@ private object OneLine {
                             top = IconVerticalPadding,
                             bottom = IconVerticalPadding
                         ),
-                    alignment = Alignment.CenterStart,
-                    children = icon
-                )
+                    alignment = Alignment.CenterStart
+                ) { icon() }
             }
             Box(
                 Modifier.weight(1f)
                     .align(Alignment.CenterVertically)
                     .padding(start = ContentLeftPadding, end = ContentRightPadding),
-                alignment = Alignment.CenterStart,
-                children = text
-            )
+                alignment = Alignment.CenterStart
+            ) { text() }
             if (trailing != null) {
                 Box(
                     Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(end = TrailingRightPadding),
-                    children = trailing
-                )
+                        .padding(end = TrailingRightPadding)
+                ) { trailing() }
             }
         }
     }
@@ -216,9 +213,8 @@ private object TwoLine {
                             top = IconVerticalPadding,
                             bottom = IconVerticalPadding
                         ),
-                    alignment = Alignment.TopStart,
-                    children = icon
-                )
+                    alignment = Alignment.TopStart
+                ) { icon() }
             }
 
             if (overlineText != null) {
@@ -261,9 +257,8 @@ private object TwoLine {
                         // TODO(popam): find way to center and wrap content without minHeight
                         Modifier.preferredHeightIn(min = minHeight)
                             .padding(end = TrailingRightPadding),
-                        alignment = Alignment.Center,
-                        children = trailing
-                    )
+                        alignment = Alignment.Center
+                    ) { trailing() }
                 }
             }
         }
@@ -310,9 +305,8 @@ private object ThreeLine {
                             top = IconThreeLineVerticalPadding,
                             bottom = IconThreeLineVerticalPadding
                         ),
-                    alignment = Alignment.CenterStart,
-                    children = icon
-                )
+                    alignment = Alignment.CenterStart
+                ) { icon() }
             }
             BaselinesOffsetColumn(
                 listOf(

@@ -17,7 +17,7 @@
 package androidx.compose.ui.demos
 
 import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
@@ -59,7 +59,7 @@ fun PopupDemo() {
             Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            this@Column.ClickableTextWithBackground(
+            ClickableTextWithBackground(
                 text = "Prev",
                 color = Color.Cyan,
                 onClick = {
@@ -103,7 +103,7 @@ fun PopupDemo() {
                 )
             }
 
-            this@Column.ClickableTextWithBackground(
+            ClickableTextWithBackground(
                 text = "Next",
                 color = Color.Cyan,
                 onClick = {
@@ -414,7 +414,7 @@ private fun PopupOnKeyboardUp() {
 }
 
 @Composable
-private fun ColumnScope.ClickableTextWithBackground(
+private fun ClickableTextWithBackground(
     text: String,
     color: Color,
     onClick: (() -> Unit)? = null,
@@ -422,7 +422,6 @@ private fun ColumnScope.ClickableTextWithBackground(
 ) {
     Box(
         Modifier
-            .align(Alignment.CenterHorizontally)
             .clickable(onClick = onClick ?: {}, enabled = onClick != null)
             .background(color)
             .padding(padding)

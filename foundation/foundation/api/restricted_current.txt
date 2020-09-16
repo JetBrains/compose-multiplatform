@@ -42,10 +42,9 @@ package androidx.compose.foundation {
   }
 
   public final class BoxKt {
-    method @androidx.compose.runtime.Composable public static void Box(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.Alignment alignment = Alignment.TopStart, kotlin.jvm.functions.Function0<kotlin.Unit> children = emptyContent());
     method @Deprecated @androidx.compose.runtime.Composable public static void Box-0SX22z8(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.graphics.Shape shape = androidx.compose.ui.graphics.RectangleShapeKt.RectangleShape, long backgroundColor = Color.Transparent, androidx.compose.foundation.BorderStroke? border = null, float padding = elvis {
-    var var8dc63c9b: androidx.compose.ui.unit.Dp = border?.width
-    if (var8dc63c9b != null) var8dc63c9b else 0.dp
+    var var8dc44ff7: androidx.compose.ui.unit.Dp = border?.width
+    if (var8dc44ff7 != null) var8dc44ff7 else 0.dp
 }, float paddingStart = Dp.Unspecified, float paddingTop = Dp.Unspecified, float paddingEnd = Dp.Unspecified, float paddingBottom = Dp.Unspecified, androidx.compose.ui.Alignment gravity = ContentGravity.TopStart, kotlin.jvm.functions.Function0<kotlin.Unit> children = emptyContent());
   }
 

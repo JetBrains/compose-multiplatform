@@ -20,7 +20,7 @@ import androidx.compose.animation.animate
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -236,14 +236,13 @@ private fun BottomNavigationItemBaselineLayout(
 ) {
     Layout(
         {
-            Box(Modifier.layoutId("icon"), children = icon)
+            Box(Modifier.layoutId("icon")) { icon() }
             Box(
                 Modifier
                     .layoutId("label")
                     .drawOpacity(iconPositionAnimationProgress)
-                    .padding(horizontal = BottomNavigationItemHorizontalPadding),
-                children = label
-            )
+                    .padding(horizontal = BottomNavigationItemHorizontalPadding)
+            ) { label() }
         }
     ) { measurables, constraints ->
         val iconPlaceable = measurables.first { it.id == "icon" }.measure(constraints)

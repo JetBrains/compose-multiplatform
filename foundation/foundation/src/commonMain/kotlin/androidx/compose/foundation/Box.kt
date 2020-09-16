@@ -31,80 +31,10 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
-/**
- * A convenience composable that combines common layout and draw logic.
- *
- * In order to define the size of the [Box], the [androidx.compose.foundation.layout.width],
- * [androidx.compose.foundation.layout.height] and [androidx.compose.foundation.layout.size]
- * modifiers can be used.
- * The [Box] will try to be only as small as its content. However, if it is constrained
- * otherwise, [Box] will allow its content to be smaller and will position the content inside,
- * according to [alignment].
- *
- * The specified [padding] will be applied inside the [Box]. In order to apply padding outside
- * the [Box], the [androidx.compose.foundation.layout.padding] modifier should be used.
- *
- * @sample androidx.compose.foundation.samples.SimpleCircleBox
- *
- * @param modifier The modifier to be applied to the Box
- * @param alignment The gravity of the content inside Box
- */
-// TODO: Mihai to delete when your part is done
-@Composable
-fun Box(
-    modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.TopStart,
-    children: @Composable () -> Unit = emptyContent()
-) {
-    // TODO(malkov): support ContentColor prorogation (b/148129218)
-
-    val columnArrangement = alignment.toColumnArrangement()
-    val columnGravity = alignment.toColumnGravity()
-    Column(
-        modifier = modifier,
-        verticalArrangement = columnArrangement,
-        horizontalAlignment = columnGravity
-    ) {
-        children()
-    }
-}
-
-/**
- * A convenience composable that combines common layout and draw logic.
- *
- * In order to define the size of the [Box], the [androidx.compose.foundation.layout.width],
- * [androidx.compose.foundation.layout.height] and [androidx.compose.foundation.layout.size]
- * modifiers can be used.
- * The [Box] will try to be only as small as its content. However, if it is constrained
- * otherwise, [Box] will allow its content to be smaller and will position the content inside,
- * according to [gravity].
- *
- * The specified [padding] will be applied inside the [Box]. In order to apply padding outside
- * the [Box], the [androidx.compose.foundation.layout.padding] modifier should be used.
- *
- * @sample androidx.compose.foundation.samples.SimpleCircleBox
- *
- * @param modifier The modifier to be applied to the Box
- * @param shape The shape of the box
- * @param backgroundColor The [Color] for background with. If [Color.Transparent], there will be no
- * background
- * @param border [BorderStroke] object that specifies border appearance, such as size and color. If
- * `null`, there will be no border
- * @param padding The padding to be applied inside Box, along its edges. Unless otherwise
- * specified, content will be padded by the [BorderStroke.width], if [border] is provided
- * @param paddingStart sets the padding of the start edge. Setting this will override [padding]
- * for the start edge
- * @param paddingTop sets the padding of the top edge. Setting this will override [padding] for
- * the top edge
- * @param paddingEnd sets the padding of the end edge. Setting this will override [padding] for
- * the end edge
- * @param paddingBottom sets the padding of the bottom edge. Setting this will override [padding]
- * for the bottom edge
- * @param gravity The gravity of the content inside Box
- */
 @Deprecated(
     "All Box parameters have been removed (and gravity has been renamed to alignment). Use " +
-            "Modifier.background, Modifier.border and Modifier.padding instead",
+            "Modifier.background, Modifier.border and Modifier.padding instead. Also Box has been" +
+            " moved to androidx.compose.foundation.layout and that should be used instead.",
     replaceWith = ReplaceWith(
         "Box(\n" +
                 "        modifier" +
@@ -121,6 +51,7 @@ fun Box(
                 "        gravity,\n" +
                 "        children\n" +
                 "    )",
+        "androidx.compose.foundation.layout.Box",
         "androidx.compose.foundation.background",
         "androidx.compose.foundation.border",
         "androidx.compose.foundation.layout.padding",
@@ -142,7 +73,10 @@ fun Box(
     gravity: ContentGravity = ContentGravity.TopStart,
     children: @Composable () -> Unit = emptyContent()
 ) {
-    Box(
+    val columnArrangement = gravity.toColumnArrangement()
+    val columnGravity = gravity.toColumnGravity()
+
+    Column(
         modifier
             .then(
                 if (backgroundColor != Color.Transparent) {
@@ -164,9 +98,11 @@ fun Box(
                     Modifier
                 }
             ),
-        gravity,
-        children
-    )
+        verticalArrangement = columnArrangement,
+        horizontalAlignment = columnGravity
+    ) {
+        children()
+    }
 }
 
 @Deprecated("Use Alignment instead", replaceWith = ReplaceWith("Alignment"))

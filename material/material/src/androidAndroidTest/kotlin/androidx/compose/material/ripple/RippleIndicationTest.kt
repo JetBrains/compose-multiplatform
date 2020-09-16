@@ -17,7 +17,7 @@
 package androidx.compose.material.ripple
 
 import android.os.Build
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.indication
@@ -34,7 +34,6 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -632,8 +631,7 @@ private fun RippleBox(interactionState: InteractionState, rippleIndication: Ripp
                 Modifier.preferredWidth(80.dp).preferredHeight(50.dp).indication(
                     interactionState = interactionState,
                     indication = rippleIndication
-                ),
-                children = emptyContent()
+                )
             )
         }
     }

@@ -16,7 +16,7 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.currentTextStyle

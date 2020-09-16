@@ -23,7 +23,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -311,11 +311,8 @@ private fun TabBaselineLayout(
 ) {
     Layout(
         {
-            Box(
-                Modifier.layoutId("text").padding(horizontal = HorizontalTextPadding),
-                children = text
-            )
-            Box(Modifier.layoutId("icon"), children = icon)
+            Box(Modifier.layoutId("text").padding(horizontal = HorizontalTextPadding)) { text() }
+            Box(Modifier.layoutId("icon")) { icon() }
         }
     ) { measurables, constraints ->
         val textPlaceable = measurables.first { it.id == "text" }.measure(

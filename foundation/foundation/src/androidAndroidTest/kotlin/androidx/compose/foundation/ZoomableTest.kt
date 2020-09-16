@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.ZoomableController
 import androidx.compose.foundation.gestures.zoomable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf

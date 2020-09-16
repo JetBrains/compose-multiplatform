@@ -20,7 +20,7 @@ import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
@@ -91,7 +91,7 @@ class LayoutNodeModifierBenchmark(
         }
 
         rule.activityTestRule.runOnUiThread {
-            rule.activityTestRule.activity.setContent { Box() }
+            rule.activityTestRule.activity.setContent { Box(Modifier) }
         }
         rule.activityTestRule.runOnUiThread {
             val composeView = rule.findAndroidOwner()

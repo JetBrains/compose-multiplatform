@@ -17,7 +17,7 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -109,7 +109,6 @@ private fun PressableContainer(
             .then(gestureDetectors)
             .background(color)
             .border(BorderStroke(2.dp, BorderColor))
-            .padding(2.dp),
-        children = children
-    )
+            .padding(2.dp)
+    ) { children() }
 }

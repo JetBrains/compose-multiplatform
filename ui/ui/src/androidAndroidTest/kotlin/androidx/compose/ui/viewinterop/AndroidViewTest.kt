@@ -27,7 +27,7 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
@@ -288,7 +288,7 @@ class AndroidViewTest {
             Box {
                 AndroidView(::FrameLayout) {
                     it.setContent(Recomposer()) {
-                        Box()
+                        Box(Modifier)
                     }
                 }
             }

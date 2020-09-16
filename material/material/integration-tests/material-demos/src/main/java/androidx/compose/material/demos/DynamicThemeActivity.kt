@@ -19,7 +19,7 @@ package androidx.compose.material.demos
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background

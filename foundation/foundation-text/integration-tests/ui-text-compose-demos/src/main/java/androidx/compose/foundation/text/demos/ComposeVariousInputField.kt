@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text.demos
 
 import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
@@ -306,7 +306,7 @@ private fun HintEditText(hintText: @Composable () -> Unit) {
     } else {
         Layout({
             inputField()
-            Box(Modifier.layoutId("hintText"), children = hintText)
+            Box(Modifier.layoutId("hintText")) { hintText() }
         }) { measurable, constraints ->
             val inputFieldPlacable =
                 measurable.first { it.id == "inputField" }.measure(constraints)
@@ -332,7 +332,7 @@ private fun CustomCursorTextField(cursor: @Composable () -> Unit) {
             textStyle = TextStyle(fontSize = fontSize8),
             onTextLayout = { layoutResult.value = it }
         )
-        Box(Modifier.layoutId("cursor"), children = cursor)
+        Box(Modifier.layoutId("cursor")) { cursor() }
     }) { measurable, constraints ->
         val inputFieldPlacable =
             measurable.first { it.id == "inputField" }.measure(constraints)

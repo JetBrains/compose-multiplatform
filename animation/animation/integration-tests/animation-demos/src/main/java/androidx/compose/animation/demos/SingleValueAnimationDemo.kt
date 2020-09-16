@@ -17,7 +17,7 @@
 package androidx.compose.animation.demos
 
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize

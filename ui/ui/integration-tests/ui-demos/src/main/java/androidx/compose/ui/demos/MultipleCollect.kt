@@ -18,7 +18,7 @@
 
 package androidx.compose.ui.demos
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -36,8 +36,8 @@ fun HeaderFooterLayout(
     content: @Composable () -> Unit
 ) {
     Layout({
-        Box(Modifier.layoutId("header"), children = header)
-        Box(Modifier.layoutId("footer"), children = footer)
+        Box(Modifier.layoutId("header")) { header() }
+        Box(Modifier.layoutId("footer")) { footer() }
         content()
     }) { measurables, constraints ->
         val headerPlaceable = measurables.first { it.id == "header" }.measure(

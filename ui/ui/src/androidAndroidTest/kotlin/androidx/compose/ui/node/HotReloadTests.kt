@@ -20,7 +20,7 @@ package androidx.compose.ui.node
 
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.clearRoots
 import androidx.compose.runtime.emit

@@ -17,7 +17,7 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.Text
@@ -185,7 +185,6 @@ private fun Button(onClick: () -> Unit, text: @Composable () -> Unit) {
             .preferredSize(120.dp, 60.dp)
             .clickable(onClick = onClick)
             .background(color = Color.LightGray),
-        alignment = Alignment.Center,
-        children = text
-    )
+        alignment = Alignment.Center
+    ) { text() }
 }
