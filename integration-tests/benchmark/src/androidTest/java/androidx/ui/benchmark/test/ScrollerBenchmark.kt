@@ -63,18 +63,17 @@ class ScrollerBenchmark {
 
     @Test
     fun changeScroll_measure() {
-        benchmarkRule.toggleStateBenchmarkMeasure(scrollerCaseFactory,
-            toggleCausesRecompose = false)
+        benchmarkRule.toggleStateBenchmarkMeasure(scrollerCaseFactory)
     }
 
     @Test
     fun changeScroll_layout() {
-        benchmarkRule.toggleStateBenchmarkLayout(scrollerCaseFactory, toggleCausesRecompose = false)
+        benchmarkRule.toggleStateBenchmarkLayout(scrollerCaseFactory)
     }
 
     @Test
     fun changeScroll_draw() {
-        benchmarkRule.toggleStateBenchmarkDraw(scrollerCaseFactory, toggleCausesRecompose = false)
+        benchmarkRule.toggleStateBenchmarkDraw(scrollerCaseFactory)
     }
 
     @Test
