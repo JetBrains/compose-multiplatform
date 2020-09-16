@@ -23,7 +23,7 @@ import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
-import androidx.compose.ui.graphics.drawscope.drawCanvas
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.positionInRoot
@@ -104,7 +104,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
     val coreModifier = Modifier
         .pointerInteropFilter(this)
         .drawBehind {
-            drawCanvas { canvas, _ -> draw(canvas.nativeCanvas) }
+            drawIntoCanvas { canvas -> draw(canvas.nativeCanvas) }
         }.onPositioned {
             // The global position of this LayoutNode can change with it being replaced. For these
             // cases, we need to inform the View.

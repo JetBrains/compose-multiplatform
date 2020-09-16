@@ -271,6 +271,57 @@ class DrawScopeTest {
     }
 
     @Test
+    fun testDrawInsetHorizontalVertical() {
+        val img = createTestDstImage()
+        val insetHorizontal = 10.0f
+        val insetVertical = 12.0f
+        TestDrawScope().drawInto(Canvas(img), dstSize) {
+            inset(insetHorizontal, insetVertical, insetHorizontal, insetVertical) {
+                drawRect(color = Color.Red)
+            }
+        }
+
+        val pixelMap = img.toPixelMap()
+        for (i in 0 until pixelMap.width) {
+            for (j in 0 until pixelMap.height) {
+                val expectedColor =
+                    if (i >= insetHorizontal && i < pixelMap.width - insetHorizontal &&
+                        j >= insetVertical && j < pixelMap.height - insetVertical) {
+                        Color.Red
+                    } else {
+                        Color.White
+                    }
+                assertEquals("Coordinate: " + i + ", " + j, expectedColor, pixelMap[i, j])
+            }
+        }
+    }
+
+    @Test
+    fun testDrawInsetAll() {
+        val img = createTestDstImage()
+        val insetAll = 10.0f
+        TestDrawScope().drawInto(Canvas(img), dstSize) {
+            inset(insetAll) {
+                drawRect(color = Color.Red)
+            }
+        }
+
+        val pixelMap = img.toPixelMap()
+        for (i in 0 until pixelMap.width) {
+            for (j in 0 until pixelMap.height) {
+                val expectedColor =
+                    if (i >= insetAll && i < pixelMap.width - insetAll &&
+                        j >= insetAll && j < pixelMap.height - insetAll) {
+                        Color.Red
+                    } else {
+                        Color.White
+                    }
+                assertEquals("Coordinate: " + i + ", " + j, expectedColor, pixelMap[i, j])
+            }
+        }
+    }
+
+    @Test
     fun testInsetRestoredAfterScopedInsetDraw() {
         val img = createTestDstImage()
         TestDrawScope().drawInto(Canvas(img), dstSize) {

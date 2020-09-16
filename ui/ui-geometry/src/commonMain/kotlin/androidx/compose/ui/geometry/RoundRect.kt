@@ -574,7 +574,13 @@ fun RoundRect.bottomRightRadius(): Radius = Radius(bottomRightRadiusX, bottomRig
 fun RoundRect.bottomLeftRadius(): Radius = Radius(bottomLeftRadiusX, bottomLeftRadiusY)
 
 /** Returns a new [RoundRect] translated by the given offset. */
-fun RoundRect.shift(offset: Offset): RoundRect = RoundRect(
+@Deprecated("Use translate(offset) instead",
+    ReplaceWith("translate(offset)", "androidx.compose.ui.RoundRect")
+)
+fun RoundRect.shift(offset: Offset): RoundRect = translate(offset)
+
+/** Returns a new [RoundRect] translated by the given offset. */
+fun RoundRect.translate(offset: Offset): RoundRect = RoundRect(
     left = left + offset.x,
     top = top + offset.y,
     right = right + offset.x,

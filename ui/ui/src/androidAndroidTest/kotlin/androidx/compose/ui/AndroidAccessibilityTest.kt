@@ -283,7 +283,8 @@ class AndroidAccessibilityTest {
             .getParcelableArray(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
         assertEquals(1, data!!.size)
         val rectF = data[0] as RectF
-        val expectedRect = textLayoutResult.getBoundingBox(0).shift(textFieldNode.globalPosition)
+        val expectedRect = textLayoutResult.getBoundingBox(0).translate(textFieldNode
+            .globalPosition)
         assertEquals(expectedRect.left, rectF.left)
         assertEquals(expectedRect.top, rectF.top)
         assertEquals(expectedRect.right, rectF.right)

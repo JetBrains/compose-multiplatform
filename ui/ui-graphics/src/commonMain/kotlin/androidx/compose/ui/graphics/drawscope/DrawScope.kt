@@ -46,7 +46,8 @@ import androidx.compose.ui.util.annotation.FloatRange
  * the dimensions of the current painting area. This provides a callback to issue more
  * drawing instructions within the modified coordinate space. This method
  * modifies the width of the [DrawScope] to be equivalent to width - (left + right) as well as
- * height to height - (top + bottom)
+ * height to height - (top + bottom). After this method is invoked, the coordinate space is
+ * returned to the state before the inset was applied.
  *
  * @param left number of pixels to inset the left drawing bound
  * @param top number of pixels to inset the top drawing bound
@@ -67,18 +68,39 @@ inline fun DrawScope.inset(
 }
 
 /**
- * Convenience method modifies the [DrawScope] bounds to inset both left and right bounds by
- * [dx] as well as the top and bottom by [dy]. If only [dx] is provided, the same inset is applied
- * to all 4 bounds
+ * Convenience method modifies the [DrawScope] bounds to inset both left, top, right and
+ * bottom bounds by [inset]. After this method is invoked,
+ * the coordinate space is returned to the state before this inset was applied.
  *
- * @param dx number of pixels to inset both left and right bounds
- * @param dy Optional number of pixels to inset both top and bottom bounds, by default this also
- * insets the top and bottom by [dx] pixels
+ * @param inset number of pixels to inset left, top, right, and bottom bounds.
  * @param block lambda that is called to issue additional drawing commands within the modified
  * coordinate space
  */
-inline fun DrawScope.inset(dx: Float = 0.0f, dy: Float = 0.0f, block: DrawScope.() -> Unit) =
-    inset(dx, dy, dx, dy, block)
+inline fun DrawScope.inset(
+    inset: Float,
+    block: DrawScope.() -> Unit
+) {
+    transform.inset(inset, inset, inset, inset)
+    block()
+    transform.inset(-inset, -inset, -inset, -inset)
+}
+
+/**
+ * Convenience method modifies the [DrawScope] bounds to inset both left and right bounds by
+ * [horizontal] as well as the top and bottom by [vertical]. After this method is invoked,
+ * the coordinate space is returned to the state before this inset was applied.
+ *
+ * @param horizontal number of pixels to inset both left and right bounds. Zero by default
+ * @param vertical Optional number of pixels to inset both top and bottom bounds. Zero by
+ * default
+ * @param block lambda that is called to issue additional drawing commands within the modified
+ * coordinate space
+ */
+inline fun DrawScope.inset(
+    horizontal: Float = 0.0f,
+    vertical: Float = 0.0f,
+    block: DrawScope.() -> Unit
+) = inset(horizontal, vertical, horizontal, vertical, block)
 
 /**
  * Translate the coordinate space by the given delta in pixels in both the x and y coordinates
@@ -167,14 +189,16 @@ inline fun DrawScope.scale(
 
 /**
  * Reduces the clip region to the intersection of the current clip and the
- * given rectangle indicated by the given left, top, right and bottom bounds.
+ * given rectangle indicated by the given left, top, right and bottom bounds. This provides
+ * a callback to issue drawing commands within the clipped region. After this method is invoked,
+ * this clip is no longer applied.
  *
  * Use [ClipOp.Difference] to subtract the provided rectangle from the
  * current clip.
  *
  * @param left Left bound of the rectangle to clip
  * @param top Top bound of the rectangle to clip
- * @param right Right bound ofthe rectangle to clip
+ * @param right Right bound of the rectangle to clip
  * @param bottom Bottom bound of the rectangle to clip
  * @param clipOp Clipping operation to conduct on the given bounds, defaults to [ClipOp.Intersect]
  * @param block Lambda callback with this CanvasScope as a receiver scope to issue drawing commands
@@ -191,7 +215,8 @@ inline fun DrawScope.clipRect(
 
 /**
  * Reduces the clip region to the intersection of the current clip and the
- * given rounded rectangle.
+ * given path. This method provides a callback to issue drawing commands within the region
+ * defined by the clipped path. After this method is invoked, this clip is no longer applied.
  *
  * @param path Shape to clip drawing content within
  * @param clipOp Clipping operation to conduct on the given bounds, defaults to [ClipOp.Intersect]
@@ -205,12 +230,27 @@ inline fun DrawScope.clipPath(
 ) = withTransform({ clipPath(path, clipOp) }, block)
 
 /**
+ * Provides access to draw directly with the underlying [Canvas]. This is helpful for situations
+ * to re-use alternative drawing logic in combination with [DrawScope]
+ *
+ * @param block Lambda callback to issue drawing commands on the provided [Canvas]
+ */
+inline fun DrawScope.drawIntoCanvas(block: (Canvas) -> Unit) = block(canvas)
+
+/**
  * Provides access to draw directly with the underlying [Canvas] along with the current
  * size of the [DrawScope]. This is helpful for situations
  * to re-use alternative drawing logic in combination with [DrawScope]
  *
  * @param block Lambda callback to issue drawing commands on the provided [Canvas] and given size
  */
+@Deprecated(
+    "Use drawIntoCanvas instead",
+    ReplaceWith(
+        "drawIntoCanvas { canvas -> }",
+        "androidx.compose.ui.graphics.drawscope.drawIntoCanvas"
+    )
+)
 inline fun DrawScope.drawCanvas(block: (Canvas, Size) -> Unit) = block(canvas, size)
 
 /**

@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.shift
+import androidx.compose.ui.geometry.translate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
@@ -62,11 +62,11 @@ private data class PaddingShape(val padding: Dp, val shape: Shape) : Shape {
 private fun Outline.offset(size: Float): Outline {
     val offset = Offset(size, size)
     return when (this) {
-        is Outline.Rectangle -> Outline.Rectangle(rect.shift(offset))
-        is Outline.Rounded -> Outline.Rounded(roundRect.shift(offset))
+        is Outline.Rectangle -> Outline.Rectangle(rect.translate(offset))
+        is Outline.Rounded -> Outline.Rounded(roundRect.translate(offset))
         is Outline.Generic -> Outline.Generic(Path().apply {
             addPath(path)
-            shift(offset)
+            translate(offset)
         })
     }
 }

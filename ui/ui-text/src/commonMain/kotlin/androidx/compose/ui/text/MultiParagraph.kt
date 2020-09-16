@@ -763,7 +763,7 @@ internal data class ParagraphInfo(
      * [MultiParagraph].
      */
     fun Rect.toGlobal(): Rect {
-        return shift(Offset(0f, this@ParagraphInfo.top))
+        return translate(Offset(0f, this@ParagraphInfo.top))
     }
 
     /**
@@ -773,7 +773,7 @@ internal data class ParagraphInfo(
      * Notice that this function changes the input value.
      */
     fun Path.toGlobal(): Path {
-        shift(Offset(0f, top))
+        translate(Offset(0f, top))
         return this
     }
 
