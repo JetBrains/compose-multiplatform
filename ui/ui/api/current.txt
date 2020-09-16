@@ -117,6 +117,10 @@ package androidx.compose.ui {
     method public abstract void drawContent();
   }
 
+  public interface DrawCacheModifier extends androidx.compose.ui.DrawModifier {
+    method public void onBuildCache-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
+  }
+
   public interface DrawLayerModifier extends androidx.compose.ui.Modifier.Element {
     method @FloatRange(from=0.0, to=1.0) public default float getAlpha();
     method public default boolean getClip();
@@ -151,8 +155,6 @@ package androidx.compose.ui {
 
   public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
     method public void draw(androidx.compose.ui.ContentDrawScope);
-    method public default kotlin.jvm.functions.Function2<androidx.compose.ui.geometry.Size,androidx.compose.ui.unit.Density,kotlin.Unit>? getBuildCache();
-    property public default kotlin.jvm.functions.Function2<androidx.compose.ui.geometry.Size,androidx.compose.ui.unit.Density,kotlin.Unit>? buildCache;
   }
 
   public final class DrawModifierKt {
