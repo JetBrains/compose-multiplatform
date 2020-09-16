@@ -285,6 +285,20 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
+    fun copy_selection_reversed() {
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange("Hello".length, "He".length)
+        )
+
+        manager.copy()
+
+        verify(clipboardManager, times(1)).setText(AnnotatedString("llo"))
+        assertThat(value.selection).isEqualTo(TextRange("Hello".length, "Hello".length))
+        assertThat(state.selectionIsOn).isFalse()
+    }
+
+    @Test
     fun paste_clipBoardManager_null() {
         manager.clipboardManager = null
 
@@ -318,6 +332,21 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
+    fun paste_selection_reversed() {
+        whenever(clipboardManager.getText()).thenReturn(AnnotatedString("i"))
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange("Hello".length, "H".length)
+        )
+
+        manager.paste()
+
+        assertThat(value.text).isEqualTo("Hi World")
+        assertThat(value.selection).isEqualTo(TextRange("Hi".length, "Hi".length))
+        assertThat(state.selectionIsOn).isFalse()
+    }
+
+    @Test
     fun cut_selection_collapse() {
         manager.value = TextFieldValue(text = text, selection = TextRange(4, 4))
 
@@ -338,6 +367,21 @@ class TextFieldSelectionManagerTest {
         verify(clipboardManager, times(1)).setText(AnnotatedString(" World"))
         assertThat(value.text).isEqualTo("HelloHello World")
         assertThat(value.selection).isEqualTo(TextRange("Hello".length, "Hello".length))
+        assertThat(state.selectionIsOn).isFalse()
+    }
+
+    @Test
+    fun cut_selection_reversed() {
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange("Hello".length, "He".length)
+        )
+
+        manager.cut()
+
+        verify(clipboardManager, times(1)).setText(AnnotatedString("llo"))
+        assertThat(value.text).isEqualTo("He World")
+        assertThat(value.selection).isEqualTo(TextRange("He".length, "He".length))
         assertThat(state.selectionIsOn).isFalse()
     }
 

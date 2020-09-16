@@ -255,7 +255,7 @@ internal class TextFieldSelectionManager() {
 
         clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
 
-        val newCursorOffset = value.selection.end
+        val newCursorOffset = value.selection.max
         val newValue = TextFieldValue(
             text = value.text,
             selection = TextRange(newCursorOffset, newCursorOffset)
@@ -279,7 +279,7 @@ internal class TextFieldSelectionManager() {
         val newText = value.getTextBeforeSelection(value.text.length) +
                 text +
                 value.getTextAfterSelection(value.text.length)
-        val newCursorOffset = value.selection.start + text.length
+        val newCursorOffset = value.selection.min + text.length
 
         val newValue = TextFieldValue(
             text = newText,
@@ -305,7 +305,7 @@ internal class TextFieldSelectionManager() {
 
         val newText = value.getTextBeforeSelection(value.text.length) +
                 value.getTextAfterSelection(value.text.length)
-        val newCursorOffset = value.selection.start
+        val newCursorOffset = value.selection.min
 
         val newValue = TextFieldValue(
             text = newText,
