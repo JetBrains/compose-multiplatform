@@ -16,13 +16,19 @@
 
 package androidx.compose.ui
 
+import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.unit.Density
 
 /**
  * A [Modifier.Element] that draws into the space of the layout.
  */
 interface DrawModifier : Modifier.Element {
+    val buildCache: ((size: Size, density: Density) -> Unit)?
+        get() = null
+
     fun ContentDrawScope.draw()
 }
 
@@ -41,6 +47,81 @@ private class DrawBackgroundModifier(
         drawContent()
     }
 }
+
+/**
+ * Draw into a [DrawScope] with content that is persisted across
+ * draw calls as long as the size of the drawing area is the same or
+ * any state objects that are read have not changed. In the event that
+ * the drawing area changes, or the underlying state values that are being read
+ * change, this method is invoked again to recreate objects to be used during drawing
+ *
+ * For example, a [androidx.compose.ui.graphics.LinearGradient] that is to occupy the full
+ * bounds of the drawing area can be created once the size has been defined and referenced
+ * for subsequent draw calls without having to re-allocate.
+ *
+ * @sample androidx.compose.ui.samples.DrawWithCacheModifierSample
+ * @sample androidx.compose.ui.samples.DrawWithCacheModifierStateParameterSample
+ */
+fun Modifier.drawWithCache(
+    onBuildDrawCache: CacheDrawScope.() -> DrawResult
+) = composed {
+    val cacheDrawScope = remember { CacheDrawScope() }
+    this.then(DrawCacheModifier(cacheDrawScope, onBuildDrawCache))
+}
+
+/**
+ * Handle to a drawing environment that enables caching of content based on the resolved size.
+ * Consumers define parameters and refer to them in the captured draw callback provided in
+ * [onDraw]
+ */
+class CacheDrawScope internal constructor(
+    internal var cachedDrawDensity: Density? = null
+) : Density {
+    internal var drawResult: DrawResult? = null
+
+    var size: Size = Size.Unspecified
+        internal set
+
+    fun onDraw(block: DrawScope.() -> Unit): DrawResult {
+        return DrawResult(block).also { drawResult = it }
+    }
+
+    override val density: Float
+        get() = cachedDrawDensity!!.density
+
+    override val fontScale: Float
+        get() = cachedDrawDensity!!.density
+}
+
+private class DrawCacheModifier(
+    val cacheDrawScope: CacheDrawScope,
+    val onBuildDrawCache: CacheDrawScope.() -> DrawResult
+) : DrawModifier {
+
+    override val buildCache: ((size: Size, density: Density) -> Unit)?
+        get() = { size, density ->
+            cacheDrawScope.apply {
+                cachedDrawDensity = density
+                this.size = size
+                drawResult = null
+                onBuildDrawCache()
+                checkNotNull(drawResult) {
+                    "DrawResult not defined, did you forget to call onDraw?"
+                }
+            }
+        }
+
+    override fun ContentDrawScope.draw() {
+        cacheDrawScope.drawResult?.block?.invoke(this)
+        drawContent()
+    }
+}
+
+/**
+ * Holder to a callback to be invoked during draw operations. This lambda
+ * captures and reuses parameters defined within the CacheDrawScope receiver scope lambda.
+ */
+class DrawResult internal constructor(internal var block: DrawScope.() -> Unit)
 
 /**
  * Creates a [DrawModifier] that allows the developer to draw before or after the layout's

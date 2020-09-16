@@ -61,7 +61,7 @@ internal abstract class LayoutNodeWrapper(
     open val invalidateLayerOnBoundsChange = true
 
     private var _measureResult: MeasureScope.MeasureResult? = null
-    var measureResult: MeasureScope.MeasureResult
+    open var measureResult: MeasureScope.MeasureResult
         get() = _measureResult ?: error(UnmeasuredError)
         internal set(value) {
             if (invalidateLayerOnBoundsChange &&

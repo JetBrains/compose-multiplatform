@@ -3026,6 +3026,10 @@ private class MockOwner(
         block()
     }
 
+    override fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+        block()
+    }
+
     override fun measureAndLayout() {
     }
 
