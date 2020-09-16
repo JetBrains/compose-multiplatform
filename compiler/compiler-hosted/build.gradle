@@ -46,7 +46,7 @@ androidx {
     publish = Publish.SNAPSHOT_AND_RELEASE
     toolingProject = true
     mavenVersion = LibraryVersions.COMPOSE
-    mavenGroup = LibraryGroups.COMPOSE
+    mavenGroup = LibraryGroups.Compose.COMPILER
     inceptionYear = "2019"
     description = "Contains the Kotlin compiler plugin for Compose used in Android Studio and IDEA"
     compilationTarget = CompilationTarget.HOST

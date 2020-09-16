@@ -27,7 +27,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compose-compiler")
+    kotlinPlugin project(path: ":compose:compiler:compiler")
 
     implementation(KOTLIN_STDLIB)
 
