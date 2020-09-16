@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
-import androidx.compose.ui.text.ParagraphConstraints
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -72,7 +71,7 @@ internal actual fun ActualParagraph(
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     maxLines: Int,
     ellipsis: Boolean,
-    constraints: ParagraphConstraints,
+    width: Float,
     density: Density,
     resourceLoader: Font.ResourceLoader
 ): Paragraph = DesktopParagraph(
@@ -86,7 +85,7 @@ internal actual fun ActualParagraph(
     ),
     maxLines,
     ellipsis,
-    constraints
+    width
 )
 
 @Suppress("UNUSED_PARAMETER")
@@ -94,19 +93,19 @@ internal actual fun ActualParagraph(
     paragraphIntrinsics: ParagraphIntrinsics,
     maxLines: Int,
     ellipsis: Boolean,
-    constraints: ParagraphConstraints
+    width: Float
 ): Paragraph = DesktopParagraph(
     paragraphIntrinsics as DesktopParagraphIntrinsics,
     maxLines,
     ellipsis,
-    constraints
+    width
 )
 
 internal class DesktopParagraph(
     intrinsics: ParagraphIntrinsics,
     val maxLines: Int,
     val ellipsis: Boolean,
-    val constraints: ParagraphConstraints
+    width: Float
 ) : Paragraph {
 
     val paragraphIntrinsics = intrinsics as DesktopParagraphIntrinsics
@@ -122,7 +121,7 @@ internal class DesktopParagraph(
         if (resetMaxLinesIfNeeded()) {
             rebuildParagraph()
         }
-        para.layout(constraints.width)
+        para.layout(width)
     }
 
     private val text: String
@@ -339,7 +338,7 @@ internal class DesktopParagraph(
                     textDecoration = currentTextDecoration
                 )
             rebuildParagraph()
-            para.layout(constraints.width)
+            para.layout(width)
         }
         para.paint(canvas.nativeCanvas, 0.0f, 0.0f)
     }

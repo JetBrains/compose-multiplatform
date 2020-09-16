@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.Paragraph
-import androidx.compose.ui.text.ParagraphConstraints
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
@@ -79,7 +78,7 @@ private fun computeLineHeightForEmptyText(
         ellipsis = false,
         density = density,
         resourceLoader = resourceLoader,
-        constraints = ParagraphConstraints(width = Float.POSITIVE_INFINITY)
+        width = Float.POSITIVE_INFINITY
     ).height.toIntPx()
 }
 

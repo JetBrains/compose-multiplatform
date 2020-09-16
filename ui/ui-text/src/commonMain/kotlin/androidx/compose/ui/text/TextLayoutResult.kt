@@ -359,7 +359,7 @@ fun createTextLayoutResult(
     multiParagraph: MultiParagraph = MultiParagraph(
         annotatedString = layoutInput.text,
         style = layoutInput.style,
-        constraints = ParagraphConstraints(width = 0f),
+        width = 0f,
         density = layoutInput.density,
         resourceLoader = layoutInput.resourceLoader
     ),

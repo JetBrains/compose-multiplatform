@@ -1231,7 +1231,7 @@ class MultiParagraphIntegrationTest {
         val paragraph = MultiParagraph(
             annotatedString = text,
             style = TextStyle(textDirection = TextDirection.Rtl),
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
@@ -1263,7 +1263,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
@@ -1294,7 +1294,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
@@ -1326,7 +1326,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
@@ -1368,7 +1368,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
@@ -1413,7 +1413,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            constraints = ParagraphConstraints(Float.MAX_VALUE),
+            width = Float.MAX_VALUE,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
@@ -1469,7 +1469,7 @@ class MultiParagraphIntegrationTest {
                 fontSize = fontSize
             ).merge(style),
             maxLines = maxLines,
-            constraints = ParagraphConstraints(width),
+            width = width,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
@@ -1491,7 +1491,7 @@ class MultiParagraphIntegrationTest {
                 localeList = localeList
             ).merge(style),
             maxLines = maxLines,
-            constraints = ParagraphConstraints(width),
+            width = width,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
