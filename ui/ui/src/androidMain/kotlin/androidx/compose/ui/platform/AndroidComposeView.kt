@@ -379,7 +379,7 @@ internal class AndroidComposeView constructor(
         // we postpone onPositioned callbacks until onLayout as LayoutCoordinates
         // are currently wrong if you try to get the global(activity) coordinates -
         // View is not yet laid out.
-        dispatchOnPositioned()
+        updatePositionCacheAndDispatch()
         if (_androidViewsHandler != null && androidViewsHandler.isLayoutRequested) {
             // Even if we laid out during onMeasure, this can happen when the Views hierarchy
             // receives forceLayout(). We need to relayout to clear the isLayoutRequested info
@@ -396,7 +396,7 @@ internal class AndroidComposeView constructor(
     // so that we don't have to continue using try/catch after fails once.
     private var isRenderNodeCompatible = true
 
-    private fun dispatchOnPositioned() {
+    private fun updatePositionCacheAndDispatch() {
         var positionChanged = false
         getLocationOnScreen(tmpPositionArray)
         if (globalPosition.x != tmpPositionArray[0] || globalPosition.y != tmpPositionArray[1]) {
@@ -519,13 +519,13 @@ internal class AndroidComposeView constructor(
     // on a different position, but also in the position of each of the grandparents as all these
     // positions add up to final global position)
     private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-        dispatchOnPositioned()
+        updatePositionCacheAndDispatch()
     }
 
     // executed when a scrolling container like ScrollView of RecyclerView performed the scroll,
     // this could affect our global position
     private val scrollChangedListener = ViewTreeObserver.OnScrollChangedListener {
-        dispatchOnPositioned()
+        updatePositionCacheAndDispatch()
     }
 
     override fun onAttachedToWindow() {
@@ -584,6 +584,15 @@ internal class AndroidComposeView constructor(
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
         measureAndLayout()
+        // TODO(b/166848812): Calling updatePositionCacheAndDispatch here seems necessary because
+        //  if the soft keyboard being displayed causes the AndroidComposeView to be offset from
+        //  the screen, we don't seem to have any timely callback that updates our globalPosition
+        //  cache. ViewTreeObserver.OnGlobalLayoutListener gets called, but not when the keyboard
+        //  opens. And when it gets called as the keyboard is closing, it is called before the
+        //  keyboard actually closes causing the globalPosition to be wrong.
+        // TODO(shepshapard): There is no test to garuntee that this method is called here as doing
+        //  so proved to be very difficult. A test should be added.
+        updatePositionCacheAndDispatch()
         val processResult = trace("AndroidOwner:onTouch") {
             val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent)
             if (pointerInputEvent != null) {
