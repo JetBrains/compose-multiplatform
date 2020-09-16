@@ -39,10 +39,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                     val library = project.extensions.findByType(LibraryExtension::class.java)
                         ?: throw Exception("Failed to find Android extension")
 
-                    library.defaultConfig.apply {
-                        minSdkVersion(21)
-                        targetSdkVersion(29)
-                    }
+                    library.defaultConfig.minSdkVersion(21)
 
                     // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
                     project.configurations.getByName("lintChecks").exclude(
@@ -66,9 +63,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                     val conf = project.configurations.create("kotlinPlugin")
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                        // TODO(b/157230246): remove when this is enabled by default in Kotlin 1.4
-                        compile.kotlinOptions.freeCompilerArgs +=
-                            "-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes"
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs +=
                             "-Xopt-in=kotlin.RequiresOptIn"

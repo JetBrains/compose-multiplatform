@@ -1,3 +1,9 @@
+set noparent
+
 jeffrygaston@google.com
 sjgilbert@google.com
 aurimas@google.com
+alanv@google.com
+
+per-file *LibraryVersions.kt=file://OWNERS
+per-file *PublishDocsRules.kt=file://OWNERS

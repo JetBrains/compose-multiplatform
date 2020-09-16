@@ -144,33 +144,60 @@ class AndroidXPlugin : Plugin<Project> {
     private fun configureTestTask(project: Project, task: Test) {
         AffectedModuleDetector.configureTaskGuard(task)
 
-        // Enable tracing to see results in command line
-        task.testLogging.apply {
-            events = hashSetOf(
-                TestLogEvent.FAILED, TestLogEvent.PASSED,
-                TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT
-            )
-            showExceptions = true
-            showCauses = true
-            showStackTraces = true
-            exceptionFormat = TestExceptionFormat.FULL
-        }
-        val report = task.reports.junitXml
-        if (report.isEnabled) {
-            val zipTask = project.tasks.register(
-                "zipResultsOf${task.name.capitalize()}",
+        val xmlReportDestDir = project.getHostTestResultDirectory()
+        val archiveName = "${project.asFilenamePrefix()}_${task.name}.zip"
+        if (project.isDisplayTestOutput()) {
+            // Enable tracing to see results in command line
+            task.testLogging.apply {
+                events = hashSetOf(
+                    TestLogEvent.FAILED, TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT
+                )
+                showExceptions = true
+                showCauses = true
+                showStackTraces = true
+                exceptionFormat = TestExceptionFormat.FULL
+            }
+        } else {
+            val htmlReport = task.reports.html
+
+            val zipHtmlTask = project.tasks.register(
+                "zipHtmlResultsOf${task.name.capitalize()}",
                 Zip::class.java
             ) {
-                it.destinationDirectory.set(project.getHostTestResultDirectory())
-                it.archiveFileName.set("${project.asFilenamePrefix()}_${task.name}.zip")
+                val destinationDirectory = File("$xmlReportDestDir-html")
+                it.destinationDirectory.set(destinationDirectory)
+                it.archiveFileName.set(archiveName)
+                it.doLast {
+                    // If the test itself didn't display output, then the report task should
+                    // remind the user where to find its output
+                    project.logger.lifecycle("Html results of ${task.name} zipped into " +
+                        "$destinationDirectory/$archiveName")
+                }
             }
-            if (project.hasProperty(TEST_FAILURES_DO_NOT_FAIL_TEST_TASK)) {
-                task.ignoreFailures = true
-            }
-            task.finalizedBy(zipTask)
+            task.finalizedBy(zipHtmlTask)
             task.doFirst {
-                zipTask.configure {
-                    it.from(report.destination)
+                zipHtmlTask.configure {
+                    it.from(htmlReport.destination)
+                }
+            }
+            val xmlReport = task.reports.junitXml
+            if (xmlReport.isEnabled) {
+                val zipXmlTask = project.tasks.register(
+                    "zipXmlResultsOf${task.name.capitalize()}",
+                    Zip::class.java
+                ) {
+                    it.destinationDirectory.set(xmlReportDestDir)
+                    it.archiveFileName.set(archiveName)
+                }
+                if (project.hasProperty(TEST_FAILURES_DO_NOT_FAIL_TEST_TASK)) {
+                    task.ignoreFailures = true
+                }
+                task.finalizedBy(zipXmlTask)
+                task.doFirst {
+                    zipXmlTask.configure {
+                        it.from(xmlReport.destination)
+                    }
                 }
             }
         }
@@ -198,9 +225,9 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun configureWithAppPlugin(project: Project, extension: AndroidXExtension) {
+    private fun configureWithAppPlugin(project: Project, androidXExtension: AndroidXExtension) {
         val appExtension = project.extensions.getByType<AppExtension>().apply {
-            configureAndroidCommonOptions(project, extension)
+            configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidApplicationOptions(project)
         }
 
@@ -216,6 +243,7 @@ class AndroidXPlugin : Plugin<Project> {
         // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
         //   - net.java.dev.jna:jna:5.5.0
         appExtension.packagingOptions.exclude("/META-INF/LGPL2.1")
+        project.configureAndroidProjectForLint(appExtension.lintOptions, androidXExtension)
     }
 
     private fun configureWithLibraryPlugin(
@@ -469,7 +497,7 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun ApplicationExtension<*, *, *, *, *>
             .addAppApkToTestConfigGeneration(project: Project) {
-        onVariantProperties {
+        onVariantProperties.withBuildType("debug") {
             project.tasks.withType(GenerateTestConfigurationTask::class.java) {
                 it.appFolder.set(artifacts.get(ArtifactType.APK))
                 it.appLoader.set(artifacts.getBuiltArtifactsLoader())
@@ -800,8 +828,7 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
     }
     task.kotlinOptions.freeCompilerArgs += listOf(
         "-Xskip-runtime-version-check",
-        "-Xskip-metadata-version-check",
-        "-XXLanguage:-NewInference"
+        "-Xskip-metadata-version-check"
     )
 }
 

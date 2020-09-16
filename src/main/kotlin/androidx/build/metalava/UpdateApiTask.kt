@@ -49,7 +49,8 @@ abstract class UpdateApiTask : DefaultTask() {
         return listOf(
             inputApi.publicApiFile,
             inputApi.restrictedApiFile,
-            inputApi.experimentalApiFile
+            inputApi.experimentalApiFile,
+            inputApi.removedApiFile
         )
     }
 
@@ -59,7 +60,8 @@ abstract class UpdateApiTask : DefaultTask() {
             listOf(
                 outputApiLocation.publicApiFile,
                 outputApiLocation.restrictedApiFile,
-                outputApiLocation.experimentalApiFile
+                outputApiLocation.experimentalApiFile,
+                outputApiLocation.removedApiFile
             )
         }
     }
@@ -78,32 +80,48 @@ abstract class UpdateApiTask : DefaultTask() {
         for (outputApi in outputApiLocations.get()) {
             val inputApi = inputApiLocation.get()
             copy(
-                inputApi.publicApiFile,
-                outputApi.publicApiFile,
-                permitOverwriting,
-                project.logger
+                source = inputApi.publicApiFile,
+                dest = outputApi.publicApiFile,
+                permitOverwriting = permitOverwriting,
+                logger = project.logger
             )
             copy(
-                inputApi.experimentalApiFile,
-                outputApi.experimentalApiFile,
+                source = inputApi.removedApiFile,
+                dest = outputApi.removedApiFile,
+                permitOverwriting = permitOverwriting,
+                logger = project.logger
+            )
+            copy(
+                source = inputApi.experimentalApiFile,
+                dest = outputApi.experimentalApiFile,
                 // Experimental APIs are never locked down,
                 // so it's always okay to overwrite them.
-                true,
-                project.logger
+                permitOverwriting = true,
+                logger = project.logger
             )
             copy(
-                inputApi.restrictedApiFile,
-                outputApi.restrictedApiFile,
-                permitOverwriting,
-                project.logger
+                source = inputApi.restrictedApiFile,
+                dest = outputApi.restrictedApiFile,
+                permitOverwriting = permitOverwriting,
+                logger = project.logger
             )
         }
     }
 }
 
-fun copy(source: File, dest: File, permitOverwriting: Boolean, logger: Logger) {
-    val overwriting = (dest.exists() && source.readText() != dest.readText())
-    val changing = overwriting || !dest.exists()
+fun copy(
+    source: File,
+    dest: File,
+    permitOverwriting: Boolean,
+    logger: Logger
+) {
+    val sourceText = if (source.exists()) {
+        source.readText()
+    } else {
+        ""
+    }
+    val overwriting = (dest.exists() && sourceText != dest.readText())
+    val changing = overwriting || (dest.exists() != source.exists())
     if (changing) {
         if (overwriting && !permitOverwriting) {
             val message = "Modifying the API definition for a previously released artifact " +
@@ -116,7 +134,12 @@ fun copy(source: File, dest: File, permitOverwriting: Boolean, logger: Logger) {
                     "anyway, you can run `./gradlew updateApi -Pforce` to ignore this message"
             throw GradleException(message)
         }
-        Files.copy(source, dest)
-        logger.lifecycle("Copied $source to $dest")
+        if (source.exists()) {
+            Files.copy(source, dest)
+            logger.lifecycle("Copied $source to $dest")
+        } else {
+            dest.delete()
+            logger.lifecycle("Deleted $dest because $source does not exist")
+        }
     }
 }

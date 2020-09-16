@@ -73,7 +73,6 @@ val EXEMPT_TASKS = setOf(
     "lintVitalRelease",
     "partiallyDejetifyArchive",
     "postInstrumentCode",
-    "properties",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishDesktopPublicationToMavenRepository",
     "publishKotlinMultiplatformPublicationToMavenRepository",
@@ -99,6 +98,8 @@ val EXEMPT_TASKS = setOf(
 
     ":camera:integration-tests:camera-testapp-uiwidgets:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-uiwidgets:packageDebug",
+    ":camera:integration-tests:camera-testapp-view:camera-testapp" +
+            "-viewGenerateTestConfigurationdebug",
     ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-view:packageDebug"
 )

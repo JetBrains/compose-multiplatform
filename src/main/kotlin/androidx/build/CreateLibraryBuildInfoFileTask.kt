@@ -114,6 +114,8 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         libraryBuildInfoFile.path = getProjectSpecificDirectory()
         libraryBuildInfoFile.sha = getFrameworksSupportCommitShaAtHead()
         libraryBuildInfoFile.groupIdRequiresSameVersion = requiresSameVersion()
+        libraryBuildInfoFile.groupZipPath = project.getGroupZipPath()
+        libraryBuildInfoFile.projectZipPath = project.getProjectZipPath()
         val libraryDependencies = ArrayList<LibraryBuildInfoFile.Dependency>()
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
         libraryBuildInfoFile.checks = checks

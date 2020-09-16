@@ -39,9 +39,11 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     val lintTask = tasks.named("lint")
     tasks.register("lintDebug") {
         it.dependsOn(lintTask)
+        it.enabled = false
     }
     tasks.register("lintRelease") {
         it.dependsOn(lintTask)
+        it.enabled = false
     }
     addToBuildOnServer(lintTask)
 
@@ -143,6 +145,12 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                     textReport = false
                     val lintDebugTask = tasks.named("lintDebug")
                     lintDebugTask.configure {
+                        it.doFirst {
+                            lintBaseline.delete()
+                        }
+                    }
+                    val lintTask = tasks.named("lint")
+                    lintTask.configure {
                         it.doFirst {
                             lintBaseline.delete()
                         }

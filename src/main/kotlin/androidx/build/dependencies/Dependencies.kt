@@ -16,13 +16,13 @@
 
 package androidx.build.dependencies
 
-const val ANDROIDX_TEST_CORE = "androidx.test:core:1.3.0-rc01"
-const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.2-rc01"
-const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.2-rc01"
-const val ANDROIDX_TEST_EXT_TRUTH = "androidx.test.ext:truth:1.3.0-rc01"
-const val ANDROIDX_TEST_MONITOR = "androidx.test:monitor:1.3.0-rc01"
-const val ANDROIDX_TEST_RULES = "androidx.test:rules:1.3.0-rc01"
-const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:1.3.0-rc01"
+const val ANDROIDX_TEST_CORE = "androidx.test:core:1.3.0"
+const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.2"
+const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.2"
+const val ANDROIDX_TEST_EXT_TRUTH = "androidx.test.ext:truth:1.3.0"
+const val ANDROIDX_TEST_MONITOR = "androidx.test:monitor:1.3.0"
+const val ANDROIDX_TEST_RULES = "androidx.test:rules:1.3.0"
+const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:1.3.0"
 const val ANDROIDX_TEST_UIAUTOMATOR = "androidx.test.uiautomator:uiautomator:2.2.0"
 const val AUTO_COMMON = "com.google.auto:auto-common:0.10"
 const val AUTO_SERVICE_ANNOTATIONS = "com.google.auto.service:auto-service-annotations:1.0-rc6"
@@ -39,12 +39,12 @@ const val CONSTRAINT_LAYOUT_CORE = "androidx.constraintlayout:constraintlayout-c
 const val DAGGER = "com.google.dagger:dagger:2.28"
 const val DAGGER_COMPILER = "com.google.dagger:dagger-compiler:2.28"
 const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.25.0"
-const val ESPRESSO_CONTRIB = "androidx.test.espresso:espresso-contrib:3.3.0-rc01"
-const val ESPRESSO_CORE = "androidx.test.espresso:espresso-core:3.3.0-rc01"
-const val ESPRESSO_INTENTS = "androidx.test.espresso:espresso-intents:3.3.0-rc01"
-const val ESPRESSO_IDLING_NET = "androidx.test.espresso.idling:idling-net:3.3.0-rc01"
-const val ESPRESSO_IDLING_RESOURCE = "androidx.test.espresso:espresso-idling-resource:3.3.0-rc01"
-const val ESPRESSO_WEB = "androidx.test.espresso:espresso-web:3.3.0-rc01"
+const val ESPRESSO_CONTRIB = "androidx.test.espresso:espresso-contrib:3.3.0"
+const val ESPRESSO_CORE = "androidx.test.espresso:espresso-core:3.3.0"
+const val ESPRESSO_INTENTS = "androidx.test.espresso:espresso-intents:3.3.0"
+const val ESPRESSO_IDLING_NET = "androidx.test.espresso.idling:idling-net:3.3.0"
+const val ESPRESSO_IDLING_RESOURCE = "androidx.test.espresso:espresso-idling-resource:3.3.0"
+const val ESPRESSO_WEB = "androidx.test.espresso:espresso-web:3.3.0"
 const val FINDBUGS = "com.google.code.findbugs:jsr305:3.0.2"
 const val GCM_NETWORK_MANAGER = "com.google.android.gms:play-services-gcm:17.0.0"
 const val GOOGLE_COMPILE_TESTING = "com.google.testing.compile:compile-testing:0.18"
@@ -70,8 +70,12 @@ const val KOTLINPOET_METADATA = "com.squareup:kotlinpoet-metadata:1.4.0"
 const val KOTLINPOET_METADATA_SPECS = "com.squareup:kotlinpoet-metadata-specs:1.4.0"
 const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
     "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
-const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.2.9"
-const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
+const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.2.10"
+const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.2.10"
+const val KSP_VERSION = "1.4.0-dev-experimental-20200914"
+const val KOTLIN_KSP_API = "org.jetbrains.kotlin:kotlin-symbol-processing-api:$KSP_VERSION"
+const val KOTLIN_KSP = "org.jetbrains.kotlin:kotlin-ksp:$KSP_VERSION"
+const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0-rc"
 
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0"
@@ -82,17 +86,26 @@ const val LEAKCANARY_INSTRUMENTATION =
 const val MATERIAL = "com.google.android.material:material:1.0.0"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.25.0"
 const val MOCKITO_KOTLIN = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
-const val MULTIDEX = "androidx.multidex:multidex:2.0.0"
+const val MULTIDEX = "androidx.multidex:multidex:2.0.1"
 const val NULLAWAY = "com.uber.nullaway:nullaway:0.3.7"
 const val PLAY_CORE = "com.google.android.play:core:1.8.0"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.2.9"
 const val RX_JAVA3 = "io.reactivex.rxjava3:rxjava:3.0.0"
-const val SKIKO_VERSION = "0.1.2"
+const val SKIKO_VERSION = "0.1.6"
 const val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
 const val SKIKO_LINUX = "org.jetbrains.skiko:skiko-jvm-runtime-linux:$SKIKO_VERSION"
 const val SKIKO_MACOS = "org.jetbrains.skiko:skiko-jvm-runtime-macos:$SKIKO_VERSION"
 const val SKIKO_WINDOWS = "org.jetbrains.skiko:skiko-jvm-runtime-windows:$SKIKO_VERSION"
+val SKIKO_CURRENT_OS by lazy {
+    val os = System.getProperty("os.name")
+    when {
+        os == "Mac OS X" -> SKIKO_MACOS
+        os.startsWith("Win") -> SKIKO_WINDOWS
+        os.startsWith("Linux") -> SKIKO_LINUX
+        else -> throw Error("Unsupported OS $os")
+    }
+}
 const val TRUTH = "com.google.truth:truth:1.0.1"
 const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
@@ -110,6 +123,8 @@ const val SHADOW_PLUGIN = "com.github.jengelman.gradle.plugins:shadow:5.2.0"
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 const val PROTOBUF_COMPILER = "com.google.protobuf:protoc:3.10.0"
 const val PROTOBUF_LITE = "com.google.protobuf:protobuf-javalite:3.10.0"
+
+const val JARJAR = "org.anarres.jarjar:jarjar-gradle:1.0.1"
 
 // The following versions change depending on whether we are in the main or ui project - the
 // specific versions are configured in build_dependencies.gradle as they are needed during
@@ -159,5 +174,6 @@ internal const val lintMinVersion = "26.3.0"
 
 const val LINT_API_MIN = "com.android.tools.lint:lint-api:$lintMinVersion"
 val LINT_API_LATEST get() = "com.android.tools.lint:lint-api:$lintVersion"
+val LINT_CHECKS_LATEST get() = "com.android.tools.lint:lint-checks:$lintVersion"
 val LINT_CORE get() = "com.android.tools.lint:lint:$lintVersion"
 val LINT_TESTS get() = "com.android.tools.lint:lint-tests:$lintVersion"

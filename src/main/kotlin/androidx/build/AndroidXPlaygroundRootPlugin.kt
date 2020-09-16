@@ -178,12 +178,9 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         companion object {
             fun load(project: Project): PlaygroundProperties {
                 return PlaygroundProperties(
-                    snapshotBuildId = project
-                        .requireProperty("androidx.playground.snapshotBuildId"),
-                    metalavaBuildId = project
-                        .requireProperty("androidx.playground.metalavaBuildId"),
-                    dokkaBuildId = project
-                        .requireProperty("androidx.playground.dokkaBuildId")
+                    snapshotBuildId = project.requireProperty(PLAYGROUND_SNAPSHOT_BUILD_ID),
+                    metalavaBuildId = project.requireProperty(PLAYGROUND_METALAVA_BUILD_ID),
+                    dokkaBuildId = project.requireProperty(PLAYGROUND_DOKKA_BUILD_ID)
                 )
             }
 
