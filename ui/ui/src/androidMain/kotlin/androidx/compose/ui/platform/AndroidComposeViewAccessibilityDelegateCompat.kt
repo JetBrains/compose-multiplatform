@@ -34,6 +34,7 @@ import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTE
 import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY
 import android.view.accessibility.AccessibilityNodeProvider
 import androidx.annotation.IntRange
+import androidx.annotation.RequiresApi
 import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Rect
@@ -283,7 +284,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         if (rangeInfo != null) {
             info.rangeInfo = AccessibilityNodeInfoCompat.RangeInfoCompat.obtain(
                 AccessibilityNodeInfoCompat.RangeInfoCompat.RANGE_TYPE_FLOAT,
-                rangeInfo.range.start, rangeInfo.range.endInclusive, rangeInfo.current
+                rangeInfo.range.start,
+                rangeInfo.range.endInclusive,
+                rangeInfo.current
             )
             if (semanticsNode.config.contains(SemanticsActions.SetProgress)) {
                 if (rangeInfo.current <
@@ -296,6 +299,78 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     info.addAction(
                         AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
                     )
+            }
+        }
+
+        val xScrollState =
+            semanticsNode.config.getOrNull(SemanticsProperties.HorizontalAccessibilityScrollState)
+        val scrollAction = semanticsNode.config.getOrNull(SemanticsActions.ScrollBy)
+        if (xScrollState != null && scrollAction != null) {
+            // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
+            // assign a role for auto scroll to work.
+            info.className = "android.widget.HorizontalScrollView"
+            if (xScrollState.value < xScrollState.maxValue) {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
+                )
+                if (!xScrollState.reverseScrolling) {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_RIGHT
+                    )
+                } else {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_LEFT
+                    )
+                }
+            }
+            if (xScrollState.value > 0f) {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
+                )
+                if (!xScrollState.reverseScrolling) {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_LEFT
+                    )
+                } else {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_RIGHT
+                    )
+                }
+            }
+        }
+        val yScrollState =
+            semanticsNode.config.getOrNull(SemanticsProperties.VerticalAccessibilityScrollState)
+        if (yScrollState != null && scrollAction != null) {
+            // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
+            // assign a role for auto scroll to work.
+            info.className = "android.widget.ScrollView"
+            if (yScrollState.value < yScrollState.maxValue) {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
+                )
+                if (!yScrollState.reverseScrolling) {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_DOWN
+                    )
+                } else {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_UP
+                    )
+                }
+            }
+            if (yScrollState.value > 0f) {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
+                )
+                if (!yScrollState.reverseScrolling) {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_UP
+                    )
+                } else {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_DOWN
+                    )
+                }
             }
         }
 
@@ -540,21 +615,87 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 }
             }
             AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD,
-            AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD -> {
-                val rangeInfo = node.config.getOrNull(SemanticsProperties.AccessibilityRangeInfo)
-                val setProgressAction = node.config.getOrNull(SemanticsActions.SetProgress)
-                if (rangeInfo != null && setProgressAction != null) {
-                    val max = rangeInfo.range.endInclusive.coerceAtLeast(rangeInfo.range.start)
-                    val min = rangeInfo.range.start.coerceAtMost(rangeInfo.range.endInclusive)
-                    var increment = if (rangeInfo.steps > 0) {
-                        (max - min) / (rangeInfo.steps + 1)
-                    } else {
-                        (max - min) / AccessibilitySliderStepsCount
+            AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD,
+            android.R.id.accessibilityActionScrollDown,
+            android.R.id.accessibilityActionScrollUp,
+            android.R.id.accessibilityActionScrollRight,
+            android.R.id.accessibilityActionScrollLeft -> {
+                if (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD ||
+                        action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD) {
+                    val rangeInfo =
+                        node.config.getOrNull(SemanticsProperties.AccessibilityRangeInfo)
+                    val setProgressAction = node.config.getOrNull(SemanticsActions.SetProgress)
+                    if (rangeInfo != null && setProgressAction != null) {
+                        val max = rangeInfo.range.endInclusive.coerceAtLeast(rangeInfo.range.start)
+                        val min = rangeInfo.range.start.coerceAtMost(rangeInfo.range.endInclusive)
+                        var increment = if (rangeInfo.steps > 0) {
+                            (max - min) / (rangeInfo.steps + 1)
+                        } else {
+                            (max - min) / AccessibilitySliderStepsCount
+                        }
+                        if (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD) {
+                            increment = -increment
+                        }
+                        return setProgressAction.action(rangeInfo.current + increment)
                     }
-                    if (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD) {
-                        increment = -increment
+                }
+
+                val scrollAction = node.config.getOrNull(SemanticsActions.ScrollBy) ?: return false
+                val xScrollState =
+                    node.config.getOrNull(SemanticsProperties.HorizontalAccessibilityScrollState)
+                if (xScrollState != null) {
+                    if (((!xScrollState.reverseScrolling &&
+                                action == android.R.id.accessibilityActionScrollRight) ||
+                                (xScrollState.reverseScrolling &&
+                                        action == android.R.id.accessibilityActionScrollLeft) ||
+                                (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)) &&
+                        xScrollState.value < xScrollState.maxValue
+                    ) {
+                        return scrollAction.action(
+                            node.globalBounds.right - node.globalBounds.left,
+                            0f
+                        )
                     }
-                    return setProgressAction.action(rangeInfo.current + increment)
+                    if (((xScrollState.reverseScrolling &&
+                                action == android.R.id.accessibilityActionScrollRight) ||
+                                (!xScrollState.reverseScrolling &&
+                                        action == android.R.id.accessibilityActionScrollLeft) ||
+                                (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)) &&
+                        xScrollState.value > 0
+                    ) {
+                        return scrollAction.action(
+                            -(node.globalBounds.right - node.globalBounds.left),
+                            0f
+                        )
+                    }
+                }
+                val yScrollState =
+                    node.config.getOrNull(SemanticsProperties.VerticalAccessibilityScrollState)
+                if (yScrollState != null) {
+                    if (((!yScrollState.reverseScrolling &&
+                                action == android.R.id.accessibilityActionScrollDown) ||
+                                (yScrollState.reverseScrolling &&
+                                        action == android.R.id.accessibilityActionScrollUp) ||
+                                (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)) &&
+                        yScrollState.value < yScrollState.maxValue
+                    ) {
+                        return scrollAction.action(
+                            0f,
+                            node.globalBounds.bottom - node.globalBounds.top
+                        )
+                    }
+                    if (((yScrollState.reverseScrolling &&
+                                action == android.R.id.accessibilityActionScrollDown) ||
+                                (!yScrollState.reverseScrolling &&
+                                        action == android.R.id.accessibilityActionScrollUp) ||
+                                (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)) &&
+                        yScrollState.value > 0
+                    ) {
+                        return scrollAction.action(
+                            0f,
+                            -(node.globalBounds.bottom - node.globalBounds.top)
+                        )
+                    }
                 }
                 return false
             }
@@ -945,13 +1086,64 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             SemanticsProperties.Text) { AnnotatedString("") }).text
                         val event = createEvent(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
-                            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED)
+                            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
+                        )
                         val textRange = newNode.config[SemanticsProperties.TextSelectionRange]
                         event.fromIndex = textRange.start
                         event.toIndex = textRange.end
                         event.itemCount = newText.length
                         event.text.add(trimToSize(newText, ParcelSafeTextLength))
                         sendEvent(event)
+                    }
+                    SemanticsProperties.HorizontalAccessibilityScrollState,
+                    SemanticsProperties.VerticalAccessibilityScrollState -> {
+                        // TODO(yingleiw): Add throttling for scroll/state events.
+                        val newXState = newNode.config.getOrNull(
+                            SemanticsProperties.HorizontalAccessibilityScrollState
+                        )
+                        val oldXState = oldNode.config.getOrNull(
+                            SemanticsProperties.HorizontalAccessibilityScrollState
+                        )
+                        val newYState = newNode.config.getOrNull(
+                            SemanticsProperties.VerticalAccessibilityScrollState
+                        )
+                        val oldYState = oldNode.config.getOrNull(
+                            SemanticsProperties.VerticalAccessibilityScrollState
+                        )
+                        sendEventForVirtualView(
+                            semanticsNodeIdToAccessibilityVirtualNodeId(newNode.id),
+                            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE,
+                            null
+                        )
+                        val deltaX = if (newXState != null && oldXState != null) {
+                            newXState.value - oldXState.value
+                        } else {
+                            0
+                        }
+                        val deltaY = if (newYState != null && oldYState != null) {
+                            newYState.value - oldYState.value
+                        } else {
+                            0
+                        }
+                        if (deltaX != 0f || deltaY != 0f) {
+                            val event = createEvent(
+                                semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                                AccessibilityEvent.TYPE_VIEW_SCROLLED
+                            )
+                            if (newXState != null) {
+                                event.scrollX = newXState.value.toInt()
+                                event.maxScrollX = newXState.maxValue.toInt()
+                            }
+                            if (newYState != null) {
+                                event.scrollY = newYState.value.toInt()
+                                event.maxScrollY = newYState.maxValue.toInt()
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                Api28Impl.setScrollEventDelta(event, deltaX.toInt(), deltaY.toInt())
+                            }
+                            sendEvent(event)
+                        }
                     }
                     else -> {
                         // TODO(b/151840490) send the correct events when property changes
@@ -1212,6 +1404,16 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             arguments: Bundle?
         ) {
             addExtraDataToAccessibilityNodeInfoHelper(virtualViewId, info, extraDataKey, arguments)
+        }
+    }
+
+    private class Api28Impl {
+        @RequiresApi(Build.VERSION_CODES.P)
+        companion object {
+            fun setScrollEventDelta(event: AccessibilityEvent, deltaX: Int, deltaY: Int) {
+                event.scrollDeltaX = deltaX
+                event.scrollDeltaY = deltaY
+            }
         }
     }
 }
