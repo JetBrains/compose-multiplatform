@@ -104,7 +104,6 @@ package androidx.compose.ui.geometry {
     method public boolean contains-k-4lQ0M(long offset);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.geometry.Rect copy(float left, float top, float right, float bottom);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect deflate(float delta);
-    method public androidx.compose.ui.geometry.Rect expandToInclude(androidx.compose.ui.geometry.Rect other);
     method public float getBottom();
     method public long getBottomCenter();
     method public long getBottomLeft();
@@ -128,10 +127,10 @@ package androidx.compose.ui.geometry {
     method public boolean isEmpty();
     method public boolean isFinite();
     method public boolean isInfinite();
-    method public androidx.compose.ui.geometry.Rect join(androidx.compose.ui.geometry.Rect other);
     method public boolean overlaps(androidx.compose.ui.geometry.Rect other);
-    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect shift-k-4lQ0M(long offset);
+    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect shift-k-4lQ0M(long offset);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate(float translateX, float translateY);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate-k-4lQ0M(long offset);
     property public final long bottomCenter;
     property public final long bottomLeft;
     property public final long bottomRight;
@@ -236,11 +235,12 @@ package androidx.compose.ui.geometry {
     method public static androidx.compose.ui.geometry.Rect middleRect(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.Rect outerRect(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.Rect safeInnerRect(androidx.compose.ui.geometry.RoundRect);
-    method public static androidx.compose.ui.geometry.RoundRect shift-cBI5anY(androidx.compose.ui.geometry.RoundRect, long offset);
+    method @Deprecated public static androidx.compose.ui.geometry.RoundRect shift-cBI5anY(androidx.compose.ui.geometry.RoundRect, long offset);
     method public static androidx.compose.ui.geometry.RoundRect shrink(androidx.compose.ui.geometry.RoundRect, float delta);
     method public static androidx.compose.ui.geometry.Rect tallMiddleRect(androidx.compose.ui.geometry.RoundRect);
     method public static long topLeftRadius(androidx.compose.ui.geometry.RoundRect);
     method public static long topRightRadius(androidx.compose.ui.geometry.RoundRect);
+    method public static androidx.compose.ui.geometry.RoundRect translate-cBI5anY(androidx.compose.ui.geometry.RoundRect, long offset);
     method public static androidx.compose.ui.geometry.Rect wideMiddleRect(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.RoundRect withRadius-Z0w6hBY(androidx.compose.ui.geometry.RoundRect, long radius);
   }

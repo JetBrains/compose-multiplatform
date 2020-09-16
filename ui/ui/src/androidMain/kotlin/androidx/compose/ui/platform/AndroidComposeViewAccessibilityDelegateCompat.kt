@@ -683,7 +683,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     private fun toScreenCoords(textNode: SemanticsNode, bounds: Rect): Rect? {
-        val screenBounds = bounds.shift(textNode.globalPosition)
+        val screenBounds = bounds.translate(textNode.globalPosition)
         val globalBounds = textNode.globalBounds
         if (screenBounds.overlaps(globalBounds)) {
             return screenBounds.intersect(globalBounds)

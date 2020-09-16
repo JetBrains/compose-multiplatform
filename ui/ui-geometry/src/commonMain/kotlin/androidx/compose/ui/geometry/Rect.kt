@@ -28,26 +28,30 @@ import kotlin.math.min
 /**
  * An immutable, 2D, axis-aligned, floating-point rectangle whose coordinates
  * are relative to a given origin.
- *
- * A Rect can be created with one its constructors or from an [Offset] and a
- * [Size] using the `&` operator:
- *
- * ```dart
- * Rect myRect = const Offset(1.0, 2.0) & const Size(3.0, 4.0);
- * ```
  */
 @Immutable
 data class Rect(
-        // The offset of the left edge of this rectangle from the x axis.
+    /**
+     * The offset of the left edge of this rectangle from the x axis.
+     */
     @Stable
     val left: Float,
-        // The offset of the top edge of this rectangle from the y axis.
+
+    /**
+     * The offset of the top edge of this rectangle from the y axis.
+     */
     @Stable
     val top: Float,
-        // The offset of the right edge of this rectangle from the x axis.
+
+    /**
+     * The offset of the right edge of this rectangle from the x axis.
+     */
     @Stable
     val right: Float,
-        // The offset of the bottom edge of this rectangle from the y axis.
+
+    /**
+     * The offset of the bottom edge of this rectangle from the y axis.
+     */
     @Stable
     val bottom: Float
 ) {
@@ -108,17 +112,29 @@ data class Rect(
      * To translate a rectangle by separate x and y components rather than by an
      * [Offset], consider [translate].
      */
+    @Deprecated(
+        "Use translate(offset) instead",
+        ReplaceWith("translate(offset)", "androidx.compose.ui.geometry")
+    )
     @Stable
     fun shift(offset: Offset): Rect {
         return Rect(left + offset.x, top + offset.y, right + offset.x, bottom + offset.y)
     }
 
     /**
+     * Returns a new rectangle translated by the given offset.
+     *
+     * To translate a rectangle by separate x and y components rather than by an
+     * [Offset], consider [translate].
+     */
+    @Stable
+    fun translate(offset: Offset): Rect {
+        return Rect(left + offset.x, top + offset.y, right + offset.x, bottom + offset.y)
+    }
+
+    /**
      * Returns a new rectangle with translateX added to the x components and
      * translateY added to the y components.
-     *
-     * To translate a rectangle by an [Offset] rather than by separate x and y
-     * components, consider [shift].
      */
     @Stable
     fun translate(translateX: Float, translateY: Float): Rect {
@@ -154,31 +170,6 @@ data class Rect(
             min(right, other.right),
             min(bottom, other.bottom)
         )
-    }
-
-    /**
-     * Returns a new rectangle which is the bounding box containing this
-     * rectangle and the given rectangle.
-     */
-    fun expandToInclude(other: Rect): Rect {
-        return Rect(
-            min(left, other.left),
-            min(top, other.top),
-            max(right, other.right),
-            max(bottom, other.bottom)
-        )
-    }
-
-    fun join(other: Rect): Rect {
-        if (other.isEmpty) {
-            // return this if the other params are empty
-            return this
-        }
-        if (isEmpty) {
-            // if we are empty, just take other
-            return other
-        }
-        return expandToInclude(other)
     }
 
     /** Whether `other` has a nonzero area of overlap with this rectangle. */

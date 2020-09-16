@@ -300,7 +300,7 @@ private class BorderModifierCache {
                         size.height - borderPixelSize * 2
                     )
                 innerPath.addOutline(lastShape!!.createOutline(sizeMinusBorder, density))
-                innerPath.shift(Offset(borderPixelSize, borderPixelSize))
+                innerPath.translate(Offset(borderPixelSize, borderPixelSize))
 
                 // now we calculate the diff between the inner and the outer paths
                 diffPath.op(outerPath, innerPath, PathOperation.difference)
