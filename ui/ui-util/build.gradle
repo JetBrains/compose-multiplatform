@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -25,36 +27,61 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("kotlin-multiplatform")
 }
 
-kotlin {
-    android()
-    jvm("desktop")
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
+if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    dependencies {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
 
-            implementation project(":compose:runtime:runtime")
-        }
+        api "androidx.annotation:annotation:1.1.0"
 
-        jvmMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-        }
+        implementation(KOTLIN_STDLIB)
+        implementation project(":compose:runtime:runtime")
 
-        androidMain.dependencies {
-            api "androidx.annotation:annotation:1.1.0"
-        }
+        testImplementation(JUNIT)
+        testImplementation(TRUTH)
+        testImplementation(KOTLIN_TEST)
+    }
+}
 
-        desktopMain.dependsOn jvmMain
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
 
-        commonTest.dependencies {
-            implementation kotlin("test-junit")
-        }
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
 
-        androidTest.dependencies {
-            implementation(TRUTH)
+                implementation project(":compose:runtime:runtime")
+            }
+
+            jvmMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+            }
+
+            androidMain.dependencies {
+                api "androidx.annotation:annotation:1.1.0"
+            }
+
+            desktopMain.dependsOn jvmMain
+
+            commonTest.dependencies {
+                implementation kotlin("test-junit")
+            }
+
+            androidTest.dependencies {
+                implementation(TRUTH)
+            }
         }
     }
 }

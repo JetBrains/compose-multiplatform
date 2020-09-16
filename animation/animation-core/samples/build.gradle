@@ -29,12 +29,10 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
 
     implementation(KOTLIN_STDLIB)
-
     implementation project(":annotation:annotation-sampled")
-
     implementation project(":compose:animation:animation-core")
     implementation project(":compose:ui:ui-unit")
 }
