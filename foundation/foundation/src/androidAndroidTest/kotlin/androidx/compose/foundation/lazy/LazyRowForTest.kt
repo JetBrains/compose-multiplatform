@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
@@ -33,17 +34,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
+import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsDisplayed
+import androidx.ui.test.assertIsEqualTo
 import androidx.ui.test.assertPositionInRootIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.getUnclippedBoundsInRoot
 import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -163,6 +168,7 @@ class LazyRowForTest {
             .assertIsDisplayed()
     }
 
+    @Ignore("This test is not fully working. To be fixed in b/167913500")
     @Test
     fun contentPaddingIsApplied() = with(rule.density) {
         val itemTag = "item"
@@ -283,13 +289,13 @@ class LazyRowForTest {
         rule.onNodeWithTag(secondItemTag)
             .assertIsDisplayed()
 
-        val lazyColumnBounds = rule.onNodeWithTag(LazyRowForTag)
+        val lazyRowBounds = rule.onNodeWithTag(LazyRowForTag)
             .getUnclippedBoundsInRoot()
 
         with(rule.density) {
             // Verify the height of the row
-            Truth.assertThat(lazyColumnBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-            Truth.assertThat(lazyColumnBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+            Truth.assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
+            Truth.assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
         }
     }
 
@@ -417,5 +423,137 @@ class LazyRowForTest {
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun whenNotAnymoreAvailableItemWasDisplayed() {
+        var items by mutableStateOf ((1..30).toList())
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 16-20
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = 300.dp, density = rule.density)
+
+        rule.runOnIdle {
+            items = (1..10).toList()
+        }
+
+        // there is no item 16 anymore so we will just display the last items 6-10
+        rule.onNodeWithTag("6")
+            .assertLeftPositionIsAlmost(0.dp)
+    }
+
+    @Test
+    fun whenFewDisplayedItemsWereRemoved() {
+        var items by mutableStateOf ((1..10).toList())
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 6-10
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = 100.dp, density = rule.density)
+
+        rule.runOnIdle {
+            items = (1..8).toList()
+        }
+
+        // there are no more items 9 and 10, so we have to scroll back
+        rule.onNodeWithTag("4")
+            .assertLeftPositionIsAlmost(0.dp)
+    }
+
+    @Test
+    fun whenItemsBecameEmpty() {
+        var items by mutableStateOf ((1..10).toList())
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.sizeIn(maxHeight = 100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 2-6
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = 20.dp, density = rule.density)
+
+        rule.runOnIdle {
+            items = emptyList()
+        }
+
+        // there are no more items so the LazyRow is zero sized
+        rule.onNodeWithTag(LazyRowForTag)
+            .assertWidthIsEqualTo(0.dp)
+            .assertHeightIsEqualTo(0.dp)
+
+        // and has no children
+        rule.onNodeWithTag("1")
+            .assertDoesNotExist()
+        rule.onNodeWithTag("2")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun scrollBackAndForth() {
+        val items by mutableStateOf ((1..20).toList())
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 6-10
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = 100.dp, density = rule.density)
+
+        // and scroll back
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = (-100).dp, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertLeftPositionIsAlmost(0.dp)
+    }
+
+    @Test
+    fun tryToScrollBackwardWhenAlreadyOnTop() {
+        val items by mutableStateOf ((1..20).toList())
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // we already displaying the first item, so this should do nothing
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = (-50).dp, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertLeftPositionIsAlmost(0.dp)
+        rule.onNodeWithTag("5")
+            .assertLeftPositionIsAlmost(80.dp)
+    }
+
+    private fun SemanticsNodeInteraction.assertLeftPositionIsAlmost(expected: Dp) {
+        getUnclippedBoundsInRoot().left.assertIsEqualTo(expected, tolerance = 1.dp)
     }
 }

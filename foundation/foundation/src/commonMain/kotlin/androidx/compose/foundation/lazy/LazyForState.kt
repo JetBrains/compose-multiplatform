@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Placeable
@@ -45,8 +44,6 @@ import androidx.compose.ui.util.fastSumBy
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-private inline class ScrollDirection(val isForward: Boolean)
-
 @Suppress("NOTHING_TO_INLINE")
 internal inline class DataIndex(val value: Int) {
     inline operator fun inc(): DataIndex = DataIndex(value + 1)
@@ -65,29 +62,16 @@ internal class LazyForState(
     /**
      * The index of the first item that is composed into the layout tree
      */
-    private var firstComposedItem = DataIndex(0)
-    /**
-     * The index of the last item that is composed into the layout tree
-     */
-    private var lastComposedItem = DataIndex(-1) // obviously-bogus sentinel value
+    private var firstVisibleItemIndex = DataIndex(0)
     /**
      * Scrolling forward is positive - i.e., the amount that the item is offset backwards
      */
-    private var firstItemScrollOffset = 0f
-    /**
-     * The amount of space remaining in the last item
-     */
-    private var lastItemRemainingSpace = 0f
+    private var firstVisibleItemScrollOffset = 0
     /**
      * The amount of scroll to be consumed in the next layout pass.  Scrolling forward is negative
      * - that is, it is the amount that the items are offset in y
      */
     private var scrollToBeConsumed = 0f
-    /**
-     * The children that have been measured this measure pass.
-     * Used to avoid measuring twice in a single pass, which is illegal
-     */
-    private val measuredThisPass: MutableMap<DataIndex, List<Placeable>> = mutableMapOf()
 
     /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
@@ -119,155 +103,25 @@ internal class LazyForState(
      */
     private var itemScope = InitialLazyItemsScopeImpl
 
-    // TODO: really want an Int here
     private fun onScroll(distance: Float): Float {
         check(abs(scrollToBeConsumed) < 0.5f) {
             "entered drag with non-zero pending scroll: $scrollToBeConsumed"
         }
-        scrollToBeConsumed = distance
+        scrollToBeConsumed += distance
         remeasurement.forceRemeasure()
-        val scrollConsumed = distance - scrollToBeConsumed
 
-        if (abs(scrollToBeConsumed) < 0.5) {
+        if (abs(scrollToBeConsumed) < 0.5f) {
             // We consumed all of it - we'll hold onto the fractional scroll for later, so report
             // that we consumed the whole thing
             return distance
         } else {
+            val scrollConsumed = distance - scrollToBeConsumed
             // We did not consume all of it - return the rest to be consumed elsewhere (e.g.,
             // nested scrolling)
             scrollToBeConsumed = 0f // We're not consuming the rest, give it back
             scrollableController.stopAnimation()
             return scrollConsumed
         }
-    }
-
-    private fun SubcomposeMeasureScope<DataIndex>.consumePendingScroll(
-        childConstraints: Constraints,
-        isVertical: Boolean,
-        itemsCount: Int,
-        itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
-    ) {
-        val scrollDirection = ScrollDirection(isForward = scrollToBeConsumed < 0f)
-
-        while (true) {
-            // General outline:
-            // Consume as much of the drag as possible via adjusting the scroll offset
-            scrollToBeConsumed = consumeScrollViaOffset(scrollToBeConsumed)
-
-            // TODO: What's the correct way to handle half a pixel of unconsumed scroll?
-
-            // Allow up to half a pixel of scroll to remain unconsumed
-            if (abs(scrollToBeConsumed) >= 0.5f) {
-                // We need to bring another item onscreen. Can we?
-                if (!composeAndMeasureNextItem(
-                        childConstraints,
-                        isVertical,
-                        scrollDirection,
-                        itemsCount,
-                        itemContentFactory
-                    )
-                ) {
-                    // Nope. Break out and return the rest of the drag
-                    break
-                }
-                // Yay, we got another item! Our scroll offsets are populated again, go back and
-                // consume them in the next round.
-            } else {
-                // We've consumed the whole scroll
-                break
-            }
-        }
-    }
-
-    /**
-     * @return The amount of scroll remaining unconsumed
-     */
-    private fun consumeScrollViaOffset(delta: Float): Float {
-        if (delta < 0) {
-            // Scrolling forward, content moves up
-            // Consume via space at end
-            // Remember: delta is *negative*
-            if (lastItemRemainingSpace >= -delta) {
-                // We can consume it all
-                updateScrollOffsets(delta)
-                return 0f
-            } else {
-                // All offset consumed, return the remaining offset to the caller
-                // delta is negative, prevRemainingSpace/lastItemRemainingSpace are positive
-                val prevRemainingSpace = lastItemRemainingSpace
-                updateScrollOffsets(-prevRemainingSpace)
-                return delta + prevRemainingSpace
-            }
-        } else {
-            // Scrolling backward, content moves down
-            // Consume via initial offset
-            if (firstItemScrollOffset >= delta) {
-                // We can consume it all
-                updateScrollOffsets(delta)
-                return 0f
-            } else {
-                // All offset consumed, return the remaining offset to the caller
-                val prevRemainingSpace = firstItemScrollOffset
-                updateScrollOffsets(prevRemainingSpace)
-                return delta - prevRemainingSpace
-            }
-        }
-    }
-
-    /**
-     * Must be called within a measure pass.
-     *
-     * @return `true` if an item was composed and measured, `false` if there are no more items in
-     * the scroll direction
-     */
-    private fun SubcomposeMeasureScope<DataIndex>.composeAndMeasureNextItem(
-        childConstraints: Constraints,
-        isVertical: Boolean,
-        scrollDirection: ScrollDirection,
-        itemsCount: Int,
-        itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
-    ): Boolean {
-        val nextItemIndex = if (scrollDirection.isForward) {
-            if (itemsCount > lastComposedItem.value + 1) {
-                ++lastComposedItem
-            } else {
-                return false
-            }
-        } else {
-            if (firstComposedItem.value > 0) {
-                --firstComposedItem
-            } else {
-                return false
-            }
-        }
-
-        val nextItems = composeChildForDataIndex(nextItemIndex, itemContentFactory).map {
-            it.measure(childConstraints)
-        }
-
-        measuredThisPass[nextItemIndex] = nextItems
-
-        val childSize = nextItems.fastSumBy { if (isVertical) it.height else it.width }
-
-        // Add in our newly composed space so that it may be consumed
-        if (scrollDirection.isForward) {
-            lastItemRemainingSpace += childSize
-        } else {
-            firstItemScrollOffset += childSize
-        }
-
-        return true
-    }
-
-    /**
-     * Does no bounds checking, just moves the start and last offsets in sync.
-     * Assumes the caller has checked bounds.
-     */
-    private fun updateScrollOffsets(delta: Float) {
-        // Scrolling forward is negative delta and consumes space, so add the negative
-        lastItemRemainingSpace += delta
-        // Scrolling forward is negative delta and adds offset, so subtract the negative
-        firstItemScrollOffset -= delta
     }
 
     /**
@@ -294,97 +148,173 @@ internal class LazyForState(
         itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
     ): MeasureScope.MeasureResult = with(scope) {
         constraints.assertNotNestingScrollableContainers(isVertical)
-        updateItemScope(constraints)
-        measuredThisPass.clear()
-        val maxMainAxis = if (isVertical) constraints.maxHeight else constraints.maxWidth
-        val childConstraints = Constraints(
-            maxWidth = if (isVertical) constraints.maxWidth else Constraints.Infinity,
-            maxHeight = if (!isVertical) constraints.maxHeight else Constraints.Infinity
-        )
+        if (itemsCount <= 0) {
+            // empty data set. reset the current scroll and report zero size
+            firstVisibleItemIndex = DataIndex(0)
+            firstVisibleItemScrollOffset = 0
+            layout(constraints.constrainWidth(0), constraints.constrainHeight(0)) {}
+        } else {
+            // this will update the scope object if the constrains have been changed
+            updateItemScope(constraints)
 
-        // We're being asked to consume scroll by the Scrollable
-        if (abs(scrollToBeConsumed) >= 0.5f) {
-            // Consume it in advance, because it simplifies the rest of this method if we
-            // know exactly how much scroll we've consumed - for instance, we can safely
-            // discard anything off the start of the viewport, because we know we can fill
-            // it, assuming nothing has shrunken on us (which has to be handled separately
-            // anyway)
-            consumePendingScroll(childConstraints, isVertical, itemsCount, itemContentFactory)
-        }
+            // assert for the incorrect initial state
+            require(firstVisibleItemScrollOffset >= 0f)
+            require(firstVisibleItemIndex.value >= 0f)
 
-        var mainAxisUsed = (-firstItemScrollOffset).roundToInt()
-        var maxCrossAxis = 0
+            if (firstVisibleItemIndex.value >= itemsCount) {
+                // the data set has been updated and now we have less items that we were
+                // scrolled to before
+                firstVisibleItemIndex = DataIndex(itemsCount - 1)
+                firstVisibleItemScrollOffset = 0
+            }
 
-        // The index of the first item that should be displayed, regardless of what is
-        // currently displayed.  Will be moved forward as we determine what's offscreen
-        var index = firstComposedItem
+            // represents the real amount of consumed pixels
+            var consumedScroll = scrollToBeConsumed.roundToInt()
 
-        // TODO: handle the case where we can't fill the viewport due to children shrinking,
-        //  but there are more items at the start that we could fill with
-        val allPlaceables = mutableListOf<Placeable>()
-        while (mainAxisUsed <= maxMainAxis && index.value < itemsCount) {
-            val placeables = measuredThisPass.getOrPut(index) {
-                composeChildForDataIndex(index, itemContentFactory).fastMap {
-                    it.measure(childConstraints)
+            // applying the whole requested scroll offset. we will figure out if we can't consume
+            // all of it later
+            firstVisibleItemScrollOffset -= consumedScroll
+
+            // if the current scroll offset is less than minimally possible
+            if (firstVisibleItemIndex == DataIndex(0) && firstVisibleItemScrollOffset < 0) {
+                consumedScroll += firstVisibleItemScrollOffset
+                firstVisibleItemScrollOffset = 0
+            }
+
+            // the constraints we will measure child with. the cross axis are not restricted
+            val childConstraints = Constraints(
+                maxWidth = if (isVertical) constraints.maxWidth else Constraints.Infinity,
+                maxHeight = if (!isVertical) constraints.maxHeight else Constraints.Infinity
+            )
+            // saving it into the field as we first go backward and after that want to go forward
+            // again from the initial position
+            val goingForwardInitialIndex = firstVisibleItemIndex
+            var goingForwardInitialScrollOffset = firstVisibleItemScrollOffset
+
+            // this will contain all the placeables representing the visible items
+            val visibleItemsPlaceables = mutableListOf<Placeable>()
+
+            // we had scrolled backward, which means items before current firstItemScrollOffset
+            // became visible. compose them and update firstItemScrollOffset
+            while (firstVisibleItemScrollOffset < 0 && firstVisibleItemIndex > DataIndex(0)) {
+                val previous = DataIndex(firstVisibleItemIndex.value - 1)
+                val placeables =
+                    subcompose(previous, itemScope.itemContentFactory(previous.value)).fastMap {
+                        it.measure(childConstraints)
+                    }
+                visibleItemsPlaceables.addAll(0, placeables)
+                val size = placeables.fastSumBy { if (isVertical) it.height else it.width }
+                firstVisibleItemScrollOffset += size
+                firstVisibleItemIndex = previous
+            }
+            // if we were scrolled backward, but there were not enough items before. this means
+            // not the whole scroll was consumed
+            if (firstVisibleItemScrollOffset < 0) {
+                consumedScroll += firstVisibleItemScrollOffset
+                goingForwardInitialScrollOffset += firstVisibleItemScrollOffset
+                firstVisibleItemScrollOffset = 0
+            }
+
+            // remembers the composed placeables which we are not currently placing as they are out
+            // of screen. it is possible we will need to place them if the remaining items will
+            // not fill the whole viewport and we will need to scroll back
+            var notUsedButComposedItems: MutableList<List<Placeable>>? = null
+
+            // composing visible items starting from goingForwardInitialIndex until we fill the
+            // whole viewport
+            var index = goingForwardInitialIndex
+            val maxMainAxis = if (isVertical) constraints.maxHeight else constraints.maxWidth
+            var mainAxisUsed = -goingForwardInitialScrollOffset
+            var maxCrossAxis = 0
+            while (mainAxisUsed <= maxMainAxis && index.value < itemsCount) {
+                val placeables =
+                    subcompose(index, itemScope.itemContentFactory(index.value)).fastMap {
+                        it.measure(childConstraints)
+                    }
+                var size = 0
+                placeables.fastForEach {
+                    size += if (isVertical) it.height else it.width
+                    maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
+                }
+                mainAxisUsed += size
+
+                if (mainAxisUsed < 0f) {
+                    // this item is offscreen and will not be placed. advance firstVisibleItemIndex
+                    firstVisibleItemIndex = index + 1
+                    firstVisibleItemScrollOffset -= size
+                    // but remember the corresponding placeables in case we will be forced to
+                    // scroll back as there were not enough items to fill the viewport
+                    if (notUsedButComposedItems == null) {
+                        notUsedButComposedItems = mutableListOf()
+                    }
+                    notUsedButComposedItems.add(placeables)
+                } else {
+                    visibleItemsPlaceables.addAll(placeables)
+                }
+
+                index++
+            }
+
+            // we didn't fill the whole viewport with items starting from firstVisibleItemIndex.
+            // lets try to scroll back if we have enough items before firstVisibleItemIndex.
+            if (mainAxisUsed < maxMainAxis) {
+                val toScrollBack = maxMainAxis - mainAxisUsed
+                firstVisibleItemScrollOffset -= toScrollBack
+                mainAxisUsed += toScrollBack
+                while (firstVisibleItemScrollOffset < 0 && firstVisibleItemIndex > DataIndex(0)) {
+                    val previous = DataIndex(firstVisibleItemIndex.value - 1)
+                    val alreadyComposedIndex = notUsedButComposedItems?.lastIndex ?: -1
+                    val placeables = if (alreadyComposedIndex >= 0) {
+                        notUsedButComposedItems!!.removeAt(alreadyComposedIndex)
+                    } else {
+                        subcompose(previous, itemScope.itemContentFactory(previous.value)).fastMap {
+                            it.measure(childConstraints)
+                        }
+                    }
+                    visibleItemsPlaceables.addAll(0, placeables)
+                    val size = placeables.fastSumBy { if (isVertical) it.height else it.width }
+                    firstVisibleItemScrollOffset += size
+                    firstVisibleItemIndex = previous
+                }
+                consumedScroll += toScrollBack
+                if (firstVisibleItemScrollOffset < 0) {
+                    consumedScroll += firstVisibleItemScrollOffset
+                    mainAxisUsed += firstVisibleItemScrollOffset
+                    firstVisibleItemScrollOffset = 0
                 }
             }
-            var size = 0
-            placeables.fastForEach {
-                size += if (isVertical) it.height else it.width
-                maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
-            }
-            mainAxisUsed += size
 
-            if (mainAxisUsed < 0f) {
-                // this item is offscreen, remove it and the offset it took up
-                firstComposedItem = index + 1
-                firstItemScrollOffset -= size
-            } else {
-                allPlaceables.addAll(placeables)
-            }
+            // report the amount of pixels we consumed
+            scrollToBeConsumed -= consumedScroll
 
-            index++
-        }
-        lastComposedItem = index - 1 // index is incremented after the last iteration
+            // Wrap the content of the children
+            val layoutWidth = constraints.constrainWidth(
+                if (isVertical) maxCrossAxis else mainAxisUsed
+            )
+            val layoutHeight = constraints.constrainHeight(
+                if (!isVertical) maxCrossAxis else mainAxisUsed
+            )
 
-        lastItemRemainingSpace = if (mainAxisUsed > maxMainAxis) {
-            (mainAxisUsed - maxMainAxis).toFloat()
-        } else {
-            0f
-        }
-
-        // Wrap the content of the children
-        val layoutWidth = constraints.constrainWidth(
-            if (isVertical) maxCrossAxis else mainAxisUsed
-        )
-        val layoutHeight = constraints.constrainHeight(
-            if (!isVertical) maxCrossAxis else mainAxisUsed
-        )
-
-        return layout(layoutWidth, layoutHeight) {
-            var currentMainAxis = (-firstItemScrollOffset).roundToInt()
-            allPlaceables.fastForEach {
-                if (isVertical) {
-                    val x = horizontalAlignment.align(layoutWidth - it.width, layoutDirection)
-                    if (currentMainAxis + it.height > 0 && currentMainAxis < layoutHeight) {
-                        it.place(x, currentMainAxis)
+            return layout(layoutWidth, layoutHeight) {
+                var currentMainAxis = -firstVisibleItemScrollOffset
+                visibleItemsPlaceables.fastForEach {
+                    if (isVertical) {
+                        val x = horizontalAlignment.align(layoutWidth - it.width, layoutDirection)
+                        if (currentMainAxis + it.height > 0 && currentMainAxis < layoutHeight) {
+                            it.place(x, currentMainAxis)
+                        }
+                        currentMainAxis += it.height
+                    } else {
+                        val y = verticalAlignment.align(layoutHeight - it.height)
+                        if (currentMainAxis + it.width > 0 && currentMainAxis < layoutWidth) {
+                            it.placeRelative(currentMainAxis, y)
+                        }
+                        currentMainAxis += it.width
                     }
-                    currentMainAxis += it.height
-                } else {
-                    val y = verticalAlignment.align(layoutHeight - it.height)
-                    if (currentMainAxis + it.width > 0 && currentMainAxis < layoutWidth) {
-                        it.placeRelative(currentMainAxis, y)
-                    }
-                    currentMainAxis += it.width
                 }
             }
         }
     }
-
-    private fun SubcomposeMeasureScope<DataIndex>.composeChildForDataIndex(
-        dataIndex: DataIndex,
-        itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
-    ): List<Measurable> = subcompose(dataIndex, itemScope.itemContentFactory(dataIndex.value))
 }
 
 /**
