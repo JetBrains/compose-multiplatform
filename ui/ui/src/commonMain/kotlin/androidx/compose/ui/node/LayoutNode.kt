@@ -32,6 +32,7 @@ import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.OnPositionedModifier
 import androidx.compose.ui.ParentDataModifier
+import androidx.compose.ui.Placeable
 import androidx.compose.ui.Remeasurement
 import androidx.compose.ui.RemeasurementModifier
 import androidx.compose.ui.ZIndexModifier
@@ -780,12 +781,11 @@ class LayoutNode : Measurable, Remeasurement {
     internal var needsOnPositionedDispatch = false
 
     fun place(x: Int, y: Int) {
-        with(InnerPlacementScope) {
-            val previousParentWidth = parentWidth
-            val previousLayoutDirection = parentLayoutDirection
-            updateValuesForRtlMirroring(layoutDirection, outerMeasurablePlaceable.measuredWidth)
+        Placeable.PlacementScope.executeWithRtlMirroringValues(
+            outerMeasurablePlaceable.measuredWidth,
+            layoutDirection
+        ) {
             outerMeasurablePlaceable.placeRelative(x, y)
-            updateValuesForRtlMirroring(previousLayoutDirection, previousParentWidth)
         }
     }
 

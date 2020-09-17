@@ -110,7 +110,7 @@ internal class OuterMeasurablePlaceable(
 
     override fun placeAt(position: IntOffset) {
         lastPosition = position
-        with(InnerPlacementScope) {
+        with(PlacementScope) {
             outerWrapper.place(position)
         }
     }

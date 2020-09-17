@@ -111,14 +111,14 @@ abstract class Placeable {
          * in RTL environment. If the value is zero, than the [Placeable] will be be placed to
          * the original position (position will not be mirrored).
          */
-        abstract val parentWidth: Int
+        protected abstract val parentWidth: Int
 
         /**
          * Keeps the layout direction of the parent of the placeable that is being places using
          * current [PlacementScope]. Used to support automatic position mirroring for convenient
          * RTL support in custom layouts.
          */
-        abstract val parentLayoutDirection: LayoutDirection
+        protected abstract val parentLayoutDirection: LayoutDirection
 
         /**
          * Place a [Placeable] at [position] in its parent's coordinate system.
@@ -180,6 +180,27 @@ abstract class Placeable {
                 place(position)
             } else {
                 place(IntOffset(parentWidth - measuredSize.width - position.x, position.y))
+            }
+        }
+
+        internal companion object : PlacementScope() {
+            override var parentLayoutDirection = LayoutDirection.Ltr
+                private set
+            override var parentWidth = 0
+                private set
+
+            inline fun executeWithRtlMirroringValues(
+                parentWidth: Int,
+                parentLayoutDirection: LayoutDirection,
+                crossinline block: PlacementScope.() -> Unit
+            ) {
+                val previousParentWidth = this.parentWidth
+                val previousParentLayoutDirection = this.parentLayoutDirection
+                this.parentWidth = parentWidth
+                this.parentLayoutDirection = parentLayoutDirection
+                this.block()
+                this.parentWidth = previousParentWidth
+                this.parentLayoutDirection = previousParentLayoutDirection
             }
         }
     }
