@@ -51,8 +51,7 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.foundation.layout.InternalLayoutApi public static interface Arrangement.Horizontal {
-    method public void arrange(int totalSize, java.util.List<java.lang.Integer> size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density, java.util.List<java.lang.Integer> outPosition);
-    method @Deprecated public default java.util.List<java.lang.Integer> arrange(int totalSize, java.util.List<java.lang.Integer> size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing();
     property public default float spacing;
   }
@@ -62,8 +61,7 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.foundation.layout.InternalLayoutApi public static interface Arrangement.Vertical {
-    method public void arrange(int totalSize, java.util.List<java.lang.Integer> size, androidx.compose.ui.unit.Density density, java.util.List<java.lang.Integer> outPosition);
-    method @Deprecated public default java.util.List<java.lang.Integer> arrange(int totalSize, java.util.List<java.lang.Integer> size);
+    method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing();
     property public default float spacing;
   }

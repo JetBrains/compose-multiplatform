@@ -51,8 +51,7 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.foundation.layout.InternalLayoutApi public static interface Arrangement.Horizontal {
-    method public void arrange(int totalSize, java.util.List<java.lang.Integer> size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density, java.util.List<java.lang.Integer> outPosition);
-    method @Deprecated public default java.util.List<java.lang.Integer> arrange(int totalSize, java.util.List<java.lang.Integer> size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing();
     property public default float spacing;
   }
@@ -62,8 +61,7 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.foundation.layout.InternalLayoutApi public static interface Arrangement.Vertical {
-    method public void arrange(int totalSize, java.util.List<java.lang.Integer> size, androidx.compose.ui.unit.Density density, java.util.List<java.lang.Integer> outPosition);
-    method @Deprecated public default java.util.List<java.lang.Integer> arrange(int totalSize, java.util.List<java.lang.Integer> size);
+    method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing();
     property public default float spacing;
   }
@@ -416,7 +414,7 @@ package androidx.compose.foundation.layout {
   }
 
   public final class RowColumnImplKt {
-    method @kotlin.PublishedApi internal static androidx.compose.ui.node.LayoutNode.MeasureBlocks rowColumnMeasureBlocks-GZ6WFlY(androidx.compose.foundation.layout.LayoutOrientation orientation, kotlin.jvm.functions.Function5<? super java.lang.Integer,? super java.util.List<java.lang.Integer>,? super androidx.compose.ui.unit.LayoutDirection,? super androidx.compose.ui.unit.Density,? super java.util.List<java.lang.Integer>,kotlin.Unit> arrangement, float arrangementSpacing, androidx.compose.foundation.layout.SizeMode crossAxisSize, androidx.compose.foundation.layout.CrossAxisAlignment crossAxisAlignment);
+    method @kotlin.PublishedApi internal static androidx.compose.ui.node.LayoutNode.MeasureBlocks rowColumnMeasureBlocks-GZ6WFlY(androidx.compose.foundation.layout.LayoutOrientation orientation, kotlin.jvm.functions.Function5<? super java.lang.Integer,? super int[],? super androidx.compose.ui.unit.LayoutDirection,? super androidx.compose.ui.unit.Density,? super int[],kotlin.Unit> arrangement, float arrangementSpacing, androidx.compose.foundation.layout.SizeMode crossAxisSize, androidx.compose.foundation.layout.CrossAxisAlignment crossAxisAlignment);
   }
 
   public final class RowKt {
