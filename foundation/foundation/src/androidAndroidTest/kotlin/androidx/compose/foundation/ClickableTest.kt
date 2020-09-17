@@ -22,7 +22,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.test.filters.MediumTest
+import androidx.ui.test.SemanticsMatcher
+import androidx.ui.test.assert
 import androidx.ui.test.assertHasClickAction
 import androidx.ui.test.assertHasNoClickAction
 import androidx.ui.test.assertIsEnabled
@@ -37,6 +40,7 @@ import androidx.ui.test.onNodeWithSubstring
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
+import androidx.ui.test.performSemanticsAction
 import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -80,6 +84,36 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .assertIsNotEnabled()
             .assertHasNoClickAction()
+    }
+
+    @Test
+    fun clickableTest_longClickSemantics() {
+        var counter = 0
+        val onClick: () -> Unit = { ++counter }
+
+        rule.setContent {
+            Box {
+                Text(
+                    "ClickableText",
+                    modifier = Modifier.testTag("myClickable").clickable(onLongClick = onClick) {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .assertIsEnabled()
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.OnLongClick))
+
+        rule.runOnIdle {
+            assertThat(counter).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performSemanticsAction(SemanticsActions.OnLongClick)
+
+        rule.runOnIdle {
+            assertThat(counter).isEqualTo(1)
+        }
     }
 
     @Test
