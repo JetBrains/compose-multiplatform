@@ -68,7 +68,7 @@ fun DrawScopeBatchedTransformSample() {
             // times between each transformation if done individually
             withTransform({
                 translate(10.0f, 12.0f)
-                rotate(45.0f)
+                rotate(45.0f, center)
                 scale(2.0f, 0.5f)
             }) {
                 drawRect(Color.Cyan)

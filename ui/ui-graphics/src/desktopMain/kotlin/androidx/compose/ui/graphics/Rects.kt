@@ -33,17 +33,17 @@ fun org.jetbrains.skija.Rect.toComposeRect() =
 fun RoundRect.toSkijaRRect(): org.jetbrains.skija.RRect {
     val radii = FloatArray(8)
 
-    radii[0] = topLeftRadiusX
-    radii[1] = topLeftRadiusY
+    radii[0] = topLeftRadius.x
+    radii[1] = topLeftRadius.y
 
-    radii[2] = topRightRadiusX
-    radii[3] = topRightRadiusY
+    radii[2] = topRightRadius.x
+    radii[3] = topRightRadius.y
 
-    radii[4] = bottomRightRadiusX
-    radii[5] = bottomRightRadiusY
+    radii[4] = bottomRightRadius.x
+    radii[5] = bottomRightRadius.y
 
-    radii[6] = bottomLeftRadiusX
-    radii[7] = bottomLeftRadiusY
+    radii[6] = bottomLeftRadius.x
+    radii[7] = bottomLeftRadius.y
 
     return org.jetbrains.skija.RRect.makeComplexLTRB(left, top, right, bottom, radii)
 }

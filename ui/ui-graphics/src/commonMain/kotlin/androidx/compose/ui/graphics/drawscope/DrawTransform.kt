@@ -57,12 +57,44 @@ inline fun DrawTransform.inset(
  * @param pivotY The y-coordinate for the pivot point, defaults to the center of the
  * coordinate space vertically
  */
+@Deprecated("use rotateRad(radians, Offset(pivotX, pivotY)) instead",
+    ReplaceWith("rotateRad(radians, Offset(pivotX, pivotY))",
+        "androidx.compose.ui.graphics.drawscope"
+    )
+)
 @Suppress("NOTHING_TO_INLINE")
 inline fun DrawTransform.rotateRad(
     radians: Float,
     pivotX: Float = center.x,
     pivotY: Float = center.y
-) = rotate(degrees(radians), pivotX, pivotY)
+) = rotate(degrees(radians), Offset(pivotX, pivotY))
+
+/**
+ * Add a rotation (in radians clockwise) to the current transform at the given pivot point.
+ * The pivot coordinate remains unchanged by the rotation transformation
+ *
+ * @param radians to rotate clockwise
+ * @param pivot The coordinate for the pivot point, defaults to the center of the
+ * coordinate space
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline fun DrawTransform.rotateRad(
+    radians: Float,
+    pivot: Offset = center
+) = rotate(degrees(radians), pivot)
+
+/**
+ * Add an axis-aligned scale to the current transform, scaling uniformly in both directions
+ * by the provided scale factor at the pivot coordinate. The pivot coordinate remains
+ * unchanged by the scale transformation.
+ *
+ * @param scale The amount to scale
+ * @param pivot The coordinate for the pivot point, defaults to the center of the
+ * coordinate space
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline fun DrawTransform.scale(scale: Float, pivot: Offset = center) =
+    scale(scale, scale, pivot)
 
 /**
  * Defines transformations that can be applied to a drawing environment
@@ -145,7 +177,25 @@ interface DrawTransform {
      *  @param pivotY The y-coordinate for the pivot point, defaults to the center of the
      *  coordinate space vertically
      */
-    fun rotate(degrees: Float, pivotX: Float = center.x, pivotY: Float = center.y)
+    @Deprecated(
+        "Use rotate(degrees, Offset(pivotX, pivotY))",
+        ReplaceWith(
+            "rotate(degrees, Offset(pivotX, pivotY))",
+            "androidx.compose.ui.graphics.drawscope"
+        )
+    )
+    fun rotate(degrees: Float, pivotX: Float = center.x, pivotY: Float = center.y) =
+        rotate(degrees, Offset(pivotX, pivotY))
+
+    /**
+     *  Add a rotation (in degrees clockwise) to the current transform at the given pivot point.
+     *  The pivot coordinate remains unchanged by the rotation transformation.
+     *
+     *  @param degrees to rotate clockwise
+     *  @param pivot The coordinates for the pivot point, defaults to the center of the
+     *  coordinate space
+     */
+    fun rotate(degrees: Float, pivot: Offset)
 
     /**
      * Add an axis-aligned scale to the current transform, scaling by the first
@@ -163,12 +213,32 @@ interface DrawTransform {
      * @param pivotY The y-coordinate for the pivot point, defaults to the center of the
      * coordinate space vertically
      */
+    @Deprecated(
+        "Use scale(scaleX, scaleY, Offset(pivotX, pivotY))",
+        ReplaceWith(
+            "scale(scaleX, scaleY, Offset(pivotX, pivotY))",
+            "androidx.compose.ui.graphics.drawscope"
+        )
+    )
     fun scale(
         scaleX: Float,
         scaleY: Float = scaleX,
         pivotX: Float = center.x,
         pivotY: Float = center.y
-    )
+    ) = scale(scaleX, scaleY, Offset(pivotX, pivotY))
+
+    /**
+     * Add an axis-aligned scale to the current transform, scaling by the first
+     * argument in the horizontal direction and the second in the vertical
+     * direction at the given pivot coordinate. The pivot coordinate remains
+     * unchanged by the scale transformation.
+     *
+     * @param scaleX The amount to scale in X
+     * @param scaleY The amount to scale in Y
+     * @param pivot The coordinate for the pivot point, defaults to the center of the
+     * coordinate space
+     */
+    fun scale(scaleX: Float, scaleY: Float, pivot: Offset = center)
 
     /**
      * Transform the drawing environment by the given matrix

@@ -75,14 +75,10 @@ class RoundRectTest {
             20f,
             30f,
             40f,
-            5f,
-            10f,
-            15f,
-            20f,
-            25f,
-            30f,
-            35f,
-            40f
+            Radius(5f, 10f),
+            Radius(15f, 20f),
+            Radius(25f, 30f),
+            Radius(35f, 40f)
         )
         assertEquals(right - left, roundRect.width)
     }
@@ -96,14 +92,10 @@ class RoundRectTest {
             top,
             30f,
             bottom,
-            5f,
-            10f,
-            15f,
-            20f,
-            25f,
-            30f,
-            35f,
-            40f
+            Radius(5f, 10f),
+            Radius(15f, 20f),
+            Radius(25f, 30f),
+            Radius(35f, 40f)
         )
         assertEquals(bottom - top, roundRect.height)
     }
@@ -116,14 +108,10 @@ class RoundRectTest {
             15f,
             20f,
             25f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f
+            Radius(30f, 30f),
+            Radius(30f, 30f),
+            Radius(30f, 30f),
+            Radius(30f, 30f)
         )
         assertEquals(roundRect1, roundRect2)
     }
@@ -136,14 +124,10 @@ class RoundRectTest {
             15f,
             20f,
             25f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f
+            Radius(30f, 30f),
+            Radius(30f, 30f),
+            Radius(30f, 30f),
+            Radius(30f, 30f)
         )
         assertEquals(roundRect1, roundRect2)
     }
@@ -156,14 +140,10 @@ class RoundRectTest {
             15f,
             20f,
             25f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f,
-            30f
+            Radius(30f, 30f),
+            Radius(30f, 30f),
+            Radius(30f, 30f),
+            Radius(30f, 30f)
         )
         assertEquals(roundRect1, roundRect2)
     }
@@ -182,15 +162,73 @@ class RoundRectTest {
             15f,
             20f,
             25f,
-            1f,
-            2f,
-            3f,
-            4f,
-            5f,
-            6f,
-            7f,
-            8f
+            Radius(1f, 2f),
+            Radius(3f, 4f),
+            Radius(5f, 6f),
+            Radius(7f, 8f)
         )
         assertEquals(roundRect1, roundRect2)
+    }
+
+    @Test
+    fun testRadiusProperties() {
+        val rr = RoundRect(
+            0f,
+            0f,
+            10f,
+            10f,
+            Radius(10f, 15f),
+            Radius(17f, 20f),
+            Radius (25f, 30f),
+            Radius(35f, 40f)
+        )
+        assertEquals(Radius(10f, 15f), rr.topLeftRadius)
+        assertEquals(Radius(17f, 20f), rr.topRightRadius)
+        assertEquals(Radius(25f, 30f), rr.bottomRightRadius)
+        assertEquals(Radius(35f, 40f), rr.bottomLeftRadius)
+    }
+
+    @Test
+    fun testMinDimension() {
+        val rr = RoundRect(0f, 0f, 100f, 50f, Radius(7f, 8f))
+        assertEquals(50f, rr.minDimension)
+    }
+
+    @Test
+    fun testMaxDimension() {
+        val rr = RoundRect(0f, 0f, 300f, 100f, Radius(5f, 10f))
+        assertEquals(300f, rr.maxDimension)
+    }
+
+    @Test
+    fun testCenter() {
+        val rr = RoundRect(0f, 0f, 200f, 100f, Radius.Zero)
+        assertEquals(Offset(100f, 50f), rr.center)
+    }
+
+    @Test
+    fun testSafeInnerRect() {
+        val insetFactor = 0.29289321881f // 1-cos(pi/4)
+        val rr = RoundRect(left = 0f, top = 0f, right = 100f, bottom = 100f,
+            topLeftRadius = Radius(0f, 5f),
+            topRightRadius = Radius(5f, 10f),
+            bottomRightRadius = Radius(10f, 15f),
+            bottomLeftRadius = Radius(15f, 20f)
+        )
+        assertEquals(
+            Rect(
+                15f * insetFactor,
+                10f * insetFactor,
+                100f - 10f * insetFactor,
+                100f - 20f * insetFactor
+            ),
+            rr.safeInnerRect
+        )
+    }
+
+    @Test
+    fun testBoundingRect() {
+        val rr = RoundRect(1f, 2f, 3f, 4f, Radius(15f, 10f))
+        assertEquals(Rect(1f, 2f, 3f, 4f), rr.boundingRect)
     }
 }

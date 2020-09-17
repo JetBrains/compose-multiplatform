@@ -134,12 +134,35 @@ inline fun DrawScope.translate(
  *  @param block lambda that is called to issue drawing commands within the rotated
  *  coordinate space
  */
+@Deprecated("Use rotate(degrees, Offset(pivotX, pivotY)) instead",
+    ReplaceWith(
+        "rotate(degrees, Offset(pivotX, pivotY))",
+        "androidx.compose.ui.graphics.drawscope"
+    )
+)
 inline fun DrawScope.rotate(
     degrees: Float,
     pivotX: Float = center.x,
     pivotY: Float = center.y,
     block: DrawScope.() -> Unit
-) = withTransform({ rotate(degrees, pivotX, pivotY) }, block)
+) = withTransform({ rotate(degrees, Offset(pivotX, pivotY)) }, block)
+
+/**
+ *  Add a rotation (in degrees clockwise) to the current transform at the given pivot point.
+ *  The pivot coordinate remains unchanged by the rotation transformation. After the provided
+ *  lambda is invoked, the rotation transformation is undone.
+ *
+ *  @param degrees to rotate clockwise
+ *  @param pivot The coordinate for the pivot point, defaults to the center of the
+ *  coordinate space
+ *  @param block lambda that is called to issue drawing commands within the rotated
+ *  coordinate space
+ */
+inline fun DrawScope.rotate(
+    degrees: Float,
+    pivot: Offset = center,
+    block: DrawScope.() -> Unit
+) = withTransform({ rotate(degrees, pivot) }, block)
 
 /**
  * Add a rotation (in radians clockwise) to the current transform at the given pivot point.
@@ -159,7 +182,7 @@ inline fun DrawScope.rotateRad(
     pivotY: Float = center.y,
     block: DrawScope.() -> Unit
 ) {
-    withTransform({ rotate(degrees(radians), pivotX, pivotY) }, block)
+    withTransform({ rotate(degrees(radians), Offset(pivotX, pivotY)) }, block)
 }
 
 /**
@@ -179,13 +202,56 @@ inline fun DrawScope.rotateRad(
  * coordinate space vertically
  * @param block lambda used to issue drawing commands within the scaled coordinate space
  */
+@Deprecated("Use scale(scaleX, scaleY, Offset(pivotX, pivotY))",
+    ReplaceWith(
+        "scale(scaleX, scaleY, Offset(pivotX, pivotY))",
+        "androidx.compose.ui.graphics.drawscope"
+    )
+)
 inline fun DrawScope.scale(
     scaleX: Float,
     scaleY: Float = scaleX,
     pivotX: Float = center.x,
     pivotY: Float = center.y,
     block: DrawScope.() -> Unit
-) = withTransform({ scale(scaleX, scaleY, pivotX, pivotY) }, block)
+) = withTransform({ scale(scaleX, scaleY, Offset(pivotX, pivotY)) }, block)
+
+/**
+ * Add an axis-aligned scale to the current transform, scaling by the first
+ * argument in the horizontal direction and the second in the vertical
+ * direction at the given pivot coordinate. The pivot coordinate remains
+ * unchanged by the scale transformation. After this method is invoked, the
+ * coordinate space is returned to the state before the scale was applied.
+ *
+ * @param scaleX The amount to scale in X
+ * @param scaleY The amount to scale in Y
+ * @param pivot The coordinate for the pivot point, defaults to the center of the
+ * coordinate space
+ * @param block lambda used to issue drawing commands within the scaled coordinate space
+ */
+inline fun DrawScope.scale(
+    scaleX: Float,
+    scaleY: Float,
+    pivot: Offset = center,
+    block: DrawScope.() -> Unit
+) = withTransform({ scale(scaleX, scaleY, pivot) }, block)
+
+/**
+ * Add an axis-aligned scale to the current transform, scaling both the horizontal direction and
+ * the vertical direction at the given pivot coordinate. The pivot coordinate remains
+ * unchanged by the scale transformation. After this method is invoked, the
+ * coordinate space is returned to the state before the scale was applied.
+ *
+ * @param scale The amount to scale uniformly in both directions
+ * @param pivot The coordinate for the pivot point, defaults to the center of the
+ * coordinate space
+ * @param block lambda used to issue drawing commands within the scaled coordinate space
+ */
+inline fun DrawScope.scale(
+    scale: Float,
+    pivot: Offset = center,
+    block: DrawScope.() -> Unit
+) = withTransform({ scale(scale, scale, pivot) }, block)
 
 /**
  * Reduces the clip region to the intersection of the current clip and the
@@ -333,19 +399,19 @@ abstract class DrawScope : Density {
             this@DrawScope.canvas.translate(left, top)
         }
 
-        override fun rotate(degrees: Float, pivotX: Float, pivotY: Float) {
+        override fun rotate(degrees: Float, pivot: Offset) {
             this@DrawScope.canvas.apply {
-                translate(pivotX, pivotY)
+                translate(pivot.x, pivot.y)
                 rotate(degrees)
-                translate(-pivotX, -pivotY)
+                translate(-pivot.x, -pivot.y)
             }
         }
 
-        override fun scale(scaleX: Float, scaleY: Float, pivotX: Float, pivotY: Float) {
+        override fun scale(scaleX: Float, scaleY: Float, pivot: Offset) {
             this@DrawScope.canvas.apply {
-                translate(pivotX, pivotY)
+                translate(pivot.x, pivot.y)
                 scale(scaleX, scaleY)
-                translate(-pivotX, -pivotY)
+                translate(-pivot.x, -pivot.y)
             }
         }
 
