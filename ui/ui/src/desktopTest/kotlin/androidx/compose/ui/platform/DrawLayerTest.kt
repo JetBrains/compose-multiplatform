@@ -26,7 +26,7 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.ui.test.DesktopScreenshotTestRule
-import androidx.ui.test.TestSkiaWindow
+import androidx.ui.test.TestComposeWindow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +39,7 @@ class DrawLayerTest {
 
     @Test
     fun scale() {
-        val window = TestSkiaWindow(width = 40, height = 40)
+        val window = TestComposeWindow(width = 40, height = 40)
         window.setContent {
             Box(
                 Modifier
@@ -66,7 +66,7 @@ class DrawLayerTest {
 
     @Test
     fun rotationZ() {
-        val window = TestSkiaWindow(width = 40, height = 40)
+        val window = TestComposeWindow(width = 40, height = 40)
         window.setContent {
             Box(
                 Modifier
@@ -94,7 +94,7 @@ class DrawLayerTest {
 
     @Test
     fun clip() {
-        val window = TestSkiaWindow(width = 40, height = 40)
+        val window = TestComposeWindow(width = 40, height = 40)
         window.setContent {
             Box(
                 Modifier

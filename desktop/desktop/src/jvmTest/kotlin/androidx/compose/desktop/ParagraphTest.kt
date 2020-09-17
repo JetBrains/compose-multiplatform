@@ -37,7 +37,7 @@ import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.ui.test.DesktopScreenshotTestRule
-import androidx.ui.test.TestSkiaWindow
+import androidx.ui.test.TestComposeWindow
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -77,7 +77,7 @@ class ParagraphTest {
     @Ignore
     @Test
     fun paragraphBasics() {
-        val window = TestSkiaWindow(width = 1024, height = 768)
+        val window = TestComposeWindow(width = 1024, height = 768)
 
         window.setContent {
             ProvideTextStyle(TextStyle(fontFamily = fontFamily)) {

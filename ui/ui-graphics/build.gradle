@@ -65,6 +65,16 @@ kotlin {
             implementation(ESPRESSO_CORE)
             implementation(JUNIT)
         }
+
+        desktopTest {
+            resources.srcDirs += "src/desktopTest/res"
+            dependencies {
+                implementation project(":ui:ui-test")
+                implementation(JUNIT)
+                implementation(TRUTH)
+                implementation(SKIKO_CURRENT_OS)
+            }
+        }
     }
 }
 
@@ -75,6 +85,10 @@ androidx {
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Compose graphics"
+}
+
+tasks.findByName("desktopTest").configure {
+    systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../../golden"
 }
 
 tasks.withType(KotlinCompile).configureEach {

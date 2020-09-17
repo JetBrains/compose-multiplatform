@@ -60,10 +60,6 @@ kotlin {
                 implementation(TRUTH)
             }
         }
-
-        test.dependencies {
-            implementation project(":ui:ui-test")
-        }
     }
 }
 
