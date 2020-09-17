@@ -44,7 +44,7 @@ import kotlin.math.sign
 @OptIn(ExperimentalLayoutNodeApi::class)
 internal fun rowColumnMeasureBlocks(
     orientation: LayoutOrientation,
-    arrangement: (Int, List<Int>, LayoutDirection, Density, MutableList<Int>) -> Unit,
+    arrangement: (Int, IntArray, LayoutDirection, Density, IntArray) -> Unit,
     arrangementSpacing: Dp,
     crossAxisSize: SizeMode,
     crossAxisAlignment: CrossAxisAlignment
@@ -222,9 +222,11 @@ internal fun rowColumnMeasureBlocks(
             mainAxisLayoutSize
         }
 
-        val mainAxisPositions = MutableList(measurables.size) { 0 }
+        val mainAxisPositions = IntArray(measurables.size) { 0 }
         layout(layoutWidth, layoutHeight) {
-            val childrenMainAxisSize = placeables.map { it!!.mainAxisSize() }
+            val childrenMainAxisSize = IntArray(measurables.size) { index ->
+                placeables[index]!!.mainAxisSize()
+            }
             arrangement(
                 mainAxisLayoutSize,
                 childrenMainAxisSize,
