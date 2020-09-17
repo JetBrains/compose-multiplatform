@@ -105,7 +105,7 @@ internal class DesktopParagraph(
     intrinsics: ParagraphIntrinsics,
     val maxLines: Int,
     val ellipsis: Boolean,
-    width: Float
+    override val width: Float
 ) : Paragraph {
 
     val paragraphIntrinsics = intrinsics as DesktopParagraphIntrinsics
@@ -126,9 +126,6 @@ internal class DesktopParagraph(
 
     private val text: String
         get() = paragraphIntrinsics.text
-
-    override val width: Float
-        get() = para.getMaxWidth()
 
     override val height: Float
         get() = para.getHeight()
