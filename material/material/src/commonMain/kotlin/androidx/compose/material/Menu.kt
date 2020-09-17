@@ -23,6 +23,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ContentGravity
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
@@ -162,18 +164,28 @@ fun DropdownMenu(
  * @param modifier The modifier to be applied to the menu item
  * @param enabled Controls the enabled state of the menu item - when `false`, the menu item
  * will not be clickable and [onClick] will not be invoked
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this DropdownMenuItem. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this DropdownMenuItem in different [Interaction]s.
  */
 @Composable
 fun DropdownMenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     content: @Composable () -> Unit
 ) {
     // TODO(popam, b/156911853): investigate replacing this Box with ListItem
     Box(
         modifier = modifier
-            .clickable(enabled = enabled, onClick = onClick, indication = RippleIndication(true))
+            .clickable(
+                enabled = enabled,
+                onClick = onClick,
+                interactionState = interactionState,
+                indication = RippleIndication(true)
+            )
             .fillMaxWidth()
             // Preferred min and max width used during the intrinsic measurement.
             .preferredSizeIn(

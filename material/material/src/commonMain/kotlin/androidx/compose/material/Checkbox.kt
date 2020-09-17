@@ -25,6 +25,8 @@ import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -63,6 +65,10 @@ import androidx.compose.ui.util.lerp
  * @param modifier Modifier to be applied to the layout of the checkbox
  * @param enabled enabled whether or not this [Checkbox] will handle input events and appear
  * enabled for semantics purposes
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Checkbox. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this Checkbox in different [Interaction]s.
  * @param checkedColor color of the box of the Checkbox when [checked]. See
  * [TriStateCheckbox] to fully customize the color of the checkmark / box / border in different
  * states.
@@ -76,12 +82,14 @@ fun Checkbox(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     checkedColor: Color = MaterialTheme.colors.secondary,
     uncheckedColor: Color = CheckboxConstants.defaultUncheckedColor
 ) {
     TriStateCheckbox(
         state = ToggleableState(checked),
         onClick = { onCheckedChange(!checked) },
+        interactionState = interactionState,
         enabled = enabled,
         boxColor = CheckboxConstants.animateDefaultBoxColor(
             state = ToggleableState(checked),
@@ -115,6 +123,10 @@ fun Checkbox(
  * @param modifier Modifier to be applied to the layout of the checkbox
  * @param enabled whether or not this [TriStateCheckbox] will handle input events and
  * appear enabled for semantics purposes
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this TriStateCheckbox. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this TriStateCheckbox in different [Interaction]s.
  * @param checkMarkColor color of the check mark of the [TriStateCheckbox]. See
  * [CheckboxConstants.animateDefaultCheckmarkColor] for customizing the check mark color in
  * different [state]s.
@@ -131,6 +143,7 @@ fun TriStateCheckbox(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     checkMarkColor: Color = CheckboxConstants.animateDefaultCheckmarkColor(state),
     boxColor: Color = CheckboxConstants.animateDefaultBoxColor(state, enabled),
     borderColor: Color = CheckboxConstants.animateDefaultBorderColor(state, enabled)
@@ -142,6 +155,7 @@ fun TriStateCheckbox(
                 state = state,
                 onClick = onClick,
                 enabled = enabled,
+                interactionState = interactionState,
                 indication = RippleIndication(bounded = false, radius = CheckboxRippleRadius)
             )
             .padding(CheckboxDefaultPadding),
