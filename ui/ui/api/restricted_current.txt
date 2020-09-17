@@ -340,16 +340,16 @@ package androidx.compose.ui {
 
   public abstract static class Placeable.PlacementScope {
     ctor public Placeable.PlacementScope();
-    method public abstract androidx.compose.ui.unit.LayoutDirection getParentLayoutDirection();
-    method public abstract int getParentWidth();
+    method protected abstract androidx.compose.ui.unit.LayoutDirection getParentLayoutDirection();
+    method protected abstract int getParentWidth();
     method public final void place(androidx.compose.ui.Placeable, int x, int y);
     method public final void place-LmmdDA8(androidx.compose.ui.Placeable, long position);
     method public final void place-gl1q84w(androidx.compose.ui.Placeable, long position);
     method public final void placeRelative(androidx.compose.ui.Placeable, int x, int y);
     method public final void placeRelative-LmmdDA8(androidx.compose.ui.Placeable, long position);
     method public final void placeRelative-gl1q84w(androidx.compose.ui.Placeable, long position);
-    property public abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
-    property public abstract int parentWidth;
+    property protected abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
+    property protected abstract int parentWidth;
   }
 
   public interface Remeasurement {
