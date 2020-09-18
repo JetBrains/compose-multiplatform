@@ -38,19 +38,24 @@ class ConverterTest {
         val converter = (Color.VectorConverter)(ColorSpaces.Srgb)
         assertEquals(converter.convertFromVector(AnimationVector4D(1f, 1f, 0f, 0f)), Color.Red)
         assertEquals(converter.convertToVector(Color.Green), AnimationVector4D(1f, 0f, 1f, 0f))
-        assertEquals(converter.convertFromVector(AnimationVector4D(0f, 0f, 0f, 1f)),
-            Color(alpha = 0f, red = 0f, green = 0f, blue = 1f))
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(0f, 0f, 0f, 1f)),
+            Color(alpha = 0f, red = 0f, green = 0f, blue = 1f)
+        )
     }
 
     @Test
     fun testRectConverter() {
         assertEquals(
             Rect.VectorConverter.convertToVector(Rect(1f, 2f, 3f, 4f)),
-            AnimationVector4D(1f, 2f, 3f, 4f))
+            AnimationVector4D(1f, 2f, 3f, 4f)
+        )
         assertEquals(
             Rect.VectorConverter.convertFromVector(
-            AnimationVector4D(-400f, -300f, -200f, -100f)),
-            Rect(-400f, -300f, -200f, -100f))
+                AnimationVector4D(-400f, -300f, -200f, -100f)
+            ),
+            Rect(-400f, -300f, -200f, -100f)
+        )
     }
 
     @Test
@@ -66,9 +71,13 @@ class ConverterTest {
     fun testOffsetConverter() {
         val x = Random.nextFloat()
         val y = Random.nextFloat()
-        assertEquals(Offset(x, y),
-            Offset.VectorConverter.convertFromVector(AnimationVector2D(x, y)))
-        assertEquals(AnimationVector2D(x, y),
-            Offset.VectorConverter.convertToVector(Offset(x, y)))
+        assertEquals(
+            Offset(x, y),
+            Offset.VectorConverter.convertFromVector(AnimationVector2D(x, y))
+        )
+        assertEquals(
+            AnimationVector2D(x, y),
+            Offset.VectorConverter.convertToVector(Offset(x, y))
+        )
     }
 }

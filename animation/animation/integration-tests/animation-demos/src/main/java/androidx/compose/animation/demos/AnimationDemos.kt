@@ -19,20 +19,27 @@ package androidx.compose.animation.demos
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-val AnimationDemos = DemoCategory("Animation", listOf(
-    ComposableDemo("Animate multi-dimensional prop") { MultiDimensionalAnimationDemo() },
-    ComposableDemo("Animate") { SingleValueAnimationDemo() },
-    ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
-    ComposableDemo("Animate Content Size") { AnimateContentSizeDemo() },
-    ComposableDemo("Animate Visibility Demo") { AnimatedVisibilityDemo() },
-    ComposableDemo("Animate Visibility Lazy Column Demo") { AnimatedVisibilityLazyColumnDemo() },
-    ComposableDemo("Cross Fade") { CrossfadeDemo() },
-    ComposableDemo("Enter/Exit Transition Demo") { EnterExitTransitionDemo() },
-    ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
-    ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },
-    ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
-    ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
-    ComposableDemo("State animation with interruptions") { StateAnimationWithInterruptionsDemo() },
-    ComposableDemo("State based ripple") { StateBasedRippleDemo() },
-    ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() }
-))
+val AnimationDemos = DemoCategory(
+    "Animation",
+    listOf(
+        ComposableDemo("Animate multi-dimensional prop") { MultiDimensionalAnimationDemo() },
+        ComposableDemo("Animate") { SingleValueAnimationDemo() },
+        ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
+        ComposableDemo("Animate Content Size") { AnimateContentSizeDemo() },
+        ComposableDemo("Animate Visibility Demo") { AnimatedVisibilityDemo() },
+        ComposableDemo("Animate Visibility Lazy Column Demo") {
+            AnimatedVisibilityLazyColumnDemo()
+        },
+        ComposableDemo("Cross Fade") { CrossfadeDemo() },
+        ComposableDemo("Enter/Exit Transition Demo") { EnterExitTransitionDemo() },
+        ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
+        ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },
+        ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
+        ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
+        ComposableDemo("State animation with interruptions") {
+            StateAnimationWithInterruptionsDemo()
+        },
+        ComposableDemo("State based ripple") { StateBasedRippleDemo() },
+        ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() }
+    )
+)

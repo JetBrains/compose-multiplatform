@@ -53,29 +53,36 @@ fun FancyScrollingDemo() {
         )
         val animScroll = animatedFloat(0f)
         val itemWidth = remember { mutableStateOf(0f) }
-        val gesture = Modifier.rawDragGestureFilter(dragObserver = object : DragObserver {
-            override fun onDrag(dragDistance: Offset): Offset {
-                // Snap to new drag position
-                animScroll.snapTo(animScroll.value + dragDistance.x)
-                return dragDistance
-            }
+        val gesture = Modifier.rawDragGestureFilter(
+            dragObserver = object : DragObserver {
+                override fun onDrag(dragDistance: Offset): Offset {
+                    // Snap to new drag position
+                    animScroll.snapTo(animScroll.value + dragDistance.x)
+                    return dragDistance
+                }
 
-            override fun onStop(velocity: Offset) {
+                override fun onStop(velocity: Offset) {
 
-                // Uses default decay animation to calculate where the fling will settle,
-                // and adjust that position as needed. The target animation will be used for
-                // animating to the adjusted target.
-                animScroll.fling(velocity.x, adjustTarget = { target ->
-                    // Adjust the target position to center align the item
-                    var rem = target % itemWidth.value
-                    if (rem < 0) {
-                        rem += itemWidth.value
-                    }
-                    TargetAnimation((target - rem),
-                        SpringSpec(dampingRatio = 2.0f, stiffness = 100f))
-                })
+                    // Uses default decay animation to calculate where the fling will settle,
+                    // and adjust that position as needed. The target animation will be used for
+                    // animating to the adjusted target.
+                    animScroll.fling(
+                        velocity.x,
+                        adjustTarget = { target ->
+                            // Adjust the target position to center align the item
+                            var rem = target % itemWidth.value
+                            if (rem < 0) {
+                                rem += itemWidth.value
+                            }
+                            TargetAnimation(
+                                (target - rem),
+                                SpringSpec(dampingRatio = 2.0f, stiffness = 100f)
+                            )
+                        }
+                    )
+                }
             }
-        })
+        )
 
         Canvas(gesture.fillMaxWidth().preferredHeight(400.dp)) {
             val width = size.width / 2f
@@ -83,8 +90,9 @@ fun FancyScrollingDemo() {
             itemWidth.value = width
             if (DEBUG) {
                 Log.w(
-                    "Anim", "Drawing items with updated" +
-                            " AnimatedFloat: ${animScroll.value}"
+                    "Anim",
+                    "Drawing items with updated" +
+                        " AnimatedFloat: ${animScroll.value}"
                 )
             }
             drawItems(scroll, width, size.height)

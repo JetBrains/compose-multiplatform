@@ -72,10 +72,12 @@ fun AnimatedItems(animateContentSize: Boolean) {
     Stack(
         Modifier.padding(bottom = 20.dp)
     ) {
-        Button(modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
+        Button(
+            modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
             onClick = {
                 counter = (counter + 1) % 12
-            }) {
+            }
+        ) {
             Text("Click Me")
         }
 
@@ -89,7 +91,7 @@ fun AnimatedItems(animateContentSize: Boolean) {
                 Item(
                     pastelColors[0],
                     "Expand Vertically + Fade In\nShrink " +
-                            "Vertically + Fade Out\n(Column Default)"
+                        "Vertically + Fade Out\n(Column Default)"
                 )
             }
             HorizontalTransition(visible = itemNum > 1) {
@@ -97,8 +99,9 @@ fun AnimatedItems(animateContentSize: Boolean) {
             }
             SlideTransition(visible = itemNum > 2) {
                 Item(
-                    pastelColors[2], "Slide In Horizontally + Fade In\nSlide Out Horizontally + " +
-                            "Fade Out"
+                    pastelColors[2],
+                    "Slide In Horizontally + Fade In\nSlide Out Horizontally + " +
+                        "Fade Out"
                 )
             }
             AnimatedVisibility(
@@ -113,8 +116,9 @@ fun AnimatedItems(animateContentSize: Boolean) {
             }
             FullyLoadedTransition(visible = itemNum > 5) {
                 Item(
-                    pastelColors[0], "Expand Vertically + Fade In + Slide In Vertically\n" +
-                            "Shrink Vertically + Fade Out + Slide Out Vertically"
+                    pastelColors[0],
+                    "Expand Vertically + Fade In + Slide In Vertically\n" +
+                        "Shrink Vertically + Fade Out + Slide Out Vertically"
                 )
             }
         }
@@ -210,7 +214,8 @@ fun FadeTransition(visible: Boolean, children: @Composable () -> Unit) {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FullyLoadedTransition(visible: Boolean, children: @Composable () -> Unit) {
-    AnimatedVisibility(visible = visible,
+    AnimatedVisibility(
+        visible = visible,
         enter = slideInVertically(
             // Start the slide from 40 (pixels) above where the content is supposed to go, to
             // produce a parallax effect
@@ -218,7 +223,8 @@ fun FullyLoadedTransition(visible: Boolean, children: @Composable () -> Unit) {
         ) + expandVertically(
             expandFrom = Alignment.Top
         ) + fadeIn(initialAlpha = 0.3f),
-        exit = slideOutVertically() + shrinkVertically() + fadeOut()) {
+        exit = slideOutVertically() + shrinkVertically() + fadeOut()
+    ) {
         children()
     }
 }

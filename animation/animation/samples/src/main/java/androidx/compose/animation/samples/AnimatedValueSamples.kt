@@ -70,10 +70,13 @@ fun ArbitraryValueTypeTransitionSample() {
                 MySize(100.dp, 100.dp)
             }
         }
-        val animSize = animate<MySize, AnimationVector2D>(mySize, TwoWayConverter(
-            convertToVector = { AnimationVector2D(it.width.value, it.height.value) },
-            convertFromVector = { MySize(it.v1.dp, it.v2.dp) }
-        ))
+        val animSize = animate<MySize, AnimationVector2D>(
+            mySize,
+            TwoWayConverter(
+                convertToVector = { AnimationVector2D(it.width.value, it.height.value) },
+                convertFromVector = { MySize(it.v1.dp, it.v2.dp) }
+            )
+        )
         Box(Modifier.preferredSize(animSize.width, animSize.height).background(color = Color.Red))
     }
 }

@@ -61,7 +61,8 @@ private fun RippleRect() {
     }
     val state = transition(definition = rippleTransDef, toState = toState.value)
     RippleRectFromState(
-        Modifier.pressIndicatorGestureFilter(onStart = onPress, onStop = onRelease), state = state)
+        Modifier.pressIndicatorGestureFilter(onStart = onPress, onStop = onRelease), state = state
+    )
 }
 
 @Composable

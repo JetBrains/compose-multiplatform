@@ -969,7 +969,8 @@ private class ChangeSizeTransition(
                         IntSize.VectorConverter,
                         clock,
                         visibilityThreshold = IntSize(1, 1)
-                    ), enter.alignment, enter.clip, listener
+                    ),
+                    enter.alignment, enter.clip, listener
                 )
                 // Animate to full size
                 sizeAnim = anim.animateTo(

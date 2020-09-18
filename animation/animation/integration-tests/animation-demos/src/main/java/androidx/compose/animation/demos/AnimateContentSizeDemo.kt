@@ -65,14 +65,16 @@ fun text() {
     val shortText = "Click me"
     val longText = "Very long text\nthat spans across\nmultiple lines"
     var short by remember { mutableStateOf(true) }
-    Box(modifier = Modifier
-        .background(Color.Blue,
-            RoundedCornerShape(15.dp)
-        )
-        .clickable { short = !short }
-        .padding(20.dp)
-        .wrapContentSize()
-        .animateContentSize { startSize, endSize -> println("$startSize -> $endSize") }
+    Box(
+        modifier = Modifier
+            .background(
+                Color.Blue,
+                RoundedCornerShape(15.dp)
+            )
+            .clickable { short = !short }
+            .padding(20.dp)
+            .wrapContentSize()
+            .animateContentSize { startSize, endSize -> println("$startSize -> $endSize") }
     ) {
         Text(
             if (short) {
