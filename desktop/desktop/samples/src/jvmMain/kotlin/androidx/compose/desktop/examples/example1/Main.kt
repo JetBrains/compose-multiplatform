@@ -122,10 +122,12 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                 if (animation.value) {
                     appendInlineContent(inlineIndicatorId)
                 }
-                pushStyle(SpanStyle(
-                    color = Color(0xff964B00),
-                    shadow = Shadow(Color.Green, offset = Offset(1f, 1f))
-                ))
+                pushStyle(
+                    SpanStyle(
+                        color = Color(0xff964B00),
+                        shadow = Shadow(Color.Green, offset = Offset(1f, 1f))
+                    )
+                )
                 append("brown fox")
                 pop()
                 pushStyle(SpanStyle(background = Color.Yellow))
@@ -165,13 +167,13 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             TextDecoration.LineThrough
         )
         val lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do" +
-                " eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad" +
-                " minim veniam, quis nostrud exercitation ullamco laboris nisi ut" +
-                " aliquipex ea commodo consequat. Duis aute irure dolor in reprehenderit" +
-                " in voluptate velit esse cillum dolore eu fugiat nulla pariatur." +
-                " Excepteur" +
-                " sint occaecat cupidatat non proident, sunt in culpa qui officia" +
-                " deserunt mollit anim id est laborum."
+            " eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad" +
+            " minim veniam, quis nostrud exercitation ullamco laboris nisi ut" +
+            " aliquipex ea commodo consequat. Duis aute irure dolor in reprehenderit" +
+            " in voluptate velit esse cillum dolore eu fugiat nulla pariatur." +
+            " Excepteur" +
+            " sint occaecat cupidatat non proident, sunt in culpa qui officia" +
+            " deserunt mollit anim id est laborum."
         var loremDecoration by remember { mutableStateOf(0) }
         Text(
             text = lorem,
@@ -200,13 +202,13 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
 
         Text(
             text = "fun <T : Comparable<T>> List<T>.quickSort(): List<T> = when {\n" +
-                    "  size < 2 -> this\n" +
-                    "  else -> {\n" +
-                    "    val pivot = first()\n" +
-                    "    val (smaller, greater) = drop(1).partition { it <= pivot }\n" +
-                    "    smaller.quickSort() + pivot + greater.quickSort()\n" +
-                    "   }\n" +
-                    "}",
+                "  size < 2 -> this\n" +
+                "  else -> {\n" +
+                "    val pivot = first()\n" +
+                "    val (smaller, greater) = drop(1).partition { it <= pivot }\n" +
+                "    smaller.quickSort() + pivot + greater.quickSort()\n" +
+                "   }\n" +
+                "}",
             modifier = Modifier.padding(10.dp).pointerMoveFilter(
                 onMove = { position ->
                     println("MOVE: $position")
@@ -221,12 +223,16 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                     println("UNHOVER!")
                     text.value = "UNHOVER ${amount.value}"
                     false
-                })
+                }
+            )
         )
 
-        Button(modifier = Modifier.padding(4.dp), onClick = {
-            amount.value++
-        }) {
+        Button(
+            modifier = Modifier.padding(4.dp),
+            onClick = {
+                amount.value++
+            }
+        ) {
             Text("Base")
         }
 
@@ -239,7 +245,8 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                     modifier = Modifier.padding(4.dp),
                     onClick = {
                         animation.value = !animation.value
-                    }) {
+                    }
+                ) {
                     Text("Toggle")
                 }
 
@@ -249,7 +256,8 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                         Window(size = IntSize(400, 200)) {
                             Animations(isCircularEnabled = animation.value)
                         }
-                    }) {
+                    }
+                ) {
                     Text("Window")
                 }
             }
@@ -257,8 +265,10 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             Animations(isCircularEnabled = animation.value)
         }
 
-        Slider(value = amount.value.toFloat() / 100f,
-            onValueChange = { amount.value = (it * 100).toInt() })
+        Slider(
+            value = amount.value.toFloat() / 100f,
+            onValueChange = { amount.value = (it * 100).toInt() }
+        )
         TextField(
             value = amount.value.toString(),
             onValueChange = { amount.value = it.toIntOrNull() ?: 42 },

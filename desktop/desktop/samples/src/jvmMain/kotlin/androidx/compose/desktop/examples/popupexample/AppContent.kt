@@ -73,9 +73,12 @@ fun content() {
                                 println("Second window is dismissed.")
                             }
                         ).show {
-                            WindowContent(amount, onClose = {
-                                AppManager.getCurrentFocusedWindow()?.close()
-                            })
+                            WindowContent(
+                                amount,
+                                onClose = {
+                                    AppManager.getCurrentFocusedWindow()?.close()
+                                }
+                            )
                         }
                     }
                 )

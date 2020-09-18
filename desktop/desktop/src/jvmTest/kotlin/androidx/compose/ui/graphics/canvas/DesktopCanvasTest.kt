@@ -121,49 +121,70 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
 
     @Test
     fun drawLine() {
-        canvas.drawLine(Offset(-4f, -4f), Offset(4f, 4f), Paint().apply {
-            color = Color.Red
-            strokeWidth = 1f
-            strokeCap = StrokeCap.Butt
-        })
-        canvas.drawLine(Offset(8f, 4f), Offset(8f, 12f), Paint().apply {
-            color = Color.Blue
-            strokeWidth = 4f
-            strokeCap = StrokeCap.Butt
-        })
-        canvas.drawLine(Offset(12f, 4f), Offset(12f, 12f), Paint().apply {
-            color = Color.Green
-            strokeWidth = 4f
-            strokeCap = StrokeCap.Round
-        })
-        canvas.drawLine(Offset(4f, 4f), Offset(4f, 12f), Paint().apply {
-            color = Color.Black.copy(alpha = 0.5f)
-            strokeWidth = 4f
-            strokeCap = StrokeCap.Square
-        })
+        canvas.drawLine(
+            Offset(-4f, -4f), Offset(4f, 4f),
+            Paint().apply {
+                color = Color.Red
+                strokeWidth = 1f
+                strokeCap = StrokeCap.Butt
+            }
+        )
+        canvas.drawLine(
+            Offset(8f, 4f), Offset(8f, 12f),
+            Paint().apply {
+                color = Color.Blue
+                strokeWidth = 4f
+                strokeCap = StrokeCap.Butt
+            }
+        )
+        canvas.drawLine(
+            Offset(12f, 4f), Offset(12f, 12f),
+            Paint().apply {
+                color = Color.Green
+                strokeWidth = 4f
+                strokeCap = StrokeCap.Round
+            }
+        )
+        canvas.drawLine(
+            Offset(4f, 4f), Offset(4f, 12f),
+            Paint().apply {
+                color = Color.Black.copy(alpha = 0.5f)
+                strokeWidth = 4f
+                strokeCap = StrokeCap.Square
+            }
+        )
 
         // should draw antialiased two-pixel line
-        canvas.drawLine(Offset(4f, 4f), Offset(4f, 12f), Paint().apply {
-            color = Color.Yellow
-            strokeWidth = 1f
-            strokeCap = StrokeCap.Butt
-        })
+        canvas.drawLine(
+            Offset(4f, 4f), Offset(4f, 12f),
+            Paint().apply {
+                color = Color.Yellow
+                strokeWidth = 1f
+                strokeCap = StrokeCap.Butt
+            }
+        )
 
         // should draw aliased one-pixel line
-        canvas.drawLine(Offset(4f, 4f), Offset(4f, 12f), Paint().apply {
-            color = Color.Yellow
-            strokeWidth = 1f
-            strokeCap = StrokeCap.Butt
-            isAntiAlias = false
-        })
+        canvas.drawLine(
+            Offset(4f, 4f), Offset(4f, 12f),
+            Paint().apply {
+                color = Color.Yellow
+                strokeWidth = 1f
+                strokeCap = StrokeCap.Butt
+                isAntiAlias = false
+            }
+        )
 
         // shouldn't draw any line
-        canvas.drawLine(Offset(4f, 4f), Offset(4f, 12f), Paint().apply {
-            color = Color.Yellow
-            strokeWidth = 0f
-            strokeCap = StrokeCap.Butt
-            isAntiAlias = false
-        })
+        canvas.drawLine(
+            Offset(4f, 4f), Offset(4f, 12f),
+            Paint().apply {
+                color = Color.Yellow
+                strokeWidth = 0f
+                strokeCap = StrokeCap.Butt
+                isAntiAlias = false
+            }
+        )
 
         screenshotRule.snap(surface)
     }
@@ -204,7 +225,8 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
         canvas.drawRect(0f, 0f, 16f, 16f, redPaint)
 
         canvas.withSaveLayer(
-            Rect(left = 4f, top = 8f, right = 12f, bottom = 16f), redPaint.apply {
+            Rect(left = 4f, top = 8f, right = 12f, bottom = 16f),
+            redPaint.apply {
                 blendMode = BlendMode.Plus
             }
         ) {
