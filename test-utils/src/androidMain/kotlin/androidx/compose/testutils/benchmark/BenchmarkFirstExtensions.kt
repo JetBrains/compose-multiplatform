@@ -148,8 +148,10 @@ fun ComposeExecutionControl.recomposeUntilNoChangesPending(maxAmountOfStep: Int 
     }
 
     // Still not stable
-    throw AssertionError("Changes are still pending after '$maxAmountOfStep' " +
-            "frames.")
+    throw AssertionError(
+        "Changes are still pending after '$maxAmountOfStep' " +
+            "frames."
+    )
 }
 
 private class LayeredCaseAdapter(private val innerCase: LayeredComposeTestCase) : ComposeTestCase {

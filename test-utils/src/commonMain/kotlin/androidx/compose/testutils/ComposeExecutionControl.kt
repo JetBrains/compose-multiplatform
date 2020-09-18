@@ -213,7 +213,8 @@ fun ComposeExecutionControl.doFramesAssertAllHadChangesExceptLastOne(
 
     if (framesDone < numberOfFramesToBeStable) {
         throw AssertionError(
-            "Hierarchy got stable in frame '$framesDone', which is before expected!")
+            "Hierarchy got stable in frame '$framesDone', which is before expected!"
+        )
     }
 }
 
@@ -237,6 +238,8 @@ fun ComposeExecutionControl.doFramesUntilNoChangesPending(maxAmountOfFrames: Int
     }
 
     // Still not stable
-    throw AssertionError("Changes are still pending after '$maxAmountOfFrames' " +
-            "frames.")
+    throw AssertionError(
+        "Changes are still pending after '$maxAmountOfFrames' " +
+            "frames."
+    )
 }
