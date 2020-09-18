@@ -167,7 +167,8 @@ fun TextDemoSelectionEnableAndDisable() {
 
     SelectionContainer(
         selection = selection.value,
-        onSelectionChange = { selection.value = it }) {
+        onSelectionChange = { selection.value = it }
+    ) {
         Column(Modifier.fillMaxHeight()) {
             Text(
                 text = textSelectable,

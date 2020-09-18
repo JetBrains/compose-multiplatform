@@ -94,7 +94,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun toggleFlagOnDialog() {
         var properties: AndroidDialogProperties?
-            by mutableStateOf(AndroidDialogProperties(SecureFlagPolicy.SecureOff))
+        by mutableStateOf(AndroidDialogProperties(SecureFlagPolicy.SecureOff))
 
         rule.setContent {
             TestDialog(properties)

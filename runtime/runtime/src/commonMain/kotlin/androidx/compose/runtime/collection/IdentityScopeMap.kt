@@ -109,7 +109,8 @@ internal class IdentityScopeMap<T : Any> {
             val valueIndex = valueOrder[size]
             values[valueIndex] = value
             val scopeSet = scopeSets[valueIndex] ?: IdentityArraySet<T>().also {
-                scopeSets[valueIndex] = it }
+                scopeSets[valueIndex] = it
+            }
 
             // insert into the right location in keyOrder
             if (insertIndex < size) {

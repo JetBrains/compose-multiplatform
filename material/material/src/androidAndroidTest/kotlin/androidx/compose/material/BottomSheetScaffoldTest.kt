@@ -105,7 +105,7 @@ class BottomSheetScaffoldTest {
             BottomSheetScaffold(
                 scaffoldState = rememberBottomSheetScaffoldState(
                     bottomSheetState =
-                    rememberBottomSheetState(initialValue = BottomSheetValue.Expanded)
+                        rememberBottomSheetState(initialValue = BottomSheetValue.Expanded)
                 ),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
@@ -126,7 +126,7 @@ class BottomSheetScaffoldTest {
         rule.setContent {
             BottomSheetScaffold(
                 scaffoldState =
-                rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
@@ -163,7 +163,7 @@ class BottomSheetScaffoldTest {
         rule.setContent {
             BottomSheetScaffold(
                 scaffoldState =
-                rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
@@ -201,7 +201,7 @@ class BottomSheetScaffoldTest {
         rule.setContent {
             BottomSheetScaffold(
                 scaffoldState =
-                rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },

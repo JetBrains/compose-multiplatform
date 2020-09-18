@@ -22,14 +22,14 @@ import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 
 fun ComposeWindow.setContent(content: @Composable () -> Unit):
-        Composition {
-    val owners = DesktopOwners(this.layer.wrapped, this::needRedrawLayer)
-    val owner = DesktopOwner(owners)
+    Composition {
+        val owners = DesktopOwners(this.layer.wrapped, this::needRedrawLayer)
+        val owner = DesktopOwner(owners)
 
-    this.owners = owners
-    val composition = owner.setContent(content)
+        this.owners = owners
+        val composition = owner.setContent(content)
 
-    parent.onDismissEvents.add(owner::dispose)
+        parent.onDismissEvents.add(owner::dispose)
 
-    return composition
-}
+        return composition
+    }

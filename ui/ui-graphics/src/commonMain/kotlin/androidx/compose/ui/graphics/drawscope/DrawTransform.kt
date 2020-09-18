@@ -57,8 +57,10 @@ inline fun DrawTransform.inset(
  * @param pivotY The y-coordinate for the pivot point, defaults to the center of the
  * coordinate space vertically
  */
-@Deprecated("use rotateRad(radians, Offset(pivotX, pivotY)) instead",
-    ReplaceWith("rotateRad(radians, Offset(pivotX, pivotY))",
+@Deprecated(
+    "use rotateRad(radians, Offset(pivotX, pivotY)) instead",
+    ReplaceWith(
+        "rotateRad(radians, Offset(pivotX, pivotY))",
         "androidx.compose.ui.graphics.drawscope"
     )
 )

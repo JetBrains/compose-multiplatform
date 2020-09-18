@@ -64,10 +64,12 @@ fun OneLineListItems(
         Divider()
         ListItem(
             text = { Text("One line clickable list item") },
-            icon = { Image(
-                icon56x56,
-                colorFilter = ColorFilter.tint(AmbientContentColor.current)
-            ) },
+            icon = {
+                Image(
+                    icon56x56,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            },
             modifier = Modifier.clickable { }
         )
         Divider()
@@ -78,10 +80,12 @@ fun OneLineListItems(
         Divider()
         ListItem(
             text = { Text("One line list item") },
-            icon = { Image(
-                icon40x40,
-                colorFilter = ColorFilter.tint(AmbientContentColor.current)
-            ) },
+            icon = {
+                Image(
+                    icon40x40,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            },
             trailing = { Icon(vectorIcon) }
         )
         Divider()
@@ -119,20 +123,24 @@ fun TwoLineListItems(icon24x24: ImageAsset, icon40x40: ImageAsset) {
             text = { Text("Two line list item with 40x40 icon") },
             secondaryText = { Text("Secondary text") },
             trailing = { Text("meta") },
-            icon = { Image(
-                icon40x40,
-                colorFilter = ColorFilter.tint(AmbientContentColor.current)
-            ) }
+            icon = {
+                Image(
+                    icon40x40,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         var checked by remember { mutableStateOf(false) }
         ListItem(
             text = { Text("Two line list item") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(
-                icon40x40,
-                colorFilter = ColorFilter.tint(AmbientContentColor.current)
-            ) },
+            icon = {
+                Image(
+                    icon40x40,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            },
             trailing = {
                 Checkbox(checked, onCheckedChange = { checked = !checked })
             }
@@ -249,19 +257,23 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
         ListItem(
             text = { Text("عنصر قائمة مكون من سطرين مع رمز") },
             overlineText = { Text("فوق الخط") },
-            icon = { Image(
-                icon40x40,
-                colorFilter = ColorFilter.tint(AmbientContentColor.current)
-            ) }
+            icon = {
+                Image(
+                    icon40x40,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
             text = { Text("Clickable two line item") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(
-                icon40x40,
-                colorFilter = ColorFilter.tint(AmbientContentColor.current)
-            ) },
+            icon = {
+                Image(
+                    icon40x40,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            },
             trailing = {
                 var checked by remember { mutableStateOf(false) }
                 Checkbox(checked, onCheckedChange = { checked = !checked })
@@ -272,10 +284,12 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
         ListItem(
             text = { Text("بندان قابلان للنقر") },
             secondaryText = { Text("نص ثانوي") },
-            icon = { Image(
-                icon40x40,
-                colorFilter = ColorFilter.tint(AmbientContentColor.current)
-            ) },
+            icon = {
+                Image(
+                    icon40x40,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            },
             modifier = Modifier.clickable { }
         )
         Divider()

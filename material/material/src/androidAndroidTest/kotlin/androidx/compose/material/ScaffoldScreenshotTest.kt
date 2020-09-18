@@ -658,11 +658,12 @@ private fun ScreenshotScaffold(
     val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 
     Providers(LayoutDirectionAmbient provides layoutDirection) {
-        Box(Modifier
-            .fillMaxSize(0.5f)
-            .wrapContentSize()
-            .semantics(mergeAllDescendants = true) {}
-            .testTag(Tag)
+        Box(
+            Modifier
+                .fillMaxSize(0.5f)
+                .wrapContentSize()
+                .semantics(mergeAllDescendants = true) {}
+                .testTag(Tag)
         ) {
             Scaffold(
                 topBar = topAppBar,

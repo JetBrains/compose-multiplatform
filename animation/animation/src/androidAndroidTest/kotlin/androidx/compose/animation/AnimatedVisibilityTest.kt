@@ -74,9 +74,11 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
-                Box(Modifier.onGloballyPositioned {
-                    offset = it.localToRoot(Offset.Zero)
-                }.size(100.dp, 100.dp)) {
+                Box(
+                    Modifier.onGloballyPositioned {
+                        offset = it.localToRoot(Offset.Zero)
+                    }.size(100.dp, 100.dp)
+                ) {
                     onDispose {
                         disposed = true
                     }
@@ -176,9 +178,11 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
-                Box(Modifier.onGloballyPositioned {
-                    offset = it.localToRoot(Offset.Zero)
-                }.size(100.dp, 100.dp)) {
+                Box(
+                    Modifier.onGloballyPositioned {
+                        offset = it.localToRoot(Offset.Zero)
+                    }.size(100.dp, 100.dp)
+                ) {
                     onDispose {
                         disposed = true
                     }

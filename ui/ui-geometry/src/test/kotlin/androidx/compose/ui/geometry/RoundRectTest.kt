@@ -209,7 +209,8 @@ class RoundRectTest {
     @Test
     fun testSafeInnerRect() {
         val insetFactor = 0.29289321881f // 1-cos(pi/4)
-        val rr = RoundRect(left = 0f, top = 0f, right = 100f, bottom = 100f,
+        val rr = RoundRect(
+            left = 0f, top = 0f, right = 100f, bottom = 100f,
             topLeftRadius = Radius(0f, 5f),
             topRightRadius = Radius(5f, 10f),
             bottomRightRadius = Radius(10f, 15f),

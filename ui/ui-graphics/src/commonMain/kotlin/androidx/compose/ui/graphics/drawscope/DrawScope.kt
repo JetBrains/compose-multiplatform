@@ -134,7 +134,8 @@ inline fun DrawScope.translate(
  *  @param block lambda that is called to issue drawing commands within the rotated
  *  coordinate space
  */
-@Deprecated("Use rotate(degrees, Offset(pivotX, pivotY)) instead",
+@Deprecated(
+    "Use rotate(degrees, Offset(pivotX, pivotY)) instead",
     ReplaceWith(
         "rotate(degrees, Offset(pivotX, pivotY))",
         "androidx.compose.ui.graphics.drawscope"
@@ -202,7 +203,8 @@ inline fun DrawScope.rotateRad(
  * coordinate space vertically
  * @param block lambda used to issue drawing commands within the scaled coordinate space
  */
-@Deprecated("Use scale(scaleX, scaleY, Offset(pivotX, pivotY))",
+@Deprecated(
+    "Use scale(scaleX, scaleY, Offset(pivotX, pivotY))",
     ReplaceWith(
         "scale(scaleX, scaleY, Offset(pivotX, pivotY))",
         "androidx.compose.ui.graphics.drawscope"

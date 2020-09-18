@@ -64,10 +64,12 @@ class OnSizeChangedTest {
         rule.runOnUiThread {
             activity.setContent {
                 with (DensityAmbient.current) {
-                    Box(Modifier.padding(10.toDp()).onSizeChanged {
-                        changedSize = it
-                        latch.countDown()
-                    }) {
+                    Box(
+                        Modifier.padding(10.toDp()).onSizeChanged {
+                            changedSize = it
+                            latch.countDown()
+                        }
+                    ) {
                         Box(Modifier.size(sizePx.toDp()))
                     }
                 }
@@ -97,10 +99,12 @@ class OnSizeChangedTest {
         rule.runOnUiThread {
             activity.setContent {
                 with (DensityAmbient.current) {
-                    Box(Modifier.padding(sizePx.toDp()).onSizeChanged {
-                        changedSize = it
-                        latch.countDown()
-                    }) {
+                    Box(
+                        Modifier.padding(sizePx.toDp()).onSizeChanged {
+                            changedSize = it
+                            latch.countDown()
+                        }
+                    ) {
                         Box(Modifier.size(10.toDp()))
                     }
                 }
@@ -128,10 +132,12 @@ class OnSizeChangedTest {
         rule.runOnUiThread {
             activity.setContent {
                 with (DensityAmbient.current) {
-                    Box(Modifier.padding(10.toDp()).onSizeChanged {
-                        changedSize = it
-                        latch.countDown()
-                    }) {
+                    Box(
+                        Modifier.padding(10.toDp()).onSizeChanged {
+                            changedSize = it
+                            latch.countDown()
+                        }
+                    ) {
                         Box(Modifier.size(sizePx.toDp()))
                     }
                 }
@@ -168,10 +174,12 @@ class OnSizeChangedTest {
                         changedSize2 = it
                         latch2.countDown()
                     } else Modifier
-                    Box(Modifier.padding(10.toDp()).onSizeChanged {
-                        changedSize1 = it
-                        latch1.countDown()
-                    }.then(mod)) {
+                    Box(
+                        Modifier.padding(10.toDp()).onSizeChanged {
+                            changedSize1 = it
+                            latch1.countDown()
+                        }.then(mod)
+                    ) {
                         Box(Modifier.size(10.toDp()))
                     }
                 }

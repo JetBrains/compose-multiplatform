@@ -225,7 +225,7 @@ enum class PointerEventPass {
  * A function used to react to and modify [PointerInputChange]s.
  */
 typealias PointerInputHandler =
-            (PointerEvent, PointerEventPass, IntSize) -> List<PointerInputChange>
+    (PointerEvent, PointerEventPass, IntSize) -> List<PointerInputChange>
 
 /**
  * The base type for all custom events.

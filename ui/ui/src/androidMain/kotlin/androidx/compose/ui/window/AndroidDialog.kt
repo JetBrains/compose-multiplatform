@@ -165,13 +165,16 @@ private class DialogWrapper(
             } else {
                 WindowManager.LayoutParams.FLAG_SECURE.inv()
             },
-            WindowManager.LayoutParams.FLAG_SECURE)
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
     }
 
     fun setProperties(properties: DialogProperties?) {
         if (properties != null && properties is AndroidDialogProperties) {
-            setSecureFlagEnabled(properties.securePolicy
-                .shouldApplySecureFlag(composeView.isFlagSecureEnabled()))
+            setSecureFlagEnabled(
+                properties.securePolicy
+                    .shouldApplySecureFlag(composeView.isFlagSecureEnabled())
+            )
         } else {
             setSecureFlagEnabled(composeView.isFlagSecureEnabled())
         }

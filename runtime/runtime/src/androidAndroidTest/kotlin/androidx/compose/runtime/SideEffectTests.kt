@@ -52,8 +52,10 @@ class SideEffectTests : BaseComposeTest() {
             recompose = invalidate
         }.then {
             assertEquals(listOf(1, 2), results, "side effects were applied")
-            assertEquals(emptyList(), resultsAtComposition,
-                "side effects weren't applied until after composition")
+            assertEquals(
+                emptyList(), resultsAtComposition,
+                "side effects weren't applied until after composition"
+            )
             recompose?.invoke() ?: error("missing recompose function")
         }.then {
             assertEquals(listOf(1, 2, 1, 2), results, "side effects applied a second time")

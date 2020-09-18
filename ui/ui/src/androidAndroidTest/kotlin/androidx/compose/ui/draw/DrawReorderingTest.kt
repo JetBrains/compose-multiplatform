@@ -80,19 +80,21 @@ class DrawReorderingTest {
     fun testDrawingOrderWhenWePlaceItemsInTheNaturalOrder() {
         rule.runOnUiThread {
             activity.setContent {
-                Layout(children = {
-                    FixedSize(
-                        10,
-                        PaddingModifier(10)
-                            .background(Color.White)
-                    )
-                    FixedSize(
-                        30,
-                        Modifier.drawLayer()
-                            .background(Color.Red)
-                            .drawLatchModifier()
-                    )
-                }) { measurables, _ ->
+                Layout(
+                    children = {
+                        FixedSize(
+                            10,
+                            PaddingModifier(10)
+                                .background(Color.White)
+                        )
+                        FixedSize(
+                            30,
+                            Modifier.drawLayer()
+                                .background(Color.Red)
+                                .drawLatchModifier()
+                        )
+                    }
+                ) { measurables, _ ->
                     val newConstraints = Constraints.fixed(30, 30)
                     val placeables = measurables.map { m ->
                         m.measure(newConstraints)
@@ -118,19 +120,21 @@ class DrawReorderingTest {
     fun testDrawingOrderWhenWePlaceItemsInTheReverseOrder() {
         rule.runOnUiThread {
             activity.setContent {
-                Layout(children = {
-                    FixedSize(
-                        10,
-                        PaddingModifier(10)
-                            .background(Color.White)
-                    )
-                    FixedSize(
-                        30,
-                        Modifier.drawLayer()
-                            .background(Color.Red)
-                            .drawLatchModifier()
-                    )
-                }) { measurables, _ ->
+                Layout(
+                    children = {
+                        FixedSize(
+                            10,
+                            PaddingModifier(10)
+                                .background(Color.White)
+                        )
+                        FixedSize(
+                            30,
+                            Modifier.drawLayer()
+                                .background(Color.Red)
+                                .drawLatchModifier()
+                        )
+                    }
+                ) { measurables, _ ->
                     val newConstraints = Constraints.fixed(30, 30)
                     val placeables = measurables.map { m ->
                         m.measure(newConstraints)
@@ -156,20 +160,22 @@ class DrawReorderingTest {
     fun testDrawingOrderIsOverriddenWithZIndexWhenWePlaceItemsInTheReverseOrder() {
         rule.runOnUiThread {
             activity.setContent {
-                Layout(children = {
-                    FixedSize(
-                        10,
-                        PaddingModifier(10)
-                            .background(Color.White)
-                    )
-                    FixedSize(
-                        30,
-                        Modifier.drawLayer()
-                            .background(Color.Red)
-                            .zIndex(1f)
-                            .drawLatchModifier()
-                    )
-                }) { measurables, _ ->
+                Layout(
+                    children = {
+                        FixedSize(
+                            10,
+                            PaddingModifier(10)
+                                .background(Color.White)
+                        )
+                        FixedSize(
+                            30,
+                            Modifier.drawLayer()
+                                .background(Color.Red)
+                                .zIndex(1f)
+                                .drawLatchModifier()
+                        )
+                    }
+                ) { measurables, _ ->
                     val newConstraints = Constraints.fixed(30, 30)
                     val placeables = measurables.map { m ->
                         m.measure(newConstraints)
@@ -195,25 +201,27 @@ class DrawReorderingTest {
     fun testCustomDrawingOrderForThreeItems() {
         rule.runOnUiThread {
             activity.setContent {
-                Layout(children = {
-                    FixedSize(
-                        30,
-                        Modifier.drawLayer()
-                            .background(Color.Red)
-                            .drawLatchModifier()
-                    )
-                    FixedSize(
-                        10,
-                        PaddingModifier(10)
-                            .background(Color.White)
-                    )
-                    FixedSize(
-                        30,
-                        Modifier.drawLayer()
-                            .background(Color.Blue)
-                            .drawLatchModifier()
-                    )
-                }) { measurables, _ ->
+                Layout(
+                    children = {
+                        FixedSize(
+                            30,
+                            Modifier.drawLayer()
+                                .background(Color.Red)
+                                .drawLatchModifier()
+                        )
+                        FixedSize(
+                            10,
+                            PaddingModifier(10)
+                                .background(Color.White)
+                        )
+                        FixedSize(
+                            30,
+                            Modifier.drawLayer()
+                                .background(Color.Blue)
+                                .drawLatchModifier()
+                        )
+                    }
+                ) { measurables, _ ->
                     val newConstraints = Constraints.fixed(30, 30)
                     val placeables = measurables.map { m ->
                         m.measure(newConstraints)
@@ -240,9 +248,11 @@ class DrawReorderingTest {
         val latch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                Layout(children = {
-                    FixedSize(30)
-                }) { measurables, constraints ->
+                Layout(
+                    children = {
+                        FixedSize(30)
+                    }
+                ) { measurables, constraints ->
                     val placeables = measurables.first().measure(constraints)
                     layout(30, 30) {
                         placeables.place(0, 0)

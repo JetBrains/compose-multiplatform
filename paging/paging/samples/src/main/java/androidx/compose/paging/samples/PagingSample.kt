@@ -100,13 +100,14 @@ class MyBackend {
 fun PagingBackendSample() {
     val myBackend = remember { MyBackend() }
 
-    val pager = remember { Pager(
-        PagingConfig(
-            pageSize = myBackend.DataBatchSize,
-            enablePlaceholders = true,
-            maxSize = 200
-        )
-    ) { myBackend.getAllData() }
+    val pager = remember {
+        Pager(
+            PagingConfig(
+                pageSize = myBackend.DataBatchSize,
+                enablePlaceholders = true,
+                maxSize = 200
+            )
+        ) { myBackend.getAllData() }
     }
 
     val lazyPagingItems = pager.flow.collectAsLazyPagingItems()
@@ -128,8 +129,10 @@ fun PagingBackendSample() {
 
         if (lazyPagingItems.loadState.append == LoadState.Loading) {
             item {
-                CircularProgressIndicator(modifier = Modifier.fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally))
+                CircularProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                )
             }
         }
     }

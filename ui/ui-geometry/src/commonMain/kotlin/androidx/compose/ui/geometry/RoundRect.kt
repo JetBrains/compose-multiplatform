@@ -296,25 +296,29 @@ fun RoundRect(
 )
 
 /** The top-left [Radius]. */
-@Deprecated("use topLeftRadius instead",
+@Deprecated(
+    "use topLeftRadius instead",
     ReplaceWith("topLeftRadius", "androidx.compose.ui.geometry")
 )
 fun RoundRect.topLeftRadius(): Radius = topLeftRadius
 
 /**  The top-right [Radius]. */
-@Deprecated("Use topRightRadius instead",
+@Deprecated(
+    "Use topRightRadius instead",
     ReplaceWith("topRightRadius", "androidx.compose.ui.geometry")
 )
 fun RoundRect.topRightRadius(): Radius = topRightRadius
 
 /**  The bottom-right [Radius]. */
-@Deprecated("Use bottomRightRadius instead",
+@Deprecated(
+    "Use bottomRightRadius instead",
     ReplaceWith("bottomRightRadius", "androidx.compose.ui.geometry")
 )
 fun RoundRect.bottomRightRadius(): Radius = bottomRightRadius
 
 /**  The bottom-right [Radius]. */
-@Deprecated("Use bottomLeftRadius instead",
+@Deprecated(
+    "Use bottomLeftRadius instead",
     ReplaceWith("bottomLeftRadius", "androidx.compose.ui.geometry")
 )
 /** The bottom-left [Radius]. */
@@ -339,7 +343,8 @@ fun RoundRect.translate(offset: Offset): RoundRect = RoundRect(
     bottomLeftRadius = bottomLeftRadius
 )
 
-@Deprecated("Use outerRect instead",
+@Deprecated(
+    "Use outerRect instead",
     ReplaceWith("boundingRect", "androidx.compose.ui.RoundRect")
 )
 /** The bounding box of this rounded rectangle (the rectangle with no rounded corners). */
@@ -398,20 +403,20 @@ val RoundRect.isFinite get() =
  * corner radii.
  */
 val RoundRect.isRect get(): Boolean = (topLeftRadius.x == 0.0f || topLeftRadius.y == 0.0f) &&
-        (topRightRadius.x == 0.0f || topRightRadius.y == 0.0f) &&
-        (bottomLeftRadius.x == 0.0f || bottomLeftRadius.y == 0.0f) &&
-        (bottomRightRadius.x == 0.0f || bottomRightRadius.y == 0.0f)
+    (topRightRadius.x == 0.0f || topRightRadius.y == 0.0f) &&
+    (bottomLeftRadius.x == 0.0f || bottomLeftRadius.y == 0.0f) &&
+    (bottomRightRadius.x == 0.0f || bottomRightRadius.y == 0.0f)
 
 /** Whether this rounded rectangle has no side with a straight section. */
 val RoundRect.isEllipse get(): Boolean =
     topLeftRadius.x == topRightRadius.x &&
-    topLeftRadius.y == topRightRadius.y &&
-    topRightRadius.x == bottomRightRadius.x &&
-    topRightRadius.y == bottomRightRadius.y &&
-    bottomRightRadius.x == bottomLeftRadius.x &&
-    bottomRightRadius.y == bottomLeftRadius.y &&
-    width <= 2.0 * topLeftRadius.x &&
-    height <= 2.0 * topLeftRadius.y
+        topLeftRadius.y == topRightRadius.y &&
+        topRightRadius.x == bottomRightRadius.x &&
+        topRightRadius.y == bottomRightRadius.y &&
+        bottomRightRadius.x == bottomLeftRadius.x &&
+        bottomRightRadius.y == bottomLeftRadius.y &&
+        width <= 2.0 * topLeftRadius.x &&
+        height <= 2.0 * topLeftRadius.y
 
 /** Whether this rounded rectangle would draw as a circle. */
 val RoundRect.isCircle get() = width == height && isEllipse
@@ -420,7 +425,8 @@ val RoundRect.isCircle get() = width == height && isEllipse
  * The lesser of the magnitudes of the [RoundRect.width] and the [RoundRect.height] of this
  * rounded rectangle.
  */
-@Deprecated("Use minDimension instead",
+@Deprecated(
+    "Use minDimension instead",
     ReplaceWith("minDimension", "androidx.compose.ui.RoundRect")
 )
 val RoundRect.shortestSide get(): Float = minDimension
@@ -435,7 +441,8 @@ val RoundRect.minDimension get(): Float = min(width.absoluteValue, height.absolu
  * The greater of the magnitudes of the [RoundRect.width] and the [RoundRect.height] of this
  * rounded rectangle.
  */
-@Deprecated("Use maxDimension instead",
+@Deprecated(
+    "Use maxDimension instead",
     ReplaceWith("maxDimension", "androidx.compose.ui.RoundRect")
 )
 val RoundRect.longestSide get(): Float = maxDimension
@@ -446,7 +453,8 @@ val RoundRect.maxDimension get(): Float = max(width.absoluteValue, height.absolu
  * The offset to the point halfway between the left and right and the top and
  * bottom edges of this rectangle.
  */
-@Deprecated("Use center instead",
+@Deprecated(
+    "Use center instead",
     ReplaceWith("center", "androidx.compose.ui.RoundRect")
 )
 fun RoundRect.center(): Offset = Offset((left + width / 2.0f), (top + height / 2.0f))
@@ -463,12 +471,12 @@ val RoundRect.center: Offset get() = Offset((left + width / 2.0f), (top + height
  */
 val RoundRect.isSimple: Boolean
     get() = topLeftRadius.x == topLeftRadius.y &&
-            topLeftRadius.x == topRightRadius.x &&
-            topLeftRadius.x == topRightRadius.y &&
-            topLeftRadius.x == bottomRightRadius.x &&
-            topLeftRadius.x == bottomRightRadius.y &&
-            topLeftRadius.x == bottomLeftRadius.x &&
-            topLeftRadius.x == bottomLeftRadius.y
+        topLeftRadius.x == topRightRadius.x &&
+        topLeftRadius.x == topRightRadius.y &&
+        topLeftRadius.x == bottomRightRadius.x &&
+        topLeftRadius.x == bottomRightRadius.y &&
+        topLeftRadius.x == bottomLeftRadius.x &&
+        topLeftRadius.x == bottomLeftRadius.y
 
 /**
  * Linearly interpolate between two rounded rectangles.

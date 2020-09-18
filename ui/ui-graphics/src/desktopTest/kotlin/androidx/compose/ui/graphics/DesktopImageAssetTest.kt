@@ -90,22 +90,26 @@ class DesktopImageAssetTest : DesktopGraphicsTest() {
 
         val array = IntArray(5)
         asset.readPixels(array, startX = 0, startY = 0, width = 1, height = 1, bufferOffset = 0)
-        assertThat(array.map(::toHexString)).isEqualTo(listOf(
-            "ffff0000",
-            "00000000",
-            "00000000",
-            "00000000",
-            "00000000"
-        ))
+        assertThat(array.map(::toHexString)).isEqualTo(
+            listOf(
+                "ffff0000",
+                "00000000",
+                "00000000",
+                "00000000",
+                "00000000"
+            )
+        )
 
         asset.readPixels(array, startX = 3, startY = 3, width = 2, height = 2, bufferOffset = 1)
-        assertThat(array.map(::toHexString)).isEqualTo(listOf(
-            "ffff0000",
-            "ffff00ff",
-            "ffffff00",
-            "ff000000",
-            "80000000"
-        ))
+        assertThat(array.map(::toHexString)).isEqualTo(
+            listOf(
+                "ffff0000",
+                "ffff00ff",
+                "ffffff00",
+                "ff000000",
+                "80000000"
+            )
+        )
     }
 
     @Test
@@ -114,14 +118,16 @@ class DesktopImageAssetTest : DesktopGraphicsTest() {
 
         val array = IntArray(6)
         asset.readPixels(array, startX = 3, startY = 3, width = 2, height = 2, stride = 3)
-        assertThat(array.map(::toHexString)).isEqualTo(listOf(
-            "ffff00ff",
-            "ffffff00",
-            "00000000",
-            "ff000000",
-            "80000000",
-            "00000000"
-        ))
+        assertThat(array.map(::toHexString)).isEqualTo(
+            listOf(
+                "ffff00ff",
+                "ffffff00",
+                "00000000",
+                "ff000000",
+                "80000000",
+                "00000000"
+            )
+        )
     }
 
     private fun toHexString(num: Int) = "%08x".format(num)

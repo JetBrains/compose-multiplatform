@@ -236,8 +236,10 @@ class LazyRowTest {
                     if (it != null) {
                         Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
                     } else {
-                        Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight()
-                            .testTag(nullTestTag))
+                        Spacer(
+                            Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                                .testTag(nullTestTag)
+                        )
                     }
                 }
             }

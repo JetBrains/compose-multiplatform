@@ -268,8 +268,10 @@ private class PopupLayout(
 
     fun setProperties(properties: PopupProperties?) {
         if (properties != null && properties is AndroidPopupProperties) {
-            setSecureFlagEnabled(properties.securePolicy
-                .shouldApplySecureFlag(composeView.isFlagSecureEnabled()))
+            setSecureFlagEnabled(
+                properties.securePolicy
+                    .shouldApplySecureFlag(composeView.isFlagSecureEnabled())
+            )
         } else {
             setSecureFlagEnabled(composeView.isFlagSecureEnabled())
         }

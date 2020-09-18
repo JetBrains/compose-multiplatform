@@ -421,7 +421,8 @@ internal fun checkArithmetic(a: TextUnit, b: TextUnit) {
 
 @PublishedApi
 internal fun checkArithmetic(a: TextUnit, b: TextUnit, c: TextUnit) {
-    require(a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit &&
+    require(
+        a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit &&
             c.type != TextUnitType.Inherit
     ) {
         "Cannot perform operation for Inherit type."

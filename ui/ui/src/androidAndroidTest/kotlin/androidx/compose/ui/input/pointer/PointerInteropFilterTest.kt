@@ -4426,7 +4426,7 @@ private fun MotionEvent(
 )
 
 internal typealias PointerEventHandler =
-        (PointerEvent, PointerEventPass, IntSize) -> List<PointerInputChange>
+    (PointerEvent, PointerEventPass, IntSize) -> List<PointerInputChange>
 
 private fun PointerEventHandler.invokeOverAllPasses(
     pointerEvent: PointerEvent,

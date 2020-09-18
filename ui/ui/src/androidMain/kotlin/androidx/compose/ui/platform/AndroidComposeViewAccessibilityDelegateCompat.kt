@@ -346,7 +346,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !info.text.isNullOrEmpty() &&
-            semanticsNode.config.contains(SemanticsActions.GetTextLayoutResult)) {
+            semanticsNode.config.contains(SemanticsActions.GetTextLayoutResult)
+        ) {
             info.unwrap().availableExtraData = listOf(EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
         }
 

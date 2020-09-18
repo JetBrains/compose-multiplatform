@@ -64,9 +64,12 @@ private class DerivedSnapshotState<T>(private val calculation: () -> T) : StateO
             return readable.result as T
         }
         val newDependencies = HashSet<StateObject>()
-        val result = Snapshot.observe({
-            if (it is StateObject) newDependencies.add(it)
-        }, null, calculation)
+        val result = Snapshot.observe(
+            {
+                if (it is StateObject) newDependencies.add(it)
+            },
+            null, calculation
+        )
 
         sync {
             val writable = first.newWritableRecord(this, snapshot)

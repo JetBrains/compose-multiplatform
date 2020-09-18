@@ -186,13 +186,16 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     fun imageShader() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
 
-        canvas.drawRect(left = 2f, top = 2f, right = 14f, bottom = 14f, paint = Paint().apply {
-            shader = ImageShader(
-                imageFromResource("androidx/compose/desktop/test.png"),
-                tileModeX = TileMode.Clamp,
-                tileModeY = TileMode.Repeated
-            )
-        })
+        canvas.drawRect(
+            left = 2f, top = 2f, right = 14f, bottom = 14f,
+            paint = Paint().apply {
+                shader = ImageShader(
+                    imageFromResource("androidx/compose/desktop/test.png"),
+                    tileModeX = TileMode.Clamp,
+                    tileModeY = TileMode.Repeated
+                )
+            }
+        )
 
         screenshotRule.snap(surface)
     }

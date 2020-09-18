@@ -529,33 +529,43 @@ class HitPathTrackerTest {
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 1f) }
-        ))
+        assertThat(log1[1].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedChange.apply { consumePositionChange(0f, 1f) }
+            )
+        )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(pif3)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 2f) }
-        ))
+        assertThat(log1[2].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedChange.apply { consumePositionChange(0f, 2f) }
+            )
+        )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(pif3)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 3f) }
-        ))
+        assertThat(log1[3].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedChange.apply { consumePositionChange(0f, 3f) }
+            )
+        )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[4].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[4].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 4f) }
-        ))
+        assertThat(log1[4].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedChange.apply { consumePositionChange(0f, 4f) }
+            )
+        )
         assertThat(log1[4].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[5].pointerInputFilter).isEqualTo(pif1)
-        assertThat(log1[5].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 5f) }
-        ))
+        assertThat(log1[5].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedChange.apply { consumePositionChange(0f, 5f) }
+            )
+        )
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes.values.first())
@@ -653,21 +663,27 @@ class HitPathTrackerTest {
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 1f) }
-        ))
+        assertThat(log1[1].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 1f) }
+            )
+        )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 2f) }
-        ))
+        assertThat(log1[2].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 2f) }
+            )
+        )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(pif1)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 3f) }
-        ))
+        assertThat(log1[3].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 3f) }
+            )
+        )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log2[0].pointerInputFilter).isEqualTo(pif3)
@@ -675,21 +691,27 @@ class HitPathTrackerTest {
         assertThat(log2[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log2[1].pointerInputFilter).isEqualTo(pif4)
-        assertThat(log2[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, -1f) }
-        ))
+        assertThat(log2[1].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent2.apply { consumePositionChange(0f, -1f) }
+            )
+        )
         assertThat(log2[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log2[2].pointerInputFilter).isEqualTo(pif4)
-        assertThat(log2[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, -2f) }
-        ))
+        assertThat(log2[2].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent2.apply { consumePositionChange(0f, -2f) }
+            )
+        )
         assertThat(log2[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log2[3].pointerInputFilter).isEqualTo(pif3)
-        assertThat(log2[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, -3f) }
-        ))
+        assertThat(log2[3].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent2.apply { consumePositionChange(0f, -3f) }
+            )
+        )
         assertThat(log2[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes).hasSize(2)
@@ -783,34 +805,44 @@ class HitPathTrackerTest {
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 1f) }
-        ))
+        assertThat(log1[1].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 1f) }
+            )
+        )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 2f) }
-        ))
+        assertThat(log1[2].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 2f) }
+            )
+        )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, 1f) }
-        ))
+        assertThat(log1[3].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent2.apply { consumePositionChange(0f, 1f) }
+            )
+        )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[4].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[4].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, 4f) }
-        ))
+        assertThat(log1[4].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent2.apply { consumePositionChange(0f, 4f) }
+            )
+        )
         assertThat(log1[4].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[5].pointerInputFilter).isEqualTo(parent)
-        assertThat(log1[5].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 20f) },
-            expectedEvent2.apply { consumePositionChange(0f, 40f) }
-        ))
+        assertThat(log1[5].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 20f) },
+                expectedEvent2.apply { consumePositionChange(0f, 40f) }
+            )
+        )
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes).hasSize(2)
@@ -883,24 +915,30 @@ class HitPathTrackerTest {
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 1f) },
-            expectedEvent2.apply { consumePositionChange(0f, 1f) }
-        ))
+        assertThat(log1[1].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 1f) },
+                expectedEvent2.apply { consumePositionChange(0f, 1f) }
+            )
+        )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 2f) },
-            expectedEvent2.apply { consumePositionChange(0f, 2f) }
-        ))
+        assertThat(log1[2].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 2f) },
+                expectedEvent2.apply { consumePositionChange(0f, 2f) }
+            )
+        )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 3f) },
-            expectedEvent2.apply { consumePositionChange(0f, 3f) }
-        ))
+        assertThat(log1[3].pointerEvent).isEqualTo(
+            pointerEventOf(
+                expectedEvent1.apply { consumePositionChange(0f, 3f) },
+                expectedEvent2.apply { consumePositionChange(0f, 3f) }
+            )
+        )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes).hasSize(2)
@@ -1957,17 +1995,20 @@ class HitPathTrackerTest {
 
         assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
 
-        val log1 = log.getOnCancelLog().filter { it.pointerInputFilter == leaf1 ||
-                    it.pointerInputFilter == middle1 ||
-                    it.pointerInputFilter == root
+        val log1 = log.getOnCancelLog().filter {
+            it.pointerInputFilter == leaf1 ||
+                it.pointerInputFilter == middle1 ||
+                it.pointerInputFilter == root
         }
 
-        val log2 = log.getOnCancelLog().filter { it.pointerInputFilter == leaf2 ||
+        val log2 = log.getOnCancelLog().filter {
+            it.pointerInputFilter == leaf2 ||
                 it.pointerInputFilter == middle2 ||
                 it.pointerInputFilter == root
         }
 
-        val log3 = log.getOnCancelLog().filter { it.pointerInputFilter == leaf3 ||
+        val log3 = log.getOnCancelLog().filter {
+            it.pointerInputFilter == leaf3 ||
                 it.pointerInputFilter == middle3 ||
                 it.pointerInputFilter == root
         }
@@ -3639,7 +3680,8 @@ class HitPathTrackerTest {
 
         val dispatchingPif = PointerInputFilterMock(
             log,
-            initHandler = { dispatcher = it })
+            initHandler = { dispatcher = it }
+        )
         val parentPif = PointerInputFilterMock(
             log,
             onCustomEvent = { _, pointerEventPass ->

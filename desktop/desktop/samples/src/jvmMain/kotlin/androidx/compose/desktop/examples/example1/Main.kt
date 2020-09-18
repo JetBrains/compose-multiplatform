@@ -298,9 +298,11 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             value = text.value,
             onValueChange = { text.value = it },
             label = { Text(text = "Input2") },
-            modifier = Modifier.keyInputFilter(ShortcutHandler(Key.MetaLeft + Key.Enter) {
-                text.value = "Cleared!"
-            })
+            modifier = Modifier.keyInputFilter(
+                ShortcutHandler(Key.MetaLeft + Key.Enter) {
+                    text.value = "Cleared!"
+                }
+            )
         )
 
         Image(imageResource("androidx/compose/desktop/example/circus.jpg"))
