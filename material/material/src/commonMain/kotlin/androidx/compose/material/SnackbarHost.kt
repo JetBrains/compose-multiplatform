@@ -329,7 +329,8 @@ private fun animatedOpacity(
             anim = animation,
             onEnd = { reason, _ ->
                 if (reason == AnimationEndReason.TargetReached) onAnimationFinish()
-            })
+            }
+        )
     }
     return animatedFloat
 }

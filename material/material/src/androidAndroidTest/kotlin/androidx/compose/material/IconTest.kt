@@ -57,8 +57,10 @@ class IconTest {
     fun vector_customIconSize_dimensions() {
         val width = 35.dp
         val height = 83.dp
-        val vector = VectorAssetBuilder(defaultWidth = width, defaultHeight = height,
-            viewportWidth = width.value, viewportHeight = height.value).build()
+        val vector = VectorAssetBuilder(
+            defaultWidth = width, defaultHeight = height,
+            viewportWidth = width.value, viewportHeight = height.value
+        ).build()
         rule
             .setMaterialContentForSizeAssertions {
                 Icon(vector)

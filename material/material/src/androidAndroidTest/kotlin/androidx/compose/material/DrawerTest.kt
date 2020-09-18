@@ -61,9 +61,13 @@ class DrawerTest {
     fun modalDrawer_testOffset_whenOpen() {
         rule.setMaterialContent {
             val drawerState = rememberDrawerState(DrawerValue.Open)
-            ModalDrawerLayout(drawerState = drawerState, drawerContent = {
-                Box(Modifier.fillMaxSize().testTag("content"))
-            }, bodyContent = emptyContent())
+            ModalDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("content"))
+                },
+                bodyContent = emptyContent()
+            )
         }
 
         rule.onNodeWithTag("content")
@@ -74,9 +78,13 @@ class DrawerTest {
     fun modalDrawer_testOffset_whenClosed() {
         rule.setMaterialContent {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawerLayout(drawerState = drawerState, drawerContent = {
-                Box(Modifier.fillMaxSize().testTag("content"))
-            }, bodyContent = emptyContent())
+            ModalDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("content"))
+                },
+                bodyContent = emptyContent()
+            )
         }
 
         val width = rule.rootWidth()
@@ -105,9 +113,13 @@ class DrawerTest {
     fun bottomDrawer_testOffset_whenOpen() {
         rule.setMaterialContent {
             val drawerState = rememberBottomDrawerState(BottomDrawerValue.Open)
-            BottomDrawerLayout(drawerState = drawerState, drawerContent = {
-                Box(Modifier.fillMaxSize().testTag("content"))
-            }, bodyContent = emptyContent())
+            BottomDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("content"))
+                },
+                bodyContent = emptyContent()
+            )
         }
 
         val width = rule.rootWidth()
@@ -121,9 +133,13 @@ class DrawerTest {
     fun bottomDrawer_testOffset_whenClosed() {
         rule.setMaterialContent {
             val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
-            BottomDrawerLayout(drawerState = drawerState, drawerContent = {
-                Box(Modifier.fillMaxSize().testTag("content"))
-            }, bodyContent = emptyContent())
+            BottomDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("content"))
+                },
+                bodyContent = emptyContent()
+            )
         }
 
         val height = rule.rootHeight()
@@ -137,9 +153,13 @@ class DrawerTest {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawerLayout(drawerState = drawerState, drawerContent = {
-                Box(Modifier.fillMaxSize().testTag("drawer"))
-            }, bodyContent = emptyContent())
+            ModalDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                bodyContent = emptyContent()
+            )
         }
 
         val width = rule.rootWidth()
@@ -170,13 +190,15 @@ class DrawerTest {
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
-            ModalDrawerLayout(drawerState = drawerState,
+            ModalDrawerLayout(
+                drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().clickable { drawerClicks += 1 })
                 },
                 bodyContent = {
                     Box(Modifier.testTag("Drawer").fillMaxSize().clickable { bodyClicks += 1 })
-                })
+                }
+            )
         }
 
         // Click in the middle of the drawer (which is the middle of the body)
@@ -207,9 +229,13 @@ class DrawerTest {
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
             drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
-            BottomDrawerLayout(drawerState = drawerState, drawerContent = {
-                Box(Modifier.fillMaxSize().testTag("drawer"))
-            }, bodyContent = emptyContent())
+            BottomDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                bodyContent = emptyContent()
+            )
         }
 
         val width = rule.rootWidth()
@@ -243,13 +269,15 @@ class DrawerTest {
         rule.setMaterialContent {
             drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
             // emulate click on the screen
-            BottomDrawerLayout(drawerState = drawerState,
+            BottomDrawerLayout(
+                drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().clickable { drawerClicks += 1 })
                 },
                 bodyContent = {
                     Box(Modifier.testTag("Drawer").fillMaxSize().clickable { bodyClicks += 1 })
-                })
+                }
+            )
         }
 
         // Click in the middle of the drawer (which is the middle of the body)
@@ -281,13 +309,15 @@ class DrawerTest {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
             Box(Modifier.testTag("Drawer")) {
-                ModalDrawerLayout(drawerState = drawerState,
+                ModalDrawerLayout(
+                    drawerState = drawerState,
                     drawerContent = {
                         Box(Modifier.fillMaxSize().background(color = Color.Magenta))
                     },
                     bodyContent = {
                         Box(Modifier.fillMaxSize().background(color = Color.Red))
-                    })
+                    }
+                )
             }
         }
 
@@ -314,13 +344,15 @@ class DrawerTest {
             // emulate click on the screen
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                 Box(Modifier.testTag("Drawer")) {
-                    ModalDrawerLayout(drawerState = drawerState,
+                    ModalDrawerLayout(
+                        drawerState = drawerState,
                         drawerContent = {
                             Box(Modifier.fillMaxSize().background(color = Color.Magenta))
                         },
                         bodyContent = {
                             Box(Modifier.fillMaxSize().background(color = Color.Red))
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -347,13 +379,15 @@ class DrawerTest {
             drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
             // emulate click on the screen
             Box(Modifier.testTag("Drawer")) {
-                BottomDrawerLayout(drawerState = drawerState,
+                BottomDrawerLayout(
+                    drawerState = drawerState,
                     drawerContent = {
                         Box(Modifier.fillMaxSize().background(color = Color.Magenta))
                     },
                     bodyContent = {
                         Box(Modifier.fillMaxSize().background(color = Color.Red))
-                    })
+                    }
+                )
             }
         }
         val isLandscape = rule.rootWidth() > rule.rootHeight()

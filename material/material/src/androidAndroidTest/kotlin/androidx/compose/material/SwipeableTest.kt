@@ -1313,7 +1313,8 @@ class SwipeableTest {
         }
 
         var endValue: String? = null
-        state.animateTo("B",
+        state.animateTo(
+            "B",
             onEnd = { _, value -> endValue = value }
         )
         assertThat(endValue).isNull()
@@ -1337,7 +1338,8 @@ class SwipeableTest {
         }
 
         var endReason: AnimationEndReason? = null
-        state.animateTo("B",
+        state.animateTo(
+            "B",
             onEnd = { reason, _ -> endReason = reason }
         )
         assertThat(endReason).isNull()
@@ -1355,12 +1357,14 @@ class SwipeableTest {
 
         restorationTester.setContent {
             state = rememberSwipeableState("A")
-            Box(Modifier.swipeable(
-                state = state!!,
-                anchors = mapOf(0f to "A", 100f to "B"),
-                thresholds = { _, _ -> FractionalThreshold(0.5f) },
-                orientation = Orientation.Horizontal
-            ))
+            Box(
+                Modifier.swipeable(
+                    state = state!!,
+                    anchors = mapOf(0f to "A", 100f to "B"),
+                    thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                    orientation = Orientation.Horizontal
+                )
+            )
         }
 
         rule.runOnIdle {

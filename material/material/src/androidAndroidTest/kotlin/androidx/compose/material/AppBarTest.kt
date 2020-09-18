@@ -100,7 +100,8 @@ class AppBarTest {
             .assertLeftPositionInRootIsEqualTo(AppBarStartAndEndPadding)
             // Navigation icon should be 4.dp from the bottom
             .assertTopPositionInRootIsEqualTo(
-                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize)
+                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
+            )
 
         rule.onNodeWithTag("title")
             // Title should be 72.dp from the start
@@ -114,7 +115,8 @@ class AppBarTest {
             .assertLeftPositionInRootIsEqualTo(expectedActionPosition(appBarBounds.width))
             // Action should be 4.dp from the bottom
             .assertTopPositionInRootIsEqualTo(
-                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize)
+                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
+            )
     }
 
     @Test
@@ -189,7 +191,8 @@ class AppBarTest {
             .assertLeftPositionInRootIsEqualTo(AppBarStartAndEndPadding)
             // Child icon should be 4.dp from the bottom
             .assertTopPositionInRootIsEqualTo(
-                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize)
+                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
+            )
     }
 
     /**

@@ -87,9 +87,11 @@ fun SimpleScaffoldWithTopBar() {
             TopAppBar(
                 title = { Text("Simple Scaffold Screen") },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        scaffoldState.drawerState.open()
-                    }) {
+                    IconButton(
+                        onClick = {
+                            scaffoldState.drawerState.open()
+                        }
+                    ) {
                         Icon(Icons.Filled.Menu)
                     }
                 }
@@ -155,9 +157,11 @@ fun ScaffoldWithBottomBarAndCutout() {
         topBar = { TopAppBar(title = { Text("Scaffold with bottom cutout") }) },
         bottomBar = {
             BottomAppBar(cutoutShape = fabShape) {
-                IconButton(onClick = {
-                    scaffoldState.drawerState.open()
-                }) {
+                IconButton(
+                    onClick = {
+                        scaffoldState.drawerState.open()
+                    }
+                ) {
                     Icon(Icons.Filled.Menu)
                 }
             }

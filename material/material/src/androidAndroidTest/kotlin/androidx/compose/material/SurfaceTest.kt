@@ -50,10 +50,12 @@ class SurfaceTest {
     @Test
     fun zOrderingBasedOnElevationIsApplied() {
         rule.setMaterialContent {
-            Box(Modifier
-                .preferredSize(10.dp, 10.dp)
-                .semantics(mergeAllDescendants = true) {}
-                .testTag("box")) {
+            Box(
+                Modifier
+                    .preferredSize(10.dp, 10.dp)
+                    .semantics(mergeAllDescendants = true) {}
+                    .testTag("box")
+            ) {
                 Surface(color = Color.Yellow, elevation = 2.dp) {
                     Box(Modifier.fillMaxSize())
                 }
@@ -77,10 +79,12 @@ class SurfaceTest {
     @Test
     fun originalOrderingWhenTheDefaultElevationIsUsed() {
         rule.setMaterialContent {
-            Box(Modifier
-                .preferredSize(10.dp, 10.dp)
-                .semantics(mergeAllDescendants = true) {}
-                .testTag("box")) {
+            Box(
+                Modifier
+                    .preferredSize(10.dp, 10.dp)
+                    .semantics(mergeAllDescendants = true) {}
+                    .testTag("box")
+            ) {
                 Surface(color = Color.Yellow) {
                     Box(Modifier.fillMaxSize())
                 }
@@ -104,10 +108,12 @@ class SurfaceTest {
     @Test
     fun elevationRawValueIsUsedAsZIndex_drawsBelow() {
         rule.setMaterialContent {
-            Box(Modifier
-                .preferredSize(10.dp, 10.dp)
-                .semantics(mergeAllDescendants = true) {}
-                .testTag("box")) {
+            Box(
+                Modifier
+                    .preferredSize(10.dp, 10.dp)
+                    .semantics(mergeAllDescendants = true) {}
+                    .testTag("box")
+            ) {
                 Box(Modifier.fillMaxSize().background(color = Color.Green).zIndex(3f))
                 Surface(color = Color.Yellow, elevation = 2.dp) {
                     Box(Modifier.fillMaxSize())
@@ -129,10 +135,12 @@ class SurfaceTest {
     @Test
     fun elevationRawValueIsUsedAsZIndex_drawsAbove() {
         rule.setMaterialContent {
-            Box(Modifier
-                .preferredSize(10.dp, 10.dp)
-                .semantics(mergeAllDescendants = true) {}
-                .testTag("box")) {
+            Box(
+                Modifier
+                    .preferredSize(10.dp, 10.dp)
+                    .semantics(mergeAllDescendants = true) {}
+                    .testTag("box")
+            ) {
                 Box(Modifier.fillMaxSize().background(color = Color.Green).zIndex(1f))
                 Surface(color = Color.Yellow, elevation = 2.dp) {
                     Box(Modifier.fillMaxSize())

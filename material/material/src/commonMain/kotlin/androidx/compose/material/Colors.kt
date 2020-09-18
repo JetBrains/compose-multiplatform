@@ -137,20 +137,20 @@ class Colors (
 
     override fun toString(): String {
         return "Colors(" +
-                "primary=$primary, " +
-                "primaryVariant=$primaryVariant, " +
-                "secondary=$secondary, " +
-                "secondaryVariant=$secondaryVariant, " +
-                "background=$background, " +
-                "surface=$surface, " +
-                "error=$error, " +
-                "onPrimary=$onPrimary, " +
-                "onSecondary=$onSecondary, " +
-                "onBackground=$onBackground, " +
-                "onSurface=$onSurface, " +
-                "onError=$onError, " +
-                "isLight=$isLight" +
-                ")"
+            "primary=$primary, " +
+            "primaryVariant=$primaryVariant, " +
+            "secondary=$secondary, " +
+            "secondaryVariant=$secondaryVariant, " +
+            "background=$background, " +
+            "surface=$surface, " +
+            "error=$error, " +
+            "onPrimary=$onPrimary, " +
+            "onSecondary=$onSecondary, " +
+            "onBackground=$onBackground, " +
+            "onSurface=$onSurface, " +
+            "onError=$onError, " +
+            "isLight=$isLight" +
+            ")"
     }
 }
 

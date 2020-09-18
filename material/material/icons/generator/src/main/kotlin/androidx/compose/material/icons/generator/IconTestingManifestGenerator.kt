@@ -62,7 +62,7 @@ class IconTestingManifestGenerator(private val icons: List<Icon>) {
                     fileContent.replace(
                         "import androidx.compose.ui.graphics.vector.VectorAsset",
                         "$wildcardImport\n" +
-                                "import androidx.compose.ui.graphics.vector.VectorAsset"
+                            "import androidx.compose.ui.graphics.vector.VectorAsset"
                     )
                 }
             }
@@ -99,13 +99,15 @@ private fun generateListOfIconsForTheme(
     return FileSpec.builder(PackageNames.MaterialIconsPackage.packageName, propertyName)
         .addProperty(
             PropertySpec.builder(propertyName, type = listOfIconsType)
-                .initializer(buildCodeBlock {
-                    addStatement("listOf(")
-                    indent()
-                    iconStatements.forEach { add(it) }
-                    unindent()
-                    addStatement(")")
-                })
+                .initializer(
+                    buildCodeBlock {
+                        addStatement("listOf(")
+                        indent()
+                        iconStatements.forEach { add(it) }
+                        unindent()
+                        addStatement(")")
+                    }
+                )
                 .build()
         ).setIndent().build()
 }

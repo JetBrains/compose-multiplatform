@@ -45,7 +45,8 @@ import androidx.compose.ui.unit.dp
 fun SimpleTextFieldSample() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Label") }
     )
@@ -68,7 +69,8 @@ fun SimpleOutlinedTextFieldSample() {
 fun TextFieldWithIcons() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         placeholder = { Text("placeholder") },
         leadingIcon = { Icon(Icons.Filled.Favorite) },
@@ -81,7 +83,8 @@ fun TextFieldWithIcons() {
 fun TextFieldWithPlaceholder() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Email") },
         placeholder = { Text("example@gmail.com") }
@@ -154,7 +157,8 @@ fun TextFieldSample() {
         TextFieldValue("example", TextRange(0, 7))
     }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Label") }
     )
@@ -179,7 +183,8 @@ fun OutlinedTextFieldSample() {
 fun TextFieldWithHideKeyboardOnImeAction() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Label") },
         imeAction = ImeAction.Done,

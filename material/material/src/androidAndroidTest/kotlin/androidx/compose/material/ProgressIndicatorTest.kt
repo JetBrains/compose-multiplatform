@@ -50,8 +50,8 @@ class ProgressIndicatorTest {
         val progress = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                LinearProgressIndicator(modifier = Modifier.testTag(tag), progress = progress.value)
-            }
+            LinearProgressIndicator(modifier = Modifier.testTag(tag), progress = progress.value)
+        }
 
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
@@ -83,8 +83,8 @@ class ProgressIndicatorTest {
         val tag = "linear"
 
         rule.setMaterialContent {
-                LinearProgressIndicator(modifier = Modifier.testTag(tag))
-            }
+            LinearProgressIndicator(modifier = Modifier.testTag(tag))
+        }
 
         rule.onNodeWithTag(tag)
             .assertValueEquals(Strings.InProgress)
@@ -106,11 +106,11 @@ class ProgressIndicatorTest {
         val progress = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                CircularProgressIndicator(
-                    modifier = Modifier.testTag(tag),
-                    progress = progress.value
-                )
-            }
+            CircularProgressIndicator(
+                modifier = Modifier.testTag(tag),
+                progress = progress.value
+            )
+        }
 
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
@@ -141,8 +141,8 @@ class ProgressIndicatorTest {
         val tag = "circular"
 
         rule.setMaterialContent {
-                CircularProgressIndicator(modifier = Modifier.testTag(tag))
-            }
+            CircularProgressIndicator(modifier = Modifier.testTag(tag))
+        }
 
         rule.onNodeWithTag(tag)
             .assertValueEquals(Strings.InProgress)

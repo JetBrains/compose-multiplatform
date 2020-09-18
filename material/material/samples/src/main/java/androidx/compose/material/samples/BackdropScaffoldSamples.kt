@@ -71,13 +71,15 @@ fun BackdropScaffoldSample() {
                 },
                 actions = {
                     var clickCount by remember { mutableStateOf(0) }
-                    IconButton(onClick = {
-                        // show snackbar as a suspend function
-                        scope.launch {
-                            scaffoldState.snackbarHostState
-                                .showSnackbar("Snackbar #${++clickCount}")
+                    IconButton(
+                        onClick = {
+                            // show snackbar as a suspend function
+                            scope.launch {
+                                scaffoldState.snackbarHostState
+                                    .showSnackbar("Snackbar #${++clickCount}")
+                            }
                         }
-                    }) {
+                    ) {
                         Icon(Icons.Default.Favorite)
                     }
                 },

@@ -113,11 +113,14 @@ class DismissState(
      * @param onReset Optional callback invoked when the component has been reset.
      */
     fun reset(onReset: (() -> Unit)? = null) {
-        animateTo(targetValue = Default, onEnd = { endReason, endValue ->
-            if (endReason != Interrupted && endValue == Default) {
-                onReset?.invoke()
+        animateTo(
+            targetValue = Default,
+            onEnd = { endReason, endValue ->
+                if (endReason != Interrupted && endValue == Default) {
+                    onReset?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -128,11 +131,14 @@ class DismissState(
      */
     fun dismiss(direction: DismissDirection, onDismissed: (() -> Unit)? = null) {
         val targetValue = if (direction == StartToEnd) DismissedToEnd else DismissedToStart
-        animateTo(targetValue = targetValue, onEnd = { endReason, endValue ->
-            if (endReason != Interrupted && endValue == targetValue) {
-                onDismissed?.invoke()
+        animateTo(
+            targetValue = targetValue,
+            onEnd = { endReason, endValue ->
+                if (endReason != Interrupted && endValue == targetValue) {
+                    onDismissed?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -204,21 +210,29 @@ fun SwipeToDismiss(
         dismissThresholds(getDismissDirection(from, to)!!)
     }
 
-    Box(Modifier.swipeable(
-        state = state,
-        anchors = anchors,
-        thresholds = thresholds,
-        orientation = Orientation.Horizontal,
-        enabled = state.value == Default,
-        reverseDirection = isRtl,
-        resistance = ResistanceConfig(
-            basis = width,
-            factorAtMin =
-            if (EndToStart in directions) StandardResistanceFactor else StiffResistanceFactor,
-            factorAtMax =
-            if (StartToEnd in directions) StandardResistanceFactor else StiffResistanceFactor
+    Box(
+        Modifier.swipeable(
+            state = state,
+            anchors = anchors,
+            thresholds = thresholds,
+            orientation = Orientation.Horizontal,
+            enabled = state.value == Default,
+            reverseDirection = isRtl,
+            resistance = ResistanceConfig(
+                basis = width,
+                factorAtMin =
+                    if (EndToStart in directions)
+                        StandardResistanceFactor
+                    else
+                        StiffResistanceFactor,
+                factorAtMax =
+                    if (StartToEnd in directions)
+                        StandardResistanceFactor
+                    else
+                        StiffResistanceFactor
+            )
         )
-    )) {
+    ) {
         Row(
             children = background,
             modifier = Modifier.matchParentSize()

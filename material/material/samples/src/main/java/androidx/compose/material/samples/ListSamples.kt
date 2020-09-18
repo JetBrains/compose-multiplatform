@@ -150,7 +150,7 @@ fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
             secondaryText = {
                 Text(
                     "This is a long secondary text for the current list item, " +
-                            "displayed on two lines"
+                        "displayed on two lines"
                 )
             },
             singleLineSecondaryText = false,
@@ -168,7 +168,7 @@ fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
             secondaryText = {
                 Text(
                     "This is a long secondary text for the current list item " +
-                            "displayed on two lines"
+                        "displayed on two lines"
                 )
             },
             singleLineSecondaryText = false,
@@ -180,7 +180,7 @@ fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
             secondaryText = {
                 Text(
                     "This is a long secondary text for the current list" +
-                            " item, displayed on two lines"
+                        " item, displayed on two lines"
                 )
             },
             singleLineSecondaryText = false,
@@ -237,7 +237,8 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
         Divider()
         ListItem(
             text = { Text("بند قائمة من سطرين") },
-            secondaryText = { Text("نص ثانوي") })
+            secondaryText = { Text("نص ثانوي") }
+        )
         Divider()
         ListItem(
             modifier = Modifier.clickable { },
@@ -296,7 +297,7 @@ fun ThreeLineRtlLtrListItems(icon40x40: ImageAsset) {
             secondaryText = {
                 Text(
                     "هذا نص ثانوي طويل لعنصر القائمة الحالي ، معروض على سطرين. " +
-                            "في لغات أخرى قد نحتاج إلى المزيد من النص"
+                        "في لغات أخرى قد نحتاج إلى المزيد من النص"
                 )
             },
             singleLineSecondaryText = false

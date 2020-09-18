@@ -55,9 +55,10 @@ class CardTest {
                 Box {
                     cardColor = MaterialTheme.colors.surface
                     Providers(AmbientShapes provides Shapes(medium = shape)) {
-                        Card(modifier = Modifier
-                            .semantics(mergeAllDescendants = true) {}
-                            .testTag("card"),
+                        Card(
+                            modifier = Modifier
+                                .semantics(mergeAllDescendants = true) {}
+                                .testTag("card"),
                             elevation = 0.dp
                         ) {
                             Box(Modifier.preferredSize(50.dp, 50.dp))

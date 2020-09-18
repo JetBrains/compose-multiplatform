@@ -33,9 +33,11 @@ enum class IconTheme(val themePackageName: String, val themeClassName: String) {
 /**
  * Returns the matching [IconTheme] from [this] [IconTheme.themePackageName].
  */
-fun String.toIconTheme() = requireNotNull(IconTheme.values().find {
-    it.themePackageName == this
-}) { "No matching theme found" }
+fun String.toIconTheme() = requireNotNull(
+    IconTheme.values().find {
+        it.themePackageName == this
+    }
+) { "No matching theme found" }
 
 /**
  * The ClassName representing this [IconTheme] object, so we can generate extension properties on
