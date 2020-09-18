@@ -134,7 +134,8 @@ class ScrollableController(
             startVelocity = velocity,
             onAnimationEnd = { _, _, velocityLeft ->
                 onScrollEnd(velocityLeft)
-            })
+            }
+        )
     }
 }
 

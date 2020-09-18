@@ -153,7 +153,8 @@ fun Image(
 ) {
     // Explicitly use a simple Layout implementation here as Spacer squashes any non fixed
     // constraint with zero
-    Layout(emptyContent(),
+    Layout(
+        emptyContent(),
         modifier.clipToBounds().paint(
             painter,
             alignment = alignment,

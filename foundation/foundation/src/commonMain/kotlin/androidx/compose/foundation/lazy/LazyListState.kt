@@ -135,7 +135,8 @@ class LazyListState constructor(
         ScrollableController(
             flingConfig = flingConfig,
             animationClock = animationClock,
-            consumeScrollDelta = { onScroll(it) })
+            consumeScrollDelta = { onScroll(it) }
+        )
 
     /**
      * The [Remeasurement] object associated with our layout. It allows us to remeasure

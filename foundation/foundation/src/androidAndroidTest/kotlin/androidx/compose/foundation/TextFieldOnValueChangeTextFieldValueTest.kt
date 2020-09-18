@@ -86,7 +86,8 @@ class TextFieldOnValueChangeTextFieldValueTest {
                     onValueChange = {
                         state.value = it
                         onValueChange(it)
-                    })
+                    }
+                )
             }
         }
 
@@ -125,12 +126,14 @@ class TextFieldOnValueChangeTextFieldValueTest {
         performEditOperation(CommitTextEditOp("ABCDE", 1))
         rule.runOnIdle {
             verify(onValueChange, times(1))
-                .invoke(eq(
-                    androidx.compose.ui.text.input.TextFieldValue(
-                        "ABCDEabcde",
-                        TextRange(5)
+                .invoke(
+                    eq(
+                        androidx.compose.ui.text.input.TextFieldValue(
+                            "ABCDEabcde",
+                            TextRange(5)
+                        )
                     )
-                ))
+                )
         }
     }
 
@@ -139,12 +142,15 @@ class TextFieldOnValueChangeTextFieldValueTest {
         // Composition change will be reported as a change
         performEditOperation(SetComposingRegionEditOp(0, 5))
         rule.runOnIdle {
-            verify(onValueChange, times(1)).invoke(eq(
-                androidx.compose.ui.text.input.TextFieldValue(
-                text = "abcde",
-                selection = TextRange.Zero,
-                composition = TextRange(0, 5)
-            )))
+            verify(onValueChange, times(1)).invoke(
+                eq(
+                    androidx.compose.ui.text.input.TextFieldValue(
+                        text = "abcde",
+                        selection = TextRange.Zero,
+                        composition = TextRange(0, 5)
+                    )
+                )
+            )
         }
     }
 
@@ -154,13 +160,15 @@ class TextFieldOnValueChangeTextFieldValueTest {
         performEditOperation(SetComposingTextEditOp(composingText, 1))
         rule.runOnIdle {
             verify(onValueChange, times(1))
-                .invoke(eq(
-                    androidx.compose.ui.text.input.TextFieldValue(
-                        text = "ABCDEabcde",
-                        selection = TextRange(5),
-                        composition = TextRange(0, 5)
+                .invoke(
+                    eq(
+                        androidx.compose.ui.text.input.TextFieldValue(
+                            text = "ABCDEabcde",
+                            selection = TextRange(5),
+                            composition = TextRange(0, 5)
+                        )
                     )
-                ))
+                )
         }
     }
 
@@ -169,12 +177,14 @@ class TextFieldOnValueChangeTextFieldValueTest {
         // Selection change is a part of value-change in EditorModel text field
         performEditOperation(SetSelectionEditOp(1, 1))
         rule.runOnIdle {
-            verify(onValueChange, times(1)).invoke(eq(
-                androidx.compose.ui.text.input.TextFieldValue(
-                    "abcde",
-                    TextRange(1)
+            verify(onValueChange, times(1)).invoke(
+                eq(
+                    androidx.compose.ui.text.input.TextFieldValue(
+                        "abcde",
+                        TextRange(1)
+                    )
                 )
-            ))
+            )
         }
     }
 
@@ -205,12 +215,14 @@ class TextFieldOnValueChangeTextFieldValueTest {
     fun deleteSurroundingText_onValueChange_call_once() {
         performEditOperation(DeleteSurroundingTextEditOp(0, 1))
         rule.runOnIdle {
-            verify(onValueChange, times(1)).invoke(eq(
-                androidx.compose.ui.text.input.TextFieldValue(
-                    "bcde",
-                    TextRange.Zero
+            verify(onValueChange, times(1)).invoke(
+                eq(
+                    androidx.compose.ui.text.input.TextFieldValue(
+                        "bcde",
+                        TextRange.Zero
+                    )
                 )
-            ))
+            )
         }
     }
 }

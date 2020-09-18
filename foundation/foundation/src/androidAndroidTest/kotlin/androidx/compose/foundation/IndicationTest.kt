@@ -74,10 +74,11 @@ class IndicationTest {
             countDownLatch.countDown()
         }
         rule.setContent {
-            Box(Modifier
-                .testTag(testTag)
-                .preferredSize(100.dp)
-                .clickable(indication = indication) {}
+            Box(
+                Modifier
+                    .testTag(testTag)
+                    .preferredSize(100.dp)
+                    .clickable(indication = indication) {}
             )
         }
         assertThat(countDownLatch.count).isEqualTo(2)
@@ -129,10 +130,11 @@ class IndicationTest {
             lastPosition = it.interactionPositionFor(Interaction.Pressed)
         }
         rule.setContent {
-            Box(Modifier
-                .testTag(testTag)
-                .preferredSize(100.dp)
-                .clickable(indication = indication) { }
+            Box(
+                Modifier
+                    .testTag(testTag)
+                    .preferredSize(100.dp)
+                    .clickable(indication = indication) { }
             )
         }
         assertThat(lastPosition).isNull()

@@ -473,8 +473,12 @@ class TextFieldTest {
             .assert(hasInputMethodsSupport())
             .assert(hasImeAction(ImeAction.Unspecified))
             .assert(isNotFocused())
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
-                TextRange.Zero))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange.Zero
+                )
+            )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetText))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetSelection))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult))
@@ -520,14 +524,22 @@ class TextFieldTest {
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
         rule.onNodeWithTag("textField")
             .assertTextEquals(hello.text)
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
-                TextRange(hello.length)))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange(hello.length)
+                )
+            )
 
         rule.onNodeWithTag("textField")
             .performSemanticsAction(SemanticsActions.SetSelection) { it(1, 3, true) }
         rule.onNodeWithTag("textField")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
-                TextRange(1, 3)))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange(1, 3)
+                )
+            )
     }
 
     @Test

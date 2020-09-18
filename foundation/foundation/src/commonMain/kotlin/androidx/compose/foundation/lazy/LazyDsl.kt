@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 
 @RequiresOptIn(
     "This is an experimental API for demonstrating how LazyColumn / LazyRow should work" +
-            "using a DSL implementation. This is a prototype and its implementation is not suited" +
-            " for PagedList or large lists."
+        "using a DSL implementation. This is a prototype and its implementation is not suited" +
+        " for PagedList or large lists."
 )
 annotation class ExperimentalLazyDsl
 
@@ -198,7 +198,9 @@ fun LazyRow(
         verticalAlignment = verticalAlignment,
         isVertical = false
     ) {
-            index -> scope.contentFor(index, this) }
+        index ->
+        scope.contentFor(index, this)
+    }
 }
 
 /**

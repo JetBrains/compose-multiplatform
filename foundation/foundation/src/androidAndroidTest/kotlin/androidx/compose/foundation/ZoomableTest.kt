@@ -130,7 +130,8 @@ class ZoomableTest {
 
         setZoomableContent {
             Modifier
-                .zoomable(controller = controller,
+                .zoomable(
+                    controller = controller,
                     onZoomStarted = { startTriggered++ },
                     onZoomStopped = { stopTriggered++ }
                 )

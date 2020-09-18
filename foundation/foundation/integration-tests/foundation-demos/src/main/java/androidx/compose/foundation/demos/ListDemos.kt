@@ -179,7 +179,8 @@ private fun RtlListDemo() {
     Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
         LazyRowForIndexed((0..100).toList(), Modifier.fillMaxWidth()) { index, item ->
             Text(
-                "$item", Modifier
+                "$item",
+                Modifier
                     .size(100.dp)
                     .background(if (index % 2 == 0) Color.LightGray else Color.Transparent)
                     .padding(16.dp)

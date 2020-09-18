@@ -60,7 +60,7 @@ object FoundationSemanticsProperties {
  *  @see FoundationSemanticsProperties.InMutuallyExclusiveGroup
  */
 var SemanticsPropertyReceiver.inMutuallyExclusiveGroup
-        by FoundationSemanticsProperties.InMutuallyExclusiveGroup
+by FoundationSemanticsProperties.InMutuallyExclusiveGroup
 
 /**
  * Whether this element is selected (out of a list of possible selections).
@@ -77,4 +77,4 @@ var SemanticsPropertyReceiver.selected by FoundationSemanticsProperties.Selected
  * @see FoundationSemanticsProperties.ToggleableState
  */
 var SemanticsPropertyReceiver.toggleableState
-        by FoundationSemanticsProperties.ToggleableState
+by FoundationSemanticsProperties.ToggleableState
