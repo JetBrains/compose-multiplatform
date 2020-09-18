@@ -96,9 +96,8 @@ class LayoutNodeModifierBenchmark(
         rule.activityTestRule.runOnUiThread {
             val composeView = rule.findAndroidOwner()
             val root = composeView.root
-            val selection = root.children[0]
-            check(selection.children.size == 1) { "Expecting only a Box" }
-            layoutNode = selection.children[0]
+            check(root.children.size == 1) { "Expecting only a Box" }
+            layoutNode = root.children[0]
             check(layoutNode.children.isEmpty()) { "Box should be empty" }
         }
     }
