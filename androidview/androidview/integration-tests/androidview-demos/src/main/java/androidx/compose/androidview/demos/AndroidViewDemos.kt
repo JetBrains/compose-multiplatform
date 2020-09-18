@@ -19,9 +19,12 @@ package androidx.compose.androidview.demos
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-val AndroidViewDemos = DemoCategory("AndroidView", listOf(
-    ComposeInAndroidDemos,
-    AndroidInComposeDemos,
-    ComplexTouchInterop,
-    ActivityDemo("WebComponent", WebComponentActivity::class)
-))
+val AndroidViewDemos = DemoCategory(
+    "AndroidView",
+    listOf(
+        ComposeInAndroidDemos,
+        AndroidInComposeDemos,
+        ComplexTouchInterop,
+        ActivityDemo("WebComponent", WebComponentActivity::class)
+    )
+)

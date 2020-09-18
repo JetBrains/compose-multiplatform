@@ -44,10 +44,14 @@ import androidx.compose.integration.demos.common.DemoCategory
 
 // TODO(b/158099918): Add this demo to AndroidViewDemos.kt once b/158099918 has been resolved.
 @Suppress("unused")
-val ComplexTouchInterop = DemoCategory("Complex Touch Interop", listOf(
-    ComposableDemo("Compose in Android in Compose in Android") {
-        ComposeInAndroidInComposeEtcTargetingDemo() }
-))
+val ComplexTouchInterop = DemoCategory(
+    "Complex Touch Interop",
+    listOf(
+        ComposableDemo("Compose in Android in Compose in Android") {
+            ComposeInAndroidInComposeEtcTargetingDemo()
+        }
+    )
+)
 
 @Composable
 fun ComposeInAndroidInComposeEtcTargetingDemo() {
@@ -55,13 +59,13 @@ fun ComposeInAndroidInComposeEtcTargetingDemo() {
     Column {
         Text(
             "In this demo, from the inside out, we have a Compose Button, wrapped in 2 Android " +
-                    "FrameLayouts, wrapped in a Compose Box, wrapped in a Column (which also has " +
-                    "this Text) which is then in the root AndroidComposeView."
+                "FrameLayouts, wrapped in a Compose Box, wrapped in a Column (which also has " +
+                "this Text) which is then in the root AndroidComposeView."
         )
         Text(
             "Each node in our tree affects the position of the button and the pointer input " +
-                    "events translate from Android to compose a couple of times and everything " +
-                    "still works."
+                "events translate from Android to compose a couple of times and everything " +
+                "still works."
         )
         Box(
             Modifier

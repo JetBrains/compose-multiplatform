@@ -118,7 +118,8 @@ class LayoutBuilder : ViewAdapter {
         }
 
         if (prev == null || intAttrs.isNotEmpty() || floatAttrs.isNotEmpty() ||
-            anyAttrs.isNotEmpty()) {
+            anyAttrs.isNotEmpty()
+        ) {
             // params have not been set yet, or they've been updated
             view.layoutParams = lp
         }
