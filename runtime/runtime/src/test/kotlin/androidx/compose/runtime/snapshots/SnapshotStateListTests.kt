@@ -208,7 +208,7 @@ class SnapshotStateListTests {
     fun validate_subList_get_outOfRange() {
         val list = mutableStateListOf(0, 1, 2, 3, 4, 5, 6)
         val subList = list.subList(2, 5)
-        subList[4]
+        subList[3]
     }
 
     @Test

@@ -141,8 +141,8 @@ private fun modificationError(): Nothing =
     error("Cannot modify a state list through an iterator")
 
 private fun validateRange(index: Int, size: Int) {
-    if (index !in 0..size) {
-        throw IndexOutOfBoundsException("index ($index) is out of bound of 0..$size")
+    if (index !in 0 until size) {
+        throw IndexOutOfBoundsException("index ($index) is out of bound of [0, $size)")
     }
 }
 
