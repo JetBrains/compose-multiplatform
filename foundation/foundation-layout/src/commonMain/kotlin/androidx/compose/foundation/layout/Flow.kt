@@ -170,7 +170,7 @@ private fun Flow(
         // Return whether the placeable can be added to the current sequence.
         fun canAddToCurrentSequence(placeable: Placeable) =
             currentSequence.isEmpty() || currentMainAxisSize + mainAxisSpacing.toIntPx() +
-                    placeable.mainAxisSize() <= constraints.mainAxisMax
+                placeable.mainAxisSize() <= constraints.mainAxisMax
 
         // Store current sequence information and start a new sequence.
         fun startNewSequence() {

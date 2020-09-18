@@ -370,9 +370,11 @@ class LayoutAlignTest : LayoutTest() {
 
     @Test
     fun test2DAlignedModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.wrapContentSize(Alignment.TopStart).aspectRatio(2f)) { }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.wrapContentSize(Alignment.TopStart).aspectRatio(2f)) { }
+            }
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(0, minIntrinsicWidth(0))
             assertEquals(25.dp.toIntPx() * 2, minIntrinsicWidth(25.dp.toIntPx()))
@@ -398,8 +400,9 @@ class LayoutAlignTest : LayoutTest() {
     @Test
     fun test1DAlignedModifier_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics({
-            Container(Modifier.wrapContentHeight(Alignment.CenterVertically)
-                .aspectRatio(2f)
+            Container(
+                Modifier.wrapContentHeight(Alignment.CenterVertically)
+                    .aspectRatio(2f)
             ) { }
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
 
@@ -457,7 +460,8 @@ class LayoutAlignTest : LayoutTest() {
                         ) {
                         }
                     }
-                }, measureBlock = { measurables, constraints ->
+                },
+                measureBlock = { measurables, constraints ->
                     val placeable = measurables.first().measure(Constraints())
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         placeable.placeRelative(0, 0)

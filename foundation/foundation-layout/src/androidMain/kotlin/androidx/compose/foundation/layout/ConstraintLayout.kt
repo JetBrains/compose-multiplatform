@@ -66,10 +66,13 @@ fun ConstraintLayout(
     val scope = remember { ConstraintLayoutScope() }
 
     @Suppress("Deprecation")
-    MultiMeasureLayout(modifier = modifier, children = {
-        scope.reset()
-        scope.children()
-    }) { measurables, constraints ->
+    MultiMeasureLayout(
+        modifier = modifier,
+        children = {
+            scope.reset()
+            scope.children()
+        }
+    ) { measurables, constraints ->
         val constraintSet = object : ConstraintSet {
             override fun applyTo(state: State, measurables: List<Measurable>) {
                 scope.applyTo(state)
@@ -837,17 +840,25 @@ class ConstrainScope internal constructor(internal val id: Any) {
 
     internal companion object {
         val verticalAnchorFunctions:
-                Array<Array<ConstraintReference.(Any, LayoutDirection) -> ConstraintReference>> =
-            arrayOf(
+            Array<Array<ConstraintReference.(Any, LayoutDirection) -> ConstraintReference>> =
                 arrayOf(
-                    { other, layoutDirection -> clearLeft(layoutDirection); leftToLeft(other) },
-                    { other, layoutDirection -> clearLeft(layoutDirection); leftToRight(other) }
-                ),
-                arrayOf(
-                    { other, layoutDirection -> clearRight(layoutDirection); rightToLeft(other) },
-                    { other, layoutDirection -> clearRight(layoutDirection); rightToRight(other) }
+                    arrayOf(
+                        { other, layoutDirection ->
+                            clearLeft(layoutDirection); leftToLeft(other)
+                        },
+                        { other, layoutDirection ->
+                            clearLeft(layoutDirection); leftToRight(other)
+                        }
+                    ),
+                    arrayOf(
+                        { other, layoutDirection ->
+                            clearRight(layoutDirection); rightToLeft(other)
+                        },
+                        { other, layoutDirection ->
+                            clearRight(layoutDirection); rightToRight(other)
+                        }
+                    )
                 )
-            )
 
         private fun ConstraintReference.clearLeft(layoutDirection: LayoutDirection) {
             leftToLeft(null)
@@ -880,16 +891,16 @@ class ConstrainScope internal constructor(internal val id: Any) {
             }
 
         val horizontalAnchorFunctions:
-                Array<Array<ConstraintReference.(Any) -> ConstraintReference>> = arrayOf(
-            arrayOf(
-                { other -> topToBottom(null); baselineToBaseline(null); topToTop(other) },
-                { other -> topToTop(null); baselineToBaseline(null); topToBottom(other) }
-            ),
-            arrayOf(
-                { other -> bottomToBottom(null); baselineToBaseline(null); bottomToTop(other) },
-                { other -> bottomToTop(null); baselineToBaseline(null); bottomToBottom(other) }
+            Array<Array<ConstraintReference.(Any) -> ConstraintReference>> = arrayOf(
+                arrayOf(
+                    { other -> topToBottom(null); baselineToBaseline(null); topToTop(other) },
+                    { other -> topToTop(null); baselineToBaseline(null); topToBottom(other) }
+                ),
+                arrayOf(
+                    { other -> bottomToBottom(null); baselineToBaseline(null); bottomToTop(other) },
+                    { other -> bottomToTop(null); baselineToBaseline(null); bottomToBottom(other) }
+                )
             )
-        )
         val baselineAnchorFunction: ConstraintReference.(Any) -> ConstraintReference =
             { other ->
                 topToTop(null)
@@ -1127,8 +1138,9 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
 
         if (DEBUG) {
             Log.d(
-                "CCL", "Measuring ${measurable.id} with: " +
-                        constraintWidget.toDebugString() + "\n" + measure.toDebugString()
+                "CCL",
+                "Measuring ${measurable.id} with: " +
+                    constraintWidget.toDebugString() + "\n" + measure.toDebugString()
             )
         }
 
@@ -1231,8 +1243,8 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
         lastMeasures.getOrPut(measurable, { arrayOf(0, 0, 0) }).copyFrom(measure)
 
         measure.measuredNeedsSolverPass = measure.measuredWidth != initialWidth ||
-                measure.measuredHeight != initialHeight ||
-                measure.measuredBaseline != initialBaseline
+            measure.measuredHeight != initialHeight ||
+            measure.measuredBaseline != initialBaseline
     }
 
     /**
@@ -1261,8 +1273,10 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
         }
         MATCH_CONSTRAINT -> {
             val useDimension = useDeprecated &&
-                    (matchConstraintDefaultDimension != MATCH_CONSTRAINT_WRAP ||
-                            dimension != knownWrapContentSize)
+                (
+                    matchConstraintDefaultDimension != MATCH_CONSTRAINT_WRAP ||
+                        dimension != knownWrapContentSize
+                    )
             outConstraints[0] = if (useDimension) dimension else 0
             outConstraints[1] = if (useDimension) dimension else rootMaxConstraint
             !useDimension
@@ -1338,7 +1352,7 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
                     Log.d(
                         "CCL",
                         "Final measurement for ${measurable.id} " +
-                                "to confirm size ${child.width} ${child.height}"
+                            "to confirm size ${child.width} ${child.height}"
                     )
                 }
                 with(measureScope) {
@@ -1374,10 +1388,10 @@ private typealias SolverChain = androidx.constraintlayout.core.state.State.Chain
 private val DEBUG = false
 private fun ConstraintWidget.toDebugString() =
     "$debugName " +
-            "width $width minWidth $minWidth maxWidth $maxWidth " +
-            "height $height minHeight $minHeight maxHeight $maxHeight " +
-            "HDB $horizontalDimensionBehaviour VDB $verticalDimensionBehaviour " +
-            "MCW $mMatchConstraintDefaultWidth MCH $mMatchConstraintDefaultHeight " +
-            "percentW $mMatchConstraintPercentWidth percentH $mMatchConstraintPercentHeight"
+        "width $width minWidth $minWidth maxWidth $maxWidth " +
+        "height $height minHeight $minHeight maxHeight $maxHeight " +
+        "HDB $horizontalDimensionBehaviour VDB $verticalDimensionBehaviour " +
+        "MCW $mMatchConstraintDefaultWidth MCH $mMatchConstraintDefaultHeight " +
+        "percentW $mMatchConstraintPercentWidth percentH $mMatchConstraintPercentHeight"
 private fun BasicMeasure.Measure.toDebugString() =
     "use deprecated is $useDeprecated "
