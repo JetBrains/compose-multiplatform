@@ -138,7 +138,7 @@ internal class AndroidComposeView constructor(
         properties = {}
     )
 
-    override val focusManager: FocusManager = FocusManager()
+    private val focusManager: FocusManager = FocusManager()
 
     private val keyInputModifier = KeyInputModifier(null, null)
 

@@ -37,7 +37,7 @@ import org.junit.runners.JUnit4
 @MediumTest
 @OptIn(ExperimentalFocus::class)
 @RunWith(JUnit4::class)
-class SetRootFocus {
+class SetRootFocusTest {
     @get:Rule
     val rule = createComposeRule()
 
