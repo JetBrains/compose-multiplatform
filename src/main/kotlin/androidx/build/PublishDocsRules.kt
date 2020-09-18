@@ -52,7 +52,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.CAMERA.group, "camera-video")
     prebuilts(LibraryGroups.CAMERA, "camera-view", "1.0.0-alpha17")
     prebuilts(LibraryGroups.CAMERA, "camera-extensions", "1.0.0-alpha17")
-            .addStubs("camera/camera-extensions-stub/camera-extensions-stub.jar")
+        .addStubs("camera/camera-extensions-stub/camera-extensions-stub.jar")
     prebuilts(LibraryGroups.CAMERA, "1.0.0-beta10")
     prebuilts(LibraryGroups.CARDVIEW, "1.0.0")
     prebuilts(LibraryGroups.COLLECTION, "1.1.0")
@@ -158,12 +158,12 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.VIEWPAGER2, "1.1.0-alpha01")
     prebuilts(LibraryGroups.WEAR, "wear-input", "1.0.0-alpha01")
     prebuilts(LibraryGroups.WEAR, "wear", "1.1.0-rc03")
-            .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
+        .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     ignore(LibraryGroups.WEAR.group, "wear-input-testing")
     prebuilts(LibraryGroups.WEBKIT, "1.4.0-alpha01")
     ignore(LibraryGroups.WINDOW.group, "window-sidecar")
     prebuilts(LibraryGroups.WINDOW, "1.0.0-alpha01")
-            .addStubs("window/stubs/window-sidecar-release-0.1.0-alpha01.aar")
+        .addStubs("window/stubs/window-sidecar-release-0.1.0-alpha01.aar")
     ignore(LibraryGroups.WORK.group, "work-inspection")
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-runtime-lint")
@@ -242,7 +242,7 @@ class PublishDocsRulesBuilder(private val name: String, private val offline: Boo
      * given [version].
      */
     fun prebuilts(libraryGroup: LibraryGroup, version: String) =
-            prebuilts(libraryGroup, Version(version))
+        prebuilts(libraryGroup, Version(version))
 
     /**
      * Specifies that docs for projects within [groupName] will be built from prebuilts with the

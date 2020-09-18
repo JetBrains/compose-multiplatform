@@ -54,7 +54,8 @@ object MetalavaTasks {
         // implemented by excluding APIs with this annotation from the restricted API file.
         val generateRestrictToLibraryGroupAPIs = !extension.mavenGroup!!.requireSameVersion
         val generateApi = project.tasks.register("generateApi", GenerateApiTask::class.java) {
-                task ->
+            task ->
+
             task.group = "API"
             task.description = "Generates API files from source"
             task.apiLocation.set(builtApiLocation)
@@ -125,7 +126,7 @@ object MetalavaTasks {
             project.tasks.register("checkApi", CheckApiEquivalenceTask::class.java) { task ->
                 task.group = "API"
                 task.description = "Checks that the API generated from source code matches the " +
-                        "checked in API file"
+                    "checked in API file"
                 task.builtApi.set(generateApi.flatMap { it.apiLocation })
                 task.cacheEvenIfNoOutputs()
                 task.checkedInApis.set(outputApiLocations)
@@ -135,8 +136,10 @@ object MetalavaTasks {
                 }
             }
 
-        val regenerateOldApis = project.tasks.register("regenerateOldApis",
-                RegenerateOldApisTask::class.java) { task ->
+        val regenerateOldApis = project.tasks.register(
+            "regenerateOldApis",
+            RegenerateOldApisTask::class.java
+        ) { task ->
             task.group = "API"
             task.description = "Regenerates historic API .txt files using the " +
                 "corresponding prebuilt and the latest Metalava"

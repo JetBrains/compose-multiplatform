@@ -73,7 +73,8 @@ abstract class UpdateApiTask : DefaultTask() {
             val version = outputApi.version()
             if (version != null && version.isFinalApi() &&
                 outputApi.publicApiFile.exists() &&
-                !project.hasProperty("force")) {
+                !project.hasProperty("force")
+            ) {
                 permitOverwriting = false
             }
         }
@@ -125,13 +126,13 @@ fun copy(
     if (changing) {
         if (overwriting && !permitOverwriting) {
             val message = "Modifying the API definition for a previously released artifact " +
-                    "having a final API version (version not ending in '-alpha') is not " +
-                    "allowed.\n\n" +
-                    "Previously declared definition is $dest\n" +
-                    "Current generated   definition is $source\n\n" +
-                    "Did you mean to increment the library version first?\n\n" +
-                    "If you have reason to overwrite the API files for the previous release " +
-                    "anyway, you can run `./gradlew updateApi -Pforce` to ignore this message"
+                "having a final API version (version not ending in '-alpha') is not " +
+                "allowed.\n\n" +
+                "Previously declared definition is $dest\n" +
+                "Current generated   definition is $source\n\n" +
+                "Did you mean to increment the library version first?\n\n" +
+                "If you have reason to overwrite the API files for the previous release " +
+                "anyway, you can run `./gradlew updateApi -Pforce` to ignore this message"
             throw GradleException(message)
         }
         if (source.exists()) {

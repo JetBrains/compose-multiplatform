@@ -139,8 +139,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         val resolvedOutputFile: File = outputXml.asFile.get()
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
-                throw RuntimeException("Failed to create " +
-                        "test configuration file: $outputXml")
+                throw RuntimeException(
+                    "Failed to create test configuration file: $outputXml"
+                )
             }
         }
         resolvedOutputFile.writeText(configContent)

@@ -44,9 +44,11 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
             println("updated local.properties")
         }
     } else {
-        throw Exception("Unable to find SDK prebuilts at $sdkPath. If you are not using a " +
+        throw Exception(
+            "Unable to find SDK prebuilts at $sdkPath. If you are not using a " +
                 "standard repo-based checkout, please follow the checkout instructions at " +
-                "go/androidx-onboarding.")
+                "go/androidx-onboarding."
+        )
     }
 }
 
@@ -89,8 +91,8 @@ fun Project.getSdkPath(): File {
 
     val osName = System.getProperty("os.name").toLowerCase(Locale.US)
     val isMacOsX = osName.contains("mac os x") ||
-            osName.contains("darwin") ||
-            osName.contains("osx")
+        osName.contains("darwin") ||
+        osName.contains("osx")
     val platform = if (isMacOsX) "darwin" else "linux"
 
     // By convention, the SDK prebuilts live under the root checkout directory.

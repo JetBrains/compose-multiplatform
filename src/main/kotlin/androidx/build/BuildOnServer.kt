@@ -48,11 +48,12 @@ open class BuildOnServer : DefaultTask() {
         val buildId = getBuildId()
 
         val filesNames = mutableListOf(
-        // TODO: re-add after merge to compose merge to master
-        // "androidx-public-docs-$buildId.zip",
-        // "dokkaPublicDocs-$buildId.zip",
-        "androidx_aggregate_build_info.txt",
-        "top-of-tree-m2repository-all-$buildId.zip")
+            // TODO: re-add after merge to compose merge to master
+            // "androidx-public-docs-$buildId.zip",
+            // "dokkaPublicDocs-$buildId.zip",
+            "androidx_aggregate_build_info.txt",
+            "top-of-tree-m2repository-all-$buildId.zip"
+        )
 
         if (project.isDocumentationEnabled()) {
             filesNames.add("androidx-tipOfTree-docs-$buildId.zip")
@@ -98,7 +99,8 @@ open class BuildOnServer : DefaultTask() {
                         var jarEntry = classesJarInputStream.nextEntry
                         while (jarEntry != null) {
                             if (jarEntry.name.startsWith("META-INF/androidx.") &&
-                                jarEntry.name.endsWith(".version")) {
+                                jarEntry.name.endsWith(".version")
+                            ) {
                                 foundVersionFile = true
                                 break
                             }

@@ -83,20 +83,29 @@ class DiffAndDocs private constructor(
         // run-time classpath. Note this breaks the ability to use JDK 9+ for compilation.
         val doclavaConfiguration = root.configurations.create("doclava")
         doclavaConfiguration.dependencies.add(root.dependencies.create(DOCLAVA_DEPENDENCY))
-        doclavaConfiguration.dependencies.add(root.dependencies.create(root.files(
-            SupportConfig.getJavaToolsJarPath())))
+        doclavaConfiguration.dependencies.add(
+            root.dependencies.create(
+                root.files(
+                    SupportConfig.getJavaToolsJarPath()
+                )
+            )
+        )
 
         // Pulls in the :fakeannotations project, which provides modified annotations required to
         // generate SDK API stubs in Doclava from Metalava-generated platform SDK stubs.
         val annotationConfiguration = root.configurations.create("annotation")
-        annotationConfiguration.dependencies.add(root.dependencies.project(
-            mapOf("path" to ":fakeannotations")))
+        annotationConfiguration.dependencies.add(
+            root.dependencies.project(
+                mapOf("path" to ":fakeannotations")
+            )
+        )
 
         rules = additionalRules + TIP_OF_TREE
         docsProject = root.findProject(":docs-fake")
         anchorTask = root.tasks.register("anchorDocsTask")
-        val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration,
-            annotationConfiguration)
+        val generateSdkApiTask = createGenerateSdkApiTask(
+            root, doclavaConfiguration, annotationConfiguration
+        )
         val offlineOverride = root.processProperty("offlineDocs")
 
         // Associate each documentation generation rule set with a GenerateDocsTask.
@@ -114,7 +123,8 @@ class DiffAndDocs private constructor(
                 dacOptions = dacOptions,
                 destDir = File(root.docsDir(), rule.name),
                 taskName = "${rule.name}DocsTask",
-                offline = offline)
+                offline = offline
+            )
             docsTasks[rule.name] = generateDocsTask
             val createDistDocsTask = createDistDocsTask(root, generateDocsTask, rule.name)
             anchorTask.configure { task ->
@@ -157,8 +167,10 @@ class DiffAndDocs private constructor(
             additionalRules: List<PublishDocsRules> = emptyList()
         ): TaskProvider<Task> {
             Preconditions.checkArgument(root.isRoot, "Must pass the root project")
-            Preconditions.checkState(root.extensions.findByName(EXT_NAME) == null,
-                "Cannot initialize DiffAndDocs twice")
+            Preconditions.checkState(
+                root.extensions.findByName(EXT_NAME) == null,
+                "Cannot initialize DiffAndDocs twice"
+            )
             val instance = DiffAndDocs(
                 root = root,
                 dacOptions = dacOptions,
@@ -196,27 +208,29 @@ class DiffAndDocs private constructor(
         val artifacts = try {
             configuration.resolvedConfiguration.resolvedArtifacts
         } catch (e: ResolveException) {
-            root.logger.error("Failed to find prebuilts for $mavenId. " +
+            root.logger.error(
+                "Failed to find prebuilts for $mavenId. " +
                     "A matching rule $originRule in docsRules(\"$originName\") " +
                     "in PublishDocsRules.kt requires it. You should either add a prebuilt, " +
-                    "or add overriding \"ignore\" or \"tipOfTree\" rules")
+                    "or add overriding \"ignore\" or \"tipOfTree\" rules"
+            )
             throw e
         }
 
         val artifact = artifacts.find { it.moduleVersion.id.toString() == mavenId }
-                ?: throw GradleException()
+            ?: throw GradleException()
 
         val folder = artifact.file.parentFile
         val tree = root.zipTree(File(folder, "${artifact.file.nameWithoutExtension}-sources.jar"))
-                .matching {
-                    it.exclude("**/*.MF")
-                    it.exclude("**/*.aidl")
-                    it.exclude("**/*.html")
-                    it.exclude("**/*.kt")
-                    it.exclude("**/META-INF/**")
-                    it.exclude("**/OWNERS")
-                    it.exclude("**/NOTICE.txt")
-                }
+            .matching {
+                it.exclude("**/*.MF")
+                it.exclude("**/*.aidl")
+                it.exclude("**/*.html")
+                it.exclude("**/*.kt")
+                it.exclude("**/META-INF/**")
+                it.exclude("**/OWNERS")
+                it.exclude("**/NOTICE.txt")
+            }
         root.configurations.remove(configuration)
         return tree
     }
@@ -224,7 +238,7 @@ class DiffAndDocs private constructor(
     private fun setupDocsProject() {
         docsProject?.afterEvaluate { docs ->
             val appExtension = docs.extensions.findByType(AppExtension::class.java)
-                    ?: throw GradleException("Android app plugin is missing on docsProject")
+                ?: throw GradleException("Android app plugin is missing on docsProject")
 
             rules.forEach { rule ->
                 appExtension.productFlavors.register(rule.name).configure {
@@ -326,8 +340,8 @@ class DiffAndDocs private constructor(
         setup: (TaskProvider<out DoclavaTask>) -> Unit
     ) {
         rules.filter { rule -> rule.resolve(extension)?.strategy == TipOfTree }
-                .mapNotNull { rule -> docsTasks[rule.name] }
-                .forEach(setup)
+            .mapNotNull { rule -> docsTasks[rule.name] }
+            .forEach(setup)
     }
 
     /**
@@ -392,7 +406,7 @@ private fun registerJavaProjectForDocsTask(
         docsTask.source(javaCompileTask.source)
         val project = docsTask.project
         docsTask.classpath += project.files(javaCompileTask.classpath) +
-                project.files(javaCompileTask.destinationDir)
+            project.files(javaCompileTask.destinationDir)
     }
 }
 
@@ -414,7 +428,7 @@ private fun registerAndroidProjectForDocsTask(
         // sources
         task.include { fileTreeElement ->
             fileTreeElement.name != "R.java" ||
-                    fileTreeElement.path.endsWith(releaseVariant.rFile())
+                fileTreeElement.path.endsWith(releaseVariant.rFile())
         }
         releaseVariant.getSourceFolders(SourceKind.JAVA).forEach { sourceSet ->
             task.source(sourceSet)
@@ -444,9 +458,11 @@ private fun createDistDocsTask(
 ): TaskProvider<Zip> = project.tasks.register("dist${ruleName}Docs", Zip::class.java) {
     it.apply {
         dependsOn(generateDocs)
-        from(generateDocs.map {
-            it.destinationDir!!
-        })
+        from(
+            generateDocs.map {
+                it.destinationDir!!
+            }
+        )
         val baseName = "androidx-$ruleName-docs"
         val buildId = getBuildId()
         archiveBaseName.set(baseName)
@@ -474,32 +490,32 @@ private fun createGenerateSdkApiTask(
     doclavaConfig: Configuration,
     annotationConfig: Configuration
 ): TaskProvider<DoclavaTask> =
-        project.tasks.register("generateSdkApi", DoclavaTask::class.java) { task ->
-            task.apply {
-                dependsOn(doclavaConfig)
-                dependsOn(annotationConfig)
-                description = "Generates API files for the current SDK."
-                setDocletpath(doclavaConfig.resolve())
-                destinationDir = project.docsDir()
-                // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
-                classpath = androidJarFile(project)
-                    .filter { it.path.contains("androidx/annotation") }
-                    .plus(project.files(annotationConfig.resolve()))
-                source(
-                    project.zipTree(androidSrcJarFile(project))
-                        .matching(PatternSet().include("**/*.java"))
-                )
-                exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
-                apiFile = sdkApiFile(project)
-                generateDocs = false
-                coreJavadocOptions {
-                    addStringOption("stubpackages", "android.*")
-                }
-                coreJavadocOptions {
-                    addStringOption("-release", "8")
-                }
+    project.tasks.register("generateSdkApi", DoclavaTask::class.java) { task ->
+        task.apply {
+            dependsOn(doclavaConfig)
+            dependsOn(annotationConfig)
+            description = "Generates API files for the current SDK."
+            setDocletpath(doclavaConfig.resolve())
+            destinationDir = project.docsDir()
+            // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
+            classpath = androidJarFile(project)
+                .filter { it.path.contains("androidx/annotation") }
+                .plus(project.files(annotationConfig.resolve()))
+            source(
+                project.zipTree(androidSrcJarFile(project))
+                    .matching(PatternSet().include("**/*.java"))
+            )
+            exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
+            apiFile = sdkApiFile(project)
+            generateDocs = false
+            coreJavadocOptions {
+                addStringOption("stubpackages", "android.*")
+            }
+            coreJavadocOptions {
+                addStringOption("-release", "8")
             }
         }
+    }
 
 /**
  * List of Doclava checks that should be ignored when generating documentation.
@@ -510,9 +526,9 @@ private val GENERATEDOCS_HIDDEN = listOf(105, 106, 107, 111, 112, 113, 115, 116,
  * Doclava checks configuration for use in generating documentation.
  */
 private val GENERATE_DOCS_CONFIG = ChecksConfig(
-        warnings = emptyList(),
-        hidden = GENERATEDOCS_HIDDEN + DEFAULT_DOCLAVA_CONFIG.hidden,
-        errors = ((101..122) - GENERATEDOCS_HIDDEN)
+    warnings = emptyList(),
+    hidden = GENERATEDOCS_HIDDEN + DEFAULT_DOCLAVA_CONFIG.hidden,
+    errors = ((101..122) - GENERATEDOCS_HIDDEN)
 )
 
 /**
@@ -538,55 +554,59 @@ private fun createGenerateDocsTask(
     taskName: String = "generateDocs",
     offline: Boolean
 ): TaskProvider<GenerateDocsTask> =
-        project.tasks.register(taskName, GenerateDocsTask::class.java) {
-            it.apply {
-                exclude("**/R.java")
-                // TODO: b/144249620 means that java generating tasks include kt source files in
-                // JavaCompile source, and since we just get all the source files this will mean we
-                // try to parse Kotlin files, which will break.
-                exclude("**/*.kt")
-                dependsOn(generateSdkApiTask, doclavaConfig)
-                group = JavaBasePlugin.DOCUMENTATION_GROUP
-                description = "Generates Java documentation in the style of d.android.com. To " +
-                        "generate offline docs use \'-PofflineDocs=true\' parameter.  Places the " +
-                        "documentation in $destDir"
+    project.tasks.register(taskName, GenerateDocsTask::class.java) {
+        it.apply {
+            exclude("**/R.java")
+            // TODO: b/144249620 means that java generating tasks include kt source files in
+            // JavaCompile source, and since we just get all the source files this will mean we
+            // try to parse Kotlin files, which will break.
+            exclude("**/*.kt")
+            dependsOn(generateSdkApiTask, doclavaConfig)
+            group = JavaBasePlugin.DOCUMENTATION_GROUP
+            description = "Generates Java documentation in the style of d.android.com. To " +
+                "generate offline docs use \'-PofflineDocs=true\' parameter.  Places the " +
+                "documentation in $destDir"
 
-                setDocletpath(doclavaConfig.resolve())
-                destinationDir = File(destDir, if (offline) "offline" else "online")
-                classpath = androidJarFile(project)
-                checksConfig = GENERATE_DOCS_CONFIG
+            setDocletpath(doclavaConfig.resolve())
+            destinationDir = File(destDir, if (offline) "offline" else "online")
+            classpath = androidJarFile(project)
+            checksConfig = GENERATE_DOCS_CONFIG
 
-                coreJavadocOptions {
-                    addStringOption("templatedir",
-                        "${project.getCheckoutRoot()}/external/doclava/res/assets/templates-sdk")
-                    // Note this is using the project's real root directory, e.g. `fw/support/ui`.
-                    addStringOption("samplesdir",
-                        "${project.rootDir}/samples")
-                    addMultilineMultiValueOption("federate").value = listOf(
-                        listOf("Android", "https://developer.android.com")
-                    )
-                    addMultilineMultiValueOption("federationapi").value = listOf(
-                        listOf("Android", generateSdkApiTask.get().apiFile?.absolutePath)
-                    )
-                    addMultilineMultiValueOption("hdf").value = listOf(
-                        listOf("android.whichdoc", "online"),
-                        listOf("android.hasSamples", "true"),
-                        listOf("dac", "true")
-                    )
+            coreJavadocOptions {
+                addStringOption(
+                    "templatedir",
+                    "${project.getCheckoutRoot()}/external/doclava/res/assets/templates-sdk"
+                )
+                // Note this is using the project's real root directory, e.g. `fw/support/ui`.
+                addStringOption(
+                    "samplesdir",
+                    "${project.rootDir}/samples"
+                )
+                addMultilineMultiValueOption("federate").value = listOf(
+                    listOf("Android", "https://developer.android.com")
+                )
+                addMultilineMultiValueOption("federationapi").value = listOf(
+                    listOf("Android", generateSdkApiTask.get().apiFile?.absolutePath)
+                )
+                addMultilineMultiValueOption("hdf").value = listOf(
+                    listOf("android.whichdoc", "online"),
+                    listOf("android.hasSamples", "true"),
+                    listOf("dac", "true")
+                )
 
-                    // Specific to reference docs.
-                    if (!offline) {
-                        addStringOption("toroot", "/")
-                        addBooleanOption("devsite", true)
-                        addBooleanOption("yamlV2", true)
-                        addStringOption("dac_libraryroot", dacOptions.libraryroot)
-                        addStringOption("dac_dataname", dacOptions.dataname)
-                    }
+                // Specific to reference docs.
+                if (!offline) {
+                    addStringOption("toroot", "/")
+                    addBooleanOption("devsite", true)
+                    addBooleanOption("yamlV2", true)
+                    addStringOption("dac_libraryroot", dacOptions.libraryroot)
+                    addStringOption("dac_dataname", dacOptions.dataname)
                 }
-
-                addArtifactsAndSince()
             }
+
+            addArtifactsAndSince()
         }
+    }
 
 /**
  * @return the project's Android SDK API txt as a File.
@@ -597,14 +617,22 @@ private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_
  * @return the project's Android SDK stub JAR as a File.
  */
 fun androidJarFile(project: Project): FileCollection =
-        project.files(arrayOf(File(project.getSdkPath(),
-                "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android.jar")))
+    project.files(
+        arrayOf(
+            File(
+                project.getSdkPath(),
+                "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android.jar"
+            )
+        )
+    )
 
 /**
  * @return the project's Android SDK stub source JAR as a File.
  */
-private fun androidSrcJarFile(project: Project): File = File(project.getSdkPath(),
-        "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android-stubs-src.jar")
+private fun androidSrcJarFile(project: Project): File = File(
+    project.getSdkPath(),
+    "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android-stubs-src.jar"
+)
 
 /**
  * @return the R.java file for the variant, which may not exist.
@@ -623,8 +651,8 @@ fun Project.docsDir(): File {
  * Extension for accessing Strings in Project.properties by [name].
  */
 fun Project.processProperty(name: String) =
-        if (hasProperty(name)) {
-            properties[name] as String
-        } else {
-            null
-        }
+    if (hasProperty(name)) {
+        properties[name] as String
+    } else {
+        null
+    }

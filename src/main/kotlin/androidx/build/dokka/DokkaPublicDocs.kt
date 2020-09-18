@@ -70,7 +70,8 @@ object DokkaPublicDocs {
         "androidx.work.impl.utils.futures",
         "androidx.work.impl.utils.taskexecutor",
         "sample",
-        "sample.foo")
+        "sample.foo"
+    )
 
     fun tryGetRunnerProject(project: Project): Project? {
         return project.rootProject.findProject(":docs-runner")
@@ -92,38 +93,39 @@ object DokkaPublicDocs {
     }
 
     @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project):
-            TaskCollection<DokkaTask> {
-        val tasks = this
-        var dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
-            .matching { it.name.contains(DOCS_TYPE) }
-        if (dokkaTasks.isEmpty()) {
-            Dokka.createDocsTask(
-                DOCS_TYPE,
-                runnerProject,
-                hiddenPackages)
-
-            dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
+        TaskCollection<DokkaTask> {
+            val tasks = this
+            var dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
                 .matching { it.name.contains(DOCS_TYPE) }
+            if (dokkaTasks.isEmpty()) {
+                Dokka.createDocsTask(
+                    DOCS_TYPE,
+                    runnerProject,
+                    hiddenPackages
+                )
 
-            tasks.register(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java) { unzipTask ->
-                unzipTask.doLast {
-                    for (jar in unzipTask.outputJars) {
+                dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
+                    .matching { it.name.contains(DOCS_TYPE) }
+
+                tasks.register(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java) { unzipTask ->
+                    unzipTask.doLast {
+                        for (jar in unzipTask.outputJars) {
+                            dokkaTasks.forEach {
+                                it.classpath += runnerProject.file(jar)
+                            }
+                        }
                         dokkaTasks.forEach {
-                            it.classpath += runnerProject.file(jar)
+                            it.classpath += androidJarFile(runnerProject)
                         }
                     }
+
                     dokkaTasks.forEach {
-                        it.classpath += androidJarFile(runnerProject)
+                        it.dependsOn(unzipTask)
                     }
                 }
-
-                dokkaTasks.forEach {
-                    it.dependsOn(unzipTask)
-                }
             }
+            return dokkaTasks
         }
-        return dokkaTasks
-    }
 
     // specifies that <project> exists and might need us to generate documentation for it
     fun registerProject(
@@ -144,9 +146,11 @@ object DokkaPublicDocs {
             val dependency = projectSourcesLocationType.dependency(extension)
             assignPrebuiltForProject(project, dependency)
         } else if (projectSourcesLocationType != null && projectSourcesLocationType !is Ignore) {
-            throw Exception("Unsupported strategy " + projectSourcesLocationType +
-                " specified for publishing public docs of project " + extension +
-                "; must be Prebuilts or Ignore or null (which means Ignore)")
+            throw Exception(
+                "Unsupported strategy " + projectSourcesLocationType +
+                    " specified for publishing public docs of project " + extension +
+                    "; must be Prebuilts or Ignore or null (which means Ignore)"
+            )
         }
     }
 
@@ -198,10 +202,12 @@ object DokkaPublicDocs {
                     try {
                         configuration.resolvedConfiguration.resolvedArtifacts
                     } catch (e: ResolveException) {
-                        runnerProject.logger.error("DokkaPublicDocs failed to find prebuilts for " +
+                        runnerProject.logger.error(
+                            "DokkaPublicDocs failed to find prebuilts for " +
                                 "$mavenId. specified in PublishDocsRules.kt ." +
                                 "You should either add a prebuilt sources jar, " +
-                                "or add an overriding \"ignore\" rule into PublishDocsRules.kt")
+                                "or add an overriding \"ignore\" rule into PublishDocsRules.kt"
+                        )
                         throw e
                     }
 
@@ -252,7 +258,7 @@ open class LocateJarsTask : DefaultTask() {
             project.dependencies.create(it)
         }.toTypedArray()
         val artifacts = project.configurations.detachedConfiguration(*dependenciesArray)
-                        .resolvedConfiguration.resolvedArtifacts
+            .resolvedConfiguration.resolvedArtifacts
 
         // save the .jar files
         val files = artifacts.map({ artifact -> artifact.file })

@@ -53,7 +53,8 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
      */
     private fun getProjectSpecificDirectory(): String {
         return project.projectDir.absolutePath.removePrefix(
-            project.getSupportRootFolder().absolutePath)
+            project.getSupportRootFolder().absolutePath
+        )
     }
 
     /**
@@ -88,15 +89,18 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
         if (!project.getBuildInfoDirectory().exists()) {
             if (!project.getBuildInfoDirectory().mkdirs()) {
-                throw RuntimeException("Failed to create " +
-                        "output directory: ${project.getBuildInfoDirectory()}")
+                throw RuntimeException(
+                    "Failed to create " +
+                        "output directory: ${project.getBuildInfoDirectory()}"
+                )
             }
         }
         val resolvedOutputFile: File = outputFile.get()
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
-                throw RuntimeException("Failed to create " +
-                        "output dependency dump file: $outputFile")
+                throw RuntimeException(
+                    "Failed to create output dependency dump file: $outputFile"
+                )
             }
         }
 
@@ -124,9 +128,9 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         project.configurations.filter {
             /* Ignore test configuration dependencies */
             !it.name.contains("test", ignoreCase = true) &&
-            /* Ignore compile configuration dependencies */
-            !it.name.contains("compileClasspath", ignoreCase = true) &&
-            !it.name.contains("compileOnly", ignoreCase = true)
+                /* Ignore compile configuration dependencies */
+                !it.name.contains("compileClasspath", ignoreCase = true) &&
+                !it.name.contains("compileOnly", ignoreCase = true)
         }.forEach { configuration ->
             configuration.allDependencies.forEach { dep ->
                 // Only consider androidx dependencies
@@ -134,9 +138,11 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
                     dep.group.toString().startsWith("androidx.") &&
                     !dep.group.toString().startsWith("androidx.test")
                 ) {
-                    if ((dep is ProjectDependency && publishedProjects
-                            .containsKey("${dep.group}:${dep.name}")) ||
-                        dep is ExternalModuleDependency
+                    if ((
+                        dep is ExternalModuleDependency ||
+                            dep is ProjectDependency && publishedProjects
+                            .containsKey("${dep.group}:${dep.name}")
+                        )
                     ) {
                         val androidXPublishedDependency = LibraryBuildInfoFile().Dependency()
                         androidXPublishedDependency.artifactId = dep.name.toString()
@@ -149,8 +155,10 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
                             !versionChecker.isReleased(
                                     androidXPublishedDependency.groupId,
                                     androidXPublishedDependency.artifactId,
-                                    androidXPublishedDependency.version)) {
-                                androidXPublishedDependency.isTipOfTree = true
+                                    androidXPublishedDependency.version
+                                )
+                        ) {
+                            androidXPublishedDependency.isTipOfTree = true
                         }
                         addDependencyToListIfNotAlreadyAdded(
                             libraryDependencies,
@@ -172,7 +180,8 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
             if (existingDependency.groupId == dependency.groupId &&
                 existingDependency.artifactId == dependency.artifactId &&
                 existingDependency.version == dependency.version &&
-                existingDependency.isTipOfTree == dependency.isTipOfTree) {
+                existingDependency.isTipOfTree == dependency.isTipOfTree
+            ) {
                 return
             }
         }

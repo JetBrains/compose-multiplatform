@@ -28,16 +28,16 @@ import java.io.File
 
 // external/doclava/src/com/google/doclava/Errors.java
 val DEFAULT_DOCLAVA_CONFIG = ChecksConfig(
-        errors = listOf(
-                101, // unresolved link
-                103, // unknown tag
-                104 // unknown param name
-        ),
-        warnings = listOf(121 /* hidden type param */),
-        hidden = listOf(
-                111, // hidden super class
-                113 // @deprecation mismatch
-        )
+    errors = listOf(
+        101, // unresolved link
+        103, // unknown tag
+        104 // unknown param name
+    ),
+    warnings = listOf(121 /* hidden type param */),
+    hidden = listOf(
+        111, // hidden super class
+        113 // @deprecation mismatch
+    )
 )
 
 private fun <E> CoreJavadocOptions.addMultilineMultiValueOption(
@@ -188,7 +188,7 @@ open class DoclavaTask : Javadoc() {
     }
 
     fun coreJavadocOptions(configure: CoreJavadocOptions.() -> Unit) =
-            (options as CoreJavadocOptions).configure()
+        (options as CoreJavadocOptions).configure()
 
     override fun generate() {
         configureDoclava()

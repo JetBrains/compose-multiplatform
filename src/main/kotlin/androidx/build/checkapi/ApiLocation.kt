@@ -209,12 +209,18 @@ data class ApiBaselinesLocation(
             val ignoreFileDirectory = apiLocation.apiFileDirectory
             return ApiBaselinesLocation(
                 ignoreFileDirectory = ignoreFileDirectory,
-                publicApiFile = File(ignoreFileDirectory,
-                    apiLocation.publicApiFile.nameWithoutExtension + EXTENSION),
-                restrictedApiFile = File(ignoreFileDirectory,
-                    apiLocation.restrictedApiFile.nameWithoutExtension + EXTENSION),
-                apiLintFile = File(ignoreFileDirectory,
-                    "api_lint$EXTENSION")
+                publicApiFile = File(
+                    ignoreFileDirectory,
+                    apiLocation.publicApiFile.nameWithoutExtension + EXTENSION
+                ),
+                restrictedApiFile = File(
+                    ignoreFileDirectory,
+                    apiLocation.restrictedApiFile.nameWithoutExtension + EXTENSION
+                ),
+                apiLintFile = File(
+                    ignoreFileDirectory,
+                    "api_lint$EXTENSION"
+                )
             )
         }
 

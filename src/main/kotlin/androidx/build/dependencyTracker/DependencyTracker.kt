@@ -36,14 +36,16 @@ internal class DependencyTracker constructor(
             project.configurations.forEach { config ->
                 logger?.info("checking config ${project.path}/$config for dependencies")
                 config
-                        .dependencies
-                        .filterIsInstance(ProjectDependency::class.java)
-                        .forEach {
-                            logger?.info("there is a dependency from ${project.path} to " +
-                                    it.dependencyProject.path)
-                            result.getOrPut(it.dependencyProject) { mutableSetOf() }
-                                    .add(project)
-                        }
+                    .dependencies
+                    .filterIsInstance(ProjectDependency::class.java)
+                    .forEach {
+                        logger?.info(
+                            "there is a dependency from ${project.path} to " +
+                                it.dependencyProject.path
+                        )
+                        result.getOrPut(it.dependencyProject) { mutableSetOf() }
+                            .add(project)
+                    }
             }
         }
         result
@@ -58,9 +60,9 @@ internal class DependencyTracker constructor(
             }
         }
         addAllDependents(project)
-        logger?.info("dependents of ${project.path} is ${result.map {
-            it.path
-        }}")
+        logger?.info(
+            "dependents of ${project.path} is ${result.map { it.path }}"
+        )
         // the project isn't a dependent of itself
         return result.minus(project)
     }
