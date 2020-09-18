@@ -66,7 +66,7 @@ fun TextDemo() {
         TextDemoBasic()
         TagLine(
             tag = "color, fontSize, fontWeight, fontFamily, fontStyle, letterSpacing, " +
-                    "background, decoration"
+                "background, decoration"
         )
         TextDemoComplexStyling()
         TagLine(tag = "Chinese, Arabic, and Hindi")
@@ -138,40 +138,42 @@ fun SecondTagLine(tag: String) {
 fun TextDemoBasic() {
     // This group of text composables show different color, fontSize, fontWeight and fontStyle in
     // English.
-    Text(text = annotatedString {
-        withStyle(
-            SpanStyle(
-                color = Color(0xFFFF0000),
-                fontSize = fontSize6,
-                fontWeight = FontWeight.W200,
-                fontStyle = FontStyle.Italic
-            )
-        ) {
-            append("$displayText   ")
-        }
+    Text(
+        text = annotatedString {
+            withStyle(
+                SpanStyle(
+                    color = Color(0xFFFF0000),
+                    fontSize = fontSize6,
+                    fontWeight = FontWeight.W200,
+                    fontStyle = FontStyle.Italic
+                )
+            ) {
+                append("$displayText   ")
+            }
 
-        withStyle(
-            SpanStyle(
-                color = Color(0xFF00FF00),
-                fontSize = fontSize8,
-                fontWeight = FontWeight.W500,
-                fontStyle = FontStyle.Normal
-            )
-        ) {
-            append("$displayText   ")
-        }
+            withStyle(
+                SpanStyle(
+                    color = Color(0xFF00FF00),
+                    fontSize = fontSize8,
+                    fontWeight = FontWeight.W500,
+                    fontStyle = FontStyle.Normal
+                )
+            ) {
+                append("$displayText   ")
+            }
 
-        withStyle(
-            SpanStyle(
-                color = Color(0xFF0000FF),
-                fontSize = fontSize10,
-                fontWeight = FontWeight.W800,
-                fontStyle = FontStyle.Normal
-            )
-        ) {
-            append(displayText)
+            withStyle(
+                SpanStyle(
+                    color = Color(0xFF0000FF),
+                    fontSize = fontSize10,
+                    fontWeight = FontWeight.W800,
+                    fontStyle = FontStyle.Normal
+                )
+            ) {
+                append(displayText)
+            }
         }
-    })
+    )
 }
 
 @Composable
@@ -183,73 +185,77 @@ fun TextDemoComplexStyling() {
 fun TextDemoLanguage() {
     // This group of text composables show different color, fontSize, fontWeight and fontStyle in
     // Chinese, Arabic, and Hindi.
-    Text(text = annotatedString {
-        withStyle(
-            style = SpanStyle(
-                color = Color(0xFFFF0000),
-                fontSize = fontSize6,
-                fontWeight = FontWeight.W200,
-                fontStyle = FontStyle.Italic
-            )
-        ) {
-            append("$displayTextChinese   ")
-        }
+    Text(
+        text = annotatedString {
+            withStyle(
+                style = SpanStyle(
+                    color = Color(0xFFFF0000),
+                    fontSize = fontSize6,
+                    fontWeight = FontWeight.W200,
+                    fontStyle = FontStyle.Italic
+                )
+            ) {
+                append("$displayTextChinese   ")
+            }
 
-        withStyle(
-            style = SpanStyle(
-                color = Color(0xFF00FF00),
-                fontSize = fontSize8,
-                fontWeight = FontWeight.W500,
-                fontStyle = FontStyle.Normal
-            )
-        ) {
-            append("$displayTextArabic   ")
-        }
+            withStyle(
+                style = SpanStyle(
+                    color = Color(0xFF00FF00),
+                    fontSize = fontSize8,
+                    fontWeight = FontWeight.W500,
+                    fontStyle = FontStyle.Normal
+                )
+            ) {
+                append("$displayTextArabic   ")
+            }
 
-        withStyle(
-            style = SpanStyle(
-                color = Color(0xFF0000FF),
-                fontSize = fontSize10,
-                fontWeight = FontWeight.W800,
-                fontStyle = FontStyle.Normal
-            )
-        ) {
-            append(displayTextHindi)
+            withStyle(
+                style = SpanStyle(
+                    color = Color(0xFF0000FF),
+                    fontSize = fontSize10,
+                    fontWeight = FontWeight.W800,
+                    fontStyle = FontStyle.Normal
+                )
+            ) {
+                append(displayTextHindi)
+            }
         }
-    })
+    )
 }
 
 @Composable
 fun TextDemoFontFamily() {
     // This group of text composables show different fontFamilies in English.
-    Text(annotatedString {
-        withStyle(
-            style = SpanStyle(
-                fontSize = fontSize8,
-                fontFamily = FontFamily.SansSerif
-            )
-        ) {
-            append("$displayText sans-serif\n")
-        }
+    Text(
+        annotatedString {
+            withStyle(
+                style = SpanStyle(
+                    fontSize = fontSize8,
+                    fontFamily = FontFamily.SansSerif
+                )
+            ) {
+                append("$displayText sans-serif\n")
+            }
 
-        withStyle(
-            style = SpanStyle(
-                fontSize = fontSize8,
-                fontFamily = FontFamily.Serif
-            )
-        ) {
-            append("$displayText serif\n")
-        }
+            withStyle(
+                style = SpanStyle(
+                    fontSize = fontSize8,
+                    fontFamily = FontFamily.Serif
+                )
+            ) {
+                append("$displayText serif\n")
+            }
 
-        withStyle(
-            style = SpanStyle(
-                fontSize = fontSize8,
-                fontFamily = FontFamily.Monospace
-            )
-        ) {
-            append("$displayText monospace")
+            withStyle(
+                style = SpanStyle(
+                    fontSize = fontSize8,
+                    fontFamily = FontFamily.Monospace
+                )
+            ) {
+                append("$displayText monospace")
+            }
         }
-    })
+    )
 }
 
 @Composable
@@ -272,19 +278,21 @@ fun TextDemoTextDecoration() {
 @Composable
 fun TextDemoLetterSpacing() {
     // This group of text composables show different letterSpacing.
-    Text(text = annotatedString {
-        withStyle(style = SpanStyle(fontSize = fontSize8)) {
-            append("$displayText   ")
+    Text(
+        text = annotatedString {
+            withStyle(style = SpanStyle(fontSize = fontSize8)) {
+                append("$displayText   ")
+            }
+            withStyle(
+                style = SpanStyle(
+                    fontSize = fontSize8,
+                    letterSpacing = 0.5.em
+                )
+            ) {
+                append(displayText)
+            }
         }
-        withStyle(
-            style = SpanStyle(
-                fontSize = fontSize8,
-                letterSpacing = 0.5.em
-            )
-        ) {
-            append(displayText)
-        }
-    })
+    )
 }
 
 @Composable

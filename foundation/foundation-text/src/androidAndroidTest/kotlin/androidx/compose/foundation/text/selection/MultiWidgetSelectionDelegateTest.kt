@@ -1803,10 +1803,14 @@ class MultiWidgetSelectionDelegateTest {
                 handlesCrossed = false
             )
             // "d" should be selected.
-            val start = Offset((fontSizeInPx * oldEndOffset) - (fontSizeInPx / 2),
-                (fontSizeInPx / 2))
-            val end = Offset((fontSizeInPx * oldEndOffset) - 1,
-                (fontSizeInPx / 2))
+            val start = Offset(
+                (fontSizeInPx * oldEndOffset) - (fontSizeInPx / 2),
+                (fontSizeInPx / 2)
+            )
+            val end = Offset(
+                (fontSizeInPx * oldEndOffset) - 1,
+                (fontSizeInPx / 2)
+            )
 
             // Act.
             val textSelectionInfo = getTextSelectionInfo(
@@ -2050,10 +2054,14 @@ class MultiWidgetSelectionDelegateTest {
                 handlesCrossed = false
             )
             // "h" should be selected.
-            val start = Offset((fontSizeInPx * oldStartOffset),
-                (fontSizeInPx / 2))
-            val end = Offset((fontSizeInPx * oldStartOffset),
-                (fontSizeInPx / 2))
+            val start = Offset(
+                (fontSizeInPx * oldStartOffset),
+                (fontSizeInPx / 2)
+            )
+            val end = Offset(
+                (fontSizeInPx * oldStartOffset),
+                (fontSizeInPx / 2)
+            )
 
             // Act.
             val textSelectionInfo = getTextSelectionInfo(
@@ -2099,10 +2107,14 @@ class MultiWidgetSelectionDelegateTest {
                 handlesCrossed = true
             )
             // "d" should be selected.
-            val start = Offset((fontSizeInPx * oldStartOffset) - 1,
-                (fontSizeInPx / 2))
-            val end = Offset((fontSizeInPx * oldStartOffset) - 1,
-                (fontSizeInPx / 2))
+            val start = Offset(
+                (fontSizeInPx * oldStartOffset) - 1,
+                (fontSizeInPx / 2)
+            )
+            val end = Offset(
+                (fontSizeInPx * oldStartOffset) - 1,
+                (fontSizeInPx / 2)
+            )
 
             // Act.
             val textSelectionInfo = getTextSelectionInfo(
@@ -2173,8 +2185,9 @@ class MultiWidgetSelectionDelegateTest {
             // "o world" is selected.
             val startOffset = text.indexOf("o")
             val start = Offset((fontSizeInPx * startOffset), (fontSizeInPx / 2))
-            val end = Offset((fontSizeInPx * text.length * 2), (fontSizeInPx * 2)
-                )
+            val end = Offset(
+                (fontSizeInPx * text.length * 2), (fontSizeInPx * 2)
+            )
 
             // Act.
             val textSelectionInfo = getTextSelectionInfo(

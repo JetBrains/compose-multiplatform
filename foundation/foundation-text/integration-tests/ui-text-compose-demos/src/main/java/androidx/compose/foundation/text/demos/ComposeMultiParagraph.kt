@@ -29,7 +29,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 
 val lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas fermentum non" +
-        " diam sed pretium."
+    " diam sed pretium."
 
 @Composable
 fun MultiParagraphDemo() {

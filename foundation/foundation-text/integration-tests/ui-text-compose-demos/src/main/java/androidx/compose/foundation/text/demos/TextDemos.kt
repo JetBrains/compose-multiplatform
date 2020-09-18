@@ -19,18 +19,24 @@ package androidx.compose.foundation.text.demos
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-val TextDemos = DemoCategory("Text", listOf(
-    ComposableDemo("Static text") { TextDemo() },
-    ComposableDemo("Text selection") { TextSelectionDemo() },
-    ComposableDemo("Text selection sample") { TextSelectionSample() },
-    ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
-    ComposableDemo("Interactive text") { InteractiveTextDemo() },
-    DemoCategory("Input fields", listOf(
-        ComposableDemo("Basic input fields") { InputFieldDemo() },
-        ComposableDemo("Various input fields") { VariousInputFieldDemo() },
-        ComposableDemo("Tricky input field") { InputFieldTrickyUseCase() },
-        ComposableDemo("Focus transition") { TextFieldFocusTransition() },
-        ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
-        ComposableDemo("TextField in Scroller") { TextFieldWithScrollerDemo() }
-    ))
-))
+val TextDemos = DemoCategory(
+    "Text",
+    listOf(
+        ComposableDemo("Static text") { TextDemo() },
+        ComposableDemo("Text selection") { TextSelectionDemo() },
+        ComposableDemo("Text selection sample") { TextSelectionSample() },
+        ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
+        ComposableDemo("Interactive text") { InteractiveTextDemo() },
+        DemoCategory(
+            "Input fields",
+            listOf(
+                ComposableDemo("Basic input fields") { InputFieldDemo() },
+                ComposableDemo("Various input fields") { VariousInputFieldDemo() },
+                ComposableDemo("Tricky input field") { InputFieldTrickyUseCase() },
+                ComposableDemo("Focus transition") { TextFieldFocusTransition() },
+                ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
+                ComposableDemo("TextField in Scroller") { TextFieldWithScrollerDemo() }
+            )
+        )
+    )
+)
