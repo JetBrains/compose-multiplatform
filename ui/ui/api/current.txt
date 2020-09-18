@@ -2164,7 +2164,7 @@ package androidx.compose.ui.selection {
     method public boolean getHandlesCrossed();
     method public androidx.compose.ui.selection.Selection.AnchorInfo getStart();
     method public androidx.compose.ui.selection.Selection merge(androidx.compose.ui.selection.Selection? other);
-    method public androidx.compose.ui.text.TextRange toTextRange();
+    method public long toTextRange();
   }
 
   @androidx.compose.runtime.Immutable public static final class Selection.AnchorInfo {
@@ -2380,7 +2380,7 @@ package androidx.compose.ui.semantics {
     method public static String getTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.AnnotatedString getText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void getTextLayoutResult(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String? label = null, kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean> action);
-    method public static androidx.compose.ui.text.TextRange getTextSelectionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static long getTextSelectionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.AccessibilityScrollState getVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void hidden(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void onClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String? label = null, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
@@ -2397,7 +2397,7 @@ package androidx.compose.ui.semantics {
     method public static void setTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String? label = null, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString,java.lang.Boolean> action);
-    method public static void setTextSelectionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.TextRange p);
+    method public static void setTextSelectionRange-Hy0MoUY(androidx.compose.ui.semantics.SemanticsPropertyReceiver, long p);
     method public static void setVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.AccessibilityScrollState p);
   }
 
