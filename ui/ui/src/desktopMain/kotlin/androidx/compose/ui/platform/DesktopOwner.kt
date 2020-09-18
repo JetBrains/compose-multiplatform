@@ -28,6 +28,7 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
@@ -81,14 +82,17 @@ class DesktopOwner(
         properties = {}
     )
 
-    private val focusManager: FocusManager = FocusManager()
+    private val _focusManager: FocusManagerImpl = FocusManagerImpl()
+    override val focusManager: FocusManager
+        get() = _focusManager
+
     private val keyInputModifier = KeyInputModifier(null, null)
 
     override val root = LayoutNode().also {
         it.measureBlocks = RootMeasureBlocks
         it.modifier = Modifier.drawLayer()
             .then(semanticsModifier)
-            .then(focusManager.modifier)
+            .then(_focusManager.modifier)
             .then(keyInputModifier)
         it.isPlaced = true
     }

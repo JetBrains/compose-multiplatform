@@ -18,6 +18,8 @@ package androidx.compose.ui.node
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
@@ -77,6 +79,12 @@ interface Owner {
     val semanticsOwner: SemanticsOwner
 
     val textInputService: TextInputService
+
+    /**
+     * Provide a focus manager that controls focus within Compose.
+     */
+    @ExperimentalFocus
+    val focusManager: FocusManager
 
     val fontLoader: Font.ResourceLoader
 
