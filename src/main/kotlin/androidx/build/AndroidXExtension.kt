@@ -36,6 +36,7 @@ open class AndroidXExtension(val project: Project) {
             field = value
             chooseProjectVersion()
         }
+    private val ALLOWED_EXTRA_PREFIXES = listOf("-alpha", "-beta", "-rc", "-dev", "-SNAPSHOT")
 
     private fun chooseProjectVersion() {
         val version: Version
@@ -49,10 +50,12 @@ open class AndroidXExtension(val project: Project) {
                     ") whose mavenGroup already specifies forcedVersion (" + groupVersion +
                 ")")
             } else {
+                verifyVersionExtraFormat(mavenVersion)
                 version = mavenVersion
             }
         } else {
             if (groupVersion != null) {
+                verifyVersionExtraFormat(groupVersion)
                 version = groupVersion
             } else {
                 return
@@ -63,6 +66,31 @@ open class AndroidXExtension(val project: Project) {
         }
         project.version = if (isSnapshotBuild()) version.copy(extra = "-SNAPSHOT") else version
         versionIsSet = true
+    }
+
+    private fun verifyVersionExtraFormat(version: Version) {
+        val extra = version.extra
+        if (extra != null) {
+            if (!version.isSnapshot()) {
+                if (ALLOWED_EXTRA_PREFIXES.any { extra.startsWith(it) }) {
+                    for (potentialPrefix in ALLOWED_EXTRA_PREFIXES) {
+                        if (extra.startsWith(potentialPrefix)) {
+                            val secondExtraPart = extra.removePrefix(
+                                potentialPrefix)
+                            if (secondExtraPart.toIntOrNull() == null) {
+                                throw IllegalArgumentException("Version $version is not" +
+                                        " a properly formatted version, please ensure that " +
+                                        "$potentialPrefix is followed by a number only")
+                            }
+                        }
+                    }
+                } else {
+                    throw IllegalArgumentException("Version $version is not a proper " +
+                            "version, version suffixes following major.minor.patch should " +
+                            "be one of ${ALLOWED_EXTRA_PREFIXES.joinToString(", ")}")
+                }
+            }
+        }
     }
 
     private fun isGroupVersionOverrideAllowed(): Boolean {
