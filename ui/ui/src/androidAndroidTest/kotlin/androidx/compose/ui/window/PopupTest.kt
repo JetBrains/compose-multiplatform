@@ -901,15 +901,17 @@ class PopupTest {
 
         Espresso.onView(instanceOf(Owner::class.java))
             .inRoot(PopupLayoutMatcher())
-            .check(matches(object : TypeSafeMatcher<View>() {
-                override fun describeTo(description: Description?) {
-                    description?.appendText("ViewTreeLifecycleOwner.get(view) != null")
-                }
+            .check(
+                matches(object : TypeSafeMatcher<View>() {
+                    override fun describeTo(description: Description?) {
+                        description?.appendText("ViewTreeLifecycleOwner.get(view) != null")
+                    }
 
-                override fun matchesSafely(item: View): Boolean {
-                    return ViewTreeLifecycleOwner.get(item) != null
-                }
-            }))
+                    override fun matchesSafely(item: View): Boolean {
+                        return ViewTreeLifecycleOwner.get(item) != null
+                    }
+                })
+            )
     }
 
     @Test

@@ -81,10 +81,13 @@ class RootNodeLayoutTest {
         val latch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                Layout({}, Modifier.onPositioned {
-                    coordinates = it
-                    latch.countDown()
-                }) { _, _ ->
+                Layout(
+                    {},
+                    Modifier.onPositioned {
+                        coordinates = it
+                        latch.countDown()
+                    }
+                ) { _, _ ->
                     layout(10, 10) {}
                 }
             }
@@ -94,7 +97,8 @@ class RootNodeLayoutTest {
         assertNotNull(coordinates)
         assertEquals(
             Rect(left = 0f, top = 0f, right = 10f, bottom = 10f),
-            coordinates!!.boundsInRoot)
+            coordinates!!.boundsInRoot
+        )
     }
 
     @Test
@@ -103,13 +107,21 @@ class RootNodeLayoutTest {
         val child = FrameLayout(activity)
         rule.runOnUiThread {
             val parent = FrameLayout(activity)
-            parent.addView(child, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT))
+            parent.addView(
+                child,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
             activity.setContentView(parent)
             child.setContent(Recomposer.current()) {
-                Layout({}, Modifier.onPositioned {
-                    latch.countDown()
-                }) { _, _ ->
+                Layout(
+                    {},
+                    Modifier.onPositioned {
+                        latch.countDown()
+                    }
+                ) { _, _ ->
                     layout(10, 15) {}
                 }
             }
@@ -126,13 +138,21 @@ class RootNodeLayoutTest {
         val child = FrameLayout(activity)
         val parent = FrameLayout(activity)
         rule.runOnUiThread {
-            parent.addView(child, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT))
+            parent.addView(
+                child,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
             activity.setContentView(parent)
             child.setContent(Recomposer.current()) {
-                Layout({}, Modifier.fillMaxSize().onPositioned {
-                    latch.countDown()
-                }) { _, _ ->
+                Layout(
+                    {},
+                    Modifier.fillMaxSize().onPositioned {
+                        latch.countDown()
+                    }
+                ) { _, _ ->
                     layout(10, 15) {}
                 }
             }

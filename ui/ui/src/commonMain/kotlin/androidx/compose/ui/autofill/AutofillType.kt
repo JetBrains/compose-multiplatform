@@ -135,7 +135,7 @@ enum class AutofillType {
      */
     @Deprecated(
         "It was is too generic since it did not indicate which part of the name it represents. " +
-                "Replace with PersonFullName or PersonFirstName, PersonLastName etc.",
+            "Replace with PersonFullName or PersonFirstName, PersonLastName etc.",
         ReplaceWith("PersonFullName", "androidx.compose.ui.autofill.AutofillType.PersonFullName"),
         DeprecationLevel.ERROR
     )

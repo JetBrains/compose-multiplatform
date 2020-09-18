@@ -368,7 +368,7 @@ class LayoutNode : Measurable, Remeasurement {
 
     override fun toString(): String {
         return "${simpleIdentityToString(this, null)} children: ${children.size} " +
-                "measureBlocks: $measureBlocks"
+            "measureBlocks: $measureBlocks"
     }
 
     /**
@@ -1009,7 +1009,7 @@ class LayoutNode : Measurable, Remeasurement {
             else -> UsageByParent.NotUsed
         }
         val newUsageHasLowerPriority = newUsageByParent == UsageByParent.InLayoutBlock &&
-                alignmentUsageByParent == UsageByParent.InMeasureBlock
+            alignmentUsageByParent == UsageByParent.InMeasureBlock
         if (!newUsageHasLowerPriority) {
             alignmentUsageByParent = newUsageByParent
         }

@@ -49,9 +49,9 @@ class ScrollOrientationLockerTest(
         @JvmStatic
         @Parameterized.Parameters(
             name = "lockedConfigs = {0}, " +
-                    "inputChanges = {1}, " +
-                    "inputOrientation = {2}, " +
-                    "expectedOutput = {3}"
+                "inputChanges = {1}, " +
+                "inputOrientation = {2}, " +
+                "expectedOutput = {3}"
         )
         fun parameters(): List<Array<Any?>> {
 

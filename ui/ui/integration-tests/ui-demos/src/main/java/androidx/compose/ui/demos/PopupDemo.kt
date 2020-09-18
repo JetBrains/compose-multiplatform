@@ -87,18 +87,20 @@ fun PopupDemo() {
                         0 -> "Shadow demo"
                         1 -> "Toggle a simple popup"
                         2 -> "Different content for the popup"
-                        3 -> "Popup's behavior when the parent's size or position " +
-                                "changes"
+                        3 -> "Popup's behavior when the parent's size or position changes"
                         4 -> "Aligning the popup below the parent"
                         5 -> "Aligning the popup inside a parent"
-                        6 -> "Insert an email in the popup and then click outside to " +
-                                "dismiss"
-                        7 -> "[bug] Undesired visual effect caused by" +
+                        6 ->
+                            "Insert an email in the popup and then click outside to dismiss"
+                        7 ->
+                            "[bug] Undesired visual effect caused by" +
                                 " having a new size content displayed at the old" +
                                 " position, until the new one is calculated"
-                        8 -> "The popup is aligning to its parent when the parent is" +
+                        8 ->
+                            "The popup is aligning to its parent when the parent is" +
                                 " inside a Scroller"
-                        9 -> "[bug] The popup is not repositioned " +
+                        9 ->
+                            "[bug] The popup is not repositioned " +
                                 "when the parent is moved by the keyboard"
                         else -> "Demo description here"
                     }
@@ -146,10 +148,12 @@ private fun ColumnScope.PopupElevation() {
     // This example utilizes the Card to draw its shadow.
     Column(Modifier.align(Alignment.CenterHorizontally)) {
         Box(Modifier.preferredSize(110.dp).background(background)) {
-            Popup(alignment = Alignment.Center, isFocusable = isFocusable,
+            Popup(
+                alignment = Alignment.Center, isFocusable = isFocusable,
                 onDismissRequest = { dismissCounter++ }
             ) {
-                Card(Modifier.preferredSize(contentSize),
+                Card(
+                    Modifier.preferredSize(contentSize),
                     elevation = elevation,
                     shape = shape
                 ) {
@@ -179,9 +183,12 @@ private fun ColumnScope.PopupElevation() {
             Text("Toggle focusable")
         }
         Spacer(Modifier.height(10.dp))
-        Button(onClick = { background =
-            if (background == Color.Transparent) Color.Yellow else Color.Transparent
-        }) {
+        Button(
+            onClick = {
+                background =
+                    if (background == Color.Transparent) Color.Yellow else Color.Transparent
+            }
+        ) {
             Text("Toggle container background")
         }
         Spacer(Modifier.height(10.dp))

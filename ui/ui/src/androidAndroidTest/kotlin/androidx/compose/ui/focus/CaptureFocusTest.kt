@@ -98,7 +98,8 @@ class CaptureFocusTest {
                 modifier = Modifier
                     .focusObserver { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(focusState)) )
+                    .then(FocusModifier(focusState))
+            )
         }
 
         // Act.
@@ -123,7 +124,8 @@ class CaptureFocusTest {
                 modifier = Modifier
                     .focusObserver { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(focusState)) )
+                    .then(FocusModifier(focusState))
+            )
         }
 
         // Act.
@@ -148,7 +150,8 @@ class CaptureFocusTest {
                 modifier = Modifier
                     .focusObserver { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(focusState)) )
+                    .then(FocusModifier(focusState))
+            )
         }
 
         // Act.

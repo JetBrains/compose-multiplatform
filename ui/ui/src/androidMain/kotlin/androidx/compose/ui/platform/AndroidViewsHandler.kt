@@ -82,7 +82,8 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
             val child = getChildAt(i)
             val node = layoutNode[child]
             if (child.isLayoutRequested && node != null &&
-                node.layoutState != NeedsRemeasure) {
+                node.layoutState != NeedsRemeasure
+            ) {
                 layoutNode[child]!!.requestRemeasure()
             }
         }

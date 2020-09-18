@@ -33,11 +33,11 @@ import androidx.compose.ui.gesture.TapGestureFilter
 internal class FocusManager(private val focusModifier: FocusModifier = FocusModifier(Inactive)) {
 
     private val passThroughClickModifier = PointerInputModifierImpl(
-            TapGestureFilter().apply {
-                onTap = { clearFocus() }
-                consumeChanges = false
-            }
-        )
+        TapGestureFilter().apply {
+            onTap = { clearFocus() }
+            consumeChanges = false
+        }
+    )
 
     /**
      * A [Modifier] that can be added to the [Owners][androidx.compose.ui.node.Owner] modifier

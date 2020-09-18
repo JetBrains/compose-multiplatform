@@ -32,18 +32,20 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun OnPositionedSample() {
-    Column(Modifier.onPositioned { coordinates ->
-        // This will be the size of the Column.
-        coordinates.size
-        // The position of the Column relative to the application window.
-        coordinates.globalPosition
-        // The position of the Column relative to the Compose root.
-        coordinates.positionInRoot
-        // These will be the alignment lines provided to the layout (empty here for Column).
-        coordinates.providedAlignmentLines
-        // This will a LayoutCoordinates instance corresponding to the parent of Column.
-        coordinates.parentCoordinates
-    }) {
+    Column(
+        Modifier.onPositioned { coordinates ->
+            // This will be the size of the Column.
+            coordinates.size
+            // The position of the Column relative to the application window.
+            coordinates.globalPosition
+            // The position of the Column relative to the Compose root.
+            coordinates.positionInRoot
+            // These will be the alignment lines provided to the layout (empty here for Column).
+            coordinates.providedAlignmentLines
+            // This will a LayoutCoordinates instance corresponding to the parent of Column.
+            coordinates.parentCoordinates
+        }
+    ) {
         Box(Modifier.preferredSize(20.dp).background(Color.Green))
         Box(Modifier.preferredSize(20.dp).background(Color.Blue))
     }

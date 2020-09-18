@@ -169,7 +169,7 @@ class ClipDrawTest {
     fun roundedUniformRectClip() {
         val shape = object : Shape {
             override fun createOutline(size: Size, density: Density): Outline =
-                    Outline.Rounded(RoundRect(size.toRect(), Radius(12f)))
+                Outline.Rounded(RoundRect(size.toRect(), Radius(12f)))
         }
         rule.runOnUiThreadIR {
             activity.setContent {
@@ -205,11 +205,13 @@ class ClipDrawTest {
         val shape = object : Shape {
             override fun createOutline(size: Size, density: Density): Outline =
                 Outline.Rounded(
-                    RoundRect(size.toRect(),
+                    RoundRect(
+                        size.toRect(),
                         Radius.Zero,
                         Radius(12f),
                         Radius(12f),
-                        Radius(12f))
+                        Radius(12f)
+                    )
                 )
         }
         rule.runOnUiThreadIR {

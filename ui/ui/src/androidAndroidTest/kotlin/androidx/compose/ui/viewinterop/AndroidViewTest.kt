@@ -322,9 +322,12 @@ class AndroidViewTest {
             val density = Density(3f)
             val sizeIpx = with(density) { size.toIntPx() }
             Providers(DensityAmbient provides density) {
-                AndroidView({ FrameLayout(it) }, Modifier.size(size).onPositioned {
-                    assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
-                })
+                AndroidView(
+                    { FrameLayout(it) },
+                    Modifier.size(size).onPositioned {
+                        assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                    }
+                )
             }
         }
         rule.waitForIdle()

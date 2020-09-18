@@ -241,12 +241,12 @@ internal class AccessibilityIterators {
 
         private fun isStartBoundary(index: Int): Boolean {
             return isLetterOrDigit(index) &&
-                    (index == 0 || !isLetterOrDigit(index - 1))
+                (index == 0 || !isLetterOrDigit(index - 1))
         }
 
         private fun isEndBoundary(index: Int): Boolean {
             return (index > 0 && isLetterOrDigit(index - 1)) &&
-                    (index == text.length || !isLetterOrDigit(index))
+                (index == text.length || !isLetterOrDigit(index))
         }
 
         private fun isLetterOrDigit(index: Int): Boolean {
@@ -283,7 +283,8 @@ internal class AccessibilityIterators {
                 start = 0
             }
             while (start < textLength && text[start] == '\n' &&
-                !isStartBoundary(start)) {
+                !isStartBoundary(start)
+            ) {
                 start++
             }
             if (start >= textLength) {
@@ -322,13 +323,17 @@ internal class AccessibilityIterators {
         }
 
         private fun isStartBoundary(index: Int): Boolean {
-            return (text[index] != '\n' &&
-                    (index == 0 || text[index - 1] == '\n'))
+            return (
+                text[index] != '\n' &&
+                    (index == 0 || text[index - 1] == '\n')
+                )
         }
 
         private fun isEndBoundary(index: Int): Boolean {
-            return (index > 0 && text[index - 1] != '\n' &&
-                    (index == text.length || text[index] == '\n'))
+            return (
+                index > 0 && text[index - 1] != '\n' &&
+                    (index == text.length || text[index] == '\n')
+                )
         }
     }
 

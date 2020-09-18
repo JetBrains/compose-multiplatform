@@ -83,14 +83,14 @@ fun DragSlopExceededGestureFilterDemo() {
     Column {
         Text(
             "Demonstrates functionality of Modifier.dragSlopExceededGestureFilter, which calls " +
-                    "its callback when touch slop has been exceeded by the average distance" +
-                    " change of all pointers.  This also demonstrates controlling which" +
-                    " directions can be dragged to exceed touch slop."
+                "its callback when touch slop has been exceeded by the average distance" +
+                " change of all pointers.  This also demonstrates controlling which" +
+                " directions can be dragged to exceed touch slop."
         )
         Text(
             "When red, a drag on the box will turn the box blue only when you drag up or down on" +
-                    " the screen.  When blue, a drag on the box will turn the box red when you" +
-                    " drag to the right or left."
+                " the screen.  When blue, a drag on the box will turn the box red when you" +
+                " drag to the right or left."
         )
         Box(
             Modifier.fillMaxSize()

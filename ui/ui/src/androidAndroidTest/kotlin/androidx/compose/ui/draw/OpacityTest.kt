@@ -116,7 +116,8 @@ class OpacityTest {
         rule.runOnUiThreadIR {
             activity.setContent {
                 Row(Modifier.background(Color.White)) {
-                    AtLeastSize(size = 10,
+                    AtLeastSize(
+                        size = 10,
                         modifier = Modifier.background(Color.White)
                             .drawOpacity(0.5f)
                             .background(color)

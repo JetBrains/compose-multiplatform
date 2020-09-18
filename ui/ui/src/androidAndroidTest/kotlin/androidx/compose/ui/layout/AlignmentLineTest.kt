@@ -30,10 +30,12 @@ class AlignmentLineTest {
     fun queryingLinesOfUnmeasuredChild() {
         val root = root {
             queryAlignmentLineDuringMeasure()
-            add(node {
-                doNotMeasure()
-                add(node())
-            })
+            add(
+                node {
+                    doNotMeasure()
+                    add(node())
+                }
+            )
         }
 
         createDelegate(root)

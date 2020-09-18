@@ -551,7 +551,7 @@ internal class AndroidComposeView constructor(
             val savedStateRegistryOwner =
                 ViewTreeSavedStateRegistryOwner.get(this) ?: throw IllegalStateException(
                     "Composed into the View which doesn't propagate" +
-                            "ViewTreeSavedStateRegistryOwner!"
+                        "ViewTreeSavedStateRegistryOwner!"
                 )
             val viewTreeOwners = AndroidOwner.ViewTreeOwners(
                 lifecycleOwner = lifecycleOwner,

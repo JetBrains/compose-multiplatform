@@ -442,8 +442,10 @@ class AndroidViewCompatTest {
                 Box(Modifier.padding(paddingDp)) {
                     AndroidView(::FrameLayout) {
                         it.setContent {
-                            Box(Modifier.padding(paddingDp)
-                                .onPositioned { inner = it.globalPosition })
+                            Box(
+                                Modifier.padding(paddingDp)
+                                    .onPositioned { inner = it.globalPosition }
+                            )
                         }
                     }
                 }
@@ -511,12 +513,16 @@ class AndroidViewCompatTest {
             Box(Modifier.onPositioned { outer = it.globalPosition }) {
                 Box(Modifier.padding(start = paddingDp, top = paddingDp)) {
                     emitView(::LinearLayout, {}) {
-                        Box(Modifier.size(sizeDp).background(Color.Blue).onPositioned {
-                            inner1 = it.globalPosition
-                        })
-                        Box(Modifier.size(sizeDp).background(Color.Gray).onPositioned {
-                            inner2 = it.globalPosition
-                        })
+                        Box(
+                            Modifier.size(sizeDp).background(Color.Blue).onPositioned {
+                                inner1 = it.globalPosition
+                            }
+                        )
+                        Box(
+                            Modifier.size(sizeDp).background(Color.Gray).onPositioned {
+                                inner2 = it.globalPosition
+                            }
+                        )
                     }
                 }
             }

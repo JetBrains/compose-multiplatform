@@ -56,7 +56,7 @@ fun HorizontalScrollersInVerticalScrollersDemo() {
         Text("Demonstrates scroll orientation locking.")
         Text(
             "There is a column of rows, all of which are scrollable. Any one pointer can only " +
-                    "contribute to dragging in one orientation at a time."
+                "contribute to dragging in one orientation at a time."
         )
         Scrollable(Orientation.Vertical) {
             RepeatingColumn(repetitions = 10) {
@@ -162,7 +162,8 @@ private fun Scrollable(orientation: Orientation, children: @Composable () -> Uni
                     Orientation.Vertical -> placeable.placeRelative(0, offset.value.roundToInt())
                 }
             }
-        })
+        }
+    )
 }
 
 private val ClipModifier = object : DrawModifier {

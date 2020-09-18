@@ -368,7 +368,7 @@ class LongPressGestureFilterTest {
     fun onPointerInput_1Down_notConsumed() {
         val down0 = down(0)
         val result = filter::onPointerInput.invokeOverAllPasses(
-                down0
+            down0
         )
         assertThat(result.consumed.downChange).isFalse()
     }
@@ -380,7 +380,7 @@ class LongPressGestureFilterTest {
 
         val down0 = down(0, 0.milliseconds)
         filter::onPointerInput.invokeOverAllPasses(
-                down0
+            down0
         )
 
         // Act
@@ -389,7 +389,7 @@ class LongPressGestureFilterTest {
         val move0 = down0.moveTo(10.milliseconds, 0f, 0f)
         val down1 = down(0, 10.milliseconds)
         val result = filter::onPointerInput.invokeOverAllPasses(
-                move0, down1
+            move0, down1
         )
 
         // Assert
@@ -405,7 +405,7 @@ class LongPressGestureFilterTest {
 
         val down0 = down(0, 0.milliseconds)
         filter::onPointerInput.invokeOverAllPasses(
-                down0
+            down0
         )
 
         // Act
@@ -413,7 +413,7 @@ class LongPressGestureFilterTest {
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
         val up0 = down0.up(50.milliseconds)
         val result = filter::onPointerInput.invokeOverAllPasses(
-                up0
+            up0
         )
 
         // Assert
@@ -428,7 +428,7 @@ class LongPressGestureFilterTest {
 
         val down0 = down(0, 0.milliseconds)
         filter::onPointerInput.invokeOverAllPasses(
-                down0
+            down0
         )
 
         // Act

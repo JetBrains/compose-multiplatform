@@ -131,16 +131,16 @@ internal class HitPathTracker {
 
         dispatchHit =
             root.dispatchChanges(
-                internalPointerEvent,
-                PointerEventPass.Initial,
-                PointerEventPass.Main
-            ) || dispatchHit
+            internalPointerEvent,
+            PointerEventPass.Initial,
+            PointerEventPass.Main
+        ) || dispatchHit
         dispatchHit =
             root.dispatchChanges(
-                internalPointerEvent,
-                PointerEventPass.Final,
-                null
-            ) || dispatchHit
+            internalPointerEvent,
+            PointerEventPass.Final,
+            null
+        ) || dispatchHit
 
         dispatchChangesRetVal.wasDispatchedToSomething = dispatchHit
         dispatchChangesRetVal.internalPointerEvent = internalPointerEvent
@@ -227,7 +227,8 @@ internal class HitPathTracker {
             val removed = hitPathsToRetain.removeOrUpdate(
                 it,
                 { value -> value == 1 },
-                { value -> value - 1 })
+                { value -> value - 1 }
+            )
             if (removed && retainedHitPaths.remove(it)) {
                 removeHitPathInternal(it)
             }
@@ -283,10 +284,10 @@ internal open class NodeParent {
         children.forEach {
             dispatchedToSomething =
                 it.dispatchChanges(
-                    internalPointerEvent,
-                    downPass,
-                    upPass
-                ) || dispatchedToSomething
+                internalPointerEvent,
+                downPass,
+                upPass
+            ) || dispatchedToSomething
         }
         return dispatchedToSomething
     }
@@ -339,7 +340,8 @@ internal open class NodeParent {
             },
             ifKept = {
                 it.removeDetachedPointerInputFilters()
-            })
+            }
+        )
     }
 
     /**
@@ -500,7 +502,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
 
     override fun toString(): String {
         return "Node(pointerInputFilter=$pointerInputFilter, children=$children, " +
-                "pointerIds=$pointerIds)"
+            "pointerIds=$pointerIds)"
     }
 
     /**

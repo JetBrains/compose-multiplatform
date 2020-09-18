@@ -133,12 +133,15 @@ class ScrollOrientationLocker(private val customEventDispatcher: CustomEventDisp
     fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
 
         if (pass == PointerEventPass.Initial &&
-            customEvent is ShareScrollOrientationLockerEvent) {
+            customEvent is ShareScrollOrientationLockerEvent
+        ) {
             if (lockerOwner) {
-                throw IllegalStateException("This instance of ScrollOrientationLocker should " +
+                throw IllegalStateException(
+                    "This instance of ScrollOrientationLocker should " +
                         "never receive a ShareScrollOrientationLockerEvent because it already " +
                         "dispatched one, and thus should be the only one in it's subtree to " +
-                        "dispatch one.")
+                        "dispatch one."
+                )
             }
             locker = customEvent.scrollOrientationLocker
         }
@@ -159,10 +162,12 @@ class ScrollOrientationLocker(private val customEventDispatcher: CustomEventDisp
      */
     fun attemptToLockPointers(changes: List<PointerInputChange>, orientation: Orientation) {
         if (locker == null) {
-            throw IllegalStateException("Internal state has not been set.  This method should not" +
+            throw IllegalStateException(
+                "Internal state has not been set.  This method should not" +
                     " be called in any place but after calls to onPointerInputSetup and before " +
                     "calls to onPointerInputTearDown or onCancel. Also, onCustomEvent must be " +
-                    "called appropriately.  See docs for details.")
+                    "called appropriately.  See docs for details."
+            )
         }
         locker!!.attemptToLockPointers(changes, orientation)
     }
@@ -189,10 +194,12 @@ class ScrollOrientationLocker(private val customEventDispatcher: CustomEventDisp
         orientation: Orientation
     ): List<PointerInputChange> {
         if (locker == null) {
-            throw IllegalStateException("Internal state has not been set.  This method should not" +
+            throw IllegalStateException(
+                "Internal state has not been set.  This method should not" +
                     " be called in any place but after calls to onPointerInputSetup and before " +
                     "calls to onPointerInputTearDown or onCancel. Also, onCustomEvent must be " +
-                    "called appropriately.  See docs for details.")
+                    "called appropriately.  See docs for details."
+            )
         }
         return locker!!.getPointersFor(changes, orientation)
     }

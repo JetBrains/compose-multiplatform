@@ -236,7 +236,7 @@ class ConstraintsTest {
     ) {
         assertTrue(
             this.minWidth == minWidth && this.maxWidth == maxWidth &&
-                    this.minHeight == minHeight && this.maxHeight == maxHeight
+                this.minHeight == minHeight && this.maxHeight == maxHeight
         )
     }
 

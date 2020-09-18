@@ -73,12 +73,14 @@ fun ViewInteropDemo() {
             Text("Increase size of Android view")
         }
         val colorIndex = remember { mutableStateOf(0) }
-        Button(onClick = {
-            colorIndex.value = (colorIndex.value + 1) % 4
-            squareRef.value!!.color = arrayOf(
-                Color.Blue, Color.LightGray, Color.Yellow, Color.Cyan
-            )[colorIndex.value]
-        }) {
+        Button(
+            onClick = {
+                colorIndex.value = (colorIndex.value + 1) % 4
+                squareRef.value!!.color = arrayOf(
+                    Color.Blue, Color.LightGray, Color.Yellow, Color.Cyan
+                )[colorIndex.value]
+            }
+        ) {
             Text("Change color of Android view")
         }
     }

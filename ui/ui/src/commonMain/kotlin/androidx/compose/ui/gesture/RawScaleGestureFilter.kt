@@ -139,93 +139,93 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
         bounds: IntSize
     ): List<PointerInputChange> {
 
-            var changesToReturn = changes
+        var changesToReturn = changes
 
-            if (pass == PointerEventPass.Initial && active) {
-                // If we are currently scaling, we want to prevent any children from reacting to any
-                // down change.
-                changesToReturn = changesToReturn.map {
-                    if (it.changedToDown() || it.changedToUp()) {
-                        it.consumeDownChange()
-                    } else {
-                        it
-                    }
-                }
-            }
-
-            if (pass == PointerEventPass.Main) {
-
-                var (currentlyDownChanges, otherChanges) = changesToReturn.partition {
-                    it.current.down && it.previous.down
-                }
-
-                val scaleObserver = scaleObserver
-
-                if (currentlyDownChanges.isEmpty()) {
-                    if (active) {
-                        active = false
-                        scaleObserver.onStop()
-                    }
+        if (pass == PointerEventPass.Initial && active) {
+            // If we are currently scaling, we want to prevent any children from reacting to any
+            // down change.
+            changesToReturn = changesToReturn.map {
+                if (it.changedToDown() || it.changedToUp()) {
+                    it.consumeDownChange()
                 } else {
-                    val dimensionInformation =
-                        currentlyDownChanges.calculateAllDimensionInformation()
-                    val scalePercentage = dimensionInformation.calculateScaleFactor()
+                    it
+                }
+            }
+        }
 
-                    // If all of the pointers somehow report the same number, scalePercentage could
-                    // end up as NaN (because the average distance that each pointer is to the
-                    // center of them all will be 0, which means that the scalePercentage should be
-                    // infinite, which clearly isn't correct).
-                    if (!scalePercentage.isNaN() && scalePercentage != 1f) {
+        if (pass == PointerEventPass.Main) {
 
-                        if (!active && canStartScaling?.invoke() != false) {
-                            active = true
-                            scaleObserver.onStart()
-                        }
+            var (currentlyDownChanges, otherChanges) = changesToReturn.partition {
+                it.current.down && it.previous.down
+            }
 
-                        if (active) {
+            val scaleObserver = scaleObserver
 
-                            val scalePercentageUsed = scaleObserver.onScale(scalePercentage)
+            if (currentlyDownChanges.isEmpty()) {
+                if (active) {
+                    active = false
+                    scaleObserver.onStop()
+                }
+            } else {
+                val dimensionInformation =
+                    currentlyDownChanges.calculateAllDimensionInformation()
+                val scalePercentage = dimensionInformation.calculateScaleFactor()
 
-                            val percentageOfChangeUsed =
-                                (scalePercentageUsed - 1) / (scalePercentage - 1)
+                // If all of the pointers somehow report the same number, scalePercentage could
+                // end up as NaN (because the average distance that each pointer is to the
+                // center of them all will be 0, which means that the scalePercentage should be
+                // infinite, which clearly isn't correct).
+                if (!scalePercentage.isNaN() && scalePercentage != 1f) {
 
-                            if (percentageOfChangeUsed > 0f) {
-                                val newCurrentlyDownChanges = mutableListOf<PointerInputChange>()
-                                for (i in currentlyDownChanges.indices) {
+                    if (!active && canStartScaling?.invoke() != false) {
+                        active = true
+                        scaleObserver.onStart()
+                    }
 
-                                    val xVectorToAverageChange =
-                                        getVectorToAverageChange(
-                                            dimensionInformation.previousX,
-                                            dimensionInformation.currentX,
-                                            i
-                                        ) * percentageOfChangeUsed
+                    if (active) {
 
-                                    val yVectorToAverageChange =
-                                        getVectorToAverageChange(
-                                            dimensionInformation.previousY,
-                                            dimensionInformation.currentY,
-                                            i
-                                        ) * percentageOfChangeUsed
+                        val scalePercentageUsed = scaleObserver.onScale(scalePercentage)
 
-                                    newCurrentlyDownChanges
-                                        .add(
-                                            currentlyDownChanges[i].consume(
-                                                xVectorToAverageChange,
-                                                yVectorToAverageChange
-                                            )
+                        val percentageOfChangeUsed =
+                            (scalePercentageUsed - 1) / (scalePercentage - 1)
+
+                        if (percentageOfChangeUsed > 0f) {
+                            val newCurrentlyDownChanges = mutableListOf<PointerInputChange>()
+                            for (i in currentlyDownChanges.indices) {
+
+                                val xVectorToAverageChange =
+                                    getVectorToAverageChange(
+                                        dimensionInformation.previousX,
+                                        dimensionInformation.currentX,
+                                        i
+                                    ) * percentageOfChangeUsed
+
+                                val yVectorToAverageChange =
+                                    getVectorToAverageChange(
+                                        dimensionInformation.previousY,
+                                        dimensionInformation.currentY,
+                                        i
+                                    ) * percentageOfChangeUsed
+
+                                newCurrentlyDownChanges
+                                    .add(
+                                        currentlyDownChanges[i].consume(
+                                            xVectorToAverageChange,
+                                            yVectorToAverageChange
                                         )
-                                }
-                                currentlyDownChanges = newCurrentlyDownChanges
+                                    )
                             }
+                            currentlyDownChanges = newCurrentlyDownChanges
                         }
                     }
                 }
-
-                changesToReturn = currentlyDownChanges + otherChanges
             }
 
-            return changesToReturn
+            changesToReturn = currentlyDownChanges + otherChanges
         }
+
+        return changesToReturn
+    }
 
     override fun onCancel() {
         if (active) {

@@ -79,15 +79,19 @@ class AndroidPopulateViewStructureTest {
         androidAutofill.populateViewStructure(viewStructure)
 
         // Assert.
-        assertThat(viewStructure).isEqualTo(FakeViewStructure().apply {
-            children.add(FakeViewStructure().apply {
-                virtualId = autofillNode.id
-                packageName = currentPackage
-                setAutofillType(View.AUTOFILL_TYPE_TEXT)
-                setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))
-                setDimens(0, 0, 0, 0, 0, 0)
-            })
-        })
+        assertThat(viewStructure).isEqualTo(
+            FakeViewStructure().apply {
+                children.add(
+                    FakeViewStructure().apply {
+                        virtualId = autofillNode.id
+                        packageName = currentPackage
+                        setAutofillType(View.AUTOFILL_TYPE_TEXT)
+                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))
+                        setDimens(0, 0, 0, 0, 0, 0)
+                    }
+                )
+            }
+        )
     }
 
     @Test
@@ -112,21 +116,27 @@ class AndroidPopulateViewStructureTest {
         androidAutofill.populateViewStructure(viewStructure)
 
         // Assert.
-        assertThat(viewStructure).isEqualTo(FakeViewStructure().apply {
-            children.add(FakeViewStructure().apply {
-                virtualId = nameAutofillNode.id
-                packageName = currentPackage
-                setAutofillType(View.AUTOFILL_TYPE_TEXT)
-                setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))
-                setDimens(0, 0, 0, 0, 0, 0)
-            })
-            children.add(FakeViewStructure().apply {
-                virtualId = emailAutofillNode.id
-                packageName = currentPackage
-                setAutofillType(View.AUTOFILL_TYPE_TEXT)
-                setAutofillHints(arrayOf(View.AUTOFILL_HINT_EMAIL_ADDRESS))
-                setDimens(0, 0, 0, 0, 0, 0)
-            })
-        })
+        assertThat(viewStructure).isEqualTo(
+            FakeViewStructure().apply {
+                children.add(
+                    FakeViewStructure().apply {
+                        virtualId = nameAutofillNode.id
+                        packageName = currentPackage
+                        setAutofillType(View.AUTOFILL_TYPE_TEXT)
+                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))
+                        setDimens(0, 0, 0, 0, 0, 0)
+                    }
+                )
+                children.add(
+                    FakeViewStructure().apply {
+                        virtualId = emailAutofillNode.id
+                        packageName = currentPackage
+                        setAutofillType(View.AUTOFILL_TYPE_TEXT)
+                        setAutofillHints(arrayOf(View.AUTOFILL_HINT_EMAIL_ADDRESS))
+                        setDimens(0, 0, 0, 0, 0, 0)
+                    }
+                )
+            }
+        )
     }
 }

@@ -125,7 +125,8 @@ internal fun <T> loadResource(
         cacheLock,
         requestCache,
         resourceCache,
-        loader)
+        loader
+    )
 }
 
 /**

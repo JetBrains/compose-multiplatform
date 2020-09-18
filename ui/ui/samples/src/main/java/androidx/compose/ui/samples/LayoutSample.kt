@@ -184,13 +184,13 @@ fun ConvenienceLayoutModifierSample() {
         modifier = Modifier
             .background(Color.Gray)
             .layout { measurable, constraints ->
-            // an example modifier that adds 50 pixels of vertical padding
-            val padding = 50
-            val placeable = measurable.measure(constraints.offset(vertical = -padding))
-            this.layout(placeable.width, placeable.height + padding) {
-                placeable.placeRelative(0, padding)
+                // an example modifier that adds 50 pixels of vertical padding
+                val padding = 50
+                val placeable = measurable.measure(constraints.offset(vertical = -padding))
+                this.layout(placeable.width, placeable.height + padding) {
+                    placeable.placeRelative(0, padding)
+                }
             }
-        }
     ) {
         Box(Modifier.fillMaxSize().background(Color.DarkGray)) {}
     }

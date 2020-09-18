@@ -102,9 +102,11 @@ class ComposeViewTest {
 
     @Test
     fun disposeOnLifecycleDestroyed() {
-        val lco = rule.runOnUiThread { TestLifecycleOwner().apply {
-            registry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        } }
+        val lco = rule.runOnUiThread {
+            TestLifecycleOwner().apply {
+                registry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+            }
+        }
         var composeViewCapture: ComposeView? = null
         rule.activityRule.scenario.onActivity { activity ->
             val composeView = ComposeView(activity).also {

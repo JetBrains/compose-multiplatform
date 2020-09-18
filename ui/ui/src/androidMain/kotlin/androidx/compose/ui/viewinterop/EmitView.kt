@@ -25,9 +25,11 @@ import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.ContextAmbient
 
 @Composable
-@Deprecated("emitView will be removed. Use AndroidView instead if possible. " +
+@Deprecated(
+    "emitView will be removed. Use AndroidView instead if possible. " +
         "Composing Views and ViewGroups directly in an existing UI composition will not be " +
-        "supported in the future.")
+        "supported in the future."
+)
 fun <T : View> emitView(
     ctor: (Context) -> T,
     update: (T) -> Unit
@@ -42,9 +44,11 @@ fun <T : View> emitView(
 }
 
 @Composable
-@Deprecated("emitView will be removed. Use AndroidView instead if possible. " +
+@Deprecated(
+    "emitView will be removed. Use AndroidView instead if possible. " +
         "Composing Views and ViewGroups directly in an existing UI composition will not be " +
-        "supported in the future.")
+        "supported in the future."
+)
 fun <T : ViewGroup> emitView(
     ctor: (Context) -> T,
     update: (T) -> Unit,

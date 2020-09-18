@@ -195,9 +195,9 @@ internal class PointerInteropFilter : PointerInputModifier {
                 // we can still intercept, we dispatch to Android after we have a chance to
                 // intercept due to movement.
                 val dispatchDuringInitialTunnel = disallowIntercept ||
-                        changes.fastAny {
-                            it.changedToDownIgnoreConsumed() || it.changedToUpIgnoreConsumed()
-                        }
+                    changes.fastAny {
+                        it.changedToDownIgnoreConsumed() || it.changedToUpIgnoreConsumed()
+                    }
 
                 if (state !== DispatchToViewState.NotDispatching) {
                     if (pass == PointerEventPass.Initial && dispatchDuringInitialTunnel) {
@@ -252,36 +252,36 @@ internal class PointerInteropFilter : PointerInputModifier {
             private fun dispatchToView(pointerEvent: PointerEvent):
                 List<PointerInputChange> {
 
-                var changes = pointerEvent.changes
+                    var changes = pointerEvent.changes
 
-                if (changes.fastAny { it.anyChangeConsumed() }) {
-                    // We should no longer dispatch to the Android View.
-                    if (state === DispatchToViewState.Dispatching) {
-                        // If we were dispatching, send ACTION_CANCEL.
-                        pointerEvent.toCancelMotionEventScope(
+                    if (changes.fastAny { it.anyChangeConsumed() }) {
+                        // We should no longer dispatch to the Android View.
+                        if (state === DispatchToViewState.Dispatching) {
+                            // If we were dispatching, send ACTION_CANCEL.
+                            pointerEvent.toCancelMotionEventScope(
+                                this.layoutCoordinates.localToRoot(Offset.Zero)
+                            ) { motionEvent ->
+                                onTouchEvent(motionEvent)
+                            }
+                        }
+                        state = DispatchToViewState.NotDispatching
+                    } else {
+                        // Dispatch and update our state with the result.
+                        pointerEvent.toMotionEventScope(
                             this.layoutCoordinates.localToRoot(Offset.Zero)
                         ) { motionEvent ->
-                            onTouchEvent(motionEvent)
+                            state = if (onTouchEvent(motionEvent)) {
+                                DispatchToViewState.Dispatching
+                            } else {
+                                DispatchToViewState.NotDispatching
+                            }
+                        }
+                        if (state === DispatchToViewState.Dispatching) {
+                            // If the Android View claimed the event, consume all changes.
+                            changes = changes.map { it.consumeAllChanges() }
                         }
                     }
-                    state = DispatchToViewState.NotDispatching
-                } else {
-                    // Dispatch and update our state with the result.
-                    pointerEvent.toMotionEventScope(
-                        this.layoutCoordinates.localToRoot(Offset.Zero)
-                    ) { motionEvent ->
-                        state = if (onTouchEvent(motionEvent)) {
-                            DispatchToViewState.Dispatching
-                        } else {
-                            DispatchToViewState.NotDispatching
-                        }
-                    }
-                    if (state === DispatchToViewState.Dispatching) {
-                        // If the Android View claimed the event, consume all changes.
-                        changes = changes.map { it.consumeAllChanges() }
-                    }
+                    return changes
                 }
-                return changes
-            }
         }
 }
