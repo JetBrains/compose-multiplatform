@@ -48,9 +48,12 @@ class AndroidXUiPlugin : Plugin<Project> {
                     // TODO: figure out how to apply this to multiplatform modules
                     project.dependencies.add(
                         "lintChecks",
-                        project.dependencies.project(mapOf(
-                            "path" to ":compose:internal-lint-checks", "configuration" to "shadow"
-                        ))
+                        project.dependencies.project(
+                            mapOf(
+                                "path" to ":compose:internal-lint-checks",
+                                "configuration" to "shadow"
+                            )
+                        )
                     )
 
                     library.lintOptions.apply {
@@ -97,8 +100,10 @@ private fun Project.configureForMultiplatform() {
     // Android Studio on versions >= 4.0canary8)
     libraryExtension.apply {
         sourceSets.findByName("main")?.apply {
-            java.srcDirs("src/commonMain/kotlin", "src/jvmMain/kotlin",
-                "src/androidMain/kotlin")
+            java.srcDirs(
+                "src/commonMain/kotlin", "src/jvmMain/kotlin",
+                "src/androidMain/kotlin"
+            )
             res.srcDirs("src/androidMain/res")
         }
         sourceSets.findByName("test")?.apply {

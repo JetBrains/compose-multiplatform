@@ -61,24 +61,28 @@ enum class LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
         generateDocs = true,
-        checkApi = RunApiTasks.Yes()),
+        checkApi = RunApiTasks.Yes()
+    ),
     SAMPLES(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
         generateDocs = true,
-        checkApi = RunApiTasks.No("Sample Library")),
+        checkApi = RunApiTasks.No("Sample Library")
+    ),
     LINT(
         publish = Publish.NONE,
         sourceJars = false,
         generateDocs = false,
         checkApi = RunApiTasks.No("Lint Library"),
-        compilationTarget = CompilationTarget.HOST),
+        compilationTarget = CompilationTarget.HOST
+    ),
     ANNOTATION_PROCESSOR(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
         generateDocs = true,
         checkApi = RunApiTasks.No("Annotation Processor"),
-        compilationTarget = CompilationTarget.HOST),
+        compilationTarget = CompilationTarget.HOST
+    ),
     UNSET()
 }
 
