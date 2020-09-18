@@ -69,18 +69,20 @@ fun DemoApp(
 
     var filterText by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
 
-    Scaffold(topBar = {
-        DemoAppBar(
-            title = backStackTitle,
-            navigationIcon = navigationIcon,
-            launchSettings = launchSettings,
-            isFiltering = isFiltering,
-            filterText = filterText,
-            onFilter = { filterText = it },
-            onStartFiltering = onStartFiltering,
-            onEndFiltering = onEndFiltering
-        )
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            DemoAppBar(
+                title = backStackTitle,
+                navigationIcon = navigationIcon,
+                launchSettings = launchSettings,
+                isFiltering = isFiltering,
+                filterText = filterText,
+                onFilter = { filterText = it },
+                onStartFiltering = onStartFiltering,
+                onEndFiltering = onEndFiltering
+            )
+        }
+    ) { innerPadding ->
         val modifier = Modifier.padding(innerPadding)
         DemoContent(modifier, currentDemo, isFiltering, filterText.text, onNavigateToDemo)
     }
