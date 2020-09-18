@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.ui.test.TestComposeWindow
 import com.google.common.truth.Truth.assertThat
+import androidx.ui.test.TestComposeWindow
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

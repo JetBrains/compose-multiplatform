@@ -24,7 +24,6 @@ import androidx.compose.ui.node.LayoutNode
 import org.jetbrains.skiko.Library
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.awt.Component
 
 @OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
 class DesktopOwnerTest {
@@ -35,7 +34,6 @@ class DesktopOwnerTest {
         var invalidateCount = 0
 
         val owners = DesktopOwners(
-            component = object : Component() {},
             invalidate = {
                 invalidateCount++
             }

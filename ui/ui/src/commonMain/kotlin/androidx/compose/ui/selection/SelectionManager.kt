@@ -486,11 +486,11 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     }
 }
 
-private fun merge(lhs: Selection?, rhs: Selection?): Selection? {
+internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
     return lhs?.merge(rhs) ?: rhs
 }
 
-private fun getCurrentSelectedText(
+internal fun getCurrentSelectedText(
     selectable: Selectable,
     selection: Selection
 ): AnnotatedString {
