@@ -159,21 +159,21 @@ internal object StaticLayoutFactory {
                     null
                 }
             }
-            // On API 21 to 23 where it failed to find StaticLayout.Builder, create with
-            // deprecated constructor, textDir and maxLines won't work in this case.
+                // On API 21 to 23 where it failed to find StaticLayout.Builder, create with
+                // deprecated constructor, textDir and maxLines won't work in this case.
                 ?: @Suppress("DEPRECATION") StaticLayout(
-                text,
-                start,
-                end,
-                paint,
-                width,
-                alignment,
-                lineSpacingMultiplier,
-                lineSpacingExtra,
-                includePadding,
-                ellipsize,
-                ellipsizedWidth
-            )
+                    text,
+                    start,
+                    end,
+                    paint,
+                    width,
+                    alignment,
+                    lineSpacingMultiplier,
+                    lineSpacingExtra,
+                    includePadding,
+                    ellipsize,
+                    ellipsizedWidth
+                )
         }
     }
 }
