@@ -193,10 +193,10 @@ inline fun Path.asAndroidPath(): android.graphics.Path =
     override fun getBounds(): Rect {
         internalPath.computeBounds(rectF, true)
         return Rect(
-                rectF.left,
-                rectF.top,
-                rectF.right,
-                rectF.bottom
+            rectF.left,
+            rectF.top,
+            rectF.right,
+            rectF.bottom
         )
     }
 

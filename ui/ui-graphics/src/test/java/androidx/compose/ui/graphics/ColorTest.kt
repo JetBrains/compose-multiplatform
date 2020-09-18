@@ -33,8 +33,10 @@ import org.junit.runners.JUnit4
 class ColorTest {
     private val adobeColorSpace = ColorSpaces.AdobeRgb
     private val srgbColor = Color(0xFFFF8000)
-    private val adobeColor = Color(red = 0.8916f, green = 0.4980f, blue = 0.1168f,
-            colorSpace = ColorSpaces.AdobeRgb)
+    private val adobeColor = Color(
+        red = 0.8916f, green = 0.4980f, blue = 0.1168f,
+        colorSpace = ColorSpaces.AdobeRgb
+    )
     private val epsilon = 0.0005f // Float16 squished into ColorLong isn't very accurate.
 
     @Test
@@ -130,24 +132,31 @@ class ColorTest {
             val expected = expectedLinear.convert(ColorSpaces.Srgb)
             val colorARGB = Color(color.toArgb())
             val expectedARGB = Color(expected.toArgb())
-            assertEquals("at t = $t[$i] was ${colorARGB.toArgb().toHexString()}, " +
-                    "expecting ${expectedARGB.toArgb().toHexString()}", expectedARGB, colorARGB)
+            assertEquals(
+                "at t = $t[$i] was ${colorARGB.toArgb().toHexString()}, " +
+                    "expecting ${expectedARGB.toArgb().toHexString()}",
+                expectedARGB, colorARGB
+            )
         }
 
         val transparentRed = Color.Red.copy(alpha = 0f)
         for (i in 0..255) {
             val t = i / 255f
             val color = lerp(red, transparentRed, t)
-            val expected = Color.Red.copy(alpha = lerp(
-                1f,
-                0f,
-                t
-            )
+            val expected = Color.Red.copy(
+                alpha = lerp(
+                    1f,
+                    0f,
+                    t
+                )
             )
             val colorARGB = Color(color.toArgb())
             val expectedARGB = Color(expected.toArgb())
-            assertEquals("at t = $t[$i] was ${colorARGB.toArgb().toHexString()}, " +
-                    "expecting ${expectedARGB.toArgb().toHexString()}", expectedARGB, colorARGB)
+            assertEquals(
+                "at t = $t[$i] was ${colorARGB.toArgb().toHexString()}, " +
+                    "expecting ${expectedARGB.toArgb().toHexString()}",
+                expectedARGB, colorARGB
+            )
         }
     }
 

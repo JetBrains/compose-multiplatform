@@ -32,14 +32,14 @@ internal actual fun ActualLinearGradientShader(
 ): Shader {
     validateColorStops(colors, colorStops)
     return LinearGradient(
-            from.x,
-            from.y,
-            to.x,
-            to.y,
-            colors.toIntArray(),
-            colorStops?.toFloatArray(),
-            tileMode.toNativeTileMode()
-        )
+        from.x,
+        from.y,
+        to.x,
+        to.y,
+        colors.toIntArray(),
+        colorStops?.toFloatArray(),
+        tileMode.toNativeTileMode()
+    )
 }
 
 internal actual fun ActualRadialGradientShader(
@@ -51,13 +51,13 @@ internal actual fun ActualRadialGradientShader(
 ): Shader {
     validateColorStops(colors, colorStops)
     return RadialGradient(
-            center.x,
-            center.y,
-            radius,
-            colors.toIntArray(),
-            colorStops?.toFloatArray(),
-            tileMode.toNativeTileMode()
-        )
+        center.x,
+        center.y,
+        radius,
+        colors.toIntArray(),
+        colorStops?.toFloatArray(),
+        tileMode.toNativeTileMode()
+    )
 }
 
 internal actual fun ActualImageShader(
@@ -66,10 +66,10 @@ internal actual fun ActualImageShader(
     tileModeY: TileMode
 ): Shader {
     return BitmapShader(
-            image.asAndroidBitmap(),
-            tileModeX.toNativeTileMode(),
-            tileModeY.toNativeTileMode()
-        )
+        image.asAndroidBitmap(),
+        tileModeX.toNativeTileMode(),
+        tileModeY.toNativeTileMode()
+    )
 }
 
 private fun List<Color>.toIntArray(): IntArray =
@@ -80,13 +80,13 @@ private fun validateColorStops(colors: List<Color>, colorStops: List<Float>?) {
         if (colors.size < 2) {
             throw IllegalArgumentException(
                 "colors must have length of at least 2 if colorStops " +
-                        "is omitted."
+                    "is omitted."
             )
         }
     } else if (colors.size != colorStops.size) {
         throw IllegalArgumentException(
             "colors and colorStops arguments must have" +
-                    " equal length."
+                " equal length."
         )
     }
 }

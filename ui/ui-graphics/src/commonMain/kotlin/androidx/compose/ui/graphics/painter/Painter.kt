@@ -196,7 +196,8 @@ abstract class Painter {
             left = 0.0f,
             top = 0.0f,
             right = this.size.width - size.width,
-            bottom = this.size.height - size.height) {
+            bottom = this.size.height - size.height
+        ) {
 
             if (alpha > 0.0f && size.width > 0 && size.height > 0) {
                 if (useLayer) {

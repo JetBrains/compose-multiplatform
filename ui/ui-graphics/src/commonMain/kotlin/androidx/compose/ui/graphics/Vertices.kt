@@ -39,20 +39,24 @@ class Vertices(
         if (colors.size != positions.size)
             throw IllegalArgumentException("positions and colors lengths must match.")
         if (indices.any(outOfBounds))
-            throw IllegalArgumentException("indices values must be valid indices " +
-                    "in the positions list.")
+            throw IllegalArgumentException(
+                "indices values must be valid indices " +
+                    "in the positions list."
+            )
 
         this.positions = encodePointList(positions)
         this.textureCoordinates = encodePointList(textureCoordinates)
         this.colors = encodeColorList(colors)
         this.indices = ShortArray(indices.size) {
-            i -> indices[i].toShort()
+            i ->
+            indices[i].toShort()
         }
     }
 
     private fun encodeColorList(colors: List<Color>): IntArray {
         return IntArray(colors.size) {
-            i -> colors[i].toArgb()
+            i ->
+            colors[i].toArgb()
         }
     }
 

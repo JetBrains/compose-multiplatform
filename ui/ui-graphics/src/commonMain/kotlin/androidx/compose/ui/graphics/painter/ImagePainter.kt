@@ -83,11 +83,11 @@ data class ImagePainter(
     private fun validateSize(srcOffset: IntOffset, srcSize: IntSize): IntSize {
         require(
             srcOffset.x >= 0 &&
-            srcOffset.y >= 0 &&
-            srcSize.width >= 0 &&
-            srcSize.height >= 0 &&
-            srcSize.width <= image.width &&
-            srcSize.height <= image.height
+                srcOffset.y >= 0 &&
+                srcSize.width >= 0 &&
+                srcSize.height >= 0 &&
+                srcSize.width <= image.width &&
+                srcSize.height <= image.height
         )
         return srcSize
     }

@@ -27,8 +27,10 @@ import kotlin.math.pow
 internal class Lab(
     name: String,
     @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
-) : ColorSpace(name,
-    ColorModel.Lab, id) {
+) : ColorSpace(
+    name,
+    ColorModel.Lab, id
+) {
 
     override val isWideGamut: Boolean
         get() = true

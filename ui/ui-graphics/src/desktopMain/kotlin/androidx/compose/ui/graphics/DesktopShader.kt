@@ -73,13 +73,13 @@ private fun validateColorStops(colors: List<Color>, colorStops: List<Float>?) {
         if (colors.size < 2) {
             throw IllegalArgumentException(
                 "colors must have length of at least 2 if colorStops " +
-                        "is omitted."
+                    "is omitted."
             )
         }
     } else if (colors.size != colorStops.size) {
         throw IllegalArgumentException(
             "colors and colorStops arguments must have" +
-                    " equal length."
+                " equal length."
         )
     }
 }

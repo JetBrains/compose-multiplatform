@@ -135,7 +135,8 @@ class ImagePainterTest {
         val dst = createTestDstImage()
         val canvas = Canvas(dst)
 
-        val topLeftPainter = ImagePainter(srcImage,
+        val topLeftPainter = ImagePainter(
+            srcImage,
             srcOffset = IntOffset.Zero,
             srcSize = IntSize(50, 50)
         )
@@ -151,7 +152,8 @@ class ImagePainterTest {
         assertEquals(Color.Blue, topLeftMap[49, 0])
         assertEquals(Color.Red, topLeftMap[49, 49])
 
-        val topRightPainter = ImagePainter(srcImage,
+        val topRightPainter = ImagePainter(
+            srcImage,
             srcOffset = IntOffset(50, 0),
             srcSize = IntSize(50, 50)
         )
@@ -165,7 +167,8 @@ class ImagePainterTest {
         assertEquals(Color.Blue, topRightMap[49, 0])
         assertEquals(Color.Blue, topRightMap[49, 49])
 
-        val bottomLeftPainter = ImagePainter(srcImage,
+        val bottomLeftPainter = ImagePainter(
+            srcImage,
             srcOffset = IntOffset(0, 50),
             srcSize = IntSize(50, 50)
         )
@@ -178,7 +181,8 @@ class ImagePainterTest {
         assertEquals(Color.Blue, bottomLeftMap[0, 49])
         assertEquals(Color.Blue, bottomLeftMap[49, 49])
 
-        val bottomRightPainter = ImagePainter(srcImage,
+        val bottomRightPainter = ImagePainter(
+            srcImage,
             srcOffset = IntOffset(50, 50),
             srcSize = IntSize(50, 50)
         )
@@ -195,7 +199,8 @@ class ImagePainterTest {
     @Test
     fun testInvalidLeftBoundThrows() {
         try {
-            ImagePainter(createTestSrcImage(),
+            ImagePainter(
+                createTestSrcImage(),
                 IntOffset(-1, 1),
                 IntSize(10, 10)
             )
@@ -208,7 +213,8 @@ class ImagePainterTest {
     @Test
     fun testInvalidTopBoundThrows() {
         try {
-            ImagePainter(createTestSrcImage(),
+            ImagePainter(
+                createTestSrcImage(),
                 IntOffset(0, -1),
                 IntSize(10, 10)
             )
@@ -222,7 +228,8 @@ class ImagePainterTest {
     fun testInvalidRightBoundThrows() {
         try {
             val image = createTestSrcImage()
-            ImagePainter(image,
+            ImagePainter(
+                image,
                 IntOffset(0, 0),
                 IntSize(image.width + 1, 10)
             )
@@ -236,7 +243,8 @@ class ImagePainterTest {
     fun testInvalidBottomBoundThrows() {
         try {
             val image = createTestSrcImage()
-            ImagePainter(image,
+            ImagePainter(
+                image,
                 IntOffset(0, 0),
                 IntSize(10, image.height + 1)
             )
@@ -249,7 +257,8 @@ class ImagePainterTest {
     @Test
     fun testRightLessThanLeftThrows() {
         try {
-            ImagePainter(createTestSrcImage(),
+            ImagePainter(
+                createTestSrcImage(),
                 IntOffset(50, 0),
                 IntSize(-40, 10)
             )
@@ -262,7 +271,8 @@ class ImagePainterTest {
     @Test
     fun testTopLessThanBottomThrows() {
         try {
-            ImagePainter(createTestSrcImage(),
+            ImagePainter(
+                createTestSrcImage(),
                 IntOffset(0, 100),
                 IntSize(-90, -90)
             )
