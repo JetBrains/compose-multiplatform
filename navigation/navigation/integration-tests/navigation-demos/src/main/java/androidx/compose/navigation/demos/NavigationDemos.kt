@@ -19,7 +19,10 @@ package androidx.compose.navigation.demos
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-val NavigationDemos = DemoCategory("Navigation", listOf(
-    ComposableDemo("Basic Nav Demo") { BasicNavDemo() },
-    ComposableDemo("Bottom Bar Nav Demo") { BottomBarNavDemo() }
-))
+val NavigationDemos = DemoCategory(
+    "Navigation",
+    listOf(
+        ComposableDemo("Basic Nav Demo") { BasicNavDemo() },
+        ComposableDemo("Bottom Bar Nav Demo") { BottomBarNavDemo() }
+    )
+)
