@@ -63,13 +63,13 @@ interface LazyListScope {
     )
 }
 
-private class IntervalHolder(
+internal class IntervalHolder(
     val startIndex: Int,
     val content: LazyItemScope.(Int) -> (@Composable () -> Unit)
 )
 
-private class LazyListScopeImpl : LazyListScope {
-    val intervals = mutableListOf<IntervalHolder>()
+internal class LazyListScopeImpl : LazyListScope {
+    private val intervals = mutableListOf<IntervalHolder>()
     var totalSize = 0
 
     fun contentFor(index: Int, scope: LazyItemScope): @Composable () -> Unit {
