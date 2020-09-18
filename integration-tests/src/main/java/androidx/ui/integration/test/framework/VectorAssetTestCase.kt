@@ -45,9 +45,11 @@ sealed class VectorAssetTestCase : ComposeTestCase {
     @Composable
     override fun emitContent() {
         Box {
-            Box(Modifier.testTag(testTag)
-                .preferredSize(24.dp)
-                .paint(VectorPainter(getVectorAsset())))
+            Box(
+                Modifier.testTag(testTag)
+                    .preferredSize(24.dp)
+                    .paint(VectorPainter(getVectorAsset()))
+            )
         }
     }
 
