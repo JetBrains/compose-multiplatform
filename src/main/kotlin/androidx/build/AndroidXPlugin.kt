@@ -285,6 +285,7 @@ class AndroidXPlugin : Plugin<Project> {
 
             check(!excludes.contains("/META-INF/*.kotlin_module"))
         }
+        project.verifyLintProjectSettings(androidXExtension)
 
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
@@ -335,6 +336,7 @@ class AndroidXPlugin : Plugin<Project> {
     private fun configureWithJavaPlugin(project: Project, extension: AndroidXExtension) {
         project.configureErrorProneForJava()
         project.configureSourceJarForJava()
+        project.verifyLintProjectSettings(extension)
 
         // Force Java 1.8 source- and target-compatibilty for all Java libraries.
         val convention = project.convention.getPlugin<JavaPluginConvention>()
@@ -702,6 +704,29 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
+    private fun Project.verifyLintProjectSettings(extension: AndroidXExtension) {
+        if (isLint()) {
+            project.afterEvaluate {
+                if (extension.publish != Publish.NONE) {
+                    throw IllegalArgumentException("Invalid Publish `${extension.publish}` for " +
+                            "lint project, should be `NONE` instead. Lint projects are meant to " +
+                            "be published through lintPublish as part of an aar, as such, lint " +
+                            "projects should always set their publish to <Publish.NONE>")
+                }
+                if (extension.toolingProject != true) {
+                    throw IllegalArgumentException("Invalid toolingProject settings: `${extension
+                        .toolingProject}` for lint project, should be `true` instead. Lint " +
+                            "projects are considered tooling projects.")
+                }
+                if (extension.compilationTarget != CompilationTarget.HOST) {
+                    throw IllegalArgumentException("Invalid compilation target: " +
+                            "`${extension.compilationTarget}` for lint project, should be " +
+                            "`CompilationTarget.HOST` instead.")
+                }
+            }
+        }
+    }
+
     private fun Project.configureJacoco() {
         apply(plugin = "jacoco")
         configure<JacocoPluginExtension> {
@@ -848,4 +873,13 @@ fun <T : Task> Project.addToCheckTask(task: TaskProvider<T>) {
     project.tasks.named("check").configure {
         it.dependsOn(task)
     }
+}
+
+/**
+ * This isn't ideal for figuring out if a project is a lint project that's meant to be published
+ * using lintPublish, however it's a reasonable estimate for now until we have a better way.
+ * @owengray plans to refine this function.
+ */
+fun Project.isLint(): Boolean {
+    return project.name.endsWith("-lint")
 }
