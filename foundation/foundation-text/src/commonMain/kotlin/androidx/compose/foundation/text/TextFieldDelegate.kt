@@ -47,6 +47,7 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -104,7 +105,12 @@ class TextFieldDelegate {
             layoutDirection: LayoutDirection,
             prevResultText: TextLayoutResult? = null
         ): Triple<Int, Int, TextLayoutResult> {
-            val layoutResult = textDelegate.layout(constraints, layoutDirection, prevResultText)
+            val layoutResult = textDelegate.layout(
+                constraints = constraints,
+                layoutDirection = layoutDirection,
+                prevResult = prevResultText,
+                respectMinConstraints = true
+            )
 
             val isEmptyText = textDelegate.text.text.isEmpty()
             val height = if (isEmptyText) {
@@ -113,7 +119,12 @@ class TextFieldDelegate {
                     density = textDelegate.density,
                     resourceLoader = textDelegate.resourceLoader
                 )
-                constraints.constrainHeight(singleLineHeight)
+                when (textDelegate.overflow) {
+                    TextOverflow.None ->
+                        singleLineHeight.coerceAtLeast(constraints.minHeight)
+                    TextOverflow.Clip, TextOverflow.Ellipsis ->
+                        constraints.constrainHeight(singleLineHeight)
+                }
             } else {
                 layoutResult.size.height
             }

@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.ceil
 
@@ -132,7 +131,7 @@ class TextDelegate(
      * Computes the visual position of the glyphs for painting the text.
      *
      * The text will layout with a width that's as close to its max intrinsic width as possible
-     * while still being greater than or equal to `minWidth` and less than or equal to `maxWidth`.
+     * while still being greater than or equal to [minWidth] and less than or equal to [maxWidth].
      */
     private fun layoutText(minWidth: Float, maxWidth: Float, layoutDirection: LayoutDirection):
         MultiParagraph {
@@ -163,9 +162,25 @@ class TextDelegate(
     fun layout(
         constraints: Constraints,
         layoutDirection: LayoutDirection,
-        prevResult: TextLayoutResult? = null
+        prevResult: TextLayoutResult? = null,
+        respectMinConstraints: Boolean = false
     ): TextLayoutResult {
-        val minWidth = constraints.minWidth.toFloat()
+        /**
+         * minWidth is only respected if it's required, where respectMinConstraints is true, or
+         * [TextAlign.Justify] is specified.
+         * In the other cases, minWidth will be ignored so that CoreText can report its actual
+         * size to the parent node. This tells the parent that the input text is too short, and
+         * CoreText is not able to meet the minWidth requirement.
+         * Notice that respectMinConstraints == true is reserved for TextField, where minWidth acts
+         * like a placeholder. This is especially useful when TextField is empty.
+         * TODO(haoyuchang): Consider break down this method into pieces and separate the
+         *  measurement logic for TextField from TextDelegate.
+         */
+        val minWidth = if (respectMinConstraints || style.textAlign == TextAlign.Justify) {
+            constraints.minWidth.toFloat()
+        } else {
+            0f
+        }
         val widthMatters = softWrap || overflow == TextOverflow.Ellipsis
         val maxWidth = if (widthMatters && constraints.hasBoundedWidth) {
             constraints.maxWidth.toFloat()
@@ -184,12 +199,7 @@ class TextDelegate(
                         style = style,
                         constraints = constraints
                     ),
-                    size = constraints.constrain(
-                        IntSize(
-                            ceil(multiParagraph.width).toInt(),
-                            ceil(multiParagraph.height).toInt()
-                        )
-                    )
+                    size = computeLayoutSize(constraints, multiParagraph, respectMinConstraints)
                 )
             }
         }
@@ -200,13 +210,7 @@ class TextDelegate(
             layoutDirection
         )
 
-        val size = constraints.constrain(
-            IntSize(
-                ceil(multiParagraph.width).toInt(),
-                ceil(multiParagraph.height).toInt()
-            )
-        )
-
+        val size = computeLayoutSize(constraints, multiParagraph, respectMinConstraints)
         return TextLayoutResult(
             TextLayoutInput(
                 text,
@@ -223,6 +227,47 @@ class TextDelegate(
             multiParagraph,
             size
         )
+    }
+
+    /**
+     * Determine the size of the Layout based on the input [constraints], [multiParagraph] size and
+     * [TextOverflow] settings.
+     */
+    private fun computeLayoutSize(
+        constraints: Constraints,
+        multiParagraph: MultiParagraph,
+        respectMinConstraints: Boolean
+    ): IntSize {
+        val width = ceil(multiParagraph.width).toInt().let {
+            if (respectMinConstraints) {
+                it.coerceAtLeast(constraints.minWidth)
+            } else {
+                it
+            }
+        }
+        val height = ceil(multiParagraph.height).toInt().let {
+            if (respectMinConstraints) {
+                it.coerceAtLeast(constraints.minHeight)
+            } else {
+                it
+            }
+        }
+        return when (overflow) {
+            // CoreText won't handle overflow. Layout will determine how to handle it.
+            TextOverflow.None ->
+                IntSize(width, height)
+            // When overflow is clip: CoreText will clip the CoreText to be the max available size.
+            // When overflow is ellipsis: If line count doesn't exceed maxLines but height
+            // exceeds the maxHeight, it will also clip.
+            // TODO(haoyuchang): support ellipsis with height, or its fallback behavior that
+            //  only cuts the exceeding lines but doesn't show '...'.
+            TextOverflow.Clip, TextOverflow.Ellipsis -> {
+                IntSize(
+                    width.coerceAtMost(constraints.maxWidth),
+                    height.coerceAtMost(constraints.maxHeight)
+                )
+            }
+        }
     }
 
     companion object {

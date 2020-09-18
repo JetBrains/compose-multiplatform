@@ -16,17 +16,18 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithText
+import androidx.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
 
@@ -41,14 +42,14 @@ class LazyForIndexedTest {
 
         rule.setContent {
             LazyColumnForIndexed(items, Modifier.preferredHeight(200.dp)) { index, item ->
-                Text("${index}x$item", Modifier.fillParentMaxWidth().height(100.dp))
+                Spacer(Modifier.fillParentMaxWidth().height(100.dp).testTag("${index}x$item"))
             }
         }
 
-        rule.onNodeWithText("0x0")
+        rule.onNodeWithTag("0x0")
             .assertTopPositionInRootIsEqualTo(0.dp)
 
-        rule.onNodeWithText("1x1")
+        rule.onNodeWithTag("1x1")
             .assertTopPositionInRootIsEqualTo(100.dp)
     }
 
@@ -58,14 +59,14 @@ class LazyForIndexedTest {
 
         rule.setContent {
             LazyRowForIndexed(items, Modifier.preferredWidth(200.dp)) { index, item ->
-                Text("${index}x$item", Modifier.fillParentMaxHeight().width(100.dp))
+                Spacer(Modifier.fillParentMaxHeight().width(100.dp).testTag("${index}x$item"))
             }
         }
 
-        rule.onNodeWithText("0x0")
+        rule.onNodeWithTag("0x0")
             .assertLeftPositionInRootIsEqualTo(0.dp)
 
-        rule.onNodeWithText("1x1")
+        rule.onNodeWithTag("1x1")
             .assertLeftPositionInRootIsEqualTo(100.dp)
     }
 }
