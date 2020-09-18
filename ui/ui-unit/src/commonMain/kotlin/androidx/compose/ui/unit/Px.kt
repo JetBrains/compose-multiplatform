@@ -225,9 +225,13 @@ inline fun Offset.round(): IntOffset = IntOffset(x.roundToInt(), y.roundToInt())
 /**
  * A four dimensional bounds using pixels for units
  */
-@Deprecated("Use Rect instead",
-    ReplaceWith("Rect(left, top, right, bottom)",
-        "androidx.compose.ui.geometry"))
+@Deprecated(
+    "Use Rect instead",
+    ReplaceWith(
+        "Rect(left, top, right, bottom)",
+        "androidx.compose.ui.geometry"
+    )
+)
 @Immutable
 data class PxBounds(
     val left: Float,
@@ -238,8 +242,10 @@ data class PxBounds(
     companion object
 }
 
-@Deprecated("Use Rect instead",
-    ReplaceWith("Rect(topleft, size)", "androidx.compose.ui.geometry"))
+@Deprecated(
+    "Use Rect instead",
+    ReplaceWith("Rect(topleft, size)", "androidx.compose.ui.geometry")
+)
 @Suppress("DEPRECATION")
 @Stable
 inline fun PxBounds(topLeft: Offset, size: Size) =
@@ -253,8 +259,13 @@ inline fun PxBounds(topLeft: Offset, size: Size) =
 /**
  * A width of this PxBounds in pixels.
  */
-@Deprecated("Use Rect.width instead", ReplaceWith("Rect.width",
-    "androidx.compose.ui.geometry"))
+@Deprecated(
+    "Use Rect.width instead",
+    ReplaceWith(
+        "Rect.width",
+        "androidx.compose.ui.geometry"
+    )
+)
 @Suppress("DEPRECATION")
 @Stable
 inline val PxBounds.width: Float get() = right - left
@@ -262,8 +273,13 @@ inline val PxBounds.width: Float get() = right - left
 /**
  * A height of this PxBounds in pixels.
  */
-@Deprecated("use Rect.height instead", ReplaceWith("Rect.height",
-    "androidx.compose.ui.geometry"))
+@Deprecated(
+    "use Rect.height instead",
+    ReplaceWith(
+        "Rect.height",
+        "androidx.compose.ui.geometry"
+    )
+)
 @Suppress("DEPRECATION")
 @Stable
 inline val PxBounds.height: Float get() = bottom - top
@@ -271,8 +287,13 @@ inline val PxBounds.height: Float get() = bottom - top
 /**
  * Returns the [Offset] of the center of the [PxBounds].
  */
-@Deprecated("Use Rect.center instead", ReplaceWith("Rect.center",
-    "androidx.compose.ui.geometry"))
+@Deprecated(
+    "Use Rect.center instead",
+    ReplaceWith(
+        "Rect.center",
+        "androidx.compose.ui.geometry"
+    )
+)
 @Suppress("DEPRECATION")
 @Stable
 inline fun PxBounds.center(): Offset {
@@ -282,8 +303,13 @@ inline fun PxBounds.center(): Offset {
 /**
  * Convert a [PxBounds] to a [Size].
  */
-@Deprecated("Use Rect.size instead", ReplaceWith("Rect.size",
-    "androidx.compose.ui.geometry"))
+@Deprecated(
+    "Use Rect.size instead",
+    ReplaceWith(
+        "Rect.size",
+        "androidx.compose.ui.geometry"
+    )
+)
 @Suppress("DEPRECATION")
 @Stable
 fun PxBounds.toSize(): Size {
@@ -294,8 +320,10 @@ fun PxBounds.toSize(): Size {
  * Convert a [Size] to a [PxBounds]. The left and top are 0.px and the right and bottom
  * are the width and height, respectively.
  */
-@Deprecated("Use toRect() instead",
-    ReplaceWith("Size.toRect()", "androidx.compose.ui.geometry"))
+@Deprecated(
+    "Use toRect() instead",
+    ReplaceWith("Size.toRect()", "androidx.compose.ui.geometry")
+)
 @Suppress("DEPRECATION")
 @Stable
 fun Size.toBounds(): PxBounds {
@@ -305,8 +333,13 @@ fun Size.toBounds(): PxBounds {
 /**
  * Convert a [PxBounds] to a [Rect].
  */
-@Deprecated("Use Rect instead of PxBounds", ReplaceWith("Rect(left, top, right, bottom)",
-    "androidx.compose.ui.geometry"))
+@Deprecated(
+    "Use Rect instead of PxBounds",
+    ReplaceWith(
+        "Rect(left, top, right, bottom)",
+        "androidx.compose.ui.geometry"
+    )
+)
 @Suppress("DEPRECATION")
 @Stable
 fun PxBounds.toRect(): Rect {

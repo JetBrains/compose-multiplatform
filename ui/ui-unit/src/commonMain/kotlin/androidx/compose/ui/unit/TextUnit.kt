@@ -407,8 +407,10 @@ internal inline fun <T> checkArithmetic(a: TextUnit, b: TextUnit, block: () -> T
 
 @PublishedApi
 internal inline fun <T> checkArithmetic(a: TextUnit, b: TextUnit, c: TextUnit, block: () -> T): T {
-    require(a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit &&
-            c.type != TextUnitType.Inherit) {
+    require(
+        a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit &&
+            c.type != TextUnitType.Inherit
+    ) {
         "Cannot perform operation for Inherit type."
     }
     require(a.type == b.type && b.type == c.type) {
