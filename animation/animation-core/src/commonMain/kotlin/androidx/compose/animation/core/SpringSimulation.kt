@@ -135,7 +135,8 @@ internal class SpringSimulation(var finalPosition: Float) {
 
         if (finalPosition == UNSET) {
             throw IllegalStateException(
-                "Error: Final position of the spring must be set before the animation starts")
+                "Error: Final position of the spring must be set before the animation starts"
+            )
         }
 
         val dampingRatioSquared = dampingRatio * dampingRatio.toDouble()
@@ -158,50 +159,85 @@ internal class SpringSimulation(var finalPosition: Float) {
      * an analytical approach.
      */
     internal fun updateValues(lastDisplacement: Float, lastVelocity: Float, timeElapsed: Long):
-            Motion {
-        init()
+        Motion {
+            init()
 
-        val adjustedDisplacement = lastDisplacement - finalPosition
-        val deltaT = timeElapsed / 1000.0 // unit: seconds
-        val displacement: Double
-        val currentVelocity: Double
-        if (dampingRatio > 1) {
-            // Overdamped
-            val coeffA =
-                (adjustedDisplacement - ((gammaMinus * adjustedDisplacement - lastVelocity) /
-                    (gammaMinus - gammaPlus)))
-            val coeffB = ((gammaMinus * adjustedDisplacement - lastVelocity) /
-                    (gammaMinus - gammaPlus))
-            displacement = (coeffA * exp(gammaMinus * deltaT) +
-                    coeffB * exp(gammaPlus * deltaT))
-            currentVelocity = (coeffA * gammaMinus * exp(gammaMinus * deltaT) +
-                    coeffB * gammaPlus * exp(gammaPlus * deltaT))
-        } else if (dampingRatio == 1.0f) {
-            // Critically damped
-            val coeffA = adjustedDisplacement
-            val coeffB = lastVelocity + naturalFreq * adjustedDisplacement
-            displacement = (coeffA + coeffB * deltaT) * exp(-naturalFreq * deltaT)
-            currentVelocity =
-                    (((coeffA + coeffB * deltaT) * exp(-naturalFreq * deltaT) *
-                    (-naturalFreq)) + coeffB * exp(-naturalFreq * deltaT))
-        } else {
-            // Underdamped
-            val cosCoeff = adjustedDisplacement
-            val sinCoeff =
-                ((1 / dampedFreq) * (((dampingRatio * naturalFreq * adjustedDisplacement) +
-                    lastVelocity)))
-            displacement = (exp(-dampingRatio * naturalFreq * deltaT) *
-                    ((cosCoeff * cos(dampedFreq * deltaT) +
-                            sinCoeff * sin(dampedFreq * deltaT))))
-            currentVelocity = (displacement * (-naturalFreq) * dampingRatio + (exp(
-                    -dampingRatio * naturalFreq * deltaT) * ((-dampedFreq * cosCoeff *
-                    sin(dampedFreq * deltaT) + dampedFreq * sinCoeff *
-                    cos(dampedFreq * deltaT)))))
+            val adjustedDisplacement = lastDisplacement - finalPosition
+            val deltaT = timeElapsed / 1000.0 // unit: seconds
+            val displacement: Double
+            val currentVelocity: Double
+            if (dampingRatio > 1) {
+                // Overdamped
+                val coeffA =
+                    (
+                        adjustedDisplacement - (
+                            (gammaMinus * adjustedDisplacement - lastVelocity) /
+                                (gammaMinus - gammaPlus)
+                            )
+                        )
+                val coeffB = (
+                    (gammaMinus * adjustedDisplacement - lastVelocity) /
+                        (gammaMinus - gammaPlus)
+                    )
+                displacement = (
+                    coeffA * exp(gammaMinus * deltaT) +
+                        coeffB * exp(gammaPlus * deltaT)
+                    )
+                currentVelocity = (
+                    coeffA * gammaMinus * exp(gammaMinus * deltaT) +
+                        coeffB * gammaPlus * exp(gammaPlus * deltaT)
+                    )
+            } else if (dampingRatio == 1.0f) {
+                // Critically damped
+                val coeffA = adjustedDisplacement
+                val coeffB = lastVelocity + naturalFreq * adjustedDisplacement
+                displacement = (coeffA + coeffB * deltaT) * exp(-naturalFreq * deltaT)
+                currentVelocity =
+                    (
+                        (
+                            (coeffA + coeffB * deltaT) * exp(-naturalFreq * deltaT) *
+                                (-naturalFreq)
+                            ) + coeffB * exp(-naturalFreq * deltaT)
+                        )
+            } else {
+                // Underdamped
+                val cosCoeff = adjustedDisplacement
+                val sinCoeff =
+                    (
+                        (1 / dampedFreq) * (
+                            (
+                                (dampingRatio * naturalFreq * adjustedDisplacement) +
+                                    lastVelocity
+                                )
+                            )
+                        )
+                displacement = (
+                    exp(-dampingRatio * naturalFreq * deltaT) *
+                        (
+                            (
+                                cosCoeff * cos(dampedFreq * deltaT) +
+                                    sinCoeff * sin(dampedFreq * deltaT)
+                                )
+                            )
+                    )
+                currentVelocity = (
+                    displacement * (-naturalFreq) * dampingRatio + (
+                        exp(
+                            -dampingRatio * naturalFreq * deltaT
+                        ) * (
+                            (
+                                -dampedFreq * cosCoeff *
+                                    sin(dampedFreq * deltaT) + dampedFreq * sinCoeff *
+                                    cos(dampedFreq * deltaT)
+                                )
+                            )
+                        )
+                    )
+            }
+
+            val newValue = (displacement + finalPosition).toFloat()
+            val newVelocity = currentVelocity.toFloat()
+
+            return Motion(newValue, newVelocity)
         }
-
-        val newValue = (displacement + finalPosition).toFloat()
-        val newVelocity = currentVelocity.toFloat()
-
-        return Motion(newValue, newVelocity)
-    }
 }

@@ -34,15 +34,19 @@ class TransitionAnimationTest {
         val physicsAnim = FloatSpringSpec()
         for (playTime in 0L until physicsAnim.getDurationMillis(0f, 1f, 0f) step 20L) {
             clock.clockTimeMillis = playTime
-            assertEquals(anim[prop1],
+            assertEquals(
+                anim[prop1],
                 physicsAnim.getValue(playTime, 0f, 1f, 0f),
-                epsilon)
+                epsilon
+            )
         }
         for (playTime in 0L until physicsAnim.getDurationMillis(100f, -100f, 0f) step 20L) {
             clock.clockTimeMillis = playTime
-            assertEquals(anim[prop2],
+            assertEquals(
+                anim[prop2],
                 physicsAnim.getValue(playTime, 100f, -100f, 0f),
-                epsilon)
+                epsilon
+            )
         }
     }
 

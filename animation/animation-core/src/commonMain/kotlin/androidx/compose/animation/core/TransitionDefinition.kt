@@ -68,8 +68,12 @@ class TransitionSpec<S> internal constructor(private val fromToPairs: Array<out 
         prop: PropKey<T, V>
     ): VectorizedAnimationSpec<V> {
         @Suppress("UNCHECKED_CAST")
-        return (propAnimation.getOrPut(prop,
-            { createSpec<V>(defaultAnimation) })) as VectorizedAnimationSpec<V>
+        return (
+            propAnimation.getOrPut(
+                prop,
+                { createSpec<V>(defaultAnimation) }
+            )
+            ) as VectorizedAnimationSpec<V>
     }
 
     private fun <V : AnimationVector> createSpec(

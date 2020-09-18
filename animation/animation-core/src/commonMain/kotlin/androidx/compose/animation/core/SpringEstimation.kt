@@ -283,26 +283,28 @@ private fun estimateDurationInternal(
     val v0 = if (initialPosition < 0) -initialVelocity else initialVelocity
     val p0 = abs(initialPosition)
 
-    return (when {
-        dampingRatio > 1.0 -> estimateOverDamped(
-            roots = roots,
-            v0 = v0,
-            p0 = p0,
-            delta = delta
-        )
-        dampingRatio < 1.0 -> estimateUnderDamped(
-            roots = roots,
-            v0 = v0,
-            p0 = p0,
-            delta = delta
-        )
-        else -> estimateCriticallyDamped(
-            roots = roots,
-            v0 = v0,
-            p0 = p0,
-            delta = delta
-        )
-    } * 1000.0).toLong()
+    return (
+        when {
+            dampingRatio > 1.0 -> estimateOverDamped(
+                roots = roots,
+                v0 = v0,
+                p0 = p0,
+                delta = delta
+            )
+            dampingRatio < 1.0 -> estimateUnderDamped(
+                roots = roots,
+                v0 = v0,
+                p0 = p0,
+                delta = delta
+            )
+            else -> estimateCriticallyDamped(
+                roots = roots,
+                v0 = v0,
+                p0 = p0,
+                delta = delta
+            )
+        } * 1000.0
+        ).toLong()
 }
 
 private inline fun iterateNewtonsMethod(
