@@ -139,20 +139,8 @@ class TextRangeTest {
     }
 
     @Test
-    fun constrain_returns_same_object_if_no_change_required() {
-        val textRange = TextRange(1, 2)
-        assertThat(textRange.constrain(0, 3)).isSameInstanceAs(textRange)
-    }
-
-    @Test
     fun constrain_updates_start_end_if_required() {
         assertThat(TextRange(0, 4).constrain(1, 3)).isEqualTo(TextRange(1, 3))
-    }
-
-    @Test
-    fun constrain_collapsed_TextRange_with_the_same_min_max_returns_the_same_instance() {
-        val textRange = TextRange(2, 2)
-        assertThat(textRange.constrain(2, 2)).isSameInstanceAs(textRange)
     }
 
     @Test
@@ -169,5 +157,11 @@ class TextRangeTest {
     @Test
     fun constrain_min_smaller_than_TextRange_values() {
         assertThat(TextRange(5, 6).constrain(0, 4)).isEqualTo(TextRange(4, 4))
+    }
+
+    @Test
+    fun to_string() {
+        assertThat(TextRange(0, 1).toString()).isEqualTo("TextRange(0, 1)")
+        assertThat(TextRange(1, 1).toString()).isEqualTo("TextRange(1, 1)")
     }
 }

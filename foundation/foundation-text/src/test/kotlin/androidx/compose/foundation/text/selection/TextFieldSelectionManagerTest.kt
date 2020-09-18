@@ -49,6 +49,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
 @SmallTest
 @RunWith(JUnit4::class)
@@ -106,8 +108,10 @@ class TextFieldSelectionManagerTest {
             beginOffset
         )
         whenever(state.layoutResult!!.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
-        whenever(state.layoutResult!!.getWordBoundary(beginOffset)).thenReturn(fakeTextRange)
-        whenever(state.layoutResult!!.getWordBoundary(dragOffset)).thenReturn(dragTextRange)
+        whenever(state.layoutResult!!.getWordBoundary(beginOffset))
+            .thenAnswer(TextRangeAnswer(fakeTextRange))
+        whenever(state.layoutResult!!.getWordBoundary(dragOffset))
+            .thenAnswer(TextRangeAnswer(dragTextRange))
         whenever(state.layoutResult!!.getBidiRunDirection(any()))
             .thenReturn(ResolvedTextDirection.Ltr)
         whenever(state.layoutResult!!.getBoundingBox(any())).thenReturn(Rect.Zero)
@@ -424,4 +428,10 @@ class TextFieldSelectionManagerTest {
 
         assertThat(manager.isTextChanged()).isFalse()
     }
+}
+
+// This class is a workaround for the bug that mockito can't stub a method returning inline class.
+// (https://github.com/nhaarman/mockito-kotlin/issues/309).
+internal class TextRangeAnswer(private val textRange: TextRange) : Answer<Any> {
+    override fun answer(invocation: InvocationOnMock?): Any = textRange.packedValue
 }
