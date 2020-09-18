@@ -167,9 +167,9 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
 
         private const val explanation =
             "Creating this extra lambda instead of just passing the already captured lambda means" +
-                    " that during code generation the Compose compiler will insert code around " +
-                    "this lambda to track invalidations. This adds some extra runtime cost so you" +
-                    " should instead just directly pass the lambda as a parameter to the function."
+                " that during code generation the Compose compiler will insert code around " +
+                "this lambda to track invalidations. This adds some extra runtime cost so you" +
+                " should instead just directly pass the lambda as a parameter to the function."
 
         val ISSUE = Issue.create(
             "UnnecessaryLambdaCreation",

@@ -49,7 +49,7 @@ class PackageNameMigrationDetector : Detector(), SourceCodeScanner {
                     node,
                     context.getLocation(node),
                     "The package name '$packageName' has been migrated to '$newPackageName', " +
-                            "please update the package name of this file accordingly."
+                        "please update the package name of this file accordingly."
                 )
             }
         }
@@ -91,9 +91,9 @@ class PackageNameMigrationDetector : Detector(), SourceCodeScanner {
             "PackageNameMigration",
             "Using an old package name that has recently been migrated to androidx.compose",
             "As part of a large migration from androidx.ui to androidx.compose, package names " +
-                    "across all libraries are being refactored. If you are seeing this Lint " +
-                    "error, you are adding new files to the old package name, once the rest of " +
-                    "the library has migrated to the new package name.",
+                "across all libraries are being refactored. If you are seeing this Lint " +
+                "error, you are adding new files to the old package name, once the rest of " +
+                "the library has migrated to the new package name.",
             Category.PERFORMANCE, 5, Severity.ERROR,
             Implementation(
                 PackageNameMigrationDetector::class.java,

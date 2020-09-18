@@ -285,7 +285,8 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
 
     private inline fun <T> composing(composer: Composer<*>, block: () -> T): T {
         val snapshot = takeMutableSnapshot(
-            readObserverOf(composer), writeObserverOf(composer))
+            readObserverOf(composer), writeObserverOf(composer)
+        )
         try {
             return snapshot.enter(block)
         } finally {
@@ -296,8 +297,10 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
     private fun applyAndCheck(snapshot: MutableSnapshot) {
         val applyResult = snapshot.apply()
         if (applyResult is SnapshotApplyResult.Failure) {
-            error("Unsupported concurrent change during composition. A state object was " +
-                    "modified by composition as well as being modified outside composition.")
+            error(
+                "Unsupported concurrent change during composition. A state object was " +
+                    "modified by composition as well as being modified outside composition."
+            )
             // TODO(chuckj): Consider lifting this restriction by forcing a recompose
         }
     }
@@ -334,8 +337,10 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         @TestOnly
         fun current(): Recomposer {
             return mainRecomposer ?: run {
-                val mainScope = CoroutineScope(NonCancellable +
-                        embeddingContext.mainThreadCompositionContext())
+                val mainScope = CoroutineScope(
+                    NonCancellable +
+                        embeddingContext.mainThreadCompositionContext()
+                )
 
                 Recomposer(embeddingContext).also {
                     mainRecomposer = it

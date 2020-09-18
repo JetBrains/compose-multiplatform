@@ -92,6 +92,6 @@ fun Activity.onNextFrame(block: () -> Unit) {
                 override fun doFrame(frameTimeNanos: Long) {
                     block()
                 }
-        })
+            })
     }
 }
