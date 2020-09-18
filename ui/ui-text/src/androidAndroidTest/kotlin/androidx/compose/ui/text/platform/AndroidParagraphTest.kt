@@ -637,9 +637,9 @@ class AndroidParagraphTest {
         assertThat(paragraph.charSequence)
             .hasSpan(ShadowSpan::class, start = 0, end = text.length) {
                 return@hasSpan it.color == color.toArgb() &&
-                        it.offsetX == offset.x &&
-                        it.offsetY == offset.y &&
-                        it.radius == radius
+                    it.offsetX == offset.x &&
+                    it.offsetY == offset.y &&
+                    it.radius == radius
             }
     }
 
@@ -670,16 +670,16 @@ class AndroidParagraphTest {
         assertThat(paragraph.charSequence)
             .hasSpan(ShadowSpan::class, start = 0, end = text.length) {
                 return@hasSpan it.color == color.toArgb() &&
-                        it.offsetX == offset.x &&
-                        it.offsetY == offset.y &&
-                        it.radius == radius
+                    it.offsetX == offset.x &&
+                    it.offsetY == offset.y &&
+                    it.radius == radius
             }
         assertThat(paragraph.charSequence)
             .hasSpanOnTop(ShadowSpan::class, start = 0, end = "abc".length) {
                 return@hasSpanOnTop it.color == colorOverwrite.toArgb() &&
-                        it.offsetX == offsetOverwrite.x &&
-                        it.offsetY == offsetOverwrite.y &&
-                        it.radius == radiusOverwrite
+                    it.offsetX == offsetOverwrite.x &&
+                    it.offsetY == offsetOverwrite.y &&
+                    it.radius == radiusOverwrite
             }
     }
 

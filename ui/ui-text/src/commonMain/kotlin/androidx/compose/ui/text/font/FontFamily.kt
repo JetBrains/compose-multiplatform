@@ -97,7 +97,7 @@ data class FontListFontFamily(val fonts: List<Font>) : FileBasedFontFamily(), Li
         check(fonts.isNotEmpty()) { "At least one font should be passed to FontFamily" }
         check(fonts.distinctBy { Pair(it.weight, it.style) }.size == fonts.size) {
             "There cannot be two fonts with the same FontWeight and FontStyle in the same " +
-                    "FontFamily"
+                "FontFamily"
         }
     }
 }

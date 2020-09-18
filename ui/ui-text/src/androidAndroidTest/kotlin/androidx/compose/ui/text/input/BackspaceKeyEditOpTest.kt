@@ -122,7 +122,8 @@ class BackspaceKeyEditOpTest {
     fun test_delete_with_composition_zwj_emoji() {
         val eb = EditingBuffer(
             "$ZWJ_EMOJI$ZWJ_EMOJI",
-            TextRange(ZWJ_EMOJI.length))
+            TextRange(ZWJ_EMOJI.length)
+        )
 
         BackspaceKeyEditOp().process(eb)
 

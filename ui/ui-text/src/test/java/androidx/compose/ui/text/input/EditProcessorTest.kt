@@ -55,9 +55,11 @@ class EditProcessorTest {
         assertEquals(0, captor.firstValue.selection.max)
 
         reset(tis)
-        val newState = proc.onEditCommands(listOf(
-            CommitTextEditOp("X", 1)
-        ))
+        val newState = proc.onEditCommands(
+            listOf(
+                CommitTextEditOp("X", 1)
+            )
+        )
 
         assertEquals("XABCDE", newState.text)
         assertEquals(1, newState.selection.min)

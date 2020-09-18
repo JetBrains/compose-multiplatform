@@ -69,7 +69,8 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
             keyboardType,
             imeAction,
             onEditCommand,
-            onImeActionPerformed)
+            onImeActionPerformed
+        )
         currentSessionToken = nextSessionToken++
         return currentSessionToken
     }
@@ -165,4 +166,4 @@ interface PlatformTextInputService {
 var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
     { TextInputService(it) }
     @VisibleForTesting
-    set
+        set

@@ -122,7 +122,8 @@ internal fun TextPaint.applySpanStyle(
             null
         },
         letterSpacing = if (style.letterSpacing.type == TextUnitType.Sp &&
-            style.letterSpacing.value != 0f) {
+            style.letterSpacing.value != 0f
+        ) {
             style.letterSpacing
         } else {
             TextUnit.Inherit
