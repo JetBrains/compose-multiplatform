@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.DrawCacheModifier
 import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.geometry.Size
@@ -28,13 +29,20 @@ internal class ModifiedDrawNode(
     drawModifier: DrawModifier
 ) : DelegatingLayoutNodeWrapper<DrawModifier>(wrapped, drawModifier) {
 
+    private val cacheDrawModifier: DrawCacheModifier? =
+        if (drawModifier is DrawCacheModifier) {
+            drawModifier
+        } else {
+            null
+        }
+
     // Flag to determine if the cache should be re-built
     private var invalidateCache = true
 
     // Callback used to build the drawing cache
     private val updateCache = {
         val size: Size = measuredSize.toSize()
-        modifier.buildCache?.invoke(size, layoutNode.mDrawScope)
+        cacheDrawModifier?.onBuildCache(size, layoutNode.mDrawScope)
         invalidateCache = false
     }
 
@@ -52,7 +60,7 @@ internal class ModifiedDrawNode(
     // This is not thread safe
     override fun draw(canvas: Canvas) {
         val size = measuredSize.toSize()
-        if (modifier.buildCache != null && invalidateCache) {
+        if (cacheDrawModifier != null && invalidateCache) {
             layoutNode.owner?.observeReads(
                 this,
                 onCommitAffectingModifiedDrawNode,
@@ -78,12 +86,10 @@ internal class ModifiedDrawNode(
         // invalidates the current layer.
         private val onCommitAffectingModifiedDrawNode: (ModifiedDrawNode) -> Unit =
             { modifiedDrawNode ->
-                // reset the last remembered size to unspecified to recreate the cache on the
-                // next draw call
-                modifiedDrawNode.apply {
-                    invalidateCache = true
-                    invalidateLayer()
-                }
+                // Note this intentionally does not invalidate the layer as Owner implementations
+                // already observe and invalidate the layer on state changes. Instead just
+                // mark the cache dirty so that it will be re-created on the next draw
+                modifiedDrawNode.invalidateCache = true
             }
     }
 }

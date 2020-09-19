@@ -26,10 +26,28 @@ import androidx.compose.ui.unit.Density
  * A [Modifier.Element] that draws into the space of the layout.
  */
 interface DrawModifier : Modifier.Element {
-    val buildCache: ((size: Size, density: Density) -> Unit)?
-        get() = null
 
     fun ContentDrawScope.draw()
+}
+
+/**
+ * [DrawModifier] implementation that supports building a cache of objects
+ * to be referenced across draw calls
+ */
+interface DrawCacheModifier : DrawModifier {
+
+    /**
+     * Callback invoked to re-build objects to be re-used across draw calls.
+     * This is useful to conditionally recreate objects only if the size of the
+     * drawing environment changes, or if state parameters that are inputs
+     * to objects change. This method is guaranteed to be called before
+     * [DrawModifier.draw].
+     *
+     * @param size The current size of the drawing environment
+     * @param density The current screen density to provide the ability to convert between
+     * density independent and raw pixel values
+     */
+    fun onBuildCache(size: Size, density: Density)
 }
 
 /**
@@ -66,7 +84,7 @@ fun Modifier.drawWithCache(
     onBuildDrawCache: CacheDrawScope.() -> DrawResult
 ) = composed {
     val cacheDrawScope = remember { CacheDrawScope() }
-    this.then(DrawCacheModifier(cacheDrawScope, onBuildDrawCache))
+    this.then(DrawBackgroundCacheModifier(cacheDrawScope, onBuildDrawCache))
 }
 
 /**
@@ -79,9 +97,15 @@ class CacheDrawScope internal constructor(
 ) : Density {
     internal var drawResult: DrawResult? = null
 
+    /**
+     * Provides the dimensions of the current drawing environment
+     */
     var size: Size = Size.Unspecified
         internal set
 
+    /**
+     * Specify the callback to be invoked to issue drawing commands
+     */
     fun onDraw(block: DrawScope.() -> Unit): DrawResult {
         return DrawResult(block).also { drawResult = it }
     }
@@ -93,23 +117,22 @@ class CacheDrawScope internal constructor(
         get() = cachedDrawDensity!!.density
 }
 
-private class DrawCacheModifier(
+private data class DrawBackgroundCacheModifier(
     val cacheDrawScope: CacheDrawScope,
     val onBuildDrawCache: CacheDrawScope.() -> DrawResult
-) : DrawModifier {
+) : DrawCacheModifier {
 
-    override val buildCache: ((size: Size, density: Density) -> Unit)?
-        get() = { size, density ->
-            cacheDrawScope.apply {
-                cachedDrawDensity = density
-                this.size = size
-                drawResult = null
-                onBuildDrawCache()
-                checkNotNull(drawResult) {
-                    "DrawResult not defined, did you forget to call onDraw?"
-                }
+    override fun onBuildCache(size: Size, density: Density) {
+        cacheDrawScope.apply {
+            cachedDrawDensity = density
+            this.size = size
+            drawResult = null
+            onBuildDrawCache()
+            checkNotNull(drawResult) {
+                "DrawResult not defined, did you forget to call onDraw?"
             }
         }
+    }
 
     override fun ContentDrawScope.draw() {
         cacheDrawScope.drawResult?.block?.invoke(this)
