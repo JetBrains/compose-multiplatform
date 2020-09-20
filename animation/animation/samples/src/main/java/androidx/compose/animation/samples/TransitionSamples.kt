@@ -70,7 +70,8 @@ fun TransitionSample() {
         // This starts the transition going from State.First to State.Second when this composable
         // gets composed for the first time.
         val state = transition(
-            definition = definition, initState = State.First, toState = State.Second)
+            definition = definition, initState = State.First, toState = State.Second
+        )
         Box(
             Modifier
                 .preferredSize(state[widthKey], state[heightKey])

@@ -67,59 +67,63 @@ private fun SwipeToDismiss() {
     val index = remember { mutableStateOf(0) }
     val itemWidth = remember { mutableStateOf(0f) }
     val isFlinging = remember { mutableStateOf(false) }
-    val modifier = Modifier.rawDragGestureFilter(dragObserver = object : DragObserver {
-        override fun onStart(downPosition: Offset) {
-            itemBottom.setBounds(0f, height)
-            if (isFlinging.value && itemBottom.targetValue < 100f) {
-                reset()
+    val modifier = Modifier.rawDragGestureFilter(
+        dragObserver = object : DragObserver {
+            override fun onStart(downPosition: Offset) {
+                itemBottom.setBounds(0f, height)
+                if (isFlinging.value && itemBottom.targetValue < 100f) {
+                    reset()
+                }
             }
-        }
 
-        private fun reset() {
-            itemBottom.snapTo(height)
-            index.value--
-            if (index.value < 0) {
-                index.value += pastelColors.size
+            private fun reset() {
+                itemBottom.snapTo(height)
+                index.value--
+                if (index.value < 0) {
+                    index.value += pastelColors.size
+                }
             }
-        }
 
-        override fun onDrag(dragDistance: Offset): Offset {
-            itemBottom.snapTo(itemBottom.targetValue + dragDistance.y)
-            return dragDistance
-        }
+            override fun onDrag(dragDistance: Offset): Offset {
+                itemBottom.snapTo(itemBottom.targetValue + dragDistance.y)
+                return dragDistance
+            }
 
-        fun adjustTarget(velocity: Float): (Float) -> TargetAnimation? {
-            return { target: Float ->
-                // The velocity is fast enough to fly off screen
-                if (target <= 0) {
-                    null
-                } else {
-                    val animation = SpringSpec<Float>(
-                        dampingRatio = 0.8f, stiffness = 300f
-                    )
-                    val projectedTarget = target + sign(velocity) * 0.2f * height
-                    if (projectedTarget < 0.6 * height) {
-                        TargetAnimation(0f, animation)
+            fun adjustTarget(velocity: Float): (Float) -> TargetAnimation? {
+                return { target: Float ->
+                    // The velocity is fast enough to fly off screen
+                    if (target <= 0) {
+                        null
                     } else {
-                        TargetAnimation(height, animation)
+                        val animation = SpringSpec<Float>(
+                            dampingRatio = 0.8f, stiffness = 300f
+                        )
+                        val projectedTarget = target + sign(velocity) * 0.2f * height
+                        if (projectedTarget < 0.6 * height) {
+                            TargetAnimation(0f, animation)
+                        } else {
+                            TargetAnimation(height, animation)
+                        }
                     }
                 }
             }
-        }
 
-        override fun onStop(velocity: Offset) {
-            isFlinging.value = true
-            itemBottom.fling(velocity.y,
-                ExponentialDecay(3.0f),
-                adjustTarget(velocity.y),
-                onEnd = { endReason, final, _ ->
-                    isFlinging.value = false
-                    if (endReason != AnimationEndReason.Interrupted && final == 0f) {
-                        reset()
+            override fun onStop(velocity: Offset) {
+                isFlinging.value = true
+                itemBottom.fling(
+                    velocity.y,
+                    ExponentialDecay(3.0f),
+                    adjustTarget(velocity.y),
+                    onEnd = { endReason, final, _ ->
+                        isFlinging.value = false
+                        if (endReason != AnimationEndReason.Interrupted && final == 0f) {
+                            reset()
+                        }
                     }
-                })
+                )
+            }
         }
-    })
+    )
 
     val heightDp = with(DensityAmbient.current) { height.toDp() }
 

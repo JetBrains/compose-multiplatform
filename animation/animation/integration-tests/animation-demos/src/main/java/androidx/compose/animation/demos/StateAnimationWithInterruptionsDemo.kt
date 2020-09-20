@@ -79,15 +79,18 @@ private val handler = Handler(Looper.getMainLooper())
 @Composable
 private fun ColorRect() {
     var toState by mutableStateOf(OverlayState.Closed)
-    handler.postDelayed(object : Runnable {
-        override fun run() {
-            if ((0..1).random() == 0) {
-                toState = OverlayState.Open
-            } else {
-                toState = OverlayState.Closed
+    handler.postDelayed(
+        object : Runnable {
+            override fun run() {
+                if ((0..1).random() == 0) {
+                    toState = OverlayState.Open
+                } else {
+                    toState = OverlayState.Closed
+                }
             }
-        }
-    }, (200..800).random().toLong())
+        },
+        (200..800).random().toLong()
+    )
     val state = transition(definition = definition, toState = toState)
     ColorRectState(state = state)
 }

@@ -293,7 +293,8 @@ class SingleValueAnimationTest {
         var value = Color.Black
         val children: @Composable() (Boolean) -> Unit = { enabled ->
             value = animate(
-                if (enabled) Color.Cyan else Color.Black, TweenSpec(
+                if (enabled) Color.Cyan else Color.Black,
+                TweenSpec(
                     durationMillis = 100,
                     easing = FastOutLinearInEasing
                 )

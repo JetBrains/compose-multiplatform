@@ -145,7 +145,8 @@ fun FadeTransition() {
 @Composable
 fun FullyLoadedTransition() {
     var visible by remember { mutableStateOf(true) }
-    AnimatedVisibility(visible = visible,
+    AnimatedVisibility(
+        visible = visible,
         enter = slideInVertically(
             // Start the slide from 40 (pixels) above where the content is supposed to go, to
             // produce a parallax effect
@@ -153,7 +154,8 @@ fun FullyLoadedTransition() {
         ) + expandVertically(
             expandFrom = Alignment.Top
         ) + fadeIn(initialAlpha = 0.3f),
-        exit = slideOutVertically() + shrinkVertically() + fadeOut()) {
+        exit = slideOutVertically() + shrinkVertically() + fadeOut()
+    ) {
         // Content that needs to appear/disappear goes here:
         Text("Content to appear/disappear", Modifier.fillMaxWidth().height(200.dp))
     }
@@ -214,7 +216,8 @@ fun SlideInOutSample() {
 fun ExpandShrinkVerticallySample() {
     var visible by remember { mutableStateOf(true) }
 
-    AnimatedVisibility(visible,
+    AnimatedVisibility(
+        visible,
         // Sets the initial height of the content to 20, revealing only the top of the content at
         // the beginning of the expanding animation.
         enter = expandVertically(
@@ -270,9 +273,11 @@ fun ExpandInShrinkOutSample() {
 fun ColumnAnimatedVisibilitySample() {
     var itemIndex by remember { mutableStateOf(0) }
     val colors = listOf(Color.Red, Color.Green, Color.Blue)
-    Column(Modifier.fillMaxWidth().clickable {
-        itemIndex = (itemIndex + 1) % colors.size
-    }) {
+    Column(
+        Modifier.fillMaxWidth().clickable {
+            itemIndex = (itemIndex + 1) % colors.size
+        }
+    ) {
         colors.forEachIndexed { i, color ->
             // By default ColumnScope.AnimatedVisibility expands and shrinks new content while
             // fading.

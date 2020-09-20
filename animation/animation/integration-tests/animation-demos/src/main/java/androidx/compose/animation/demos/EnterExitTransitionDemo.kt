@@ -76,59 +76,83 @@ fun EnterExitTransitionDemo() {
         var visible by remember { mutableStateOf(true) }
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(0) }
         Column(Modifier.fillMaxSize()) {
-            Button(modifier = Modifier.align(CenterHorizontally), onClick = {
-                alignment = TopCenter
-                visible = !visible
-            }) {
+            Button(
+                modifier = Modifier.align(CenterHorizontally),
+                onClick = {
+                    alignment = TopCenter
+                    visible = !visible
+                }
+            ) {
                 Text("Top")
             }
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 Stack(Modifier.fillMaxHeight().wrapContentWidth()) {
-                    Button(modifier = Modifier.align(TopEnd), onClick = {
-                        alignment = TopStart
-                        visible = !visible
-                    }) {
+                    Button(
+                        modifier = Modifier.align(TopEnd),
+                        onClick = {
+                            alignment = TopStart
+                            visible = !visible
+                        }
+                    ) {
                         Text("Top\nStart")
                     }
-                    Button(modifier = Modifier.align(CenterEnd), onClick = {
-                        alignment = CenterStart
-                        visible = !visible
-                    }) {
+                    Button(
+                        modifier = Modifier.align(CenterEnd),
+                        onClick = {
+                            alignment = CenterStart
+                            visible = !visible
+                        }
+                    ) {
                         Text("Start")
                     }
-                    Button(modifier = Modifier.align(BottomEnd), onClick = {
-                        alignment = BottomStart
-                        visible = !visible
-                    }) {
+                    Button(
+                        modifier = Modifier.align(BottomEnd),
+                        onClick = {
+                            alignment = BottomStart
+                            visible = !visible
+                        }
+                    ) {
                         Text("Bottom\nStart")
                     }
                 }
                 CenterMenu(selectedOption, oppositeAlignment.value, alignment, visible)
                 Stack(Modifier.fillMaxHeight().wrapContentWidth()) {
-                    Button(modifier = Modifier.align(TopStart), onClick = {
-                        alignment = TopEnd
-                        visible = !visible
-                    }) {
+                    Button(
+                        modifier = Modifier.align(TopStart),
+                        onClick = {
+                            alignment = TopEnd
+                            visible = !visible
+                        }
+                    ) {
                         Text("Top\nEnd")
                     }
-                    Button(modifier = Modifier.align(CenterStart), onClick = {
-                        alignment = CenterEnd
-                        visible = !visible
-                    }) {
+                    Button(
+                        modifier = Modifier.align(CenterStart),
+                        onClick = {
+                            alignment = CenterEnd
+                            visible = !visible
+                        }
+                    ) {
                         Text("End")
                     }
-                    Button(modifier = Modifier.align(BottomEnd), onClick = {
-                        alignment = BottomEnd
-                        visible = !visible
-                    }) {
+                    Button(
+                        modifier = Modifier.align(BottomEnd),
+                        onClick = {
+                            alignment = BottomEnd
+                            visible = !visible
+                        }
+                    ) {
                         Text("Bottom\nEnd")
                     }
                 }
             }
-            Button(modifier = Modifier.align(CenterHorizontally), onClick = {
-                alignment = BottomCenter
-                visible = !visible
-            }) {
+            Button(
+                modifier = Modifier.align(CenterHorizontally),
+                onClick = {
+                    alignment = BottomCenter
+                    visible = !visible
+                }
+            ) {
                 Text("Bottom")
             }
 
@@ -220,14 +244,15 @@ fun FadeOptions(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
         val radioOptions =
             listOf("No Fade", "Fade In", "Fade Out", "Fade In & Fade out")
         radioOptions.forEachIndexed { i, text ->
-            Row(Modifier
-                .fillMaxWidth()
-                .preferredHeight(30.dp)
-                .selectable(
-                    selected = (i == selectedOption),
-                    onClick = { onOptionSelected(i) }
-                )
-                .padding(horizontal = 16.dp),
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .preferredHeight(30.dp)
+                    .selectable(
+                        selected = (i == selectedOption),
+                        onClick = { onOptionSelected(i) }
+                    )
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(

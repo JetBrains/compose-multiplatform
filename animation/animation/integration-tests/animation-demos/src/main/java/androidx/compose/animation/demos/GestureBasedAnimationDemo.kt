@@ -65,7 +65,8 @@ fun GestureBasedAnimationDemo() {
         Modifier.pressIndicatorGestureFilter(
             onStart = { toState.value = ComponentState.Pressed },
             onStop = { toState.value = ComponentState.Released },
-            onCancel = { toState.value = ComponentState.Released })
+            onCancel = { toState.value = ComponentState.Released }
+        )
 
     val state = transition(definition = definition, toState = toState.value)
     ScaledColorRect(pressIndicator, scale = state[scale], color = state[color])

@@ -41,14 +41,16 @@ fun AnimateContent() {
     val shortText = "Hi"
     val longText = "Very long text\nthat spans across\nmultiple lines"
     var short by remember { mutableStateOf(true) }
-    Box(modifier = Modifier
-        .background(Color.Blue,
-            RoundedCornerShape(15.dp)
-        )
-        .clickable { short = !short }
-        .padding(20.dp)
-        .wrapContentSize()
-        .animateContentSize()
+    Box(
+        modifier = Modifier
+            .background(
+                Color.Blue,
+                RoundedCornerShape(15.dp)
+            )
+            .clickable { short = !short }
+            .padding(20.dp)
+            .wrapContentSize()
+            .animateContentSize()
     ) {
         Text(
             if (short) {

@@ -52,19 +52,24 @@ fun SpringBackScrollingDemo() {
         val animScroll = animatedFloat(0f)
         val itemWidth = remember { mutableStateOf(0f) }
         val isFlinging = remember { mutableStateOf(false) }
-        val gesture = Modifier.rawDragGestureFilter(dragObserver = object : DragObserver {
-            override fun onDrag(dragDistance: Offset): Offset {
-                animScroll.snapTo(animScroll.targetValue + dragDistance.x)
-                return dragDistance
-            }
+        val gesture = Modifier.rawDragGestureFilter(
+            dragObserver = object : DragObserver {
+                override fun onDrag(dragDistance: Offset): Offset {
+                    animScroll.snapTo(animScroll.targetValue + dragDistance.x)
+                    return dragDistance
+                }
 
-            override fun onStop(velocity: Offset) {
-                isFlinging.value = true
-                animScroll.fling(velocity.x, onEnd = { _, _, _ ->
-                    isFlinging.value = false
-                })
+                override fun onStop(velocity: Offset) {
+                    isFlinging.value = true
+                    animScroll.fling(
+                        velocity.x,
+                        onEnd = { _, _, _ ->
+                            isFlinging.value = false
+                        }
+                    )
+                }
             }
-        })
+        )
         Canvas(gesture.fillMaxWidth().preferredHeight(400.dp)) {
             itemWidth.value = size.width / 2f
             if (isFlinging.value) {
@@ -94,8 +99,9 @@ fun SpringBackScrollingDemo() {
             }
             if (DEBUG) {
                 Log.w(
-                    "Anim", "Spring back scrolling, redrawing with new" +
-                            " scroll value: ${animScroll.value}"
+                    "Anim",
+                    "Spring back scrolling, redrawing with new" +
+                        " scroll value: ${animScroll.value}"
                 )
             }
             drawRects(animScroll.value)

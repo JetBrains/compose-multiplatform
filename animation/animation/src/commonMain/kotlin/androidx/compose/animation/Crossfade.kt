@@ -116,7 +116,8 @@ private fun animatedOpacity(
                 if (reason == AnimationEndReason.TargetReached) {
                     onAnimationFinish()
                 }
-            })
+            }
+        )
     }
     return animatedFloat
 }

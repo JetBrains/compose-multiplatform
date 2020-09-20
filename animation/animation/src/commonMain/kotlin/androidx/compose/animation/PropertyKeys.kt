@@ -210,8 +210,8 @@ private val IntSizeToVector: TwoWayConverter<IntSize, AnimationVector2D> =
  * [ColorSpace].
  */
 val Color.Companion.VectorConverter:
-            (colorSpace: ColorSpace) -> TwoWayConverter<Color, AnimationVector4D>
-    get() = ColorToVector
+    (colorSpace: ColorSpace) -> TwoWayConverter<Color, AnimationVector4D>
+        get() = ColorToVector
 
 /**
  * A lambda that takes a [ColorSpace] and returns a converter that can both convert a [Color] to
@@ -308,8 +308,10 @@ val OffsetToVectorConverter: TwoWayConverter<Offset, AnimationVector2D> =
  * A type converter that converts a [PxBounds] to a [AnimationVector4D], and vice versa.
  * @see Rect.Companion.VectorConverter
  */
-@Deprecated("Use Rect and RectToVectorConverter instead",
-    ReplaceWith("Rect.VectorConverter"))
+@Deprecated(
+    "Use Rect and RectToVectorConverter instead",
+    ReplaceWith("Rect.VectorConverter")
+)
 @Suppress("DEPRECATION")
 val PxBounds.Companion.VectorConverter: TwoWayConverter<PxBounds, AnimationVector4D>
     get() = PxBoundsToVector
