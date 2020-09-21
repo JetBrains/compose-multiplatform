@@ -44,7 +44,7 @@ fun runMetalavaWithArgs(
         "HiddenSuperclass" // We allow having a hidden parent class
     ) + args
 
-    val workQueue = workerExecutor.noIsolation()
+    val workQueue = workerExecutor.processIsolation()
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
         parameters.getArgs().set(allArgs)
         parameters.getMetalavaClasspath().set(metalavaConfiguration.files)
