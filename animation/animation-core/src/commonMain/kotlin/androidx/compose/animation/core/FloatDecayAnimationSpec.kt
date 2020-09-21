@@ -118,7 +118,7 @@ class ExponentialDecay(
         startVelocity: Float
     ): Float {
         return start - startVelocity / friction +
-                startVelocity / friction * exp(friction * playTime / 1000f)
+            startVelocity / friction * exp(friction * playTime / 1000f)
     }
 
     override fun getVelocity(
@@ -145,7 +145,7 @@ class ExponentialDecay(
             ln(abs(absVelocityThreshold / startVelocity).toDouble()) / friction * 1000
 
         return start - startVelocity / friction +
-                startVelocity / friction * exp((friction * duration / 1000f)).toFloat()
+            startVelocity / friction * exp((friction * duration / 1000f)).toFloat()
     }
 }
 

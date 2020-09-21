@@ -88,7 +88,7 @@ class TweenSpec<T>(
  */
 interface DurationBasedAnimationSpec<T> : AnimationSpec<T> {
     override fun <V : AnimationVector> vectorize(converter: TwoWayConverter<T, V>):
-            VectorizedDurationBasedAnimationSpec<V>
+        VectorizedDurationBasedAnimationSpec<V>
 }
 
 /**
@@ -242,9 +242,12 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
     override fun <V : AnimationVector> vectorize(
         converter: TwoWayConverter<T, V>
     ): VectorizedKeyframesSpec<V> {
-        return VectorizedKeyframesSpec(config.keyframes.mapValues {
-            it.value.toPair(converter.convertToVector)
-        }, config.durationMillis, config.delayMillis)
+        return VectorizedKeyframesSpec(
+            config.keyframes.mapValues {
+                it.value.toPair(converter.convertToVector)
+            },
+            config.durationMillis, config.delayMillis
+        )
     }
 
     /**

@@ -99,7 +99,8 @@ class AnimationTest {
                 lerp(startValue.v3, endValue.v3, fraction)
             )
             assertEquals(
-                animValue, keyframes.getValue(
+                animValue,
+                keyframes.getValue(
                     delay + i.toLong(),
                     startValue, endValue, startValue
                 )
@@ -242,7 +243,8 @@ class AnimationTest {
             VectorizedSpringSpec(
                 Spring.DampingRatioLowBouncy, Spring.StiffnessLow,
                 AnimationVector(5f, 4f, 0.1f, 20f)
-            ), start, end, startVelocity
+            ),
+            start, end, startVelocity
         )
 
         verifyAnimation(
@@ -256,8 +258,10 @@ class AnimationTest {
             VectorizedKeyframesSpec(
                 mutableMapOf(
                     200 to (start to LinearEasing)
-                ), 800
-            ), start, end, startVelocity
+                ),
+                800
+            ),
+            start, end, startVelocity
         )
     }
 

@@ -135,13 +135,13 @@ class SpringEstimationTest(private val m: Double, private val k: Double) {
             (
                 (
                     abs(simTwoFramesBefore.value) >= 0.999 &&
-                    abs(simTwoFramesAfter.value) <= 1.001
-                ) || (
+                        abs(simTwoFramesAfter.value) <= 1.001
+                    ) || (
                     abs(simAtTime.value) >= 0.999 &&
-                    abs(simTwoFramesBefore.value) < abs(simAtTime.value) &&
-                    abs(simTwoFramesAfter.value) < abs(simAtTime.value)
+                        abs(simTwoFramesBefore.value) < abs(simAtTime.value) &&
+                        abs(simTwoFramesAfter.value) < abs(simAtTime.value)
+                    )
                 )
-            )
         } else {
             // In the under-damped scenario, x(t) varies heavily due to oscillations, therefore
             // the over/critically damped conditions may fail erroneously.

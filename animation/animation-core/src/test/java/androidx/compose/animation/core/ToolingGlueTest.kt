@@ -30,8 +30,10 @@ class ToolingGlueTest {
     fun testSeekableAnimation() {
         val animation = SeekableAnimation(def, "start", "end")
         val defaultAnim = FloatSpringSpec()
-        assertEquals(max(defaultAnim.getDurationMillis(0f, 100f, 0f), 500L),
-            animation.duration)
+        assertEquals(
+            max(defaultAnim.getDurationMillis(0f, 100f, 0f), 500L),
+            animation.duration
+        )
 
         var playtime = 0L
         while (playtime <= animation.duration) {
@@ -128,13 +130,15 @@ private val def2 = transitionDefinition<String> {
     }
 
     transition("start" to "end") {
-        alpha using repeatable(100,
+        alpha using repeatable(
+            100,
             tween(
                 easing = LinearEasing,
                 durationMillis = 200
             )
         )
-        scale using repeatable(18,
+        scale using repeatable(
+            18,
             tween(
                 easing = LinearEasing,
                 durationMillis = 1000
@@ -144,13 +148,15 @@ private val def2 = transitionDefinition<String> {
     }
 
     transition("end" to "start") {
-        alpha using repeatable(100,
+        alpha using repeatable(
+            100,
             tween(
                 easing = LinearEasing,
                 durationMillis = 200
             )
         )
-        scale using repeatable(18,
+        scale using repeatable(
+            18,
             tween(
                 easing = LinearEasing,
                 durationMillis = 1000,
