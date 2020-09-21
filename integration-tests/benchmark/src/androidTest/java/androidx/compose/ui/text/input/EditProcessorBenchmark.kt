@@ -63,8 +63,10 @@ class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenar
                 TestScenario(listOf(SetComposingTextEditOp("Android", 1)), "Insert composition"),
                 TestScenario(listOf(SetComposingRegionEditOp(0, 1)), "Set composition"),
                 TestScenario(listOf(DeleteSurroundingTextEditOp(0, 1)), "Delete text"),
-                TestScenario(listOf(DeleteSurroundingTextInCodePointsEditOp(0, 1)),
-                    "Delete text in code points"),
+                TestScenario(
+                    listOf(DeleteSurroundingTextInCodePointsEditOp(0, 1)),
+                    "Delete text in code points"
+                ),
                 TestScenario(listOf(SetSelectionEditOp(0, 1)), "Set selection"),
                 TestScenario(listOf(BackspaceKeyEditOp()), "Backspace"),
                 TestScenario(listOf(MoveCursorEditOp(1)), "Cursor movement")
