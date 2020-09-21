@@ -51,22 +51,22 @@ class ParagraphTest {
 
     private val text1 =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do" +
-                " eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad" +
-                " minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip" +
-                " ex ea commodo consequat. Duis aute irure dolor in reprehenderit in" +
-                " voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur" +
-                " sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt" +
-                " mollit anim id est laborum."
+            " eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad" +
+            " minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip" +
+            " ex ea commodo consequat. Duis aute irure dolor in reprehenderit in" +
+            " voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur" +
+            " sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt" +
+            " mollit anim id est laborum."
 
     private val text2 =
         "fun <T : Comparable<T>> List<T>.quickSort(): List<T> = when {\n" +
-                "  size < 2 -> this\n" +
-                "  else -> {\n" +
-                "    val pivot = first()\n" +
-                "    val (smaller, greater) = drop(1).partition { it <= pivot }\n" +
-                "    smaller.quickSort() + pivot + greater.quickSort()\n" +
-                "   }\n" +
-                "}"
+            "  size < 2 -> this\n" +
+            "  else -> {\n" +
+            "    val pivot = first()\n" +
+            "    val (smaller, greater) = drop(1).partition { it <= pivot }\n" +
+            "    smaller.quickSort() + pivot + greater.quickSort()\n" +
+            "   }\n" +
+            "}"
 
     val fontFamily = fontFamily(
         font("Noto", "NotoSans-Regular.ttf"),

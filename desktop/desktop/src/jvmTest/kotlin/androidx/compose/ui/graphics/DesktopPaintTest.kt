@@ -46,10 +46,13 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     @Test
     fun blendModePlus() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
-        canvas.drawRect(left = 4f, top = 4f, right = 12f, bottom = 12f, paint = Paint().apply {
-            color = Color.Blue
-            blendMode = BlendMode.Plus
-        })
+        canvas.drawRect(
+            left = 4f, top = 4f, right = 12f, bottom = 12f,
+            paint = Paint().apply {
+                color = Color.Blue
+                blendMode = BlendMode.Plus
+            }
+        )
 
         screenshotRule.snap(surface)
     }
@@ -57,10 +60,13 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     @Test
     fun blendModeMultiply() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
-        canvas.drawRect(left = 4f, top = 4f, right = 12f, bottom = 12f, paint = Paint().apply {
-            color = Color.Gray
-            blendMode = BlendMode.Multiply
-        })
+        canvas.drawRect(
+            left = 4f, top = 4f, right = 12f, bottom = 12f,
+            paint = Paint().apply {
+                color = Color.Gray
+                blendMode = BlendMode.Multiply
+            }
+        )
 
         screenshotRule.snap(surface)
     }
@@ -118,14 +124,17 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     fun linearGradientShader() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
 
-        canvas.drawRect(left = 2f, top = 2f, right = 14f, bottom = 14f, paint = Paint().apply {
-            shader = LinearGradientShader(
-                from = Offset(0f, 0f),
-                to = Offset(6f, 6f),
-                colors = listOf(Color.Blue, Color.Green),
-                tileMode = TileMode.Mirror
-            )
-        })
+        canvas.drawRect(
+            left = 2f, top = 2f, right = 14f, bottom = 14f,
+            paint = Paint().apply {
+                shader = LinearGradientShader(
+                    from = Offset(0f, 0f),
+                    to = Offset(6f, 6f),
+                    colors = listOf(Color.Blue, Color.Green),
+                    tileMode = TileMode.Mirror
+                )
+            }
+        )
 
         screenshotRule.snap(surface)
     }
@@ -134,15 +143,18 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     fun linearGradientShaderWithStops() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
 
-        canvas.drawRect(left = 1f, top = 2f, right = 14f, bottom = 15f, paint = Paint().apply {
-            shader = LinearGradientShader(
-                from = Offset(0f, 0f),
-                to = Offset(12f, 0f),
-                colorStops = listOf(0f, 0.25f, 1f),
-                colors = listOf(Color.Blue, Color.Green, Color.Yellow),
-                tileMode = TileMode.Mirror
-            )
-        })
+        canvas.drawRect(
+            left = 1f, top = 2f, right = 14f, bottom = 15f,
+            paint = Paint().apply {
+                shader = LinearGradientShader(
+                    from = Offset(0f, 0f),
+                    to = Offset(12f, 0f),
+                    colorStops = listOf(0f, 0.25f, 1f),
+                    colors = listOf(Color.Blue, Color.Green, Color.Yellow),
+                    tileMode = TileMode.Mirror
+                )
+            }
+        )
 
         screenshotRule.snap(surface)
     }
@@ -151,14 +163,17 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     fun radialGradientShader() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
 
-        canvas.drawRect(left = 2f, top = 2f, right = 14f, bottom = 14f, paint = Paint().apply {
-            shader = RadialGradientShader(
-                center = Offset(4f, 8f),
-                radius = 8f,
-                colors = listOf(Color.Blue, Color.Green),
-                tileMode = TileMode.Clamp
-            )
-        })
+        canvas.drawRect(
+            left = 2f, top = 2f, right = 14f, bottom = 14f,
+            paint = Paint().apply {
+                shader = RadialGradientShader(
+                    center = Offset(4f, 8f),
+                    radius = 8f,
+                    colors = listOf(Color.Blue, Color.Green),
+                    tileMode = TileMode.Clamp
+                )
+            }
+        )
 
         screenshotRule.snap(surface)
     }
