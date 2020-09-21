@@ -37,7 +37,7 @@ class SeekableAnimation<T>(
 ) {
     private val currentValues: MutableMap<PropKey<Any, AnimationVector>, Any> = mutableMapOf()
     private val currentAnimWrappers: MutableMap<PropKey<Any, AnimationVector>,
-            Animation<Any, AnimationVector>> = mutableMapOf()
+        Animation<Any, AnimationVector>> = mutableMapOf()
 
     init {
         val to = def.states[toState]!!

@@ -75,8 +75,10 @@ class DecayAnimationTest {
 
         val startValue = 2000f
         val startVelocity = 800f
-        val fullAnim = ExponentialDecay(absVelocityThreshold = 0f).createAnimation(startValue,
-            startVelocity)
+        val fullAnim = ExponentialDecay(absVelocityThreshold = 0f).createAnimation(
+            startValue,
+            startVelocity
+        )
 
         val finishValue = fullAnim.getValue(Int.MAX_VALUE.toLong())
 

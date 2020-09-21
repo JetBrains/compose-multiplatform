@@ -27,13 +27,15 @@ import androidx.compose.ui.unit.dp
 
 @Sampled
 fun FloatKeyframesBuilder() {
-    KeyframesSpec(KeyframesSpec.KeyframesSpecConfig<Float>().apply {
-        0f at 0 // ms  // Optional
-        0.4f at 75 // ms
-        0.4f at 225 // ms
-        0f at 375 // ms  // Optional
-        durationMillis = 375
-    })
+    KeyframesSpec(
+        KeyframesSpec.KeyframesSpecConfig<Float>().apply {
+            0f at 0 // ms  // Optional
+            0.4f at 75 // ms
+            0.4f at 225 // ms
+            0f at 375 // ms  // Optional
+            durationMillis = 375
+        }
+    )
 }
 
 @Sampled

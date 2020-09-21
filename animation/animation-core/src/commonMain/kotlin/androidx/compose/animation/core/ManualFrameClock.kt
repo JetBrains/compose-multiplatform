@@ -30,8 +30,8 @@ import androidx.compose.runtime.dispatch.MonotonicFrameClock
 class ManualFrameClock
 @Deprecated(
     message = "dispatchOnSubscribe should only be used for backwards compatibility when this " +
-            "MonotonicFrameClock is used as an AnimationClockObservable in places where " +
-            "ManualAnimationClock was used before.",
+        "MonotonicFrameClock is used as an AnimationClockObservable in places where " +
+        "ManualAnimationClock was used before.",
     replaceWith = ReplaceWith("ManualFrameClock(initialTime)")
 )
 constructor(

@@ -71,7 +71,7 @@ class AnimatedValueTest {
 
         // Animate beyond upper bound
         animatedFloat.animateTo(5f) { endReason: AnimationEndReason, _: Float ->
-                reason = endReason
+            reason = endReason
         }
         clock.clockTimeMillis += 10000L
         assertEquals(4f, animatedFloat.value)
