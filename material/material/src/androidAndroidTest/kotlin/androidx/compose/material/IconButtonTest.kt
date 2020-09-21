@@ -15,11 +15,10 @@
  */
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.samples.IconButtonSample
 import androidx.compose.material.samples.IconToggleButtonSample
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -66,10 +65,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconButton(onClick = {}) {
-                    Box(
-                        Modifier.preferredSize(diameter).testTag("icon"),
-                        children = emptyContent()
-                    )
+                    Box(Modifier.preferredSize(diameter).testTag("icon"))
                 }
             }
         }
@@ -87,10 +83,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconButton(onClick = {}) {
-                    Box(
-                        Modifier.preferredSize(width, height).testTag("icon"),
-                        children = emptyContent()
-                    )
+                    Box(Modifier.preferredSize(width, height).testTag("icon"))
                 }
             }
         }
@@ -119,10 +112,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
-                    Box(
-                        Modifier.preferredSize(diameter).testTag("icon"),
-                        children = emptyContent()
-                    )
+                    Box(Modifier.preferredSize(diameter).testTag("icon"))
                 }
             }
         }
@@ -140,9 +130,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
-                    Box(
-                        Modifier.preferredSize(width, height).testTag("icon"),
-                        children = emptyContent())
+                    Box(Modifier.preferredSize(width, height).testTag("icon"))
                 }
             }
         }

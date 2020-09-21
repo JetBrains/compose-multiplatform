@@ -17,9 +17,9 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
@@ -28,6 +28,7 @@ import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
@@ -56,13 +57,15 @@ fun SwipeableSample() {
                 anchors = anchors,
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal
-            ),
-        backgroundColor = Color.Black
+            )
+            .background(Color.Black)
     ) {
         Box(
-            Modifier.offsetPx(x = swipeableState.offset).preferredSize(squareSize),
-            backgroundColor = Color.Red,
-            gravity = ContentGravity.Center
+            Modifier
+                .offsetPx(x = swipeableState.offset)
+                .preferredSize(squareSize)
+                .background(Color.Red),
+            alignment = Alignment.Center
         ) {
             Text(swipeableState.value, color = Color.White, fontSize = 24.sp)
         }

@@ -18,7 +18,8 @@
 
 package androidx.compose.ui.demos
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Layout
@@ -35,8 +36,8 @@ fun HeaderFooterLayout(
     content: @Composable () -> Unit
 ) {
     Layout({
-        Box(Modifier.layoutId("header"), children = header)
-        Box(Modifier.layoutId("footer"), children = footer)
+        Box(Modifier.layoutId("header")) { header() }
+        Box(Modifier.layoutId("footer")) { footer() }
         content()
     }) { measurables, constraints ->
         val headerPlaceable = measurables.first { it.id == "header" }.measure(
@@ -73,13 +74,13 @@ fun HeaderFooterLayout(
 @Composable
 fun MultipleCollectTest() {
     val header = @Composable {
-        Box(Modifier.fillMaxSize(), backgroundColor = Color(android.graphics.Color.GRAY))
+        Box(Modifier.fillMaxSize().background(Color(android.graphics.Color.GRAY)))
     }
     val footer = @Composable {
-        Box(Modifier.fillMaxSize(), backgroundColor = Color(android.graphics.Color.BLUE))
+        Box(Modifier.fillMaxSize().background(Color(android.graphics.Color.BLUE)))
     }
     HeaderFooterLayout(header = header, footer = footer) {
-        Box(Modifier.fillMaxSize(), backgroundColor = Color(android.graphics.Color.GREEN))
-        Box(Modifier.fillMaxSize(), backgroundColor = Color(android.graphics.Color.YELLOW))
+        Box(Modifier.fillMaxSize().background(Color(android.graphics.Color.GREEN)))
+        Box(Modifier.fillMaxSize().background(Color(android.graphics.Color.YELLOW)))
     }
 }

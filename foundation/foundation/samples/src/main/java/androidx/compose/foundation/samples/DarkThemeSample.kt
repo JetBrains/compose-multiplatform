@@ -17,10 +17,9 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,7 +31,7 @@ import androidx.compose.ui.unit.dp
 fun DarkThemeSample() {
     val dark = isSystemInDarkTheme()
     val color = if (dark) Color.White else Color.Black
-    Stack {
+    Box {
         Box(Modifier.preferredSize(50.dp).background(color = color))
     }
 }

@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -39,8 +39,8 @@ fun ComposeTestRuleJUnit.setContentForSizeAssertions(
     children: @Composable () -> Unit
 ): SemanticsNodeInteraction {
     setContent {
-        Stack {
-            Stack(
+        Box {
+            Box(
                 Modifier.preferredSizeIn(maxWidth = parentMaxWidth, maxHeight = parentMaxHeight)
                     .testTag("containerForSizeAssertion")) {
                 children()

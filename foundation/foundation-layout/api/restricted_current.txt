@@ -66,6 +66,22 @@ package androidx.compose.foundation.layout {
     property public default float spacing;
   }
 
+  public final class BoxKt {
+    method @androidx.compose.runtime.Composable public static void Box(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.Alignment alignment = Alignment.TopStart, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> children);
+    method @androidx.compose.runtime.Composable public static void Box(androidx.compose.ui.Modifier modifier);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Stack(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.Alignment alignment = Alignment.TopStart, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> children);
+  }
+
+  @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface BoxScope {
+    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment alignment);
+    method @Deprecated @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier gravity(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment align);
+    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier matchParentSize(androidx.compose.ui.Modifier);
+    field public static final androidx.compose.foundation.layout.BoxScope.Companion Companion;
+  }
+
+  public static final class BoxScope.Companion implements androidx.compose.foundation.layout.BoxScope {
+  }
+
   public final class ChainStyle {
     field public static final androidx.compose.foundation.layout.ChainStyle.Companion Companion;
   }
@@ -444,20 +460,6 @@ package androidx.compose.foundation.layout {
 
   public final class SpacerKt {
     method @androidx.compose.runtime.Composable public static void Spacer(androidx.compose.ui.Modifier modifier);
-  }
-
-  public final class StackKt {
-    method @androidx.compose.runtime.Composable public static void Stack(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.Alignment alignment = Alignment.TopStart, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.StackScope,kotlin.Unit> children);
-  }
-
-  @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface StackScope {
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment alignment);
-    method @Deprecated @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier gravity(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment align);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier matchParentSize(androidx.compose.ui.Modifier);
-    field public static final androidx.compose.foundation.layout.StackScope.Companion Companion;
-  }
-
-  public static final class StackScope.Companion implements androidx.compose.foundation.layout.StackScope {
   }
 
   public final class State extends androidx.constraintlayout.core.state.State {

@@ -47,7 +47,7 @@ import androidx.compose.ui.util.fastMaxBy
  *
  * This composable function creates a custom [Layout] for its content. The size of the custom
  * layout is determined by the largest width and largest height of the children. All children
- * will be arranged in a stack (aligned to the top start of the [Layout]).
+ * will be arranged in a box (aligned to the top start of the [Layout]).
  *
  * __Note__: Once the exit transition is finished, the [content] composable will be skipped (i.e.
  * the content will be removed from the tree, and disposed).
@@ -110,7 +110,7 @@ fun AnimatedVisibility(
  *
  * This composable function creates a custom [Layout] for its content. The size of the custom
  * layout is determined by the largest width and largest height of the children. All children
- * will be arranged in a stack (aligned to the top start of the [Layout]).
+ * will be arranged in a box (aligned to the top start of the [Layout]).
  *
  * __Note__: Once the exit transition is finished, the [content] composable will be skipped (i.e.
  * the content will be removed from the tree, and disposed).
@@ -172,7 +172,7 @@ fun RowScope.AnimatedVisibility(
  *
  * This composable function creates a custom [Layout] for its content. The size of the custom
  * layout is determined by the largest width and largest height of the children. All children
- * will be arranged in a stack (aligned to the top start of the [Layout]).
+ * will be arranged in a box (aligned to the top start of the [Layout]).
  *
  * __Note__: Once the exit transition is finished, the [content] composable will be skipped (i.e.
  * the content will be removed from the tree, and disposed).

@@ -17,7 +17,8 @@
 package androidx.compose.animation.demos
 
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ fun SingleValueAnimationDemo() {
     val enabled = remember { mutableStateOf(true) }
     val color = animate(if (enabled.value) Color.Green else Color.Red)
     Box(
-        Modifier.fillMaxSize().clickable { enabled.value = !enabled.value },
-        backgroundColor = color
+        Modifier.fillMaxSize().clickable { enabled.value = !enabled.value }.background(color)
     )
 }

@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -43,7 +43,7 @@ fun TextFieldSample() {
 @OptIn(ExperimentalFoundationApi::class)
 fun PlaceholderTextFieldSample() {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    Stack {
+    Box {
         BaseTextField(
             value = state.value,
             onValueChange = { state.value = it }

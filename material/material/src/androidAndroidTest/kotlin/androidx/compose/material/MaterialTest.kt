@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.foundation.text.LastBaseline
@@ -111,8 +111,8 @@ fun ComposeTestRuleJUnit.setMaterialContentForSizeAssertions(
     setContent {
         MaterialTheme {
             Surface {
-                Stack {
-                    Stack(
+                Box {
+                    Box(
                         Modifier.preferredSizeIn(
                             maxWidth = parentMaxWidth,
                             maxHeight = parentMaxHeight

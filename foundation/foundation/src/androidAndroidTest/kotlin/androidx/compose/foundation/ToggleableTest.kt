@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.triStateToggleable
@@ -133,7 +133,7 @@ class ToggleableTest {
     @Test
     fun toggleableTest_disabledSemantics() {
         rule.setContent {
-            Stack {
+            Box {
                 Box(
                     Modifier.triStateToggleable(
                         state = ToggleableState.On,
@@ -156,7 +156,7 @@ class ToggleableTest {
         val onCheckedChange: (Boolean) -> Unit = { checked = it }
 
         rule.setContent {
-            Stack {
+            Box {
                 Box(
                     Modifier.toggleable(value = checked, onValueChange = onCheckedChange),
                     children = {
@@ -179,7 +179,7 @@ class ToggleableTest {
         val interactionState = InteractionState()
 
         rule.setContent {
-            Stack {
+            Box {
                 Box(Modifier.toggleable(
                     value = true,
                     interactionState = interactionState,
@@ -215,7 +215,7 @@ class ToggleableTest {
         var emitToggleableText by mutableStateOf(true)
 
         rule.setContent {
-            Stack {
+            Box {
                 if (emitToggleableText) {
                     Box(Modifier.toggleable(
                         value = true,

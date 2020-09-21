@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -24,7 +23,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.MainAxisAlignment
 import androidx.compose.foundation.layout.SizeMode
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
@@ -80,19 +79,19 @@ fun AlertDialog(
         onDismissRequest = onDismissRequest,
         buttons = {
             @OptIn(ExperimentalLayout::class)
-            Stack(Modifier.fillMaxWidth().padding(all = 8.dp)) {
-                FlowRow(
-                    mainAxisSize = SizeMode.Expand,
-                    mainAxisAlignment = MainAxisAlignment.End,
-                    mainAxisSpacing = 8.dp,
-                    crossAxisSpacing = 12.dp
-                ) {
-                    if (dismissButton != null) {
-                        dismissButton()
-                    }
-                    confirmButton()
-                }
+            (Box(Modifier.fillMaxWidth().padding(all = 8.dp)) {
+        FlowRow(
+            mainAxisSize = SizeMode.Expand,
+            mainAxisAlignment = MainAxisAlignment.End,
+            mainAxisSpacing = 8.dp,
+            crossAxisSpacing = 12.dp
+        ) {
+            if (dismissButton != null) {
+                dismissButton()
             }
+            confirmButton()
+        }
+    })
         },
         modifier = modifier,
         title = title,

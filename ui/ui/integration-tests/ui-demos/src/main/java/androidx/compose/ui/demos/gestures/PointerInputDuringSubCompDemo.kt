@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,7 +74,7 @@ fun PointerInputDuringSubComp() {
                 Modifier.fillParentMaxSize()
                     .border(width = 1.dp, color = Color.Black)
                     .pointerCounterGestureFilter { newCount -> pointerCount.value = newCount },
-                gravity = Alignment.Center
+                alignment = Alignment.Center
             ) {
                 Text(
                     "${pointerCount.value}",

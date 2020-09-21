@@ -20,10 +20,11 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -71,7 +72,7 @@ fun ComposeInAndroidInComposeEtcTargetingDemo() {
         ) {
 
             AndroidView(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxHeight(),
                 viewBlock = {
                     FrameLayout(context).apply {
                         setPadding(100, 100, 100, 100)

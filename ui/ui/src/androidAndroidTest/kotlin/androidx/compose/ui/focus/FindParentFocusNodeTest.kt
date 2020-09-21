@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.focus.FocusState.Inactive

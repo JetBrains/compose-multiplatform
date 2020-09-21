@@ -16,9 +16,8 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ContentColorAmbient
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,19 +38,20 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyRowFor
 import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.integration.demos.common.ComposableDemo
 import kotlin.random.Random
 
 val LazyListDemos = listOf(
@@ -104,13 +104,10 @@ private fun ListAddRemoveItemsDemo() {
 @Composable
 fun Button(modifier: Modifier, onClick: () -> Unit, children: @Composable () -> Unit) {
     Box(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(4.dp),
-        backgroundColor = Color(0xFF6200EE),
-        paddingStart = 16.dp,
-        paddingEnd = 16.dp,
-        paddingTop = 8.dp,
-        paddingBottom = 8.dp
+        modifier
+            .clickable(onClick = onClick)
+            .background(Color(0xFF6200EE), RoundedCornerShape(4.dp))
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Providers(ContentColorAmbient provides Color.White) {
             children()
@@ -129,9 +126,8 @@ private fun LazyRowItemsDemo() {
 private fun Square(index: Int) {
     val width = remember { Random.nextInt(50, 150).dp }
     Box(
-        Modifier.preferredWidth(width).fillMaxHeight(),
-        backgroundColor = colors[index % colors.size],
-        gravity = ContentGravity.Center
+        Modifier.preferredWidth(width).fillMaxHeight().background(colors[index % colors.size]),
+        alignment = Alignment.Center
     ) {
         Text(index.toString())
     }
@@ -213,7 +209,7 @@ private fun LazyRowScope() {
 
         val items = listOf(Color.Cyan, Color.Blue, Color.Magenta)
         itemsIndexed(items) { index, item ->
-            Box(modifier = Modifier.background(item).size(40.dp), gravity = ContentGravity.Center) {
+            Box(modifier = Modifier.background(item).size(40.dp), alignment = Alignment.Center) {
                 Text("$index", fontSize = 30.sp)
             }
         }

@@ -19,7 +19,7 @@ package androidx.compose.material.studies.rally
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun AccountsBody(accounts: List<Account>) {
-    Stack(Modifier.verticalScroll(rememberScrollState(0f)).padding(16.dp)) {
+    Box(Modifier.verticalScroll(rememberScrollState(0f)).padding(16.dp)) {
         val accountsProportion = accounts.extractProportions { it.balance }
         val colors = accounts.map { it.color }
         AnimatedCircle(

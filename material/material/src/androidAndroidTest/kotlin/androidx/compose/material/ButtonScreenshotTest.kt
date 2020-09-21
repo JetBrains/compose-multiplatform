@@ -17,7 +17,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Modifier
@@ -79,7 +79,7 @@ class ButtonScreenshotTest {
     @Test
     fun ripple() {
         rule.setMaterialContent {
-            Stack(Modifier.size(200.dp, 100.dp).wrapContentSize()) {
+            Box(Modifier.size(200.dp, 100.dp).wrapContentSize()) {
                 Button(onClick = { }) { }
             }
         }

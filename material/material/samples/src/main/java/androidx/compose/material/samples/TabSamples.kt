@@ -23,7 +23,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.transition
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
@@ -48,7 +48,6 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -296,8 +295,7 @@ fun FancyTab(title: String, onClick: () -> Unit, selected: Boolean) {
             Box(
                 Modifier.preferredSize(10.dp)
                     .align(Alignment.CenterHorizontally)
-                    .background(color = if (selected) Color.Red else Color.White),
-                children = emptyContent()
+                    .background(color = if (selected) Color.Red else Color.White)
             )
             Text(
                 text = title,

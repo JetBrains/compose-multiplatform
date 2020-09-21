@@ -17,9 +17,8 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.Modifier
@@ -51,10 +50,10 @@ class SurfaceTest {
     @Test
     fun zOrderingBasedOnElevationIsApplied() {
         rule.setMaterialContent {
-            Stack(Modifier
+            Box(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
-                .testTag("stack")) {
+                .testTag("box")) {
                 Surface(color = Color.Yellow, elevation = 2.dp) {
                     Box(Modifier.fillMaxSize())
                 }
@@ -64,7 +63,7 @@ class SurfaceTest {
             }
         }
 
-        rule.onNodeWithTag("stack")
+        rule.onNodeWithTag("box")
             .captureToBitmap()
             .assertShape(
                 density = rule.density,
@@ -78,10 +77,10 @@ class SurfaceTest {
     @Test
     fun originalOrderingWhenTheDefaultElevationIsUsed() {
         rule.setMaterialContent {
-            Stack(Modifier
+            Box(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
-                .testTag("stack")) {
+                .testTag("box")) {
                 Surface(color = Color.Yellow) {
                     Box(Modifier.fillMaxSize())
                 }
@@ -91,7 +90,7 @@ class SurfaceTest {
             }
         }
 
-        rule.onNodeWithTag("stack")
+        rule.onNodeWithTag("box")
             .captureToBitmap()
             .assertShape(
                 density = rule.density,
@@ -105,10 +104,10 @@ class SurfaceTest {
     @Test
     fun elevationRawValueIsUsedAsZIndex_drawsBelow() {
         rule.setMaterialContent {
-            Stack(Modifier
+            Box(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
-                .testTag("stack")) {
+                .testTag("box")) {
                 Box(Modifier.fillMaxSize().background(color = Color.Green).zIndex(3f))
                 Surface(color = Color.Yellow, elevation = 2.dp) {
                     Box(Modifier.fillMaxSize())
@@ -116,7 +115,7 @@ class SurfaceTest {
             }
         }
 
-        rule.onNodeWithTag("stack")
+        rule.onNodeWithTag("box")
             .captureToBitmap()
             .assertShape(
                 density = rule.density,
@@ -130,10 +129,10 @@ class SurfaceTest {
     @Test
     fun elevationRawValueIsUsedAsZIndex_drawsAbove() {
         rule.setMaterialContent {
-            Stack(Modifier
+            Box(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
-                .testTag("stack")) {
+                .testTag("box")) {
                 Box(Modifier.fillMaxSize().background(color = Color.Green).zIndex(1f))
                 Surface(color = Color.Yellow, elevation = 2.dp) {
                     Box(Modifier.fillMaxSize())
@@ -141,7 +140,7 @@ class SurfaceTest {
             }
         }
 
-        rule.onNodeWithTag("stack")
+        rule.onNodeWithTag("box")
             .captureToBitmap()
             .assertShape(
                 density = rule.density,

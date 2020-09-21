@@ -16,12 +16,13 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -59,7 +60,7 @@ fun HorizontalScrollersInVerticalScrollersDemo() {
         )
         Scrollable(Orientation.Vertical) {
             RepeatingColumn(repetitions = 10) {
-                Box(paddingTop = 8.dp, paddingBottom = 8.dp) {
+                Box(Modifier.padding(vertical = 8.dp)) {
                     // Inner composable that scrolls
                     Scrollable(Orientation.Horizontal) {
                         RepeatingRow(repetitions = 10) {

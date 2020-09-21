@@ -28,7 +28,6 @@ val FoundationDemos = DemoCategory("Foundation", listOf(
     ComposableDemo("Scrollable Column") { ScrollableColumnSample() },
     ComposableDemo("Controlled Scrollable Row") { ControlledScrollableRowSample() },
     ComposableDemo("Draw Modifiers") { DrawModifiersDemo() },
-    ComposableDemo("Boxes") { BoxDemo() },
     DemoCategory("Lazy lists", LazyListDemos),
     ComposableDemo("Priority InteractionState") { PriorityInteractionStateSample() },
     ComposableDemo("Multiple-interaction InteractionState") { MultipleInteractionStateSample() }

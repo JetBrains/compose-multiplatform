@@ -17,7 +17,8 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +38,7 @@ fun DialogSample() {
     if (openDialog.value) {
         Dialog(onDismissRequest = { openDialog.value = false }) {
             // Draw a rectangle shape with rounded corners inside the dialog
-            Box(Modifier.preferredSize(dialogWidth, dialogHeight), backgroundColor = Color.White)
+            Box(Modifier.preferredSize(dialogWidth, dialogHeight).background(Color.White))
         }
     }
 }

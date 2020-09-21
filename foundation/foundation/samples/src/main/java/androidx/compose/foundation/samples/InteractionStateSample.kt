@@ -18,16 +18,18 @@ package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
@@ -68,8 +70,9 @@ fun PriorityInteractionStateSample() {
             Modifier
                 .fillMaxSize()
                 .clickable(interactionState = interactionState) { /* do nothing */ }
-                .then(draggable),
-            border = BorderStroke(3.dp, color)
+                .then(draggable)
+                .border(BorderStroke(3.dp, color))
+                .padding(3.dp)
         ) {
             Text(
                 text, style = currentTextStyle().copy(textAlign = TextAlign.Center),
@@ -119,8 +122,9 @@ fun MultipleInteractionStateSample() {
             Box(
                 Modifier
                     .preferredSize(width = 240.dp, height = 80.dp)
-                    .then(clickable),
-                border = BorderStroke(3.dp, Color.Blue)
+                    .then(clickable)
+                    .border(BorderStroke(3.dp, Color.Blue))
+                    .padding(3.dp)
             ) {
                 val pressed = Interaction.Pressed in interactionState
                 Text(
@@ -132,8 +136,9 @@ fun MultipleInteractionStateSample() {
             Box(
                 Modifier
                     .preferredSize(width = 240.dp, height = 80.dp)
-                    .then(draggable),
-                border = BorderStroke(3.dp, Color.Red)
+                    .then(draggable)
+                    .border(BorderStroke(3.dp, Color.Red))
+                    .padding(3.dp)
             ) {
                 val dragged = Interaction.Dragged in interactionState
                 Text(

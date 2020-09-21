@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -56,7 +56,7 @@ class ClickableTest {
     @Test
     fun clickableTest_defaultSemantics() {
         rule.setContent {
-            Stack {
+            Box {
                 Text("ClickableText", modifier = Modifier.testTag("myClickable").clickable {})
             }
         }
@@ -69,7 +69,7 @@ class ClickableTest {
     @Test
     fun clickableTest_disabledSemantics() {
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(enabled = false) {}
@@ -90,7 +90,7 @@ class ClickableTest {
         }
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(onClick = onClick)
@@ -119,7 +119,7 @@ class ClickableTest {
         val onClick: () -> Unit = { ++counter }
 
         rule.setContent {
-            Stack(modifier = Modifier.clickable(onClick = onClick)) {
+            Box(modifier = Modifier.clickable(onClick = onClick)) {
                 Text("Foo")
                 Text("Bar")
             }
@@ -147,7 +147,7 @@ class ClickableTest {
         val onClick: () -> Unit = { ++counter }
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(onLongClick = onClick) {}
@@ -182,7 +182,7 @@ class ClickableTest {
         val onLongClick: () -> Unit = { ++longClickCounter }
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier
@@ -224,7 +224,7 @@ class ClickableTest {
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier
@@ -267,7 +267,7 @@ class ClickableTest {
         val onLongClick: () -> Unit = { ++longClickCounter }
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier
@@ -320,7 +320,7 @@ class ClickableTest {
         val onClick: () -> Unit = { ++counter }
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(onDoubleClick = onClick) {}
@@ -352,7 +352,7 @@ class ClickableTest {
         val interactionState = InteractionState()
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier
@@ -387,7 +387,7 @@ class ClickableTest {
         var emitClickableText by mutableStateOf(true)
 
         rule.setContent {
-            Stack {
+            Box {
                 if (emitClickableText) {
                     Text(
                         "ClickableText",
@@ -431,7 +431,7 @@ class ClickableTest {
         val onLongClick: () -> Unit = { ++longClickCounter }
 
         rule.setContent {
-            Stack {
+            Box {
                 Text(
                     "ClickableText",
                     modifier = Modifier

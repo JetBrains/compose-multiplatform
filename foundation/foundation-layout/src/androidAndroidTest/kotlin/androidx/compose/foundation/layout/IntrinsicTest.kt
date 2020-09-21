@@ -49,7 +49,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                     FixedIntrinsicsBox(
                         Modifier.onPositioned { coordinates: LayoutCoordinates ->
                             minIntrinsicWidthSize.value = coordinates.size
@@ -78,7 +78,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 FixedIntrinsicsBox(
                     Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicHeightSize.value = coordinates.size
@@ -106,7 +106,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 FixedIntrinsicsBox(
                     Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicWidthSize.value = coordinates.size
@@ -134,7 +134,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                     FixedIntrinsicsBox(
                         Modifier.onPositioned { coordinates: LayoutCoordinates ->
                             maxIntrinsicHeightSize.value = coordinates.size
@@ -162,7 +162,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(maxWidth = 5.dp)) {
                     FixedIntrinsicsBox(
                         Modifier.onPositioned { coordinates: LayoutCoordinates ->
@@ -192,7 +192,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(minWidth = 15.dp)) {
                         FixedIntrinsicsBox(
                             Modifier.onPositioned { coordinates: LayoutCoordinates ->
@@ -222,7 +222,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(maxHeight = 35.dp),
                     modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicHeightSize.value = coordinates.size
@@ -254,7 +254,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(minHeight = 45.dp),
                     modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicHeightSize.value = coordinates.size
@@ -286,7 +286,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(maxWidth = 25.dp),
                     modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicWidthSize.value = coordinates.size
@@ -318,7 +318,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(minWidth = 35.dp),
                     modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicWidthSize.value = coordinates.size
@@ -350,7 +350,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(maxHeight = 55.dp),
                     modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicHeightSize.value = coordinates.size
@@ -382,7 +382,7 @@ class IntrinsicTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack {
+            Box {
                 ConstrainedBox(DpConstraints(minHeight = 65.dp),
                     modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicHeightSize.value = coordinates.size
