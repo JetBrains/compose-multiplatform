@@ -40,6 +40,7 @@ import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
+import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
@@ -265,8 +266,10 @@ class DesktopOwner(
             .asSequence()
             .filterIsInstance<PointerMoveEventFilter>()
         ) {
-            if (!onMoveConsumed)
-                onMoveConsumed = filter.onMoveHandler(position)
+            if (!onMoveConsumed) {
+                val relative = position - filter.layoutCoordinates.globalBounds.topLeft
+                onMoveConsumed = filter.onMoveHandler(relative)
+            }
             if (!onEnterConsumed && !oldMoveFilters.contains(filter))
                 onEnterConsumed = filter.onEnterHandler()
         }
