@@ -22,7 +22,6 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -33,7 +32,7 @@ import androidx.compose.foundation.animation.fling
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeightIn
@@ -224,7 +223,7 @@ private fun SliderImpl(
     val widthDp = with(DensityAmbient.current) {
         width.toDp()
     }
-    Stack(modifier.then(DefaultSliderConstraints)) {
+    Box(modifier.then(DefaultSliderConstraints)) {
         val thumbSize = ThumbRadius * 2
         val offset = (widthDp - thumbSize) * positionFraction
         val center = Modifier.align(Alignment.CenterStart)

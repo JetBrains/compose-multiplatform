@@ -18,7 +18,7 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable

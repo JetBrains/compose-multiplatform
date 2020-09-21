@@ -21,7 +21,7 @@ import androidx.compose.animation.ColorPropKey
 import androidx.compose.animation.DpPropKey
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.transition
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable

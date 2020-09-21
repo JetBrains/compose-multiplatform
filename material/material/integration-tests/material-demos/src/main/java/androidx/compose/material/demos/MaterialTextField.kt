@@ -16,7 +16,7 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
@@ -223,7 +223,7 @@ private fun TextFieldWithMessage(
     }
 
     Column {
-        Box(modifier = Modifier.weight(1f, fill = false), children = textField)
+        Box(modifier = Modifier.weight(1f, fill = false)) { textField() }
         Text(
             text = "Helper message",
             style = typography.copy(color = color),

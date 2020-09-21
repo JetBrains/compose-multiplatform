@@ -17,9 +17,8 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Layout
@@ -159,8 +158,8 @@ fun LayoutTagChildrenUsage(header: @Composable () -> Unit, footer: @Composable (
     Layout({
         // Here the Containers are only needed to apply the modifiers. You could use the
         // modifier on header and footer directly if they are composables accepting modifiers.
-        Box(Modifier.layoutId("header"), children = header)
-        Box(Modifier.layoutId("footer"), children = footer)
+        Box(Modifier.layoutId("header")) { header() }
+        Box(Modifier.layoutId("footer")) { footer() }
     }) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             when (measurable.id) {
@@ -181,7 +180,7 @@ fun LayoutTagChildrenUsage(header: @Composable () -> Unit, footer: @Composable (
 @Sampled
 @Composable
 fun ConvenienceLayoutModifierSample() {
-    Stack(
+    Box(
         modifier = Modifier
             .background(Color.Gray)
             .layout { measurable, constraints ->
@@ -193,6 +192,6 @@ fun ConvenienceLayoutModifierSample() {
             }
         }
     ) {
-        Stack(Modifier.fillMaxSize().background(Color.DarkGray)) {}
+        Box(Modifier.fillMaxSize().background(Color.DarkGray)) {}
     }
 }

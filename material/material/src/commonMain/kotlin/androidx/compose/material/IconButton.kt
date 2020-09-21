@@ -16,16 +16,16 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -71,9 +71,8 @@ fun IconButton(
                 indication = RippleIndication(bounded = false, radius = RippleRadius)
             )
             .then(IconButtonSizeModifier),
-        gravity = ContentGravity.Center,
-        children = icon
-    )
+        alignment = Alignment.Center
+    ) { icon() }
 }
 
 /**
@@ -111,9 +110,8 @@ fun IconToggleButton(
             interactionState = interactionState,
             indication = RippleIndication(bounded = false, radius = RippleRadius)
         ).then(IconButtonSizeModifier),
-        gravity = ContentGravity.Center,
-        children = icon
-    )
+        alignment = Alignment.Center
+    ) { icon() }
 }
 
 // Default radius of an unbounded ripple in an IconButton

@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import android.os.Build
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,7 +63,7 @@ class BorderTest(val shape: Shape) {
     fun border_color() {
         rule.setContent {
             SemanticParent {
-                Stack(
+                Box(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
                         .background(color = Color.Blue)
                         .border(BorderStroke(10.0f.toDp(), Color.Red), shape)
@@ -88,7 +88,7 @@ class BorderTest(val shape: Shape) {
     fun border_brush() {
         rule.setContent {
             SemanticParent {
-                Stack(
+                Box(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
                         .background(color = Color.Blue)
                         .border(
@@ -115,7 +115,7 @@ class BorderTest(val shape: Shape) {
     fun border_biggerThanLayout_fills() {
         rule.setContent {
             SemanticParent {
-                Stack(
+                Box(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
                         .background(color = Color.Blue)
                         .border(BorderStroke(1500.0f.toDp(), Color.Red), shape)
@@ -137,7 +137,7 @@ class BorderTest(val shape: Shape) {
     fun border_lessThanZero_doesNothing() {
         rule.setContent {
             SemanticParent {
-                Stack(
+                Box(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
                         .background(color = Color.Blue)
                         .border(BorderStroke(-5.0f.toDp(), Color.Red), shape)
@@ -160,10 +160,9 @@ class BorderTest(val shape: Shape) {
         rule.setContent {
             SemanticParent {
                 Box(
-                    Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp()),
-                    backgroundColor = Color.White
+                    Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp()).background(Color.White)
                 ) {
-                    Stack(
+                    Box(
                         Modifier.preferredSize(0.0f.toDp(), 40.0f.toDp())
                             .border(BorderStroke(4.0f.toDp(), Color.Red), shape)
                     ) {}
@@ -182,7 +181,7 @@ class BorderTest(val shape: Shape) {
 
     @Composable
     fun SemanticParent(children: @Composable Density.() -> Unit) {
-        Stack {
+        Box {
             Box(modifier = Modifier.testTag(testTag)) {
                 DensityAmbient.current.children()
             }

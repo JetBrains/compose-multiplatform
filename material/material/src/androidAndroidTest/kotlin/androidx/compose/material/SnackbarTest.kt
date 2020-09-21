@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.foundation.text.LastBaseline
@@ -67,7 +67,7 @@ class SnackbarTest {
     fun defaultSnackbar_semantics() {
         var clicked = false
         rule.setMaterialContent {
-            Stack {
+            Box {
                 Snackbar(text = { Text("Message") }, action = {
                     TextButton(onClick = { clicked = true }) {
                         Text("UNDO")
@@ -332,7 +332,7 @@ class SnackbarTest {
         var background = Color.Yellow
         var snackBarColor = Color.Transparent
         rule.setMaterialContent {
-            Stack {
+            Box {
                 background = MaterialTheme.colors.surface
                 // Snackbar has a background color of onSurface with an alpha applied blended
                 // on top of surface
@@ -375,7 +375,7 @@ class SnackbarTest {
             override fun dismiss() {}
         }
         rule.setMaterialContent {
-            Stack {
+            Box {
                 Snackbar(snackbarData = snackbarData)
             }
         }

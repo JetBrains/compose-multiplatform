@@ -16,11 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -375,7 +375,7 @@ private fun IconsWithTextFieldLayout(
             )
 
             if (label != null) {
-                Box(modifier = Modifier.layoutId(LabelId), children = label)
+                Box(modifier = Modifier.layoutId(LabelId)) { label() }
             }
         },
         modifier = modifier

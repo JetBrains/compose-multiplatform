@@ -17,7 +17,8 @@
 package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredSize
@@ -31,10 +32,10 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SpacerExample() {
     Row {
-        Box(Modifier.preferredSize(100.dp), backgroundColor = Color.Red)
+        Box(Modifier.preferredSize(100.dp).background(Color.Red))
         Spacer(Modifier.preferredWidth(20.dp))
-        Box(Modifier.preferredSize(100.dp), backgroundColor = Color.Magenta)
+        Box(Modifier.preferredSize(100.dp).background(Color.Magenta))
         Spacer(Modifier.weight(1f))
-        Box(Modifier.preferredSize(100.dp), backgroundColor = Color.Black)
+        Box(Modifier.preferredSize(100.dp).background(Color.Black))
     }
 }

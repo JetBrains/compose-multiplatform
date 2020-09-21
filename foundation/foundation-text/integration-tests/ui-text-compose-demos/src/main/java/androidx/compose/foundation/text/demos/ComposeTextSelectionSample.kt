@@ -16,9 +16,10 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -100,7 +101,7 @@ private fun Basics() {
         style = commonStyle.merge(header)
     )
     Row {
-        Box(Modifier.padding(8.dp).preferredSize(48.dp), backgroundColor = rectColor)
+        Box(Modifier.padding(8.dp).preferredSize(48.dp).background(rectColor))
         Text(
             text = "Jetpack Compose is a modern toolkit for building native Android UI." +
                 " Jetpack Compose simplifies and accelerates UI development on Android " +
@@ -134,11 +135,13 @@ private fun AddTextElement() {
                 style = commonStyle
             )
         }
-        Box(Modifier.padding(8.dp).preferredSize(48.dp), backgroundColor = rectColor)
+        Box(Modifier.padding(8.dp).preferredSize(48.dp).background(rectColor))
     }
     Box(
-        Modifier.padding(top = 20.dp, bottom = 20.dp).preferredSize(200.dp, 60.dp),
-        backgroundColor = rectColor
+        Modifier
+            .padding(top = 20.dp, bottom = 20.dp)
+            .preferredSize(200.dp, 60.dp)
+            .background(rectColor)
     )
     Text(
         text = annotatedString {
@@ -203,10 +206,7 @@ private fun MultiLanguage(title: String, content: String) {
         style = commonStyle.merge(header)
     )
     Row {
-        Box(
-            Modifier.padding(8.dp).preferredSize(48.dp),
-            backgroundColor = rectColor
-        )
+        Box(Modifier.padding(8.dp).preferredSize(48.dp).background(rectColor))
         Text(
             text = content,
             modifier = Modifier.weight(1f),

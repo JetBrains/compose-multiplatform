@@ -19,9 +19,8 @@ package androidx.compose.material.icons
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
@@ -198,7 +197,7 @@ private fun MSSIMMatcher.assertBitmapsAreEqual(
  */
 @Composable
 private fun DrawVectors(programmaticVector: VectorAsset, xmlVector: VectorAsset) {
-    Stack {
+    Box {
         // Ideally these icons would be 24 dp, but due to density changes across devices we test
         // against in CI, on some devices using DP here causes there to be anti-aliasing issues.
         // Using ipx directly ensures that we will always have a consistent layout / drawing

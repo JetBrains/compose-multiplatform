@@ -21,7 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.androidview.adapters.setOnClick
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.Text

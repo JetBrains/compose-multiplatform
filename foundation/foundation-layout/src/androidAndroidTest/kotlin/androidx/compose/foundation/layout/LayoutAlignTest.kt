@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
@@ -130,23 +129,23 @@ class LayoutAlignTest : LayoutTest() {
         val childPosition = Array(3) { Ref<Offset>() }
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Stack(Modifier.fillMaxSize()) {
-                    Stack(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
-                        Stack(
+                Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
+                        Box(
                             Modifier.preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[0], childPosition[0], positionedLatch)
                         ) {
                         }
                     }
-                    Stack(Modifier.fillMaxSize().wrapContentHeight(Alignment.CenterVertically)) {
-                        Stack(
+                    Box(Modifier.fillMaxSize().wrapContentHeight(Alignment.CenterVertically)) {
+                        Box(
                             Modifier.preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[1], childPosition[1], positionedLatch)
                         ) {
                         }
                     }
-                    Stack(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
-                        Stack(
+                    Box(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
+                        Box(
                             Modifier.preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[2], childPosition[2], positionedLatch)
                         ) {

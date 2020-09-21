@@ -23,8 +23,10 @@ import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Recomposer
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
@@ -92,8 +94,7 @@ class PointerInteropFilterAndroidViewOffsetsTest {
                     with(DensityAmbient.current) {
                         // Box is "three"
                         Box(
-                            paddingStart = (2f / density).dp,
-                            paddingTop = (12f / density).dp
+                            Modifier.padding(start = (2f / density).dp, top = (12f / density).dp)
                         ) {
                             AndroidView({ two })
                         }

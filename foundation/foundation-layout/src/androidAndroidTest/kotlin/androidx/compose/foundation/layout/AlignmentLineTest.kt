@@ -56,7 +56,7 @@ class AlignmentLineTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack(
+            Box(
                 Modifier.onPositioned {
                     parentSize.value = it.size
                     layoutLatch.countDown()
@@ -102,7 +102,7 @@ class AlignmentLineTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack(
+            Box(
                 modifier = Modifier.onPositioned {
                     parentSize.value = it.size
                     layoutLatch.countDown()
@@ -145,7 +145,7 @@ class AlignmentLineTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack(modifier = Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
+            Box(modifier = Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
                 AlignmentLineLayout(
                     childDp, 0.dp, testLine, lineDp,
                     Modifier.saveLayoutInfo(childSize, childPosition, layoutLatch)
@@ -176,7 +176,7 @@ class AlignmentLineTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
+            Box(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
                     Modifier.saveLayoutInfo(childSize, childPosition, layoutLatch)
@@ -208,7 +208,7 @@ class AlignmentLineTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
+            Box(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
                 AlignmentLineLayout(
                     childDp, 0.dp, testLine, lineDp,
                     Modifier.preferredSizeIn(maxWidth = maxWidth)
@@ -242,7 +242,7 @@ class AlignmentLineTest : LayoutTest() {
         val childSize = Ref<IntSize>()
         val childPosition = Ref<Offset>()
         show {
-            Stack(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
+            Box(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
                     Modifier.preferredSizeIn(maxHeight = maxHeight)
@@ -268,7 +268,7 @@ class AlignmentLineTest : LayoutTest() {
         val latch = CountDownLatch(1)
         val minHeight = 10.dp
         show {
-            Stack {
+            Box {
                 WithConstraints(
                     Modifier
                         .preferredSizeIn(minHeight = minHeight)
@@ -288,7 +288,7 @@ class AlignmentLineTest : LayoutTest() {
         val latch = CountDownLatch(1)
         val minWidth = 10.dp
         show {
-            Stack {
+            Box {
                 WithConstraints(
                     Modifier
                         .preferredSizeIn(minWidth = minWidth)
@@ -318,7 +318,7 @@ class AlignmentLineTest : LayoutTest() {
         val incomingSize = incomingSizePx.toDp()
 
         show {
-            Stack {
+            Box {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredWidth(incomingSize)
@@ -361,7 +361,7 @@ class AlignmentLineTest : LayoutTest() {
         val incomingSize = incomingSizePx.toDp()
 
         show {
-            Stack {
+            Box {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredHeight(incomingSize)

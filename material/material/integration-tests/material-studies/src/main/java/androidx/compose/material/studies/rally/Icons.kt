@@ -16,7 +16,7 @@
 
 package androidx.compose.material.studies.rally
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.materialIcon

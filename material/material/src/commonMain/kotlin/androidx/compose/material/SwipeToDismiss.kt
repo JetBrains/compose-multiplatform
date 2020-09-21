@@ -21,7 +21,7 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.material.DismissDirection.EndToStart
 import androidx.compose.material.DismissDirection.StartToEnd
@@ -204,7 +204,7 @@ fun SwipeToDismiss(
         dismissThresholds(getDismissDirection(from, to)!!)
     }
 
-    Stack(Modifier.swipeable(
+    Box(Modifier.swipeable(
         state = state,
         anchors = anchors,
         thresholds = thresholds,

@@ -95,7 +95,7 @@ class LayoutDirectionModifierTest : LayoutTest() {
         show {
             val initialLayoutDirection = LayoutDirectionAmbient.current
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Stack {
+                Box {
                     Providers(LayoutDirectionAmbient provides initialLayoutDirection) {
                         Layout(emptyContent()) { _, _ ->
                             resultLayoutDirection.value = layoutDirection

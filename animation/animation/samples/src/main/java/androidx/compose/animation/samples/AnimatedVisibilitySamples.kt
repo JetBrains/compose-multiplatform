@@ -38,16 +38,15 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOut
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -115,7 +114,7 @@ fun SlideTransition() {
         ) + fadeOut()
     ) {
         // Content that needs to appear/disappear goes here:
-        Stack(Modifier.fillMaxWidth().height(200.dp)) {}
+        Box(Modifier.fillMaxWidth().height(200.dp)) {}
     }
 }
 

@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -206,7 +206,7 @@ fun Scaffold(
                 if (topBar != null) {
                     TopBarContainer(Modifier.zIndex(TopAppBarZIndex), scaffoldState, topBar)
                 }
-                Stack(Modifier.weight(1f, fill = true)) {
+                Box(Modifier.weight(1f, fill = true)) {
                     ScaffoldContent(Modifier.fillMaxSize(), scaffoldState, bodyContent)
                     Column(Modifier.align(Alignment.BottomCenter)) {
                         snackbarHost(scaffoldState.snackbarHostState)
@@ -385,7 +385,7 @@ private fun BoundsAwareScaffoldSlot(
  */
 @Composable
 private fun ScaffoldSlot(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Stack(modifier) { content() }
+    Box(modifier) { content() }
 }
 
 private val FabSpacing = 16.dp

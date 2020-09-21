@@ -17,7 +17,8 @@
 package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
@@ -28,5 +29,5 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun SimpleAspectRatio() {
-    Box(Modifier.preferredWidth(100.dp).aspectRatio(2f), backgroundColor = Color.Green)
+    Box(Modifier.preferredWidth(100.dp).aspectRatio(2f).background(Color.Green))
 }

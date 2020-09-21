@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
@@ -278,10 +278,9 @@ private fun NewLineButtonSnackbar(
             Modifier
                 .relativePaddingFrom(LastBaseline, after = LongButtonVerticalOffset)
                 .relativePaddingFrom(FirstBaseline, before = HeightToFirstLine)
-                .padding(end = HorizontalSpacingButtonSide),
-            children = text
-        )
-        Box(Modifier.align(Alignment.End), children = action)
+                .padding(end = HorizontalSpacingButtonSide)
+        ) { text() }
+        Box(Modifier.align(Alignment.End)) { action() }
     }
 }
 
@@ -294,8 +293,8 @@ private fun OneRowSnackbar(
     val actionTag = "action"
     Layout(
         {
-            Box(Modifier.layoutId(textTag), children = text)
-            Box(Modifier.layoutId(actionTag), children = action)
+            Box(Modifier.layoutId(textTag)) { text() }
+            Box(Modifier.layoutId(actionTag)) { action() }
         },
         modifier = Modifier.padding(
             start = HorizontalSpacing,

@@ -16,8 +16,9 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -76,8 +77,8 @@ fun LongPressDragGestureFilterDemo() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .longPressDragGestureFilter(longPressDragObserver),
-            backgroundColor = color.value
+                .longPressDragGestureFilter(longPressDragObserver)
+                .background(color.value)
         )
     }
 }

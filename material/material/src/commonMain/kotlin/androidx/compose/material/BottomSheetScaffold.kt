@@ -24,7 +24,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -333,12 +333,12 @@ fun BottomSheetScaffold(
                     )
                 },
                 floatingActionButton = {
-                    Stack(Modifier.zIndex(FabZIndex)) {
+                    Box(Modifier.zIndex(FabZIndex)) {
                         floatingActionButton?.invoke()
                     }
                 },
                 snackbarHost = {
-                    Stack(Modifier.zIndex(SnackbarZIndex)) {
+                    Box(Modifier.zIndex(SnackbarZIndex)) {
                         snackbarHost(scaffoldState.snackbarHostState)
                     }
                 },

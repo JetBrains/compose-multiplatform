@@ -16,9 +16,9 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -89,10 +89,7 @@ fun Icon(
     // TODO: consider allowing developers to override the intrinsic size, and specify their own
     // size that this icon will be forced to take up.
     // TODO: b/149735981 semantics for content description
-    Box(
-        modifier.defaultSizeFor(painter).paint(painter, colorFilter = ColorFilter.tint(tint)),
-        children = emptyContent()
-    )
+    Box(modifier.defaultSizeFor(painter).paint(painter, colorFilter = ColorFilter.tint(tint)))
 }
 
 private fun Modifier.defaultSizeFor(painter: Painter) =

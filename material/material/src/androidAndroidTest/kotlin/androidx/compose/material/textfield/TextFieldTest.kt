@@ -20,13 +20,12 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
@@ -772,7 +771,7 @@ class TextFieldTest {
         val latch = CountDownLatch(1)
 
         rule.setMaterialContent {
-            Stack(Modifier.background(color = Color.White)) {
+            Box(Modifier.background(color = Color.White)) {
                 TextField(
                     modifier = Modifier
                         .focusObserver { if (it.isFocused) latch.countDown() }

@@ -16,8 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Row
@@ -139,27 +138,27 @@ private object OneLine {
             if (icon != null) {
                 Box(
                     Modifier.align(Alignment.CenterVertically)
-                        .preferredWidthIn(min = IconLeftPadding + IconMinPaddedWidth),
-                    gravity = ContentGravity.CenterStart,
-                    paddingStart = IconLeftPadding,
-                    paddingTop = IconVerticalPadding,
-                    paddingBottom = IconVerticalPadding,
-                    children = icon
-                )
+                        .preferredWidthIn(min = IconLeftPadding + IconMinPaddedWidth)
+                        .padding(
+                            start = IconLeftPadding,
+                            top = IconVerticalPadding,
+                            bottom = IconVerticalPadding
+                        ),
+                    alignment = Alignment.CenterStart
+                ) { icon() }
             }
             Box(
                 Modifier.weight(1f)
                     .align(Alignment.CenterVertically)
                     .padding(start = ContentLeftPadding, end = ContentRightPadding),
-                gravity = ContentGravity.CenterStart,
-                children = text
-            )
+                alignment = Alignment.CenterStart
+            ) { text() }
             if (trailing != null) {
                 Box(
-                    Modifier.align(Alignment.CenterVertically),
-                    paddingEnd = TrailingRightPadding,
-                    children = trailing
-                )
+                    Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = TrailingRightPadding)
+                ) { trailing() }
             }
         }
     }
@@ -204,16 +203,18 @@ private object TwoLine {
 
             if (icon != null) {
                 Box(
-                    Modifier.preferredSizeIn(
-                        minWidth = IconLeftPadding + IconMinPaddedWidth,
-                        minHeight = minHeight
-                    ),
-                    gravity = ContentGravity.TopStart,
-                    paddingStart = IconLeftPadding,
-                    paddingTop = IconVerticalPadding,
-                    paddingBottom = IconVerticalPadding,
-                    children = icon
-                )
+                    Modifier
+                        .preferredSizeIn(
+                            minWidth = IconLeftPadding + IconMinPaddedWidth,
+                            minHeight = minHeight
+                        )
+                        .padding(
+                            start = IconLeftPadding,
+                            top = IconVerticalPadding,
+                            bottom = IconVerticalPadding
+                        ),
+                    alignment = Alignment.TopStart
+                ) { icon() }
             }
 
             if (overlineText != null) {
@@ -256,9 +257,8 @@ private object TwoLine {
                         // TODO(popam): find way to center and wrap content without minHeight
                         Modifier.preferredHeightIn(min = minHeight)
                             .padding(end = TrailingRightPadding),
-                        gravity = ContentGravity.Center,
-                        children = trailing
-                    )
+                        alignment = Alignment.Center
+                    ) { trailing() }
                 }
             }
         }
@@ -298,13 +298,15 @@ private object ThreeLine {
             if (icon != null) {
                 val minSize = IconLeftPadding + IconMinPaddedWidth
                 Box(
-                    Modifier.preferredSizeIn(minWidth = minSize, minHeight = minSize),
-                    gravity = ContentGravity.CenterStart,
-                    paddingStart = IconLeftPadding,
-                    paddingTop = IconThreeLineVerticalPadding,
-                    paddingBottom = IconThreeLineVerticalPadding,
-                    children = icon
-                )
+                    Modifier
+                        .preferredSizeIn(minWidth = minSize, minHeight = minSize)
+                        .padding(
+                            start = IconLeftPadding,
+                            top = IconThreeLineVerticalPadding,
+                            bottom = IconThreeLineVerticalPadding
+                        ),
+                    alignment = Alignment.CenterStart
+                ) { icon() }
             }
             BaselinesOffsetColumn(
                 listOf(

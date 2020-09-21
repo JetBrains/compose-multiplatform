@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import android.os.SystemClock.sleep
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
@@ -172,16 +172,10 @@ class DrawerTest {
             // emulate click on the screen
             ModalDrawerLayout(drawerState = drawerState,
                 drawerContent = {
-                    Box(
-                        Modifier.fillMaxSize().clickable { drawerClicks += 1 },
-                        children = emptyContent()
-                    )
+                    Box(Modifier.fillMaxSize().clickable { drawerClicks += 1 })
                 },
                 bodyContent = {
-                    Box(
-                        Modifier.testTag("Drawer").fillMaxSize().clickable { bodyClicks += 1 },
-                        children = emptyContent()
-                    )
+                    Box(Modifier.testTag("Drawer").fillMaxSize().clickable { bodyClicks += 1 })
                 })
         }
 
@@ -251,16 +245,10 @@ class DrawerTest {
             // emulate click on the screen
             BottomDrawerLayout(drawerState = drawerState,
                 drawerContent = {
-                    Box(
-                        Modifier.fillMaxSize().clickable { drawerClicks += 1 },
-                        children = emptyContent()
-                    )
+                    Box(Modifier.fillMaxSize().clickable { drawerClicks += 1 })
                 },
                 bodyContent = {
-                    Box(
-                        Modifier.testTag("Drawer").fillMaxSize().clickable { bodyClicks += 1 },
-                        children = emptyContent()
-                    )
+                    Box(Modifier.testTag("Drawer").fillMaxSize().clickable { bodyClicks += 1 })
                 })
         }
 

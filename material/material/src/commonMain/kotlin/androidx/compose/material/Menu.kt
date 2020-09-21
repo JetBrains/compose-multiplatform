@@ -21,13 +21,12 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -42,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
@@ -194,7 +194,7 @@ fun DropdownMenuItem(
                 minHeight = DropdownMenuItemDefaultMinHeight
             )
             .padding(horizontal = DropdownMenuHorizontalPadding),
-        gravity = ContentGravity.CenterStart
+        alignment = Alignment.CenterStart
     ) {
         // TODO(popam, b/156912039): update emphasis if the menu item is disabled
         val typography = MaterialTheme.typography

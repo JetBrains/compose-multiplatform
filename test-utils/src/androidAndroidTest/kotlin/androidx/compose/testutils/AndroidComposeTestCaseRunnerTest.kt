@@ -17,7 +17,7 @@
 package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf

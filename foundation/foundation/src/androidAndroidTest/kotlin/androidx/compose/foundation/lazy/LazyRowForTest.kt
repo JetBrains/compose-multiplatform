@@ -19,7 +19,7 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
@@ -62,7 +62,7 @@ class LazyRowForTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            Stack(Modifier.preferredWidth(200.dp)) {
+            Box(Modifier.preferredWidth(200.dp)) {
                 LazyRowFor(items) {
                     Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
                 }
@@ -87,7 +87,7 @@ class LazyRowForTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            Stack(Modifier.preferredWidth(200.dp)) {
+            Box(Modifier.preferredWidth(200.dp)) {
                 LazyRowFor(items, Modifier.testTag(LazyRowForTag)) {
                     Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
                 }
@@ -115,7 +115,7 @@ class LazyRowForTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            Stack(Modifier.preferredWidth(200.dp)) {
+            Box(Modifier.preferredWidth(200.dp)) {
                 LazyRowFor(items, Modifier.testTag(LazyRowForTag)) {
                     Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
                 }
@@ -140,7 +140,7 @@ class LazyRowForTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            Stack(Modifier.preferredWidth(200.dp)) {
+            Box(Modifier.preferredWidth(200.dp)) {
                 LazyRowFor(items, Modifier.testTag(LazyRowForTag)) {
                     Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
                 }
@@ -401,7 +401,7 @@ class LazyRowForTest {
 
         rule.setContent {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Stack(Modifier.preferredWidth(100.dp)) {
+                Box(Modifier.preferredWidth(100.dp)) {
                     LazyRowFor(items, Modifier.testTag(LazyRowForTag)) {
                         Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
                     }

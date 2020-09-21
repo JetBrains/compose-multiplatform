@@ -20,9 +20,8 @@ import androidx.compose.animation.animate
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ContentColorAmbient
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
@@ -31,6 +30,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.LastBaseline
@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
@@ -169,7 +170,7 @@ fun BottomNavigationItem(
                 indication = ripple
             )
             .weight(1f)
-    }, gravity = ContentGravity.Center) {
+    }, alignment = Alignment.Center) {
         BottomNavigationTransition(
             selectedContentColor,
             unselectedContentColor,
@@ -235,13 +236,13 @@ private fun BottomNavigationItemBaselineLayout(
 ) {
     Layout(
         {
-            Box(Modifier.layoutId("icon"), children = icon)
+            Box(Modifier.layoutId("icon")) { icon() }
             Box(
-                Modifier.layoutId("label").drawOpacity(iconPositionAnimationProgress),
-                paddingStart = BottomNavigationItemHorizontalPadding,
-                paddingEnd = BottomNavigationItemHorizontalPadding,
-                children = label
-            )
+                Modifier
+                    .layoutId("label")
+                    .drawOpacity(iconPositionAnimationProgress)
+                    .padding(horizontal = BottomNavigationItemHorizontalPadding)
+            ) { label() }
         }
     ) { measurables, constraints ->
         val iconPlaceable = measurables.first { it.id == "icon" }.measure(constraints)

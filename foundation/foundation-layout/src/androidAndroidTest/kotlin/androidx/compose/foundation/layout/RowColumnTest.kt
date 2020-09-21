@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -1637,7 +1636,7 @@ class RowColumnTest : LayoutTest() {
         val childHeight = 100.toDp()
         val latch = CountDownLatch(1)
         show {
-            Stack {
+            Box {
                 ConstrainedBox(
                     DpConstraints(
                         minWidth = availableWidth,
@@ -2087,7 +2086,7 @@ class RowColumnTest : LayoutTest() {
         val childHeight = 100.toDp()
         val latch = CountDownLatch(1)
         show {
-            Stack {
+            Box {
                 ConstrainedBox(
                     DpConstraints(
                         minWidth = availableWidth,
@@ -3688,7 +3687,7 @@ class RowColumnTest : LayoutTest() {
         val columnHeight = 24
 
         show {
-            Stack {
+            Box {
                 Column(Modifier.preferredHeight(columnHeight.toDp())) {
                     Container(
                         Modifier.weight(2f)

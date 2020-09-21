@@ -21,8 +21,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.indication
-import androidx.compose.foundation.layout.Stack
-import androidx.compose.foundation.layout.StackScope
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.padding
@@ -77,7 +77,7 @@ fun Switch(
     val maxBound = with(DensityAmbient.current) { ThumbPathLength.toPx() }
     val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange, AnimationSpec)
     val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
-    Stack(
+    Box(
         modifier
             .toggleable(
                 value = checked,
@@ -111,7 +111,7 @@ fun Switch(
 }
 
 @Composable
-private fun StackScope.SwitchImpl(
+private fun BoxScope.SwitchImpl(
     checked: Boolean,
     enabled: Boolean,
     checkedColor: Color,

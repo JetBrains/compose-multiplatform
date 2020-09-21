@@ -37,7 +37,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -69,7 +69,7 @@ fun AnimatedVisibilityDemo() {
 @Composable
 fun AnimatedItems(animateContentSize: Boolean) {
     var counter by remember { mutableStateOf(0) }
-    Stack(
+    Box(
         Modifier.padding(bottom = 20.dp)
     ) {
         Button(
@@ -127,7 +127,7 @@ fun AnimatedItems(animateContentSize: Boolean) {
 
 @Composable
 fun Item(color: Color, text: String = "") {
-    Stack(Modifier.height(80.dp).fillMaxWidth().background(color)) {
+    Box(Modifier.height(80.dp).fillMaxWidth().background(color)) {
         Text(
             text,
             modifier = Modifier.align(Alignment.CenterStart).padding(start = 10.dp)

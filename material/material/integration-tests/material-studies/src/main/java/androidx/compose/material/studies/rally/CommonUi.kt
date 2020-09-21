@@ -16,7 +16,7 @@
 
 package androidx.compose.material.studies.rally
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -17,12 +17,13 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +57,7 @@ fun NestedScrollingDemo() {
                 "scrolling with 1 or many fingers.")
         Scrollable {
             RepeatingColumn(repetitions = 3) {
-                Box(Modifier.preferredHeight(398.dp), padding = 72.dp) {
+                Box(Modifier.preferredHeight(398.dp).padding(72.dp)) {
                     // Inner composable that scrolls
                     Scrollable {
                         RepeatingColumn(repetitions = 5) {
@@ -186,8 +187,10 @@ private fun RepeatingColumn(repetitions: Int, row: @Composable () -> Unit) {
             row()
             if (i != repetitions) {
                 Box(
-                    Modifier.fillMaxWidth().preferredHeight(1.dp),
-                    backgroundColor = Color(0f, 0f, 0f, .12f)
+                    Modifier
+                        .fillMaxWidth()
+                        .preferredHeight(1.dp)
+                        .background(Color(0f, 0f, 0f, .12f))
                 )
             }
         }

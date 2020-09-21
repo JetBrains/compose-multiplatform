@@ -16,7 +16,7 @@
 package androidx.compose.ui.window
 
 import android.view.View
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
@@ -221,7 +221,7 @@ class PopupTest {
         val measureLatch = CountDownLatch(1)
         var isFocusable by mutableStateOf(false)
         rule.setContent {
-            Stack {
+            Box {
                 PopupTestTag(testTag) {
                     Popup(
                         alignment = Alignment.TopStart,
@@ -230,7 +230,7 @@ class PopupTest {
                     ) {
                         // This is called after the OnChildPosition method in Popup() which
                         // updates the popup to its final position
-                        Stack(
+                        Box(
                             modifier = Modifier.width(200.dp).height(200.dp).onPositioned {
                                 measureLatch.countDown()
                             }

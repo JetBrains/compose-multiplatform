@@ -25,7 +25,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offsetPx
@@ -257,7 +257,7 @@ fun ModalBottomSheetLayout(
             resistance = null
         )
 
-        Stack(Modifier.fillMaxSize().then(swipeable)) {
+        Box(Modifier.fillMaxSize().then(swipeable)) {
             content()
 
             Scrim(

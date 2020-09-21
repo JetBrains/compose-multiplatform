@@ -17,8 +17,8 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.Providers
@@ -53,7 +53,7 @@ class CardTest {
         var cardColor = Color.Transparent
         rule.setMaterialContent {
             Surface(color = background) {
-                Stack {
+                Box {
                     cardColor = MaterialTheme.colors.surface
                     Providers(ShapesAmbient provides Shapes(medium = shape)) {
                         Card(modifier = Modifier

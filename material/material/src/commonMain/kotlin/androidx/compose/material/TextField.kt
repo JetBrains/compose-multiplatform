@@ -16,12 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.LastBaseline
@@ -400,9 +400,8 @@ private fun IconsWithTextFieldLayout(
                         .iconPadding(
                             start = TextFieldPadding,
                             end = TextFieldPadding
-                        ),
-                    children = label
-                )
+                        )
+                ) { label() }
             }
             textField(Modifier.layoutId(TextFieldId).then(padding))
         },
