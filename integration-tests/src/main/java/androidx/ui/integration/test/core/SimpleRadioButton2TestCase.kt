@@ -64,9 +64,11 @@ private fun Outline.offset(size: Float): Outline {
     return when (this) {
         is Outline.Rectangle -> Outline.Rectangle(rect.translate(offset))
         is Outline.Rounded -> Outline.Rounded(roundRect.translate(offset))
-        is Outline.Generic -> Outline.Generic(Path().apply {
-            addPath(path)
-            translate(offset)
-        })
+        is Outline.Generic -> Outline.Generic(
+            Path().apply {
+                addPath(path)
+                translate(offset)
+            }
+        )
     }
 }
