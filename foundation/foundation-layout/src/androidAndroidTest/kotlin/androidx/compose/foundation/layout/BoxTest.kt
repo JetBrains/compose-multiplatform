@@ -22,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -59,7 +59,7 @@ class BoxTest : LayoutTest() {
                     Container(
                         Modifier.align(Alignment.BottomEnd)
                             .saveLayoutInfo(alignedChildSize, alignedChildPosition, positionedLatch)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 stackSize.value = coordinates.size
                                 positionedLatch.countDown()
                             },
@@ -104,7 +104,7 @@ class BoxTest : LayoutTest() {
         show {
             Container(alignment = Alignment.TopStart) {
                 Box(
-                    Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         stackSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -161,7 +161,7 @@ class BoxTest : LayoutTest() {
         show {
             Container(alignment = Alignment.TopStart) {
                 Box(
-                    Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         stackSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -244,7 +244,7 @@ class BoxTest : LayoutTest() {
                     Box(
                         Modifier
                             .preferredSize(tripleSizeDp)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 stackSize.value = coordinates.size
                                 positionedLatch.countDown()
                             }
@@ -354,7 +354,7 @@ class BoxTest : LayoutTest() {
                         sizeDp,
                         sizeDp
                     ).then(
-                        Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                        Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                             stackSize.value = coordinates.size
                             positionedLatch.countDown()
                         }
@@ -406,7 +406,7 @@ class BoxTest : LayoutTest() {
                 modifier = Modifier.size(outerSize)
             ) {
                 Box(
-                    Modifier.size(innerSize).onPositioned {
+                    Modifier.size(innerSize).onGloballyPositioned {
                         assertEquals(outerSizePx - innerSizePx, it.positionInParent.x)
                         assertEquals(outerSizePx - innerSizePx, it.positionInParent.y)
                         positionedLatch.countDown()
@@ -425,11 +425,12 @@ class BoxTest : LayoutTest() {
         show {
             Box(Modifier.size(sizeDp)) {
                 Box(
-                    Modifier.align(Alignment.BottomEnd).align(Alignment.TopStart).onPositioned {
-                        assertEquals(size, it.positionInParent.x)
-                        assertEquals(size, it.positionInParent.y)
-                        positionedLatch.countDown()
-                    }
+                    Modifier.align(Alignment.BottomEnd).align(Alignment.TopStart)
+                        .onGloballyPositioned {
+                            assertEquals(size, it.positionInParent.x)
+                            assertEquals(size, it.positionInParent.y)
+                            positionedLatch.countDown()
+                        }
                 )
             }
         }

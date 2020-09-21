@@ -38,7 +38,7 @@ import androidx.compose.ui.SimpleRow
 import androidx.compose.ui.Wrap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(JUnit4::class)
-class OnPositionedTest {
+class OnGloballyPositionedTest {
 
     @Suppress("DEPRECATION")
     @get:Rule
@@ -87,7 +87,7 @@ class OnPositionedTest {
                             Wrap(
                                 minWidth = size,
                                 minHeight = size,
-                                modifier = Modifier.onPositioned { coordinates ->
+                                modifier = Modifier.onGloballyPositioned { coordinates ->
                                     wrap1Position = coordinates.globalPosition.x
                                     latch.countDown()
                                 }
@@ -96,7 +96,7 @@ class OnPositionedTest {
                             Wrap(
                                 minWidth = size,
                                 minHeight = size,
-                                modifier = Modifier.onPositioned { coordinates ->
+                                modifier = Modifier.onGloballyPositioned { coordinates ->
                                     wrap2Position = coordinates.globalPosition.x
                                     latch.countDown()
                                 }
@@ -128,7 +128,7 @@ class OnPositionedTest {
                 AtLeastSize(size = 20) {
                     Wrap(
                         minWidth = size, minHeight = size,
-                        modifier = Modifier.onPositioned {
+                        modifier = Modifier.onGloballyPositioned {
                             realChildSize = it.size.width
                             childLatch.countDown()
                         }
@@ -170,7 +170,7 @@ class OnPositionedTest {
                             Wrap(
                                 minWidth = 10,
                                 minHeight = 10,
-                                modifier = Modifier.onPositioned { coordinates ->
+                                modifier = Modifier.onGloballyPositioned { coordinates ->
                                     childGlobalPosition = coordinates.positionInRoot
                                     latch.countDown()
                                 }
@@ -209,21 +209,21 @@ class OnPositionedTest {
                         Wrap(
                             minWidth = 10,
                             minHeight = 10,
-                            modifier = Modifier.onPositioned {
+                            modifier = Modifier.onGloballyPositioned {
                                 wrap1OnPositionedCalled = true
                             }
                         )
                         Wrap(
                             minWidth = 10,
                             minHeight = 10,
-                            modifier = Modifier.onPositioned {
+                            modifier = Modifier.onGloballyPositioned {
                                 wrap2OnPositionedCalled = true
                             }
                         ) {
                             Wrap(
                                 minWidth = 10,
                                 minHeight = 10,
-                                modifier = Modifier.onPositioned {
+                                modifier = Modifier.onGloballyPositioned {
                                     latch.countDown()
                                 }
                             )
@@ -248,7 +248,7 @@ class OnPositionedTest {
                 FixedSize(
                     10,
                     PaddingModifier(5).then(
-                        Modifier.onPositioned {
+                        Modifier.onGloballyPositioned {
                             coordinates = it
                             positionedLatch.countDown()
                         }
@@ -281,7 +281,7 @@ class OnPositionedTest {
                 FixedSize(
                     10,
                     PaddingModifier(5).then(
-                        Modifier.onPositioned {
+                        Modifier.onGloballyPositioned {
                             coordinates = it
                             positionedLatch.countDown()
                         }
@@ -319,7 +319,7 @@ class OnPositionedTest {
             frameLayout?.setContent(Recomposer.current()) {
                 Layout(
                     {},
-                    modifier = Modifier.onPositioned {
+                    modifier = Modifier.onGloballyPositioned {
                         coordinates = it
                         positionedLatch.countDown()
                     }
@@ -365,7 +365,7 @@ class OnPositionedTest {
             frameLayout.setContent(Recomposer.current()) {
                 Layout(
                     {},
-                    modifier = Modifier.onPositioned {
+                    modifier = Modifier.onGloballyPositioned {
                         coordinates = it
                         positionedLatch.countDown()
                     }
@@ -403,7 +403,7 @@ class OnPositionedTest {
                         Box(Modifier.size(25.toDp())) {
                             Box(
                                 Modifier.size(size.toDp())
-                                    .onPositioned {
+                                    .onGloballyPositioned {
                                         coordinates1 = it
                                         positionedLatch.countDown()
                                     }
@@ -412,7 +412,7 @@ class OnPositionedTest {
                         Box(Modifier.size(25.toDp())) {
                             Box(
                                 Modifier.size(size.toDp())
-                                    .onPositioned {
+                                    .onGloballyPositioned {
                                         coordinates2 = it
                                         positionedLatch.countDown()
                                     }

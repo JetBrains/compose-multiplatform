@@ -25,7 +25,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -72,7 +72,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         .preferredWidth((rule.displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             aspectRatioBoxSize.value = coordinates.size
                         }
                 )
@@ -82,7 +82,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             centerTo(parent)
                             width = Dimension.value(1.dp)
                             height = Dimension.fillToConstraints
-                        }.onPositioned { coordinates ->
+                        }.onGloballyPositioned { coordinates ->
                             dividerSize.value = coordinates.size
                         }
                 )
@@ -132,7 +132,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         .preferredWidth((rule.displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             aspectRatioBoxSize.value = coordinates.size
                         }
                 )
@@ -142,7 +142,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             centerTo(parent)
                             width = Dimension.value(1.dp)
                             height = Dimension.fillToConstraints
-                        }.onPositioned { coordinates ->
+                        }.onGloballyPositioned { coordinates ->
                             dividerSize.value = coordinates.size
                         }
                 )
@@ -192,7 +192,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         .preferredWidth((rule.displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             aspectRatioBoxSize.value = coordinates.size
                         }
                 )
@@ -203,7 +203,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             width = Dimension.value(1.dp)
                             height = Dimension.percent(0.8f)
                         }
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             dividerSize.value = coordinates.size
                         }
                 )
@@ -254,7 +254,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         .preferredWidth((rule.displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             aspectRatioBoxSize.value = coordinates.size
                         }
                 )
@@ -265,7 +265,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             width = Dimension.value(1.dp)
                             height = Dimension.percent(0.8f)
                         }
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             dividerSize.value = coordinates.size
                         }
                 )
@@ -304,7 +304,7 @@ class ConstraintLayoutTest : LayoutTest() {
         rule.setContent {
             ConstraintLayout(
                 // CL is wrapping width and height.
-                modifier = Modifier.onPositioned {
+                modifier = Modifier.onGloballyPositioned {
                     constraintLayoutSize.value = it.size
                 }
             ) {
@@ -323,7 +323,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         .preferredWidth(size)
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             aspectRatioBoxSize.value = coordinates.size
                         }
                 )
@@ -334,7 +334,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             width = Dimension.value(1.dp)
                             height = Dimension.fillToConstraints
                         }
-                        .onPositioned { coordinates ->
+                        .onGloballyPositioned { coordinates ->
                             dividerSize.value = coordinates.size
                         }
                 )
@@ -377,7 +377,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             centerTo(parent)
                         }
                         .preferredSize(boxSize.toDp(), boxSize.toDp())
-                        .onPositioned {
+                        .onGloballyPositioned {
                             position[0].value = it.positionInRoot
                         }
                 )
@@ -389,7 +389,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             bottom.linkTo(box0.top)
                         }
                         .preferredSize(boxSize.toDp(), boxSize.toDp())
-                        .onPositioned {
+                        .onGloballyPositioned {
                             position[1].value = it.positionInRoot
                         }
                 )
@@ -400,7 +400,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             bottom.linkTo(parent.bottom, margin = offset.toDp())
                         }
                         .preferredSize(boxSize.toDp(), boxSize.toDp())
-                        .onPositioned {
+                        .onGloballyPositioned {
                             position[2].value = it.positionInRoot
                         }
                 )
@@ -469,7 +469,7 @@ class ConstraintLayoutTest : LayoutTest() {
                 for (i in 0..2) {
                     Box(
                         Modifier.layoutId("box$i").preferredSize(boxSize.toDp(), boxSize.toDp())
-                            .onPositioned {
+                            .onGloballyPositioned {
                                 position[i].value = it.positionInRoot
                             }
                     )
@@ -522,7 +522,7 @@ class ConstraintLayoutTest : LayoutTest() {
                                 centerTo(parent)
                             }
                             .preferredSize(boxSize.toDp(), boxSize.toDp())
-                            .onPositioned {
+                            .onGloballyPositioned {
                                 position[0].value = it.positionInRoot
                             }
                     )
@@ -534,7 +534,7 @@ class ConstraintLayoutTest : LayoutTest() {
                                 bottom.linkTo(box0.top)
                             }
                             .preferredSize(boxSize.toDp(), boxSize.toDp())
-                            .onPositioned {
+                            .onGloballyPositioned {
                                 position[1].value = it.positionInRoot
                             }
                     )
@@ -545,7 +545,7 @@ class ConstraintLayoutTest : LayoutTest() {
                                 bottom.linkTo(parent.bottom, margin = offset.toDp())
                             }
                             .preferredSize(boxSize.toDp(), boxSize.toDp())
-                            .onPositioned {
+                            .onGloballyPositioned {
                                 position[2].value = it.positionInRoot
                             }
                     )
@@ -606,7 +606,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         Modifier.size(1.dp)
                             .constrainAs(ref) {
                                 absoluteLeft.linkTo(guideline)
-                            }.onPositioned {
+                            }.onGloballyPositioned {
                                 position[index] = it.positionInParent.x
                             }
                     )
@@ -652,7 +652,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             Modifier.size(1.dp)
                                 .constrainAs(ref) {
                                     absoluteLeft.linkTo(guideline)
-                                }.onPositioned {
+                                }.onGloballyPositioned {
                                     position[index] = it.positionInParent.x
                                 }
                         )
@@ -710,7 +710,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         Modifier.size(1.dp)
                             .constrainAs(ref) {
                                 absoluteLeft.linkTo(barrier)
-                            }.onPositioned {
+                            }.onGloballyPositioned {
                                 position[index] = it.positionInParent.x
                             }
                     )
@@ -764,7 +764,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             Modifier.size(1.dp)
                                 .constrainAs(ref) {
                                     absoluteLeft.linkTo(barrier)
-                                }.onPositioned {
+                                }.onGloballyPositioned {
                                     position[index] = it.positionInParent.x
                                 }
                         )
@@ -823,7 +823,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         Modifier.size(1.toDp())
                             .constrainAs(ref) {
                                 anchor()
-                            }.onPositioned {
+                            }.onGloballyPositioned {
                                 position[index] = it.positionInParent.x
                             }
                     )
@@ -894,7 +894,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             Modifier.size(1.toDp())
                                 .constrainAs(ref) {
                                     anchor()
-                                }.onPositioned {
+                                }.onGloballyPositioned {
                                     position[index] = it.positionInParent.x
                                 }
                         )
@@ -952,7 +952,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         .constrainAs(createRef()) {
                             absoluteLeft.linkTo(leftBarrier)
                             top.linkTo(topBarrier)
-                        }.onPositioned {
+                        }.onGloballyPositioned {
                             position[0] = it.positionInParent
                         }
                 )
@@ -962,7 +962,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         .constrainAs(createRef()) {
                             absoluteLeft.linkTo(rightBarrier)
                             top.linkTo(bottomBarrier)
-                        }.onPositioned {
+                        }.onGloballyPositioned {
                             position[1] = it.positionInParent
                         }
                 )
@@ -984,7 +984,7 @@ class ConstraintLayoutTest : LayoutTest() {
                     Modifier.constrainAs(box) {
                         start.linkTo(parent.end)
                         start.linkTo(parent.start)
-                    }.onPositioned {
+                    }.onGloballyPositioned {
                         Assert.assertEquals(0f, it.positionInParent.x)
                     }
                 )
@@ -1011,7 +1011,7 @@ class ConstraintLayoutTest : LayoutTest() {
                     Modifier.size(boxSize).constrainAs(box1) {
                         start.linkTo(startGuideline)
                         top.linkTo(topGuideline)
-                    }.onPositioned {
+                    }.onGloballyPositioned {
                         Assert.assertEquals(20f, it.boundsInParent.left)
                         Assert.assertEquals(20f, it.boundsInParent.top)
                     }
@@ -1020,7 +1020,7 @@ class ConstraintLayoutTest : LayoutTest() {
                     Modifier.size(boxSize).constrainAs(box2) {
                         end.linkTo(endGuideline)
                         bottom.linkTo(bottomGuideline)
-                    }.onPositioned {
+                    }.onGloballyPositioned {
                         Assert.assertEquals(80f, it.boundsInParent.right)
                         Assert.assertEquals(80f, it.boundsInParent.bottom)
                     }

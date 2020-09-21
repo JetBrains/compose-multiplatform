@@ -40,7 +40,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -375,7 +375,9 @@ private fun BoundsAwareScaffoldSlot(
         onBoundsKnown(null)
     }
     ScaffoldSlot(
-        modifier = modifier.onPositioned { coords -> onBoundsKnown(coords.boundsInParent) },
+        modifier = modifier.onGloballyPositioned { coords ->
+            onBoundsKnown(coords.boundsInParent)
+        },
         content = slotContent
     )
 }

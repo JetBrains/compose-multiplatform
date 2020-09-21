@@ -25,7 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -54,7 +54,7 @@ class ContainerTest : LayoutTest() {
         show {
             Box {
                 Container(
-                    Modifier.onPositioned { coordinates ->
+                    Modifier.onGloballyPositioned { coordinates ->
                         containerSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -82,14 +82,14 @@ class ContainerTest : LayoutTest() {
             Box {
                 Container(
                     padding = PaddingValues(paddingDp),
-                    modifier = Modifier.onPositioned { coordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates ->
                         containerSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
                 ) {
                     EmptyBox(
                         width = sizeDp, height = sizeDp,
-                        modifier = Modifier.onPositioned { coordinates ->
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
                             childPosition.value = coordinates.positionInRoot
                             positionedLatch.countDown()
                         }
@@ -122,7 +122,7 @@ class ContainerTest : LayoutTest() {
         show {
             Box {
                 Row(
-                    Modifier.onPositioned { coordinates ->
+                    Modifier.onGloballyPositioned { coordinates ->
                         containerSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -130,7 +130,7 @@ class ContainerTest : LayoutTest() {
                     Container(width = childWidthDp, height = childHeightDp) {
                         EmptyBox(
                             width = sizeDp, height = sizeDp,
-                            modifier = Modifier.onPositioned { coordinates ->
+                            modifier = Modifier.onGloballyPositioned { coordinates ->
                                 childSize[0] = coordinates.size
                                 positionedLatch.countDown()
                             }
@@ -139,7 +139,7 @@ class ContainerTest : LayoutTest() {
                     Container(constraints = childConstraints) {
                         EmptyBox(
                             width = sizeDp, height = sizeDp,
-                            modifier = Modifier.onPositioned { coordinates ->
+                            modifier = Modifier.onGloballyPositioned { coordinates ->
                                 childSize[1] = coordinates.size
                                 positionedLatch.countDown()
                             }
@@ -153,7 +153,7 @@ class ContainerTest : LayoutTest() {
                     ) {
                         EmptyBox(
                             width = sizeDp, height = sizeDp,
-                            modifier = Modifier.onPositioned { coordinates ->
+                            modifier = Modifier.onGloballyPositioned { coordinates ->
                                 childSize[2] = coordinates.size
                                 positionedLatch.countDown()
                             }
@@ -185,14 +185,14 @@ class ContainerTest : LayoutTest() {
         show {
             Container(
                 alignment = Alignment.TopStart,
-                modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                     alignSize.value = coordinates.size
                     positionedLatch.countDown()
                 }
             ) {
                 Container(
                     expanded = true,
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         containerSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -200,7 +200,7 @@ class ContainerTest : LayoutTest() {
                     EmptyBox(
                         width = sizeDp,
                         height = sizeDp,
-                        modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
                             childSize.value = coordinates.size
                             childPosition.value = coordinates.positionInRoot
                             positionedLatch.countDown()
@@ -240,7 +240,7 @@ class ContainerTest : LayoutTest() {
             Box {
                 val constraints = DpConstraints(minWidth = sizeDp * 2, minHeight = sizeDp * 2)
                 ConstrainedBox(
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         containerSize.value = coordinates.size
                         positionedLatch.countDown()
                     },
@@ -249,7 +249,7 @@ class ContainerTest : LayoutTest() {
                     Container(alignment = Alignment.BottomEnd) {
                         EmptyBox(
                             width = sizeDp, height = sizeDp,
-                            modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                            modifier = Modifier.onGloballyPositioned { coordinates ->
                                 childSize.value = coordinates.size
                                 childPosition.value =
                                     coordinates.positionInRoot
@@ -281,7 +281,7 @@ class ContainerTest : LayoutTest() {
             Box {
                 Container(
                     width = sizeDp, height = sizeDp, padding = PaddingValues(10.dp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         containerSize.value = coordinates.size
                         latch.countDown()
                     }
@@ -317,7 +317,7 @@ class ContainerTest : LayoutTest() {
         show {
             Box {
                 Container(
-                    Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         containerSize = coordinates.size
                         latch.countDown()
                     },
@@ -347,7 +347,7 @@ class ContainerTest : LayoutTest() {
                     Spacer(
                         Modifier
                             .preferredSize(width = childSize, height = childSize)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childCoordinates = coordinates
                                 latch.countDown()
                             }
@@ -389,7 +389,9 @@ class ContainerTest : LayoutTest() {
                             EmptyBox(
                                 width = size.value,
                                 height = 10.dp,
-                                modifier = Modifier.onPositioned { layoutLatch.countDown() }
+                                modifier = Modifier.onGloballyPositioned {
+                                    layoutLatch.countDown()
+                                }
                             )
                         }
                     }
@@ -429,7 +431,9 @@ class ContainerTest : LayoutTest() {
                             EmptyBox(
                                 width = size.value,
                                 height = 10.dp,
-                                modifier = Modifier.onPositioned { layoutLatch.countDown() }
+                                modifier = Modifier.onGloballyPositioned {
+                                    layoutLatch.countDown()
+                                }
                             )
                         }
                     }
@@ -469,7 +473,9 @@ class ContainerTest : LayoutTest() {
                             EmptyBox(
                                 width = size.value,
                                 height = 10.dp,
-                                modifier = Modifier.onPositioned { layoutLatch.countDown() }
+                                modifier = Modifier.onGloballyPositioned {
+                                    layoutLatch.countDown()
+                                }
                             )
                         }
                     }

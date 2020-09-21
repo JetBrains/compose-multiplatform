@@ -42,7 +42,7 @@ import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
@@ -324,7 +324,9 @@ fun BottomSheetScaffold(
                         swipeable
                             .fillMaxWidth()
                             .heightIn(min = sheetPeekHeight)
-                            .onPositioned { bottomSheetHeight = it.size.height.toFloat() },
+                            .onGloballyPositioned {
+                                bottomSheetHeight = it.size.height.toFloat()
+                            },
                         shape = sheetShape,
                         elevation = sheetElevation,
                         color = sheetBackgroundColor,

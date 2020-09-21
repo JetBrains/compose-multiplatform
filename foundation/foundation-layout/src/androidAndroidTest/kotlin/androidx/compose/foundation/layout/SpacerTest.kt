@@ -18,7 +18,7 @@ package androidx.compose.foundation.layout
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
@@ -50,7 +50,7 @@ class SpacerTest : LayoutTest() {
             Container(constraints = bigConstraints) {
                 Spacer(
                     Modifier.preferredSize(width = width, height = height)
-                        .onPositioned { position: LayoutCoordinates ->
+                        .onGloballyPositioned { position: LayoutCoordinates ->
                             size = position.size
                             drawLatch.countDown()
                         }
@@ -84,7 +84,7 @@ class SpacerTest : LayoutTest() {
                 ) {
                     Spacer(
                         Modifier.preferredSize(width = width, height = height)
-                            .onPositioned { position: LayoutCoordinates ->
+                            .onGloballyPositioned { position: LayoutCoordinates ->
                                 size = position.size
                                 drawLatch.countDown()
                             }
@@ -109,7 +109,7 @@ class SpacerTest : LayoutTest() {
         show {
             Container(constraints = bigConstraints) {
                 Spacer(
-                    Modifier.preferredWidth(width).onPositioned { position: LayoutCoordinates ->
+                    Modifier.preferredWidth(width).onGloballyPositioned { position ->
                         size = position.size
                         drawLatch.countDown()
                     }
@@ -142,7 +142,7 @@ class SpacerTest : LayoutTest() {
                 ) {
                     Spacer(
                         Modifier.preferredWidth(width)
-                            .onPositioned { position: LayoutCoordinates ->
+                            .onGloballyPositioned { position: LayoutCoordinates ->
                                 size = position.size
                                 drawLatch.countDown()
                             }
@@ -168,7 +168,7 @@ class SpacerTest : LayoutTest() {
             Container(constraints = bigConstraints) {
                 Spacer(
                     Modifier.preferredHeight(height)
-                        .onPositioned { position: LayoutCoordinates ->
+                        .onGloballyPositioned { position: LayoutCoordinates ->
                             size = position.size
                             drawLatch.countDown()
                         }
@@ -201,7 +201,7 @@ class SpacerTest : LayoutTest() {
                 ) {
                     Spacer(
                         Modifier.preferredHeight(height)
-                            .onPositioned { position: LayoutCoordinates ->
+                            .onGloballyPositioned { position: LayoutCoordinates ->
                                 size = position.size
                                 drawLatch.countDown()
                             }

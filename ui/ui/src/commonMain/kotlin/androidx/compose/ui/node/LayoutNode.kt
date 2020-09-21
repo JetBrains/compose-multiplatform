@@ -30,7 +30,7 @@ import androidx.compose.ui.LayoutModifier
 import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.OnPositionedModifier
+import androidx.compose.ui.OnGloballyPositionedModifier
 import androidx.compose.ui.OnRemeasuredModifier
 import androidx.compose.ui.ParentDataModifier
 import androidx.compose.ui.Placeable
@@ -662,7 +662,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             // when possible.
             val outerWrapper = modifier.foldOut(innerLayoutNodeWrapper) { mod, toWrap ->
                 var wrapper = toWrap
-                if (mod is OnPositionedModifier) {
+                if (mod is OnGloballyPositionedModifier) {
                     onPositionedCallbacks += mod
                 }
                 if (mod is OnRemeasuredModifier) {
@@ -780,7 +780,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * List of all OnPositioned callbacks in the modifier chain.
      */
-    private val onPositionedCallbacks = mutableVectorOf<OnPositionedModifier>()
+    private val onPositionedCallbacks = mutableVectorOf<OnGloballyPositionedModifier>()
 
     /**
      * List of all OnSizeChangedModifiers in the modifier chain.
@@ -789,7 +789,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
 
     /**
      * Flag used by [OnPositionedDispatcher] to identify LayoutNodes that have already
-     * had their [OnPositionedModifier]'s dispatch called so that they aren't called
+     * had their [OnGloballyPositionedModifier]'s dispatch called so that they aren't called
      * multiple times.
      */
     internal var needsOnPositionedDispatch = false
@@ -853,11 +853,12 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     }
 
     /**
-     * Return true if there is a new [OnPositionedModifier] assigned to this Layout.
+     * Return true if there is a new [OnGloballyPositionedModifier] assigned to this Layout.
      */
     private fun hasNewPositioningCallback(): Boolean {
         return modifier.foldOut(false) { mod, hasNewCallback ->
-            hasNewCallback || (mod is OnPositionedModifier && mod !in onPositionedCallbacks)
+            hasNewCallback ||
+                    (mod is OnGloballyPositionedModifier && mod !in onPositionedCallbacks)
         }
     }
 
@@ -1090,7 +1091,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         if (!isPlaced) {
             return // it hasn't been placed, so don't make a call
         }
-        onPositionedCallbacks.forEach { it.onPositioned(coordinates) }
+        onPositionedCallbacks.forEach { it.onGloballyPositioned(coordinates) }
     }
 
     /**

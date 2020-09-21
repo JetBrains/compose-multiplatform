@@ -262,13 +262,18 @@ package androidx.compose.ui {
     method public default <R> R! foldOut(R? initial, kotlin.jvm.functions.Function2<? super androidx.compose.ui.Modifier.Element,? super R,? extends R> operation);
   }
 
-  public interface OnPositionedModifier extends androidx.compose.ui.Modifier.Element {
-    method public void onPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
+  public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
+    method public void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
 
-  public final class OnPositionedModifierKt {
-    method public static androidx.compose.ui.Modifier onPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onPositioned);
-    method @Deprecated public static androidx.compose.ui.Modifier onPositioned(kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onPositioned);
+  public final class OnGloballyPositionedModifierKt {
+    method public static androidx.compose.ui.Modifier onGloballyPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onGloballyPositioned);
+    method @Deprecated public static androidx.compose.ui.Modifier onPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onPositioned);
+  }
+
+  @Deprecated public interface OnPositionedModifier extends androidx.compose.ui.OnGloballyPositionedModifier {
+    method @Deprecated public default void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
+    method @Deprecated public void onPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
 
   public interface OnRemeasuredModifier extends androidx.compose.ui.Modifier.Element {

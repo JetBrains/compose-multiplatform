@@ -45,7 +45,7 @@ import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.FontLoaderAmbient
@@ -286,7 +286,7 @@ fun CoreTextField(
             }
         }
 
-        val onPositionedModifier = Modifier.onPositioned {
+        val onPositionedModifier = Modifier.onGloballyPositioned {
             if (textInputService != null) {
                 state.layoutCoordinates = it
                 if (state.selectionIsOn) {

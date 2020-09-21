@@ -45,7 +45,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
@@ -333,7 +333,7 @@ class WithConstraintsTest {
             activity.setContent {
                 Container(width = 200, height = 200) {
                     WithConstraints(
-                        modifier = Modifier.onPositioned {
+                        modifier = Modifier.onGloballyPositioned {
                             // OnPositioned can be fired multiple times with the same value
                             // for example when requestLayout() was triggered on ComposeView.
                             // if we called twice, let's make sure we got the correct values.
@@ -344,7 +344,7 @@ class WithConstraintsTest {
                     ) {
                         Container(
                             width = size.value, height = size.value,
-                            modifier = Modifier.onPositioned {
+                            modifier = Modifier.onGloballyPositioned {
                                 // OnPositioned can be fired multiple times with the same value
                                 // for example when requestLayout() was triggered on ComposeView.
                                 // if we called twice, let's make sure we got the correct values.

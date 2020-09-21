@@ -2123,7 +2123,7 @@ class AndroidLayoutDrawTest {
                             layout(placeable.width, placeable.height) {
                                 placeable.place(Offset(offset, offset))
                             }
-                        }.onPositioned {
+                        }.onGloballyPositioned {
                             resultCoordinates = it
                             latch.countDown()
                         }
@@ -2159,7 +2159,7 @@ class AndroidLayoutDrawTest {
                             layout(placeable.width, placeable.height) {
                                 placeable.place(Offset(offset, offset))
                             }
-                        }.onPositioned {
+                        }.onGloballyPositioned {
                             convenienceCoordinates = it
                             latch.countDown()
                         }
@@ -2178,12 +2178,10 @@ class AndroidLayoutDrawTest {
                 }
                 FixedSize(
                     size = size,
-                    modifier = layoutModifier.plus(
-                        onPositioned {
-                            coordinates = it
-                            latch.countDown()
-                        }
-                    )
+                    modifier = layoutModifier.onGloballyPositioned {
+                        coordinates = it
+                        latch.countDown()
+                    }
                 )
             }
         }

@@ -25,7 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -253,7 +253,7 @@ class LayoutAlignTest : LayoutTest() {
         show {
             Container(Modifier.wrapContentSize(Alignment.TopStart)) {
                 Layout(
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         wrapSize.value = coordinates.size
                         positionedLatch.countDown()
                     },
@@ -301,7 +301,7 @@ class LayoutAlignTest : LayoutTest() {
         show {
             Box(
                 Modifier.size(outerSize.toDp())
-                    .onPositioned {
+                    .onGloballyPositioned {
                         assertEquals(outerSize, it.size.width.toFloat())
                         positionedLatch.countDown()
                     }
@@ -309,7 +309,7 @@ class LayoutAlignTest : LayoutTest() {
                 Box(
                     Modifier.wrapContentSize(Alignment.BottomEnd, unbounded = true)
                         .size(innerSize.toDp())
-                        .onPositioned {
+                        .onGloballyPositioned {
                             assertEquals(
                                 Offset(outerSize - innerSize, outerSize - innerSize),
                                 it.positionInParent
@@ -320,7 +320,7 @@ class LayoutAlignTest : LayoutTest() {
                 Box(
                     Modifier.wrapContentWidth(Alignment.End, unbounded = true)
                         .size(innerSize.toDp())
-                        .onPositioned {
+                        .onGloballyPositioned {
                             assertEquals(outerSize - innerSize, it.positionInParent.x)
                             positionedLatch.countDown()
                         }
@@ -328,7 +328,7 @@ class LayoutAlignTest : LayoutTest() {
                 Box(
                     Modifier.wrapContentHeight(Alignment.Bottom, unbounded = true)
                         .size(innerSize.toDp())
-                        .onPositioned {
+                        .onGloballyPositioned {
                             assertEquals(outerSize - innerSize, it.positionInParent.y)
                             positionedLatch.countDown()
                         }
