@@ -99,7 +99,8 @@ class FontWeightStyleSpanTest {
         }
         val span = FontWeightStyleSpan(
             weight = FontStyle.FONT_WEIGHT_NORMAL,
-            style = FontWeightStyleSpan.STYLE_NONE)
+            style = FontWeightStyleSpan.STYLE_NONE
+        )
         span.updatePaint(textPaint)
 
         assertThat(textPaint.typeface.isItalic).isTrue()
