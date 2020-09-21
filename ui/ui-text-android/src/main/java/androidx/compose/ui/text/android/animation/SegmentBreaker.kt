@@ -111,7 +111,8 @@ object SegmentBreaker {
             SegmentType.Word -> breakInWords(layoutHelper)
             SegmentType.Character -> breakWithBreakIterator(
                 text,
-                BreakIterator.getCharacterInstance(Locale.getDefault()))
+                BreakIterator.getCharacterInstance(Locale.getDefault())
+            )
         }
     }
 
@@ -155,14 +156,16 @@ object SegmentBreaker {
     }
 
     private fun breakSegmentWithDocument(layoutHelper: LayoutHelper): List<Segment> {
-        return listOf(Segment(
-            startOffset = 0,
-            endOffset = layoutHelper.layout.text.length,
-            left = 0,
-            top = 0,
-            right = layoutHelper.layout.width,
-            bottom = layoutHelper.layout.height
-        ))
+        return listOf(
+            Segment(
+                startOffset = 0,
+                endOffset = layoutHelper.layout.text.length,
+                left = 0,
+                top = 0,
+                right = layoutHelper.layout.width,
+                bottom = layoutHelper.layout.height
+            )
+        )
     }
 
     private fun breakSegmentWithParagraph(layoutHelper: LayoutHelper): List<Segment> {
@@ -173,14 +176,16 @@ object SegmentBreaker {
             val paraEnd = layoutHelper.getParagraphEnd(i)
             val paraFirstLine = layout.getLineForOffset(paraStart, false /* downstream */)
             val paraLastLine = layout.getLineForOffset(paraEnd, true /* upstream */)
-            result.add(Segment(
-                startOffset = paraStart,
-                endOffset = paraEnd,
-                left = 0,
-                top = layout.getLineTop(paraFirstLine),
-                right = layout.width,
-                bottom = layout.getLineBottom(paraLastLine)
-            ))
+            result.add(
+                Segment(
+                    startOffset = paraStart,
+                    endOffset = paraEnd,
+                    left = 0,
+                    top = layout.getLineTop(paraFirstLine),
+                    right = layout.width,
+                    bottom = layout.getLineBottom(paraLastLine)
+                )
+            )
         }
         return result
     }
@@ -192,14 +197,16 @@ object SegmentBreaker {
         val result = mutableListOf<Segment>()
         val layout = layoutHelper.layout
         for (i in 0 until layoutHelper.layout.lineCount) {
-            result.add(Segment(
-                startOffset = layout.getLineStart(i),
-                endOffset = layout.getLineEnd(i),
-                left = if (dropSpaces) ceil(layout.getLineLeft(i)).toInt() else 0,
-                top = layout.getLineTop(i),
-                right = if (dropSpaces) ceil(layout.getLineRight(i)).toInt() else layout.width,
-                bottom = layout.getLineBottom(i)
-            ))
+            result.add(
+                Segment(
+                    startOffset = layout.getLineStart(i),
+                    endOffset = layout.getLineEnd(i),
+                    left = if (dropSpaces) ceil(layout.getLineLeft(i)).toInt() else 0,
+                    top = layout.getLineTop(i),
+                    right = if (dropSpaces) ceil(layout.getLineRight(i)).toInt() else layout.width,
+                    bottom = layout.getLineBottom(i)
+                )
+            )
         }
         return result
     }
@@ -263,7 +270,8 @@ object SegmentBreaker {
             val layout = layoutHelper.layout
 
             if (dropSpaces && end == start + 1 &&
-                layoutHelper.isLineEndSpace(layout.text.get(start)))
+                layoutHelper.isLineEndSpace(layout.text.get(start))
+            )
                 return@lambda
             val lineNo = layout.getLineForOffset(start, false /* downstream */)
             val paraRTL = layout.getParagraphDirection(lineNo) == Layout.DIR_RIGHT_TO_LEFT
@@ -282,14 +290,16 @@ object SegmentBreaker {
                     upstream = true
                 )
             ).toInt()
-            res.add(Segment(
-                startOffset = start,
-                endOffset = end,
-                left = min(startPos, endPos),
-                top = layout.getLineTop(lineNo),
-                right = max(startPos, endPos),
-                bottom = layout.getLineBottom(lineNo)
-            ))
+            res.add(
+                Segment(
+                    startOffset = start,
+                    endOffset = end,
+                    left = min(startPos, endPos),
+                    top = layout.getLineTop(lineNo),
+                    right = max(startPos, endPos),
+                    bottom = layout.getLineBottom(lineNo)
+                )
+            )
         }
         return res
     }

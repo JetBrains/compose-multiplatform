@@ -291,12 +291,12 @@ internal class WordIterator(
         internal fun isPunctuation(cp: Int): Boolean {
             val type = Character.getType(cp)
             return type == Character.CONNECTOR_PUNCTUATION.toInt() ||
-                    type == Character.DASH_PUNCTUATION.toInt() ||
-                    type == Character.END_PUNCTUATION.toInt() ||
-                    type == Character.FINAL_QUOTE_PUNCTUATION.toInt() ||
-                    type == Character.INITIAL_QUOTE_PUNCTUATION.toInt() ||
-                    type == Character.OTHER_PUNCTUATION.toInt() ||
-                    type == Character.START_PUNCTUATION.toInt()
+                type == Character.DASH_PUNCTUATION.toInt() ||
+                type == Character.END_PUNCTUATION.toInt() ||
+                type == Character.FINAL_QUOTE_PUNCTUATION.toInt() ||
+                type == Character.INITIAL_QUOTE_PUNCTUATION.toInt() ||
+                type == Character.OTHER_PUNCTUATION.toInt() ||
+                type == Character.START_PUNCTUATION.toInt()
         }
     }
 }

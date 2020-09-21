@@ -346,5 +346,5 @@ class LayoutHelper(val layout: Layout) {
     // The spaces that will not be rendered if they are placed at the line end. In most case, it is
     // whitespace or line feed character, hence checking linearly should be enough.
     fun isLineEndSpace(c: Char) = c == ' ' || c == '\n' || c == '\u1680' ||
-            (c in '\u2000'..'\u200A' && c != '\u2007') || c == '\u205F' || c == '\u3000'
+        (c in '\u2000'..'\u200A' && c != '\u2007') || c == '\u205F' || c == '\u3000'
 }

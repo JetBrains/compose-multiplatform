@@ -142,7 +142,8 @@ class TextLayout constructor(
 
         val widthInt = ceil(width).toInt()
         layout = if (boringMetrics != null && layoutIntrinsics.maxIntrinsicWidth <= width &&
-            !hasBaselineShiftSpans) {
+            !hasBaselineShiftSpans
+        ) {
             BoringLayoutFactory.create(
                 text = charSequence,
                 paint = textPaint,
@@ -290,17 +291,17 @@ class TextLayout constructor(
 @RequiresApi(api = 18)
 @OptIn(InternalPlatformTextApi::class)
 internal fun getTextDirectionHeuristic(@TextDirection textDirectionHeuristic: Int):
-        TextDirectionHeuristic {
-    return when (textDirectionHeuristic) {
-        TEXT_DIRECTION_LTR -> TextDirectionHeuristics.LTR
-        TEXT_DIRECTION_LOCALE -> TextDirectionHeuristics.LOCALE
-        TEXT_DIRECTION_RTL -> TextDirectionHeuristics.RTL
-        TEXT_DIRECTION_FIRST_STRONG_RTL -> TextDirectionHeuristics.FIRSTSTRONG_RTL
-        TEXT_DIRECTION_ANY_RTL_LTR -> TextDirectionHeuristics.ANYRTL_LTR
-        TEXT_DIRECTION_FIRST_STRONG_LTR -> TextDirectionHeuristics.FIRSTSTRONG_LTR
-        else -> TextDirectionHeuristics.FIRSTSTRONG_LTR
+    TextDirectionHeuristic {
+        return when (textDirectionHeuristic) {
+            TEXT_DIRECTION_LTR -> TextDirectionHeuristics.LTR
+            TEXT_DIRECTION_LOCALE -> TextDirectionHeuristics.LOCALE
+            TEXT_DIRECTION_RTL -> TextDirectionHeuristics.RTL
+            TEXT_DIRECTION_FIRST_STRONG_RTL -> TextDirectionHeuristics.FIRSTSTRONG_RTL
+            TEXT_DIRECTION_ANY_RTL_LTR -> TextDirectionHeuristics.ANYRTL_LTR
+            TEXT_DIRECTION_FIRST_STRONG_LTR -> TextDirectionHeuristics.FIRSTSTRONG_LTR
+            else -> TextDirectionHeuristics.FIRSTSTRONG_LTR
+        }
     }
-}
 
 @OptIn(InternalPlatformTextApi::class)
 internal object TextAlignmentAdapter {
