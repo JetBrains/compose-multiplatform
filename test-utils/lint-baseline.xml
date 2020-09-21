@@ -13,13 +13,46 @@
     </issue>
 
     <issue
+        id="BanTargetApiAnnotation"
+        message="Uses @TargetApi annotation"
+        errorLine1="@TargetApi(Build.VERSION_CODES.Q)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            line="346"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="BanTargetApiAnnotation"
+        message="Uses @TargetApi annotation"
+        errorLine1="@TargetApi(Build.VERSION_CODES.Q)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            line="159"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="BanTargetApiAnnotation"
+        message="Uses @TargetApi annotation"
+        errorLine1="@TargetApi(Build.VERSION_CODES.Q)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            line="42"
+            column="1"/>
+    </issue>
+
+    <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 28, the call containing class androidx.compose.testutils.AndroidComposeTestCaseRunner is not annotated with @RequiresApi(x) where x is at least 28. Either annotate the containing class with at least @RequiresApi(28) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(28)."
         errorLine1="            bitmap = Bitmap.createBitmap(picture)"
         errorLine2="                            ~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="265"
+            line="275"
             column="29"/>
     </issue>
 
@@ -30,7 +63,7 @@
         errorLine2="                             ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="338"
+            line="348"
             column="30"/>
     </issue>
 
@@ -41,7 +74,7 @@
         errorLine2="                   ~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="341"
+            line="351"
             column="20"/>
     </issue>
 
@@ -52,7 +85,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="342"
+            line="352"
             column="27"/>
     </issue>
 
@@ -63,7 +96,7 @@
         errorLine2="                   ~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="346"
+            line="356"
             column="20"/>
     </issue>
 
