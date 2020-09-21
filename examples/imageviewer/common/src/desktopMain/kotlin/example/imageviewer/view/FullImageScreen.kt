@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.Image
@@ -41,6 +42,8 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.AppState
@@ -51,6 +54,8 @@ import example.imageviewer.style.DarkGreen
 import example.imageviewer.style.Foreground
 import example.imageviewer.style.MiniatureColor
 import example.imageviewer.style.Transparent
+import example.imageviewer.style.TranslucentBlack
+import example.imageviewer.style.TranslucentWhite
 import example.imageviewer.style.icBack
 import example.imageviewer.style.icFilterGrayscaleOn
 import example.imageviewer.style.icFilterGrayscaleOff
@@ -106,8 +111,11 @@ fun setToolBar(
     text: String,
     content: ContentState
 ) {
-
-    Surface(color = MiniatureColor, modifier = Modifier.preferredHeight(44.dp)) {
+    val backButtonHover = remember { mutableStateOf(false) }
+    Surface(
+        color = MiniatureColor,
+        modifier = Modifier.preferredHeight(44.dp)
+    ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Surface(
                 color = Transparent,
@@ -115,6 +123,16 @@ fun setToolBar(
                 shape = CircleShape
             ) {
                 Clickable(
+                    modifier = Modifier.hover(
+                        onEnter = {
+                            backButtonHover.value = true
+                            false
+                        },
+                        onExit = {
+                            backButtonHover.value = false
+                            false
+                    })
+                    .background(color = if (backButtonHover.value) TranslucentBlack else Transparent),
                     onClick = {
                         if (content.isContentReady()) {
                             content.restoreMainImage()
@@ -160,11 +178,22 @@ fun FilterButton(
     type: FilterType,
     modifier: Modifier = Modifier.preferredSize(38.dp)
 ) {
+    val filterButtonHover = remember { mutableStateOf(false) }
     Surface(
         color = Transparent,
         shape = CircleShape
     ) {
         Clickable(
+            modifier = Modifier.hover(
+                onEnter = {
+                    filterButtonHover.value = true
+                    false
+                },
+                onExit = {
+                    filterButtonHover.value = false
+                    false
+            })
+            .background(color = if (filterButtonHover.value) TranslucentBlack else Transparent),
             onClick = { content.toggleFilter(type)}
         ) {
             Image(

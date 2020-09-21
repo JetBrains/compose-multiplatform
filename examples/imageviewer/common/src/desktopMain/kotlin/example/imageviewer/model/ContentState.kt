@@ -32,9 +32,24 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
 
-class ContentState(
-    private val repository: ImageRepository
-) {
+object ContentState {
+
+    private lateinit var repository: ImageRepository
+    private lateinit var uriRepository: String
+
+    fun applyContent(uriRepository: String): ContentState {
+        if (this::uriRepository.isInitialized && this.uriRepository == uriRepository) {
+            return this
+        }
+        this.uriRepository = uriRepository
+        repository = ImageRepository(uriRepository)
+        isAppUIReady.value = false
+
+        initData()
+
+        return this
+    }
+
     private val executor: ExecutorService by lazy { Executors.newFixedThreadPool(2) }
 
     private val isAppUIReady = mutableStateOf(false)
@@ -124,7 +139,7 @@ class ContentState(
     }
 
     // application content initialization
-    fun initData() {
+    private fun initData() {
         if (isAppUIReady.value)
             return
 

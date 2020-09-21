@@ -159,7 +159,7 @@ object ContentState {
     }
 
     // application content initialization
-    fun initData() {
+    private fun initData() {
         if (isAppUIReady.value)
             return
 
