@@ -488,9 +488,9 @@ package androidx.compose.ui.unit {
   }
 
   public final class TextUnitKt {
-    method @kotlin.PublishedApi internal static inline <T> T! checkArithmetic-bAewZlA(long a, kotlin.jvm.functions.Function0<? extends T> block);
-    method @kotlin.PublishedApi internal static inline <T> T! checkArithmetic-pdU9Bpg(long a, long b, kotlin.jvm.functions.Function0<? extends T> block);
-    method @kotlin.PublishedApi internal static inline <T> T! checkArithmetic-wj_tM-0(long a, long b, long c, kotlin.jvm.functions.Function0<? extends T> block);
+    method @kotlin.PublishedApi internal static void checkArithmetic--R2X_6o(long a);
+    method @kotlin.PublishedApi internal static void checkArithmetic-8E83U4Q(long a, long b);
+    method @kotlin.PublishedApi internal static void checkArithmetic-HxQ2Pkc(long a, long b, long c);
     method @androidx.compose.runtime.Stable public static inline long coerceAtLeast-8E83U4Q(long, long minimumValue);
     method @androidx.compose.runtime.Stable public static inline long coerceAtMost-8E83U4Q(long, long maximumValue);
     method @androidx.compose.runtime.Stable public static inline long coerceIn-HxQ2Pkc(long, long minimumValue, long maximumValue);
