@@ -517,15 +517,19 @@ private fun Modifier.dragPositionGestureFilter(
             onStart = {
                 tracker.init(it)
                 onPress(it)
-            }, onStop = {
+            },
+            onStop = {
                 onRelease(tracker.getPosition())
-            })
-        .dragGestureFilter(dragObserver = object :
-            DragObserver {
-            override fun onDrag(dragDistance: Offset): Offset {
-                tracker.onDrag(dragDistance)
-                return Offset.Zero
             }
-        })
+        )
+        .dragGestureFilter(
+            dragObserver = object :
+                DragObserver {
+                override fun onDrag(dragDistance: Offset): Offset {
+                    tracker.onDrag(dragDistance)
+                    return Offset.Zero
+                }
+            }
+        )
         .longPressDragGestureFilter(longPressDragObserver)
 }

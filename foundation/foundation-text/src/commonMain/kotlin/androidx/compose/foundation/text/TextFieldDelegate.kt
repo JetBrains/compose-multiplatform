@@ -177,10 +177,12 @@ class TextFieldDelegate {
 
             val bbox = if (value.selection.max < value.text.length) {
                 textLayoutResult.getBoundingBox(
-                    offsetMap.originalToTransformed(value.selection.max))
+                    offsetMap.originalToTransformed(value.selection.max)
+                )
             } else if (value.selection.max != 0) {
                 textLayoutResult.getBoundingBox(
-                    offsetMap.originalToTransformed(value.selection.max) - 1)
+                    offsetMap.originalToTransformed(value.selection.max) - 1
+                )
             } else {
                 val lineHeightForEmptyText = computeLineHeightForEmptyText(
                     textDelegate.style,
@@ -239,11 +241,13 @@ class TextFieldDelegate {
             textInputService?.showSoftwareKeyboard(token)
             if (hasFocus) {
                 val offset = offsetMap.transformedToOriginal(
-                    textLayoutResult.getOffsetForPosition(position))
+                    textLayoutResult.getOffsetForPosition(position)
+                )
                 onEditCommand(
                     listOf(SetSelectionEditOp(offset, offset)),
                     editProcessor,
-                    onValueChange)
+                    onValueChange
+                )
             }
         }
 
@@ -272,7 +276,8 @@ class TextFieldDelegate {
                 keyboardType = keyboardType,
                 imeAction = imeAction,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
-                onImeActionPerformed = onImeActionPerformed) ?: INVALID_SESSION
+                onImeActionPerformed = onImeActionPerformed
+            ) ?: INVALID_SESSION
         }
 
         /**

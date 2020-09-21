@@ -111,12 +111,14 @@ class TextFieldDelegateTest {
 
         TextFieldDelegate.onEditCommand(ops, processor, onValueChange)
 
-        verify(onValueChange, times(1)).invoke(eq(
-            TextFieldValue(
-            text = dummyEditorState.text,
-            selection = dummyEditorState.selection
+        verify(onValueChange, times(1)).invoke(
+            eq(
+                TextFieldValue(
+                    text = dummyEditorState.text,
+                    selection = dummyEditorState.selection
+                )
+            )
         )
-        ))
     }
 
     @Test
@@ -140,17 +142,20 @@ class TextFieldDelegateTest {
             onValueChange,
             textInputService,
             dummyInputSessionToken,
-            true)
+            true
+        )
 
         assertEquals(1, captor.allValues.size)
         assertEquals(1, captor.firstValue.size)
         assertTrue(captor.firstValue[0] is SetSelectionEditOp)
-        verify(onValueChange, times(1)).invoke(eq(
-            TextFieldValue(
-                text = dummyEditorState.text,
-                selection = dummyEditorState.selection
+        verify(onValueChange, times(1)).invoke(
+            eq(
+                TextFieldValue(
+                    text = dummyEditorState.text,
+                    selection = dummyEditorState.selection
+                )
             )
-        ))
+        )
         verify(textInputService).showSoftwareKeyboard(eq(dummyInputSessionToken))
     }
 
@@ -169,7 +174,8 @@ class TextFieldDelegateTest {
             onValueChange,
             textInputService,
             dummyInputSessionToken,
-            false)
+            false
+        )
 
         verify(onValueChange, never()).invoke(any())
         verify(textInputService).showSoftwareKeyboard(eq(dummyInputSessionToken))
@@ -178,14 +184,16 @@ class TextFieldDelegateTest {
     @Test
     fun on_focus() {
         val dummyEditorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        TextFieldDelegate.onFocus(textInputService, dummyEditorState, processor,
-            KeyboardType.Text, ImeAction.Unspecified, onValueChange, onEditorActionPerformed)
+        TextFieldDelegate.onFocus(
+            textInputService, dummyEditorState, processor,
+            KeyboardType.Text, ImeAction.Unspecified, onValueChange, onEditorActionPerformed
+        )
         verify(textInputService).startInput(
             eq(
                 TextFieldValue(
-                text = dummyEditorState.text,
-                selection = dummyEditorState.selection
-            )
+                    text = dummyEditorState.text,
+                    selection = dummyEditorState.selection
+                )
             ),
             eq(KeyboardType.Text),
             eq(ImeAction.Unspecified),
@@ -206,7 +214,8 @@ class TextFieldDelegateTest {
             dummyInputSessionToken,
             processor,
             true,
-            onValueChange)
+            onValueChange
+        )
 
         assertEquals(1, captor.allValues.size)
         assertEquals(1, captor.firstValue.size)
@@ -227,7 +236,8 @@ class TextFieldDelegateTest {
             dummyInputSessionToken,
             processor,
             false, // There is no next focused client. Hide the keyboard.
-            onValueChange)
+            onValueChange
+        )
 
         assertEquals(1, captor.allValues.size)
         assertEquals(1, captor.firstValue.size)
@@ -376,7 +386,8 @@ class TextFieldDelegateTest {
             onValueChange,
             textInputService,
             dummyInputSessionToken,
-            true)
+            true
+        )
 
         val cursorOffsetInTransformedText = offset / 2
         assertEquals(1, captor.allValues.size)
@@ -385,12 +396,14 @@ class TextFieldDelegateTest {
         val setSelectionEditOp = captor.firstValue[0] as SetSelectionEditOp
         assertEquals(cursorOffsetInTransformedText, setSelectionEditOp.start)
         assertEquals(cursorOffsetInTransformedText, setSelectionEditOp.end)
-        verify(onValueChange, times(1)).invoke(eq(
-            TextFieldValue(
-                text = dummyEditorState.text,
-                selection = dummyEditorState.selection
+        verify(onValueChange, times(1)).invoke(
+            eq(
+                TextFieldValue(
+                    text = dummyEditorState.text,
+                    selection = dummyEditorState.selection
+                )
             )
-        ))
+        )
     }
 
     @Test
