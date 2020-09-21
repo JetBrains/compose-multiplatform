@@ -166,7 +166,7 @@ private val phoneNumberFilter = object : VisualTransformation {
         val trimmed = if (text.text.length >= 10) text.text.substring(0..9) else text.text
         val filled = trimmed + "_".repeat(10 - trimmed.length)
         val res = "(" + filled.substring(0..2) + ") " + filled.substring(3..5) + "-" +
-                filled.substring(6..9)
+            filled.substring(6..9)
         return TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslater)
     }
 }
@@ -353,7 +353,7 @@ private fun CustomCursorTextField(cursor: @Composable () -> Unit) {
                     )
                 // Place the custom cursor aligned with center of the original cursor.
                 val cursorX = (cursorRect.left + cursorRect.right) / 2 -
-                        (cursorPlacable.width / 2)
+                    (cursorPlacable.width / 2)
                 cursorPlacable.placeRelative(cursorX.roundToInt(), cursorRect.top.roundToInt())
             }
         }

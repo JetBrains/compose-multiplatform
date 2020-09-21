@@ -193,7 +193,8 @@ class SelectionModeTest {
             SelectionMode.Vertical.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isFalse()
     }
@@ -207,7 +208,8 @@ class SelectionModeTest {
             SelectionMode.Vertical.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isTrue()
     }
@@ -221,7 +223,8 @@ class SelectionModeTest {
             SelectionMode.Vertical.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isFalse()
     }
@@ -235,7 +238,8 @@ class SelectionModeTest {
             SelectionMode.Vertical.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isTrue()
     }
@@ -249,7 +253,8 @@ class SelectionModeTest {
             SelectionMode.Horizontal.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isFalse()
     }
@@ -263,7 +268,8 @@ class SelectionModeTest {
             SelectionMode.Horizontal.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isTrue()
     }
@@ -277,7 +283,8 @@ class SelectionModeTest {
             SelectionMode.Horizontal.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isFalse()
     }
@@ -291,7 +298,8 @@ class SelectionModeTest {
             SelectionMode.Horizontal.areHandlesCrossed(
                 bounds = bounds,
                 start = start,
-                end = end)
+                end = end
+            )
 
         assertThat(result).isTrue()
     }
