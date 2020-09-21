@@ -91,9 +91,12 @@ class AndroidViewBindingTest {
             val density = Density(3f)
             val sizeIpx = with(density) { size.toIntPx() }
             Providers(DensityAmbient provides density) {
-                AndroidViewBinding(TestLayoutBinding::inflate, Modifier.size(size).onPositioned {
-                    Truth.assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
-                })
+                AndroidViewBinding(
+                    TestLayoutBinding::inflate,
+                    Modifier.size(size).onPositioned {
+                        Truth.assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                    }
+                )
             }
         }
         rule.waitForIdle()
