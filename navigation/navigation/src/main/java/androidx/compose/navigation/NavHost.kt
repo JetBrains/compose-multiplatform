@@ -49,9 +49,12 @@ fun NavHost(
     startDestination: Any,
     builder: NavGraphBuilder.() -> Unit
 ) {
-    NavHost(navController, remember (id, startDestination, builder) {
-        navController.createGraph(id, startDestination, builder)
-    })
+    NavHost(
+        navController,
+        remember (id, startDestination, builder) {
+            navController.createGraph(id, startDestination, builder)
+        }
+    )
 }
 
 /**
