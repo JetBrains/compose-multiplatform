@@ -43,19 +43,23 @@ fun BottomBarNavDemo() {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("Profile", "Dashboard", "Scrollable")
 
-    Scaffold(bottomBar = { BottomNavigation {
-        items.forEachIndexed { index, item ->
-            BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
-                label = { Text(item) },
-                selected = selectedItem == index,
-                onClick = {
-                    navController.navigate(item)
-                    selectedItem = index
+    Scaffold(
+        bottomBar = {
+            BottomNavigation {
+                items.forEachIndexed { index, item ->
+                    BottomNavigationItem(
+                        icon = { Icon(Icons.Filled.Favorite) },
+                        label = { Text(item) },
+                        selected = selectedItem == index,
+                        onClick = {
+                            navController.navigate(item)
+                            selectedItem = index
+                        }
+                    )
                 }
-            )
+            }
         }
-    } }) {
+    ) {
         NavHost(navController, startDestination = "Profile") {
             composable("Profile") { Profile() }
             composable("Dashboard") { Dashboard() }

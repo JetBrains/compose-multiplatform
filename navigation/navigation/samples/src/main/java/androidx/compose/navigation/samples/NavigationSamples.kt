@@ -91,9 +91,11 @@ fun Scrollable() {
 @Composable
 fun NavigateButton(screen: Screen) {
     val navController = AmbientNavController.current
-    Button(onClick = { navController.navigate(screen.title) },
+    Button(
+        onClick = { navController.navigate(screen.title) },
         backgroundColor = LightGray,
-        modifier = Modifier.fillMaxWidth()) {
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(text = "Navigate to " + screen.title)
     }
 }
