@@ -149,10 +149,13 @@ class DesktopPathTest : DesktopGraphicsTest() {
             relativeLineTo(0f, -8f)
         }
 
-        canvas.drawPath(path, redPaint.apply {
-            style = PaintingStyle.Stroke
-            strokeWidth = 2f
-        })
+        canvas.drawPath(
+            path,
+            redPaint.apply {
+                style = PaintingStyle.Stroke
+                strokeWidth = 2f
+            }
+        )
 
         screenshotRule.snap(surface)
     }
