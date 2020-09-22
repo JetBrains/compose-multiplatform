@@ -15,7 +15,7 @@ class ComposePlugin : Plugin<Project> {
         project.afterEvaluate {
             project.dependencies.add(
                     "kotlinCompilerPluginClasspath",
-                    "org.jetbrains.compose:compose-compiler:$composeVersion"
+                    "org.jetbrains.compose.compiler:compiler:$composeVersion"
             )
         }
 
