@@ -69,7 +69,7 @@ kotlin {
         }
 
         androidAndroidTest.dependencies {
-            implementation project(":compose:material:material:samples")
+            implementation project(":compose:material:material:material-samples")
             implementation project(":test-screenshot")
             implementation project(":ui:ui-test")
 
