@@ -171,14 +171,14 @@ class RoundRectTest {
     @Test
     fun testRoundRectWithRectAndSeparateRadii() {
         val roundRect1 = RoundRect(
-                Rect(10f, 15f, 20f, 25f),
-                Radius(1f, 2f),
-                Radius(3f, 4f),
-                Radius(5f, 6f),
-                Radius(7f, 8f)
-            )
+            Rect(10f, 15f, 20f, 25f),
+            Radius(1f, 2f),
+            Radius(3f, 4f),
+            Radius(5f, 6f),
+            Radius(7f, 8f)
+        )
         val roundRect2 = RoundRect(
-                10f,
+            10f,
             15f,
             20f,
             25f,

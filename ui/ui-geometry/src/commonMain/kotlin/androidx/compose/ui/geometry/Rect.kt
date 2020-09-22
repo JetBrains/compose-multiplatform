@@ -86,17 +86,17 @@ data class Rect(
     @Stable
     val isInfinite: Boolean
         get() = left >= Float.POSITIVE_INFINITY ||
-                top >= Float.POSITIVE_INFINITY ||
-                right >= Float.POSITIVE_INFINITY ||
-                bottom >= Float.POSITIVE_INFINITY
+            top >= Float.POSITIVE_INFINITY ||
+            right >= Float.POSITIVE_INFINITY ||
+            bottom >= Float.POSITIVE_INFINITY
 
     /** Whether all coordinates of this rectangle are finite. */
     @Stable
     val isFinite: Boolean
         get() = left.isFinite() &&
-                top.isFinite() &&
-                right.isFinite() &&
-                bottom.isFinite()
+            top.isFinite() &&
+            right.isFinite() &&
+            bottom.isFinite()
 
     /**
      * Whether this rectangle encloses a non-zero area. Negative areas are
@@ -281,10 +281,10 @@ data class Rect(
     }
 
     override fun toString() = "Rect.fromLTRB(" +
-            "${left.toStringAsFixed(1)}, " +
-            "${top.toStringAsFixed(1)}, " +
-            "${right.toStringAsFixed(1)}, " +
-            "${bottom.toStringAsFixed(1)})"
+        "${left.toStringAsFixed(1)}, " +
+        "${top.toStringAsFixed(1)}, " +
+        "${right.toStringAsFixed(1)}, " +
+        "${bottom.toStringAsFixed(1)})"
 }
 
 /**
