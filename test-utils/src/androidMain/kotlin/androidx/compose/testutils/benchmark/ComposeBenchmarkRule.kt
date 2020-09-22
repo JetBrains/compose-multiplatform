@@ -45,7 +45,8 @@ class ComposeBenchmarkRule(
 
     override fun apply(base: Statement, description: Description?): Statement {
         val statement = benchmarkRule.apply(
-            activityTestRule.apply(base, description), description!!)
+            activityTestRule.apply(base, description), description!!
+        )
         if (!enableTransitions) {
             return disableTransitionsRule.apply(statement, description)
         }

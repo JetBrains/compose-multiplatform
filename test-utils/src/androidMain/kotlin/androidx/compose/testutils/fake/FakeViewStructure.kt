@@ -125,14 +125,14 @@ data class FakeViewStructure(
     }
 
     override fun equals(other: Any?) = other is FakeViewStructure &&
-            other.virtualId == virtualId &&
-            other.packageName == packageName &&
-            other.typeName == typeName &&
-            other.entryName == entryName &&
-            other.autofillType == autofillType &&
-            other.autofillHints.contentEquals(autofillHints) &&
-            other.bounds.contentEquals(bounds) &&
-            other.children == children
+        other.virtualId == virtualId &&
+        other.packageName == packageName &&
+        other.typeName == typeName &&
+        other.entryName == entryName &&
+        other.autofillType == autofillType &&
+        other.autofillHints.contentEquals(autofillHints) &&
+        other.bounds.contentEquals(bounds) &&
+        other.children == children
 
     override fun hashCode() = super.hashCode()
 
@@ -224,7 +224,8 @@ data class FakeViewStructure(
 private fun Rect?.contentEquals(other: Rect?) = when {
     (other == null && this == null) -> true
     (other == null || this == null) -> false
-    else -> other.left == left &&
+    else ->
+        other.left == left &&
             other.right == right &&
             other.bottom == bottom &&
             other.top == top
