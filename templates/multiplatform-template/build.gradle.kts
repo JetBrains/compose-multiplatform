@@ -2,6 +2,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven("https://packages.jetbrains.team/maven/p/ui/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
