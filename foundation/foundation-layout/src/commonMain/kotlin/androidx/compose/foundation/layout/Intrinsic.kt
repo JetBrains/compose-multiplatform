@@ -182,8 +182,10 @@ private interface PreferredIntrinsicSizeModifier : LayoutModifier {
  * Layout composable that forces its child to be as wide as its min intrinsic width.
  * If incoming constraints do not allow this, the closest possible width will be used.
  */
-@Deprecated("This component is deprecated. " +
-        "Please use the preferredWidth(IntrinsicSize.Min) modifier instead.")
+@Deprecated(
+    "This component is deprecated. " +
+        "Please use the preferredWidth(IntrinsicSize.Min) modifier instead."
+)
 @Composable
 fun MinIntrinsicWidth(children: @Composable () -> Unit) {
     Layout(
@@ -216,8 +218,10 @@ fun MinIntrinsicWidth(children: @Composable () -> Unit) {
  * Layout composable that forces its child to be as tall as its min intrinsic height.
  * If incoming constraints do not allow this, the closest possible height will be used.
  */
-@Deprecated("This component is deprecated. " +
-        "Please use the preferredHeight(IntrinsicSize.Min) modifier instead.")
+@Deprecated(
+    "This component is deprecated. " +
+        "Please use the preferredHeight(IntrinsicSize.Min) modifier instead."
+)
 @Composable
 fun MinIntrinsicHeight(children: @Composable () -> Unit) {
     Layout(
@@ -250,8 +254,10 @@ fun MinIntrinsicHeight(children: @Composable () -> Unit) {
  * Layout composable that forces its child to be as wide as its max intrinsic width.
  * If incoming constraints do not allow this, the closest possible width will be used.
  */
-@Deprecated("This component is deprecated. " +
-        "Please use the preferredWidth(IntrinsicSize.Max) modifier instead.")
+@Deprecated(
+    "This component is deprecated. " +
+        "Please use the preferredWidth(IntrinsicSize.Max) modifier instead."
+)
 @Composable
 fun MaxIntrinsicWidth(children: @Composable () -> Unit) {
     Layout(
@@ -284,8 +290,10 @@ fun MaxIntrinsicWidth(children: @Composable () -> Unit) {
  * Layout composable that forces its child to be as tall as its max intrinsic height.
  * If incoming constraints do not allow this, the closest possible height will be used.
  */
-@Deprecated("This component is deprecated. " +
-        "Please use the preferredHeight(IntrinsicSize.Max) modifier instead.")
+@Deprecated(
+    "This component is deprecated. " +
+        "Please use the preferredHeight(IntrinsicSize.Max) modifier instead."
+)
 @Composable
 fun MaxIntrinsicHeight(children: @Composable () -> Unit) {
     Layout(

@@ -136,22 +136,27 @@ private fun testText() {
 @Composable
 private fun testSiblings() {
     Column {
-        Box(boxSize.background(color = Color.Red).alignWithSiblings { p -> p.width }
+        Box(
+            boxSize.background(color = Color.Red).alignWithSiblings { p -> p.width }
         ) {}
-        Box(boxSize.background(color = Color.Green).alignWithSiblings { p -> p.width / 2 }
+        Box(
+            boxSize.background(color = Color.Green).alignWithSiblings { p -> p.width / 2 }
         ) {}
-        Box(boxSize.background(color = Color.Blue).alignWithSiblings { p -> p.width / 4 }
+        Box(
+            boxSize.background(color = Color.Blue).alignWithSiblings { p -> p.width / 4 }
         ) {}
     }
 }
 
 @Composable
 private fun CustomLayout(rtlSupport: Boolean) {
-    Layout(children = @Composable {
-        Box(boxSize.background(color = Color.Red)) {}
-        Box(boxSize.background(color = Color.Green)) {}
-        Box(boxSize.background(color = Color.Blue)) {}
-    }) { measurables, constraints ->
+    Layout(
+        children = @Composable {
+            Box(boxSize.background(color = Color.Red)) {}
+            Box(boxSize.background(color = Color.Green)) {}
+            Box(boxSize.background(color = Color.Blue)) {}
+        }
+    ) { measurables, constraints ->
         val p = measurables.map { e ->
             e.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }

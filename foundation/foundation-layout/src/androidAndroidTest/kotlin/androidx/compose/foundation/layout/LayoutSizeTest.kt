@@ -274,7 +274,8 @@ class LayoutSizeTest : LayoutTest() {
                                 positionedLatch.countDown()
                             }
                     ) {
-                        Container(expanded = true,
+                        Container(
+                            expanded = true,
                             modifier = Modifier.saveLayoutInfo(
                                 size = childSize,
                                 position = childPosition,
@@ -305,14 +306,18 @@ class LayoutSizeTest : LayoutTest() {
             Box {
                 Row {
                     Container(Modifier.preferredWidthIn(max = Dp.Infinity)) {
-                        Container(width = sizeDp, height = sizeDp,
-                            modifier = Modifier.saveLayoutInfo(size[0], position[0],
-                                positionedLatch)
+                        Container(
+                            width = sizeDp, height = sizeDp,
+                            modifier = Modifier.saveLayoutInfo(
+                                size[0], position[0],
+                                positionedLatch
+                            )
                         ) {
                         }
                     }
                     Container(Modifier.preferredHeightIn(max = Dp.Infinity)) {
-                        Container(width = sizeDp, height = sizeDp,
+                        Container(
+                            width = sizeDp, height = sizeDp,
                             modifier = Modifier.saveLayoutInfo(
                                 size[1],
                                 position[1],
@@ -366,10 +371,11 @@ class LayoutSizeTest : LayoutTest() {
         val boxSize = Ref<IntSize>()
         val boxPosition = Ref<Offset>()
         show {
-            Box(Modifier.wrapContentSize(Alignment.TopStart)
-                .size(sizeDp * 2)
-                .size(sizeDp)
-                .saveLayoutInfo(boxSize, boxPosition, positionedLatch)
+            Box(
+                Modifier.wrapContentSize(Alignment.TopStart)
+                    .size(sizeDp * 2)
+                    .size(sizeDp)
+                    .saveLayoutInfo(boxSize, boxPosition, positionedLatch)
             )
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
@@ -378,7 +384,8 @@ class LayoutSizeTest : LayoutTest() {
         assertEquals(
             Offset(
                 (sizeIpx / 2).toFloat(),
-                (sizeIpx / 2).toFloat()),
+                (sizeIpx / 2).toFloat()
+            ),
             boxPosition.value
         )
     }
@@ -392,10 +399,11 @@ class LayoutSizeTest : LayoutTest() {
         val boxSize = Ref<IntSize>()
         val boxPosition = Ref<Offset>()
         show {
-            Box(Modifier.wrapContentSize(Alignment.TopStart)
-                .size(sizeDp)
-                .size(sizeDp * 2)
-                .saveLayoutInfo(boxSize, boxPosition, positionedLatch)
+            Box(
+                Modifier.wrapContentSize(Alignment.TopStart)
+                    .size(sizeDp)
+                    .size(sizeDp * 2)
+                    .saveLayoutInfo(boxSize, boxPosition, positionedLatch)
             )
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
@@ -636,11 +644,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testMinWidthModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredWidthIn(min = 10.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredWidthIn(min = 10.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(10, minIntrinsicWidth(0))
             assertEquals(10, minIntrinsicWidth(5))
@@ -666,11 +676,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testMaxWidthModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredWidthIn(max = 20.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredWidthIn(max = 20.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(0, minIntrinsicWidth(0))
             assertEquals(15, minIntrinsicWidth(15))
@@ -696,11 +708,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testMinHeightModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredHeightIn(min = 30.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredHeightIn(min = 30.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(0, minIntrinsicWidth(0))
             assertEquals(15, minIntrinsicWidth(15))
@@ -726,11 +740,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testMaxHeightModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredHeightIn(max = 40.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredHeightIn(max = 40.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(0, minIntrinsicWidth(0))
             assertEquals(15, minIntrinsicWidth(15))
@@ -756,11 +772,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testWidthModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredWidth(10.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredWidth(10.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(10, minIntrinsicWidth(0))
             assertEquals(10, minIntrinsicWidth(10))
@@ -786,11 +804,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testHeightModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredHeight(10.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredHeight(10.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(0, minIntrinsicWidth(0))
             assertEquals(15, minIntrinsicWidth(15))
@@ -816,18 +836,20 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testWidthHeightModifiers_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(
-                Modifier.preferredSizeIn(
-                    minWidth = 10.toDp(),
-                    maxWidth = 20.toDp(),
-                    minHeight = 30.toDp(),
-                    maxHeight = 40.toDp()
-                )
-            ) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(
+                    Modifier.preferredSizeIn(
+                        minWidth = 10.toDp(),
+                        maxWidth = 20.toDp(),
+                        minHeight = 30.toDp(),
+                        maxHeight = 40.toDp()
+                    )
+                ) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(10, minIntrinsicWidth(0))
             assertEquals(15, minIntrinsicWidth(15))
@@ -853,11 +875,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testMinSizeModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredSizeIn(minWidth = 20.toDp(), minHeight = 30.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredSizeIn(minWidth = 20.toDp(), minHeight = 30.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(20, minIntrinsicWidth(0))
             assertEquals(20, minIntrinsicWidth(10))
@@ -883,11 +907,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testMaxSizeModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredSizeIn(maxWidth = 40.toDp(), maxHeight = 50.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredSizeIn(maxWidth = 40.toDp(), maxHeight = 50.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(0, minIntrinsicWidth(0))
             assertEquals(15, minIntrinsicWidth(15))
@@ -913,11 +939,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testPreferredSizeModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.preferredSize(40.toDp(), 50.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.preferredSize(40.toDp(), 50.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(40, minIntrinsicWidth(0))
             assertEquals(40, minIntrinsicWidth(35))
@@ -1058,11 +1086,13 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testDefaultMinSizeConstraintsModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.defaultMinSizeConstraints(40.toDp(), 50.toDp())) {
-                Container(Modifier.aspectRatio(1f)) { }
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.defaultMinSizeConstraints(40.toDp(), 50.toDp())) {
+                    Container(Modifier.aspectRatio(1f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, _, _ ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, _, _ ->
             // Min width.
             assertEquals(40, minIntrinsicWidth(0))
             assertEquals(40, minIntrinsicWidth(35))
@@ -1223,11 +1253,14 @@ class LayoutSizeTest : LayoutTest() {
 
     private fun verifyIntrinsicMeasurements(expandedModifier: Modifier) = with(density) {
         // intrinsic measurements do not change with the ExpandedModifier
-        testIntrinsics(@Composable {
-            Container(
-                expandedModifier.then(Modifier.aspectRatio(2f)),
-                width = 30.toDp(), height = 40.toDp()) { }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        testIntrinsics(
+            @Composable {
+                Container(
+                    expandedModifier.then(Modifier.aspectRatio(2f)),
+                    width = 30.toDp(), height = 40.toDp()
+                ) { }
+            }
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Width
             assertEquals(40, minIntrinsicWidth(20))
             assertEquals(30, minIntrinsicWidth(Constraints.Infinity))

@@ -67,7 +67,7 @@ private data class AlignmentLineOffset(
     init {
         require(
             (before.value >= 0f || before == Dp.Unspecified) &&
-                    (after.value >= 0f || after == Dp.Unspecified)
+                (after.value >= 0f || after == Dp.Unspecified)
         ) {
             "Padding from alignment line must be a non-negative number"
         }

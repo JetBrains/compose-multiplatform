@@ -179,13 +179,15 @@ internal fun rowColumnMeasureBlocks(
                     afterCrossAxisAlignmentLine = max(
                         afterCrossAxisAlignmentLine,
                         placeable.crossAxisSize() -
-                                (alignmentLinePosition.let {
+                            (
+                                alignmentLinePosition.let {
                                     if (it != AlignmentLine.Unspecified) {
                                         it
                                     } else {
                                         placeable.crossAxisSize()
                                     }
-                                })
+                                }
+                                )
                     )
                 }
             }
