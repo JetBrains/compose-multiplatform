@@ -201,6 +201,13 @@ object SemanticsActions {
     val OnClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnClick")
 
     /**
+     * Action to be performed when the node is long clicked.
+     *
+     * @see SemanticsPropertyReceiver.onLongClick
+     */
+    val OnLongClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnLongClick")
+
+    /**
      * Action to scroll to a specified position.
      *
      * @see SemanticsPropertyReceiver.ScrollBy
@@ -479,6 +486,16 @@ fun SemanticsPropertyReceiver.getTextLayoutResult(
  */
 fun SemanticsPropertyReceiver.onClick(label: String? = null, action: () -> Boolean) {
     this[SemanticsActions.OnClick] = AccessibilityAction(label, action)
+}
+
+/**
+ * This function adds the [SemanticsActions.OnLongClick] to the [SemanticsPropertyReceiver].
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.OnLongClick] is called.
+ */
+fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: () -> Boolean) {
+    this[SemanticsActions.OnLongClick] = AccessibilityAction(label, action)
 }
 
 /**

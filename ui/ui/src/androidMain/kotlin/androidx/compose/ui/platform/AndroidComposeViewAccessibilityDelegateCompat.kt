@@ -240,6 +240,16 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK
             )
         }
+        info.isLongClickable = false
+        semanticsNode.config.getOrNull(SemanticsActions.OnLongClick)?.let {
+            info.isLongClickable = true
+            info.addAction(
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_LONG_CLICK,
+                    it.label
+                )
+            )
+        }
         if (semanticsNode.config.contains(SemanticsActions.SetProgress)) {
             info.addAction(
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SET_PROGRESS
@@ -616,6 +626,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             AccessibilityNodeInfoCompat.ACTION_CLICK -> {
                 return if (node.config.contains(SemanticsActions.OnClick)) {
                     node.config[SemanticsActions.OnClick].action()
+                } else {
+                    false
+                }
+            }
+            AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
+                return if (node.config.contains(SemanticsActions.OnLongClick)) {
+                    node.config[SemanticsActions.OnLongClick].action()
                 } else {
                     false
                 }
