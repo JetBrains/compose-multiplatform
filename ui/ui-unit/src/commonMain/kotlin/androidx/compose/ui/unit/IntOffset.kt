@@ -122,8 +122,13 @@ inline class IntOffset(
     companion object {
         val Zero = IntOffset(0, 0)
 
-        @Deprecated("Use IntOffset.Zero instead", ReplaceWith("Zero",
-            "androidx.compose.ui.unit.IntOffset"))
+        @Deprecated(
+            "Use IntOffset.Zero instead",
+            ReplaceWith(
+                "Zero",
+                "androidx.compose.ui.unit.IntOffset"
+            )
+        )
         val Origin = Zero
     }
 }
