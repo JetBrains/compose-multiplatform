@@ -45,7 +45,7 @@ class SelectionManagerDragTest {
     private val containerLayoutCoordinates = mock<LayoutCoordinates> {
         on { isAttached } doReturn true
         on { childToLocal(child = any(), childLocal = Offset(any())) } doAnswer
-                childToLocal_result
+            childToLocal_result
     }
 
     private val startSelectable = mock<Selectable> {
@@ -136,7 +136,7 @@ class SelectionManagerDragTest {
 
     @Test
     fun handleDragObserver_onDrag_startHandle_reuse_endHandle_calls_getSelection_change_selection
-                () {
+    () {
         val dragDistance = Offset(100f, 100f)
         selectionManager.handleDragObserver(isStartHandle = true).onStart(Offset.Zero)
 
@@ -163,7 +163,7 @@ class SelectionManagerDragTest {
 
     @Test
     fun handleDragObserver_onDrag_endHandle_resue_startHandle_calls_getSelection_change_selection
-                () {
+    () {
         val dragDistance = Offset(100f, 100f)
         selectionManager.handleDragObserver(isStartHandle = false).onStart(Offset.Zero)
 

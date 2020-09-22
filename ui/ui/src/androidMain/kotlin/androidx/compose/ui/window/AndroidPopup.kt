@@ -92,16 +92,19 @@ internal actual fun ActualPopup(
     // TODO(soboleva): Look at module arrangement so that Box can be
     // used instead of this custom Layout
     // Get the parent's global position, size and layout direction
-    Layout(children = emptyContent(), modifier = Modifier.onPositioned { childCoordinates ->
-        val coordinates = childCoordinates.parentCoordinates!!
-        // Get the global position of the parent
-        val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
-        val layoutSize = coordinates.size
+    Layout(
+        children = emptyContent(),
+        modifier = Modifier.onPositioned { childCoordinates ->
+            val coordinates = childCoordinates.parentCoordinates!!
+            // Get the global position of the parent
+            val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
+            val layoutSize = coordinates.size
 
-        popupLayout.parentGlobalBounds = IntBounds(layoutPosition, layoutSize)
-        // Update the popup's position
-        popupLayout.updatePosition()
-    }) { _, _ ->
+            popupLayout.parentGlobalBounds = IntBounds(layoutPosition, layoutSize)
+            // Update the popup's position
+            popupLayout.updatePosition()
+        }
+    ) { _, _ ->
         popupLayout.parentLayoutDirection = layoutDirection
         layout(0, 0) {}
     }
@@ -112,13 +115,16 @@ internal actual fun ActualPopup(
     val parentComposition = compositionReference()
     onCommit {
         composition = popupLayout.setContent(recomposer, parentComposition) {
-            SimpleStack(Modifier.semantics { this.popup() }.onPositioned {
-                // Get the size of the content
-                popupLayout.popupContentSize = it.size
+            SimpleStack(
+                Modifier.semantics { this.popup() }.onPositioned {
+                    // Get the size of the content
+                    popupLayout.popupContentSize = it.size
 
-                // Update the popup's position
-                popupLayout.updatePosition()
-            }, children = children)
+                    // Update the popup's position
+                    popupLayout.updatePosition()
+                },
+                children = children
+            )
         }
     }
 
@@ -315,13 +321,15 @@ private class PopupLayout(
             gravity = Gravity.START or Gravity.TOP
 
             // Flags specific to android.widget.PopupWindow
-            flags = flags and (WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES or
+            flags = flags and (
+                WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
                     WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH or
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
                     WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
-                    WindowManager.LayoutParams.FLAG_SPLIT_TOUCH).inv()
+                    WindowManager.LayoutParams.FLAG_SPLIT_TOUCH
+                ).inv()
 
             type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL
 

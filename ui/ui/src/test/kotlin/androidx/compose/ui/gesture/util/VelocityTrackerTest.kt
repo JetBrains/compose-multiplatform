@@ -74,7 +74,8 @@ class VelocityTrackerTest {
                 checkVelocity(
                     tracker.calculateVelocity(),
                     649.48932102748f,
-                    3890.30505589076f)
+                    3890.30505589076f
+                )
                 tracker.resetTracking()
             }
         }

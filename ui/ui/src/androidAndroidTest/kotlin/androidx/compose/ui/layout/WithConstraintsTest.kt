@@ -108,14 +108,20 @@ class WithConstraintsTest {
                         }
                         WithConstraints(drawModifier) {
                             paddedConstraints.value = constraints
-                            Layout(measureBlock = { _, childConstraints ->
-                                firstChildConstraints.value = childConstraints
-                                layout(size, size) { }
-                            }, children = { })
-                            Layout(measureBlock = { _, chilConstraints ->
-                                secondChildConstraints.value = chilConstraints
-                                layout(size, size) { }
-                            }, children = { })
+                            Layout(
+                                measureBlock = { _, childConstraints ->
+                                    firstChildConstraints.value = childConstraints
+                                    layout(size, size) { }
+                                },
+                                children = { }
+                            )
+                            Layout(
+                                measureBlock = { _, chilConstraints ->
+                                    secondChildConstraints.value = chilConstraints
+                                    layout(size, size) { }
+                                },
+                                children = { }
+                            )
                         }
                     }
                 }
@@ -148,18 +154,21 @@ class WithConstraintsTest {
                     val outerModifier = Modifier.drawBehind {
                         drawRect(model.outerColor)
                     }
-                    Layout(children = {
-                        val innerModifier = Modifier.drawBehind {
-                            drawLatch.countDown()
-                            drawRect(model.innerColor)
-                        }
-                        Layout(
-                            children = {},
-                            modifier = innerModifier
-                        ) { measurables, constraints2 ->
-                            layout(model.size, model.size) {}
-                        }
-                    }, modifier = outerModifier) { measurables, constraints3 ->
+                    Layout(
+                        children = {
+                            val innerModifier = Modifier.drawBehind {
+                                drawLatch.countDown()
+                                drawRect(model.innerColor)
+                            }
+                            Layout(
+                                children = {},
+                                modifier = innerModifier
+                            ) { measurables, constraints2 ->
+                                layout(model.size, model.size) {}
+                            }
+                        },
+                        modifier = outerModifier
+                    ) { measurables, constraints3 ->
                         val placeable = measurables[0].measure(
                             Constraints.fixed(
                                 model.size,
@@ -323,15 +332,18 @@ class WithConstraintsTest {
         rule.runOnUiThreadIR {
             activity.setContent {
                 Container(width = 200, height = 200) {
-                    WithConstraints(modifier = Modifier.onPositioned {
-                        // OnPositioned can be fired multiple times with the same value
-                        // for example when requestLayout() was triggered on ComposeView.
-                        // if we called twice, let's make sure we got the correct values.
-                        assertTrue(withConstSize == null || withConstSize == it.size)
-                        withConstSize = it.size
-                        withConstLatch.countDown()
-                    }) {
-                        Container(width = size.value, height = size.value,
+                    WithConstraints(
+                        modifier = Modifier.onPositioned {
+                            // OnPositioned can be fired multiple times with the same value
+                            // for example when requestLayout() was triggered on ComposeView.
+                            // if we called twice, let's make sure we got the correct values.
+                            assertTrue(withConstSize == null || withConstSize == it.size)
+                            withConstSize = it.size
+                            withConstLatch.countDown()
+                        }
+                    ) {
+                        Container(
+                            width = size.value, height = size.value,
                             modifier = Modifier.onPositioned {
                                 // OnPositioned can be fired multiple times with the same value
                                 // for example when requestLayout() was triggered on ComposeView.
@@ -339,7 +351,8 @@ class WithConstraintsTest {
                                 assertTrue(childSize == null || childSize == it.size)
                                 childSize = it.size
                                 childLatch.countDown()
-                            }) {
+                            }
+                        ) {
                         }
                     }
                 }
@@ -529,20 +542,22 @@ class WithConstraintsTest {
                 assertEquals(1, outerComposeLatch.count)
                 outerComposeLatch.countDown()
                 val children = @Composable {
-                    Layout(children = {
-                        WithConstraints {
-                            assertEquals(1, innerComposeLatch.count)
-                            innerComposeLatch.countDown()
-                            Layout(children = emptyContent()) { _, _ ->
-                                assertEquals(1, innerMeasureLatch.count)
-                                innerMeasureLatch.countDown()
-                                layout(100, 100) {
-                                    assertEquals(1, innerLayoutLatch.count)
-                                    innerLayoutLatch.countDown()
+                    Layout(
+                        children = {
+                            WithConstraints {
+                                assertEquals(1, innerComposeLatch.count)
+                                innerComposeLatch.countDown()
+                                Layout(children = emptyContent()) { _, _ ->
+                                    assertEquals(1, innerMeasureLatch.count)
+                                    innerMeasureLatch.countDown()
+                                    layout(100, 100) {
+                                        assertEquals(1, innerLayoutLatch.count)
+                                        innerLayoutLatch.countDown()
+                                    }
                                 }
                             }
                         }
-                    }) { measurables, constraints ->
+                    ) { measurables, constraints ->
                         assertEquals(1, outerMeasureLatch.count)
                         outerMeasureLatch.countDown()
                         layout(100, 100) {
@@ -608,24 +623,27 @@ class WithConstraintsTest {
         val zeroConstraints = Constraints.fixed(0, 0)
         rule.runOnUiThreadIR {
             activity.setContent {
-                Layout(measureBlock = { measurables, _ ->
-                    layout(0, 0) {
-                        // there was a bug when the child of WithConstraints wasn't marking
-                        // needsRemeasure and it was only measured because the constraints
-                        // have been changed. to verify needRemeasure is true we measure the
-                        // children with the default zero constraints so it will be equals to the
-                        // initial constraints
-                        measurables.first().measure(zeroConstraints).place(0, 0)
-                    }
-                }, children = {
-                    WithConstraints {
-                        compositionLatch.countDown()
-                        Layout(children = {}) { _, _ ->
-                            childMeasureLatch.countDown()
-                            layout(0, 0) {}
+                Layout(
+                    measureBlock = { measurables, _ ->
+                        layout(0, 0) {
+                            // there was a bug when the child of WithConstraints wasn't marking
+                            // needsRemeasure and it was only measured because the constraints
+                            // have been changed. to verify needRemeasure is true we measure the
+                            // children with the default zero constraints so it will be equals to the
+                            // initial constraints
+                            measurables.first().measure(zeroConstraints).place(0, 0)
+                        }
+                    },
+                    children = {
+                        WithConstraints {
+                            compositionLatch.countDown()
+                            Layout(children = {}) { _, _ ->
+                                childMeasureLatch.countDown()
+                                layout(0, 0) {}
+                            }
                         }
                     }
-                })
+                )
             }
         }
 
@@ -715,11 +733,13 @@ class WithConstraintsTest {
 
 @Composable
 private fun TestLayout(@Suppress("UNUSED_PARAMETER") someInput: Int) {
-    Layout(children = {
-        WithConstraints {
-            NeedsOtherMeasurementComposable(10)
+    Layout(
+        children = {
+            WithConstraints {
+                NeedsOtherMeasurementComposable(10)
+            }
         }
-    }) { measurables, constraints ->
+    ) { measurables, constraints ->
         val withConstraintsPlaceable = measurables[0].measure(constraints)
 
         layout(30, 30) {
@@ -772,17 +792,20 @@ fun ContainerChildrenAffectsParentSize(
     height: Int,
     children: @Composable () -> Unit
 ) {
-    Layout(children = children, measureBlock = remember<MeasureBlock>(width, height) {
-        { measurables, _ ->
-            val constraint = Constraints(maxWidth = width, maxHeight = height)
-            val placeables = measurables.map { it.measure(constraint) }
-            layout(width, height) {
-                placeables.forEach {
-                    it.place((width - width) / 2, (height - height) / 2)
+    Layout(
+        children = children,
+        measureBlock = remember<MeasureBlock>(width, height) {
+            { measurables, _ ->
+                val constraint = Constraints(maxWidth = width, maxHeight = height)
+                val placeables = measurables.map { it.measure(constraint) }
+                layout(width, height) {
+                    placeables.forEach {
+                        it.place((width - width) / 2, (height - height) / 2)
+                    }
                 }
             }
         }
-    })
+    )
 }
 
 @Composable

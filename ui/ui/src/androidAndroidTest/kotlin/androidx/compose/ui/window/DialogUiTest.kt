@@ -72,9 +72,11 @@ class DialogUiTest {
             val text = remember { mutableStateOf(textBeforeClick) }
 
             if (showDialog.value) {
-                Dialog(onDismissRequest = {
-                    showDialog.value = false
-                }) {
+                Dialog(
+                    onDismissRequest = {
+                        showDialog.value = false
+                    }
+                ) {
                     Text(
                         text = text.value,
                         modifier = Modifier.clickable {
@@ -102,9 +104,11 @@ class DialogUiTest {
             val showDialog = remember { mutableStateOf(true) }
 
             if (showDialog.value) {
-                Dialog(onDismissRequest = {
-                    showDialog.value = false
-                }) {
+                Dialog(
+                    onDismissRequest = {
+                        showDialog.value = false
+                    }
+                ) {
                     Text(defaultText)
                 }
             }
@@ -149,9 +153,11 @@ class DialogUiTest {
             val showDialog = remember { mutableStateOf(true) }
 
             if (showDialog.value) {
-                Dialog(onDismissRequest = {
-                    showDialog.value = false
-                }) {
+                Dialog(
+                    onDismissRequest = {
+                        showDialog.value = false
+                    }
+                ) {
                     Text(defaultText)
                 }
             }

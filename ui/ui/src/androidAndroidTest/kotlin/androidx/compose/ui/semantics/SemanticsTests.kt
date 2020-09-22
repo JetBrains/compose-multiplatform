@@ -86,8 +86,9 @@ class SemanticsTests {
         val grandchild2 = "grandchild2"
         val child2 = "grandchild2"
         rule.setContent {
-            SimpleTestLayout(Modifier.testTag(TestTag)
-                .semantics(mergeAllDescendants = true) { accessibilityLabel = root }
+            SimpleTestLayout(
+                Modifier.testTag(TestTag)
+                    .semantics(mergeAllDescendants = true) { accessibilityLabel = root }
             ) {
                 SimpleTestLayout(Modifier.semantics { accessibilityLabel = child1 }) {
                     SimpleTestLayout(Modifier.semantics { accessibilityLabel = grandchild1 }) { }
@@ -98,7 +99,8 @@ class SemanticsTests {
         }
 
         rule.onNodeWithTag(TestTag).assertLabelEquals(
-            "$root, $child1, $grandchild1, $grandchild2, $child2")
+            "$root, $child1, $grandchild1, $grandchild2, $child2"
+        )
     }
 
     @Test
@@ -194,8 +196,10 @@ class SemanticsTests {
         val afterLabel = "after"
         val isAfter = mutableStateOf(false)
         rule.setContent {
-            SimpleTestLayout(Modifier.testTag(TestTag).semantics {
-                accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel }
+            SimpleTestLayout(
+                Modifier.testTag(TestTag).semantics {
+                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                }
             ) {}
         }
 
@@ -214,8 +218,10 @@ class SemanticsTests {
 
         rule.setContent {
             SimpleTestLayout(Modifier.testTag("don't care")) {
-                SimpleTestLayout(Modifier.testTag(TestTag).semantics {
-                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel }
+                SimpleTestLayout(
+                    Modifier.testTag(TestTag).semantics {
+                        accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                    }
                 ) {}
             }
         }
@@ -236,8 +242,10 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout {
                 SimpleTestLayout {
-                    SimpleTestLayout(Modifier.testTag(TestTag).semantics {
-                        accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel }
+                    SimpleTestLayout(
+                        Modifier.testTag(TestTag).semantics {
+                            accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                        }
                     ) {}
                 }
             }
@@ -258,8 +266,10 @@ class SemanticsTests {
 
         rule.setContent {
             SimpleTestLayout(Modifier.testTag(TestTag).semantics(mergeAllDescendants = true) {}) {
-                SimpleTestLayout(Modifier.semantics {
-                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel }
+                SimpleTestLayout(
+                    Modifier.semantics {
+                        accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                    }
                 ) {}
             }
         }
@@ -297,8 +307,10 @@ class SemanticsTests {
         val isAfter = mutableStateOf(false)
 
         rule.setContent {
-            SimpleTestLayout(Modifier.testTag(TestTag).semantics {
-                accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel }
+            SimpleTestLayout(
+                Modifier.testTag(TestTag).semantics {
+                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                }
             ) {
                 SimpleTestLayout(Modifier.semantics { }) { }
                 SimpleTestLayout(Modifier.semantics { }) { }
@@ -326,13 +338,17 @@ class SemanticsTests {
         val isAfter = mutableStateOf(false)
 
         rule.setContent {
-            SimpleTestLayout(Modifier.testTag(TestTag).semantics {
-                accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
-                onClick(action = {
-                    if (isAfter.value) afterAction() else beforeAction()
-                    return@onClick true
-                })
-            }) {
+            SimpleTestLayout(
+                Modifier.testTag(TestTag).semantics {
+                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                    onClick(
+                        action = {
+                            if (isAfter.value) afterAction() else beforeAction()
+                            return@onClick true
+                        }
+                    )
+                }
+            ) {
                 SimpleTestLayout {
                     remember { nodeCount++ }
                 }

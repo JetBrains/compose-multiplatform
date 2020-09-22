@@ -90,7 +90,8 @@ fun loadFontResource(
         null
     } else if (!pendingFontFamily.canLoadSynchronously) {
         throw IllegalArgumentException(
-            "Only FontFamily that can be loaded synchronously can be used as a pendingFontFamily")
+            "Only FontFamily that can be loaded synchronously can be used as a pendingFontFamily"
+        )
     } else {
         synchronized(cacheLock) {
             syncLoadedTypefaces.getOrPut(pendingFontFamily) {
@@ -103,7 +104,8 @@ fun loadFontResource(
         null
     } else if (!failedFontFamily.canLoadSynchronously) {
         throw IllegalArgumentException(
-            "Only FontFamily that can be loaded synchronously can be used as a failedFontFamily")
+            "Only FontFamily that can be loaded synchronously can be used as a failedFontFamily"
+        )
     } else {
         synchronized(cacheLock) {
             syncLoadedTypefaces.getOrPut(failedFontFamily) {
@@ -145,7 +147,8 @@ fun loadFontResource(
         }
         return DeferredResource(
             pendingResource = pendingTypeface,
-            failedResource = failedTypeface).apply {
+            failedResource = failedTypeface
+        ).apply {
             loadCompleted(typeface)
         }
     } else {
@@ -154,7 +157,8 @@ fun loadFontResource(
             return DeferredResource(
                 state = LoadingState.FAILED,
                 pendingResource = pendingTypeface,
-                failedResource = failedTypeface)
+                failedResource = failedTypeface
+            )
         }
         val key = fontFamily.cacheKey(context)
         return loadResource(key, pendingTypeface, failedTypeface) {

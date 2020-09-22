@@ -134,9 +134,9 @@ internal class DesktopPlatformInput(val component: Component) : PlatformTextInpu
     private fun Char.isPrintable(): Boolean {
         val block = Character.UnicodeBlock.of(this)
         return (!Character.isISOControl(this)) &&
-                this != KeyEvent.CHAR_UNDEFINED &&
-                block != null &&
-                block != Character.UnicodeBlock.SPECIALS
+            this != KeyEvent.CHAR_UNDEFINED &&
+            block != null &&
+            block != Character.UnicodeBlock.SPECIALS
     }
 
     fun onKeyTyped(char: Char) {
@@ -223,7 +223,8 @@ internal class DesktopPlatformInput(val component: Component) : PlatformTextInpu
                         Rectangle(
                             it.right.toInt() + component.locationOnScreen.x,
                             it.bottom.toInt() + component.locationOnScreen.y,
-                            0, 0)
+                            0, 0
+                        )
                     }
 
                 override fun getCommittedText(

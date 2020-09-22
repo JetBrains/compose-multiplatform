@@ -39,7 +39,8 @@ import androidx.compose.ui.util.fastForEach
  *
  * @param commitExecutor The executor on which all `onCommit` calls will be made.
  */
-@Deprecated("Frames have been replaced by snapshots",
+@Deprecated(
+    "Frames have been replaced by snapshots",
     ReplaceWith(
         "SnapshotStateObserver",
         "androidx.compose.runtime.snapshots"

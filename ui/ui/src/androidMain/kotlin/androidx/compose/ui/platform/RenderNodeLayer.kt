@@ -122,7 +122,8 @@ internal class RenderNodeLayer(
                 renderNode.top,
                 renderNode.left + width,
                 renderNode.top + height
-            )) {
+            )
+        ) {
             outlineResolver.update(Size(width.toFloat(), height.toFloat()))
             renderNode.setOutline(outlineResolver.outline)
             invalidate()

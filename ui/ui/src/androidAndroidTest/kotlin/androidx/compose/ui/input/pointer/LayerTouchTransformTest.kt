@@ -97,20 +97,21 @@ class LayerTouchTransformTest {
                     modifier = Modifier.fillMaxSize().offset(offsetX, offsetY)
                 ) {
                     SimpleLayout(modifier = background.then(Modifier.preferredSize(containerDp))) {
-                        SimpleLayout(modifier = Modifier
-                            .drawLayer(
-                                translationX = 50.0f,
-                                translationY = 30.0f,
-                                rotationZ = 45.0f,
-                                scaleX = 2.0f,
-                                scaleY = 0.5f,
-                                transformOrigin = TransformOrigin(1.0f, 1.0f)
-                            ).drawBehind {
-                                drawRect(color)
-                            }
-                            .then(latchDrawModifier)
-                            .preferredSize(boxDp)
-                            .pressIndicatorGestureFilter(onStart, onStop, onStop)
+                        SimpleLayout(
+                            modifier = Modifier
+                                .drawLayer(
+                                    translationX = 50.0f,
+                                    translationY = 30.0f,
+                                    rotationZ = 45.0f,
+                                    scaleX = 2.0f,
+                                    scaleY = 0.5f,
+                                    transformOrigin = TransformOrigin(1.0f, 1.0f)
+                                ).drawBehind {
+                                    drawRect(color)
+                                }
+                                .then(latchDrawModifier)
+                                .preferredSize(boxDp)
+                                .pressIndicatorGestureFilter(onStart, onStop, onStop)
                         )
                     }
                 }

@@ -59,13 +59,16 @@ class TextInputServiceAndroidTest {
             KeyboardType.Text,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -76,14 +79,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -94,13 +100,16 @@ class TextInputServiceAndroidTest {
             KeyboardType.Number,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_NUMBER and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -111,13 +120,16 @@ class TextInputServiceAndroidTest {
             KeyboardType.Phone,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_PHONE and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -128,14 +140,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Uri,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((InputType.TYPE_TEXT_VARIATION_URI and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -146,14 +161,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Email,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -164,14 +182,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Password,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((InputType.TYPE_TEXT_VARIATION_PASSWORD and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -182,14 +203,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.NumberPassword,
             ImeAction.Unspecified,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_NUMBER and info.inputType) != 0)
             assertTrue((InputType.TYPE_NUMBER_VARIATION_PASSWORD and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_UNSPECIFIED)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_UNSPECIFIED
+            )
         }
     }
 
@@ -200,14 +224,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.NoAction,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_NONE)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_NONE
+            )
         }
     }
 
@@ -218,14 +245,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.Go,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_GO)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_GO
+            )
         }
     }
 
@@ -236,14 +266,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.Next,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_NEXT)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_NEXT
+            )
         }
     }
 
@@ -254,14 +287,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.Previous,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_PREVIOUS)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_PREVIOUS
+            )
         }
     }
 
@@ -272,14 +308,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.Search,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_SEARCH)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_SEARCH
+            )
         }
     }
 
@@ -290,14 +329,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.Send,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_SEND)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_SEND
+            )
         }
     }
 
@@ -308,14 +350,17 @@ class TextInputServiceAndroidTest {
             KeyboardType.Ascii,
             ImeAction.Done,
             onEditCommand = {},
-            onImeActionPerformed = {})
+            onImeActionPerformed = {}
+        )
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
             assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue((EditorInfo.IME_MASK_ACTION and info.imeOptions)
-                    == EditorInfo.IME_ACTION_DONE)
+            assertTrue(
+                (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                    == EditorInfo.IME_ACTION_DONE
+            )
         }
     }
 }

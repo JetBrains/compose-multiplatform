@@ -196,7 +196,8 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable),
+                selectable = selectable
+            ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
@@ -221,7 +222,8 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable),
+                selectable = selectable
+            ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
@@ -254,7 +256,8 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = startSelectable),
+                selectable = startSelectable
+            ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
@@ -264,7 +267,7 @@ class SelectionManagerTest {
         )
 
         val result = annotatedString.subSequence(startOffset, annotatedString.length) +
-                annotatedString + annotatedString.subSequence(0, endOffset)
+            annotatedString + annotatedString.subSequence(0, endOffset)
         assertThat(selectionManager.getSelectedText()).isEqualTo(result)
         verify(selectable, times(0)).getText()
         verify(startSelectable, times(1)).getText()
@@ -292,7 +295,8 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = startSelectable),
+                selectable = startSelectable
+            ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
@@ -302,7 +306,7 @@ class SelectionManagerTest {
         )
 
         val result = annotatedString.subSequence(endOffset, annotatedString.length) +
-                annotatedString + annotatedString.subSequence(0, startOffset)
+            annotatedString + annotatedString.subSequence(0, startOffset)
         assertThat(selectionManager.getSelectedText()).isEqualTo(result)
         verify(selectable, times(0)).getText()
         verify(startSelectable, times(1)).getText()
@@ -331,7 +335,8 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable),
+                selectable = selectable
+            ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
@@ -361,7 +366,8 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable),
+                selectable = selectable
+            ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,

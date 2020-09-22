@@ -74,7 +74,7 @@ private fun getStrokeLineJoin(id: Int, defValue: StrokeJoin = StrokeJoin.Miter):
 
 internal fun XmlPullParser.isAtEnd(): Boolean =
     eventType == XmlPullParser.END_DOCUMENT ||
-            (depth < 1 && eventType == XmlPullParser.END_TAG)
+        (depth < 1 && eventType == XmlPullParser.END_TAG)
 
 /**
  * @param nestedGroups The number of additionally nested VectorGroups to represent clip paths.

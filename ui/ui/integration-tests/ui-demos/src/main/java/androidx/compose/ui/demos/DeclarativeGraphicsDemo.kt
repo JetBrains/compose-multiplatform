@@ -35,10 +35,11 @@ fun DeclarativeGraphicsDemo() {
      * Demo that shows how to leverage DrawScope to draw 4 rectangular quadrants
      * inset by a given dimension with a diamond drawn within each of the quadrants
      */
-    Canvas(modifier =
-        Modifier.fillMaxSize()
-            .wrapContentSize(Alignment.Center)
-            .preferredSize(120.dp, 120.dp)
+    Canvas(
+        modifier =
+            Modifier.fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+                .preferredSize(120.dp, 120.dp)
     ) {
         drawRect(color = Color.Gray)
         // Inset content by 10 pixels on the left/right sides and 12 by the

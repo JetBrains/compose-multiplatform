@@ -79,7 +79,8 @@ class ScaleGestureFilterTest {
                             ) {
                                 setupLatch.countDown()
                             }
-                        }, children = emptyContent()
+                        },
+                        children = emptyContent()
                     )
                 }
             }

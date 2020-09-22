@@ -90,9 +90,11 @@ fun DragAndScaleGestureFilterDemo() {
 
     Column {
         Text("Demonstrates combining dragging with scaling.")
-        Text("Drag and scale around.  Play with how slop works for both dragging and scaling. Tap" +
+        Text(
+            "Drag and scale around.  Play with how slop works for both dragging and scaling. Tap" +
                 " on the box to flip the order of scaling and dragging.  The behavior is always " +
-                "the same because the 2 gesture filters are completely orthogonal.")
+                "the same because the 2 gesture filters are completely orthogonal."
+        )
         Box(
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)

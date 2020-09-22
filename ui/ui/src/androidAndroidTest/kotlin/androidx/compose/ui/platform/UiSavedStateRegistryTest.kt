@@ -138,9 +138,13 @@ class DisposableUiSavedStateRegistryTest {
         assertTrue(registry.canBeSaved(5.toShort()))
         assertTrue(registry.canBeSaved(Size(5, 5)))
         assertTrue(registry.canBeSaved(SizeF(5f, 5f)))
-        assertTrue(registry.canBeSaved(SparseArray<Parcelable>().apply {
-            put(5, CustomParcelable())
-        }))
+        assertTrue(
+            registry.canBeSaved(
+                SparseArray<Parcelable>().apply {
+                    put(5, CustomParcelable())
+                }
+            )
+        )
         assertTrue(registry.canBeSaved(arrayListOf("String")))
     }
 

@@ -232,10 +232,11 @@ class DesktopOwner(
         val inputFilters = mutableListOf<PointerInputFilter>()
         root.hitTest(position, inputFilters)
 
-        for (filter in inputFilters
-            .asReversed()
-            .asSequence()
-            .filterIsInstance<MouseScrollEventFilter>()
+        for (
+            filter in inputFilters
+                .asReversed()
+                .asSequence()
+                .filterIsInstance<MouseScrollEventFilter>()
         ) {
             val isConsumed = filter.onMouseScroll(event)
             if (isConsumed) break
@@ -261,10 +262,11 @@ class DesktopOwner(
         var onEnterConsumed = false
         var onExitConsumed = false
 
-        for (filter in newMoveFilters
-            .asReversed()
-            .asSequence()
-            .filterIsInstance<PointerMoveEventFilter>()
+        for (
+            filter in newMoveFilters
+                .asReversed()
+                .asSequence()
+                .filterIsInstance<PointerMoveEventFilter>()
         ) {
             if (!onMoveConsumed) {
                 val relative = position - filter.layoutCoordinates.globalBounds.topLeft

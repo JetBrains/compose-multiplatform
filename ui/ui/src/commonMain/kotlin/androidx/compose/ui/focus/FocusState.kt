@@ -20,7 +20,8 @@ package androidx.compose.ui.focus
  * Different states of the focus system. These are the states used by the Focus Nodes.
  *
  */
-@Deprecated("FocusState2 has been replaced by FocusState",
+@Deprecated(
+    "FocusState2 has been replaced by FocusState",
     ReplaceWith(
         "FocusState",
         "androidx.compose.ui.focus.FocusState"

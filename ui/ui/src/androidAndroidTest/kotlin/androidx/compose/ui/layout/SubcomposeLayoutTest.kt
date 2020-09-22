@@ -445,9 +445,11 @@ class SubcomposeLayoutTest {
             val density = Density(3f)
             val sizeIpx = with(density) { size.toIntPx() }
             Providers(DensityAmbient provides density) {
-                SubcomposeLayout<Unit>(Modifier.size(size).onPositioned {
-                    assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
-                }) { constraints ->
+                SubcomposeLayout<Unit>(
+                    Modifier.size(size).onPositioned {
+                        assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                    }
+                ) { constraints ->
                     layout(constraints.maxWidth, constraints.maxHeight) {}
                 }
             }

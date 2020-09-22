@@ -83,12 +83,14 @@ class DrawReorderingTest {
                     size = 30
                 ) {
                     FixedSize(
-                        10, PaddingModifier(10)
+                        10,
+                        PaddingModifier(10)
                             .zIndex(1f)
                             .background(Color.White)
                     )
                     FixedSize(
-                        30, Modifier.drawLayer()
+                        30,
+                        Modifier.drawLayer()
                             .background(Color.Red)
                             .drawLatchModifier()
                     )
@@ -112,12 +114,14 @@ class DrawReorderingTest {
                     size = 30
                 ) {
                     FixedSize(
-                        10, PaddingModifier(10)
+                        10,
+                        PaddingModifier(10)
                             .zIndex(1f)
                             .background(Color.White)
                     )
                     FixedSize(
-                        30, Modifier.background(Color.Red)
+                        30,
+                        Modifier.background(Color.Red)
                             .drawLatchModifier()
                     )
                 }
@@ -207,7 +211,8 @@ class DrawReorderingTest {
                     size = 30
                 ) {
                     FixedSize(
-                        10, PaddingModifier(10)
+                        10,
+                        PaddingModifier(10)
                             .zIndex(state.value)
                             .background(Color.Black)
                     )
@@ -487,13 +492,15 @@ class DrawReorderingTest {
                     size = 30
                 ) {
                     FixedSize(
-                        10, PaddingModifier(10)
+                        10,
+                        PaddingModifier(10)
                             .zIndex(3f)
                             .zIndex(1f)
                             .background(Color.White)
                     )
                     FixedSize(
-                        30, Modifier.zIndex(2f)
+                        30,
+                        Modifier.zIndex(2f)
                             .background(Color.Red)
                             .drawLatchModifier()
                     )
@@ -623,12 +630,14 @@ class DrawReorderingTest {
                     size = 30
                 ) {
                     FixedSize(
-                        10, PaddingModifier(10)
+                        10,
+                        PaddingModifier(10)
                             .drawLayer(shadowElevation = 1f)
                             .background(Color.White)
                     )
                     FixedSize(
-                        30, Modifier.drawLayer()
+                        30,
+                        Modifier.drawLayer()
                             .background(Color.Red)
                             .drawLatchModifier()
                     )

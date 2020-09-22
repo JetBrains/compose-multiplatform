@@ -108,7 +108,8 @@ object SemanticsProperties {
         mergePolicy = { _, _ ->
             throw IllegalStateException(
                 "merge function called on unmergeable property IsPopup. " +
-                "A popup should not be a child of a clickable/focusable node.")
+                    "A popup should not be a child of a clickable/focusable node."
+            )
         }
     )
 
@@ -121,7 +122,8 @@ object SemanticsProperties {
         mergePolicy = { _, _ ->
             throw IllegalStateException(
                 "merge function called on unmergeable property IsDialog. " +
-                "A dialog should not be a child of a clickable/focusable node.")
+                    "A dialog should not be a child of a clickable/focusable node."
+            )
         }
     )
 
@@ -189,7 +191,7 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.getTextLayoutResult
      */
     val GetTextLayoutResult = SemanticsPropertyKey<AccessibilityAction<
-                (MutableList<TextLayoutResult>) -> Boolean>>("GetTextLayoutResult")
+            (MutableList<TextLayoutResult>) -> Boolean>>("GetTextLayoutResult")
 
     /**
      * Action to be performed when the node is clicked.
@@ -221,7 +223,7 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.setSelection
      */
     val SetSelection = SemanticsPropertyKey<
-            AccessibilityAction<(Int, Int, Boolean) -> Boolean>>("SetSelection")
+        AccessibilityAction<(Int, Int, Boolean) -> Boolean>>("SetSelection")
 
     /**
      * Action to set the text of this node.
@@ -229,7 +231,7 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.setText
      */
     val SetText = SemanticsPropertyKey<
-            AccessibilityAction<(AnnotatedString) -> Boolean>>("SetText")
+        AccessibilityAction<(AnnotatedString) -> Boolean>>("SetText")
 
     /**
      * Custom actions which are defined by app developers.
@@ -272,7 +274,7 @@ class SemanticsPropertyKey<T>(
     final operator fun getValue(thisRef: SemanticsPropertyReceiver, property: KProperty<*>): T {
         throw UnsupportedOperationException(
             "You cannot retrieve a semantics property directly - " +
-                    "use one of the SemanticsConfiguration.getOr* methods instead"
+                "use one of the SemanticsConfiguration.getOr* methods instead"
         )
     }
 
@@ -399,7 +401,7 @@ fun SemanticsPropertyReceiver.hidden() {
  * @see SemanticsProperties.HorizontalAccessibilityScrollState
  */
 var SemanticsPropertyReceiver.horizontalAccessibilityScrollState
-        by SemanticsProperties.HorizontalAccessibilityScrollState
+by SemanticsProperties.HorizontalAccessibilityScrollState
 
 /**
  * The vertical scroll state of this node if this node is scrollable.
@@ -407,7 +409,7 @@ var SemanticsPropertyReceiver.horizontalAccessibilityScrollState
  * @see SemanticsProperties.VerticalAccessibilityScrollState
  */
 var SemanticsPropertyReceiver.verticalAccessibilityScrollState
-        by SemanticsProperties.VerticalAccessibilityScrollState
+by SemanticsProperties.VerticalAccessibilityScrollState
 
 /**
  * Whether this semantics node represents a Popup. Not to be confused with if this node is

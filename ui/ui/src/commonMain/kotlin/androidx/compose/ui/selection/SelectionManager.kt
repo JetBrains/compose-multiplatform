@@ -198,7 +198,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
             .fold(null) { mergedSelection: Selection?,
-                          handler: Selectable ->
+                handler: Selectable ->
                 merge(
                     mergedSelection,
                     handler.getSelection(

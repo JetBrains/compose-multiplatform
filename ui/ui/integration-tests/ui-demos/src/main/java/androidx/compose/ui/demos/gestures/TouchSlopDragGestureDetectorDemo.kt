@@ -110,11 +110,11 @@ fun DragGestureFilterDemo() {
     Column {
         Text(
             "Demonstrates standard dragging (when a slop has to be exceeded before dragging can " +
-                    "start) and customization of the direction in which dragging can occur."
+                "start) and customization of the direction in which dragging can occur."
         )
         Text(
             "When the box is blue, it can only be dragged horizontally.  When the box is red, it" +
-                    " can only be dragged vertically."
+                " can only be dragged vertically."
         )
         Box(
             Modifier.offset(offsetX, offsetY)

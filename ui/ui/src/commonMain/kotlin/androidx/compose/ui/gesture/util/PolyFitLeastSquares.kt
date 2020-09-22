@@ -103,8 +103,10 @@ internal fun polyFitLeastSquares(
             // alternatives to throwing an Exception here.
 
             // Vectors are linearly dependent or zero so no solution.
-            throw IllegalArgumentException("Vectors are linearly dependent or zero so no " +
-                    "solution. TODO(shepshapard), actually determine what this means")
+            throw IllegalArgumentException(
+                "Vectors are linearly dependent or zero so no " +
+                    "solution. TODO(shepshapard), actually determine what this means"
+            )
         }
 
         val inverseNorm: Float = 1.0f / norm

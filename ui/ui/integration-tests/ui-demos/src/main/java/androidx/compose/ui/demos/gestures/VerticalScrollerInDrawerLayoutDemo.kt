@@ -64,7 +64,7 @@ fun VerticalScrollerInDrawerDemo() {
         Text("Demonstrates scroll orientation locking.")
         Text(
             "There is a vertically scrolling column and a drawer layout.  A pointer can only " +
-                    "contribute to dragging the column or the drawer, but not both."
+                "contribute to dragging the column or the drawer, but not both."
         )
         DrawerLayout(280.dp) {
             Scrollable(Orientation.Vertical) {
@@ -213,7 +213,8 @@ private fun Scrollable(orientation: Orientation, children: @Composable () -> Uni
                     Orientation.Vertical -> placeable.placeRelative(0, offset.value.roundToInt())
                 }
             }
-        })
+        }
+    )
 }
 
 private val ClipModifier = object : DrawModifier {

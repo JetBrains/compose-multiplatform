@@ -90,15 +90,19 @@ class AndroidAutoFillTest {
         val currentPackageName = ownerView.context.applicationInfo.packageName
 
         // Assert.
-        assertThat(viewStructure).isEqualTo(FakeViewStructure().apply {
-            children.add(FakeViewStructure().apply {
-                virtualId = autofillNode.id
-                packageName = currentPackageName
-                setAutofillType(View.AUTOFILL_TYPE_TEXT)
-                setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))
-                setDimens(0, 0, 0, 0, 0, 0)
-            })
-        })
+        assertThat(viewStructure).isEqualTo(
+            FakeViewStructure().apply {
+                children.add(
+                    FakeViewStructure().apply {
+                        virtualId = autofillNode.id
+                        packageName = currentPackageName
+                        setAutofillType(View.AUTOFILL_TYPE_TEXT)
+                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))
+                        setDimens(0, 0, 0, 0, 0, 0)
+                    }
+                )
+            }
+        )
     }
 
     @SdkSuppress(minSdkVersion = 26)

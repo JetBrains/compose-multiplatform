@@ -63,7 +63,7 @@ fun Modifier.scaleSlopExceededGestureFilter(
  * @see scaleSlopExceededGestureFilter
  */
 internal class ScaleSlopExceededGestureFilter(private val scaleSlop: Float) : PointerInputFilter
-    () {
+() {
     lateinit var onScaleSlopExceeded: () -> Unit
 
     var passedSlop = false
@@ -75,38 +75,38 @@ internal class ScaleSlopExceededGestureFilter(private val scaleSlop: Float) : Po
         bounds: IntSize
     ): List<PointerInputChange> {
 
-            if (pass == PointerEventPass.Main) {
+        if (pass == PointerEventPass.Main) {
 
-                if (!passedSlop) {
+            if (!passedSlop) {
 
-                    val currentlyDownChanges =
-                        changes.filter { it.current.down && it.previous.down }
+                val currentlyDownChanges =
+                    changes.filter { it.current.down && it.previous.down }
 
-                    if (currentlyDownChanges.isNotEmpty()) {
-                        val dimensionInformation =
-                            currentlyDownChanges.calculateAllDimensionInformation()
-                        val scaleDifference = dimensionInformation.calculateScaleDifference()
+                if (currentlyDownChanges.isNotEmpty()) {
+                    val dimensionInformation =
+                        currentlyDownChanges.calculateAllDimensionInformation()
+                    val scaleDifference = dimensionInformation.calculateScaleDifference()
 
-                        scaleDiffTotal += scaleDifference
+                    scaleDiffTotal += scaleDifference
 
-                        if (scaleDiffTotal.absoluteValue > scaleSlop) {
-                            passedSlop = true
-                            onScaleSlopExceeded.invoke()
-                        }
+                    if (scaleDiffTotal.absoluteValue > scaleSlop) {
+                        passedSlop = true
+                        onScaleSlopExceeded.invoke()
                     }
                 }
             }
-
-            if (passedSlop &&
-                pass == PointerEventPass.Final &&
-                changes.all { it.changedToUpIgnoreConsumed() }
-            ) {
-                passedSlop = false
-                scaleDiffTotal = 0f
-            }
-
-            return changes
         }
+
+        if (passedSlop &&
+            pass == PointerEventPass.Final &&
+            changes.all { it.changedToUpIgnoreConsumed() }
+        ) {
+            passedSlop = false
+            scaleDiffTotal = 0f
+        }
+
+        return changes
+    }
 
     override fun onCancel() {
         passedSlop = false

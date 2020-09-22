@@ -52,7 +52,8 @@ class RecordingInputConnectionUpdateTextFieldValueTest {
             TextFieldValue(
                 "",
                 TextRange.Zero
-            ), listener
+            ),
+            listener
         )
     }
 

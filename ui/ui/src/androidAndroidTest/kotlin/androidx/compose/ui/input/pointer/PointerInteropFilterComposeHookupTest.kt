@@ -70,15 +70,16 @@ class PointerInteropFilterComposeHookupTest {
                 )
                 setContent(Recomposer.current()) {
                     with(DensityAmbient.current) {
-                        Box(modifier = Modifier
-                            .spyGestureFilter {
-                                eventStringLog.add(it.name)
-                            }
-                            .pointerInteropFilter(
-                                disallowInterceptRequester,
-                                motionEventCallback
-                            )
-                            .size(100f.toDp(), 100f.toDp())
+                        Box(
+                            modifier = Modifier
+                                .spyGestureFilter {
+                                    eventStringLog.add(it.name)
+                                }
+                                .pointerInteropFilter(
+                                    disallowInterceptRequester,
+                                    motionEventCallback
+                                )
+                                .size(100f.toDp(), 100f.toDp())
                         )
                     }
                 }

@@ -595,7 +595,8 @@ class PointerInputTest {
                 Offset(
                     consumedX,
                     consumedY
-                ), consumedDown
+                ),
+                consumedDown
             )
         )
     }

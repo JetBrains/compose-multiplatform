@@ -105,9 +105,9 @@ internal abstract class LayoutNodeWrapper(
         //  so calling this is expensive.  Would be nice to cache data such that this is cheap.
         val localPointerPosition = globalToLocal(globalPointerPosition)
         return localPointerPosition.x >= 0 &&
-                localPointerPosition.x < measuredSize.width &&
-                localPointerPosition.y >= 0 &&
-                localPointerPosition.y < measuredSize.height
+            localPointerPosition.x < measuredSize.width &&
+            localPointerPosition.y >= 0 &&
+            localPointerPosition.y < measuredSize.height
     }
 
     /**
@@ -390,7 +390,7 @@ internal abstract class LayoutNodeWrapper(
 
     internal companion object {
         const val ExpectAttachedLayoutCoordinates = "LayoutCoordinate operations are only valid " +
-                "when isAttached is true"
+            "when isAttached is true"
         const val UnmeasuredError = "Asking for measurement result of unmeasured layout modifier"
     }
 }

@@ -44,58 +44,78 @@ import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-private val GestureDemos = DemoCategory("Gestures", listOf(
-    DemoCategory("Common Gestures", listOf(
-        ComposableDemo("Press Indication") { PressIndicatorGestureFilterDemo() },
-        ComposableDemo("Tap") { TapGestureFilterDemo() },
-        ComposableDemo("Double Tap") { DoubleTapGestureFilterDemo() },
-        ComposableDemo("Long Press") { LongPressGestureDetectorDemo() },
-        ComposableDemo("Scroll") { ScrollGestureFilterDemo() },
-        ComposableDemo("Drag") { DragGestureFilterDemo() },
-        ComposableDemo("Long Press Drag") { LongPressDragGestureFilterDemo() },
-        ComposableDemo("Scale") { ScaleGestureFilterDemo() }
-    )),
-    DemoCategory("Building Block Gestures", listOf(
-        ComposableDemo("Drag Slop Exceeded") { DragSlopExceededGestureFilterDemo() },
-        ComposableDemo("Raw Drag") { RawDragGestureFilterDemo() }
-    )),
-    DemoCategory(
-        "Combinations / Case Studies", listOf(
-            ComposableDemo("Nested Pressing") { NestedPressingDemo() },
-            ComposableDemo("Horizontal Scrollers In Vertical Scroller") {
-                HorizontalScrollersInVerticalScrollersDemo()
-            },
-            ComposableDemo("Vertical Scroller in Nav Drawer") {
-                VerticalScrollerInDrawerDemo()
-            },
-            ComposableDemo("Nested Scrolling") { NestedScrollingDemo() },
-            ComposableDemo("Nested Scaling") { NestedScalingDemo() },
-            ComposableDemo("Drag and Scale") { DragAndScaleGestureFilterDemo() },
-            ComposableDemo("Popup Drag") { PopupDragDemo() },
-            ComposableDemo("Double Tap in Tap") { DoubleTapInTapDemo() },
-            ComposableDemo("Nested Long Press") { NestedLongPressDemo() },
-            ComposableDemo("Pointer Input During Sub Comp") { PointerInputDuringSubComp() }
-        ))
-))
+private val GestureDemos = DemoCategory(
+    "Gestures",
+    listOf(
+        DemoCategory(
+            "Common Gestures",
+            listOf(
+                ComposableDemo("Press Indication") { PressIndicatorGestureFilterDemo() },
+                ComposableDemo("Tap") { TapGestureFilterDemo() },
+                ComposableDemo("Double Tap") { DoubleTapGestureFilterDemo() },
+                ComposableDemo("Long Press") { LongPressGestureDetectorDemo() },
+                ComposableDemo("Scroll") { ScrollGestureFilterDemo() },
+                ComposableDemo("Drag") { DragGestureFilterDemo() },
+                ComposableDemo("Long Press Drag") { LongPressDragGestureFilterDemo() },
+                ComposableDemo("Scale") { ScaleGestureFilterDemo() }
+            )
+        ),
+        DemoCategory(
+            "Building Block Gestures",
+            listOf(
+                ComposableDemo("Drag Slop Exceeded") { DragSlopExceededGestureFilterDemo() },
+                ComposableDemo("Raw Drag") { RawDragGestureFilterDemo() }
+            )
+        ),
+        DemoCategory(
+            "Combinations / Case Studies",
+            listOf(
+                ComposableDemo("Nested Pressing") { NestedPressingDemo() },
+                ComposableDemo("Horizontal Scrollers In Vertical Scroller") {
+                    HorizontalScrollersInVerticalScrollersDemo()
+                },
+                ComposableDemo("Vertical Scroller in Nav Drawer") {
+                    VerticalScrollerInDrawerDemo()
+                },
+                ComposableDemo("Nested Scrolling") { NestedScrollingDemo() },
+                ComposableDemo("Nested Scaling") { NestedScalingDemo() },
+                ComposableDemo("Drag and Scale") { DragAndScaleGestureFilterDemo() },
+                ComposableDemo("Popup Drag") { PopupDragDemo() },
+                ComposableDemo("Double Tap in Tap") { DoubleTapInTapDemo() },
+                ComposableDemo("Nested Long Press") { NestedLongPressDemo() },
+                ComposableDemo("Pointer Input During Sub Comp") { PointerInputDuringSubComp() }
+            )
+        )
+    )
+)
 
-private val FocusDemos = DemoCategory("Focus", listOf(
-    ComposableDemo("Focusable Siblings") { FocusableDemo() },
-    ComposableDemo("Reuse Focus Requester") { ReuseFocusRequester() }
-    ))
+private val FocusDemos = DemoCategory(
+    "Focus",
+    listOf(
+        ComposableDemo("Focusable Siblings") { FocusableDemo() },
+        ComposableDemo("Reuse Focus Requester") { ReuseFocusRequester() }
+    )
+)
 
-private val GraphicsDemos = DemoCategory("Graphics", listOf(
-    ComposableDemo("VectorGraphicsDemo") { VectorGraphicsDemo() },
-    ComposableDemo("DeclarativeGraphicsDemo") { DeclarativeGraphicsDemo() }
-))
+private val GraphicsDemos = DemoCategory(
+    "Graphics",
+    listOf(
+        ComposableDemo("VectorGraphicsDemo") { VectorGraphicsDemo() },
+        ComposableDemo("DeclarativeGraphicsDemo") { DeclarativeGraphicsDemo() }
+    )
+)
 
-val CoreDemos = DemoCategory("Framework", listOf(
-    ComposableDemo("Explicit autofill types") { ExplicitAutofillTypesDemo() },
-    FocusDemos,
-    ComposableDemo("KeyInput") { KeyInputDemo() },
-    ComposableDemo("Multiple collects measure") { MultipleCollectTest() },
-    ComposableDemo("Popup") { PopupDemo() },
-    GraphicsDemos,
-    GestureDemos,
-    ComposableDemo("Views interoperability") { ViewInteropDemo() },
-    ComposableDemo("ViewModel") { ViewModelDemo() }
-))
+val CoreDemos = DemoCategory(
+    "Framework",
+    listOf(
+        ComposableDemo("Explicit autofill types") { ExplicitAutofillTypesDemo() },
+        FocusDemos,
+        ComposableDemo("KeyInput") { KeyInputDemo() },
+        ComposableDemo("Multiple collects measure") { MultipleCollectTest() },
+        ComposableDemo("Popup") { PopupDemo() },
+        GraphicsDemos,
+        GestureDemos,
+        ComposableDemo("Views interoperability") { ViewInteropDemo() },
+        ComposableDemo("ViewModel") { ViewModelDemo() }
+    )
+)

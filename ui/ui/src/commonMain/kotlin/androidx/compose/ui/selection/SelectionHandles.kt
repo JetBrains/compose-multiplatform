@@ -129,7 +129,8 @@ fun SelectionHandle(
 ) {
     SelectionHandleLayout(
         modifier,
-        isLeft(isStartHandle, directions, handlesCrossed))
+        isLeft(isStartHandle, directions, handlesCrossed)
+    )
 }
 
 /**
@@ -162,5 +163,5 @@ internal fun isHandleLtrDirection(
     areHandlesCrossed: Boolean
 ): Boolean {
     return direction == ResolvedTextDirection.Ltr && !areHandlesCrossed ||
-            direction == ResolvedTextDirection.Rtl && areHandlesCrossed
+        direction == ResolvedTextDirection.Rtl && areHandlesCrossed
 }

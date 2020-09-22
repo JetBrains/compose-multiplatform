@@ -65,11 +65,14 @@ class ModelReadsTest {
         var positionLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                Layout({}, modifier = Modifier.drawBehind {
-                    // read from the model
-                    offset.value
-                    drawLatch.countDown()
-                }) { _, _ ->
+                Layout(
+                    {},
+                    modifier = Modifier.drawBehind {
+                        // read from the model
+                        offset.value
+                        drawLatch.countDown()
+                    }
+                ) { _, _ ->
                     layout(10, 10) {
                         // read from the model
                         offset.value
@@ -108,11 +111,14 @@ class ModelReadsTest {
         var positionLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                Layout({}, modifier = Modifier.drawBehind {
-                    // read from the model
-                    drawModel.value
-                    drawLatch.countDown()
-                }) { _, _ ->
+                Layout(
+                    {},
+                    modifier = Modifier.drawBehind {
+                        // read from the model
+                        drawModel.value
+                        drawLatch.countDown()
+                    }
+                ) { _, _ ->
                     layout(10, 10) {
                         // read from the model
                         positionModel.value
@@ -150,11 +156,14 @@ class ModelReadsTest {
         var drawLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                Layout({}, modifier = Modifier.drawBehind {
-                    // read from the model
-                    offset.value
-                    drawLatch.countDown()
-                }) { _, _ ->
+                Layout(
+                    {},
+                    modifier = Modifier.drawBehind {
+                        // read from the model
+                        offset.value
+                        drawLatch.countDown()
+                    }
+                ) { _, _ ->
                     measureLatch.countDown()
                     // read from the model
                     layout(offset.value, 10) {}
@@ -231,13 +240,16 @@ class ModelReadsTest {
         val model = mutableStateOf(0)
         rule.runOnUiThread {
             activity.setContent {
-                AtLeastSize(10, modifier = Modifier.drawBehind {
-                    if (enabled.value) {
-                        // read the model
-                        model.value
+                AtLeastSize(
+                    10,
+                    modifier = Modifier.drawBehind {
+                        if (enabled.value) {
+                            // read the model
+                            model.value
+                        }
+                        latch.countDown()
                     }
-                    latch.countDown()
-                }) {
+                ) {
                 }
             }
         }

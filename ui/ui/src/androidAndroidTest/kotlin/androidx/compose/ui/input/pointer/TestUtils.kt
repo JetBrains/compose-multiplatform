@@ -75,10 +75,10 @@ internal fun PointerInputEvent(
     uptime: Uptime,
     pointers: List<PointerInputEventData>
 ) = PointerInputEvent(
-        uptime,
-        pointers,
-        MotionEventDouble
-    )
+    uptime,
+    pointers,
+    MotionEventDouble
+)
 
 internal fun catchThrowable(lambda: () -> Unit): Throwable? {
     var exception: Throwable? = null

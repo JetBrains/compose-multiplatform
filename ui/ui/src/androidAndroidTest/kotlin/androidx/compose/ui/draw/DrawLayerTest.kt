@@ -141,7 +141,8 @@ class DrawLayerTest {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
                 Padding(10) {
-                    FixedSize(10,
+                    FixedSize(
+                        10,
                         Modifier.drawLayer(
                             rotationZ = 90f,
                             transformOrigin = TransformOrigin(1.0f, 1.0f)
@@ -164,7 +165,8 @@ class DrawLayerTest {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
                 Padding(10) {
-                    FixedSize(10,
+                    FixedSize(
+                        10,
                         Modifier.drawLayer(
                             translationX = 5.0f,
                             translationY = 8.0f
