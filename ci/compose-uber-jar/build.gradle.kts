@@ -33,8 +33,8 @@ val shadowJar = tasks.named("shadowJar", ShadowJar::class) {
     archiveFileName.set("compose-full.jar")
 }
 
-tasks.register("publishToSpace") {
-    dependsOn(tasks.named("publishAllPublicationsToSpaceRepository"))
+tasks.register("publishToComposeRepo") {
+    dependsOn(tasks.named("publishAllPublicationsToComposeRepoRepository"))
 }
 
 publishing {
@@ -48,7 +48,7 @@ publishing {
     }
     repositories {
         maven(properties.composeRepoUrl) {
-            name = "Space"
+            name = "ComposeRepo"
             authentication {
                 credentials {
                     username = properties.composeRepoUserName
@@ -66,7 +66,8 @@ class ComposeUberJarProperties {
     val composeVersionFile: String?
         get() = typedProperty<String>(COMPOSE_VERSION_FILE_PROPERTY)
 
-    val composeRepoUrl: String = "https://packages.jetbrains.team/maven/p/ui/dev"
+    val composeRepoUrl: String
+        get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"
 
     val composeRepoUserName: String?
         get() = System.getenv("COMPOSE_REPO_USERNAME")
