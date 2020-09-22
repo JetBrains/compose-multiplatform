@@ -30,6 +30,7 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByName
 import java.io.File
 
 fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
@@ -106,7 +107,7 @@ private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension)
         ?: throw Exception("You must specify mavenGroup for $name project")
     val strippedGroupId = mavenGroup.substringAfterLast(".")
     if (mavenGroup.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
-        throw Exception("Your artifactId must start with $strippedGroupId")
+        throw Exception("Your artifactId must start with $strippedGroupId! (currently is $name)")
     }
     return mavenGroup
 }
