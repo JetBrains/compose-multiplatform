@@ -133,7 +133,10 @@ open class AndroidXExtension(val project: Project) {
      * Whether to run API tasks such as tracking and linting. The default value is
      * [RunApiTasks.Auto], which automatically picks based on the project's properties.
      */
-    var runApiTasks: RunApiTasks = RunApiTasks.Auto
+    var runApiTasks: RunApiTasks =
+        // TODO: fix with library type/role system
+        if (project.isSamplesProject()) RunApiTasks.No("sample project")
+        else RunApiTasks.Auto
     var failOnDeprecationWarnings = true
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 
@@ -204,4 +207,15 @@ sealed class RunApiTasks {
 class License {
     var name: String? = null
     var url: String? = null
+}
+
+// Whether the project is a samples project. Temporary, until LibraryType is introduced
+// Paging and the Support samples need some fixing, because they do not match the simple rule
+// <the library the sample library provides samples for> = <sample library>.parent
+// As such, there is ambiguity which needs further tooling or policy to resolve
+//
+// TODO: implement library type/role system
+// TODO: ensure Support samples and Paging samples are working
+fun Project.isSamplesProject(): Boolean {
+    return name.endsWith("samples")
 }

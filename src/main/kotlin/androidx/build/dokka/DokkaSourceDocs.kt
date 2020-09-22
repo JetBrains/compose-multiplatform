@@ -20,6 +20,7 @@ package androidx.build.dokka
 
 import androidx.build.AndroidXExtension
 import androidx.build.defaultPublishVariant
+import androidx.build.isSamplesProject
 import androidx.build.java.JavaCompileInputs
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
@@ -80,7 +81,7 @@ object DokkaSourceDocs {
         if (tryGetRunnerProject(project) == null) {
             return
         }
-        if (!project.isSamplesProject && !extension.generateDocs) {
+        if (!extension.generateDocs) {
             project.logger.info(
                 "Project ${project.name} has docs generation disabled, ignoring docs tasks."
             )
@@ -126,7 +127,7 @@ object DokkaSourceDocs {
 
             // Filter out sample packages from the generated documentation, we only need them in
             // Dokka to resolve @sample links
-            if (project.isSamplesProject) {
+            if (project.isSamplesProject()) {
                 val sourceFiles = inputs.sourcePaths.asFileTree.files.filter { file ->
                     file.extension == "kt"
                 }
@@ -161,7 +162,3 @@ object DokkaSourceDocs {
         }
     }
 }
-
-// TODO: b/145500705 figure out better strategy for handling samples, for now let's just include
-// samples in doc generation as they are needed to resolve @sample links in KDoc
-private val Project.isSamplesProject get() = name == "samples"
