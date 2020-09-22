@@ -19,12 +19,13 @@ import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,6 +46,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -76,7 +80,12 @@ fun main() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(title) }
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Outlined.Home)
+                            Text(title)
+                        }
+                    }
                 )
             },
             floatingActionButton = {
@@ -298,16 +307,18 @@ fun Animations(isCircularEnabled: Boolean) = Row {
 
     MaterialTheme {
         Box(
-            Modifier.size(70.dp).clickable { enabled.value = !enabled.value },
-            backgroundColor = color
+            Modifier
+                .size(70.dp)
+                .clickable { enabled.value = !enabled.value }
+                .background(color)
         )
     }
 }
 
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
-private fun RightColumn(modifier: Modifier) = LazyColumn(modifier) {
+private fun RightColumn(modifier: Modifier) = LazyColumn(modifier.drawLayer(alpha = 0.5f)) {
     items((1..10000).toList()) { x ->
-        Text(x.toString())
+        Text(x.toString(), Modifier.drawLayer(alpha = 0.5f))
     }
 }
