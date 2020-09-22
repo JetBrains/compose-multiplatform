@@ -38,9 +38,11 @@ import java.util.concurrent.TimeUnit
 class LayoutAspectRatioTest : LayoutTest() {
     @Test
     fun testAspectRatioModifier_intrinsicDimensions() = with(density) {
-        testIntrinsics(@Composable {
-            Container(modifier = Modifier.aspectRatio(2f), width = 30.dp, height = 40.dp) { }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        testIntrinsics(
+            @Composable {
+                Container(modifier = Modifier.aspectRatio(2f), width = 30.dp, height = 40.dp) { }
+            }
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             assertEquals(40, minIntrinsicWidth(20))
             assertEquals(40, maxIntrinsicWidth(20))
             assertEquals(20, minIntrinsicHeight(40))
@@ -90,14 +92,16 @@ class LayoutAspectRatioTest : LayoutTest() {
         val size = Ref<IntSize>()
         val position = Ref<Offset>()
         show {
-            Layout(@Composable {
-                Container(
-                    Modifier
-                        .aspectRatio(aspectRatio)
-                        .then(Modifier.saveLayoutInfo(size, position, positionedLatch))
-                ) {
+            Layout(
+                @Composable {
+                    Container(
+                        Modifier
+                            .aspectRatio(aspectRatio)
+                            .then(Modifier.saveLayoutInfo(size, position, positionedLatch))
+                    ) {
+                    }
                 }
-            }) { measurables, incomingConstraints ->
+            ) { measurables, incomingConstraints ->
                 require(measurables.isNotEmpty())
                 val placeable = measurables.first().measure(childContraints)
                 layout(incomingConstraints.maxWidth, incomingConstraints.maxHeight) {

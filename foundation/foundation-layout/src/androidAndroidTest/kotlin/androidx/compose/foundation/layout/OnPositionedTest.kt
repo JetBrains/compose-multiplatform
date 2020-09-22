@@ -85,10 +85,12 @@ class OnPositionedTest : LayoutTest() {
         val positionedLatch = CountDownLatch(2)
         show {
             Container(
-                Modifier.padding(start = firstPaddingPx.toDp()).then(Modifier.onPositioned {
-                    gpCoordinates = it
-                    positionedLatch.countDown()
-                })
+                Modifier.padding(start = firstPaddingPx.toDp()).then(
+                    Modifier.onPositioned {
+                        gpCoordinates = it
+                        positionedLatch.countDown()
+                    }
+                )
             ) {
                 Container(Modifier.padding(start = secondPaddingPx.toDp())) {
                     Container(
@@ -139,8 +141,10 @@ class OnPositionedTest : LayoutTest() {
                     Container(
                         Modifier.onPositioned {
                             realGlobalPosition = it.localToGlobal(localPosition)
-                            realLocalPosition = it.globalToLocal(framePadding +
-                                    frameGlobalPosition!!)
+                            realLocalPosition = it.globalToLocal(
+                                framePadding +
+                                    frameGlobalPosition!!
+                            )
                             positionedLatch.countDown()
                         },
                         expanded = true,

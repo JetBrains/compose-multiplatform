@@ -33,44 +33,55 @@ fun DemoInlineDSL() {
     ConstraintLayout {
         val (text1, text2, text3) = createRefs()
 
-        Text("Text1", Modifier.constrainAs(text1) {
-            start.linkTo(text2.end, margin = 20.dp)
-        })
-        Text("Text2", Modifier.constrainAs(text2) {
-            centerTo(parent)
-        })
+        Text(
+            "Text1",
+            Modifier.constrainAs(text1) {
+                start.linkTo(text2.end, margin = 20.dp)
+            }
+        )
+        Text(
+            "Text2",
+            Modifier.constrainAs(text2) {
+                centerTo(parent)
+            }
+        )
 
         val barrier = createBottomBarrier(text1, text2)
-        Text("This is a very long text", Modifier.constrainAs(text3) {
-            top.linkTo(barrier, margin = 20.dp)
-            centerHorizontallyTo(parent)
-            width = Dimension.preferredWrapContent.atMost(40.dp)
-        })
+        Text(
+            "This is a very long text",
+            Modifier.constrainAs(text3) {
+                top.linkTo(barrier, margin = 20.dp)
+                centerHorizontallyTo(parent)
+                width = Dimension.preferredWrapContent.atMost(40.dp)
+            }
+        )
     }
 }
 
 @Sampled
 @Composable
 fun DemoConstraintSet() {
-    ConstraintLayout(ConstraintSet {
-        val text1 = createRefFor("text1")
-        val text2 = createRefFor("text2")
-        val text3 = createRefFor("text3")
+    ConstraintLayout(
+        ConstraintSet {
+            val text1 = createRefFor("text1")
+            val text2 = createRefFor("text2")
+            val text3 = createRefFor("text3")
 
-        constrain(text1) {
-            start.linkTo(text2.end, margin = 20.dp)
-        }
-        constrain(text2) {
-            centerTo(parent)
-        }
+            constrain(text1) {
+                start.linkTo(text2.end, margin = 20.dp)
+            }
+            constrain(text2) {
+                centerTo(parent)
+            }
 
-        val barrier = createBottomBarrier(text1, text2)
-        constrain(text3) {
-            top.linkTo(barrier, margin = 20.dp)
-            centerHorizontallyTo(parent)
-            width = Dimension.preferredWrapContent.atMost(40.dp)
+            val barrier = createBottomBarrier(text1, text2)
+            constrain(text3) {
+                top.linkTo(barrier, margin = 20.dp)
+                centerHorizontallyTo(parent)
+                width = Dimension.preferredWrapContent.atMost(40.dp)
+            }
         }
-    }) {
+    ) {
         Text("Text1", Modifier.layoutId("text1"))
         Text("Text2", Modifier.layoutId("text2"))
         Text("This is a very long text", Modifier.layoutId("text3"))

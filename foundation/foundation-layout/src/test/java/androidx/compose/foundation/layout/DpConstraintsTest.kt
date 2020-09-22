@@ -129,8 +129,10 @@ class DpConstraintsTest {
         minHeight: Dp,
         maxHeight: Dp
     ) {
-        assertTrue(this.minWidth == minWidth && this.maxWidth == maxWidth &&
-                this.minHeight == minHeight && this.maxHeight == maxHeight)
+        assertTrue(
+            this.minWidth == minWidth && this.maxWidth == maxWidth &&
+                this.minHeight == minHeight && this.maxHeight == maxHeight
+        )
     }
 
     private fun assertInvalid(

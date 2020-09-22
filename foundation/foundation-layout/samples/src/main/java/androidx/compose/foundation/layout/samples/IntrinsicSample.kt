@@ -88,7 +88,7 @@ fun MatchParentDividerForText() {
             Box(Modifier.preferredWidth(1.dp).fillMaxHeight().background(Color.Black))
             Text(
                 text = "This is a much much much much much much much much much much" +
-                        " much much much much much much longer text",
+                    " much much much much much much longer text",
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )
         }
