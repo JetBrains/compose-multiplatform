@@ -20,24 +20,17 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.ScrollableController
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.MeasureScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Placeable
 import androidx.compose.ui.Remeasurement
 import androidx.compose.ui.RemeasurementModifier
 import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastSumBy
@@ -98,11 +91,6 @@ internal class LazyForState(
         }
     }
 
-    /**
-     * The cached instance of the scope to be used for composing items.
-     */
-    private var itemScope = InitialLazyItemsScopeImpl
-
     private fun onScroll(distance: Float): Float {
         check(abs(scrollToBeConsumed) < 0.5f) {
             "entered drag with non-zero pending scroll: $scrollToBeConsumed"
@@ -125,17 +113,6 @@ internal class LazyForState(
     }
 
     /**
-     * Updates the [itemScope] with the last [constraints] we got from the parent
-     */
-    private fun Density.updateItemScope(constraints: Constraints) {
-        val width = constraints.maxWidth.toDp()
-        val height = constraints.maxHeight.toDp()
-        if (width != itemScope.maxWidth || height != itemScope.maxHeight) {
-            itemScope = LazyItemScopeImpl(width, height)
-        }
-    }
-
-    /**
      * Measures and positions currently visible items using [itemContentFactory] for subcomposing.
      */
     fun measure(
@@ -145,7 +122,7 @@ internal class LazyForState(
         horizontalAlignment: Alignment.Horizontal,
         verticalAlignment: Alignment.Vertical,
         itemsCount: Int,
-        itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
+        itemContentFactory: (Int) -> @Composable () -> Unit
     ): MeasureScope.MeasureResult = with(scope) {
         constraints.assertNotNestingScrollableContainers(isVertical)
         if (itemsCount <= 0) {
@@ -154,9 +131,6 @@ internal class LazyForState(
             firstVisibleItemScrollOffset = 0
             layout(constraints.constrainWidth(0), constraints.constrainHeight(0)) {}
         } else {
-            // this will update the scope object if the constrains have been changed
-            updateItemScope(constraints)
-
             // assert for the incorrect initial state
             require(firstVisibleItemScrollOffset >= 0f)
             require(firstVisibleItemIndex.value >= 0f)
@@ -199,7 +173,7 @@ internal class LazyForState(
             while (firstVisibleItemScrollOffset < 0 && firstVisibleItemIndex > DataIndex(0)) {
                 val previous = DataIndex(firstVisibleItemIndex.value - 1)
                 val placeables =
-                    subcompose(previous, itemScope.itemContentFactory(previous.value)).fastMap {
+                    subcompose(previous, itemContentFactory(previous.value)).fastMap {
                         it.measure(childConstraints)
                     }
                 visibleItemsPlaceables.addAll(0, placeables)
@@ -228,7 +202,7 @@ internal class LazyForState(
             var maxCrossAxis = 0
             while (mainAxisUsed <= maxMainAxis && index.value < itemsCount) {
                 val placeables =
-                    subcompose(index, itemScope.itemContentFactory(index.value)).fastMap {
+                    subcompose(index, itemContentFactory(index.value)).fastMap {
                         it.measure(childConstraints)
                     }
                 var size = 0
@@ -267,7 +241,7 @@ internal class LazyForState(
                     val placeables = if (alreadyComposedIndex >= 0) {
                         notUsedButComposedItems!!.removeAt(alreadyComposedIndex)
                     } else {
-                        subcompose(previous, itemScope.itemContentFactory(previous.value)).fastMap {
+                        subcompose(previous, itemContentFactory(previous.value)).fastMap {
                             it.measure(childConstraints)
                         }
                     }
@@ -315,19 +289,4 @@ internal class LazyForState(
             }
         }
     }
-}
-
-/**
- * Pre-allocated initial value for [LazyItemScopeImpl] to not have it nullable and avoid using
- * late init.
- */
-private val InitialLazyItemsScopeImpl = LazyItemScopeImpl(0.dp, 0.dp)
-
-private data class LazyItemScopeImpl(
-    val maxWidth: Dp,
-    val maxHeight: Dp
-) : LazyItemScope {
-    override fun Modifier.fillParentMaxSize() = size(maxWidth, maxHeight)
-    override fun Modifier.fillParentMaxWidth() = width(maxWidth)
-    override fun Modifier.fillParentMaxHeight() = height(maxHeight)
 }
