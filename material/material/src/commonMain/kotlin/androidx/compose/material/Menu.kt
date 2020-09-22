@@ -109,7 +109,7 @@ fun DropdownMenu(
                 dropdownOffset,
                 density
             ) { parentBounds, menuBounds ->
-                transformOrigin = calculateTransformOrigin(parentBounds, menuBounds, density)
+                transformOrigin = calculateTransformOrigin(parentBounds, menuBounds)
             }
 
             Popup(
@@ -132,15 +132,7 @@ fun DropdownMenu(
                         { transformOrigin }
                     )
                 }
-                Card(
-                    modifier = drawLayer
-                        // MenuVerticalMargin corresponds to the one Material row margin
-                        // required between the menu and the display edges. The
-                        // MenuElevationInset is needed for drawing the elevation,
-                        // otherwise it is clipped. TODO(popam): remove it after b/156890315
-                        .padding(MenuElevationInset, MenuVerticalMargin),
-                    elevation = MenuElevation
-                ) {
+                Card(modifier = drawLayer, elevation = MenuElevation) {
                     @OptIn(ExperimentalLayout::class)
                     ScrollableColumn(
                         modifier = dropdownModifier
@@ -210,7 +202,6 @@ fun DropdownMenuItem(
 
 // Size constants.
 private val MenuElevation = 8.dp
-internal val MenuElevationInset = 32.dp
 private val MenuVerticalMargin = 32.dp
 private val DropdownMenuHorizontalPadding = 16.dp
 internal val DropdownMenuVerticalPadding = 8.dp
@@ -266,42 +257,35 @@ private class MenuDrawLayerModifier(
     override val scaleY: Float get() = scaleProvider()
     override val alpha: Float get() = alphaProvider()
     override val transformOrigin: TransformOrigin get() = transformOriginProvider()
-    override val clip: Boolean = true
 }
 
 private fun calculateTransformOrigin(
     parentBounds: IntBounds,
-    menuBounds: IntBounds,
-    density: Density
+    menuBounds: IntBounds
 ): TransformOrigin {
-    val inset = with(density) { MenuElevationInset.toIntPx() }
-    val realMenuBounds = IntBounds(
-        menuBounds.left + inset,
-        menuBounds.top + inset,
-        menuBounds.right - inset,
-        menuBounds.bottom - inset
-    )
     val pivotX = when {
-        realMenuBounds.left >= parentBounds.right -> 0
-        realMenuBounds.right <= parentBounds.left -> 1
+        menuBounds.left >= parentBounds.right -> 0f
+        menuBounds.right <= parentBounds.left -> 1f
+        menuBounds.width == 0 -> 0f
         else -> {
             val intersectionCenter =
-                (max(parentBounds.left, realMenuBounds.left) +
-                        min(parentBounds.right, realMenuBounds.right)) / 2
-            (intersectionCenter + inset - menuBounds.left) / menuBounds.width
+                (max(parentBounds.left, menuBounds.left) +
+                        min(parentBounds.right, menuBounds.right)) / 2
+            (intersectionCenter - menuBounds.left).toFloat() / menuBounds.width
         }
     }
     val pivotY = when {
-        realMenuBounds.top >= parentBounds.bottom -> 0
-        realMenuBounds.bottom <= parentBounds.top -> 1
+        menuBounds.top >= parentBounds.bottom -> 0f
+        menuBounds.bottom <= parentBounds.top -> 1f
+        menuBounds.height == 0 -> 0f
         else -> {
             val intersectionCenter =
-                (max(parentBounds.top, realMenuBounds.top) +
-                        min(parentBounds.bottom, realMenuBounds.bottom)) / 2
-            (intersectionCenter + inset - menuBounds.top) / menuBounds.height
+                (max(parentBounds.top, menuBounds.top) +
+                        min(parentBounds.bottom, menuBounds.bottom)) / 2
+            (intersectionCenter - menuBounds.top).toFloat() / menuBounds.height
         }
     }
-    return TransformOrigin(pivotX.toFloat(), pivotY.toFloat())
+    return TransformOrigin(pivotX, pivotY)
 }
 
 // Menu positioning.
@@ -324,40 +308,37 @@ internal data class DropdownMenuPositionProvider(
     ): IntOffset {
         // The min margin above and below the menu, relative to the screen.
         val verticalMargin = with(density) { MenuVerticalMargin.toIntPx() }
-        // The padding inset that accommodates elevation, needs to be taken into account.
-        val inset = with(density) { MenuElevationInset.toIntPx() }
-        val realPopupWidth = popupContentSize.width - inset * 2
-        val realPopupHeight = popupContentSize.height - inset * 2
+        // The content offset specified using the dropdown offset parameter.
         val contentOffsetX = with(density) { contentOffset.x.toIntPx() }
         val contentOffsetY = with(density) { contentOffset.y.toIntPx() }
 
         // Compute horizontal position.
         val toRight = parentGlobalBounds.right + contentOffsetX
-        val toLeft = parentGlobalBounds.left - contentOffsetX - realPopupWidth
-        val toDisplayRight = windowGlobalBounds.width - realPopupWidth
+        val toLeft = parentGlobalBounds.left - contentOffsetX - popupContentSize.width
+        val toDisplayRight = windowGlobalBounds.width - popupContentSize.width
         val toDisplayLeft = 0
         val x = if (layoutDirection == LayoutDirection.Ltr) {
             sequenceOf(toRight, toLeft, toDisplayRight)
         } else {
             sequenceOf(toLeft, toRight, toDisplayLeft)
         }.firstOrNull {
-            it >= 0 && it + realPopupWidth <= windowGlobalBounds.width
+            it >= 0 && it + popupContentSize.width <= windowGlobalBounds.width
         } ?: toLeft
 
         // Compute vertical position.
         val toBottom = parentGlobalBounds.bottom + contentOffsetY
-        val toTop = parentGlobalBounds.top - contentOffsetY - realPopupHeight
-        val toCenter = parentGlobalBounds.top - realPopupHeight / 2
-        val toDisplayBottom = windowGlobalBounds.height - realPopupHeight - verticalMargin
+        val toTop = parentGlobalBounds.top - contentOffsetY - popupContentSize.height
+        val toCenter = parentGlobalBounds.top - popupContentSize.height / 2
+        val toDisplayBottom = windowGlobalBounds.height - popupContentSize.height - verticalMargin
         val y = sequenceOf(toBottom, toTop, toCenter, toDisplayBottom).firstOrNull {
             it >= verticalMargin &&
-                    it + realPopupHeight <= windowGlobalBounds.height - verticalMargin
+                    it + popupContentSize.height <= windowGlobalBounds.height - verticalMargin
         } ?: toTop
 
         onPositionCalculated(
             parentGlobalBounds,
-            IntBounds(x - inset, y - inset, x + inset + realPopupWidth, y + inset + realPopupHeight)
+            IntBounds(x, y, x + popupContentSize.width, y + popupContentSize.height)
         )
-        return IntOffset(x - inset, y - inset)
+        return IntOffset(x, y)
     }
 }
