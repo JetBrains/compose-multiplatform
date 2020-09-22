@@ -18,11 +18,13 @@ package androidx.compose.ui.window
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Outline
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewOutlineProvider
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
@@ -38,11 +40,16 @@ import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.onPositioned
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
@@ -70,20 +77,15 @@ internal actual fun ActualPopup(
     children: @Composable () -> Unit
 ) {
     val view = ViewAmbient.current
-    val providedTestTag = PopupTestTagAmbient.current
+    val density = DensityAmbient.current
 
-    val popupPositionProperties = remember { PopupPositionProperties() }
-    val popupLayout = remember {
-        PopupLayout(
-            composeView = view,
-            onDismissRequest = onDismissRequest,
-            testTag = providedTestTag
-        )
-    }
+    val popupLayout = remember { PopupLayout(view, density) }
 
     // Refresh anything that might have changed
-    popupLayout.testTag = providedTestTag
-    remember(isFocusable) { popupLayout.updateLayoutParams(isFocusable) }
+    popupLayout.onDismissRequest = onDismissRequest
+    popupLayout.testTag = PopupTestTagAmbient.current
+    remember(popupPositionProvider) { popupLayout.setPositionProvider(popupPositionProvider) }
+    remember(isFocusable) { popupLayout.setIsFocusable(isFocusable) }
 
     var composition: Composition? = null
 
@@ -96,12 +98,11 @@ internal actual fun ActualPopup(
         val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
         val layoutSize = coordinates.size
 
-        popupPositionProperties.parentGlobalBounds = IntBounds(layoutPosition, layoutSize)
-
+        popupLayout.parentGlobalBounds = IntBounds(layoutPosition, layoutSize)
         // Update the popup's position
-        popupLayout.updatePosition(popupPositionProvider, popupPositionProperties)
+        popupLayout.updatePosition()
     }) { _, _ ->
-        popupPositionProperties.parentLayoutDirection = layoutDirection
+        popupLayout.parentLayoutDirection = layoutDirection
         layout(0, 0) {}
     }
 
@@ -113,10 +114,10 @@ internal actual fun ActualPopup(
         composition = popupLayout.setContent(recomposer, parentComposition) {
             SimpleStack(Modifier.semantics { this.popup() }.onPositioned {
                 // Get the size of the content
-                popupPositionProperties.popupContentSize = it.size
+                popupLayout.popupContentSize = it.size
 
                 // Update the popup's position
-                popupLayout.updatePosition(popupPositionProvider, popupPositionProperties)
+                popupLayout.updatePosition()
             }, children = children)
         }
     }
@@ -166,55 +167,100 @@ private inline fun SimpleStack(modifier: Modifier, noinline children: @Composabl
  * The layout the popup uses to display its content.
  *
  * @param composeView The parent view of the popup which is the AndroidComposeView.
- * @param onDismissRequest Executed when the popup tries to dismiss itself.
- * @param testTag The test tag used to match the popup in tests.
  */
 @SuppressLint("ViewConstructor")
 private class PopupLayout(
     private val composeView: View,
-    private val onDismissRequest: (() -> Unit)? = null,
-    var testTag: String
+    private val density: Density
 ) : FrameLayout(composeView.context) {
     private val windowManager =
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val params = createLayoutParams()
     private var viewAdded: Boolean = false
 
+    /** Executed when the popup tries to dismiss itself. */
+    var onDismissRequest: (() -> Unit)? = null
+    /** The test tag used to match the popup in tests. */
+    var testTag: String = ""
+
+    /** The logic of positioning the popup relative to its parent. */
+    private var positionProvider: PopupPositionProvider? = null
+
+    // Position params
+    var parentGlobalBounds = IntBounds(0, 0, 0, 0)
+    var popupContentSize = IntSize.Zero
+    var parentLayoutDirection: LayoutDirection = LayoutDirection.Ltr
+
+    private val maxSupportedElevation = 30.dp
+
     init {
         id = android.R.id.content
         ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(this, ViewTreeViewModelStoreOwner.get(composeView))
         ViewTreeSavedStateRegistryOwner.set(this, ViewTreeSavedStateRegistryOwner.get(composeView))
+
+        // Enable children to draw their shadow by not clipping them
+        clipChildren = false
+        // Allocate space for elevation
+        with(density) { elevation = maxSupportedElevation.toPx() }
+        // Simple outline to force window manager to allocate space for shadow.
+        // Note that the outline affects clickable area for the dismiss listener. In case of shapes
+        // like circle the area for dismiss might be to small (rectangular outline consuming clicks
+        // outside of the circle).
+        outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, result: Outline) {
+                result.setRect(0, 0, view.width, view.height)
+                // We set alpha to 0 to hide the view's shadow and let the composable to draw its
+                // own shadow. This still enables us to get the extra space needed in the surface.
+                result.alpha = 0f
+            }
+        }
     }
 
-    private fun Rect.toIntBounds() = IntBounds(
-        left = left,
-        top = top,
-        right = right,
-        bottom = bottom
-    )
+    fun setPositionProvider(positionProvider: PopupPositionProvider) {
+        val wasProviderSetBefore = this.positionProvider != null
+        this.positionProvider = positionProvider
+        // If we already had a provider before, update our position.
+        // Otherwise, the position will be calculated during the first layout.
+        if (wasProviderSetBefore) {
+            updatePosition()
+        }
+    }
 
     /**
-     * Shows the popup at a position given by the method which calculates the coordinates
-     * relative to its parent.
-     *
-     * @param positionProvider The logic of positioning the popup relative to its parent.
-     * @param positionProperties Properties to use to position the popup.
+     * Set whether the popup can grab a focus and support dismissal.
      */
-    fun updatePosition(
-        positionProvider: PopupPositionProvider,
-        positionProperties: PopupPositionProperties
-    ) {
+    fun setIsFocusable(isFocusable: Boolean) {
+        params.flags = if (!isFocusable) {
+            params.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        } else {
+            params.flags and (WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv())
+        }
+
+        if (viewAdded) {
+            windowManager.updateViewLayout(this, params)
+        }
+    }
+
+    /**
+     * Updates the position of the popup based on current position properties.
+     */
+    fun updatePosition() {
+        val provider = positionProvider
+        if (provider == null) {
+            return
+        }
+
         val windowGlobalBounds = Rect().let {
             composeView.rootView.getWindowVisibleDisplayFrame(it)
             it.toIntBounds()
         }
 
-        val popupGlobalPosition = positionProvider.calculatePosition(
-            positionProperties.parentGlobalBounds,
+        val popupGlobalPosition = provider.calculatePosition(
+            parentGlobalBounds,
             windowGlobalBounds,
-            positionProperties.parentLayoutDirection,
-            positionProperties.popupContentSize
+            parentLayoutDirection,
+            popupContentSize
         )
 
         // WindowManager treats the given coordinates as relative to our window, not relative to the
@@ -230,23 +276,6 @@ private class PopupLayout(
             windowManager.addView(this, params)
             viewAdded = true
         } else {
-            windowManager.updateViewLayout(this, params)
-        }
-    }
-
-    /**
-     * Update the LayoutParams.
-     *
-     * @param popupIsFocusable Indicates if the popup can grab the focus.
-     */
-    fun updateLayoutParams(popupIsFocusable: Boolean) {
-        params.flags = if (!popupIsFocusable) {
-            params.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        } else {
-            params.flags and (WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv())
-        }
-
-        if (viewAdded) {
             windowManager.updateViewLayout(this, params)
         }
     }
@@ -306,6 +335,13 @@ private class PopupLayout(
             format = PixelFormat.TRANSLUCENT
         }
     }
+
+    private fun Rect.toIntBounds() = IntBounds(
+        left = left,
+        top = top,
+        right = right,
+        bottom = bottom
+    )
 }
 
 /**

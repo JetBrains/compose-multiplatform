@@ -31,16 +31,22 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
+import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -78,20 +84,21 @@ fun PopupDemo() {
             ) {
                 val description: String = {
                     when (exampleIndex.value) {
-                        0 -> "Toggle a simple popup"
-                        1 -> "Different content for the popup"
-                        2 -> "Popup's behavior when the parent's size or position " +
+                        0 -> "Shadow demo"
+                        1 -> "Toggle a simple popup"
+                        2 -> "Different content for the popup"
+                        3 -> "Popup's behavior when the parent's size or position " +
                                 "changes"
-                        3 -> "Aligning the popup below the parent"
-                        4 -> "Aligning the popup inside a parent"
-                        5 -> "Insert an email in the popup and then click outside to " +
+                        4 -> "Aligning the popup below the parent"
+                        5 -> "Aligning the popup inside a parent"
+                        6 -> "Insert an email in the popup and then click outside to " +
                                 "dismiss"
-                        6 -> "[bug] Undesired visual effect caused by" +
+                        7 -> "[bug] Undesired visual effect caused by" +
                                 " having a new size content displayed at the old" +
                                 " position, until the new one is calculated"
-                        7 -> "The popup is aligning to its parent when the parent is" +
+                        8 -> "The popup is aligning to its parent when the parent is" +
                                 " inside a Scroller"
-                        8 -> "[bug] The popup is not repositioned " +
+                        9 -> "[bug] The popup is not repositioned " +
                                 "when the parent is moved by the keyboard"
                         else -> "Demo description here"
                     }
@@ -114,14 +121,78 @@ fun PopupDemo() {
         }
 
         when (exampleIndex.value) {
-            0 -> PopupToggle()
-            1 -> PopupWithChangingContent()
-            2 -> PopupWithChangingParent()
-            3 -> PopupAlignmentDemo()
-            4 -> PopupWithEditText()
-            5 -> PopupWithChangingSize()
-            6 -> PopupInsideScroller()
-            7 -> PopupOnKeyboardUp()
+            0 -> PopupElevation()
+            1 -> PopupToggle()
+            2 -> PopupWithChangingContent()
+            3 -> PopupWithChangingParent()
+            4 -> PopupAlignmentDemo()
+            5 -> PopupWithEditText()
+            6 -> PopupWithChangingSize()
+            7 -> PopupInsideScroller()
+            8 -> PopupOnKeyboardUp()
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.PopupElevation() {
+    var isFocusable by remember { mutableStateOf(false) }
+    var shape by remember { mutableStateOf(RectangleShape) }
+    var background by remember { mutableStateOf(Color.Transparent) }
+    var contentSize by remember { mutableStateOf(100.dp) }
+    var dismissCounter by remember { mutableStateOf(0) }
+    var elevation by remember { mutableStateOf(6.dp) }
+
+    // This example utilizes the Card to draw its shadow.
+    Column(Modifier.align(Alignment.CenterHorizontally)) {
+        Box(Modifier.preferredSize(110.dp).background(background)) {
+            Popup(alignment = Alignment.Center, isFocusable = isFocusable,
+                onDismissRequest = { dismissCounter++ }
+            ) {
+                Card(Modifier.preferredSize(contentSize),
+                    elevation = elevation,
+                    shape = shape
+                ) {
+                    Text(text = "This is popup!", textAlign = TextAlign.Center)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+        Text("Dismiss clicked: $dismissCounter (focusable: $isFocusable)")
+        Spacer(Modifier.height(20.dp))
+        Row {
+            Button(onClick = { elevation -= 1.dp }) {
+                Text("-1")
+            }
+            Text("Elevation: $elevation")
+            Button(onClick = { elevation += 1.dp }) {
+                Text("+1")
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        Button(onClick = { shape = if (shape == CircleShape) RectangleShape else CircleShape }) {
+            Text("Toggle shape")
+        }
+        Spacer(Modifier.height(10.dp))
+        Button(onClick = { isFocusable = !isFocusable }) {
+            Text("Toggle focusable")
+        }
+        Spacer(Modifier.height(10.dp))
+        Button(onClick = { background =
+            if (background == Color.Transparent) Color.Yellow else Color.Transparent
+        }) {
+            Text("Toggle container background")
+        }
+        Spacer(Modifier.height(10.dp))
+        Row {
+            Button(onClick = { contentSize -= 10.dp }) {
+                Text("-10.dp")
+            }
+            Text("Size: $contentSize")
+            Button(onClick = { contentSize += 10.dp }) {
+                Text("+10.dp")
+            }
         }
     }
 }

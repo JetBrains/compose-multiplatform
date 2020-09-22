@@ -115,13 +115,6 @@ internal fun PopupTestTag(tag: String, children: @Composable () -> Unit) {
     Providers(PopupTestTagAmbient provides tag, children = children)
 }
 
-internal class PopupPositionProperties {
-    // Screen relative global bounds
-    var parentGlobalBounds = IntBounds(0, 0, 0, 0)
-    var popupContentSize = IntSize.Zero
-    var parentLayoutDirection: LayoutDirection = LayoutDirection.Ltr
-}
-
 @Composable
 fun Popup(
     popupPositionProvider: PopupPositionProvider,
