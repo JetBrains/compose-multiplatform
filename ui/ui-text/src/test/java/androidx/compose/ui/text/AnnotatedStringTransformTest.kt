@@ -73,8 +73,10 @@ class AnnotatedStringTransformTest {
 
     @Test
     fun `English uppercase sparse`() {
-        val input = AnnotatedString("aaa bbb ccc",
-            listOf(makeRange(spanStyle1, "aaa (bbb) ccc")))
+        val input = AnnotatedString(
+            "aaa bbb ccc",
+            listOf(makeRange(spanStyle1, "aaa (bbb) ccc"))
+        )
 
         val uppercase = input.toUpperCase()
 
@@ -83,12 +85,14 @@ class AnnotatedStringTransformTest {
 
     @Test
     fun `English uppercase`() {
-        val input = AnnotatedString("aaa bbb ccc",
+        val input = AnnotatedString(
+            "aaa bbb ccc",
             listOf(
                 makeRange(spanStyle1, "(aaa bbb ccc)"),
                 makeRange(spanStyle2, "(aaa )bbb ccc"),
                 makeRange(spanStyle3, "aaa (bbb ccc)")
-            ), listOf(
+            ),
+            listOf(
                 makeRange(paraStyle1, "(aaa bbb )ccc"),
                 makeRange(paraStyle2, "aaa bbb (ccc)")
             )
@@ -103,12 +107,14 @@ class AnnotatedStringTransformTest {
 
     @Test
     fun `English lowercase`() {
-        val input = AnnotatedString("aaa bbb ccc",
+        val input = AnnotatedString(
+            "aaa bbb ccc",
             listOf(
                 makeRange(spanStyle1, "(aaa bbb ccc)"),
                 makeRange(spanStyle2, "(aaa )bbb ccc"),
                 makeRange(spanStyle3, "aaa (bbb ccc)")
-            ), listOf(
+            ),
+            listOf(
                 makeRange(paraStyle1, "(aaa bbb )ccc"),
                 makeRange(paraStyle2, "aaa bbb (ccc)")
             )
@@ -123,12 +129,14 @@ class AnnotatedStringTransformTest {
 
     @Test
     fun `English capitalize`() {
-        val input = AnnotatedString("aaa bbb ccc",
+        val input = AnnotatedString(
+            "aaa bbb ccc",
             listOf(
                 makeRange(spanStyle1, "(aaa bbb ccc)"),
                 makeRange(spanStyle2, "(aaa )bbb ccc"),
                 makeRange(spanStyle3, "aaa (bbb ccc)")
-            ), listOf(
+            ),
+            listOf(
                 makeRange(paraStyle1, "(aaa bbb )ccc"),
                 makeRange(paraStyle2, "aaa bbb (ccc)")
             )
@@ -143,12 +151,14 @@ class AnnotatedStringTransformTest {
 
     @Test
     fun `English decapitalize`() {
-        val input = AnnotatedString("aaa bbb ccc",
+        val input = AnnotatedString(
+            "aaa bbb ccc",
             listOf(
                 makeRange(spanStyle1, "(aaa bbb ccc)"),
                 makeRange(spanStyle2, "(aaa )bbb ccc"),
                 makeRange(spanStyle3, "aaa (bbb ccc)")
-            ), listOf(
+            ),
+            listOf(
                 makeRange(paraStyle1, "(aaa bbb )ccc"),
                 makeRange(paraStyle2, "aaa bbb (ccc)")
             )
@@ -163,12 +173,14 @@ class AnnotatedStringTransformTest {
 
     @Test
     fun `locale dependent uppercase or lowercase (Turkish uppercase)`() {
-        val input = AnnotatedString("hhh iii jjj",
+        val input = AnnotatedString(
+            "hhh iii jjj",
             listOf(
                 makeRange(spanStyle1, "(hhh iii jjj)"),
                 makeRange(spanStyle2, "(hhh )iii jjj"),
                 makeRange(spanStyle3, "hhh (iii jjj)")
-            ), listOf(
+            ),
+            listOf(
                 makeRange(paraStyle1, "(hhh iii )jjj"),
                 makeRange(paraStyle2, "hhh iii (jjj)")
             )
@@ -186,23 +198,27 @@ class AnnotatedStringTransformTest {
                 makeRange(spanStyle2, "(HHH )$upperI$upperI$upperI JJJ"),
                 makeRange(spanStyle3, "HHH ($upperI$upperI$upperI JJJ)")
             ),
-            uppercase.spanStyles)
+            uppercase.spanStyles
+        )
         assertEquals(
             listOf(
                 makeRange(paraStyle1, "(HHH $upperI$upperI$upperI )JJJ"),
                 makeRange(paraStyle2, "HHH $upperI$upperI$upperI (JJJ)")
             ),
-            uppercase.paragraphStyles)
+            uppercase.paragraphStyles
+        )
     }
 
     @Test
     fun `not 1-by-1 mapping uppercase or lowercase (Lithuanian lowercase)`() {
-        val input = AnnotatedString("HHH ÌÌÌ YYY",
+        val input = AnnotatedString(
+            "HHH ÌÌÌ YYY",
             listOf(
                 makeRange(spanStyle1, "(HHH ÌÌÌ YYY)"),
                 makeRange(spanStyle2, "(HHH )ÌÌÌ YYY"),
                 makeRange(spanStyle3, "HHH (ÌÌÌ YYY)")
-            ), listOf(
+            ),
+            listOf(
                 makeRange(paraStyle1, "(HHH ÌÌÌ )YYY"),
                 makeRange(paraStyle2, "HHH ÌÌÌ (YYY)")
             )
@@ -220,23 +236,27 @@ class AnnotatedStringTransformTest {
                 makeRange(spanStyle2, "(hhh )$lowerIDot$lowerIDot$lowerIDot yyy"),
                 makeRange(spanStyle3, "hhh ($lowerIDot$lowerIDot$lowerIDot yyy)")
             ),
-            lowercase.spanStyles)
+            lowercase.spanStyles
+        )
         assertEquals(
             listOf(
                 makeRange(paraStyle1, "(hhh $lowerIDot$lowerIDot$lowerIDot )yyy"),
                 makeRange(paraStyle2, "hhh $lowerIDot$lowerIDot$lowerIDot (yyy)")
             ),
-            lowercase.paragraphStyles)
+            lowercase.paragraphStyles
+        )
     }
 
     @Test
     fun `nothing happens for CJK uppercase or lowercase (Japanese uppercase)`() {
-        val input = AnnotatedString("あああ いいい ううう",
+        val input = AnnotatedString(
+            "あああ いいい ううう",
             listOf(
                 makeRange(spanStyle1, "(あああ いいい ううう)"),
                 makeRange(spanStyle2, "(あああ )いいい ううう"),
                 makeRange(spanStyle3, "あああ (いいい ううう)")
-            ), listOf(
+            ),
+            listOf(
                 makeRange(paraStyle1, "(あああ いいい )ううう"),
                 makeRange(paraStyle2, "あああ いいい (ううう)")
             )

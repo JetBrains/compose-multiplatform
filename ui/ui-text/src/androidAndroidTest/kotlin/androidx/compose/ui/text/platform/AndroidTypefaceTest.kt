@@ -61,7 +61,8 @@ class AndroidTypefaceTest {
     fun createDefaultTypeface() {
         val typeface = androidTypefaceFromFontFamily(context, FontFamily.Default)
         val nativeTypeface = typeface.getNativeTypeface(
-            FontWeight.Normal, FontStyle.Normal, FontSynthesis.None)
+            FontWeight.Normal, FontStyle.Normal, FontSynthesis.None
+        )
 
         assertThat(nativeTypeface).isNotNull()
         assertThat(nativeTypeface.isBold).isFalse()
@@ -73,39 +74,45 @@ class AndroidTypefaceTest {
     fun fontWeightItalicCreatesItalicFont() {
         val typeface = androidTypefaceFromFontFamily(context, FontFamily.Default)
         val nativeTypeface = typeface.getNativeTypeface(
-            FontWeight.Normal, FontStyle.Italic, FontSynthesis.None)
+            FontWeight.Normal, FontStyle.Italic, FontSynthesis.None
+        )
 
         assertThat(nativeTypeface).isNotNull()
         assertThat(nativeTypeface.isBold).isFalse()
         assertThat(nativeTypeface.isItalic).isTrue()
         assertThat(nativeTypeface.bitmap()).isEqualToBitmap(
-            Typeface.defaultFromStyle(Typeface.ITALIC).bitmap())
+            Typeface.defaultFromStyle(Typeface.ITALIC).bitmap()
+        )
     }
 
     @Test
     fun fontWeightBoldCreatesBoldFont() {
         val typeface = androidTypefaceFromFontFamily(context, FontFamily.Default)
         val nativeTypeface = typeface.getNativeTypeface(
-            FontWeight.Bold, FontStyle.Normal, FontSynthesis.None)
+            FontWeight.Bold, FontStyle.Normal, FontSynthesis.None
+        )
 
         assertThat(nativeTypeface).isNotNull()
         assertThat(nativeTypeface.isBold).isTrue()
         assertThat(nativeTypeface.isItalic).isFalse()
         assertThat(nativeTypeface.bitmap()).isEqualToBitmap(
-            Typeface.defaultFromStyle(Typeface.BOLD).bitmap())
+            Typeface.defaultFromStyle(Typeface.BOLD).bitmap()
+        )
     }
 
     @Test
     fun fontWeightBoldFontStyleItalicCreatesBoldItalicFont() {
         val typeface = androidTypefaceFromFontFamily(context, FontFamily.Default)
         val nativeTypeface = typeface.getNativeTypeface(
-            FontWeight.Bold, FontStyle.Italic, FontSynthesis.None)
+            FontWeight.Bold, FontStyle.Italic, FontSynthesis.None
+        )
 
         assertThat(nativeTypeface).isNotNull()
         assertThat(nativeTypeface.isBold).isTrue()
         assertThat(nativeTypeface.isItalic).isTrue()
         assertThat(nativeTypeface.bitmap()).isEqualToBitmap(
-            Typeface.defaultFromStyle(Typeface.BOLD_ITALIC).bitmap())
+            Typeface.defaultFromStyle(Typeface.BOLD_ITALIC).bitmap()
+        )
     }
 
     @Test
@@ -318,7 +325,8 @@ class AndroidTypefaceTest {
             context = context,
             fontFamily = fontFamily,
             necessaryStyles = null,
-            fontMatcher = fontMatcher)
+            fontMatcher = fontMatcher
+        )
             .getNativeTypeface(fontWeight, fontStyle, FontSynthesis.All)
 
         verify(fontMatcher, times(1)).matchFont(

@@ -36,8 +36,8 @@ fun ParagraphStyleSample() {
     )
     Text(
         text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor " +
-                "incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis " +
-                "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis " +
+            "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         style = textStyle
     )
 }
@@ -46,8 +46,8 @@ fun ParagraphStyleSample() {
 @Composable
 fun ParagraphStyleAnnotatedStringsSample() {
     val text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor " +
-            "incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis " +
-            "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        "incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis " +
+        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 
     val paragraphStyle1 = ParagraphStyle(
         textIndent = TextIndent(firstLine = 14.sp)

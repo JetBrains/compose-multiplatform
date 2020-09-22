@@ -70,11 +70,13 @@ fun CustomFontFamilySample() {
         font(
             resId = R.font.my_font_400_regular,
             weight = FontWeight.W400,
-            style = FontStyle.Normal),
+            style = FontStyle.Normal
+        ),
         font(
             resId = R.font.my_font_400_italic,
             weight = FontWeight.W400,
-            style = FontStyle.Italic)
+            style = FontStyle.Italic
+        )
     )
     Text(text = "Demo Text", fontFamily = fontFamily)
 }

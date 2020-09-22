@@ -98,7 +98,7 @@ internal class SpanIterableSubject<T : Any> private constructor(
 
     companion object {
         fun <T : Any> factory(spanClazz: KClass<out T>): Factory<SpanIterableSubject<T>?,
-                List<SpanInfo<T>>?> {
+            List<SpanInfo<T>>?> {
             return Factory { failureMetadata, subject ->
                 SpanIterableSubject(
                     failureMetadata,
@@ -175,13 +175,13 @@ internal class SpanIterableSubject<T : Any> private constructor(
     override fun actualCustomStringRepresentation(): String {
         if (subjects != null) {
             return "{" +
-                    subjects.joinToString(
-                        separator = ", ",
-                        transform = {
-                            "${it.span::class.java.simpleName}[${it.start}, ${it.end}]"
-                        }
-                    ) +
-                    "}"
+                subjects.joinToString(
+                    separator = ", ",
+                    transform = {
+                        "${it.span::class.java.simpleName}[${it.start}, ${it.end}]"
+                    }
+                ) +
+                "}"
         } else {
             return super.actualCustomStringRepresentation()
         }

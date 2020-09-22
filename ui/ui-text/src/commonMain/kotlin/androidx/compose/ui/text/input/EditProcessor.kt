@@ -55,7 +55,8 @@ class EditProcessor {
         if (mPreviousState != model) {
             mBuffer = EditingBuffer(
                 initialText = model.text,
-                initialSelection = model.selection)
+                initialSelection = model.selection
+            )
         }
 
         mPreviousState = model
@@ -78,7 +79,8 @@ class EditProcessor {
                 TextRange(mBuffer.compositionStart, mBuffer.compositionEnd)
             } else {
                 null
-            })
+            }
+        )
 
         mPreviousState = newState
         return newState

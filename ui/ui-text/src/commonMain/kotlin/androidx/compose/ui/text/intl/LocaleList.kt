@@ -42,7 +42,7 @@ data class LocaleList constructor(val localeList: List<Locale>) : Collection<Loc
      * compliant language tag.
      */
     constructor(languageTags: String) :
-            this(languageTags.split(",").map { it.trim() }.map { Locale(it) })
+        this(languageTags.split(",").map { it.trim() }.map { Locale(it) })
 
     /**
      * Creates a [LocaleList] object from a list of [Locale]s.

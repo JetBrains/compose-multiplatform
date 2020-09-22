@@ -1888,8 +1888,10 @@ class ParagraphIntegrationTest {
 
             paragraphNoMaxLine.paint(Canvas(imageNoMaxLine))
             paragraphWithMaxLine.paint(Canvas(imageWithMaxLine))
-            assertThat(imageNoMaxLine.asAndroidBitmap()).isNotEqualToBitmap(imageWithMaxLine
-                .asAndroidBitmap())
+            assertThat(imageNoMaxLine.asAndroidBitmap()).isNotEqualToBitmap(
+                imageWithMaxLine
+                    .asAndroidBitmap()
+            )
         }
     }
 
@@ -2063,7 +2065,7 @@ class ParagraphIntegrationTest {
                 style = TextStyle(fontSize = fontSize),
                 maxLines = maxLines,
                 ellipsis = true,
-                        // One line can only contain 1 character
+                // One line can only contain 1 character
                 width = fontSizeInPx
             )
 
@@ -2760,7 +2762,7 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.lineCount).isEqualTo(1)
             // Notice that in this test font, the width of character equals to fontSize.
             val expectedLineRight = "abc".length * spanStyleFontSizeInPx +
-                    "de".length * fontSizeInPx
+                "de".length * fontSizeInPx
             assertThat(paragraph.getLineWidth(0)).isEqualTo(expectedLineRight)
         }
     }
@@ -3019,7 +3021,7 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.lineCount).isEqualTo(1)
             // Notice that in this test font, the width of character equals to fontSize.
             val expectedWidth = "abc".length * (1 + letterSpacingOverwrite) * fontSizeInPx +
-                    "de".length * (1 + letterSpacing) * fontSizeInPx
+                "de".length * (1 + letterSpacing) * fontSizeInPx
             assertThat(paragraph.getLineWidth(0)).isEqualTo(expectedWidth)
         }
     }
@@ -3051,7 +3053,7 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.lineCount).isEqualTo(1)
             // Notice that in this test font, the width of character equals to fontSize.
             val expectedWidth = (1 + letterSpacing) *
-                    ("abc".length * fontSizeOverwriteInPx + "de".length * fontSizeInPx)
+                ("abc".length * fontSizeOverwriteInPx + "de".length * fontSizeInPx)
             assertThat(paragraph.getLineWidth(0)).isEqualTo(expectedWidth)
         }
     }
@@ -3082,7 +3084,7 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.lineCount).isEqualTo(1)
             // Notice that in this test font, the width of character equals to fontSize.
             val expectedWidth = (1 + letterSpacing) *
-                    ("abc".length * fontSizeInPx * scaleX + "de".length * fontSizeInPx)
+                ("abc".length * fontSizeInPx * scaleX + "de".length * fontSizeInPx)
             assertThat(paragraph.getLineWidth(0)).isEqualTo(expectedWidth)
         }
     }
@@ -3115,7 +3117,7 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.lineCount).isEqualTo(1)
             // Notice that in this test font, the width of character equals to fontSize.
             val expectedWidth = text.length * letterSpacingInPx +
-                    ("abc".length * fontSizeOverwriteInPx + "de".length * fontSizeInPx)
+                ("abc".length * fontSizeOverwriteInPx + "de".length * fontSizeInPx)
             assertThat(paragraph.getLineWidth(0)).isEqualTo(expectedWidth)
         }
     }
@@ -3147,7 +3149,7 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.lineCount).isEqualTo(1)
             // Notice that in this test font, the width of character equals to fontSize.
             val expectedWidth = text.length * letterSpacingInPx +
-                    ("abc".length * fontSizeInPx * scaleX + "de".length * fontSizeInPx)
+                ("abc".length * fontSizeInPx * scaleX + "de".length * fontSizeInPx)
             assertThat(paragraph.getLineWidth(0)).isEqualTo(expectedWidth)
         }
     }
@@ -3177,7 +3179,7 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.lineCount).isEqualTo(1)
             // Notice that in this test font, the width of character equals to fontSize.
             val expectedWidth = fontSize * text.length + "abc".length * letterSpacingSp +
-                    "de".length * fontSize * letterSpacingEm
+                "de".length * fontSize * letterSpacingEm
             assertThat(paragraph.getLineWidth(0)).isEqualTo(expectedWidth)
         }
     }

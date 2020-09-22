@@ -203,7 +203,8 @@ class MultiParagraph(
             )
 
             if (paragraph.didExceedMaxLines ||
-                (endLineIndex == maxLines && index != intrinsics.infoList.lastIndex)) {
+                (endLineIndex == maxLines && index != intrinsics.infoList.lastIndex)
+            ) {
                 didExceedMaxLines = true
                 break
             }
@@ -249,7 +250,7 @@ class MultiParagraph(
     fun getPathForRange(start: Int, end: Int): Path {
         require(start in 0..end && end <= annotatedString.text.length) {
             "Start($start) or End($end) is out of range [0..${annotatedString.text.length})," +
-                    " or start > end!"
+                " or start > end!"
         }
 
         if (start == end) return Path()

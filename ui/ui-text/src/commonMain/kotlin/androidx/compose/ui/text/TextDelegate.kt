@@ -135,30 +135,30 @@ class TextDelegate(
      * while still being greater than or equal to `minWidth` and less than or equal to `maxWidth`.
      */
     private fun layoutText(minWidth: Float, maxWidth: Float, layoutDirection: LayoutDirection):
-            MultiParagraph {
-        layoutIntrinsics(layoutDirection)
-        // if minWidth == maxWidth the width is fixed.
-        //    therefore we can pass that value to our paragraph and use it
-        // if minWidth != maxWidth there is a range
-        //    then we should check if the max intrinsic width is in this range to decide the
-        //    width to be passed to Paragraph
-        //        if max intrinsic width is between minWidth and maxWidth
-        //           we can use it to layout
-        //        else if max intrinsic width is greater than maxWidth, we can only use maxWidth
-        //        else if max intrinsic width is less than minWidth, we should use minWidth
-        val width = if (minWidth == maxWidth) {
-            maxWidth
-        } else {
-            nonNullIntrinsics.maxIntrinsicWidth.coerceIn(minWidth, maxWidth)
-        }
+        MultiParagraph {
+            layoutIntrinsics(layoutDirection)
+            // if minWidth == maxWidth the width is fixed.
+            //    therefore we can pass that value to our paragraph and use it
+            // if minWidth != maxWidth there is a range
+            //    then we should check if the max intrinsic width is in this range to decide the
+            //    width to be passed to Paragraph
+            //        if max intrinsic width is between minWidth and maxWidth
+            //           we can use it to layout
+            //        else if max intrinsic width is greater than maxWidth, we can only use maxWidth
+            //        else if max intrinsic width is less than minWidth, we should use minWidth
+            val width = if (minWidth == maxWidth) {
+                maxWidth
+            } else {
+                nonNullIntrinsics.maxIntrinsicWidth.coerceIn(minWidth, maxWidth)
+            }
 
-        return MultiParagraph(
-            intrinsics = nonNullIntrinsics,
-            maxLines = maxLines,
-            ellipsis = overflow == TextOverflow.Ellipsis,
-            width = width
-        )
-    }
+            return MultiParagraph(
+                intrinsics = nonNullIntrinsics,
+                maxLines = maxLines,
+                ellipsis = overflow == TextOverflow.Ellipsis,
+                width = width
+            )
+        }
 
     fun layout(
         constraints: Constraints,
@@ -175,7 +175,9 @@ class TextDelegate(
 
         if (prevResult != null && prevResult.canReuse(
                 text, style, maxLines, softWrap, overflow, density, layoutDirection,
-                resourceLoader, constraints)) {
+                resourceLoader, constraints
+            )
+        ) {
             return with(prevResult) {
                 copy(
                     layoutInput = layoutInput.copy(

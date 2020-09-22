@@ -49,13 +49,15 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
         val secondToken = textInputService.startInput(
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         assertThat(firstToken).isNotEqualTo(secondToken)
     }
@@ -71,7 +73,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         textInputService.stopInput(firstToken)
         verify(platformService, times(1)).stopInput()
@@ -88,7 +91,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
@@ -96,7 +100,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         textInputService.stopInput(firstToken)
         verify(platformService, never()).stopInput()
@@ -113,7 +118,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         textInputService.showSoftwareKeyboard(firstToken)
         verify(platformService, times(1)).showSoftwareKeyboard()
@@ -130,7 +136,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
@@ -138,7 +145,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         textInputService.showSoftwareKeyboard(firstToken)
         verify(platformService, never()).showSoftwareKeyboard()
@@ -155,7 +163,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         val dummyEditorModel = TextFieldValue()
         textInputService.onStateUpdated(firstToken, dummyEditorModel)
@@ -173,7 +182,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
@@ -181,7 +191,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         val dummyEditorModel = TextFieldValue()
         textInputService.onStateUpdated(firstToken, dummyEditorModel)
@@ -199,7 +210,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         val dummyRect = Rect(Offset.Zero, Size(100f, 100f))
         textInputService.notifyFocusedRect(firstToken, dummyRect)
@@ -217,7 +229,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
@@ -225,7 +238,8 @@ class TextInputServiceTest {
             KeyboardType.Text,
             ImeAction.NoAction,
             {}, // onEditCommand
-            {}) // onImeActionPerformed
+            {} // onImeActionPerformed
+        )
 
         val dummyRect = Rect(Offset.Zero, Size(100f, 100f))
         textInputService.notifyFocusedRect(firstToken, dummyRect)
