@@ -17,6 +17,7 @@
 package androidx.compose.ui.geometry
 
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -44,5 +45,12 @@ class RadiusTest {
         val copy = radius.copy(y = 300f)
         Assert.assertEquals(100f, copy.x)
         Assert.assertEquals(300f, copy.y)
+    }
+
+    @Test
+    fun testDestructuringAssignment() {
+        val (x, y) = Radius(17f, 42f)
+        assertEquals(17f, x)
+        assertEquals(42f, y)
     }
 }

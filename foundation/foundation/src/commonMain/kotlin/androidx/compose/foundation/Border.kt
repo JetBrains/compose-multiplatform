@@ -25,8 +25,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.boundingRect
 import androidx.compose.ui.geometry.isSimple
-import androidx.compose.ui.geometry.outerRect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
@@ -170,10 +170,10 @@ private class BorderModifier(
                 drawRoundRectBorder(borderSize, outline.rect, 0f, brush)
             } else if (outline is Outline.Rounded && outline.roundRect.isSimple) {
                 // shortcut to make rounded rectangles draw faster
-                val radius = outline.roundRect.bottomLeftRadiusY
+                val radius = outline.roundRect.bottomLeftRadius.y
                 drawRoundRectBorder(
                     borderSize,
-                    outline.roundRect.outerRect(),
+                    outline.roundRect.boundingRect,
                     radius,
                     brush
                 )

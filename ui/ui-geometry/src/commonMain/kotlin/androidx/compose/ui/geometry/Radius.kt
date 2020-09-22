@@ -35,7 +35,13 @@ import kotlin.math.truncate
 @Stable
 inline fun Radius(x: Float, y: Float = x) = Radius(packFloats(x, y))
 
-/** A radius for either circular or elliptical shapes. */
+/**
+ * A radius for either circular or elliptical (oval) shapes.
+ *
+ * Note consumers should create an instance of this class through the corresponding
+ * function constructor as it is represented as an inline class with 2 float
+ * parameters packed into a single long to reduce allocation overhead
+ **/
 @Immutable
 inline class Radius(@PublishedApi internal val packedValue: Long) {
 
@@ -47,6 +53,14 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
     @Stable
     val y: Float
         get() = unpackFloat2(packedValue)
+
+    @Suppress("NOTHING_TO_INLINE")
+    @Stable
+    inline operator fun component1(): Float = x
+
+    @Suppress("NOTHING_TO_INLINE")
+    @Stable
+    inline operator fun component2(): Float = y
 
     /**
      * Returns a copy of this Radius instance optionally overriding the
