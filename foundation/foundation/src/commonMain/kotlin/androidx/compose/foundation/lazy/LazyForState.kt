@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.foundation.animation.FlingConfig
+import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -292,6 +293,7 @@ internal class LazyForState(
         itemsCount: Int,
         itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
     ): MeasureScope.MeasureResult = with(scope) {
+        constraints.assertNotNestingScrollableContainers(isVertical)
         updateItemScope(constraints)
         measuredThisPass.clear()
         val maxMainAxis = if (isVertical) constraints.maxHeight else constraints.maxWidth

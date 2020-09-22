@@ -410,6 +410,7 @@ private data class ScrollingLayoutModifier(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureScope.MeasureResult {
+        constraints.assertNotNestingScrollableContainers(isVertical)
         val childConstraints = constraints.copy(
             maxHeight = if (isVertical) Constraints.Infinity else constraints.maxHeight,
             maxWidth = if (isVertical) constraints.maxWidth else Constraints.Infinity
@@ -427,6 +428,26 @@ private data class ScrollingLayoutModifier(
             val xOffset = if (isVertical) 0 else absScroll.roundToInt()
             val yOffset = if (isVertical) absScroll.roundToInt() else 0
             placeable.placeRelative(xOffset, yOffset)
+        }
+    }
+}
+
+internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolean) {
+    if (isVertical) {
+        check(maxHeight != Constraints.Infinity) {
+            "Nesting scrollable in the same direction layouts like ScrollableContainer and " +
+                    "LazyColumnFor is not allowed. If you want to add a header before the list of" +
+                    " items please take a look on LazyColumn component which has a DSL api which" +
+                    " allows to first add a header via item() function and then the list of " +
+                    "items via items()."
+        }
+    } else {
+        check(maxWidth != Constraints.Infinity) {
+            "Nesting scrollable in the same direction layouts like ScrollableRow and " +
+                    "LazyRowFor is not allowed. If you want to add a header before the list of " +
+                    "items please take a look on LazyRow component which has a DSL api which " +
+                    "allows to first add a fixed element via item() function and then the " +
+                    "list of items via items()."
         }
     }
 }
