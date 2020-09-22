@@ -138,57 +138,57 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
         bounds: IntSize
     ): List<PointerInputChange> {
 
-            var internalChanges = changes
+        var internalChanges = changes
 
-            if (pass == PointerEventPass.Initial && state == State.Started) {
-                internalChanges = internalChanges.map {
-                    if (it.changedToDown()) {
-                        it.consumeDownChange()
-                    } else {
-                        it
-                    }
+        if (pass == PointerEventPass.Initial && state == State.Started) {
+            internalChanges = internalChanges.map {
+                if (it.changedToDown()) {
+                    it.consumeDownChange()
+                } else {
+                    it
                 }
             }
-
-            if (pass == PointerEventPass.Main) {
-
-                if (state == State.Idle && internalChanges.all { it.changedToDown() }) {
-                    // If we have not yet started and all of the changes changed to down, we are
-                    // starting.
-                    state = State.Started
-                    onStart?.invoke(internalChanges.first().current.position!!)
-                } else if (state == State.Started) {
-                    if (internalChanges.all { it.changedToUpIgnoreConsumed() }) {
-                        // If we have started and all of the changes changed to up, we are stopping.
-                        state = State.Idle
-                        onStop?.invoke()
-                    } else if (!internalChanges.anyPointersInBounds(bounds)) {
-                        // If all of the down pointers are currently out of bounds, we should cancel
-                        // as this indicates that the user does not which to trigger a press based
-                        // event.
-                        state = State.Idle
-                        onCancel?.invoke()
-                    }
-                }
-
-                if (state == State.Started) {
-                    internalChanges = internalChanges.map { it.consumeDownChange() }
-                }
-            }
-
-            if (
-                pass == PointerEventPass.Final &&
-                state == State.Started &&
-                internalChanges.fastAny { it.anyPositionChangeConsumed() }
-            ) {
-                // On the final pass, if we have started and any of the changes had consumed
-                // position changes, we cancel.
-                state = State.Idle
-                onCancel?.invoke()
-            }
-
-            return internalChanges
         }
+
+        if (pass == PointerEventPass.Main) {
+
+            if (state == State.Idle && internalChanges.all { it.changedToDown() }) {
+                // If we have not yet started and all of the changes changed to down, we are
+                // starting.
+                state = State.Started
+                onStart?.invoke(internalChanges.first().current.position!!)
+            } else if (state == State.Started) {
+                if (internalChanges.all { it.changedToUpIgnoreConsumed() }) {
+                    // If we have started and all of the changes changed to up, we are stopping.
+                    state = State.Idle
+                    onStop?.invoke()
+                } else if (!internalChanges.anyPointersInBounds(bounds)) {
+                    // If all of the down pointers are currently out of bounds, we should cancel
+                    // as this indicates that the user does not which to trigger a press based
+                    // event.
+                    state = State.Idle
+                    onCancel?.invoke()
+                }
+            }
+
+            if (state == State.Started) {
+                internalChanges = internalChanges.map { it.consumeDownChange() }
+            }
+        }
+
+        if (
+            pass == PointerEventPass.Final &&
+            state == State.Started &&
+            internalChanges.fastAny { it.anyPositionChangeConsumed() }
+        ) {
+            // On the final pass, if we have started and any of the changes had consumed
+            // position changes, we cancel.
+            state = State.Idle
+            onCancel?.invoke()
+        }
+
+        return internalChanges
+    }
 
     override fun onCancel() {
         if (state == State.Started) {

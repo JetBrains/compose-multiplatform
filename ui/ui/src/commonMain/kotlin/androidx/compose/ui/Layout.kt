@@ -257,8 +257,10 @@ internal fun materializerOf(
 }
 
 @Composable
-@Deprecated("This composable is temporary to enable quicker prototyping in ConstraintLayout. " +
-        "It should not be used in app code directly.")
+@Deprecated(
+    "This composable is temporary to enable quicker prototyping in ConstraintLayout. " +
+        "It should not be used in app code directly."
+)
 @OptIn(ExperimentalLayoutNodeApi::class)
 fun MultiMeasureLayout(
     modifier: Modifier = Modifier,

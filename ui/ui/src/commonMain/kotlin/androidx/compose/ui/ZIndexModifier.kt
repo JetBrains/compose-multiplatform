@@ -49,8 +49,9 @@ interface ZIndexModifier : Modifier.Element {
 @Stable
 fun Modifier.zIndex(zIndex: Float): Modifier = this.then(SimpleZIndexModifier(zIndex))
 
-private data class SimpleZIndexModifier(override val zIndex: Float) : ZIndexModifier,
-    InspectableParameter {
+private data class SimpleZIndexModifier(
+    override val zIndex: Float
+) : ZIndexModifier, InspectableParameter {
     override val nameFallback = "zIndex"
     override val valueOverride = zIndex
     override val inspectableElements = emptySequence<ParameterElement>()

@@ -89,57 +89,57 @@ internal class LongPressGestureFilter(
         bounds: IntSize
     ): List<PointerInputChange> {
 
-            var changesToReturn = changes
+        var changesToReturn = changes
 
-            if (pass == PointerEventPass.Initial && state == State.Fired) {
-                // If we fired and have not reset, we should prevent other pointer input nodes from
-                // responding to up, so consume it early on.
-                changesToReturn = changesToReturn.map {
-                    if (it.changedToUp()) {
-                        it.consumeDownChange()
-                    } else {
-                        it
-                    }
+        if (pass == PointerEventPass.Initial && state == State.Fired) {
+            // If we fired and have not reset, we should prevent other pointer input nodes from
+            // responding to up, so consume it early on.
+            changesToReturn = changesToReturn.map {
+                if (it.changedToUp()) {
+                    it.consumeDownChange()
+                } else {
+                    it
                 }
             }
+        }
 
-            if (pass == PointerEventPass.Main) {
-                if (state == State.Idle && changes.all { it.changedToDown() }) {
-                    // If we are idle and all of the changes changed to down, we are prime to fire
-                    // the event.
-                    primeToFire()
-                } else if (state != State.Idle && changes.all { it.changedToUpIgnoreConsumed() }) {
-                    // If we have started and all of the changes changed to up, reset to idle.
-                    resetToIdle()
-                } else if (!changesToReturn.anyPointersInBounds(bounds)) {
-                    // If all pointers have gone out of bounds, reset to idle.
-                    resetToIdle()
-                }
-
-                if (state == State.Primed) {
-                    // If we are primed, keep track of all down pointer positions so we can pass
-                    // pointer position information to the event we will fire.
-                    changes.forEach {
-                        if (it.current.down) {
-                            pointerPositions[it.id] = it.current.position!!
-                        } else {
-                            pointerPositions.remove(it.id)
-                        }
-                    }
-                }
-            }
-
-            if (
-                pass == PointerEventPass.Final &&
-                state != State.Idle &&
-                changes.fastAny { it.anyPositionChangeConsumed() }
-            ) {
-                // If we are anything but Idle and something consumed movement, reset.
+        if (pass == PointerEventPass.Main) {
+            if (state == State.Idle && changes.all { it.changedToDown() }) {
+                // If we are idle and all of the changes changed to down, we are prime to fire
+                // the event.
+                primeToFire()
+            } else if (state != State.Idle && changes.all { it.changedToUpIgnoreConsumed() }) {
+                // If we have started and all of the changes changed to up, reset to idle.
+                resetToIdle()
+            } else if (!changesToReturn.anyPointersInBounds(bounds)) {
+                // If all pointers have gone out of bounds, reset to idle.
                 resetToIdle()
             }
 
-            return changesToReturn
+            if (state == State.Primed) {
+                // If we are primed, keep track of all down pointer positions so we can pass
+                // pointer position information to the event we will fire.
+                changes.forEach {
+                    if (it.current.down) {
+                        pointerPositions[it.id] = it.current.position!!
+                    } else {
+                        pointerPositions.remove(it.id)
+                    }
+                }
+            }
         }
+
+        if (
+            pass == PointerEventPass.Final &&
+            state != State.Idle &&
+            changes.fastAny { it.anyPositionChangeConsumed() }
+        ) {
+            // If we are anything but Idle and something consumed movement, reset.
+            resetToIdle()
+        }
+
+        return changesToReturn
+    }
 
     override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
         if (

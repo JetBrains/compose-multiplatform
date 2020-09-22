@@ -58,26 +58,29 @@ class DrawModifierTest {
         val size = 200
         rule.setContent {
             var rectColor by remember { mutableStateOf(Color.Blue) }
-            AtLeastSize(size = size, modifier = Modifier.testTag(testTag).drawWithCache {
-                val drawSize = this.size
-                val path = Path().apply {
-                    lineTo(drawSize.width / 2f, 0f)
-                    lineTo(drawSize.width / 2f, drawSize.height)
-                    lineTo(0f, drawSize.height)
-                    close()
+            AtLeastSize(
+                size = size,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    val drawSize = this.size
+                    val path = Path().apply {
+                        lineTo(drawSize.width / 2f, 0f)
+                        lineTo(drawSize.width / 2f, drawSize.height)
+                        lineTo(0f, drawSize.height)
+                        close()
+                    }
+                    cacheBuildCount++
+                    onDraw {
+                        drawRect(rectColor)
+                        drawPath(path, Color.Red)
+                    }
+                }.clickable {
+                    if (rectColor == Color.Blue) {
+                        rectColor = Color.Green
+                    } else {
+                        rectColor = Color.Blue
+                    }
                 }
-                cacheBuildCount++
-                onDraw {
-                    drawRect(rectColor)
-                    drawPath(path, Color.Red)
-                }
-            }.clickable {
-                if (rectColor == Color.Blue) {
-                    rectColor = Color.Green
-                } else {
-                    rectColor = Color.Blue
-                }
-            }) { }
+            ) { }
         }
 
         rule.onNodeWithTag(testTag).apply {
@@ -127,22 +130,25 @@ class DrawModifierTest {
 
         rule.setContent {
             var pathFillBounds by remember { mutableStateOf(false) }
-            AtLeastSize(size = size, modifier = Modifier.testTag(testTag).drawWithCache {
-                val pathSize = if (pathFillBounds) this.size else this.size / 2f
-                val path = Path().apply {
-                    lineTo(pathSize.width, 0f)
-                    lineTo(pathSize.width, pathSize.height)
-                    lineTo(0f, pathSize.height)
-                    close()
+            AtLeastSize(
+                size = size,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    val pathSize = if (pathFillBounds) this.size else this.size / 2f
+                    val path = Path().apply {
+                        lineTo(pathSize.width, 0f)
+                        lineTo(pathSize.width, pathSize.height)
+                        lineTo(0f, pathSize.height)
+                        close()
+                    }
+                    cacheBuildCount++
+                    onDraw {
+                        drawRect(Color.Red)
+                        drawPath(path, Color.Blue)
+                    }
+                }.clickable {
+                    pathFillBounds = !pathFillBounds
                 }
-                cacheBuildCount++
-                onDraw {
-                    drawRect(Color.Red)
-                    drawPath(path, Color.Blue)
-                }
-            }.clickable {
-                pathFillBounds = !pathFillBounds
-            }) { }
+            ) { }
         }
 
         rule.onNodeWithTag(testTag).apply {
@@ -190,25 +196,28 @@ class DrawModifierTest {
         val endSize = 400
         rule.setContent {
             var size by remember { mutableStateOf(startSize) }
-            AtLeastSize(size = size, modifier = Modifier.testTag(testTag).drawWithCache {
-                val drawSize = this.size
-                val path = Path().apply {
-                    lineTo(drawSize.width, 0f)
-                    lineTo(drawSize.height, drawSize.height)
-                    lineTo(0f, drawSize.height)
-                    close()
+            AtLeastSize(
+                size = size,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    val drawSize = this.size
+                    val path = Path().apply {
+                        lineTo(drawSize.width, 0f)
+                        lineTo(drawSize.height, drawSize.height)
+                        lineTo(0f, drawSize.height)
+                        close()
+                    }
+                    cacheBuildCount++
+                    onDraw {
+                        drawPath(path, Color.Red)
+                    }
+                }.clickable {
+                    if (size == startSize) {
+                        size = endSize
+                    } else {
+                        size = startSize
+                    }
                 }
-                cacheBuildCount++
-                onDraw {
-                    drawPath(path, Color.Red)
-                }
-            }.clickable {
-                if (size == startSize) {
-                    size = endSize
-                } else {
-                    size = startSize
-                }
-            }) { }
+            ) { }
         }
 
         rule.onNodeWithTag(testTag).apply {

@@ -174,25 +174,29 @@ class PainterModifierTest {
             containerSizePx
         ).apply {
             assertEquals(
-                Color.White.toArgb(), getPixel(
+                Color.White.toArgb(),
+                getPixel(
                     containerWidth.roundToInt() - 1,
                     containerHeight.roundToInt() - 1
                 )
             )
             assertEquals(
-                Color.Red.toArgb(), getPixel(
+                Color.Red.toArgb(),
+                getPixel(
                     containerWidth.roundToInt() + 1,
                     containerWidth.roundToInt() + 1
                 )
             )
             assertEquals(
-                Color.Red.toArgb(), getPixel(
+                Color.Red.toArgb(),
+                getPixel(
                     containerWidth.roundToInt() * 2 - 1,
                     containerWidth.roundToInt() * 2 - 1
                 )
             )
             assertEquals(
-                Color.White.toArgb(), getPixel(
+                Color.White.toArgb(),
+                getPixel(
                     containerWidth.roundToInt() * 2 + 1,
                     containerHeight.roundToInt() * 2 + 1
                 )
@@ -259,7 +263,8 @@ class PainterModifierTest {
             assertEquals(Color.Red.toArgb(), getPixel(0, 0))
             assertEquals(Color.Red.toArgb(), getPixel(containerWidth.roundToInt() - 1, 0))
             assertEquals(
-                Color.Red.toArgb(), getPixel(
+                Color.Red.toArgb(),
+                getPixel(
                     containerWidth.roundToInt() - 1,
                     containerHeight.roundToInt() - 1
                 )
@@ -301,7 +306,8 @@ class PainterModifierTest {
             assertEquals(Color.Red.toArgb(), getPixel(0, 0))
             assertEquals(Color.Red.toArgb(), getPixel(containerWidth.roundToInt() / 2 - 1, 0))
             assertEquals(
-                Color.White.toArgb(), getPixel(
+                Color.White.toArgb(),
+                getPixel(
                     containerWidth.roundToInt() - 1,
                     containerHeight.roundToInt() - 1
                 )
@@ -310,7 +316,8 @@ class PainterModifierTest {
 
             assertEquals(Color.White.toArgb(), getPixel(containerWidth.roundToInt() / 2 + 1, 0))
             assertEquals(
-                Color.White.toArgb(), getPixel(
+                Color.White.toArgb(),
+                getPixel(
                     containerWidth.roundToInt() / 2 + 1,
                     containerHeight.roundToInt() / 2 + 1
                 )
@@ -347,7 +354,8 @@ class PainterModifierTest {
             assertEquals(Color.Red.toArgb(), getPixel(0, 0))
             assertEquals(Color.Red.toArgb(), getPixel(containerSize - 1, 0))
             assertEquals(
-                Color.Red.toArgb(), getPixel(
+                Color.Red.toArgb(),
+                getPixel(
                     containerSize - 1,
                     containerSize - 1
                 )
@@ -479,9 +487,10 @@ class PainterModifierTest {
                 override fun DrawScope.onDraw() { /* no-op */
                 }
             }
-            Box(modifier =
-                Modifier.then(modifier)
-                .paint(painter, contentScale = contentScale)
+            Box(
+                modifier =
+                    Modifier.then(modifier)
+                        .paint(painter, contentScale = contentScale)
             )
         }
 
@@ -562,7 +571,8 @@ class PainterModifierTest {
                             defaultWidth = vectorWidthDp,
                             defaultHeight = vectorHeightDp
                         ) { viewportWidth, viewportHeight ->
-                            Path(fill = SolidColor(Color.Red),
+                            Path(
+                                fill = SolidColor(Color.Red),
                                 pathData = PathData {
                                     horizontalLineToRelative(viewportWidth)
                                     verticalLineToRelative(viewportHeight)
@@ -601,9 +611,11 @@ class PainterModifierTest {
         assertThat(modifier.nameFallback).isEqualTo("paint")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(modifier.javaClass.declaredFields
-                .filter { !it.isSynthetic && it.name != "nameFallback" }
-                .map { it.name })
+            .containsExactlyElementsIn(
+                modifier.javaClass.declaredFields
+                    .filter { !it.isSynthetic && it.name != "nameFallback" }
+                    .map { it.name }
+            )
     }
 
     @Composable
@@ -626,12 +638,12 @@ class PainterModifierTest {
     }
 }
 
-    private fun ComposeTestRule.obtainScreenshotBitmap(width: Int, height: Int = width): Bitmap {
-        val bitmap = onRoot().captureToBitmap()
-        assertEquals(width, bitmap.width)
-        assertEquals(height, bitmap.height)
-        return bitmap
-    }
+private fun ComposeTestRule.obtainScreenshotBitmap(width: Int, height: Int = width): Bitmap {
+    val bitmap = onRoot().captureToBitmap()
+    assertEquals(width, bitmap.width)
+    assertEquals(height, bitmap.height)
+    return bitmap
+}
 
 private class TestPainter(
     val width: Float,
@@ -683,11 +695,13 @@ fun NoIntrinsicSizeContainer(
     Layout(children, modifier) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
         val width = max(
-            placeables.maxByOrNull { it.width }?.width ?: 0, constraints
+            placeables.maxByOrNull { it.width }?.width ?: 0,
+            constraints
                 .minWidth
         )
         val height = max(
-            placeables.maxByOrNull { it.height }?.height ?: 0, constraints
+            placeables.maxByOrNull { it.height }?.height ?: 0,
+            constraints
                 .minHeight
         )
         layout(width, height) {

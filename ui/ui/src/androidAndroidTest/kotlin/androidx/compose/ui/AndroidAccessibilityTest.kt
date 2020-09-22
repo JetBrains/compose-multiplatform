@@ -150,9 +150,9 @@ class AndroidAccessibilityTest {
             }
             androidComposeView = container.getChildAt(0) as AndroidComposeView
             delegate = ViewCompat.getAccessibilityDelegate(androidComposeView) as
-                    AndroidComposeViewAccessibilityDelegateCompat
+                AndroidComposeViewAccessibilityDelegateCompat
             provider = delegate.getAccessibilityNodeProvider(androidComposeView).provider
-                        as AccessibilityNodeProvider
+                as AccessibilityNodeProvider
         }
     }
 
@@ -168,7 +168,8 @@ class AndroidAccessibilityTest {
             }
             Build.VERSION.SDK_INT >= 19 -> {
                 accessibilityNodeInfo.extras.getCharSequence(
-                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY")
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY"
+                )
             }
             else -> {
                 null
@@ -177,8 +178,11 @@ class AndroidAccessibilityTest {
         assertEquals("Checked", stateDescription)
         assertTrue(accessibilityNodeInfo.isClickable)
         assertTrue(accessibilityNodeInfo.isVisibleToUser)
-        assertTrue(accessibilityNodeInfo.actionList.contains(
-            AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)))
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
+            )
+        )
 
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
@@ -189,21 +193,34 @@ class AndroidAccessibilityTest {
         assertFalse(accessibilityNodeInfo.isFocused)
         assertTrue(accessibilityNodeInfo.isEditable)
         assertTrue(accessibilityNodeInfo.isVisibleToUser)
-        assertTrue(accessibilityNodeInfo.actionList.contains(
-            AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)))
-        assertTrue(accessibilityNodeInfo.actionList.contains(
-            AccessibilityNodeInfo.AccessibilityAction(ACTION_SET_SELECTION, null)))
-        assertTrue(accessibilityNodeInfo.actionList.contains(
-            AccessibilityNodeInfo.AccessibilityAction(ACTION_NEXT_AT_MOVEMENT_GRANULARITY, null)))
-        assertTrue(accessibilityNodeInfo.actionList.contains(
-            AccessibilityNodeInfo.AccessibilityAction(
-                ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, null)))
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
+            )
+        )
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_SET_SELECTION, null)
+            )
+        )
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_NEXT_AT_MOVEMENT_GRANULARITY, null)
+            )
+        )
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(
+                    ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, null
+                )
+            )
+        )
         assertEquals(
             AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER or
-                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD or
-                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PARAGRAPH or
-                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE or
-                    AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PAGE,
+                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD or
+                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PARAGRAPH or
+                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE or
+                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PAGE,
             accessibilityNodeInfo.movementGranularities
         )
         if (Build.VERSION.SDK_INT >= 26) {
@@ -238,10 +255,12 @@ class AndroidAccessibilityTest {
             provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument)
         }
         rule.onNodeWithTag(TextFieldTag)
-            .assert(SemanticsMatcher.expectValue(
-                SemanticsProperties.TextSelectionRange,
-                TextRange(1)
-            ))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange(1)
+                )
+            )
         argument = Bundle()
         argument.putInt(
             AccessibilityNodeInfo.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
@@ -259,10 +278,12 @@ class AndroidAccessibilityTest {
             )
         }
         rule.onNodeWithTag(TextFieldTag)
-            .assert(SemanticsMatcher.expectValue(
-                SemanticsProperties.TextSelectionRange,
-                TextRange(0)
-            ))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange(0)
+                )
+            )
     }
 
     @Test
@@ -283,8 +304,10 @@ class AndroidAccessibilityTest {
             .getParcelableArray(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
         assertEquals(1, data!!.size)
         val rectF = data[0] as RectF
-        val expectedRect = textLayoutResult.getBoundingBox(0).translate(textFieldNode
-            .globalPosition)
+        val expectedRect = textLayoutResult.getBoundingBox(0).translate(
+            textFieldNode
+                .globalPosition
+        )
         assertEquals(expectedRect.left, rectF.left)
         assertEquals(expectedRect.top, rectF.top)
         assertEquals(expectedRect.right, rectF.right)
@@ -367,11 +390,14 @@ class AndroidAccessibilityTest {
 
         rule.runOnIdle {
             // One from initialization and one from text field removal.
-            verify(container, atLeast(2)).requestSendAccessibilityEvent(eq(androidComposeView),
-                argThat(ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+            verify(container, atLeast(2)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
                             it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
-                })
+                    }
+                )
             )
         }
     }
@@ -388,7 +414,7 @@ class AndroidAccessibilityTest {
         )
         args.putBoolean(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, false)
         val provider = delegate.getAccessibilityNodeProvider(androidComposeView).provider as
-                AccessibilityNodeProvider
+            AccessibilityNodeProvider
         provider.performAction(
             textFieldNode.id,
             AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,

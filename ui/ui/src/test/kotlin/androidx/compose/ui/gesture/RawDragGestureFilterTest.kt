@@ -780,8 +780,10 @@ class RawDragGestureFilterTest {
         filter::onPointerInput.invokeOverAllPasses(move)
 
         // Assert
-        if (!blocked && (filterOrientation == Orientation.Horizontal && dx != 0f ||
-                    filterOrientation == Orientation.Vertical && dy != 0f)
+        if (!blocked && (
+            filterOrientation == Orientation.Horizontal && dx != 0f ||
+                filterOrientation == Orientation.Vertical && dy != 0f
+            )
         ) {
             assertThat(scrollOrientationLocker.getPointersFor(listOf(move), otherOrientation))
                 .hasSize(0)

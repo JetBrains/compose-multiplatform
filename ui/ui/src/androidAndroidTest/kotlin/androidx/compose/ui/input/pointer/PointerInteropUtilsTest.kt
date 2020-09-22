@@ -60,7 +60,8 @@ class PointerInteropUtilsTest {
                     3f,
                     4f
                 )
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -112,7 +113,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer1,
                 pointer2
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -140,7 +142,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer2,
                 pointer1
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -168,7 +171,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer1,
                 pointer2
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -196,7 +200,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer2,
                 pointer1
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -249,7 +254,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer1,
                 pointer2
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -302,7 +308,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer2,
                 pointer1
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -364,7 +371,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer1,
                 pointer2
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -392,7 +400,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer2,
                 pointer1
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent
@@ -445,7 +454,8 @@ class PointerInteropUtilsTest {
             listOf(
                 pointer2,
                 pointer1
-            ), expected
+            ),
+            expected
         )
 
         lateinit var actual: MotionEvent

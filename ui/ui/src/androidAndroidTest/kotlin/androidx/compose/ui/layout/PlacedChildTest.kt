@@ -36,12 +36,16 @@ class PlacedChildTest {
     fun remeasureNotPlacedChild() {
         val root = root {
             measureBlocks = UseChildSizeButNotPlace
-            add(node {
-                wrapChildren = true
-                add(node {
-                    size = 10
-                })
-            })
+            add(
+                node {
+                    wrapChildren = true
+                    add(
+                        node {
+                            size = 10
+                        }
+                    )
+                }
+            )
         }
 
         val delegate = createDelegate(root)

@@ -53,14 +53,14 @@ fun DoubleTapInTapDemo() {
     Column {
         Text(
             "Demonstrates interaction between DoubleTapGestureFilter and TapGestureFilter in an " +
-                    "edge case that is nevertheless supported (normally regions will be separated" +
-                    " by a pressIndicatorGestureFilter, but here they are not)."
+                "edge case that is nevertheless supported (normally regions will be separated" +
+                " by a pressIndicatorGestureFilter, but here they are not)."
         )
         Text(
             "Double tap the inner box to change the inner box color. Tap anywhere in the outer " +
-                    "box once (including the inner box) to change the outer box background " +
-                    "color. Tap rapidly with one or more fingers anywhere and the colors should" +
-                    "change as one would expect."
+                "box once (including the inner box) to change the outer box background " +
+                "color. Tap rapidly with one or more fingers anywhere and the colors should" +
+                "change as one would expect."
         )
         Box(
             Modifier

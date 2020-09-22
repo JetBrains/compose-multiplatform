@@ -90,7 +90,7 @@ internal class DrawCache {
         val targetImage = cachedImage
         check(targetImage != null) {
             "drawCachedImage must be invoked first before attempting to draw the result " +
-                    "into another destination"
+                "into another destination"
         }
         target.drawImage(targetImage, Offset.Zero, alpha = alpha, colorFilter = colorFilter)
     }

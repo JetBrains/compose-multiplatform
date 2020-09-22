@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.gesture
 
-@RequiresOptIn("This pointer input API is experimental and is likely to change before becoming " +
-        "stable.")
+@RequiresOptIn(
+    "This pointer input API is experimental and is likely to change before becoming " +
+        "stable."
+)
 annotation class ExperimentalPointerInput

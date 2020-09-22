@@ -233,13 +233,13 @@ class FocusRequesterTest {
             ) {
                 Box(
                     modifier = Modifier
-                    .focusObserver { focusState1 = it }
-                    .focus()
+                        .focusObserver { focusState1 = it }
+                        .focus()
                 )
                 Box(
                     modifier = Modifier
-                    .focusObserver { focusState2 = it }
-                    .focus()
+                        .focusObserver { focusState2 = it }
+                        .focus()
                 )
             }
         }

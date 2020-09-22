@@ -224,13 +224,15 @@ private fun doSetContent(
     content: @Composable () -> Unit
 ): Composition {
     if (inspectionWanted(owner)) {
-        owner.view.setTag(R.id.inspection_slot_table_set,
-                Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>()))
+        owner.view.setTag(
+            R.id.inspection_slot_table_set,
+            Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>())
+        )
     }
     @OptIn(ExperimentalComposeApi::class)
     val original = compositionFor(owner.root, UiApplier(owner.root), recomposer, parentComposition)
     val wrapped = owner.view.getTag(R.id.wrapped_composition_tag)
-            as? WrappedComposition
+        as? WrappedComposition
         ?: WrappedComposition(owner, original).also {
             owner.view.setTag(R.id.wrapped_composition_tag, it)
         }
@@ -261,7 +263,7 @@ private class WrappedComposition(
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
                             owner.view.getTag(R.id.inspection_slot_table_set) as?
-                                    MutableSet<SlotTable>
+                                MutableSet<SlotTable>
                         inspectionTable?.add(currentComposer.slotTable)
                         Providers(InspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner, content)
@@ -312,4 +314,4 @@ private val DefaultLayoutParams = ViewGroup.LayoutParams(
  */
 private fun inspectionWanted(owner: AndroidOwner): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-            owner.view.attributeSourceResourceMap.isNotEmpty()
+        owner.view.attributeSourceResourceMap.isNotEmpty()

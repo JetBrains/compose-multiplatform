@@ -386,7 +386,7 @@ class AccessibilityIteratorsTest {
         val startLineTop = textLayoutResult.getLineTop(startLine)
         val endLineTop = textLayoutResult.getLineTop(endLine)
         val lineHeight = textLayoutResult.getLineBottom(endLine) -
-                textLayoutResult.getLineTop(endLine)
+            textLayoutResult.getLineTop(endLine)
         val iteratorStep = endLineTop - startLineTop
         val nodeHeight = textFieldNode.globalBounds.bottom - textFieldNode.globalBounds.top
         Truth.assertThat(abs(iteratorStep - nodeHeight) < lineHeight)
@@ -409,7 +409,7 @@ class AccessibilityIteratorsTest {
         val startLineTop = textLayoutResult.getLineTop(startLine)
         val endLineTop = textLayoutResult.getLineTop(endLine)
         val lineHeight = textLayoutResult.getLineBottom(endLine) -
-                textLayoutResult.getLineTop(endLine)
+            textLayoutResult.getLineTop(endLine)
         val iteratorStep = endLineTop - startLineTop
         val nodeHeight = textFieldNode.globalBounds.bottom - textFieldNode.globalBounds.top
         Truth.assertThat(abs(iteratorStep - nodeHeight) < lineHeight)

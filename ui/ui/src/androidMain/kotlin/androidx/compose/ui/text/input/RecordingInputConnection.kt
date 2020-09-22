@@ -98,12 +98,16 @@ internal class RecordingInputConnection(
         val candidateEnd = next.composition?.max ?: -1
         if (DEBUG) {
             Log.d(
-                TAG, "updateSelection(" +
-                        "selection = (${next.selection.min},${next.selection.max}), " +
-                        "compoairion = ($candidateStart, $candidateEnd)")
+                TAG,
+                "updateSelection(" +
+                    "selection = (${next.selection.min},${next.selection.max}), " +
+                    "compoairion = ($candidateStart, $candidateEnd)"
+            )
         }
-        imm.updateSelection(view, next.selection.min, next.selection.max,
-            candidateStart, candidateEnd)
+        imm.updateSelection(
+            view, next.selection.min, next.selection.max,
+            candidateStart, candidateEnd
+        )
     }
 
     // The recoding editing ops.

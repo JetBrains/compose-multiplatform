@@ -48,10 +48,10 @@ fun ScrollGestureFilterDemo() {
         Text("Demonstrates scroll orientation locking")
         Text(
             "The inner box is composed inside of the outer.  If you start dragging the inner box" +
-                    "vertically, it will drag vertically , the same pointer will only ever allow " +
-                    "the box to be dragged vertically.  If drag the inner box horizontally, the " +
-                    "container will start being dragged horizontally and that pointer will only " +
-                    "ever drag horizontally."
+                "vertically, it will drag vertically , the same pointer will only ever allow " +
+                "the box to be dragged vertically.  If drag the inner box horizontally, the " +
+                "container will start being dragged horizontally and that pointer will only " +
+                "ever drag horizontally."
         )
         ScrollableBox(240.dp, Orientation.Horizontal, Green, Yellow) {
             ScrollableBox(144.dp, Orientation.Vertical, Red, Blue)
@@ -100,13 +100,13 @@ fun ScrollableBox(
     }
 
     Box(
-            Modifier.offset(offsetX, offsetY)
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center)
-                .scrollGestureFilter(scrollCallback, orientation)
-                .preferredSize(size)
-                .background(color.value)
-        ) {
-            children()
-        }
+        Modifier.offset(offsetX, offsetY)
+            .fillMaxSize()
+            .wrapContentSize(Alignment.Center)
+            .scrollGestureFilter(scrollCallback, orientation)
+            .preferredSize(size)
+            .background(color.value)
+    ) {
+        children()
+    }
 }

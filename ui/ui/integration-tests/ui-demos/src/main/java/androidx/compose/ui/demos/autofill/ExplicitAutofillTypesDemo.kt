@@ -119,9 +119,11 @@ private fun Autofill(
     val autofillTree = AutofillTreeAmbient.current
     autofillTree += autofillNode
 
-    Box(Modifier.onPositioned {
-        autofillNode.boundingBox = it.boundingBox().toComposeRect()
-    }) {
+    Box(
+        Modifier.onPositioned {
+            autofillNode.boundingBox = it.boundingBox().toComposeRect()
+        }
+    ) {
         children(autofillNode)
     }
 }

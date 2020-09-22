@@ -22,8 +22,8 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.node.ModifiedFocusRequesterNode
 
 private val focusRequesterNotInitialized = "FocusRequester is not initialized. One reason for " +
-        "this is that you requesting focus changes during composition. Focus requests should " +
-        "not be made during composition, but should be made in response to some event."
+    "this is that you requesting focus changes during composition. Focus requests should " +
+    "not be made during composition, but should be made in response to some event."
 
 /**
  * The [FocusRequester] is used in conjunction with

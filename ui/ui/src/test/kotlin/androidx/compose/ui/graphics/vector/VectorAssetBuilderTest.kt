@@ -63,17 +63,17 @@ class VectorAssetBuilderTest {
     fun testAddGroup() {
         val vectorAsset = builder().apply {
             pushGroup("group1")
-                addPath(name = "path1", pathData = emptyList())
-                pushGroup("group2")
-                    addPath(name = "path2", pathData = emptyList())
-                popGroup()
-                pushGroup("group3")
-                    addPath(name = "path3", pathData = emptyList())
-                    addPath(name = "path4", pathData = emptyList())
-                popGroup()
+            addPath(name = "path1", pathData = emptyList())
+            pushGroup("group2")
+            addPath(name = "path2", pathData = emptyList())
+            popGroup()
+            pushGroup("group3")
+            addPath(name = "path3", pathData = emptyList())
+            addPath(name = "path4", pathData = emptyList())
+            popGroup()
             popGroup()
             pushGroup(name = "group4")
-                addPath(name = "path5", pathData = emptyList())
+            addPath(name = "path5", pathData = emptyList())
             // intentionally avoid popping group as build will pop all groups to the root
         }.build()
 

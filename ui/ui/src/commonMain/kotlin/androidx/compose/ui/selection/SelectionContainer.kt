@@ -82,7 +82,9 @@ fun SelectionContainer(
                     ) {
                         SelectionHandle(
                             modifier =
-                            Modifier.dragGestureFilter(manager.handleDragObserver(isStartHandle)),
+                                Modifier.dragGestureFilter(
+                                    manager.handleDragObserver(isStartHandle)
+                                ),
                             isStartHandle = isStartHandle,
                             directions = Pair(it.start.direction, it.end.direction),
                             handlesCrossed = it.handlesCrossed

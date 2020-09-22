@@ -53,8 +53,10 @@ import kotlin.math.roundToInt
 fun NestedScrollingDemo() {
     Column {
         Text("Demonstrates nested scrolling.")
-        Text("There are 3 fake vertical scrollers inside another vertical scroller.  Try " +
-                "scrolling with 1 or many fingers.")
+        Text(
+            "There are 3 fake vertical scrollers inside another vertical scroller.  Try " +
+                "scrolling with 1 or many fingers."
+        )
         Scrollable {
             RepeatingColumn(repetitions = 3) {
                 Box(Modifier.preferredHeight(398.dp).padding(72.dp)) {
@@ -124,7 +126,8 @@ private fun Scrollable(children: @Composable () -> Unit) {
             layout(constraints.maxWidth, constraints.maxHeight) {
                 placeable.placeRelative(0, offset.value.roundToInt())
             }
-        })
+        }
+    )
 }
 
 /**

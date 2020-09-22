@@ -73,7 +73,8 @@ class PointerInteropFilterAndroidViewHookupTest {
                 setContent(Recomposer.current()) {
                     AndroidView(
                         { child },
-                        Modifier.spyGestureFilter { eventStringLog.add(it.name) })
+                        Modifier.spyGestureFilter { eventStringLog.add(it.name) }
+                    )
                 }
             }
 
@@ -442,7 +443,7 @@ class PointerInteropFilterAndroidViewHookupTest {
 }
 
 private class CustomView2(context: Context, val callBack: (MotionEvent?) -> Unit) : ViewGroup
-    (context) {
+(context) {
     var retVal = true
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {

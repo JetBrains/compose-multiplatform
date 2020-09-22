@@ -51,7 +51,7 @@ fun ReuseFocusRequester() {
     ) {
         Text(
             "Click to Focus on the shape. The focused shape disappears, and is replaced by " +
-                    "another shape. The same focus requester is used for both shapes."
+                "another shape. The same focus requester is used for both shapes."
         )
 
         // Shared focus requester.

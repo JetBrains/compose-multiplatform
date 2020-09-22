@@ -83,7 +83,8 @@ internal fun PointerInputChange.consume(
             positionChange = Offset(
                 consumed.positionChange.x + dx,
                 consumed.positionChange.y + dy
-            ), downChange = consumed.downChange || downChange
+            ),
+            downChange = consumed.downChange || downChange
         )
     )
 

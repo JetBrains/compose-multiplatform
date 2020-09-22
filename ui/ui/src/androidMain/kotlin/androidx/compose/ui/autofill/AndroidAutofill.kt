@@ -86,7 +86,8 @@ internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
                 )
             }
             autofillNode.boundingBox?.toAndroidRect()?.run {
-                setDimens(left, top, 0, 0, width(), height()) }
+                setDimens(left, top, 0, 0, width(), height())
+            }
         }
         index++
     }
