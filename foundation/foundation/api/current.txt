@@ -55,7 +55,7 @@ package androidx.compose.foundation {
   public final class ClickableKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, boolean enabled = true, String? onClickLabel = null, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick = null, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), String? onLongClickLabel = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick = null, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ClickableTextKt {
