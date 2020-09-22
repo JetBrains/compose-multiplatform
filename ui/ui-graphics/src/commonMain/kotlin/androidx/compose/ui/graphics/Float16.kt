@@ -291,8 +291,10 @@ internal inline class Float16(val halfValue: Short) : Comparable<Float16> {
      */
     fun withSign(sign: Float16): Float16 =
         Float16(
-            (sign.halfValue.toInt() and FP16_SIGN_MASK or
-                    (halfValue.toInt() and FP16_COMBINED)).toShort()
+            (
+                sign.halfValue.toInt() and FP16_SIGN_MASK or
+                    (halfValue.toInt() and FP16_COMBINED)
+                ).toShort()
         )
 
     /**
@@ -444,7 +446,7 @@ internal inline class Float16(val halfValue: Short) : Comparable<Float16> {
     val exponent: Int
         get() {
             return (halfValue.toInt().ushr(FP16_EXPONENT_SHIFT) and FP16_EXPONENT_MASK) -
-                    FP16_EXPONENT_BIAS
+                FP16_EXPONENT_BIAS
         }
 
     /**
@@ -499,7 +501,7 @@ internal inline class Float16(val halfValue: Short) : Comparable<Float16> {
      */
     fun isNormalized(): Boolean {
         return halfValue.toInt() and FP16_EXPONENT_MAX != 0 &&
-                halfValue.toInt() and FP16_EXPONENT_MAX != FP16_EXPONENT_MAX
+            halfValue.toInt() and FP16_EXPONENT_MAX != FP16_EXPONENT_MAX
     }
 
     /**

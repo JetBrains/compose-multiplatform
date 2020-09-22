@@ -201,8 +201,10 @@ expect class NativePathEffect
     /**
      * Add a round rectangle shape to the path from the given [RoundRect]
      */
-    @Deprecated("Use addRoundRect(roundRect) instead",
-        ReplaceWith("addRoundRect(rrect)", "androidx.compose.ui.graphics"))
+    @Deprecated(
+        "Use addRoundRect(roundRect) instead",
+        ReplaceWith("addRoundRect(rrect)", "androidx.compose.ui.graphics")
+    )
     fun addRRect(rrect: RoundRect) = addRoundRect(rrect)
 
     /**
@@ -287,8 +289,10 @@ expect class NativePathEffect
             if (path.op(path1, path2, operation)) {
                 return path
             }
-            throw IllegalArgumentException("Path.combine() failed.  This may be due an invalid " +
-                    "path; in particular, check for NaN values.")
+            throw IllegalArgumentException(
+                "Path.combine() failed.  This may be due an invalid " +
+                    "path; in particular, check for NaN values."
+            )
         }
     }
 }

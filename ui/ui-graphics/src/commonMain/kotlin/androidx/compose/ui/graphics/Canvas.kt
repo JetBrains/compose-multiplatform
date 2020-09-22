@@ -463,15 +463,15 @@ interface Canvas {
         useCenter: Boolean,
         paint: Paint
     ) = drawArc(
-            left = rect.left,
-            top = rect.top,
-            right = rect.right,
-            bottom = rect.bottom,
-            startAngle = startAngle,
-            sweepAngle = sweepAngle,
-            useCenter = useCenter,
-            paint = paint
-        )
+        left = rect.left,
+        top = rect.top,
+        right = rect.right,
+        bottom = rect.bottom,
+        startAngle = startAngle,
+        sweepAngle = sweepAngle,
+        useCenter = useCenter,
+        paint = paint
+    )
 
     /**
      * Draw an arc scaled to fit inside the given rectangle. It starts from

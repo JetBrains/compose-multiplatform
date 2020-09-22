@@ -288,36 +288,46 @@ class AndroidBlendModeTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun testBlendModeColorDodgeMapsToFramework() {
-        assertEquals(android.graphics.BlendMode.COLOR_DODGE,
-            BlendMode.ColorDodge.toAndroidBlendMode())
+        assertEquals(
+            android.graphics.BlendMode.COLOR_DODGE,
+            BlendMode.ColorDodge.toAndroidBlendMode()
+        )
     }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun testBlendModeColorBurnMapsToFramework() {
-        assertEquals(android.graphics.BlendMode.COLOR_BURN,
-            BlendMode.ColorBurn.toAndroidBlendMode())
+        assertEquals(
+            android.graphics.BlendMode.COLOR_BURN,
+            BlendMode.ColorBurn.toAndroidBlendMode()
+        )
     }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun testBlendModeHardlightMapsToFramework() {
-        assertEquals(android.graphics.BlendMode.HARD_LIGHT,
-            BlendMode.Hardlight.toAndroidBlendMode())
+        assertEquals(
+            android.graphics.BlendMode.HARD_LIGHT,
+            BlendMode.Hardlight.toAndroidBlendMode()
+        )
     }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun testBlendModeSoftlightMapsToFramework() {
-        assertEquals(android.graphics.BlendMode.SOFT_LIGHT,
-            BlendMode.Softlight.toAndroidBlendMode())
+        assertEquals(
+            android.graphics.BlendMode.SOFT_LIGHT,
+            BlendMode.Softlight.toAndroidBlendMode()
+        )
     }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun testBlendModeDifferenceMapsToFramework() {
-        assertEquals(android.graphics.BlendMode.DIFFERENCE,
-            BlendMode.Difference.toAndroidBlendMode())
+        assertEquals(
+            android.graphics.BlendMode.DIFFERENCE,
+            BlendMode.Difference.toAndroidBlendMode()
+        )
     }
 
     @Test
@@ -341,8 +351,10 @@ class AndroidBlendModeTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun testBlendModeSaturationMapsToFramework() {
-        assertEquals(android.graphics.BlendMode.SATURATION,
-            BlendMode.Saturation.toAndroidBlendMode())
+        assertEquals(
+            android.graphics.BlendMode.SATURATION,
+            BlendMode.Saturation.toAndroidBlendMode()
+        )
     }
 
     @Test
@@ -354,8 +366,10 @@ class AndroidBlendModeTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun testBlendModeLuminosityMapsFramework() {
-        assertEquals(android.graphics.BlendMode.LUMINOSITY,
-            BlendMode.Luminosity.toAndroidBlendMode())
+        assertEquals(
+            android.graphics.BlendMode.LUMINOSITY,
+            BlendMode.Luminosity.toAndroidBlendMode()
+        )
     }
 
     @Test

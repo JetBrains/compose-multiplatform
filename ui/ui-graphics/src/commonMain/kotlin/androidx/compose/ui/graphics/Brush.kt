@@ -63,14 +63,14 @@ fun LinearGradient(
     endY: Float,
     tileMode: TileMode = TileMode.Clamp
 ) = LinearGradient(
-        colors,
-        null,
-        startX,
-        startY,
-        endX,
-        endY,
-        tileMode
-    )
+    colors,
+    null,
+    startX,
+    startY,
+    endX,
+    endY,
+    tileMode
+)
 
 /**
  * Creates a linear gradient with the provided colors along the given start and end coordinates.
@@ -97,14 +97,14 @@ fun LinearGradient(
     endY: Float,
     tileMode: TileMode = TileMode.Clamp
 ) = LinearGradient(
-        List<Color>(colorStops.size) { i -> colorStops[i].second },
-        List<Float>(colorStops.size) { i -> colorStops[i].first },
-        startX,
-        startY,
-        endX,
-        endY,
-        tileMode
-    )
+    List<Color>(colorStops.size) { i -> colorStops[i].second },
+    List<Float>(colorStops.size) { i -> colorStops[i].first },
+    startX,
+    startY,
+    endX,
+    endY,
+    tileMode
+)
 
 /**
  * Creates a radial gradient with the given colors at the provided offset defined in the [ColorStop]
@@ -128,13 +128,13 @@ fun RadialGradient(
     radius: Float,
     tileMode: TileMode = TileMode.Clamp
 ) = RadialGradient(
-        List<Color>(colorStops.size) { i -> colorStops[i].second },
-        List<Float>(colorStops.size) { i -> colorStops[i].first },
-        centerX,
-        centerY,
-        radius,
-        tileMode
-    )
+    List<Color>(colorStops.size) { i -> colorStops[i].second },
+    List<Float>(colorStops.size) { i -> colorStops[i].first },
+    centerX,
+    centerY,
+    radius,
+    tileMode
+)
 
 /**
  * Creates a radial gradient with the given colors evenly dispersed within the gradient
@@ -176,14 +176,14 @@ fun VerticalGradient(
     endY: Float,
     tileMode: TileMode = TileMode.Clamp
 ) = LinearGradient(
-        colors,
-        null,
-        startX = 0.0f,
-        startY = startY,
-        endX = 0.0f,
-        endY = endY,
-        tileMode = tileMode
-    )
+    colors,
+    null,
+    startX = 0.0f,
+    startY = startY,
+    endX = 0.0f,
+    endY = endY,
+    tileMode = tileMode
+)
 
 /**
  * Creates a vertical gradient with the given colors at the provided offset defined in the [ColorStop]
@@ -205,14 +205,14 @@ fun VerticalGradient(
     endY: Float,
     tileMode: TileMode = TileMode.Clamp
 ) = LinearGradient(
-        List<Color>(colorStops.size) { i -> colorStops[i].second },
-        List<Float>(colorStops.size) { i -> colorStops[i].first },
-        startX = 0.0f,
-        startY = startY,
-        endX = 0.0f,
-        endY = endY,
-        tileMode = tileMode
-    )
+    List<Color>(colorStops.size) { i -> colorStops[i].second },
+    List<Float>(colorStops.size) { i -> colorStops[i].first },
+    startX = 0.0f,
+    startY = startY,
+    endX = 0.0f,
+    endY = endY,
+    tileMode = tileMode
+)
 
 /**
  * Creates a horizontal gradient with the given colors evenly dispersed within the gradient
@@ -233,14 +233,14 @@ fun HorizontalGradient(
     endX: Float,
     tileMode: TileMode = TileMode.Clamp
 ) = LinearGradient(
-        colors,
-        null,
-        startX = startX,
-        startY = 0.0f,
-        endX = endX,
-        endY = 0.0f,
-        tileMode = tileMode
-    )
+    colors,
+    null,
+    startX = startX,
+    startY = 0.0f,
+    endX = endX,
+    endY = 0.0f,
+    tileMode = tileMode
+)
 
 /**
  * Creates a horizontal gradient with the given colors dispersed at the provided offset defined in the [ColorStop]
@@ -263,14 +263,14 @@ fun HorizontalGradient(
     endX: Float,
     tileMode: TileMode = TileMode.Clamp
 ) = LinearGradient(
-        List<Color>(colorStops.size) { i -> colorStops[i].second },
-        List<Float>(colorStops.size) { i -> colorStops[i].first },
-        startX = startX,
-        startY = 0.0f,
-        endX = endX,
-        endY = 0.0f,
-        tileMode = tileMode
-    )
+    List<Color>(colorStops.size) { i -> colorStops[i].second },
+    List<Float>(colorStops.size) { i -> colorStops[i].first },
+    startX = startX,
+    startY = 0.0f,
+    endX = endX,
+    endY = 0.0f,
+    tileMode = tileMode
+)
 
 /**
  * Brush implementation used to apply a linear gradient on a given [Paint]

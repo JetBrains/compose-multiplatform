@@ -54,12 +54,12 @@ fun Matrix.setFrom(matrix: android.graphics.Matrix) {
 fun android.graphics.Matrix.setFrom(matrix: Matrix) {
     require(
         matrix[0, 2] == 0f &&
-        matrix[1, 2] == 0f &&
-        matrix[2, 2] == 1f &&
-        matrix[3, 2] == 0f &&
-        matrix[2, 0] == 0f &&
-        matrix[2, 1] == 0f &&
-        matrix[2, 3] == 0f
+            matrix[1, 2] == 0f &&
+            matrix[2, 2] == 1f &&
+            matrix[3, 2] == 0f &&
+            matrix[2, 0] == 0f &&
+            matrix[2, 1] == 0f &&
+            matrix[2, 3] == 0f
     ) {
         "Android does not support arbitrary transforms"
     }

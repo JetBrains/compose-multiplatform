@@ -60,7 +60,7 @@ data class TransferParameters(
         if (!(d >= 0.0 && d <= 1.0)) {
             throw IllegalArgumentException(
                 "Parameter d must be in the range [0..1], was " +
-                        "$d"
+                    "$d"
             )
         }
 
@@ -79,7 +79,7 @@ data class TransferParameters(
         if ((a == 0.0 || gamma == 0.0) && c == 0.0) {
             throw IllegalArgumentException(
                 "Parameter a or g is zero," +
-                        " and c is zero, the transfer function is constant"
+                    " and c is zero, the transfer function is constant"
             )
         }
 
@@ -89,8 +89,10 @@ data class TransferParameters(
 
         if (a < 0.0 || gamma < 0.0) {
             throw IllegalArgumentException(
-                ("The transfer function must be " +
-                        "positive or increasing")
+                (
+                    "The transfer function must be " +
+                        "positive or increasing"
+                    )
             )
         }
     }

@@ -25,8 +25,10 @@ import androidx.compose.ui.util.annotation.Size
 internal class Xyz(
     name: String,
     @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
-) : ColorSpace(name,
-    ColorModel.Xyz, id) {
+) : ColorSpace(
+    name,
+    ColorModel.Xyz, id
+) {
 
     override val isWideGamut: Boolean
         get() = true

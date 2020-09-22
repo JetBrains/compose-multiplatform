@@ -152,13 +152,15 @@ class DrawScopeTest {
         TestDrawScope().drawInto(Canvas(img), dstSize) {
             // Verify that the overload that consumes a color parameter
             // fills the canvas with red color
-            drawRect(color =
-                Color.Red.copy(
-                    alpha = 0.5f,
-                    red = Color.Red.red,
-                    green = Color.Red.green,
-                    blue = Color.Red.blue
-                ))
+            drawRect(
+                color =
+                    Color.Red.copy(
+                        alpha = 0.5f,
+                        red = Color.Red.red,
+                        green = Color.Red.green,
+                        blue = Color.Red.blue
+                    )
+            )
         }
 
         val expected = Color(
@@ -186,15 +188,16 @@ class DrawScopeTest {
         TestDrawScope().drawInto(Canvas(img), dstSize) {
             // Verify that the overload that consumes a brush parameter
             // fills the canvas with red color
-            drawRect(brush =
-                SolidColor(
-                    Color.Red.copy(
-                        alpha = 0.5f,
-                        red = Color.Red.red,
-                        green = Color.Red.green,
-                        blue = Color.Red.blue
+            drawRect(
+                brush =
+                    SolidColor(
+                        Color.Red.copy(
+                            alpha = 0.5f,
+                            red = Color.Red.red,
+                            green = Color.Red.green,
+                            blue = Color.Red.blue
+                        )
                     )
-                )
             )
         }
 
@@ -260,7 +263,8 @@ class DrawScopeTest {
             for (j in 0 until pixelMap.height) {
                 val expectedColor =
                     if (i >= insetLeft && i < pixelMap.width - insetRight &&
-                        j >= insetTop && j < pixelMap.height - insetBottom) {
+                        j >= insetTop && j < pixelMap.height - insetBottom
+                    ) {
                         Color.Red
                     } else {
                         Color.White
@@ -286,7 +290,8 @@ class DrawScopeTest {
             for (j in 0 until pixelMap.height) {
                 val expectedColor =
                     if (i >= insetHorizontal && i < pixelMap.width - insetHorizontal &&
-                        j >= insetVertical && j < pixelMap.height - insetVertical) {
+                        j >= insetVertical && j < pixelMap.height - insetVertical
+                    ) {
                         Color.Red
                     } else {
                         Color.White
@@ -311,7 +316,8 @@ class DrawScopeTest {
             for (j in 0 until pixelMap.height) {
                 val expectedColor =
                     if (i >= insetAll && i < pixelMap.width - insetAll &&
-                        j >= insetAll && j < pixelMap.height - insetAll) {
+                        j >= insetAll && j < pixelMap.height - insetAll
+                    ) {
                         Color.Red
                     } else {
                         Color.White
@@ -687,7 +693,8 @@ class DrawScopeTest {
         assertEquals(pixelMap1.bufferOffset, pixelMap2.bufferOffset)
         for (x in 0 until pixelMap1.width) {
             for (y in 0 until pixelMap1.height) {
-                assertEquals("coordinate: " + x + ", " + y + " expected: " +
+                assertEquals(
+                    "coordinate: " + x + ", " + y + " expected: " +
                         pixelMap1[x, y] + " actual: " + pixelMap2[x, y],
                     pixelMap1[x, y],
                     pixelMap2[x, y]
@@ -717,11 +724,14 @@ class DrawScopeTest {
                 )
             },
             { canvas ->
-                canvas.drawLine(start, end, Paint().apply {
-                    this.color = Color.Cyan
-                    this.strokeWidth = strokeWidth
-                    this.strokeCap = StrokeCap.Round
-                })
+                canvas.drawLine(
+                    start, end,
+                    Paint().apply {
+                        this.color = Color.Cyan
+                        this.strokeWidth = strokeWidth
+                        this.strokeCap = StrokeCap.Round
+                    }
+                )
             }
         )
 
@@ -739,11 +749,14 @@ class DrawScopeTest {
                 )
             },
             { canvas ->
-                canvas.drawLine(start, end, Paint().apply {
-                    this.color = Color.Cyan
-                    this.strokeWidth = strokeWidth
-                    this.strokeCap = StrokeCap.Round
-                })
+                canvas.drawLine(
+                    start, end,
+                    Paint().apply {
+                        this.color = Color.Cyan
+                        this.strokeWidth = strokeWidth
+                        this.strokeCap = StrokeCap.Round
+                    }
+                )
             }
         )
     }
@@ -841,7 +854,8 @@ class DrawScopeTest {
         assertEquals(pixelMap1.bufferOffset, pixelMap2.bufferOffset)
         for (x in 0 until pixelMap1.width) {
             for (y in 0 until pixelMap1.height) {
-                assertEquals("coordinate: " + x + ", " + y + " expected: " +
+                assertEquals(
+                    "coordinate: " + x + ", " + y + " expected: " +
                         pixelMap1[x, y] + " actual: " + pixelMap2[x, y],
                     pixelMap1[x, y],
                     pixelMap2[x, y]

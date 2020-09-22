@@ -131,8 +131,8 @@ internal fun NativePaint.setNativeBlendMode(mode: BlendMode) {
 internal fun NativePaint.setNativeColorFilter(value: ColorFilter?) {
     if (value != null) {
         this.colorFilter = android.graphics.PorterDuffColorFilter(
-                value.color.toArgb(),
-                value.blendMode.toPorterDuffMode()
+            value.color.toArgb(),
+            value.blendMode.toPorterDuffMode()
         )
     } else {
         this.colorFilter = null
