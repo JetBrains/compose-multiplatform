@@ -731,19 +731,25 @@ open class MutableSnapshot internal constructor(
                         // obscure the current value so ignore the conflict
                     }
                     current -> {
-                        (mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
-                            mergedRecords = it
-                        }).add(state to current.create())
+                        (
+                            mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
+                                mergedRecords = it
+                            }
+                            ).add(state to current.create())
 
                         // If we revert to current then the state is no longer modified.
-                        (statesToRemove ?: mutableListOf<StateObject>().also {
-                            statesToRemove = it
-                        }).add(state)
+                        (
+                            statesToRemove ?: mutableListOf<StateObject>().also {
+                                statesToRemove = it
+                            }
+                            ).add(state)
                     }
                     else -> {
-                        (mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
-                            mergedRecords = it
-                        }).add(
+                        (
+                            mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
+                                mergedRecords = it
+                            }
+                            ).add(
                             if (merged != previous) state to merged
                             else state to previous.create()
                         )
@@ -1102,19 +1108,24 @@ private val emptyLambda: (invalid: SnapshotIdSet) -> Unit = { }
  * A snapshot object that simplifies the code by treating the global state as a mutable snapshot.
  */
 internal class GlobalSnapshot(id: Int, invalid: SnapshotIdSet) :
-    MutableSnapshot(id, invalid, null, sync {
-        // Take a defensive copy of the  globalWriteObservers list. This then avoids having to
-        // synchronized access to writerObserver in places it is called and allows the list to
-        // change while notifications are being dispatched. Changes to globalWriteObservers force
-        // a new global snapshot to be created.
-        (if (globalWriteObservers.isNotEmpty()) {
-            globalWriteObservers.toMutableList()
-        } else null)?.let {
-            it.firstOrNull() ?: { state: Any ->
-                it.forEach { it(state) }
+    MutableSnapshot(
+        id, invalid, null,
+        sync {
+            // Take a defensive copy of the  globalWriteObservers list. This then avoids having to
+            // synchronized access to writerObserver in places it is called and allows the list to
+            // change while notifications are being dispatched. Changes to globalWriteObservers force
+            // a new global snapshot to be created.
+            (
+                if (globalWriteObservers.isNotEmpty()) {
+                    globalWriteObservers.toMutableList()
+                } else null
+                )?.let {
+                it.firstOrNull() ?: { state: Any ->
+                    it.forEach { it(state) }
+                }
             }
         }
-    }) {
+    ) {
 
     override fun takeNestedSnapshot(readObserver: SnapshotReadObserver?): Snapshot =
         takeNewSnapshot { invalid ->
@@ -1206,9 +1217,11 @@ internal class NestedMutableSnapshot(
                 if (result != SnapshotApplyResult.Success) return result
 
                 // Add all modified objects in this set to the parent
-                (parent.modified ?: HashSet<StateObject>().also {
-                    parent.modified = it
-                }).addAll(modified)
+                (
+                    parent.modified ?: HashSet<StateObject>().also {
+                        parent.modified = it
+                    }
+                    ).addAll(modified)
             }
 
             // Make the snapshot visible in the parent snapshot
@@ -1420,11 +1433,13 @@ private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
     // Update the transparent snapshot if necessary
     // This doesn't need to take the sync because it is updating thread local state.
     (threadSnapshot.get() as? TransparentObserverMutableSnapshot)?.let {
-        threadSnapshot.set(TransparentObserverMutableSnapshot(
-            currentGlobalSnapshot,
-            it.specifiedReadObserver,
-            it.specifiedWriteObserver
-        ))
+        threadSnapshot.set(
+            TransparentObserverMutableSnapshot(
+                currentGlobalSnapshot,
+                it.specifiedReadObserver,
+                it.specifiedWriteObserver
+            )
+        )
         it.dispose()
     }
     return result
@@ -1457,7 +1472,7 @@ private fun valid(currentSnapshot: Int, candidateSnapshot: Int, invalid: Snapsho
     //
     // INVALID_SNAPSHOT is reserved as an invalid snapshot id.
     return candidateSnapshot != INVALID_SNAPSHOT && candidateSnapshot <= currentSnapshot &&
-            !invalid.get(candidateSnapshot)
+        !invalid.get(candidateSnapshot)
 }
 
 // Determine if the given data is valid for the snapshot.
@@ -1501,8 +1516,10 @@ fun <T : StateRecord> T.readable(state: StateObject, snapshot: Snapshot): T {
 }
 
 private fun readError(): Nothing {
-    error("Reading a state that was created after the snapshot was taken or in a snapshot that " +
-            "has not yet been applied")
+    error(
+        "Reading a state that was created after the snapshot was taken or in a snapshot that " +
+            "has not yet been applied"
+    )
 }
 
 /**
@@ -1646,9 +1663,11 @@ private fun optimisticMerges(
                 ?: readError()
             val merged = state.mergeRecords(previous, current, applied)
             if (merged != null) {
-                (result ?: hashMapOf<StateRecord, StateRecord>().also {
-                    result = it
-                })[current] = merged
+                (
+                    result ?: hashMapOf<StateRecord, StateRecord>().also {
+                        result = it
+                    }
+                    )[current] = merged
             } else {
                 // If one fails don't bother calculating the others as they are likely not going
                 // to be used. There is an unlikely case that a optimistic merge cannot be

@@ -198,17 +198,29 @@ internal fun createCompositionCoroutineScope(
     coroutineContext: CoroutineContext,
     composer: Composer<*>
 ) = if (coroutineContext[Job] != null) {
-    CoroutineScope(Job().apply {
-        completeExceptionally(IllegalArgumentException("CoroutineContext supplied to " +
-                "rememberCoroutineScope may not include a parent job"))
-    })
+    CoroutineScope(
+        Job().apply {
+            completeExceptionally(
+                IllegalArgumentException(
+                    "CoroutineContext supplied to " +
+                        "rememberCoroutineScope may not include a parent job"
+                )
+            )
+        }
+    )
 } else {
     val applyContext = composer.recomposer.applyingCoroutineContext
     if (applyContext == null) {
-        CoroutineScope(Job().apply {
-            completeExceptionally(IllegalStateException("cannot create a new composition " +
-                    "coroutine scope - Composition is not active"))
-        })
+        CoroutineScope(
+            Job().apply {
+                completeExceptionally(
+                    IllegalStateException(
+                        "cannot create a new composition " +
+                            "coroutine scope - Composition is not active"
+                    )
+                )
+            }
+        )
     } else CoroutineScope(applyContext + Job(applyContext[Job]) + coroutineContext)
 }
 

@@ -18,7 +18,8 @@
 
 package androidx.compose.runtime.frames
 
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "SnapshotApplyConflictException",
         "androidx.compose.runtime.snapshots.SnapshotApplyConflictException"
@@ -30,7 +31,8 @@ class FrameAborted(val frame: Frame) : RuntimeException("Frame aborted")
 /**
  * Base implementation of a frame record
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "StateRecord",
         "androidx.compose.runtime.snapshots.StateRecord"
@@ -44,7 +46,8 @@ abstract class AbstractRecord : Record {
 /**
  * Frame local values of a framed object.
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "StateRecord",
         "androidx.compose.runtime.snapshots.StateRecord"
@@ -76,7 +79,8 @@ interface Record {
  * Interface implemented by all model objects. Used by this module to maintain the state records
  * of a model object.
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "StateObject",
         "androidx.compose.runtime.snapshots.StateObject"
@@ -147,7 +151,8 @@ class Frame internal constructor(
  * [FrameReadObserver] will be called for every frame read happened on the current
  * thread during execution of the [block].
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "Snapshot.observe(readObserver, null, block)",
         "androidx.compose.runtime.snapshots.Snapshot"
@@ -158,7 +163,8 @@ fun observeAllReads(readObserver: FrameReadObserver, block: () -> Unit): Unit = 
 /**
  * Return the thread's active frame. This will throw if no frame is active for the thread.
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "Snapshot.current",
         "androidx.compose.runtime.snapshots.Snapshot"
@@ -167,7 +173,8 @@ fun observeAllReads(readObserver: FrameReadObserver, block: () -> Unit): Unit = 
 )
 fun currentFrame(): Frame = deprecated()
 
-@Deprecated("Frames has been replaced by snapshots. There is no equivalent with snapshots, it is" +
+@Deprecated(
+    "Frames has been replaced by snapshots. There is no equivalent with snapshots, it is" +
         " always valid to read and write to a state object.",
     level = DeprecationLevel.ERROR
 )
@@ -179,7 +186,8 @@ val inFrame: Boolean get(): Boolean = deprecated()
  * @param readOnly true if the frame can only be read from
  * @return the newly created frame's data
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "takeMutableSnapshot()",
         "androidx.compose.runtime.snapshots.takeMutableSnapshot"
@@ -191,7 +199,8 @@ fun open(readOnly: Boolean = false): Unit = deprecated()
 /**
  * Open a frame with observers
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "takeMutableSnapshot(readObserver, writeObserver)",
         "androidx.compose.runtime.snapshots.takeMutableSnapshot"
@@ -205,7 +214,8 @@ fun open(readObserver: FrameReadObserver? = null, writeObserver: FrameWriteObser
 /*
  * Commits the pending frame if there one is open. Intended to be used in a `finally` clause
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith("snapshot.apply()"),
     DeprecationLevel.ERROR
 )
@@ -216,7 +226,8 @@ fun commitHandler(): Unit = deprecated()
  * current committed frame. Throws IllegalStateException no frame is open (use `commitHandler()` to
  * commit a frame if one is open).
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith("snapshot.apply()"),
     DeprecationLevel.ERROR
 )
@@ -225,12 +236,14 @@ fun commit(): Unit = deprecated()
 /**
  * Returns true if the given object framed object mutated in the the frame
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     level = DeprecationLevel.ERROR
 )
 fun wasModified(value: Any): Boolean = error("deprecated")
 
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith(
         "Snapshot.registerApplyObserver",
         "androidx.compose.runtime.snapshots.Snapshot"
@@ -243,7 +256,8 @@ fun registerCommitObserver(observer: FrameCommitObserver): () -> Unit = deprecat
  * Commit the given frame. Throws FrameAborted if changes in the frame collides with the current
  * committed frame.
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith("frame.apply().check()"),
     DeprecationLevel.ERROR
 )
@@ -254,7 +268,8 @@ fun commit(frame: Frame): Unit = error("deprecated")
  * no frame is open (use `abortHandler` to abort a frame without throwing an exception or to abort a
  * frame if one is open).
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith("snapshot.dispose()"),
     DeprecationLevel.ERROR
 )
@@ -263,7 +278,8 @@ fun abort(): Unit = deprecated()
 /**
  * Abort the given frame and throw a FrameAborted exception.
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith("frame.dispose()"),
     DeprecationLevel.ERROR
 )
@@ -273,7 +289,8 @@ fun abort(frame: Frame): Unit = deprecated()
  * Abort the current frame if one is open. This is intended to be used in a catch handler to abort
  * the frame and then rethrow the exception.
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith("snapshot.dispose()"),
     DeprecationLevel.ERROR
 )
@@ -282,7 +299,8 @@ fun abortHandler(): Unit = deprecated()
 /**
  * Abort the given frame.
  */
-@Deprecated("Frames has been replaced by snapshots",
+@Deprecated(
+    "Frames has been replaced by snapshots",
     ReplaceWith("frame.dispose()"),
     DeprecationLevel.ERROR
 )
@@ -328,12 +346,14 @@ fun <T : Record> T.readable(framed: Framed): T = error("deprecated")
 )
 fun _readable(r: Record, framed: Framed): Record = error("deprecated")
 
-@Deprecated("Frames has been replaced by snapshots.",
+@Deprecated(
+    "Frames has been replaced by snapshots.",
     level = DeprecationLevel.ERROR
 )
 fun _writable(r: Record, framed: Framed): Record = error("deprecated")
 
-@Deprecated("Frames has been replaced by snapshots.",
+@Deprecated(
+    "Frames has been replaced by snapshots.",
     level = DeprecationLevel.ERROR
 )
 fun _created(framed: Framed): Unit = error("deprecated")

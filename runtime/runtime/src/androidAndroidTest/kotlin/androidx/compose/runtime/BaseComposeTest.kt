@@ -36,9 +36,11 @@ import kotlin.test.assertTrue
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(LinearLayout(this).apply {
-            id = ROOT_ID
-        })
+        setContentView(
+            LinearLayout(this).apply {
+                id = ROOT_ID
+            }
+        )
     }
 }
 @Suppress("DEPRECATION")

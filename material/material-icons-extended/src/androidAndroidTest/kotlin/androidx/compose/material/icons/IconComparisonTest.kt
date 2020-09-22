@@ -182,12 +182,16 @@ private fun MSSIMMatcher.assertBitmapsAreEqual(
         pixels
     }
 
-    val result = this.compareBitmaps(xmlPixelArray, programmaticPixelArray,
-        programmaticBitmap.width, programmaticBitmap.height)
+    val result = this.compareBitmaps(
+        xmlPixelArray, programmaticPixelArray,
+        programmaticBitmap.width, programmaticBitmap.height
+    )
 
     if (!result.matches) {
-        throw AssertionError("Bitmap comparison failed for $iconName, stats: " +
-                "${result.comparisonStatistics}\n")
+        throw AssertionError(
+            "Bitmap comparison failed for $iconName, stats: " +
+                "${result.comparisonStatistics}\n"
+        )
     }
 }
 

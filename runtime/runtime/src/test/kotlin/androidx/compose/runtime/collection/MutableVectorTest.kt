@@ -303,9 +303,12 @@ class MutableVectorTest {
 
     @Test
     fun foldIndexed() {
-        assertEquals("01-12-23-34-45-", list.foldIndexed("") { index, acc, i ->
-            "$acc$index$i-"
-        })
+        assertEquals(
+            "01-12-23-34-45-",
+            list.foldIndexed("") { index, acc, i ->
+                "$acc$index$i-"
+            }
+        )
     }
 
     @Test
@@ -315,9 +318,12 @@ class MutableVectorTest {
 
     @Test
     fun foldRightIndexed() {
-        assertEquals("45-34-23-12-01-", list.foldRightIndexed("") { index, i, acc ->
-            "$acc$index$i-"
-        })
+        assertEquals(
+            "45-34-23-12-01-",
+            list.foldRightIndexed("") { index, i, acc ->
+                "$acc$index$i-"
+            }
+        )
     }
 
     @Test

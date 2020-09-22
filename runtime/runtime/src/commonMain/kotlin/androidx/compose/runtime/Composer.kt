@@ -327,7 +327,7 @@ class Composer<N>(
     private val lifecycleObservers = HashMap<
         CompositionLifecycleObserverHolder,
         CompositionLifecycleObserverHolder
-    >()
+        >()
     private val pendingStack = Stack<Pending?>()
     private var pending: Pending? = null
     private var nodeIndex: Int = 0
@@ -558,8 +558,8 @@ class Composer<N>(
     @ComposeCompilerApi
     val skipping: Boolean get() {
         return !inserting &&
-                !providersInvalid &&
-                currentRecomposeScope?.requiresRecompose == false
+            !providersInvalid &&
+            currentRecomposeScope?.requiresRecompose == false
     }
 
     /**
@@ -626,9 +626,13 @@ class Composer<N>(
                 if (!observationsProcessed.removeValueScope(value, scope) &&
                     scope.invalidate() != InvalidationResult.IGNORED
                 ) {
-                    (invalidated ?: (HashSet<RecomposeScope>().also {
-                        invalidated = it
-                    })).add(scope)
+                    (
+                        invalidated ?: (
+                            HashSet<RecomposeScope>().also {
+                                invalidated = it
+                            }
+                            )
+                        ).add(scope)
                 }
             }
         }
@@ -646,7 +650,7 @@ class Composer<N>(
      */
     private class LifecycleEventDispatcher(
         private val lifecycleObservers: MutableMap<CompositionLifecycleObserverHolder,
-                CompositionLifecycleObserverHolder>
+            CompositionLifecycleObserverHolder>
     ) : LifecycleManager {
         private val enters = mutableSetOf<CompositionLifecycleObserverHolder>()
         private val leaves = mutableSetOf<CompositionLifecycleObserverHolder>()
@@ -1652,8 +1656,10 @@ class Composer<N>(
 
         // Walk down from the anchor group counting nodes of siblings in front of this group
         var current = anchorLocation
-        val nodeIndexLimit = index + ((nodeCountOverrides[anchorGroup] ?: anchorGroup.nodes) -
-                group.nodes)
+        val nodeIndexLimit = index + (
+            (nodeCountOverrides[anchorGroup] ?: anchorGroup.nodes) -
+                group.nodes
+            )
         loop@ while (index < nodeIndexLimit) {
             if (current == groupLocation) break
             current++
@@ -1707,11 +1713,13 @@ class Composer<N>(
      * early.
      */
     private fun compoundKeyOf(group: Group?, recomposeGroup: Group, recomposeKey: Int): Int {
-        return if (group == recomposeGroup) recomposeKey else (compoundKeyOf(
-            (group ?: error("Detached group")).parent,
-            recomposeGroup,
-            recomposeKey
-        ) rol 3) xor (if (group.dataKey != null) group.dataKey.hashCode() else group.key)
+        return if (group == recomposeGroup) recomposeKey else (
+            compoundKeyOf(
+                (group ?: error("Detached group")).parent,
+                recomposeGroup,
+                recomposeKey
+            ) rol 3
+            ) xor (if (group.dataKey != null) group.dataKey.hashCode() else group.key)
     }
 
     internal fun invalidate(scope: RecomposeScope): InvalidationResult {
@@ -1819,7 +1827,7 @@ class Composer<N>(
         // This allows for the invalidate stack to be out of sync since this might be called during exception stack
         // unwinding that might have not called the doneJoin/endRestartGroup in the wrong order.
         val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop()
-            else null
+        else null
         scope?.requiresRecompose = false
         val result = if (scope != null && (scope.used || collectKeySources)) {
             if (scope.anchor == null) {
@@ -2303,9 +2311,11 @@ class Composer<N>(
         }
 
         override fun recordInspectionTable(table: MutableSet<SlotTable>) {
-            (inspectionTables ?: HashSet<MutableSet<SlotTable>>().also {
-                inspectionTables = it
-            }).add(table)
+            (
+                inspectionTables ?: HashSet<MutableSet<SlotTable>>().also {
+                    inspectionTables = it
+                }
+                ).add(table)
         }
 
         override fun startComposing() {
@@ -2593,10 +2603,11 @@ private fun MutableList<Any>.find(value: Any, scope: RecomposeScope): Int {
         index++
         if (index >= size ||
             identityHashCode(get(index)) != valueHash ||
-            identityHashCode(get(index + 1)) != scopeHash) {
-                index--
-                break
-            }
+            identityHashCode(get(index + 1)) != scopeHash
+        ) {
+            index--
+            break
+        }
     }
     return -(index + 1)
 }

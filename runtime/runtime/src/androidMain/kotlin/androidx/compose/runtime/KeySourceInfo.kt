@@ -30,32 +30,35 @@ private fun findSourceKey(key: Any): Int? =
 internal actual fun recordSourceKeyInfo(key: Any) {
     val sk = findSourceKey(key)
     sk?.let {
-        keyInfo.getOrPut(sk, {
-            val stack = Thread.currentThread().stackTrace
-            // On Android the frames looks like:
-            //  0: getThreadStackTrace() (native method)
-            //  1: getStackTrace()
-            //  2: recordSourceKeyInfo()
-            //  3: start()
-            //  4: start()
-            //  5: startRestartGroup() or startReplaceableGroup() or startNode() or startDefaults()
-            //  6: <calling method>
-            // On a desktop VM this looks like:
-            //  0: getStackTrace()
-            //  1: recordSourceKey()
-            //  2: start()
-            //  3: startRestartGroup() or startReplaceableGroup() or startNode() or startDefaults()
-            //  4: non-inline call/emit?
-            //  4 or 5: <calling method>
-            val frame = stack
-                .drop(3) // The first 3 elements are never interesting to us
-                .dropWhile { it.className.startsWith("androidx.compose.runtime.Composer") } // Drop all
-                // start*
-                .drop(1) // Drop non-inline call/emit
-                .dropWhile { it.lineNumber == -1 } // Drop if we do not have source info
-                .first()
-            "${frame.className}.${frame.methodName} (${frame.fileName}:${frame.lineNumber})"
-        })
+        keyInfo.getOrPut(
+            sk,
+            {
+                val stack = Thread.currentThread().stackTrace
+                // On Android the frames looks like:
+                //  0: getThreadStackTrace() (native method)
+                //  1: getStackTrace()
+                //  2: recordSourceKeyInfo()
+                //  3: start()
+                //  4: start()
+                //  5: startRestartGroup() or startReplaceableGroup() or startNode() or startDefaults()
+                //  6: <calling method>
+                // On a desktop VM this looks like:
+                //  0: getStackTrace()
+                //  1: recordSourceKey()
+                //  2: start()
+                //  3: startRestartGroup() or startReplaceableGroup() or startNode() or startDefaults()
+                //  4: non-inline call/emit?
+                //  4 or 5: <calling method>
+                val frame = stack
+                    .drop(3) // The first 3 elements are never interesting to us
+                    .dropWhile { it.className.startsWith("androidx.compose.runtime.Composer") } // Drop all
+                    // start*
+                    .drop(1) // Drop non-inline call/emit
+                    .dropWhile { it.lineNumber == -1 } // Drop if we do not have source info
+                    .first()
+                "${frame.className}.${frame.methodName} (${frame.fileName}:${frame.lineNumber})"
+            }
+        )
     }
 }
 
