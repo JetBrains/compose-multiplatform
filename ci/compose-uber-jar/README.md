@@ -22,5 +22,5 @@ The jar will be available at `build/libs/compose-full.jar`
 ```
 export COMPOSE_REPO_USERNAME=<COMPOSE_REPO_USERNAME>
 export COMPOSE_REPO_KEY=<COMPOSE_REPO_KEY>
-./gradlew publishToSpace
+./gradlew publishToComposeRepo
 ```

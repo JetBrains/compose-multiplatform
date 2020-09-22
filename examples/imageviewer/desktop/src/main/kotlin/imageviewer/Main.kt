@@ -23,8 +23,8 @@ import example.imageviewer.model.ImageRepository
 
 fun main() {
 
-    val content = ContentState(
-        ImageRepository("https://spvessel.com/iv/images/fetching.list")
+    val content = ContentState.applyContent(
+        "https://spvessel.com/iv/images/fetching.list"
     )
 
     AppWindow("ImageViewer", getPreferredWindowSize(800, 1000)).show {

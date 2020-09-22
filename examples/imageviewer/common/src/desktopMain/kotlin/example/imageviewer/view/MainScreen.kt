@@ -15,7 +15,12 @@
  */
 package example.imageviewer.view
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.RectangleShape
@@ -53,6 +58,10 @@ import example.imageviewer.style.DarkGray
 import example.imageviewer.style.DarkGreen
 import example.imageviewer.style.Foreground
 import example.imageviewer.style.Transparent
+import example.imageviewer.style.TranslucentBlack
+import example.imageviewer.style.TranslucentWhite
+import example.imageviewer.style.PreviewImageAreaHoverColor
+import example.imageviewer.style.MiniatureHoverColor
 import example.imageviewer.style.MiniatureColor
 import example.imageviewer.style.LightGray
 import example.imageviewer.style.icRefresh
@@ -112,7 +121,7 @@ fun setTopContent(content: ContentState) {
 
 @Composable
 fun setTitleBar(text: String, content: ContentState) {
-
+    val refreshButtonHover = remember { mutableStateOf(false) }
     TopAppBar(
         backgroundColor = DarkGreen,
         title = {
@@ -128,6 +137,16 @@ fun setTitleBar(text: String, content: ContentState) {
                 shape = CircleShape
             ) {
                 Clickable(
+                    modifier = Modifier.hover(
+                        onEnter = {
+                            refreshButtonHover.value = true
+                            false
+                        },
+                        onExit = {
+                            refreshButtonHover.value = false
+                            false
+                    })
+                    .background(color = if (refreshButtonHover.value) TranslucentBlack else Transparent),
                     onClick = {
                         if (content.isContentReady())
                             content.refresh()
@@ -144,12 +163,23 @@ fun setTitleBar(text: String, content: ContentState) {
 
 @Composable
 fun setPreviewImageUI(content: ContentState) {
-
-    Clickable(onClick = {
-        AppState.screenState(ScreenType.FullscreenImage)
+    val previewImageHover = remember { mutableStateOf(false) }
+    Clickable(
+        modifier = Modifier.hover(
+            onEnter = {
+                previewImageHover.value = true
+                false
+            },
+            onExit = {
+                previewImageHover.value = false
+                false
+        })
+        .background(color = if (previewImageHover.value) PreviewImageAreaHoverColor else DarkGray),
+        onClick = {
+            AppState.screenState(ScreenType.FullscreenImage)
     }) {
         Card(
-            backgroundColor = DarkGray,
+            backgroundColor = Transparent,
             modifier = Modifier.preferredHeight(250.dp),
             shape = RectangleShape,
             elevation = 1.dp
@@ -173,29 +203,28 @@ fun setMiniatureUI(
     picture: Picture,
     content: ContentState
 ) {
-    val active = remember { mutableStateOf(false)  }
+    val cardHover = remember { mutableStateOf(false) }
+    val infoButtonHover = remember { mutableStateOf(false) }
     Card(
-        backgroundColor = MiniatureColor,
+        backgroundColor = if (cardHover.value) MiniatureHoverColor else MiniatureColor,
         modifier = Modifier.padding(start = 10.dp, end = 10.dp).preferredHeight(70.dp)
             .fillMaxWidth()
+            .hover(onEnter = {
+                cardHover.value = true
+                false
+            },
+            onExit = {
+                cardHover.value = false
+                false
+            })
             .clickable {
                 content.setMainImage(picture)
             },
         shape = RectangleShape,
-        elevation = 2.dp
+        elevation = 20.dp
     ) {
-        Row(modifier = Modifier
-            .padding(end = 30.dp)
-            .maybePointerMoveFilter(onEnter = {
-                active.value = true
-                false
-            },
-                onExit = {
-                    active.value = false
-                    false
-                }
-            )
-            .background(color = if (active.value) Color.LightGray else Color.Black)) {
+        Row(modifier = Modifier.padding(end = 30.dp)
+            ) {
                 Clickable(
                     onClick = {
                         content.fullscreen(picture)
@@ -213,18 +242,27 @@ fun setMiniatureUI(
             }
             Text(
                 text = picture.name,
-                color = if (active.value) Color.Red else Foreground,
+                color = Foreground,
                 modifier = Modifier
                     .weight(1f)
                     .align(Alignment.CenterVertically)
                     .padding(start = 16.dp),
-                fontSize = TextUnit.Sp(if (active.value) 40 else 16),
                 style = MaterialTheme.typography.body1
             )
                 
             Clickable(
                 modifier = Modifier.preferredHeight(70.dp)
-                        .preferredWidth(30.dp),
+                        .preferredWidth(30.dp)
+                        .hover(
+                            onEnter = {
+                                infoButtonHover.value = true
+                                false
+                            },
+                            onExit = {
+                                infoButtonHover.value = false
+                                false
+                        })
+                        .background(color = if (infoButtonHover.value) TranslucentWhite else Transparent),
                 onClick = {
                     showPopUpMessage(
                         "${ResString.picture} " +

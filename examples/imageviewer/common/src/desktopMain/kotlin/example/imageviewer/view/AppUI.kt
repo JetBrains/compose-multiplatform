@@ -32,8 +32,6 @@ private val state: MutableState<Boolean> = mutableStateOf(false)
 @Composable
 fun BuildAppUI(content: ContentState) {
 
-    content.initData()
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Gray
