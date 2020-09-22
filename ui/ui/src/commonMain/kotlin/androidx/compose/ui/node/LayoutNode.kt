@@ -31,6 +31,7 @@ import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.OnPositionedModifier
+import androidx.compose.ui.OnRemeasuredModifier
 import androidx.compose.ui.ParentDataModifier
 import androidx.compose.ui.Placeable
 import androidx.compose.ui.Remeasurement
@@ -59,6 +60,7 @@ import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.deleteAt
 import androidx.compose.ui.util.nativeClass
@@ -649,6 +651,7 @@ class LayoutNode : Measurable, Remeasurement {
             }
             val addedCallback = hasNewPositioningCallback()
             onPositionedCallbacks.clear()
+            onRemeasuredCallbacks.clear()
             outerZIndexModifier = null
             innerLayerWrapper = null
 
@@ -658,6 +661,9 @@ class LayoutNode : Measurable, Remeasurement {
                 var wrapper = toWrap
                 if (mod is OnPositionedModifier) {
                     onPositionedCallbacks += mod
+                }
+                if (mod is OnRemeasuredModifier) {
+                    onRemeasuredCallbacks += mod
                 }
                 if (mod is ZIndexModifier) {
                     outerZIndexModifier = mod
@@ -772,6 +778,11 @@ class LayoutNode : Measurable, Remeasurement {
      * List of all OnPositioned callbacks in the modifier chain.
      */
     private val onPositionedCallbacks = mutableVectorOf<OnPositionedModifier>()
+
+    /**
+     * List of all OnSizeChangedModifiers in the modifier chain.
+     */
+    private val onRemeasuredCallbacks = mutableVectorOf<OnRemeasuredModifier>()
 
     /**
      * Flag used by [OnPositionedDispatcher] to identify LayoutNodes that have already
@@ -1037,6 +1048,14 @@ class LayoutNode : Measurable, Remeasurement {
         innerLayoutNodeWrapper.measureResult = measureResult
         this.providedAlignmentLines.clear()
         this.providedAlignmentLines += measureResult.alignmentLines
+
+        if (onRemeasuredCallbacks.isNotEmpty()) {
+            owner?.pauseModelReadObserveration {
+                val content = innerLayoutNodeWrapper
+                val size = IntSize(content.measuredWidth, content.measuredHeight)
+                onRemeasuredCallbacks.forEach { it.onRemeasured(size) }
+            }
+        }
     }
 
     /**
