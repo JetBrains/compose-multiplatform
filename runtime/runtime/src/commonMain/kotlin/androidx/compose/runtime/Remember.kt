@@ -69,8 +69,8 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
 ): T {
     return currentComposer.cache(
         currentComposer.changed(v1) or
-        currentComposer.changed(v2) or
-        currentComposer.changed(v3),
+            currentComposer.changed(v2) or
+            currentComposer.changed(v3),
         calculation
     )
 }

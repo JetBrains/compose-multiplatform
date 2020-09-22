@@ -19,7 +19,7 @@ package androidx.compose.runtime
 @RequiresOptIn(
     level = RequiresOptIn.Level.WARNING,
     message = "This API is intended to be targeted by the Compose Compiler Plugin and not called " +
-            "directly."
+        "directly."
 )
 @Target(
     AnnotationTarget.CLASS,

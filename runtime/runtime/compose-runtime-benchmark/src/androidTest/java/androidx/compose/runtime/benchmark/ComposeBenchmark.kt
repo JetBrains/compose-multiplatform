@@ -217,8 +217,7 @@ fun HundredRects(model: ColorModel, narrow: Boolean = false) {
                 }
             } else {
                 Rect(model.color)
-            }
-        else
+            } else
             Rect()
     }
 }
