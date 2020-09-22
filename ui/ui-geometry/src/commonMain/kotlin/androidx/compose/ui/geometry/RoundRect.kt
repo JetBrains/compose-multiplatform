@@ -179,9 +179,9 @@ data class RoundRect(
         val blRadius = bottomLeftRadius()
         val rect =
             "${left.toStringAsFixed(1)}, " +
-                    "${top.toStringAsFixed(1)}, " +
-                    "${right.toStringAsFixed(1)}, " +
-                    bottom.toStringAsFixed(1)
+                "${top.toStringAsFixed(1)}, " +
+                "${right.toStringAsFixed(1)}, " +
+                bottom.toStringAsFixed(1)
         if (tlRadius == trRadius &&
             trRadius == brRadius &&
             brRadius == blRadius
@@ -190,14 +190,14 @@ data class RoundRect(
                 return "RoundRect(rect=$rect, radius=${tlRadius.x.toStringAsFixed(1)})"
             }
             return "RoundRect(rect=$rect, x=${tlRadius.x.toStringAsFixed(1)}, " +
-                    "y=${tlRadius.y.toStringAsFixed(1)})"
+                "y=${tlRadius.y.toStringAsFixed(1)})"
         }
         return "RoundRect(" +
-                "rect=$rect, " +
-                "topLeft=$tlRadius, " +
-                "topRight=$trRadius, " +
-                "bottomRight=$brRadius, " +
-                "bottomLeft=$blRadius)"
+            "rect=$rect, " +
+            "topLeft=$tlRadius, " +
+            "topRight=$trRadius, " +
+            "bottomRight=$brRadius, " +
+            "bottomLeft=$blRadius)"
     }
 
     companion object {
@@ -207,8 +207,10 @@ data class RoundRect(
     }
 }
 
-@Deprecated("Use RoundRect constructor instead",
-    ReplaceWith("RoundRect(" +
+@Deprecated(
+    "Use RoundRect constructor instead",
+    ReplaceWith(
+        "RoundRect(" +
             "left, " +
             "top, " +
             "right, " +
@@ -222,7 +224,7 @@ data class RoundRect(
             "bottomLeftRadiusX, " +
             "bottomLeftRadiusY" +
             ")",
-            "androidx.compose.ui.geometry"
+        "androidx.compose.ui.geometry"
     )
 )
 fun RRect(
@@ -296,11 +298,13 @@ fun RoundRect(
  * Construct a rounded rectangle from its left, top, right, and bottom edges,
  * and the same radii along its horizontal axis and its vertical axis.
  */
-@Deprecated("Use RoundRect(left, top, right, bottom, radiusX, radiusY) instead",
+@Deprecated(
+    "Use RoundRect(left, top, right, bottom, radiusX, radiusY) instead",
     ReplaceWith(
         "RoundRect(left, top, right, bottom, radiusX, radiusY)",
         "androidx.compose.ui.geometry"
-    ))
+    )
+)
 fun RRect(
     left: Float,
     top: Float,
@@ -346,10 +350,12 @@ fun RoundRect(
  * Construct a rounded rectangle from its left, top, right, and bottom edges,
  * and the same radius in each corner.
  */
-@Deprecated("Use RoundRect(left, top, right, bottom, radius) instead",
+@Deprecated(
+    "Use RoundRect(left, top, right, bottom, radius) instead",
     ReplaceWith(
         "RoundRect(left, top, right, bottom, radius)",
-        "androidx.compose.ui.geometry")
+        "androidx.compose.ui.geometry"
+    )
 )
 fun RRect(
     left: Float,
@@ -387,10 +393,12 @@ fun RoundRect(
  * Construct a rounded rectangle from its bounding box and the same radii
  * along its horizontal axis and its vertical axis.
  */
-@Deprecated("Use RoundRect(rect, radiusX, radiusY), instead",
+@Deprecated(
+    "Use RoundRect(rect, radiusX, radiusY), instead",
     ReplaceWith(
         "RoundRect(rect, radiusX, radiusY)",
-        "androidx.compose.ui.geometry")
+        "androidx.compose.ui.geometry"
+    )
 )
 fun RRect(
     rect: Rect,
@@ -422,7 +430,8 @@ fun RoundRect(
  * Construct a rounded rectangle from its bounding box and a radius that is
  * the same in each corner.
  */
-@Deprecated("Use RoundRect(rect, radius) instead",
+@Deprecated(
+    "Use RoundRect(rect, radius) instead",
     ReplaceWith("RoundRect(rect, radius)", "androidx.compose.ui.geometry")
 )
 fun RRect(
@@ -534,7 +543,8 @@ fun RoundRect(
  *
  * The corner radii default to [Radius.Zero], i.e. right-angled corners
  */
-@Deprecated("Use RoundRect(rect, topLeft, topRight, bottomRight, bottomLeft) instead",
+@Deprecated(
+    "Use RoundRect(rect, topLeft, topRight, bottomRight, bottomLeft) instead",
     ReplaceWith(
         "RoundRect(rect, topLeft, topRight, bottomRight, bottomLeft)",
         "androidx.compose.ui.geometry"
@@ -574,7 +584,8 @@ fun RoundRect.bottomRightRadius(): Radius = Radius(bottomRightRadiusX, bottomRig
 fun RoundRect.bottomLeftRadius(): Radius = Radius(bottomLeftRadiusX, bottomLeftRadiusY)
 
 /** Returns a new [RoundRect] translated by the given offset. */
-@Deprecated("Use translate(offset) instead",
+@Deprecated(
+    "Use translate(offset) instead",
     ReplaceWith("translate(offset)", "androidx.compose.ui.RoundRect")
 )
 fun RoundRect.shift(offset: Offset): RoundRect = translate(offset)
@@ -715,24 +726,24 @@ val RoundRect.isFinite get() =
  * corner radii.
  */
 val RoundRect.isRect get(): Boolean = (topLeftRadiusX == 0.0f || topLeftRadiusY == 0.0f) &&
-        (topRightRadiusX == 0.0f || topRightRadiusY == 0.0f) &&
-        (bottomLeftRadiusX == 0.0f || bottomLeftRadiusY == 0.0f) &&
-        (bottomRightRadiusX == 0.0f || bottomRightRadiusY == 0.0f)
+    (topRightRadiusX == 0.0f || topRightRadiusY == 0.0f) &&
+    (bottomLeftRadiusX == 0.0f || bottomLeftRadiusY == 0.0f) &&
+    (bottomRightRadiusX == 0.0f || bottomRightRadiusY == 0.0f)
 
 /** Whether this rounded rectangle has a side with no straight section. */
 val RoundRect.isStadium get(): Boolean =
     topLeftRadiusX == topRightRadiusX && topLeftRadiusY == topRightRadiusY &&
-            topRightRadiusX == bottomRightRadiusX && topRightRadiusY == bottomRightRadiusY &&
-            bottomRightRadiusX == bottomLeftRadiusX && bottomRightRadiusY == bottomLeftRadiusY &&
-            (width <= 2.0 * topLeftRadiusX || height <= 2.0 * topLeftRadiusY)
+        topRightRadiusX == bottomRightRadiusX && topRightRadiusY == bottomRightRadiusY &&
+        bottomRightRadiusX == bottomLeftRadiusX && bottomRightRadiusY == bottomLeftRadiusY &&
+        (width <= 2.0 * topLeftRadiusX || height <= 2.0 * topLeftRadiusY)
 
 /** Whether this rounded rectangle has no side with a straight section. */
 val RoundRect.isEllipse get(): Boolean =
     topLeftRadiusX == topRightRadiusX && topLeftRadiusY == topRightRadiusY &&
-            topRightRadiusX == bottomRightRadiusX && topRightRadiusY == bottomRightRadiusY &&
-            bottomRightRadiusX == bottomLeftRadiusX && bottomRightRadiusY == bottomLeftRadiusY &&
-            width <= 2.0 * topLeftRadiusX &&
-            height <= 2.0 * topLeftRadiusY
+        topRightRadiusX == bottomRightRadiusX && topRightRadiusY == bottomRightRadiusY &&
+        bottomRightRadiusX == bottomLeftRadiusX && bottomRightRadiusY == bottomLeftRadiusY &&
+        width <= 2.0 * topLeftRadiusX &&
+        height <= 2.0 * topLeftRadiusY
 
 /** Whether this rounded rectangle would draw as a circle. */
 val RoundRect.isCircle get() = width == height && isEllipse
@@ -761,12 +772,12 @@ fun RoundRect.center(): Offset = Offset((left + width / 2.0f), (top + height / 2
  */
 val RoundRect.isSimple: Boolean
     get() = topLeftRadiusX == topLeftRadiusY &&
-            topLeftRadiusX == topRightRadiusX &&
-            topLeftRadiusX == topRightRadiusY &&
-            topLeftRadiusX == bottomRightRadiusX &&
-            topLeftRadiusX == bottomRightRadiusY &&
-            topLeftRadiusX == bottomLeftRadiusX &&
-            topLeftRadiusX == bottomLeftRadiusY
+        topLeftRadiusX == topRightRadiusX &&
+        topLeftRadiusX == topRightRadiusY &&
+        topLeftRadiusX == bottomRightRadiusX &&
+        topLeftRadiusX == bottomRightRadiusY &&
+        topLeftRadiusX == bottomLeftRadiusX &&
+        topLeftRadiusX == bottomLeftRadiusY
 
 /**
  * Linearly interpolate between two rounded rectangles.

@@ -197,8 +197,11 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
      * See also [Rect.center].
      */
     @Stable
-    fun center(origin: Offset = Offset.Zero): Offset = Offset(origin.x + width / 2.0f, origin.y +
-            height / 2.0f)
+    fun center(origin: Offset = Offset.Zero): Offset = Offset(
+        origin.x + width / 2.0f,
+        origin.y +
+            height / 2.0f
+    )
 
     /**
      * The offset to the center of the right edge of the rectangle described by the
