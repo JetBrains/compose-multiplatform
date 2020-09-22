@@ -116,7 +116,7 @@ inline class Constraints(
         }
 
     /**
-     * Whether or not the upper bound on the maximum width.
+     * `false` when [maxWidth] is [Infinity] and `true` if [maxWidth] is a non-[Infinity] value.
      * @see hasBoundedHeight
      */
     val hasBoundedWidth: Boolean
@@ -126,7 +126,7 @@ inline class Constraints(
         }
 
     /**
-     * Whether or not the upper bound on the maximum height.
+     * `false` when [maxHeight] is [Infinity] and `true` if [maxWidth] is a non-[Infinity] value.
      * @see hasBoundedWidth
      */
     val hasBoundedHeight: Boolean
