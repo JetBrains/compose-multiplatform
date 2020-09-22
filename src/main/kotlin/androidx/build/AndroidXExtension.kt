@@ -121,39 +121,52 @@ open class AndroidXExtension(val project: Project) {
                 // the following project is not intended to be accessed from Java
                 // ":annotation:annotation" -> return false
             }
+            // TODO: rework this to use LibraryType. Fork Library and KolinOnlyLibrary?
             if (project.path.contains("-ktx")) return false
             if (project.path.startsWith(":compose")) return false
             if (project.path.startsWith(":ui")) return false
             return field
         }
     private var licenses: MutableCollection<License> = ArrayList()
-    var publish: Publish = Publish.NONE
 
+    // Should only be used to override LibraryType.publish, if a library isn't ready to publish yet
+    var publish: Publish = Publish.NONE
+        // Allow gradual transition from publish to library type
+        get() = if (type != LibraryType.UNSET) type.publish else field
     /**
      * Whether to run API tasks such as tracking and linting. The default value is
      * [RunApiTasks.Auto], which automatically picks based on the project's properties.
      */
-    var runApiTasks: RunApiTasks =
-        // TODO: fix with library type/role system
-        if (project.isSamplesProject()) RunApiTasks.No("sample project")
-        else RunApiTasks.Auto
+    // TODO: decide whether we want to support overriding runApiTasks
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.runApiTasks")
+    var runApiTasks: RunApiTasks = RunApiTasks.Auto
+        get() = if (type != LibraryType.UNSET) type.checkApi else field
+    var type: LibraryType = LibraryType.UNSET
     var failOnDeprecationWarnings = true
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.compilationTarget")
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
+        get() = if (type != LibraryType.UNSET) type.compilationTarget else field
 
     /**
      * It disables docs generation and api tracking for tooling modules like annotation processors.
      * We don't expect such modules to be used by developers as libraries, so we don't guarantee
      * any api stability and don't expose any docs about them.
      */
+    // This is now deprecated in favor of LibraryType
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.LINT and ANNOTATION_PROCESSOR")
     var toolingProject = false
 
     /**
      * Disables just docs generation for modules that are published and should have their API
      * tracked to ensure intra-library versioning compatibility, but are not expected to be
      * directly used by developers.
+     * Now deprecated and should not be used in new code. New code should read type.generateDocs.
      */
+    // TODO: decide whether we want to support overriding generateDocs
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.generateDocs")
     var generateDocs = true
         get() {
+            if (type != LibraryType.UNSET) return type.generateDocs
             if (toolingProject) return false
             if (!publish.shouldRelease()) return false
             return field
@@ -174,48 +187,7 @@ open class AndroidXExtension(val project: Project) {
     }
 }
 
-enum class CompilationTarget {
-    /** This library is meant to run on the host machine (like an annotation processor). */
-    HOST,
-    /** This library is meant to run on an Android device. */
-    DEVICE
-}
-
-/**
- * Publish Enum:
- * Publish.NONE -> Generates no aritfacts; does not generate snapshot artifacts
- *                 or releasable maven artifacts
- * Publish.SNAPSHOT_ONLY -> Only generates snapshot artifacts
- * Publish.SNAPSHOT_AND_RELEASE -> Generates both snapshot artifacts and releasable maven artifact
-*/
-enum class Publish {
-    NONE, SNAPSHOT_ONLY, SNAPSHOT_AND_RELEASE;
-
-    fun shouldRelease() = this == SNAPSHOT_AND_RELEASE
-    fun shouldPublish() = this == SNAPSHOT_ONLY || this == SNAPSHOT_AND_RELEASE
-}
-
-sealed class RunApiTasks {
-    /** Automatically determine whether API tasks should be run. */
-    object Auto : RunApiTasks()
-    /** Always run API tasks regardless of other project properties. */
-    data class Yes(val reason: String? = null) : RunApiTasks()
-    /** Do not run any API tasks. */
-    data class No(val reason: String) : RunApiTasks()
-}
-
 class License {
     var name: String? = null
     var url: String? = null
-}
-
-// Whether the project is a samples project. Temporary, until LibraryType is introduced
-// Paging and the Support samples need some fixing, because they do not match the simple rule
-// <the library the sample library provides samples for> = <sample library>.parent
-// As such, there is ambiguity which needs further tooling or policy to resolve
-//
-// TODO: implement library type/role system
-// TODO: ensure Support samples and Paging samples are working
-fun Project.isSamplesProject(): Boolean {
-    return name.endsWith("samples")
 }
