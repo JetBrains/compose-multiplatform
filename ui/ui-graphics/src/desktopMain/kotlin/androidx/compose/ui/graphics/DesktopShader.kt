@@ -54,15 +54,21 @@ internal actual fun ActualRadialGradientShader(
     )
 }
 
-@Suppress("UNUSED_PARAMETER")
 internal actual fun ActualImageShader(
     image: ImageAsset,
     tileModeX: TileMode,
     tileModeY: TileMode
 ): Shader {
-    // TODO(demin): implement ImageShader
-    println("ImageShader not implemented yet")
-    return Shader(0)
+    return image.asDesktopBitmap().makeShader(
+        tileModeX.toSkijaTileMode(),
+        tileModeY.toSkijaTileMode()
+    )
+}
+
+private fun TileMode.toSkijaTileMode() = when (this) {
+    TileMode.Clamp -> FilterTileMode.CLAMP
+    TileMode.Repeated -> FilterTileMode.REPEAT
+    TileMode.Mirror -> FilterTileMode.MIRROR
 }
 
 private fun List<Color>.toIntArray(): IntArray =

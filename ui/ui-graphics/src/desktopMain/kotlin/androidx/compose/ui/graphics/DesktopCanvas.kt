@@ -29,9 +29,12 @@ import org.jetbrains.skija.Rect as SkijaRect
 
 actual typealias NativeCanvas = org.jetbrains.skija.Canvas
 
-@Suppress("UNUSED_PARAMETER")
 internal actual fun ActualCanvas(image: ImageAsset): Canvas {
-    TODO("Canvas(image: ImageAsset) isn't implemented yet")
+    val skijaBitmap = image.asDesktopBitmap()
+    require(!skijaBitmap.isImmutable) {
+        "Cannot draw on immutable ImageAsset"
+    }
+    return DesktopCanvas(org.jetbrains.skija.Canvas(skijaBitmap))
 }
 
 actual val Canvas.nativeCanvas: NativeCanvas get() = (this as DesktopCanvas).skija
@@ -181,8 +184,8 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
     }
 
     override fun drawImage(image: ImageAsset, topLeftOffset: Offset, paint: Paint) {
-        skija.drawImageRect(
-            image.asDesktopImage(),
+        skija.drawBitmapRect(
+            image.asDesktopBitmap(),
             SkijaRect.makeXYWH(
                 0f,
                 0f,
@@ -207,8 +210,8 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
         dstSize: IntSize,
         paint: Paint
     ) {
-        skija.drawImageRect(
-            image.asDesktopImage(),
+        skija.drawBitmapRect(
+            image.asDesktopBitmap(),
             SkijaRect.makeXYWH(
                 srcOffset.x.toFloat(),
                 srcOffset.y.toFloat(),
