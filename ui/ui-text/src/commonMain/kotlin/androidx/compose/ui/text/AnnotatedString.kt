@@ -84,7 +84,7 @@ data class AnnotatedString internal constructor(
             require(paragraphStyle.start >= lastStyleEnd) { "ParagraphStyle should not overlap" }
             require(paragraphStyle.end <= text.length) {
                 "ParagraphStyle range [${paragraphStyle.start}, ${paragraphStyle.end})" +
-                        " is out of boundary"
+                    " is out of boundary"
             }
             lastStyleEnd = paragraphStyle.end
         }
@@ -732,7 +732,7 @@ inline fun annotatedString(builder: (Builder).() -> Unit): AnnotatedString =
  */
 internal fun contains(baseStart: Int, baseEnd: Int, targetStart: Int, targetEnd: Int) =
     (baseStart <= targetStart && targetEnd <= baseEnd) &&
-            (baseEnd != targetEnd || (targetStart == targetEnd) == (baseStart == baseEnd))
+        (baseEnd != targetEnd || (targetStart == targetEnd) == (baseStart == baseEnd))
 
 /**
  * Helper function that checks if the range [lStart, lEnd) intersects with the range
@@ -742,4 +742,4 @@ internal fun contains(baseStart: Int, baseEnd: Int, targetStart: Int, targetEnd:
  */
 internal fun intersect(lStart: Int, lEnd: Int, rStart: Int, rEnd: Int) =
     maxOf(lStart, rStart) < minOf(lEnd, rEnd) ||
-            contains(lStart, lEnd, rStart, rEnd) || contains(rStart, rEnd, lStart, lEnd)
+        contains(lStart, lEnd, rStart, rEnd) || contains(rStart, rEnd, lStart, lEnd)

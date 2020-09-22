@@ -163,7 +163,8 @@ internal class AndroidParagraph constructor(
                 val line = layout.getLineForOffset(start)
                 // This Placeholder is ellipsized, return null instead.
                 if (layout.getLineEllipsisCount(line) > 0 &&
-                    end > layout.getLineEllipsisOffset(line)) {
+                    end > layout.getLineEllipsisOffset(line)
+                ) {
                     return@map null
                 }
 
@@ -240,7 +241,7 @@ internal class AndroidParagraph constructor(
         if (start !in 0..end || end > charSequence.length) {
             throw AssertionError(
                 "Start($start) or End($end) is out of Range(0..${charSequence.length})," +
-                        " or start > end!"
+                    " or start > end!"
             )
         }
         val path = android.graphics.Path()

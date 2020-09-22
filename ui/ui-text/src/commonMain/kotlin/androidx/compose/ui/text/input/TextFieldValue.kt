@@ -117,7 +117,7 @@ data class TextFieldValue(
         composition?.let {
             require(composition.end <= text.length) {
                 "Composition is out of bounds. " +
-                        "[composition: $selection, text.length = ${text.length}]"
+                    "[composition: $selection, text.length = ${text.length}]"
             }
         }
     }

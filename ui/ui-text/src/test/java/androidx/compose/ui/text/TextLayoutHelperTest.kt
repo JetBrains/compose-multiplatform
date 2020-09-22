@@ -62,159 +62,179 @@ class TextLayoutHelperTest {
     @Test
     fun testCanResue_same() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isTrue()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isTrue()
     }
 
     @Test
     fun testCanResue_different_text() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, Android").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, Android").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_style() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(fontSize = 1.5.em),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(fontSize = 1.5.em),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_maxLines() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 2,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 2,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_softWrap() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_overflow() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Clip,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Clip,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_density() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(2.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(2.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_layoutDirection() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Rtl,
-            resourceLoader = resourceLoader,
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Rtl,
+                resourceLoader = resourceLoader,
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_resourceLoader() {
         val constraints = Constraints.fixedWidth(100)
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = mock(),
-            constraints = constraints
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = mock(),
+                constraints = constraints
+            )
+        ).isFalse()
     }
 
     @Test
     fun testCanResue_different_constraints() {
-        assertThat(referenceResult.canReuse(
-            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
-            style = TextStyle(),
-            maxLines = 1,
-            softWrap = true,
-            overflow = TextOverflow.Ellipsis,
-            density = Density(1.0f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = resourceLoader,
-            constraints = Constraints.fixedWidth(200)
-        )).isFalse()
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = Constraints.fixedWidth(200)
+            )
+        ).isFalse()
     }
 }

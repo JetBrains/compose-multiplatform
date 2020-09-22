@@ -112,12 +112,14 @@ class EditingBuffer(
         val end = initialSelection.max
         if (start < 0 || start > initialText.length) {
             throw IndexOutOfBoundsException(
-                "start ($start) offset is outside of text region ${initialText.length}")
+                "start ($start) offset is outside of text region ${initialText.length}"
+            )
         }
 
         if (end < 0 || end > initialText.length) {
             throw IndexOutOfBoundsException(
-                "end ($end) offset is outside of text region ${initialText.length}")
+                "end ($end) offset is outside of text region ${initialText.length}"
+            )
         }
 
         if (start > end) {
@@ -137,12 +139,14 @@ class EditingBuffer(
 
         if (start < 0 || start > gapBuffer.length) {
             throw IndexOutOfBoundsException(
-                "start ($start) offset is outside of text region ${gapBuffer.length}")
+                "start ($start) offset is outside of text region ${gapBuffer.length}"
+            )
         }
 
         if (end < 0 || end > gapBuffer.length) {
             throw IndexOutOfBoundsException(
-                "end ($end) offset is outside of text region ${gapBuffer.length}")
+                "end ($end) offset is outside of text region ${gapBuffer.length}"
+            )
         }
 
         if (start > end) {
@@ -278,11 +282,13 @@ class EditingBuffer(
     internal fun setSelection(start: Int, end: Int) {
         if (start < 0 || start > gapBuffer.length) {
             throw IndexOutOfBoundsException(
-                "start ($start) offset is outside of text region ${gapBuffer.length}")
+                "start ($start) offset is outside of text region ${gapBuffer.length}"
+            )
         }
         if (end < 0 || end> gapBuffer.length) {
             throw IndexOutOfBoundsException(
-                "end ($end) offset is outside of text region ${gapBuffer.length}")
+                "end ($end) offset is outside of text region ${gapBuffer.length}"
+            )
         }
         if (start > end) {
             throw IllegalArgumentException("Do not set reversed range: $start > $end")
@@ -308,11 +314,13 @@ class EditingBuffer(
     internal fun setComposition(start: Int, end: Int) {
         if (start < 0 || start > gapBuffer.length) {
             throw IndexOutOfBoundsException(
-                "start ($start) offset is outside of text region ${gapBuffer.length}")
+                "start ($start) offset is outside of text region ${gapBuffer.length}"
+            )
         }
         if (end < 0 || end> gapBuffer.length) {
             throw IndexOutOfBoundsException(
-                "end ($end) offset is outside of text region ${gapBuffer.length}")
+                "end ($end) offset is outside of text region ${gapBuffer.length}"
+            )
         }
         if (start >= end) {
             throw IllegalArgumentException("Do not set reversed or empty range: $start > $end")

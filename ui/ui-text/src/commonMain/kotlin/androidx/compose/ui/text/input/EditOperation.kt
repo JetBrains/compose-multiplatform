@@ -347,8 +347,8 @@ data class MoveCursorEditOp(
             for (i in 0 until amount) {
                 val next = bufferText.findFollowingBreak(newCursor)
                 if (next == -1) break
-                    newCursor = next
-                }
+                newCursor = next
+            }
         } else {
             for (i in 0 until -amount) {
                 val prev = bufferText.findPrecedingBreak(newCursor)
