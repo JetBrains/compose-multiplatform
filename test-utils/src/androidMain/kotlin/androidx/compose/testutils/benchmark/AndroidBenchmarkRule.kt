@@ -41,7 +41,8 @@ class AndroidBenchmarkRule : TestRule {
 
     override fun apply(base: Statement, description: Description?): Statement {
         return benchmarkRule.apply(
-            activityTestRule.apply(base, description), description!!)
+            activityTestRule.apply(base, description), description!!
+        )
     }
 
     /**
