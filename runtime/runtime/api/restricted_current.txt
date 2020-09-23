@@ -204,6 +204,10 @@ package androidx.compose.runtime {
     method public kotlinx.coroutines.CoroutineScope getCoroutineScope();
   }
 
+  public final class DerivedStateKt {
+    method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
+  }
+
   public final class EffectsKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference compositionReference();
     method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();

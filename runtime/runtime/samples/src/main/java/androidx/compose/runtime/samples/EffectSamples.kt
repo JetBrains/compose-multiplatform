@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -129,3 +130,21 @@ private class Element(val id: Int)
 private fun ListItem(item: Any, selected: Boolean) {}
 
 private const val parentId = 0
+
+@Suppress("CanBeVal", "unused")
+@Sampled
+@Composable
+fun DerivedStateSample() {
+    @Composable fun CountDisplay(count: State<Int>) {
+        Text("Count: ${count.value}")
+    }
+
+    @Composable fun Example() {
+        var a by mutableStateOf(0)
+        var b by mutableStateOf(0)
+        val sum = derivedStateOf { a + b }
+        // Changing either a or b will cause CountDisplay to recompose but not trigger Example
+        // to recompose.
+        CountDisplay(sum)
+    }
+}

@@ -784,10 +784,16 @@ open class MutableSnapshot internal constructor(
     internal inline fun <T> advance(block: () -> T): T {
         recordPrevious(id)
         return block().also {
+            val previousId = id
             sync {
                 id = nextSnapshotId++
                 openSnapshots = openSnapshots.set(id)
             }
+            var currentInvald = invalid
+            for (invalidId in previousId + 1 until id) {
+                currentInvald = currentInvald.set(invalidId)
+            }
+            invalid = currentInvald
         }
     }
 
@@ -1530,6 +1536,7 @@ private fun readError(): Nothing {
 private fun used(state: StateObject, id: Int, invalid: SnapshotIdSet): StateRecord? {
     var current: StateRecord? = state.firstStateRecord
     var validRecord: StateRecord? = null
+    val lowestOpen = invalid.lowest(id)
     while (current != null) {
         val currentId = current.snapshotId
         if (currentId == INVALID_SNAPSHOT) {
@@ -1537,7 +1544,7 @@ private fun used(state: StateObject, id: Int, invalid: SnapshotIdSet): StateReco
             // immediately.
             return current
         }
-        if (valid(current, id - 1, invalid)) {
+        if (valid(current, lowestOpen, invalid)) {
             if (validRecord == null) {
                 validRecord = current
             } else {
@@ -1565,7 +1572,16 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
 
     // Otherwise, make a copy of the readable data and mark it as born in this snapshot, making it
     // writable.
+    @OptIn(ExperimentalComposeApi::class)
+    val newData = newWritableRecord(state, snapshot)
 
+    snapshot.recordModified(state)
+
+    return newData
+}
+
+@ExperimentalComposeApi
+internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot: Snapshot): T {
     // Calling used() on a state object might return the same record for each thread calling
     // used() therefore selecting the record to reuse should be guarded.
 
@@ -1578,18 +1594,15 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
     // cache the result of readable() as the mutating thread calls to writable() can change the
     // result of readable().
     @Suppress("UNCHECKED_CAST")
-    val newData = (used(state, id, openSnapshots) as T?)?.apply {
+    val newData = (used(state, snapshot.id, openSnapshots) as T?)?.apply {
         snapshotId = Int.MAX_VALUE
-    } ?: readData.create().apply {
+    } ?: create().apply {
         snapshotId = Int.MAX_VALUE
         this.next = state.firstStateRecord
         state.prependStateRecord(this as T)
     } as T
-    newData.assign(readData)
-    newData.snapshotId = id
-
-    snapshot.recordModified(state)
-
+    newData.assign(this)
+    newData.snapshotId = snapshot.id
     return newData
 }
 
