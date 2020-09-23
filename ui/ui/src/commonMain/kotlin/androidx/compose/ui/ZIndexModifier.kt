@@ -17,8 +17,8 @@
 package androidx.compose.ui
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 
 /**
  * A [Modifier.Element] that controls the drawing order for the children of the same layout
@@ -51,8 +51,8 @@ fun Modifier.zIndex(zIndex: Float): Modifier = this.then(SimpleZIndexModifier(zI
 
 private data class SimpleZIndexModifier(
     override val zIndex: Float
-) : ZIndexModifier, InspectableParameter {
+) : ZIndexModifier, InspectableValue {
     override val nameFallback = "zIndex"
     override val valueOverride = zIndex
-    override val inspectableElements = emptySequence<ParameterElement>()
+    override val inspectableElements = emptySequence<ValueElement>()
 }

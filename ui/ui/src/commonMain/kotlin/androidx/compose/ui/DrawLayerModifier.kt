@@ -20,8 +20,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
@@ -176,22 +176,22 @@ private data class SimpleDrawLayerModifier(
     override val transformOrigin: TransformOrigin,
     override val shape: Shape,
     override val clip: Boolean
-) : DrawLayerModifier, InspectableParameter {
+) : DrawLayerModifier, InspectableValue {
     override val nameFallback: String = "drawLayer"
-    override val inspectableElements: Sequence<ParameterElement>
+    override val inspectableElements: Sequence<ValueElement>
         get() = sequenceOf(
-            ParameterElement("scaleX", scaleX),
-            ParameterElement("scaleY", scaleY),
-            ParameterElement("alpha", alpha),
-            ParameterElement("translationX", translationX),
-            ParameterElement("translationY", translationY),
-            ParameterElement("shadowElevation", shadowElevation),
-            ParameterElement("rotationX", rotationX),
-            ParameterElement("rotationY", rotationY),
-            ParameterElement("rotationZ", rotationZ),
-            ParameterElement("transformOrigin", transformOrigin),
-            ParameterElement("shape", shape),
-            ParameterElement("clip", clip)
+            ValueElement("scaleX", scaleX),
+            ValueElement("scaleY", scaleY),
+            ValueElement("alpha", alpha),
+            ValueElement("translationX", translationX),
+            ValueElement("translationY", translationY),
+            ValueElement("shadowElevation", shadowElevation),
+            ValueElement("rotationX", rotationX),
+            ValueElement("rotationY", rotationY),
+            ValueElement("rotationZ", rotationZ),
+            ValueElement("transformOrigin", transformOrigin),
+            ValueElement("shape", shape),
+            ValueElement("clip", clip)
         )
 }
 

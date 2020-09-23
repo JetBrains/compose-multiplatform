@@ -17,33 +17,33 @@
 package androidx.compose.ui.platform
 
 /**
- * A compose parameter that is inspectable by tools. It gives access to private parts of a
- * parameter value.
+ * A compose value that is inspectable by tools. It gives access to private parts of a value.
  */
-interface InspectableParameter {
+interface InspectableValue {
 
     /**
-     * The elements of a compose parameter instance.
+     * The elements of a compose value.
      */
-    val inspectableElements: Sequence<ParameterElement>
+    val inspectableElements: Sequence<ValueElement>
+        get() = sequenceOf()
 
     /**
-     * Use this name as the parameter name shown in tools if this is a sub element of another
-     * [InspectableParameter] specified with an empty name. Example: a modifier with multiple
-     * elements.
+     * Use this name as the reference name shown in tools of this value if there is no explicit
+     * reference name given to the value.
+     * Example: a modifier in a modifier list.
      */
     val nameFallback: String?
         get() = null
 
     /**
-     * Use this value as a representation of the overall value of this parameter.
+     * Use this value as a readable representation of the value.
      */
     val valueOverride: Any?
         get() = null
 }
 
 /**
- * A parameter element describes the elements of a compose parameter instance.
+ * A [ValueElement] describes an element of a compose value instance.
  * The [name] typically refers to a (possibly private) property name with its corresponding [value].
  */
-data class ParameterElement(val name: String, val value: Any?)
+data class ValueElement(val name: String, val value: Any?)

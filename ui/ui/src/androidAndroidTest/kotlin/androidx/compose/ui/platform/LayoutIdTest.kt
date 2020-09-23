@@ -83,7 +83,7 @@ class LayoutIdTest {
 
     @Test
     fun testInspectable() {
-        val modifier = Modifier.layoutId("box") as InspectableParameter
+        val modifier = Modifier.layoutId("box") as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("layoutId")
         Truth.assertThat(modifier.valueOverride).isNull()
         Truth.assertThat(modifier.inspectableElements.map { it.name }.toList())
