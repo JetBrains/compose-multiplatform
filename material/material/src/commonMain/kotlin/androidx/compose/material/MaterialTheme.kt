@@ -17,10 +17,11 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.IndicationAmbient
+import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
 
@@ -63,10 +64,10 @@ fun MaterialTheme(
     }.apply { updateColorsFrom(colors) }
     val indicationFactory: @Composable () -> Indication = remember { { RippleIndication() } }
     Providers(
-        ColorAmbient provides rememberedColors,
-        IndicationAmbient provides indicationFactory,
-        TypographyAmbient provides typography,
-        ShapesAmbient provides shapes
+        AmbientColors provides rememberedColors,
+        AmbientIndication provides indicationFactory,
+        AmbientTypography provides typography,
+        AmbientShapes provides shapes
     ) {
         ProvideTextStyle(value = typography.body1, children = content)
     }
@@ -83,8 +84,9 @@ object MaterialTheme {
      * @sample androidx.compose.material.samples.ThemeColorSample
      */
     @Composable
+    @ComposableContract(readonly = true)
     val colors: Colors
-        get() = ColorAmbient.current
+        get() = AmbientColors.current
 
     /**
      * Retrieves the current [Typography] at the call site's position in the hierarchy.
@@ -92,13 +94,15 @@ object MaterialTheme {
      * @sample androidx.compose.material.samples.ThemeTextStyleSample
      */
     @Composable
+    @ComposableContract(readonly = true)
     val typography: Typography
-        get() = TypographyAmbient.current
+        get() = AmbientTypography.current
 
     /**
      * Retrieves the current [Shapes] at the call site's position in the hierarchy.
      */
     @Composable
+    @ComposableContract(readonly = true)
     val shapes: Shapes
-        get() = ShapesAmbient.current
+        get() = AmbientShapes.current
 }

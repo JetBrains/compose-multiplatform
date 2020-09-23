@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.Color
  * [indication] modifier.
  *
  * If you want to override default behaviour for [indication] for the whole subtree, consider
- * creating object of this factory and providing it in [IndicationAmbient].
+ * creating object of this factory and providing it in [AmbientIndication].
  */
 @Stable
 interface Indication {
@@ -84,7 +84,7 @@ interface IndicationInstance {
  * @sample androidx.compose.foundation.samples.IndicationSample
  *
  * @param interactionState state for indication to indicate against. This state is updates by
- * modifier such as [Clickable].
+ * modifier such as [clickable].
  * @param indication indication to be drawn. If `null`, there will be no indication shown
  */
 fun Modifier.indication(
@@ -103,7 +103,7 @@ fun Modifier.indication(
  * By default there will be [DefaultDebugIndication] created.
  */
 // TODO : temporary made it to be lambda, fix when b/157150564 is fixed
-val IndicationAmbient = staticAmbientOf<@Composable () -> Indication> { { DefaultDebugIndication } }
+val AmbientIndication = staticAmbientOf<@Composable () -> Indication> { { DefaultDebugIndication } }
 
 private object NoIndication : Indication {
     private object NoIndicationInstance : IndicationInstance {

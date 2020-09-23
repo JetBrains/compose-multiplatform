@@ -18,10 +18,10 @@ package androidx.compose.material
 
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animatedValue
-import androidx.compose.foundation.IndicationAmbient
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
+import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
@@ -95,7 +95,7 @@ fun FloatingActionButton(
             Box(
                 modifier = Modifier
                     .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
-                    .indication(interactionState, IndicationAmbient.current()),
+                    .indication(interactionState, AmbientIndication.current()),
                 alignment = Alignment.Center
             ) { icon() }
         }

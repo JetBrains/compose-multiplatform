@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.contentColor
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.ui.graphics.Color
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
@@ -38,7 +38,8 @@ class SurfaceContentColorTest {
         rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.primary) {
-                    assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onPrimary)
+                    assertThat(AmbientContentColor.current)
+                        .isEqualTo(MaterialTheme.colors.onPrimary)
                 }
             }
         }
@@ -49,7 +50,8 @@ class SurfaceContentColorTest {
         rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.secondary) {
-                    assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onSecondary)
+                    assertThat(AmbientContentColor.current)
+                        .isEqualTo(MaterialTheme.colors.onSecondary)
                 }
             }
         }
@@ -60,7 +62,8 @@ class SurfaceContentColorTest {
         rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onBackground)
+                    assertThat(AmbientContentColor.current)
+                        .isEqualTo(MaterialTheme.colors.onBackground)
                 }
             }
         }
@@ -71,7 +74,8 @@ class SurfaceContentColorTest {
         rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.surface) {
-                    assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onSurface)
+                    assertThat(AmbientContentColor.current)
+                        .isEqualTo(MaterialTheme.colors.onSurface)
                 }
             }
         }
@@ -82,7 +86,7 @@ class SurfaceContentColorTest {
         rule.setContent {
             MaterialTheme {
                 Surface(color = Color.Yellow) {
-                    assertThat(contentColor()).isEqualTo(Color.Black)
+                    assertThat(AmbientContentColor.current).isEqualTo(Color.Black)
                 }
             }
         }
@@ -97,7 +101,8 @@ class SurfaceContentColorTest {
                     // This surface should inherit the parent contentColor, as yellow is not part
                     // of the theme
                     Surface(color = Color.Yellow) {
-                        assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onSurface)
+                        assertThat(AmbientContentColor.current)
+                            .isEqualTo(MaterialTheme.colors.onSurface)
                     }
                 }
             }

@@ -18,9 +18,9 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
@@ -264,18 +264,18 @@ class MenuTest {
 
         rule.setContent {
             onSurface = MaterialTheme.colors.onSurface
-            enabledEmphasis = EmphasisAmbient.current.high
-            disabledEmphasis = EmphasisAmbient.current.disabled
+            enabledEmphasis = AmbientEmphasisLevels.current.high
+            disabledEmphasis = AmbientEmphasisLevels.current.disabled
             DropdownMenu(
                 toggle = { Box(Modifier.size(20.dp)) },
                 onDismissRequest = {},
                 expanded = true
             ) {
                 DropdownMenuItem(onClick = {}) {
-                    enabledContentColor = contentColor()
+                    enabledContentColor = AmbientContentColor.current
                 }
                 DropdownMenuItem(enabled = false, onClick = {}) {
-                    disabledContentColor = contentColor()
+                    disabledContentColor = AmbientContentColor.current
                 }
             }
         }

@@ -79,7 +79,7 @@ fun TopAppBar(
     elevation: Dp = TopAppBarElevation
 ) {
     AppBar(backgroundColor, contentColor, elevation, RectangleShape, modifier) {
-        val emphasisLevels = EmphasisAmbient.current
+        val emphasisLevels = AmbientEmphasisLevels.current
         if (navigationIcon == null) {
             Spacer(TitleInsetWithoutIcon)
         } else {
@@ -174,7 +174,7 @@ fun BottomAppBar(
     elevation: Dp = BottomAppBarElevation,
     content: @Composable RowScope.() -> Unit
 ) {
-    val scaffoldGeometry = ScaffoldGeometryAmbient.current
+    val scaffoldGeometry = AmbientScaffoldGeometry.current
     val fabBounds = scaffoldGeometry.fabBounds
     val shape = if (cutoutShape != null && scaffoldGeometry.isFabDocked && fabBounds != null) {
         BottomAppBarCutoutShape(cutoutShape, fabBounds)

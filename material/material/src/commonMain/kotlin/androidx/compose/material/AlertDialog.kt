@@ -140,7 +140,7 @@ fun AlertDialog(
             color = backgroundColor,
             contentColor = contentColor
         ) {
-            val emphasisLevels = EmphasisAmbient.current
+            val emphasisLevels = AmbientEmphasisLevels.current
             Column {
                 if (title != null) {
                     Box(TitlePadding.align(Alignment.Start)) {

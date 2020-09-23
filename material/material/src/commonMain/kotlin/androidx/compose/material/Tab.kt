@@ -23,14 +23,13 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.background
-import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -93,8 +92,8 @@ fun Tab(
     text: @Composable () -> Unit = emptyContent(),
     icon: @Composable () -> Unit = emptyContent(),
     interactionState: InteractionState = remember { InteractionState() },
-    selectedContentColor: Color = contentColor(),
-    unselectedContentColor: Color = EmphasisAmbient.current.medium.applyEmphasis(
+    selectedContentColor: Color = AmbientContentColor.current,
+    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
         selectedContentColor
     )
 ) {
@@ -141,8 +140,8 @@ fun Tab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionState: InteractionState = remember { InteractionState() },
-    selectedContentColor: Color = contentColor(),
-    unselectedContentColor: Color = EmphasisAmbient.current.medium.applyEmphasis(
+    selectedContentColor: Color = AmbientContentColor.current,
+    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
         selectedContentColor
     ),
     content: @Composable ColumnScope.() -> Unit
@@ -185,7 +184,7 @@ object TabConstants {
     fun DefaultDivider(
         modifier: Modifier = Modifier,
         thickness: Dp = DefaultDividerThickness,
-        color: Color = contentColor().copy(alpha = DefaultDividerOpacity)
+        color: Color = AmbientContentColor.current.copy(alpha = DefaultDividerOpacity)
     ) {
         Divider(modifier = modifier, thickness = thickness, color = color)
     }
@@ -202,7 +201,7 @@ object TabConstants {
     fun DefaultIndicator(
         modifier: Modifier = Modifier,
         height: Dp = DefaultIndicatorHeight,
-        color: Color = contentColor()
+        color: Color = AmbientContentColor.current
     ) {
         Box(modifier
             .fillMaxWidth()
@@ -259,7 +258,7 @@ private val TabTintColor = ColorPropKey()
 
 /**
  * [transition] defining how the tint color for a tab animates, when a new tab is selected. This
- * component uses [ContentColorAmbient] to provide an interpolated value between [activeColor]
+ * component uses [AmbientContentColor] to provide an interpolated value between [activeColor]
  * and [inactiveColor] depending on the animation status.
  */
 @Composable
@@ -296,7 +295,7 @@ private fun TabTransition(
         }
     }
     val state = transition(transitionDefinition, selected)
-    Providers(ContentColorAmbient provides state[TabTintColor], children = content)
+    Providers(AmbientContentColor provides state[TabTintColor], children = content)
 }
 
 /**

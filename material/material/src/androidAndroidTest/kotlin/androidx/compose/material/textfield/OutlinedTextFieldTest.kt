@@ -19,9 +19,9 @@ package androidx.compose.material.textfield
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.background
-import androidx.compose.foundation.contentColor
-import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
@@ -381,13 +381,14 @@ class OutlinedTextFieldTest {
                 label = {},
                 placeholder = {
                     Text("placeholder")
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 0.6f
                             )
                         )
-                    assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.subtitle1)
+                    assertThat(AmbientTextStyle.current)
+                        .isEqualTo(MaterialTheme.typography.subtitle1)
                 }
             )
         }
@@ -509,7 +510,7 @@ class OutlinedTextFieldTest {
                 label = {},
                 isErrorValue = false,
                 leadingIcon = {
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -517,7 +518,7 @@ class OutlinedTextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -537,7 +538,7 @@ class OutlinedTextFieldTest {
                 label = {},
                 isErrorValue = true,
                 leadingIcon = {
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -545,7 +546,7 @@ class OutlinedTextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(contentColor()).isEqualTo(MaterialTheme.colors.error)
+                    assertThat(AmbientContentColor.current).isEqualTo(MaterialTheme.colors.error)
                 }
             )
         }

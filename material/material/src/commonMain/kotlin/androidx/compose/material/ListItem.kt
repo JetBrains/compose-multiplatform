@@ -72,7 +72,7 @@ fun ListItem(
     trailing: @Composable (() -> Unit)? = null,
     text: @Composable () -> Unit
 ) {
-    val emphasisLevels = EmphasisAmbient.current
+    val emphasisLevels = AmbientEmphasisLevels.current
     val typography = MaterialTheme.typography
 
     val styledText = applyTextStyle(typography.subtitle1, emphasisLevels.high, text)!!

@@ -28,14 +28,14 @@ import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
@@ -129,7 +129,7 @@ internal fun TextFieldImpl(
         Decoration(
             contentColor = inactiveColor,
             typography = MaterialTheme.typography.subtitle1,
-            emphasis = EmphasisAmbient.current.high
+            emphasis = AmbientEmphasisLevels.current.high
         ) {
             TextFieldScroller(
                 scrollerPosition = rememberSavedInstanceState(
@@ -173,7 +173,7 @@ internal fun TextFieldImpl(
             keyboardController.value?.showSoftwareKeyboard()
         }
 
-    val emphasisLevels = EmphasisAmbient.current
+    val emphasisLevels = AmbientEmphasisLevels.current
 
     TextFieldTransitionScope.transition(
         inputState = inputState,
@@ -222,7 +222,7 @@ internal fun TextFieldImpl(
                         Decoration(
                             contentColor = inactiveColor,
                             typography = MaterialTheme.typography.subtitle1,
-                            emphasis = EmphasisAmbient.current.medium,
+                            emphasis = AmbientEmphasisLevels.current.medium,
                             children = placeholder
                         )
                     }
@@ -359,7 +359,7 @@ internal fun Decoration(
     children: @Composable () -> Unit
 ) {
     val colorAndEmphasis = @Composable {
-        Providers(ContentColorAmbient provides contentColor) {
+        Providers(AmbientContentColor provides contentColor) {
             if (emphasis != null) ProvideEmphasis(
                 emphasis,
                 children

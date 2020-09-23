@@ -56,7 +56,7 @@ import androidx.compose.ui.util.nativeClass
  * responds to other interactions by showing a fixed state layer.
  *
  * By default this [Indication] with default parameters will be provided by [MaterialTheme]
- * through [androidx.compose.foundation.IndicationAmbient], and hence used in interactions such as
+ * through [androidx.compose.foundation.AmbientIndication], and hence used in interactions such as
  * [androidx.compose.foundation.clickable] out of the box. You can also manually create a
  * [RippleIndication] and provide it to [androidx.compose.foundation.indication] in order to
  * customize its appearance.
@@ -77,7 +77,7 @@ fun RippleIndication(
     radius: Dp? = null,
     color: Color = Color.Unset
 ): RippleIndication {
-    val theme = RippleThemeAmbient.current
+    val theme = AmbientRippleTheme.current
     val clock = AnimationClockAmbient.current.asDisposableClock()
     val resolvedColor = color.useOrElse { theme.defaultColor() }
     val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
@@ -97,7 +97,7 @@ fun RippleIndication(
  * responds to other interactions by showing a fixed state layer.
  *
  * By default this [Indication] with default parameters will be provided by [MaterialTheme]
- * through [androidx.compose.foundation.IndicationAmbient], and hence used in interactions such as
+ * through [androidx.compose.foundation.AmbientIndication], and hence used in interactions such as
  * [androidx.compose.foundation.clickable] out of the box. You can also manually create a
  * [RippleIndication] and provide it to [androidx.compose.foundation.indication] in order to
  * customize its appearance.

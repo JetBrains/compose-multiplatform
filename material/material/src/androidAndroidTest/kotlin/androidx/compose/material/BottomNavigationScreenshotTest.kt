@@ -355,7 +355,7 @@ private fun CustomBottomNavigation(
 ) {
     // Apply default emphasis
     @Suppress("NAME_SHADOWING")
-    val unselectedContentColor = EmphasisAmbient.current.medium
+    val unselectedContentColor = AmbientEmphasisLevels.current.medium
         .applyEmphasis(unselectedContentColor)
     Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(Tag)) {
         BottomNavigation(backgroundColor = backgroundColor) {

@@ -17,8 +17,8 @@
 
 package androidx.compose.material.ripple
 
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.contentColor
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.luminance
 /**
  * Defines the appearance and the behavior for [RippleIndication]s.
  *
- * You can define a new theme and apply it via [RippleThemeAmbient].
+ * You can define a new theme and apply it via [AmbientRippleTheme].
  */
 @ExperimentalMaterialApi
 interface RippleTheme {
@@ -66,12 +66,12 @@ interface RippleOpacity {
  * Ambient used for providing [RippleTheme] down the tree.
  */
 @ExperimentalMaterialApi
-val RippleThemeAmbient = staticAmbientOf<RippleTheme> { DefaultRippleTheme }
+val AmbientRippleTheme = staticAmbientOf<RippleTheme> { DefaultRippleTheme }
 
 private object DefaultRippleTheme : RippleTheme {
     @Composable
     override fun defaultColor(): Color {
-        val contentColor = contentColor()
+        val contentColor = AmbientContentColor.current
         val lightTheme = MaterialTheme.colors.isLight
         val contentLuminance = contentColor.luminance()
         // If we are on a colored surface (typically indicated by low luminance content), the
@@ -87,7 +87,7 @@ private object DefaultRippleTheme : RippleTheme {
     @Composable
     override fun rippleOpacity(): RippleOpacity {
         val lightTheme = MaterialTheme.colors.isLight
-        val contentLuminance = contentColor().luminance()
+        val contentLuminance = AmbientContentColor.current.luminance()
         return when {
             lightTheme -> {
                 if (contentLuminance > 0.5) {
