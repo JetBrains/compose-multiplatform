@@ -24,7 +24,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.material.Text
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,6 +55,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -78,6 +78,7 @@ import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorXmlResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
@@ -349,7 +350,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
             onValueChange = { text.value = it },
             label = { Text(text = "Input2") },
             placeholder = {
-                Text(text = "Important input" )
+                Text(text = "Important input")
             },
             modifier = Modifier.shortcuts {
                 on(Key.MetaLeft + Key.ShiftLeft + Key.Enter) {
@@ -361,7 +362,18 @@ private fun ScrollableContent(scrollState: ScrollState) {
             }
         )
 
-        Image(imageResource("androidx/compose/desktop/example/circus.jpg"), Modifier.size(200.dp))
+        Row {
+            Image(
+                imageResource("androidx/compose/desktop/example/circus.jpg"),
+                Modifier.size(200.dp)
+            )
+
+            Icon(
+                vectorXmlResource("androidx/compose/desktop/example/ic_baseline_deck_24.xml"),
+                Modifier.size(100.dp).align(Alignment.CenterVertically),
+                tint = Color.Blue.copy(alpha = 0.5f)
+            )
+        }
     }
 }
 
