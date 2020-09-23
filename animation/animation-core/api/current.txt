@@ -55,6 +55,7 @@ package androidx.compose.animation.core {
   }
 
   public final class AnimationKt {
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.TargetBasedAnimation<T,V> TargetBasedAnimation(androidx.compose.animation.core.AnimationSpec<T> animationSpec, T? startValue, T? endValue, T? startVelocity, androidx.compose.animation.core.TwoWayConverter<T,V> converter);
   }
 
   public interface AnimationSpec<T> {
@@ -161,6 +162,16 @@ package androidx.compose.animation.core {
   public final class CubicBezierEasing implements kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> {
     ctor public CubicBezierEasing(float a, float b, float c, float d);
     method public Float! invoke(float fraction);
+  }
+
+  public final class DecayAnimation {
+    ctor public DecayAnimation(androidx.compose.animation.core.FloatDecayAnimationSpec anim, float startValue, float startVelocity);
+    method public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getConverter();
+    method public long getDurationMillis();
+    method public Float! getValue(long playTime);
+    method public androidx.compose.animation.core.AnimationVector1D getVelocityVector(long playTime);
+    property public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> converter;
+    property public long durationMillis;
   }
 
   public final class DefaultAnimationClock extends androidx.compose.animation.core.BaseAnimationClock {
@@ -383,6 +394,16 @@ package androidx.compose.animation.core {
     method public androidx.compose.animation.core.TargetAnimation copy(float target, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animation);
     method public androidx.compose.animation.core.AnimationSpec<java.lang.Float> getAnimation();
     method public float getTarget();
+  }
+
+  public final class TargetBasedAnimation<T, V extends androidx.compose.animation.core.AnimationVector> {
+    ctor public TargetBasedAnimation(androidx.compose.animation.core.AnimationSpec<T> animationSpec, T? startValue, T? endValue, androidx.compose.animation.core.TwoWayConverter<T,V> converter, V? startVelocityVector);
+    method public androidx.compose.animation.core.TwoWayConverter<T,V> getConverter();
+    method public long getDurationMillis();
+    method public T! getEndValue();
+    method public T! getValue(long playTime);
+    method public V getVelocityVector(long playTime);
+    property public long durationMillis;
   }
 
   public final class ToolingGlueKt {

@@ -43,7 +43,6 @@ class RepeatableAnimationTest {
             repeat,
             0f,
             0f,
-            AnimationVector(0f),
             Float.VectorConverter
         )
 
@@ -87,7 +86,6 @@ class RepeatableAnimationTest {
             repeat,
             0f,
             100f,
-            AnimationVector(0f),
             Float.VectorConverter
         )
 
