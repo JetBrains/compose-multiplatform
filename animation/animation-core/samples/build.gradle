@@ -15,7 +15,7 @@
  */
 
 import androidx.build.LibraryGroups
-import androidx.build.Publish
+import androidx.build.LibraryType
 import androidx.build.LibraryVersions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -49,7 +49,7 @@ tasks.withType(KotlinCompile).configureEach {
 
 androidx {
     name = "AndroidX Compose UI Animation Library Core Classes Samples"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.SAMPLES
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.ANIMATION
     inceptionYear = "2019"
