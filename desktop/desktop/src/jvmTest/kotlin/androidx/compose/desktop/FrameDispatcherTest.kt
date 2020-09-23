@@ -16,6 +16,7 @@
 
 package androidx.compose.desktop
 
+import androidx.compose.ui.platform.FrameDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -38,7 +39,7 @@ internal class FrameDispatcherTest {
 
     fun TestCoroutineScope.testFrameDispatcher() = FrameDispatcher(
         ::onFrame,
-        framesPerSecond = { 100 }, // one frame is 10 milliseconds
+        framesPerSecond = { 100f }, // one frame is 10 milliseconds
         nanoTime = { currentTime * 1_000_000 },
         coroutineContext
     )

@@ -17,6 +17,7 @@
 package androidx.compose.desktop
 
 import androidx.compose.ui.platform.DesktopComponent
+import androidx.compose.ui.platform.FrameDispatcher
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
@@ -40,8 +41,9 @@ internal class FrameSkiaLayer {
     private val picture = MutableResource<Picture>()
     private val pictureRecorder = PictureRecorder()
 
-    private fun onFrame(nanoTime: Long) {
+    private suspend fun onFrame(nanoTime: Long) {
         this.frameNanoTime = nanoTime
+        preparePicture(frameNanoTime)
         wrapped.redrawLayer()
     }
 
@@ -49,11 +51,6 @@ internal class FrameSkiaLayer {
         var currentInputMethodRequests: InputMethodRequests? = null
 
         override fun getInputMethodRequests() = currentInputMethodRequests
-
-        override fun redrawLayer() {
-            preparePicture(frameNanoTime)
-            super.redrawLayer()
-        }
 
         override fun enableInput(inputMethodRequests: InputMethodRequests) {
             currentInputMethodRequests = inputMethodRequests
@@ -74,8 +71,15 @@ internal class FrameSkiaLayer {
     init {
         wrapped.renderer = object : SkiaRenderer {
             override fun onRender(canvas: Canvas, width: Int, height: Int) {
-                picture.useWithoutClosing {
-                    it?.also(canvas::drawPicture)
+                try {
+                    picture.useWithoutClosing {
+                        it?.also(canvas::drawPicture)
+                    }
+                } catch (e: Throwable) {
+                    e.printStackTrace(System.err)
+                    if (System.getProperty("compose.desktop.render.ignore.errors") == null) {
+                        System.exit(1)
+                    }
                 }
             }
 
@@ -88,10 +92,10 @@ internal class FrameSkiaLayer {
     // We draw into picture, because SkiaLayer.draw can be called from the other thread,
     // but onRender should be called in AWT thread. Picture doesn't add any visible overhead on
     // CPU/RAM.
-    private fun preparePicture(frameTimeNanos: Long) {
+    private suspend fun preparePicture(frameTimeNanos: Long) {
         val bounds = Rect.makeWH(wrapped.width.toFloat(), wrapped.height.toFloat())
         val pictureCanvas = pictureRecorder.beginRecording(bounds)
-        renderer?.onRender(pictureCanvas, wrapped.width, wrapped.height, frameTimeNanos)
+        renderer?.onFrame(pictureCanvas, wrapped.width, wrapped.height, frameTimeNanos)
         picture.set(pictureRecorder.finishRecordingAsPicture())
     }
 
@@ -100,9 +104,9 @@ internal class FrameSkiaLayer {
         wrapped.reinit()
     }
 
-    private fun getFramesPerSecond(): Int {
+    private fun getFramesPerSecond(): Float {
         val refreshRate = wrapped.graphicsConfiguration.device.displayMode.refreshRate
-        return if (refreshRate != DisplayMode.REFRESH_RATE_UNKNOWN) refreshRate else 60
+        return if (refreshRate != DisplayMode.REFRESH_RATE_UNKNOWN) refreshRate.toFloat() else 60f
     }
 
     fun updateLayer() {
@@ -126,6 +130,6 @@ internal class FrameSkiaLayer {
     }
 
     interface Renderer {
-        fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
+        suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
     }
 }
