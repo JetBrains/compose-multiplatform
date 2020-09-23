@@ -174,6 +174,7 @@ internal class LazyListScopeImpl : LazyListScope {
 @ExperimentalLazyDsl
 fun LazyRow(
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: LazyListScope.() -> Unit
@@ -184,10 +185,12 @@ fun LazyRow(
     LazyFor(
         itemsCount = scope.totalSize,
         modifier = modifier,
+        state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
         isVertical = false
-    ) { index -> scope.contentFor(index, this) }
+    ) {
+            index -> scope.contentFor(index, this) }
 }
 
 /**
@@ -204,6 +207,7 @@ fun LazyRow(
 @ExperimentalLazyDsl
 fun LazyColumn(
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: LazyListScope.() -> Unit
@@ -214,10 +218,11 @@ fun LazyColumn(
     LazyFor(
         itemsCount = scope.totalSize,
         modifier = modifier,
+        state = state,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
         isVertical = true
-    ) {
-        index -> scope.contentFor(index, this)
+    ) { index ->
+        scope.contentFor(index, this)
     }
 }

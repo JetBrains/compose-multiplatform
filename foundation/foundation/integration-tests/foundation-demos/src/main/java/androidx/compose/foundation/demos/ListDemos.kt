@@ -16,13 +16,15 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayout
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -37,6 +39,7 @@ import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyRowFor
 import androidx.compose.foundation.lazy.LazyRowForIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.runtime.Composable
@@ -57,6 +60,7 @@ import kotlin.random.Random
 val LazyListDemos = listOf(
     ComposableDemo("Simple column") { LazyColumnDemo() },
     ComposableDemo("Add/remove items") { ListAddRemoveItemsDemo() },
+    ComposableDemo("Hoisted state") { ListHoistedStateDemo() },
     ComposableDemo("Horizontal list") { LazyRowItemsDemo() },
     ComposableDemo("List with indexes") { ListWithIndexSample() },
     ComposableDemo("Pager-like list") { PagerLikeDemo() },
@@ -93,10 +97,32 @@ private fun ListAddRemoveItemsDemo() {
             Button(modifier = buttonModifier, onClick = { numItems-- }) { Text("Remove") }
             Button(modifier = buttonModifier, onClick = { offset++ }) { Text("Offset") }
         }
-        Column {
-            LazyColumnFor((1..numItems).map { it + offset }.toList()) {
-                Text("$it", style = currentTextStyle().copy(fontSize = 20.sp))
-            }
+        LazyColumnFor(
+            (1..numItems).map { it + offset }.toList(),
+            Modifier.fillMaxWidth()
+        ) {
+            Text("$it", style = currentTextStyle().copy(fontSize = 40.sp))
+        }
+    }
+}
+
+@OptIn(ExperimentalLayout::class)
+@Composable
+private fun ListHoistedStateDemo() {
+    val state = rememberLazyListState()
+    Column {
+        FlowRow {
+            Text(
+                "First item: ${state.firstVisibleItemIndex}",
+                style = currentTextStyle().copy(fontSize = 30.sp)
+            )
+        }
+        LazyColumnFor(
+            (0..1000).toList(),
+            Modifier.fillMaxWidth(),
+            state = state
+        ) {
+            Text("$it", style = currentTextStyle().copy(fontSize = 40.sp))
         }
     }
 }
