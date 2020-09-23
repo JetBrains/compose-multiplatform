@@ -110,6 +110,7 @@ private class CompositionImpl(
         parent.composeInitial(composer, composable)
     }
 
+    @OptIn(ExperimentalComposeApi::class)
     override fun dispose() {
         if (!disposed) {
             disposed = true

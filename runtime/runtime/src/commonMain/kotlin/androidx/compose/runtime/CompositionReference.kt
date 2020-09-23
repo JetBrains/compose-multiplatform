@@ -31,6 +31,7 @@ private val EmptyAmbientMap: AmbientMap = buildableMapOf()
  *
  * @see compositionReference
  */
+@OptIn(InternalComposeApi::class)
 abstract class CompositionReference internal constructor() {
     internal abstract val compoundHashKey: Int
     internal abstract val collectingKeySources: Boolean

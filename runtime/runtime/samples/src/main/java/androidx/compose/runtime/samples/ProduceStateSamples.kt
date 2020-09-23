@@ -17,6 +17,7 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState

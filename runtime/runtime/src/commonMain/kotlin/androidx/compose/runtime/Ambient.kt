@@ -68,6 +68,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
      *
      * @sample androidx.compose.runtime.samples.consumeAmbient
      */
+    @OptIn(ComposeCompilerApi::class)
     @ComposableContract(readonly = true)
     @Composable
     inline val current: T get() = currentComposer.consume(this)
@@ -170,6 +171,7 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T>
  * @see staticAmbientOf
  */
 @Composable
+@OptIn(ComposeCompilerApi::class)
 fun Providers(vararg values: ProvidedValue<*>, children: @Composable () -> Unit) {
     currentComposer.startProviders(values)
     children()

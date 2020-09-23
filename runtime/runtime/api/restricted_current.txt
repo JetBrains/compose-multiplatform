@@ -35,9 +35,9 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class Anchor {
-    ctor public Anchor(internal int loc);
     method public boolean getValid();
-    method public int location(androidx.compose.runtime.SlotTable slots);
+    method public int toIndexFor(androidx.compose.runtime.SlotTable slots);
+    method public int toIndexFor(androidx.compose.runtime.SlotWriter writer);
     property public final boolean valid;
   }
 
@@ -118,7 +118,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(int value);
     method @androidx.compose.runtime.InternalComposeApi public void collectKeySourceInformation();
     method @androidx.compose.runtime.InternalComposeApi public void composeInitial(kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method @kotlin.PublishedApi internal <T> T! consume(androidx.compose.runtime.Ambient<T> key);
+    method @androidx.compose.runtime.ComposeCompilerApi @kotlin.PublishedApi internal <T> T! consume(androidx.compose.runtime.Ambient<T> key);
     method @androidx.compose.runtime.ComposeCompilerApi public <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method @androidx.compose.runtime.ComposeCompilerApi public void emitNode(Object? node);
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
@@ -148,7 +148,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void startReplaceableGroup(int key, String? sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key, String? sourceInformation);
-    method @kotlin.PublishedApi internal void updateValue(Object? value);
+    method @androidx.compose.runtime.ComposeCompilerApi @kotlin.PublishedApi internal void updateValue(Object? value);
     method @androidx.compose.runtime.ComposeCompilerApi public N! useNode();
     property public final androidx.compose.runtime.Applier<N> applier;
     property public final int currentCompoundKeyHash;
@@ -281,16 +281,16 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class KeyInfo {
-    method public Object? getDataKey();
     method public int getIndex();
     method public int getKey();
     method public int getLocation();
     method public int getNodes();
-    property public final Object? dataKey;
+    method public Object? getObjectKey();
     property public final int index;
     property public final int key;
     property public final int location;
     property public final int nodes;
+    property public final Object? objectKey;
   }
 
   public final class KeyKt {
@@ -436,141 +436,148 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class SlotReader {
-    ctor public SlotReader(androidx.compose.runtime.SlotTable table);
+    ctor public SlotReader(internal androidx.compose.runtime.SlotTable table);
+    method public androidx.compose.runtime.Anchor anchor(optional int index);
     method public void beginEmpty();
     method public void close();
     method public void endEmpty();
     method public void endGroup();
-    method public void endNode();
     method public java.util.List<androidx.compose.runtime.KeyInfo> extractKeys();
-    method public Object? get(androidx.compose.runtime.Anchor anchor);
     method public Object? get(int index);
-    method public int getCurrent();
     method public int getCurrentEnd();
-    method public Object! getGroupData();
-    method public Object! getGroupDataKey();
+    method public int getCurrentGroup();
+    method public Object! getGroupAux();
     method public int getGroupEnd();
     method public int getGroupKey();
     method public Object! getGroupNode();
+    method public Object! getGroupObjectKey();
     method public int getGroupSize();
+    method public int getGroupSlotCount();
+    method public int getGroupSlotIndex();
     method public boolean getInEmpty();
-    method public int getNodeIndex();
-    method public int getParentLocation();
+    method public int getNodeCount();
+    method public int getParent();
     method public int getParentNodes();
-    method public int getParentSlots();
-    method public androidx.compose.runtime.SlotTable getTable();
+    method public int getSize();
+    method public int getSlot();
+    method public Object? groupAux(int index);
     method public int groupEnd(int index);
+    method public Object? groupGet(int index);
     method public int groupKey(int index);
+    method public int groupKey(androidx.compose.runtime.Anchor anchor);
+    method public Object? groupObjectKey(int index);
     method public int groupSize(int index);
-    method public boolean isGroup();
-    method public boolean isGroup(int index);
+    method public boolean hasObjectKey(int index);
     method public boolean isGroupEnd();
     method public boolean isNode();
-    method public boolean isNode(int location);
+    method public boolean isNode(int index);
     method public Object? next();
-    method public void reposition(int value);
+    method public Object? node(int index);
+    method public int nodeCount(int index);
+    method public int parent(int index);
+    method public int parentOf(int index);
+    method public void reposition(int index);
+    method public void restoreParent(int index);
     method public int skipGroup();
-    method public int skipNode();
     method public void skipToGroupEnd();
-    method public void startDataGroup();
     method public void startGroup();
     method public void startNode();
-    property public final int current;
     property public final int currentEnd;
-    property public final Object! groupData;
-    property public final Object! groupDataKey;
+    property public final int currentGroup;
+    property public final Object! groupAux;
     property public final int groupEnd;
     property public final int groupKey;
     property public final Object! groupNode;
+    property public final Object! groupObjectKey;
     property public final int groupSize;
+    property public final int groupSlotCount;
+    property public final int groupSlotIndex;
     property public final boolean inEmpty;
-    property public final boolean isGroup;
     property public final boolean isGroupEnd;
     property public final boolean isNode;
-    property public final int nodeIndex;
-    property public final int parentLocation;
+    property public final int nodeCount;
+    property public final int parent;
     property public final int parentNodes;
-    property public final int parentSlots;
-    property public final androidx.compose.runtime.SlotTable table;
-  }
-
-  public final class SlotTable {
-    ctor public SlotTable(internal Object![] slots);
-    ctor public SlotTable();
-    method public int getSize();
-    method @androidx.compose.runtime.InternalComposeApi public java.util.List<java.lang.Integer> groupPathTo(int location);
-    method @androidx.compose.runtime.InternalComposeApi public androidx.compose.runtime.SlotReader openReader();
-    method @androidx.compose.runtime.InternalComposeApi public androidx.compose.runtime.SlotWriter openWriter();
-    method @androidx.compose.runtime.InternalComposeApi public inline <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SlotReader,? extends T> block);
-    method @androidx.compose.runtime.InternalComposeApi @org.jetbrains.annotations.TestOnly public void verifyWellFormed();
-    method @androidx.compose.runtime.InternalComposeApi public inline <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SlotWriter,? extends T> block);
     property public final int size;
-    field public static final androidx.compose.runtime.SlotTable.Companion Companion;
+    property public final int slot;
   }
 
-  @androidx.compose.runtime.InternalComposeApi public static final class SlotTable.Companion {
-    method public Object getEMPTY();
-    property public final Object EMPTY;
+  @androidx.compose.runtime.InternalComposeApi public final class SlotTable {
+    ctor public SlotTable();
+    method public int anchorIndex(androidx.compose.runtime.Anchor anchor);
+    method public String asString();
+    method public int[] getGroups();
+    method public int getGroupsSize();
+    method public Object![] getSlots();
+    method public int getSlotsSize();
+    method public boolean isEmpty();
+    method public androidx.compose.runtime.SlotReader openReader();
+    method public androidx.compose.runtime.SlotWriter openWriter();
+    method public boolean ownsAnchor(androidx.compose.runtime.Anchor anchor);
+    method public inline <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SlotReader,? extends T> block);
+    method public void verifyWellFormed();
+    method public inline <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SlotWriter,? extends T> block);
+    property public final int[] groups;
+    property public final int groupsSize;
+    property public final boolean isEmpty;
+    property public final Object![] slots;
+    property public final int slotsSize;
   }
 
   public final class SlotTableKt {
+    method public static java.util.List<java.lang.Integer> slice(int[], Iterable<java.lang.Integer> indices);
     field @kotlin.PublishedApi internal static final Object EMPTY;
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class SlotWriter {
+    method public void advanceBy(int amount);
     method public androidx.compose.runtime.Anchor anchor(optional int index);
+    method public int anchorIndex(androidx.compose.runtime.Anchor anchor);
     method public void beginInsert();
     method public void close();
-    method public int endData();
     method public int endGroup();
     method public void endInsert();
-    method public int endNode();
-    method public void ensureStarted(int location);
+    method public void ensureStarted(int index);
     method public void ensureStarted(androidx.compose.runtime.Anchor anchor);
-    method public Object? get(androidx.compose.runtime.Anchor anchor);
-    method public Object? get(int index);
     method public boolean getClosed();
-    method public int getCurrent();
-    method public int getGroupSize();
-    method public int getNodeIndex();
-    method public int getParentLocation();
-    method public int getParentNodes();
-    method public androidx.compose.runtime.SlotTable getTable();
+    method public int getCurrentGroup();
+    method public int getParent();
+    method public Object? groupAux(int index);
+    method public int groupKey(int index);
+    method public Object? groupObjectKey(int index);
     method public int groupSize(int index);
     method public java.util.Iterator<java.lang.Object> groupSlots();
-    method public boolean isGroup();
-    method public boolean isGroup(int index);
+    method public String groupsAsString();
+    method public boolean isGroupEnd();
     method public boolean isNode();
-    method public java.util.List<androidx.compose.runtime.Anchor> moveFrom(androidx.compose.runtime.SlotTable table, int location);
+    method public java.util.List<androidx.compose.runtime.Anchor> moveFrom(androidx.compose.runtime.SlotTable table, int index);
     method public void moveGroup(int offset);
-    method public int parentIndex(androidx.compose.runtime.Anchor anchor);
+    method public Object? node(int index);
+    method public int parent(int index);
+    method public int parent(androidx.compose.runtime.Anchor anchor);
     method public boolean removeGroup();
+    method public void seek(androidx.compose.runtime.Anchor anchor);
     method public void set(Object? value);
-    method public void setCurrent(int p);
+    method public Object? set(int index, Object? value);
     method public Object? skip();
-    method public void skip(int amount);
     method public int skipGroup();
-    method public int skipNode();
     method public void skipToGroupEnd();
-    method public void startData(int key, Object? dataKey, Object? data);
+    method public void startData(int key, Object? objectKey, Object? aux);
+    method public void startData(int key, Object? aux);
     method public void startGroup();
     method public void startGroup(int key);
     method public void startGroup(int key, Object? dataKey);
-    method public void startGroup(int key, Object? dataKey, Object? data);
-    method public void startNode();
     method public void startNode(Object? key);
     method public void startNode(Object? key, Object? node);
     method public Object? update(Object? value);
-    method public void updateData(Object? value);
+    method public void updateAux(Object? value);
+    method public void updateNode(Object? value);
+    method public void updateParentNode(Object? value);
     property public final boolean closed;
-    property public final int current;
-    property public final int groupSize;
-    property public final boolean isGroup;
+    property public final int currentGroup;
+    property public final boolean isGroupEnd;
     property public final boolean isNode;
-    property public final int nodeIndex;
-    property public final int parentLocation;
-    property public final int parentNodes;
-    property public final androidx.compose.runtime.SlotTable table;
+    property public final int parent;
   }
 
   public interface SnapshotMutationPolicy<T> {
