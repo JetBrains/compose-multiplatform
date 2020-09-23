@@ -38,7 +38,7 @@ dependencies {
 
 androidx {
     name = "Compose Android Stubs"
-    publish = Publish.NONE
+    publish = Publish.SNAPSHOT_AND_RELEASE
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
