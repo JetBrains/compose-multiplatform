@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import androidx.ui.test.SemanticsNodeInteraction
+import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.assertCountEquals
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsDisplayed
@@ -780,6 +781,40 @@ class LazyColumnForTest {
             //  number of pixels
             //  assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10.dp.toPx().roundToInt())
             assertThat(state.firstVisibleItemScrollOffset).isGreaterThan(5.dp.toPx().roundToInt())
+        }
+    }
+
+    @Test
+    fun stateIsRestored() {
+        val restorationTester = StateRestorationTester(rule)
+        val items by mutableStateOf ((1..20).toList())
+        var state: LazyListState?
+        restorationTester.setContent {
+            state = rememberLazyListState()
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag),
+                state = state!!
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 30.dp, density = rule.density)
+
+        state = null
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        assertThat(state!!.firstVisibleItemIndex).isEqualTo(1)
+
+        with (rule.density) {
+            // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
+            //  number of pixels
+            //  assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10.dp.toPx().roundToInt())
+            assertThat(state!!.firstVisibleItemScrollOffset).isGreaterThan(5.dp.toPx()
+                .roundToInt())
         }
     }
 
