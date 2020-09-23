@@ -57,3 +57,14 @@ to download maven artifacts:
 ### Publishing Compose Desktop
 
 Run a new build in [Compose configuration](https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Skija_JetpackComposeMpp_Dev)
+
+### Building Docker Images
+
+For building locally see corresponding the instructions:
+ * for [Linux](docker/linux/README.md), 
+ * for [Windows](docker/windows/README.md).
+     
+For updating internal images on Docker registry run a build in one of 
+the corresponding configurations:
+* for [Linux](https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Compose_Docker_Linux),
+* for [Windows](https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Compose_Docker_Windows)
