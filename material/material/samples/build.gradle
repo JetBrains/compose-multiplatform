@@ -15,7 +15,7 @@
  */
 
 import androidx.build.LibraryGroups
-import androidx.build.Publish
+import androidx.build.LibraryType
 import androidx.build.LibraryVersions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -54,7 +54,7 @@ android {
 
 androidx {
     name = "AndroidX Compose UI Material Design Components Samples"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.SAMPLES
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.MATERIAL
     inceptionYear = "2019"
