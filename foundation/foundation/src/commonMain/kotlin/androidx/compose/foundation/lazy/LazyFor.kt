@@ -277,6 +277,10 @@ internal inline fun LazyFor(
     val config = defaultFlingConfig()
     val state = remember(clock, config) { LazyForState(config, clock) }
     val reverseDirection = LayoutDirectionAmbient.current == LayoutDirection.Rtl && !isVertical
+
+    val cachingItemContentFactory = remember { CachingItemContentFactory(itemContentFactory) }
+    cachingItemContentFactory.itemContentFactory = itemContentFactory
+
     SubcomposeLayout<DataIndex>(
         modifier
             .scrollable(
@@ -288,6 +292,9 @@ internal inline fun LazyFor(
             .padding(contentPadding)
             .then(state.remeasurementModifier)
     ) { constraints ->
+        // this will update the scope object if the constrains have been changed
+        cachingItemContentFactory.updateItemScope(this, constraints)
+
         state.measure(
             this,
             constraints,
@@ -295,7 +302,7 @@ internal inline fun LazyFor(
             horizontalAlignment,
             verticalAlignment,
             itemsCount,
-            itemContentFactory
+            cachingItemContentFactory
         )
     }
 }

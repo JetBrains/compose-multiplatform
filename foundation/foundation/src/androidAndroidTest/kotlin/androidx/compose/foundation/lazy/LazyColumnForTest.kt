@@ -690,10 +690,45 @@ class LazyColumnForTest {
             .assertTopPositionIsAlmost(80.dp)
     }
 
+    @Test
+    fun contentOfNotStableItemsIsNotRecomposedDuringScroll() {
+        val items = listOf(NotStable(1), NotStable(2))
+        var firstItemRecomposed = 0
+        var secondItemRecomposed = 0
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                if (it.count == 1) {
+                    firstItemRecomposed++
+                } else {
+                    secondItemRecomposed++
+                }
+                Spacer(Modifier.size(75.dp))
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(firstItemRecomposed).isEqualTo(1)
+            assertThat(secondItemRecomposed).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = (50).dp, density = rule.density)
+
+        rule.runOnIdle {
+            assertThat(firstItemRecomposed).isEqualTo(1)
+            assertThat(secondItemRecomposed).isEqualTo(1)
+        }
+    }
+
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
         getUnclippedBoundsInRoot().top.assertIsEqualTo(expected, tolerance = 1.dp)
     }
 }
+
+data class NotStable(val count: Int)
 
 internal fun IntegerSubject.isWithin1PixelFrom(expected: Int) {
     isIn(Range.closed(expected - 1, expected + 1))

@@ -556,4 +556,37 @@ class LazyRowForTest {
     private fun SemanticsNodeInteraction.assertLeftPositionIsAlmost(expected: Dp) {
         getUnclippedBoundsInRoot().left.assertIsEqualTo(expected, tolerance = 1.dp)
     }
+
+    @Test
+    fun contentOfNotStableItemsIsNotRecomposedDuringScroll() {
+        val items = listOf(NotStable(1), NotStable(2))
+        var firstItemRecomposed = 0
+        var secondItemRecomposed = 0
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                if (it.count == 1) {
+                    firstItemRecomposed++
+                } else {
+                    secondItemRecomposed++
+                }
+                Spacer(Modifier.size(75.dp))
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(firstItemRecomposed).isEqualTo(1)
+            Truth.assertThat(secondItemRecomposed).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = (50).dp, density = rule.density)
+
+        rule.runOnIdle {
+            Truth.assertThat(firstItemRecomposed).isEqualTo(1)
+            Truth.assertThat(secondItemRecomposed).isEqualTo(1)
+        }
+    }
 }
