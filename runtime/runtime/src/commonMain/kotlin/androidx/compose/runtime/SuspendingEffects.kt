@@ -22,10 +22,13 @@ import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+@Suppress("DEPRECATION")
+@Deprecated("No replacement; removing CompositionCoroutineScope in migration to LaunchedTask")
 private class SuspendingEffect(
     private val recomposer: Recomposer,
     private val block: suspend CompositionCoroutineScope.() -> Unit
@@ -50,6 +53,7 @@ private class SuspendingEffect(
  * frame of the composition. This can be useful for performing the next action of an animation
  * while the effect is still present in the composition.
  */
+@Deprecated("No replacement; LaunchedTask uses CoroutineScope as a receiver directly")
 interface CompositionCoroutineScope : CoroutineScope {
     // This method deliberately shadows the awaitFrame method from kotlinx-coroutines-android
     // to redirect usage to the CompositionFrameClock API in effect blocks.
@@ -68,7 +72,8 @@ interface CompositionCoroutineScope : CoroutineScope {
  * [kotlinx.coroutines.CancellationException] or the exception that failed the current
  * [kotlinx.coroutines.Job].
  */
-@Suppress("unused")
+@Suppress("unused", "DeprecatedCallableAddReplaceWith", "DEPRECATION")
+@Deprecated("No replacement; LaunchedTask uses CoroutineScope as a receiver directly")
 suspend fun CompositionCoroutineScope.awaitDispose(onDispose: () -> Unit = {}): Nothing = try {
     suspendCancellableCoroutine<Nothing> { /* Suspend until cancellation */ }
 } finally {
@@ -84,6 +89,11 @@ suspend fun CompositionCoroutineScope.awaitDispose(onDispose: () -> Unit = {}): 
  * cause [block] to launch again. To re-launch a suspend function when inputs change, see the
  * other overloads of [launchInComposition] that accept input value parameters.
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Renamed to LaunchedTask; custom scope removed",
+    replaceWith = ReplaceWith("LaunchedTask(block)", "androidx.compose.runtime.LaunchedTask")
+)
 @Composable
 fun launchInComposition(
     block: suspend CompositionCoroutineScope.() -> Unit
@@ -104,6 +114,11 @@ fun launchInComposition(
  * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
  * scoped to the composition in response to event callbacks.
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Renamed to LaunchedTask; custom scope removed",
+    replaceWith = ReplaceWith("LaunchedTask(key, block)", "androidx.compose.runtime.LaunchedTask")
+)
 @Composable
 fun launchInComposition(
     key: Any?,
@@ -126,6 +141,14 @@ fun launchInComposition(
  * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
  * scoped to the composition in response to event callbacks.
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Renamed to LaunchedTask; custom scope removed",
+    replaceWith = ReplaceWith(
+        "LaunchedTask(key1, key2, block)",
+        "androidx.compose.runtime.LaunchedTask"
+    )
+)
 @Composable
 fun launchInComposition(
     key1: Any?,
@@ -149,6 +172,14 @@ fun launchInComposition(
  * Instead, see [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch
  * ongoing jobs scoped to the composition in response to event callbacks.
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Renamed to LaunchedTask; custom scope removed",
+    replaceWith = ReplaceWith(
+        "LaunchedTask(key1, key2, key3, block)",
+        "androidx.compose.runtime.LaunchedTask"
+    )
+)
 @Composable
 fun launchInComposition(
     key1: Any?,
@@ -173,6 +204,14 @@ fun launchInComposition(
  * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
  * scoped to the composition in response to event callbacks.
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Renamed to LaunchedTask; custom scope removed",
+    replaceWith = ReplaceWith(
+        "LaunchedTask(*keys, block)",
+        "androidx.compose.runtime.LaunchedTask"
+    )
+)
 @Composable
 fun launchInComposition(
     vararg keys: Any?,
@@ -258,4 +297,128 @@ inline fun rememberCoroutineScope(
         )
     }
     return wrapper.coroutineScope
+}
+
+private class LaunchedTaskImpl(
+    private val recomposer: Recomposer,
+    private val task: suspend CoroutineScope.() -> Unit
+) : CompositionLifecycleObserver {
+
+    private var job: Job? = null
+
+    override fun onEnter() {
+        job?.cancel("Old job was still running!")
+        val scope = CoroutineScope(recomposer.applyingCoroutineContext
+            ?: error("cannot launch LaunchedTask - Recomposer is not running"))
+        job = scope.launch(block = task)
+    }
+
+    override fun onLeave() {
+        job?.cancel()
+        job = null
+    }
+}
+
+/**
+ * When [LaunchedTask] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] when the [LaunchedTask]
+ * leaves the composition.
+ *
+ * To cancel and re-launch a task when input parameters change, see the overloads of
+ * [LaunchedTask] that accept additional key parameters.
+ */
+@Composable
+fun LaunchedTask(
+    block: suspend CoroutineScope.() -> Unit
+) {
+    @OptIn(ExperimentalComposeApi::class)
+    val recomposer = currentComposer.recomposer
+    remember { LaunchedTaskImpl(recomposer, block) }
+}
+
+/**
+ * When [LaunchedTask] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedTask] is recomposed with a different [key]. The coroutine will be
+ * [cancelled][Job.cancel] when the [LaunchedTask] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+fun LaunchedTask(
+    key: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    @OptIn(ExperimentalComposeApi::class)
+    val recomposer = currentComposer.recomposer
+    remember(key) { LaunchedTaskImpl(recomposer, block) }
+}
+
+/**
+ * When [LaunchedTask] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedTask] is recomposed with a different [key]. The coroutine will be
+ * [cancelled][Job.cancel] when the [LaunchedTask] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+fun LaunchedTask(
+    key1: Any?,
+    key2: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    @OptIn(ExperimentalComposeApi::class)
+    val recomposer = currentComposer.recomposer
+    remember(key1, key2) { LaunchedTaskImpl(recomposer, block) }
+}
+
+/**
+ * When [LaunchedTask] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedTask] is recomposed with a different [key]. The coroutine will be
+ * [cancelled][Job.cancel] when the [LaunchedTask] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+fun LaunchedTask(
+    key1: Any?,
+    key2: Any?,
+    key3: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    @OptIn(ExperimentalComposeApi::class)
+    val recomposer = currentComposer.recomposer
+    remember(key1, key2, key3) { LaunchedTaskImpl(recomposer, block) }
+}
+
+/**
+ * When [LaunchedTask] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedTask] is recomposed with a different [key]. The coroutine will be
+ * [cancelled][Job.cancel] when the [LaunchedTask] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+fun LaunchedTask(
+    vararg keys: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    @OptIn(ExperimentalComposeApi::class)
+    val recomposer = currentComposer.recomposer
+    remember(*keys) { LaunchedTaskImpl(recomposer, block) }
 }

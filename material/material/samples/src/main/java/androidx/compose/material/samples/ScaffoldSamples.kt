@@ -19,12 +19,12 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.animation.animatedFloat
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -49,8 +49,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.launchInComposition
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -266,7 +266,7 @@ fun ScaffoldWithCoroutinesSnackbar() {
     val snackbarHostState = remember { SnackbarHostState() }
     // we allow only one snackbar to be in the queue here, hence conflated
     val channel = remember { BroadcastChannel<Int>(Channel.Factory.CONFLATED) }
-    launchInComposition {
+    LaunchedTask {
         channel.asFlow().collect { index ->
             val result = snackbarHostState.showSnackbar(
                 message = "Snackbar # $index",
