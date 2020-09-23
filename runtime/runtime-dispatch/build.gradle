@@ -35,7 +35,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB_COMMON)
-            api(KOTLIN_COROUTINES_CORE_COMMON)
+            api(KOTLIN_COROUTINES_CORE)
         }
         jvmMain.dependencies {
             implementation(KOTLIN_STDLIB)
