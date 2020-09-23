@@ -13,5 +13,5 @@ at https://android.googlesource.com/platform/frameworks/support.
        * `imageviewer` - Image Viewer application for Android and Desktop
        * `issues` - GitHub issue tracker with an adaptive UI and ktor-client
    * `gradle-plugin` - plugin for simpler usage of Compose with Gradle build
-   * `templates` - new application templates (see `app-template/build_and_run_from_cli_example.sh` for using without Gradle)
+   * `templates` - new application templates (see `desktop-template/build_and_run_from_cli_example.sh` for using without Gradle)
    * `tutorials` - tutorials on using Compose for Desktop
