@@ -27,6 +27,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.Saver
+import androidx.compose.runtime.savedinstancestate.listSaver
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.MeasureScope
@@ -74,9 +77,12 @@ fun rememberLazyListState(
     val clock = AnimationClockAmbient.current.asDisposableClock()
     val config = defaultFlingConfig()
 
-    return remember(
-        clock, config
-    ) {
+    // Avoid creating a new instance every invocation
+    val saver = remember(config, clock) {
+        LazyListState.Saver(config, clock)
+    }
+
+    return rememberSavedInstanceState(config, clock, saver = saver) {
         LazyListState(
             initialFirstVisibleItemIndex,
             initialFirstVisibleItemScrollOffset,
@@ -363,5 +369,25 @@ class LazyListState constructor(
                 }
             }
         }
+    }
+
+    companion object {
+        /**
+         * The default [Saver] implementation for [LazyListState].
+         */
+        fun Saver(
+            flingConfig: FlingConfig,
+            animationClock: AnimationClockObservable
+        ): Saver<LazyListState, *> = listSaver(
+            save = { listOf(it.firstVisibleItemIndex, it.firstVisibleItemScrollOffset) },
+            restore = {
+                LazyListState(
+                    firstVisibleItemIndex = it[0],
+                    firstVisibleItemScrollOffset = it[1],
+                    flingConfig = flingConfig,
+                    animationClock = animationClock
+                )
+            }
+        )
     }
 }
