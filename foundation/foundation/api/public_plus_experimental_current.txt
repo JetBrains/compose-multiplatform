@@ -318,6 +318,11 @@ package androidx.compose.foundation.lazy {
     method public int getFirstVisibleItemScrollOffset();
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
+    field public static final androidx.compose.foundation.lazy.LazyListState.Companion Companion;
+  }
+
+  public static final class LazyListState.Companion {
+    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.lazy.LazyListState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
   }
 
   public final class LazyListStateKt {
