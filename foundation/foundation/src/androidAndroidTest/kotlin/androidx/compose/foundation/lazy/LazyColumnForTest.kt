@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +47,7 @@ import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.assertCountEquals
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsDisplayed
+import androidx.ui.test.assertIsEqualTo
 import androidx.ui.test.assertIsNotDisplayed
 import androidx.ui.test.assertPositionInRootIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
@@ -63,6 +65,7 @@ import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -326,6 +329,7 @@ class LazyColumnForTest {
             .assertIsDisplayed()
     }
 
+    @Ignore("This test is not fully working. To be fixed in b/167913500")
     @Test
     fun contentPaddingIsApplied() = with(rule.density) {
         val itemTag = "item"
@@ -557,6 +561,138 @@ class LazyColumnForTest {
             .assertWidthIsEqualTo(150.dp)
             .assertHeightIsEqualTo(150.dp)
     }
+
+    @Test
+    fun whenNotAnymoreAvailableItemWasDisplayed() {
+        var items by mutableStateOf ((1..30).toList())
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 16-20
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 300.dp, density = rule.density)
+
+        rule.runOnIdle {
+            items = (1..10).toList()
+        }
+
+        // there is no item 16 anymore so we will just display the last items 6-10
+        rule.onNodeWithTag("6")
+            .assertTopPositionIsAlmost(0.dp)
+    }
+
+    @Test
+    fun whenFewDisplayedItemsWereRemoved() {
+        var items by mutableStateOf ((1..10).toList())
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 6-10
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 100.dp, density = rule.density)
+
+        rule.runOnIdle {
+            items = (1..8).toList()
+        }
+
+        // there are no more items 9 and 10, so we have to scroll back
+        rule.onNodeWithTag("4")
+            .assertTopPositionIsAlmost(0.dp)
+    }
+
+    @Test
+    fun whenItemsBecameEmpty() {
+        var items by mutableStateOf ((1..10).toList())
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.sizeIn(maxHeight = 100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 2-6
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 20.dp, density = rule.density)
+
+        rule.runOnIdle {
+            items = emptyList()
+        }
+
+        // there are no more items so the LazyColumn is zero sized
+        rule.onNodeWithTag(LazyColumnForTag)
+            .assertWidthIsEqualTo(0.dp)
+            .assertHeightIsEqualTo(0.dp)
+
+        // and has no children
+        rule.onNodeWithTag("1")
+            .assertDoesNotExist()
+        rule.onNodeWithTag("2")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun scrollBackAndForth() {
+        val items by mutableStateOf ((1..20).toList())
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // after scroll we will display items 6-10
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 100.dp, density = rule.density)
+
+        // and scroll back
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = (-100).dp, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionIsAlmost(0.dp)
+    }
+
+    @Test
+    fun tryToScrollBackwardWhenAlreadyOnTop() {
+        val items by mutableStateOf ((1..20).toList())
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        // we already displaying the first item, so this should do nothing
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = (-50).dp, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionIsAlmost(0.dp)
+        rule.onNodeWithTag("5")
+            .assertTopPositionIsAlmost(80.dp)
+    }
+
+    private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
+        getUnclippedBoundsInRoot().top.assertIsEqualTo(expected, tolerance = 1.dp)
+    }
 }
 
 internal fun IntegerSubject.isWithin1PixelFrom(expected: Int) {
@@ -570,7 +706,7 @@ internal fun SemanticsNodeInteraction.scrollBy(x: Dp = 0.dp, y: Dp = 0.dp, densi
             val xPx = x.toIntPx()
             val yPx = y.toIntPx()
             val offsetX = if (xPx > 0) xPx + touchSlop else if (xPx < 0) xPx - touchSlop else 0
-            val offsetY = if (yPx > 0) yPx + touchSlop else if (yPx < 0) xPx - touchSlop else 0
+            val offsetY = if (yPx > 0) yPx + touchSlop else if (yPx < 0) yPx - touchSlop else 0
             swipeWithVelocity(
                 start = center,
                 end = Offset(center.x - offsetX, center.y - offsetY),
