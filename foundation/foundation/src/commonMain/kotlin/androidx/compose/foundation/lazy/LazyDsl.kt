@@ -85,6 +85,9 @@ internal class LazyListScopeImpl : LazyListScope {
         items: List<T>,
         itemContent: @Composable LazyItemScope.(item: T) -> Unit
     ) {
+        // There aren't any items to display
+        if (items.isEmpty()) { return }
+
         val interval = IntervalHolder(
             startIndex = totalSize,
             content = { index ->
@@ -114,6 +117,9 @@ internal class LazyListScopeImpl : LazyListScope {
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     ) {
+        // There aren't any items to display
+        if (items.isEmpty()) { return }
+
         val interval = IntervalHolder(
             startIndex = totalSize,
             content = { index ->

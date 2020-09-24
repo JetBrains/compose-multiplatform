@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -202,6 +203,23 @@ class LazyRowTest {
             .assertIsDisplayed()
 
         rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun lazyRowAllowEmptyListItems() {
+        val itemTag = "itemTag"
+
+        rule.setContent {
+            LazyRow {
+                items(emptyList()) { }
+                item {
+                    Spacer(Modifier.preferredSize(10.dp).testTag(itemTag))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(itemTag)
             .assertIsDisplayed()
     }
 }
