@@ -50,6 +50,7 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(TRUTH)
         androidTestImplementation(KOTLIN_TEST)
@@ -90,6 +91,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ANDROIDX_TEST_EXT_JUNIT)
                 implementation(ESPRESSO_CORE)
             }
         }

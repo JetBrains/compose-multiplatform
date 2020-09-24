@@ -33,11 +33,11 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @SmallTest
 @OptIn(ExperimentalFocus::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class OwnerFocusTest {
     @get:Rule
     val rule = createComposeRule()

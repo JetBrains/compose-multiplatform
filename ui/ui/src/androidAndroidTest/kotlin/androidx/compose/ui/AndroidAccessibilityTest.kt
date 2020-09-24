@@ -83,7 +83,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.any
@@ -92,7 +92,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(
     ExperimentalFoundationApi::class,
     ExperimentalLayoutNodeApi::class

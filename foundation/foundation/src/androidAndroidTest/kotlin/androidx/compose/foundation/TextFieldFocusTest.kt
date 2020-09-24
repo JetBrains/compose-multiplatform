@@ -29,18 +29,17 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
 import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
 @OptIn(ExperimentalFocus::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class TextFieldFocusTest {
     @get:Rule
     val rule = createComposeRule()
@@ -65,7 +64,6 @@ class TextFieldFocusTest {
     data class FocusTestData(val focusRequester: FocusRequester, var focused: Boolean = false)
 
     @Test
-    @UiThreadTest
     fun requestFocus() {
         lateinit var testDataList: List<FocusTestData>
 

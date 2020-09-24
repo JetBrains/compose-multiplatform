@@ -37,10 +37,10 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalFoundationApi::class)
 class SoftwareKeyboardTest {
     @get:Rule

@@ -37,12 +37,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 // Tests basic operations to make sure that pointerInputModifier(view: AndroidViewHolder) is
 // hooked up to PointerInteropFilter correctly.
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class PointerInteropFilterComposeHookupTest {
 
     private lateinit var root: View

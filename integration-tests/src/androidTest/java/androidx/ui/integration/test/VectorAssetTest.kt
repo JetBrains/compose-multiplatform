@@ -37,7 +37,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.roundToInt
 
 /**
@@ -46,7 +46,7 @@ import kotlin.math.roundToInt
  */
 @LargeTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class VectorAssetTest {
     @get:Rule
     val rule = createComposeRule()
