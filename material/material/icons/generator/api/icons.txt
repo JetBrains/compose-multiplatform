@@ -53,6 +53,12 @@ Filled.AlarmAdd
 Filled.AlarmOff
 Filled.AlarmOn
 Filled.Album
+Filled.AlignHorizontalCenter
+Filled.AlignHorizontalLeft
+Filled.AlignHorizontalRight
+Filled.AlignVerticalBottom
+Filled.AlignVerticalCenter
+Filled.AlignVerticalTop
 Filled.AllInbox
 Filled.AllInclusive
 Filled.AllOut
@@ -546,6 +552,7 @@ Filled.HistoryToggleOff
 Filled.Home
 Filled.HomeRepairService
 Filled.HomeWork
+Filled.HorizontalDistribute
 Filled.HorizontalRule
 Filled.HorizontalSplit
 Filled.HotTub
@@ -915,6 +922,7 @@ Filled.Publish
 Filled.PublishedWithChanges
 Filled.PushPin
 Filled.QrCode
+Filled.QrCode2
 Filled.QrCodeScanner
 Filled.QueryBuilder
 Filled.QuestionAnswer
@@ -1222,6 +1230,7 @@ Filled.UnfoldMore
 Filled.Unpublished
 Filled.Unsubscribe
 Filled.Update
+Filled.UpdateDisabled
 Filled.Upgrade
 Filled.Usb
 Filled.Verified
@@ -1229,6 +1238,7 @@ Filled.VerifiedUser
 Filled.VerticalAlignBottom
 Filled.VerticalAlignCenter
 Filled.VerticalAlignTop
+Filled.VerticalDistribute
 Filled.VerticalSplit
 Filled.Vibration
 Filled.VideoCall
@@ -1362,6 +1372,12 @@ Outlined.AlarmAdd
 Outlined.AlarmOff
 Outlined.AlarmOn
 Outlined.Album
+Outlined.AlignHorizontalCenter
+Outlined.AlignHorizontalLeft
+Outlined.AlignHorizontalRight
+Outlined.AlignVerticalBottom
+Outlined.AlignVerticalCenter
+Outlined.AlignVerticalTop
 Outlined.AllInbox
 Outlined.AllInclusive
 Outlined.AllOut
@@ -1855,6 +1871,7 @@ Outlined.HistoryToggleOff
 Outlined.Home
 Outlined.HomeRepairService
 Outlined.HomeWork
+Outlined.HorizontalDistribute
 Outlined.HorizontalRule
 Outlined.HorizontalSplit
 Outlined.HotTub
@@ -2224,6 +2241,7 @@ Outlined.Publish
 Outlined.PublishedWithChanges
 Outlined.PushPin
 Outlined.QrCode
+Outlined.QrCode2
 Outlined.QrCodeScanner
 Outlined.QueryBuilder
 Outlined.QuestionAnswer
@@ -2531,6 +2549,7 @@ Outlined.UnfoldMore
 Outlined.Unpublished
 Outlined.Unsubscribe
 Outlined.Update
+Outlined.UpdateDisabled
 Outlined.Upgrade
 Outlined.Usb
 Outlined.Verified
@@ -2538,6 +2557,7 @@ Outlined.VerifiedUser
 Outlined.VerticalAlignBottom
 Outlined.VerticalAlignCenter
 Outlined.VerticalAlignTop
+Outlined.VerticalDistribute
 Outlined.VerticalSplit
 Outlined.Vibration
 Outlined.VideoCall
@@ -2671,6 +2691,12 @@ Rounded.AlarmAdd
 Rounded.AlarmOff
 Rounded.AlarmOn
 Rounded.Album
+Rounded.AlignHorizontalCenter
+Rounded.AlignHorizontalLeft
+Rounded.AlignHorizontalRight
+Rounded.AlignVerticalBottom
+Rounded.AlignVerticalCenter
+Rounded.AlignVerticalTop
 Rounded.AllInbox
 Rounded.AllInclusive
 Rounded.AllOut
@@ -3164,6 +3190,7 @@ Rounded.HistoryToggleOff
 Rounded.Home
 Rounded.HomeRepairService
 Rounded.HomeWork
+Rounded.HorizontalDistribute
 Rounded.HorizontalRule
 Rounded.HorizontalSplit
 Rounded.HotTub
@@ -3533,6 +3560,7 @@ Rounded.Publish
 Rounded.PublishedWithChanges
 Rounded.PushPin
 Rounded.QrCode
+Rounded.QrCode2
 Rounded.QrCodeScanner
 Rounded.QueryBuilder
 Rounded.QuestionAnswer
@@ -3840,6 +3868,7 @@ Rounded.UnfoldMore
 Rounded.Unpublished
 Rounded.Unsubscribe
 Rounded.Update
+Rounded.UpdateDisabled
 Rounded.Upgrade
 Rounded.Usb
 Rounded.Verified
@@ -3847,6 +3876,7 @@ Rounded.VerifiedUser
 Rounded.VerticalAlignBottom
 Rounded.VerticalAlignCenter
 Rounded.VerticalAlignTop
+Rounded.VerticalDistribute
 Rounded.VerticalSplit
 Rounded.Vibration
 Rounded.VideoCall
@@ -3980,6 +4010,12 @@ Sharp.AlarmAdd
 Sharp.AlarmOff
 Sharp.AlarmOn
 Sharp.Album
+Sharp.AlignHorizontalCenter
+Sharp.AlignHorizontalLeft
+Sharp.AlignHorizontalRight
+Sharp.AlignVerticalBottom
+Sharp.AlignVerticalCenter
+Sharp.AlignVerticalTop
 Sharp.AllInbox
 Sharp.AllInclusive
 Sharp.AllOut
@@ -4473,6 +4509,7 @@ Sharp.HistoryToggleOff
 Sharp.Home
 Sharp.HomeRepairService
 Sharp.HomeWork
+Sharp.HorizontalDistribute
 Sharp.HorizontalRule
 Sharp.HorizontalSplit
 Sharp.HotTub
@@ -4842,6 +4879,7 @@ Sharp.Publish
 Sharp.PublishedWithChanges
 Sharp.PushPin
 Sharp.QrCode
+Sharp.QrCode2
 Sharp.QrCodeScanner
 Sharp.QueryBuilder
 Sharp.QuestionAnswer
@@ -5149,6 +5187,7 @@ Sharp.UnfoldMore
 Sharp.Unpublished
 Sharp.Unsubscribe
 Sharp.Update
+Sharp.UpdateDisabled
 Sharp.Upgrade
 Sharp.Usb
 Sharp.Verified
@@ -5156,6 +5195,7 @@ Sharp.VerifiedUser
 Sharp.VerticalAlignBottom
 Sharp.VerticalAlignCenter
 Sharp.VerticalAlignTop
+Sharp.VerticalDistribute
 Sharp.VerticalSplit
 Sharp.Vibration
 Sharp.VideoCall
@@ -5289,6 +5329,12 @@ TwoTone.AlarmAdd
 TwoTone.AlarmOff
 TwoTone.AlarmOn
 TwoTone.Album
+TwoTone.AlignHorizontalCenter
+TwoTone.AlignHorizontalLeft
+TwoTone.AlignHorizontalRight
+TwoTone.AlignVerticalBottom
+TwoTone.AlignVerticalCenter
+TwoTone.AlignVerticalTop
 TwoTone.AllInbox
 TwoTone.AllInclusive
 TwoTone.AllOut
@@ -5782,6 +5828,7 @@ TwoTone.HistoryToggleOff
 TwoTone.Home
 TwoTone.HomeRepairService
 TwoTone.HomeWork
+TwoTone.HorizontalDistribute
 TwoTone.HorizontalRule
 TwoTone.HorizontalSplit
 TwoTone.HotTub
@@ -6151,6 +6198,7 @@ TwoTone.Publish
 TwoTone.PublishedWithChanges
 TwoTone.PushPin
 TwoTone.QrCode
+TwoTone.QrCode2
 TwoTone.QrCodeScanner
 TwoTone.QueryBuilder
 TwoTone.QuestionAnswer
@@ -6458,6 +6506,7 @@ TwoTone.UnfoldMore
 TwoTone.Unpublished
 TwoTone.Unsubscribe
 TwoTone.Update
+TwoTone.UpdateDisabled
 TwoTone.Upgrade
 TwoTone.Usb
 TwoTone.Verified
@@ -6465,6 +6514,7 @@ TwoTone.VerifiedUser
 TwoTone.VerticalAlignBottom
 TwoTone.VerticalAlignCenter
 TwoTone.VerticalAlignTop
+TwoTone.VerticalDistribute
 TwoTone.VerticalSplit
 TwoTone.Vibration
 TwoTone.VideoCall
