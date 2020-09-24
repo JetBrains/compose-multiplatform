@@ -16,8 +16,6 @@
 
 package androidx.build
 
-import org.gradle.api.Project
-
 /**
  * LibraryType represents the purpose and type of a library, whether it is a conventional library,
  * a set of samples showing how to use a conventional library, a set of lint rules for using a
@@ -37,17 +35,24 @@ import org.gradle.api.Project
  *      to our semantic versioning protocol
  *
  * The possible values of LibraryType are as follows:
- * PUBLISHED_LIBRARY: a conventional library, published, sourced, documented, and versioned
+ * PUBLISHED_LIBRARY: a conventional library, published, sourced, documented, and versioned.
  * SAMPLES: a library of samples, published as additional properties to a conventional library,
  *      including published source. Documented in a special way, not API tracked.
  * LINT: a library of lint rules for using a conventional library. Published through lintPublish as
- *      part of an AAR, not published standalone
+ *      part of an AAR, not published standalone.
+ * COMPILER_PLUGIN: a tool that modifies the kotlin or java compiler. Used only while compiling.
+ * GRADLE_PLUGIN: a library that is a gradle plugin.
  * ANNOTATION_PROCESSOR: a library consisting of an annotation processor. Used only while compiling.
+ * OTHER_CODE_PROCESSOR: a library that algorithmically generates and/or alters code
+ *                      but not through hooking into custom annotations or the kotlin compiler.
+ *                      For example, navigation:safe-args-generator or Jetifier.
  * UNSET: a library that has not yet been migrated to using LibraryType. Should never be used.
  *
  * TODO: potential future LibraryTypes:
  * KOTLIN_ONLY_LIBRARY: like PUBLISHED_LIBRARY, but not intended for use from java. ktx and compose.
- * INTERNAL_TEST: compilationTarget varies? Everything else is default.
+ * INTERNAL_TEST
+ * DEMO
+ * IDE_PLUGIN
  *
  */
 enum class LibraryType(
@@ -76,18 +81,45 @@ enum class LibraryType(
         checkApi = RunApiTasks.No("Lint Library"),
         compilationTarget = CompilationTarget.HOST
     ),
+    COMPILER_PLUGIN(
+        Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = false,
+        generateDocs = false,
+        RunApiTasks.No("Compiler Plugin (Host-only)"),
+        CompilationTarget.HOST
+    ),
+    GRADLE_PLUGIN(
+        Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = false,
+        generateDocs = false,
+        RunApiTasks.No("Gradle Plugin (Host-only)"),
+        CompilationTarget.HOST
+    ),
     ANNOTATION_PROCESSOR(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
-        generateDocs = true,
+        generateDocs = false,
         checkApi = RunApiTasks.No("Annotation Processor"),
         compilationTarget = CompilationTarget.HOST
     ),
+    OTHER_CODE_PROCESSOR(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = false,
+        generateDocs = false,
+        checkApi = RunApiTasks.No("Code Processor (Host-only)"),
+        compilationTarget = CompilationTarget.HOST
+    ),
+    IDE_PLUGIN(
+        publish = Publish.NONE,
+        sourceJars = false,
+        generateDocs = false,
+        // TODO: figure out a way to make sure we don't break Studio
+        checkApi = RunApiTasks.No("IDE Plugin (consumed only by Android Studio"),
+        // This is a bit complicated. IDE plugins usually have an on-device component installed by
+        // Android Studio, rather than by a client of the library, but also a host-side component.
+        compilationTarget = CompilationTarget.DEVICE
+    ),
     UNSET()
-}
-
-fun Project.isSamplesProject(): Boolean {
-    return project.extensions.findByType(AndroidXExtension::class.java)?.type == LibraryType.SAMPLES
 }
 
 enum class CompilationTarget {
@@ -103,11 +135,14 @@ enum class CompilationTarget {
  *                 or releasable maven artifacts
  * Publish.SNAPSHOT_ONLY -> Only generates snapshot artifacts
  * Publish.SNAPSHOT_AND_RELEASE -> Generates both snapshot artifacts and releasable maven artifact
+ * Publish.UNSET -> Do the default, based on LibraryType. If LibraryType.UNSET -> Publish.NONE
  *
  * TODO: should we introduce a Publish.lintPublish?
+ * TODO: remove Publish.UNSET once we remove LibraryType.UNSET.
+ * It is necessary now in order to be able to override LibraryType.publish (with Publish.None)
  */
 enum class Publish {
-    NONE, SNAPSHOT_ONLY, SNAPSHOT_AND_RELEASE;
+    NONE, SNAPSHOT_ONLY, SNAPSHOT_AND_RELEASE, UNSET;
 
     fun shouldRelease() = this == SNAPSHOT_AND_RELEASE
     fun shouldPublish() = this == SNAPSHOT_ONLY || this == SNAPSHOT_AND_RELEASE

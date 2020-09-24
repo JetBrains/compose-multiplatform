@@ -109,7 +109,7 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             disable("KtxExtensionAvailable")
             disable("GradleDependency")
 
-            if (extension.compilationTarget != CompilationTarget.HOST) {
+            if (extension.type.compilationTarget != CompilationTarget.HOST) {
                 fatal("Assert")
                 fatal("NewApi")
                 fatal("ObsoleteSdkInt")
