@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.toSize
 internal class ModifiedDrawNode(
     wrapped: LayoutNodeWrapper,
     drawModifier: DrawModifier
-) : DelegatingLayoutNodeWrapper<DrawModifier>(wrapped, drawModifier) {
+) : DelegatingLayoutNodeWrapper<DrawModifier>(wrapped, drawModifier), OwnerScope {
 
     private val cacheDrawModifier: DrawCacheModifier? =
         if (drawModifier is DrawCacheModifier) {
@@ -92,4 +92,7 @@ internal class ModifiedDrawNode(
                 modifiedDrawNode.invalidateCache = true
             }
     }
+
+    override val isValid: Boolean
+        get() = isAttached
 }

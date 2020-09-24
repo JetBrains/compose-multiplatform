@@ -85,7 +85,7 @@ internal val sharedDrawScope = LayoutNodeDrawScope()
     ExperimentalFocus::class,
     ExperimentalLayoutNodeApi::class
 )
-class LayoutNode : Measurable, Remeasurement {
+class LayoutNode : Measurable, Remeasurement, OwnerScope {
 
     constructor() : this(false)
 
@@ -367,6 +367,9 @@ class LayoutNode : Measurable, Remeasurement {
             _zIndexSortedChildren.sortWith(ZIndexComparator)
             return _zIndexSortedChildrenList
         }
+
+    override val isValid: Boolean
+        get() = isAttached()
 
     override fun toString(): String {
         return "${simpleIdentityToString(this, null)} children: ${children.size} " +

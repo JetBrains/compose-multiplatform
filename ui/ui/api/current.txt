@@ -1743,7 +1743,7 @@ package androidx.compose.ui.node {
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER}) public @interface InternalCoreApi {
   }
 
-  @androidx.compose.ui.node.ExperimentalLayoutNodeApi public final class LayoutNode implements androidx.compose.ui.Measurable androidx.compose.ui.Remeasurement {
+  @androidx.compose.ui.node.ExperimentalLayoutNodeApi public final class LayoutNode implements androidx.compose.ui.Measurable androidx.compose.ui.node.OwnerScope androidx.compose.ui.Remeasurement {
     ctor public LayoutNode();
     method public void attach(androidx.compose.ui.node.Owner owner);
     method public void detach();
@@ -1770,6 +1770,7 @@ package androidx.compose.ui.node {
     method public void ignoreModelReads(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void insertAt(int index, androidx.compose.ui.node.LayoutNode instance);
     method public boolean isPlaced();
+    method public boolean isValid();
     method public int maxIntrinsicHeight(int width);
     method public int maxIntrinsicWidth(int height);
     method public androidx.compose.ui.Placeable measure-BRTryo0(long constraints);
@@ -1795,6 +1796,7 @@ package androidx.compose.ui.node {
     property public final int depth;
     property public final int height;
     property public final boolean isPlaced;
+    property public boolean isValid;
     property public final androidx.compose.ui.node.LayoutNode.MeasureBlocks measureBlocks;
     property public final androidx.compose.ui.MeasureScope measureScope;
     property public final androidx.compose.ui.Modifier modifier;
@@ -1878,7 +1880,7 @@ package androidx.compose.ui.node {
     method public void measureAndLayout();
     method public void observeLayoutModelReads(androidx.compose.ui.node.LayoutNode node, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void observeMeasureModelReads(androidx.compose.ui.node.LayoutNode node, kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method public <T> void observeReads(T target, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onChanged, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public <T extends androidx.compose.ui.node.OwnerScope> void observeReads(T target, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onChanged, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void onAttach(androidx.compose.ui.node.LayoutNode node);
     method public void onDetach(androidx.compose.ui.node.LayoutNode node);
     method public void onRequestMeasure(androidx.compose.ui.node.LayoutNode layoutNode);
@@ -1907,6 +1909,11 @@ package androidx.compose.ui.node {
     method public boolean getEnableExtraAssertions();
     method public void setEnableExtraAssertions(boolean p);
     property public final boolean enableExtraAssertions;
+  }
+
+  public interface OwnerScope {
+    method public boolean isValid();
+    property public abstract boolean isValid;
   }
 
   public final class Ref<T> {

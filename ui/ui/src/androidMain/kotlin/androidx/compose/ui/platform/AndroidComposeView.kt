@@ -63,6 +63,7 @@ import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
@@ -181,6 +182,8 @@ internal class AndroidComposeView constructor(
     // Used as an ambient for performing autofill.
     override val autofill: Autofill? get() = _autofill
 
+    private var observationClearRequested = false
+
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         Log.d(FOCUS_TAG, "Owner FocusChanged($gainFocus)")
@@ -251,7 +254,17 @@ internal class AndroidComposeView constructor(
 
     override fun onDetach(node: LayoutNode) {
         measureAndLayoutDelegate.onNodeDetached(node)
-        snapshotObserver.clear(node)
+        requestClearInvalidObservations()
+    }
+
+    fun requestClearInvalidObservations() {
+        if (!observationClearRequested) {
+            observationClearRequested = true
+            post {
+                observationClearRequested = false
+                snapshotObserver.removeObservationsFor { !(it as OwnerScope).isValid }
+            }
+        }
     }
 
     private var _androidViewsHandler: AndroidViewsHandler? = null
@@ -417,7 +430,11 @@ internal class AndroidComposeView constructor(
         snapshotObserver.observeReads(node, onCommitAffectingMeasure, block)
     }
 
-    override fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+    override fun <T : OwnerScope> observeReads(
+        target: T,
+        onChanged: (T) -> Unit,
+        block: () -> Unit
+    ) {
         snapshotObserver.observeReads(target, onChanged, block)
     }
 
@@ -568,6 +585,7 @@ internal class AndroidComposeView constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        snapshotObserver.clear()
         snapshotObserver.enableStateUpdatesObserving(false)
         ifDebug { if (autofillSupported()) _autofill?.unregisterCallback() }
         if (measureAndLayoutScheduled) {
