@@ -20,13 +20,12 @@ import androidx.compose.animation.animate
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.contentColor
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -146,8 +145,8 @@ fun BottomNavigationItem(
     label: @Composable () -> Unit = emptyContent(),
     alwaysShowLabels: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    selectedContentColor: Color = contentColor(),
-    unselectedContentColor: Color = EmphasisAmbient.current.medium.applyEmphasis(
+    selectedContentColor: Color = AmbientContentColor.current,
+    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
         selectedContentColor
     )
 ) {
@@ -188,16 +187,16 @@ fun BottomNavigationItem(
 }
 
 /**
- * Transition that animates [contentColor] between [inactiveColor] and [activeColor], depending
+ * Transition that animates [AmbientContentColor] between [inactiveColor] and [activeColor], depending
  * on [selected]. This component also provides the animation fraction as a parameter to [content],
  * to allow animating the position of the icon and the scale of the label alongside this color
  * animation.
  *
- * @param activeColor [contentColor] when this item is [selected]
- * @param inactiveColor [contentColor] when this item is not [selected]
+ * @param activeColor [AmbientContentColor] when this item is [selected]
+ * @param inactiveColor [AmbientContentColor] when this item is not [selected]
  * @param selected whether this item is selected
- * @param content the content of the [BottomNavigationItem] to animate [contentColor] for, where
- * the animationProgress is the current progress of the animation from 0f to 1f.
+ * @param content the content of the [BottomNavigationItem] to animate [AmbientContentColor] for,
+ * where the animationProgress is the current progress of the animation from 0f to 1f.
  */
 @Composable
 private fun BottomNavigationTransition(
@@ -213,7 +212,7 @@ private fun BottomNavigationTransition(
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
 
-    Providers(ContentColorAmbient provides color) {
+    Providers(AmbientContentColor provides color) {
         content(animationProgress)
     }
 }

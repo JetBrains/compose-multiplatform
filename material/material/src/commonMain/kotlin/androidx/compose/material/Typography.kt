@@ -208,4 +208,4 @@ private fun TextStyle.withDefaultFontFamily(default: FontFamily): TextStyle {
  *
  * To access values within this ambient, use [MaterialTheme.typography].
  */
-internal val TypographyAmbient = staticAmbientOf { Typography() }
+internal val AmbientTypography = staticAmbientOf { Typography() }

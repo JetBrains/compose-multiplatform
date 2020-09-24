@@ -54,4 +54,4 @@ data class Shapes(
 /**
  * Ambient used to specify the default shapes for the surfaces.
  */
-internal val ShapesAmbient = staticAmbientOf { Shapes() }
+internal val AmbientShapes = staticAmbientOf { Shapes() }

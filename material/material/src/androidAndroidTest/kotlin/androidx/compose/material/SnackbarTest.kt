@@ -338,7 +338,7 @@ class SnackbarTest {
                 // on top of surface
                 snackBarColor = MaterialTheme.colors.onSurface.copy(alpha = 0.8f)
                     .compositeOver(background)
-                Providers(ShapesAmbient provides Shapes(medium = shape)) {
+                Providers(AmbientShapes provides Shapes(medium = shape)) {
                     Snackbar(modifier = Modifier
                         .semantics(mergeAllDescendants = true) {}
                         .testTag("snackbar"),

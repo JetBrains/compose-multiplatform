@@ -44,8 +44,8 @@ import androidx.compose.ui.unit.TextUnit
 /**
  * High level element that displays text and provides semantics / accessibility information.
  *
- * The default [style] uses the [currentTextStyle] defined by a theme. If you are setting your
- * own style, you may want to consider first retrieving [currentTextStyle], and using
+ * The default [style] uses the [AmbientTextStyle] defined by a theme. If you are setting your
+ * own style, you may want to consider first retrieving [AmbientTextStyle], and using
  * [TextStyle.copy] to keep any theme defined attributes, only modifying the specific attributes
  * you want to override.
  *
@@ -57,13 +57,13 @@ import androidx.compose.ui.unit.TextUnit
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
- * [contentColor] will be used - this allows this [Text] or element containing this [Text] to
+ * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
  * adapt to different background colors and still maintain contrast and accessibility.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param color [Color] to apply to the text. If [Color.Unset], and [style] has no color set, this
- * will be [contentColor].
+ * will be [AmbientContentColor].
  * @param fontSize The size of glyphs to use when painting the text. See [TextStyle.fontSize].
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * See [TextStyle.fontStyle].
@@ -104,7 +104,7 @@ fun Text(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    style: TextStyle = currentTextStyle()
+    style: TextStyle = AmbientTextStyle.current
 ) {
     Text(
         AnnotatedString(text),
@@ -130,8 +130,8 @@ fun Text(
 /**
  * High level element that displays text and provides semantics / accessibility information.
  *
- * The default [style] uses the [currentTextStyle] defined by a theme. If you are setting your
- * own style, you may want to consider first retrieving [currentTextStyle], and using
+ * The default [style] uses the [AmbientTextStyle] defined by a theme. If you are setting your
+ * own style, you may want to consider first retrieving [AmbientTextStyle], and using
  * [TextStyle.copy] to keep any theme defined attributes, only modifying the specific attributes
  * you want to override.
  *
@@ -143,13 +143,13 @@ fun Text(
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
- * [contentColor] will be used - this allows this [Text] or element containing this [Text] to
+ * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
  * adapt to different background colors and still maintain contrast and accessibility.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param color [Color] to apply to the text. If [Color.Unset], and [style] has no color set, this
- * will be [contentColor].
+ * will be [AmbientContentColor].
  * @param fontSize The size of glyphs to use when painting the text. See [TextStyle.fontSize].
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * See [TextStyle.fontStyle].
@@ -193,9 +193,9 @@ fun Text(
     maxLines: Int = Int.MAX_VALUE,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    style: TextStyle = currentTextStyle()
+    style: TextStyle = AmbientTextStyle.current
 ) {
-    val textColor = color.useOrElse { style.color.useOrElse { contentColor() } }
+    val textColor = color.useOrElse { style.color.useOrElse { AmbientContentColor.current } }
     val mergedStyle = style.merge(
         TextStyle(
             color = textColor,
@@ -222,20 +222,29 @@ fun Text(
     )
 }
 
-private val TextStyleAmbient = ambientOf(
+/**
+ * Ambient containing the preferred [TextStyle] that will be used by [Text] components by default.
+ * To set the value for this ambient, see [ProvideTextStyle] which will merge any missing
+ * [TextStyle] properties with the existing [TextStyle] set in this ambient.
+ *
+ * @see ProvideTextStyle
+ */
+val AmbientTextStyle = ambientOf(
     @OptIn(ExperimentalComposeApi::class) structuralEqualityPolicy()
 ) { TextStyle() }
 
+// TODO: b/156598010 remove this and replace with fold definition on the backing Ambient
 /**
- * This component is used to set the current value of the Text style ambient. The given style will
- * be merged with the current style values for any missing attributes. Any [Text]
- * components included in this component's children will be styled with this style unless
- * styled explicitly.
+ * This function is used to set the current value of [AmbientTextStyle], merging the given style
+ * with the current style values for any missing attributes. Any [Text] components included in
+ * this component's [children] will be styled with this style unless styled explicitly.
+ *
+ * @see AmbientTextStyle
  */
 @Composable
 fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
-    val mergedStyle = currentTextStyle().merge(value)
-    Providers(TextStyleAmbient provides mergedStyle, children = children)
+    val mergedStyle = AmbientTextStyle.current.merge(value)
+    Providers(AmbientTextStyle provides mergedStyle, children = children)
 }
 
 /**
@@ -243,6 +252,13 @@ fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
  * components included in this component's children will be styled with this style unless
  * styled explicitly.
  */
+@Deprecated(
+    message = "Use ThemeTextStyle.current explicitly",
+    replaceWith = ReplaceWith(
+        "ThemeTextStyle.current",
+        "androidx.compose.foundation.ThemeTextStyle"
+    )
+)
 @Composable
 @ComposableContract(readonly = true)
-fun currentTextStyle(): TextStyle = TextStyleAmbient.current
+fun currentTextStyle(): TextStyle = AmbientTextStyle.current

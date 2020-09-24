@@ -190,7 +190,7 @@ fun DropdownMenuItem(
     ) {
         // TODO(popam, b/156912039): update emphasis if the menu item is disabled
         val typography = MaterialTheme.typography
-        val emphasisLevels = EmphasisAmbient.current
+        val emphasisLevels = AmbientEmphasisLevels.current
         ProvideTextStyle(typography.subtitle1) {
             ProvideEmphasis(
                 if (enabled) emphasisLevels.high else emphasisLevels.disabled,

@@ -142,7 +142,7 @@ object RadioButtonConstants {
      */
     @Composable
     val defaultDisabledColor: Color
-        get() = EmphasisAmbient.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
+        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
 }
 
 private fun DrawScope.drawRadio(color: Color, dotRadius: Dp) {

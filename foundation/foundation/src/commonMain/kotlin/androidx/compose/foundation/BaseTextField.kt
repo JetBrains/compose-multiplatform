@@ -93,9 +93,9 @@ var blinkingCursorEnabled: Boolean = true
  * [TextFieldValue].
  * @param modifier optional [Modifier] for this text field.
  * @param textColor [Color] to apply to the text. If [Color.Unset], and [textStyle] has no color
- * set, this will be [contentColor].
+ * set, this will be [AmbientContentColor].
  * @param textStyle Style configuration that applies at character level such as color, font etc.
- * The default [textStyle] uses the [currentTextStyle] defined by the theme
+ * The default [textStyle] uses the [AmbientTextStyle] defined by the theme
  * @param keyboardType The keyboard type to be used in this text field. Note that this input type
  * is honored by IME and shows corresponding keyboard but this is not guaranteed. For example,
  * some IME may send non-ASCII character even if you set [KeyboardType.Ascii].
@@ -128,16 +128,16 @@ fun BaseTextField(
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     textColor: Color = Color.Unset,
-    textStyle: TextStyle = currentTextStyle(),
+    textStyle: TextStyle = AmbientTextStyle.current,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Unspecified,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    cursorColor: Color = contentColor()
+    cursorColor: Color = AmbientContentColor.current
 ) {
-    val color = textColor.useOrElse { textStyle.color.useOrElse { contentColor() } }
+    val color = textColor.useOrElse { textStyle.color.useOrElse { AmbientContentColor.current } }
     val mergedStyle = textStyle.merge(TextStyle(color = color))
 
     // cursor with blinking animation

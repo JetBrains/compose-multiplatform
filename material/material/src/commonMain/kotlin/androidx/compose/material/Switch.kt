@@ -183,14 +183,14 @@ internal object SwitchDefaults {
         get() = MaterialTheme.colors.onSurface
 
     @Composable
-    private fun makeDisabledCheckedTrackColor(checkedColor: Color) = EmphasisAmbient.current
+    private fun makeDisabledCheckedTrackColor(checkedColor: Color) = AmbientEmphasisLevels.current
         .disabled
         .applyEmphasis(checkedColor)
         .compositeOver(MaterialTheme.colors.surface)
 
     @Composable
     private val disabledUncheckedTrackColor
-        get() = EmphasisAmbient.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
+        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
             .compositeOver(MaterialTheme.colors.surface)
 
     @Composable
@@ -198,14 +198,14 @@ internal object SwitchDefaults {
         get() = MaterialTheme.colors.surface
 
     @Composable
-    private fun makeDisabledCheckedThumbColor(checkedColor: Color) = EmphasisAmbient.current
+    private fun makeDisabledCheckedThumbColor(checkedColor: Color) = AmbientEmphasisLevels.current
         .disabled
         .applyEmphasis(checkedColor)
         .compositeOver(MaterialTheme.colors.surface)
 
     @Composable
     private val disabledUncheckedThumbColor
-        get() = EmphasisAmbient.current.disabled.applyEmphasis(MaterialTheme.colors.surface)
+        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.surface)
             .compositeOver(MaterialTheme.colors.surface)
 
     @Composable

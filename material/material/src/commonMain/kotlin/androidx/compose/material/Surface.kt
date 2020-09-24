@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ContentColorAmbient
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
@@ -104,7 +104,7 @@ fun Surface(
             )
             .clip(shape)
     ) {
-        Providers(ContentColorAmbient provides contentColor, children = content)
+        Providers(AmbientContentColor provides contentColor, children = content)
     }
 }
 

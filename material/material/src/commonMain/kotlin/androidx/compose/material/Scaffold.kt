@@ -100,7 +100,7 @@ internal class ScaffoldGeometry {
     var isFabDocked by mutableStateOf(false)
 }
 
-internal val ScaffoldGeometryAmbient = staticAmbientOf { ScaffoldGeometry() }
+internal val AmbientScaffoldGeometry = staticAmbientOf { ScaffoldGeometry() }
 
 /**
  * The possible positions for a [FloatingActionButton] attached to a [Scaffold].
@@ -340,7 +340,7 @@ private fun BottomBarContainer(
         Modifier,
         { scaffoldState.scaffoldGeometry.bottomBarBounds = it },
         slotContent = {
-            Providers(ScaffoldGeometryAmbient provides scaffoldState.scaffoldGeometry) {
+            Providers(AmbientScaffoldGeometry provides scaffoldState.scaffoldGeometry) {
                 bottomBar()
             }
         }

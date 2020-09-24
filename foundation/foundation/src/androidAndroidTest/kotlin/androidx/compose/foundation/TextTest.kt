@@ -57,7 +57,7 @@ class TextTest {
     private val TestText = "TestText"
 
     @Test
-    fun inheritsCurrentTextStyle() {
+    fun inheritsThemeTextStyle() {
         var textColor: Color? = null
         var textAlign: TextAlign? = null
         var fontSize: TextUnit? = null

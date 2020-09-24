@@ -539,7 +539,7 @@ class ScaffoldTest {
             Scaffold(
                 scaffoldState = scaffoldState,
                 bottomBar = {
-                    geometry = ScaffoldGeometryAmbient.current
+                    geometry = AmbientScaffoldGeometry.current
                     Box(Modifier
                         .onPositioned { positioned: LayoutCoordinates ->
                             bottomBarSize = positioned.size

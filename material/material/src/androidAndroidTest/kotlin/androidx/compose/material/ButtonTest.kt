@@ -18,13 +18,12 @@ package androidx.compose.material
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.contentColor
-import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -237,7 +236,7 @@ class ButtonTest {
     fun containedButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             Button(onClick = {}) {
-                assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.button)
+                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -246,7 +245,7 @@ class ButtonTest {
     fun outlinedButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             OutlinedButton(onClick = {}) {
-                assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.button)
+                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -255,7 +254,7 @@ class ButtonTest {
     fun textButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             TextButton(onClick = {}) {
-                assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.button)
+                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -290,7 +289,7 @@ class ButtonTest {
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             primary = MaterialTheme.colors.primary
-            Providers(ShapesAmbient provides Shapes(small = shape)) {
+            Providers(AmbientShapes provides Shapes(small = shape)) {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = 0.dp) {
                     Box(Modifier.preferredSize(10.dp, 10.dp))
                 }
@@ -315,7 +314,7 @@ class ButtonTest {
         rule.setMaterialContent {
             onPrimary = MaterialTheme.colors.onPrimary
             Button(onClick = {}) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -329,7 +328,7 @@ class ButtonTest {
         rule.setMaterialContent {
             primary = MaterialTheme.colors.primary
             OutlinedButton(onClick = {}) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -343,7 +342,7 @@ class ButtonTest {
         rule.setMaterialContent {
             primary = MaterialTheme.colors.primary
             TextButton(onClick = {}) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -481,9 +480,9 @@ class ButtonTest {
         var emphasis: Emphasis? = null
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = EmphasisAmbient.current.disabled
+            emphasis = AmbientEmphasisLevels.current.disabled
             Button(onClick = {}, enabled = false) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -497,9 +496,9 @@ class ButtonTest {
         var emphasis: Emphasis? = null
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = EmphasisAmbient.current.disabled
+            emphasis = AmbientEmphasisLevels.current.disabled
             OutlinedButton(onClick = {}, enabled = false) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -513,9 +512,9 @@ class ButtonTest {
         var emphasis: Emphasis? = null
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = EmphasisAmbient.current.disabled
+            emphasis = AmbientEmphasisLevels.current.disabled
             TextButton(onClick = {}, enabled = false) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 

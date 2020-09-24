@@ -18,8 +18,8 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.border
-import androidx.compose.foundation.contentColor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -51,7 +51,7 @@ class AlertDialogTest {
                 onDismissRequest = {},
                 modifier = Modifier.border(10.dp, Color.Blue),
                 text = {
-                    contentColor = contentColor()
+                    contentColor = AmbientContentColor.current
                     Text("Text")
                 },
                 confirmButton = {},

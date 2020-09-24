@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
-import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.RadioButton
@@ -216,7 +216,7 @@ private fun TextFieldWithMessage(
     val typography = MaterialTheme.typography.caption
     val color = when (helperMessageOption) {
         Option.Helper -> {
-            EmphasisAmbient.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
+            AmbientEmphasisLevels.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
         }
         Option.Error -> MaterialTheme.colors.error
         else -> Color.Unset
