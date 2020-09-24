@@ -26,6 +26,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.scrollorientationlocking.ScrollOrientationLocker
 import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -105,11 +106,13 @@ internal class DragSlopExceededGestureFilter(
         scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
     }
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
+
+        val changes = pointerEvent.changes
 
         scrollOrientationLocker.onPointerInputSetup(changes, pass)
 

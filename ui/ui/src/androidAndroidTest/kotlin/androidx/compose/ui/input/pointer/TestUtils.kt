@@ -36,11 +36,11 @@ open class StubPointerInputHandler(
     private var modifyBlock: PointerInputHandler? = null
 ) : PointerInputHandler {
     override fun invoke(
-        p1: List<PointerInputChange>,
+        p1: PointerEvent,
         p2: PointerEventPass,
         p3: IntSize
     ): List<PointerInputChange> {
-        return modifyBlock?.invoke(p1, p2, p3) ?: p1
+        return modifyBlock?.invoke(p1, p2, p3) ?: p1.changes
     }
 }
 
@@ -95,6 +95,9 @@ internal fun catchThrowable(lambda: () -> Unit): Throwable? {
 internal fun internalPointerEventOf(vararg changes: PointerInputChange) =
     InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), MotionEventDouble)
 
+internal fun pointerEventOf(vararg changes: PointerInputChange) =
+    PointerEvent(changes.toList(), MotionEventDouble)
+
 /**
  * To be used to construct types that require a MotionEvent but where no details of the MotionEvent
  * are actually needed.
@@ -116,13 +119,13 @@ internal class SpyGestureModifier : PointerInputModifier {
     override val pointerInputFilter: PointerInputFilter =
         object : PointerInputFilter() {
 
-            override fun onPointerInput(
-                changes: List<PointerInputChange>,
+            override fun onPointerEvent(
+                pointerEvent: PointerEvent,
                 pass: PointerEventPass,
                 bounds: IntSize
             ): List<PointerInputChange> {
                 callback.invoke(pass)
-                return changes
+                return pointerEvent.changes
             }
 
             override fun onCancel() {

@@ -325,11 +325,12 @@ class ClipPointerInputTest {
         val log = mutableListOf<Offset>()
 
         override val pointerInputFilter = object : PointerInputFilter() {
-            override fun onPointerInput(
-                changes: List<PointerInputChange>,
+            override fun onPointerEvent(
+                pointerEvent: PointerEvent,
                 pass: PointerEventPass,
                 bounds: IntSize
             ): List<PointerInputChange> {
+                val changes = pointerEvent.changes
                 if (pass == PointerEventPass.Initial) {
                     changes.forEach {
                         println("testtest, bounds: $bounds")

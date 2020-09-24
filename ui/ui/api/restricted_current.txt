@@ -1562,6 +1562,8 @@ package androidx.compose.ui.input.pointer {
 
   public final class PointerEvent {
     ctor public PointerEvent(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes);
+    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> component1();
+    method public androidx.compose.ui.input.pointer.PointerEvent copy(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, android.view.MotionEvent? motionEvent);
     method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> getChanges();
   }
 
@@ -1643,8 +1645,7 @@ package androidx.compose.ui.input.pointer {
     method public abstract void onCancel();
     method public void onCustomEvent(androidx.compose.ui.input.pointer.CustomEvent customEvent, androidx.compose.ui.input.pointer.PointerEventPass pass);
     method public void onInit(androidx.compose.ui.input.pointer.CustomEventDispatcher customEventDispatcher);
-    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> onPointerEvent-d1fqKvQ(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
-    method public abstract java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> onPointerInput-e3WT7_U(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
+    method public abstract java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> onPointerEvent-d1fqKvQ(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
   }
 
   public interface PointerInputModifier extends androidx.compose.ui.Modifier.Element {

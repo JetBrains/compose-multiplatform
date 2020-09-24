@@ -19,6 +19,7 @@ package androidx.compose.ui.gesture
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -69,11 +70,13 @@ internal class ScaleSlopExceededGestureFilter(private val scaleSlop: Float) : Po
     var passedSlop = false
     var scaleDiffTotal = 0f
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
+
+        val changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Main) {
 
