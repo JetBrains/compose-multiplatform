@@ -188,7 +188,7 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
         accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
         assertEquals("android.widget.EditText", accessibilityNodeInfo.className)
-        assertEquals(InitialText, accessibilityNodeInfo.text)
+        assertEquals(InitialText, accessibilityNodeInfo.text.toString())
         assertTrue(accessibilityNodeInfo.isFocusable)
         assertFalse(accessibilityNodeInfo.isFocused)
         assertTrue(accessibilityNodeInfo.isEditable)
