@@ -389,6 +389,9 @@ internal class AndroidComposeView constructor(
         }
     }
 
+    override val hasPendingMeasureOrLayout
+        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
+
     private var globalPosition: IntOffset = IntOffset.Zero
 
     private val tmpPositionArray = intArrayOf(0, 0)

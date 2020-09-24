@@ -166,6 +166,9 @@ class DesktopOwner(
         container.invalidate()
     }
 
+    override val hasPendingMeasureOrLayout
+        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
+
     // Don't inline these variables into snapshotObserver.observeReads,
     // because observeReads requires that onChanged should always be the same instance.
     // Otherwise there will be a memory leak and FPS drop (see b/163905871)

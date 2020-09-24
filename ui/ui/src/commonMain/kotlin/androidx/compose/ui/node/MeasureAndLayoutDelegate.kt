@@ -39,11 +39,15 @@ import androidx.compose.ui.util.fastForEach
  */
 @OptIn(ExperimentalLayoutNodeApi::class)
 internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
-
     /**
-     * LayoutNodes that need measure or layout
+     * LayoutNodes that need measure or layout.
      */
     private val relayoutNodes = DepthSortedSet(Owner.enableExtraAssertions)
+
+    /**
+     * Whether any LayoutNode needs measure or layout.
+     */
+    val hasPendingMeasureOrLayout get() = relayoutNodes.isNotEmpty()
 
     /**
      * Flag to indicate that we're currently measuring.
