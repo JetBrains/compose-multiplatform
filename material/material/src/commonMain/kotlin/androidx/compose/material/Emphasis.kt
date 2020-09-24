@@ -16,8 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.ContentColorAmbient
-import androidx.compose.foundation.contentColor
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.runtime.Ambient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -33,7 +32,7 @@ import androidx.compose.ui.util.annotation.FloatRange
  * should have an emphasis level of [EmphasisLevels.disabled], to show that the button is
  * currently not active / able to be interacted with.
  *
- * Emphasis works by adjusting the color provided by [contentColor], so that emphasis levels
+ * Emphasis works by adjusting the color provided by [AmbientContentColor], so that emphasis levels
  * cascade through a subtree without requiring components to be aware of their context.
  *
  * The default implementations convey emphasis by changing the alpha / opacity of [color], to
@@ -41,7 +40,7 @@ import androidx.compose.ui.util.annotation.FloatRange
  *
  * To set emphasis for a particular subtree, see [ProvideEmphasis].
  *
- * To define the emphasis levels in your application, see [EmphasisLevels] and [EmphasisAmbient]
+ * To define the emphasis levels in your application, see [EmphasisLevels] and [AmbientEmphasisLevels]
  * - note that this should not typically be customized, as the default values are optimized for
  * accessibility and contrast on different surfaces.
  *
@@ -60,7 +59,7 @@ interface Emphasis {
  * EmphasisLevels represents the different levels of [Emphasis] that can be applied to a component.
  *
  * By default, the [Emphasis] implementation for each level varies depending on the color being
- * emphasized (typically [contentColor]). This ensures that the [Emphasis] has the correct
+ * emphasized (typically [AmbientContentColor]). This ensures that the [Emphasis] has the correct
  * contrast for the background they are on, as [Colors.primary] surfaces typically require
  * higher contrast for the content color than [Colors.surface] surfaces to ensure they are
  * accessible.
@@ -68,7 +67,7 @@ interface Emphasis {
  * This typically should not be customized as the default implementation is optimized for
  * correct accessibility and contrast on different surfaces.
  *
- * See [EmphasisAmbient] to retrieve the current [EmphasisLevels]
+ * See [AmbientEmphasisLevels] to retrieve the current [EmphasisLevels]
  */
 interface EmphasisLevels {
     /**
@@ -89,23 +88,23 @@ interface EmphasisLevels {
 }
 
 /**
- * Applies [emphasis] to [content], by modifying the value of [contentColor].
+ * Applies [emphasis] to [content], by modifying the value of [AmbientContentColor].
  *
- * See [EmphasisAmbient] to retrieve the levels of emphasis provided in the theme,
+ * See [AmbientEmphasisLevels] to retrieve the levels of emphasis provided in the theme,
  * so they can be applied with this function.
  *
  * @sample androidx.compose.material.samples.EmphasisSample
  */
 @Composable
 fun ProvideEmphasis(emphasis: Emphasis, content: @Composable () -> Unit) {
-    val emphasizedColor = emphasis.applyEmphasis(contentColor())
-    Providers(ContentColorAmbient provides emphasizedColor, children = content)
+    val emphasizedColor = emphasis.applyEmphasis(AmbientContentColor.current)
+    Providers(AmbientContentColor provides emphasizedColor, children = content)
 }
 
 /**
  * Ambient containing the current [EmphasisLevels] in this hierarchy.
  */
-val EmphasisAmbient: Ambient<EmphasisLevels> = staticAmbientOf { DefaultEmphasisLevels }
+val AmbientEmphasisLevels: Ambient<EmphasisLevels> = staticAmbientOf { DefaultEmphasisLevels }
 
 private object DefaultEmphasisLevels : EmphasisLevels {
 

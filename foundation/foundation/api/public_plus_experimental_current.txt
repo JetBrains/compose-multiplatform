@@ -7,7 +7,7 @@ package androidx.compose.foundation {
   }
 
   public final class BaseTextFieldKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void BaseTextField-ngE-tqQ(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, long textColor = Color.Unset, androidx.compose.ui.text.TextStyle textStyle = currentTextStyle(), androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed = {}, androidx.compose.ui.text.input.VisualTransformation visualTransformation = VisualTransformation.None, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = {}, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = {}, long cursorColor = contentColor());
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void BaseTextField-ngE-tqQ(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, long textColor = Color.Unset, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed = {}, androidx.compose.ui.text.input.VisualTransformation visualTransformation = VisualTransformation.None, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = {}, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = {}, long cursorColor = AmbientContentColor.current);
     method @VisibleForTesting public static void setBlinkingCursorEnabled(boolean p);
   }
 
@@ -55,7 +55,7 @@ package androidx.compose.foundation {
   public final class ClickableKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, boolean enabled = true, String? onClickLabel = null, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), String? onLongClickLabel = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick = null, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+}), androidx.compose.foundation.Indication? indication = AmbientIndication.invoke(), String? onLongClickLabel = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick = null, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ClickableTextKt {
@@ -63,8 +63,8 @@ package androidx.compose.foundation {
   }
 
   public final class ContentColorKt {
-    method @androidx.compose.runtime.Composable public static long contentColor();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getContentColorAmbient();
+    method @Deprecated @androidx.compose.runtime.Composable public static long contentColor();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getAmbientContentColor();
   }
 
   public final class DarkThemeKt {
@@ -75,9 +75,9 @@ package androidx.compose.foundation {
   }
 
   public final class IconKt {
-    method @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, androidx.compose.ui.Modifier modifier = Modifier, long tint = contentColor());
-    method @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, androidx.compose.ui.Modifier modifier = Modifier, long tint = contentColor());
-    method @androidx.compose.runtime.Composable public static void Icon-uUQrhdE(androidx.compose.ui.graphics.ImageAsset asset, androidx.compose.ui.Modifier modifier = Modifier, long tint = contentColor());
+    method @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, androidx.compose.ui.Modifier modifier = Modifier, long tint = AmbientContentColor.current);
+    method @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, androidx.compose.ui.Modifier modifier = Modifier, long tint = AmbientContentColor.current);
+    method @androidx.compose.runtime.Composable public static void Icon-uUQrhdE(androidx.compose.ui.graphics.ImageAsset asset, androidx.compose.ui.Modifier modifier = Modifier, long tint = AmbientContentColor.current);
   }
 
   public final class ImageKt {
@@ -96,7 +96,7 @@ package androidx.compose.foundation {
   }
 
   public final class IndicationKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<kotlin.jvm.functions.Function0<androidx.compose.foundation.Indication>> getIndicationAmbient();
+    method public static androidx.compose.runtime.ProvidableAmbient<kotlin.jvm.functions.Function0<androidx.compose.foundation.Indication>> getAmbientIndication();
     method public static androidx.compose.ui.Modifier indication(androidx.compose.ui.Modifier, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication = null);
   }
 
@@ -191,9 +191,10 @@ package androidx.compose.foundation {
 
   public final class TextKt {
     method @androidx.compose.runtime.Composable public static void ProvideTextStyle(androidx.compose.ui.text.TextStyle value, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method @androidx.compose.runtime.Composable public static void Text-TPAwlIA(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.Modifier modifier = Modifier, long color = Color.Unset, long fontSize = TextUnit.Inherit, androidx.compose.ui.text.font.FontStyle? fontStyle = null, androidx.compose.ui.text.font.FontWeight? fontWeight = null, androidx.compose.ui.text.font.FontFamily? fontFamily = null, long letterSpacing = TextUnit.Inherit, androidx.compose.ui.text.style.TextDecoration? textDecoration = null, androidx.compose.ui.text.style.TextAlign? textAlign = null, long lineHeight = TextUnit.Inherit, androidx.compose.ui.text.style.TextOverflow overflow = TextOverflow.Clip, boolean softWrap = true, int maxLines = 2147483647, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent = mapOf(), kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = {}, androidx.compose.ui.text.TextStyle style = currentTextStyle());
-    method @androidx.compose.runtime.Composable public static void Text-Vh6c2nE(String text, androidx.compose.ui.Modifier modifier = Modifier, long color = Color.Unset, long fontSize = TextUnit.Inherit, androidx.compose.ui.text.font.FontStyle? fontStyle = null, androidx.compose.ui.text.font.FontWeight? fontWeight = null, androidx.compose.ui.text.font.FontFamily? fontFamily = null, long letterSpacing = TextUnit.Inherit, androidx.compose.ui.text.style.TextDecoration? textDecoration = null, androidx.compose.ui.text.style.TextAlign? textAlign = null, long lineHeight = TextUnit.Inherit, androidx.compose.ui.text.style.TextOverflow overflow = TextOverflow.Clip, boolean softWrap = true, int maxLines = 2147483647, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = {}, androidx.compose.ui.text.TextStyle style = currentTextStyle());
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static androidx.compose.ui.text.TextStyle currentTextStyle();
+    method @androidx.compose.runtime.Composable public static void Text-TPAwlIA(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.Modifier modifier = Modifier, long color = Color.Unset, long fontSize = TextUnit.Inherit, androidx.compose.ui.text.font.FontStyle? fontStyle = null, androidx.compose.ui.text.font.FontWeight? fontWeight = null, androidx.compose.ui.text.font.FontFamily? fontFamily = null, long letterSpacing = TextUnit.Inherit, androidx.compose.ui.text.style.TextDecoration? textDecoration = null, androidx.compose.ui.text.style.TextAlign? textAlign = null, long lineHeight = TextUnit.Inherit, androidx.compose.ui.text.style.TextOverflow overflow = TextOverflow.Clip, boolean softWrap = true, int maxLines = 2147483647, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent = mapOf(), kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = {}, androidx.compose.ui.text.TextStyle style = AmbientTextStyle.current);
+    method @androidx.compose.runtime.Composable public static void Text-Vh6c2nE(String text, androidx.compose.ui.Modifier modifier = Modifier, long color = Color.Unset, long fontSize = TextUnit.Inherit, androidx.compose.ui.text.font.FontStyle? fontStyle = null, androidx.compose.ui.text.font.FontWeight? fontWeight = null, androidx.compose.ui.text.font.FontFamily? fontFamily = null, long letterSpacing = TextUnit.Inherit, androidx.compose.ui.text.style.TextDecoration? textDecoration = null, androidx.compose.ui.text.style.TextAlign? textAlign = null, long lineHeight = TextUnit.Inherit, androidx.compose.ui.text.style.TextOverflow overflow = TextOverflow.Clip, boolean softWrap = true, int maxLines = 2147483647, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = {}, androidx.compose.ui.text.TextStyle style = AmbientTextStyle.current);
+    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static androidx.compose.ui.text.TextStyle currentTextStyle();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.TextStyle> getAmbientTextStyle();
   }
 
 }
@@ -336,17 +337,17 @@ package androidx.compose.foundation.selection {
   public final class SelectableKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, boolean enabled = true, boolean inMutuallyExclusiveGroup = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+}), androidx.compose.foundation.Indication? indication = AmbientIndication.invoke(), kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ToggleableKt {
     method public static androidx.compose.foundation.selection.ToggleableState ToggleableState(boolean value);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier toggleable(androidx.compose.ui.Modifier, boolean value, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
+}), androidx.compose.foundation.Indication? indication = AmbientIndication.invoke(), kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.foundation.selection.ToggleableState state, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+}), androidx.compose.foundation.Indication? indication = AmbientIndication.invoke(), kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public enum ToggleableState {

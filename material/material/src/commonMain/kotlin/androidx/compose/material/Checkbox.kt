@@ -304,7 +304,7 @@ object CheckboxConstants {
      */
     @Composable
     val defaultDisabledColor: Color
-        get() = EmphasisAmbient.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
+        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
 
     /**
      * Default color that will be used for [TriStateCheckbox] when disabled and in a
@@ -312,7 +312,7 @@ object CheckboxConstants {
      */
     @Composable
     fun defaultDisabledIndeterminateColor(checkedColor: Color): Color {
-        return EmphasisAmbient.current.disabled.applyEmphasis(checkedColor)
+        return AmbientEmphasisLevels.current.disabled.applyEmphasis(checkedColor)
     }
 }
 

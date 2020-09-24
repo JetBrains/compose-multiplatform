@@ -17,7 +17,7 @@
 package androidx.compose.foundation.selection
 
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.IndicationAmbient
+import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Strings
@@ -50,7 +50,7 @@ import androidx.compose.ui.semantics.semantics
  * @param interactionState [InteractionState] that will be updated when this element is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when the modified element is pressed. By default,
- * the indication from [IndicationAmbient] will be used. Set to `null` to show no indication
+ * the indication from [AmbientIndication] will be used. Set to `null` to show no indication
  */
 @Composable
 fun Modifier.selectable(
@@ -58,7 +58,7 @@ fun Modifier.selectable(
     enabled: Boolean = true,
     inMutuallyExclusiveGroup: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    indication: Indication? = IndicationAmbient.current(),
+    indication: Indication? = AmbientIndication.current(),
     onClick: () -> Unit
 ) = composed {
     Modifier.clickable(

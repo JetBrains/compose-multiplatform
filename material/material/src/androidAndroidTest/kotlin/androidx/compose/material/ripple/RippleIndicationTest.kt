@@ -431,7 +431,7 @@ class RippleIndicationTest {
         }
 
         rule.setContent {
-            Providers(RippleThemeAmbient provides rippleTheme) {
+            Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
@@ -472,7 +472,7 @@ class RippleIndicationTest {
         }
 
         rule.setContent {
-            Providers(RippleThemeAmbient provides rippleTheme) {
+            Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
@@ -513,7 +513,7 @@ class RippleIndicationTest {
         var rippleTheme by mutableStateOf(createRippleTheme(initialColor, initialAlpha))
 
         rule.setContent {
-            Providers(RippleThemeAmbient provides rippleTheme) {
+            Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = Color.Black) {
                         Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
