@@ -47,8 +47,10 @@ import androidx.compose.ui.semantics.findChildById
 import androidx.compose.ui.semantics.getAllSemanticsNodesToMap
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.length
+import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import androidx.core.view.AccessibilityDelegateCompat
@@ -56,6 +58,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 
+@OptIn(InternalTextApi::class)
 internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidComposeView) :
     AccessibilityDelegateCompat() {
     companion object {
@@ -226,7 +229,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         // TODO: we need a AnnotedString to CharSequence conversion function
         info.text = trimToSize(
-            semanticsNode.config.getOrNull(SemanticsProperties.Text)?.text,
+            semanticsNode.config.getOrNull(SemanticsProperties.Text)
+                ?.toAccessibilitySpannableString(),
             ParcelSafeTextLength
         )
         info.stateDescription =

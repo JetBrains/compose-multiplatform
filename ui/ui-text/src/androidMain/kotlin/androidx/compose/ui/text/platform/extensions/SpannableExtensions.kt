@@ -273,7 +273,7 @@ private fun Spannable.setBackground(color: Color, start: Int, end: Int) {
     }
 }
 
-private fun Spannable.setLocaleList(localeList: LocaleList?, start: Int, end: Int) {
+internal fun Spannable.setLocaleList(localeList: LocaleList?, start: Int, end: Int) {
     localeList?.let {
         setSpan(
             if (Build.VERSION.SDK_INT >= 24) {
