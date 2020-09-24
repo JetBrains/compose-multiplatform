@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -25,39 +27,71 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("kotlin-multiplatform")
 }
 
-kotlin {
-    android()
-    jvm("desktop")
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
-            api project(":compose:ui:ui-geometry")
+if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    dependencies {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
 
-            implementation project(":compose:runtime:runtime")
-            implementation project(":compose:ui:ui-util")
-        }
-        jvmMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-        }
-        androidMain.dependencies {
-            api "androidx.annotation:annotation:1.1.0"
-        }
+        api project(":compose:ui:ui-geometry")
+        api "androidx.annotation:annotation:1.1.0"
 
-        commonTest.dependencies {
-            implementation kotlin("test-junit")
-        }
+        implementation(KOTLIN_STDLIB)
+        implementation project(":compose:runtime:runtime")
+        implementation project(":compose:ui:ui-util")
 
-        androidTest.dependencies {
-            implementation(TRUTH)
-        }
-        androidAndroidTest.dependencies {
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(ESPRESSO_CORE)
+        testImplementation(JUNIT)
+        testImplementation(TRUTH)
+
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ESPRESSO_CORE)
+        androidTestImplementation(TRUTH)
+        androidTestImplementation(KOTLIN_TEST)
+    }
+}
+
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
+                api project(":compose:ui:ui-geometry")
+
+                implementation project(":compose:runtime:runtime")
+                implementation project(":compose:ui:ui-util")
+            }
+            jvmMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+            }
+            androidMain.dependencies {
+                api "androidx.annotation:annotation:1.1.0"
+            }
+
+            commonTest.dependencies {
+                implementation kotlin("test-junit")
+            }
+
+            androidTest.dependencies {
+                implementation(TRUTH)
+            }
+            androidAndroidTest.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ESPRESSO_CORE)
+            }
         }
     }
 }
