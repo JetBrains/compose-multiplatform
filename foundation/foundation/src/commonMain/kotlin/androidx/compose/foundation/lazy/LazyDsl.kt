@@ -165,6 +165,8 @@ internal class LazyListScopeImpl : LazyListScope {
  * currently visible items.
  * This API is not stable yet, please consider using [LazyRowFor] instead.
  *
+ * @sample androidx.compose.foundation.samples.LazyRowSample
+ *
  * @param modifier the modifier to apply to this layout
  * @param contentPadding specify a padding around the whole content
  * @param verticalAlignment the vertical alignment applied to the items
@@ -194,6 +196,8 @@ fun LazyRow(
  * The DSL implementation of a vertically scrolling list that only composes and lays out the
  * currently visible items.
  * This API is not stable yet, please consider using [LazyColumnFor] instead.
+ *
+ * @sample androidx.compose.foundation.samples.LazyColumnSample
  *
  * @param modifier the modifier to apply to this layout
  * @param contentPadding specify a padding around the whole content
