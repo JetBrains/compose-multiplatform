@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.zIndex
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.doReturn
@@ -66,7 +65,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.Mockito.times
 
-@SmallTest
 @RunWith(JUnit4::class)
 @OptIn(ExperimentalLayoutNodeApi::class)
 class LayoutNodeTest {

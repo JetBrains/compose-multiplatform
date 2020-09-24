@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.isNull
@@ -52,7 +51,6 @@ import org.junit.runners.JUnit4
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-@SmallTest
 @RunWith(JUnit4::class)
 @OptIn(InternalTextApi::class)
 class TextFieldSelectionManagerTest {

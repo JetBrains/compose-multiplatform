@@ -28,7 +28,6 @@ import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
-import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -40,7 +39,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @OptIn(ExperimentalTextApi::class)
-@SmallTest
 @RunWith(JUnit4::class)
 class TextInputServiceAndroidTest {
 
