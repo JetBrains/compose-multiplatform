@@ -16,6 +16,7 @@
 
 package androidx.build.gmaven
 
+import androidx.build.AndroidXPlaygroundRootPlugin
 import androidx.build.Version
 import groovy.util.XmlSlurper
 import groovy.util.slurpersupport.Node
@@ -43,6 +44,11 @@ class GMavenVersionChecker(private val logger: Logger) {
      * @return true if the artifact is already on maven.google.com
      */
     fun isReleased(group: String, artifactName: String, version: String): Boolean {
+        // Playground projects insert SNAPSHOT_MARKER as a placeholder for unreleased ToT project
+        // dependency, so we can immediately return false here.
+        // Note: SNAPSHOT_MARKER requires a special path here because it fails Version validation
+        if (version == AndroidXPlaygroundRootPlugin.SNAPSHOT_MARKER) return false
+
         return getVersions(group, artifactName)?.contains(Version(version)) ?: false
     }
 
