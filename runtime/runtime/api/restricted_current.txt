@@ -622,6 +622,7 @@ package androidx.compose.runtime.collection {
     method public T! removeAt(int index);
     method public void removeRange(int start, int end);
     method public boolean retainAll(java.util.Collection<? extends T> elements);
+    method public inline boolean reversedAny(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
     method public operator T! set(int index, T? element);
     method public void sortWith(java.util.Comparator<T> comparator);
     method public inline int sumBy(kotlin.jvm.functions.Function1<? super T,java.lang.Integer> selector);

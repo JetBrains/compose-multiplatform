@@ -456,6 +456,34 @@ class SubcomposeLayoutTest {
         }
         rule.waitForIdle()
     }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun drawingOrderIsControlledByPlaceCalls() {
+        val layoutTag = "layout"
+
+        rule.setContent {
+            SubcomposeLayout<Color>(Modifier.testTag(layoutTag)) { constraints ->
+                val first = subcompose(Color.Red) {
+                    Spacer(Modifier.size(10.dp).background(Color.Red))
+                }.first().measure(constraints)
+                val second = subcompose(Color.Green) {
+                    Spacer(Modifier.size(10.dp).background(Color.Green))
+                }.first().measure(constraints)
+
+                layout(first.width, first.height) {
+                    second.place(0, 0)
+                    first.place(0, 0)
+                }
+            }
+        }
+
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(layoutTag)
+            .captureToBitmap()
+            .assertCenterPixelColor(Color.Red)
+    }
 }
 
 fun Bitmap.assertCenterPixelColor(expectedColor: Color) {

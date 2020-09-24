@@ -50,6 +50,7 @@ import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.merge
+import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
@@ -65,7 +66,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.deleteAt
 import androidx.compose.ui.util.nativeClass
 import kotlin.math.roundToInt
-import kotlin.math.sign
 
 /**
  * Enable to log changes to the LayoutNode tree.  This logging is quite chatty.
@@ -350,22 +350,27 @@ class LayoutNode : Measurable, Remeasurement {
         _foldedChildren.forEach { child ->
             child.detach()
         }
+        placeOrder = NotPlacedPlaceOrder
+        isPlaced = false
     }
 
-    private val _zIndexSortedChildren = mutableVectorOf<LayoutNode>()
-    private val _zIndexSortedChildrenList = _zIndexSortedChildren.asMutableList()
+    private val _zSortedChildren = mutableVectorOf<LayoutNode>()
 
     /**
-     * Returns the children list sorted by their [LayoutNode.zIndex].
+     * Returns the children list sorted by their [LayoutNode.zIndex] first (smaller first) and the
+     * order they were placed via [Placeable.placeAt] by parent (smaller first).
+     * Please note that this list contains not placed items as well, so you have to manually
+     * filter them.
+     *
      * Note that the object is reused so you shouldn't save it for later.
      */
     @PublishedApi
-    internal val zIndexSortedChildren: List<LayoutNode>
+    internal val zSortedChildren: MutableVector<LayoutNode>
         get() {
-            _zIndexSortedChildren.clear()
-            _zIndexSortedChildren.addAll(_children)
-            _zIndexSortedChildren.sortWith(ZIndexComparator)
-            return _zIndexSortedChildrenList
+            _zSortedChildren.clear()
+            _zSortedChildren.addAll(_children)
+            _zSortedChildren.sortWith(ZComparator)
+            return _zSortedChildren
         }
 
     override fun toString(): String {
@@ -537,13 +542,19 @@ class LayoutNode : Measurable, Remeasurement {
         internal set
 
     /**
-     * Whether or not this LayoutNode was placed by its parent during the last layout.
-     * It is possible that this value is not equals to [isPlaced] when:
-     * 1) The node was placed by the parent, but the grandparent didn't place the parent
-     * 2) This value is set to false before the start of the layout pass to be able to detect the
-     * nodes which were placed previously but not placed during this pass
+     * The order in which this node was placed by its parent during the previous [layoutChildren].
+     * Before the placement the order is set to [NotPlacedPlaceOrder] to all the children. Then
+     * every placed node assigns this variable to [parent]s [nextChildPlaceOrder] and increments
+     * this counter. Not placed items will still have [NotPlacedPlaceOrder] set.
      */
-    private var isPlacedByParent = false
+    private var placeOrder: Int = NotPlacedPlaceOrder
+
+    /**
+     * The counter on a parent node which is used by its children to understand the order in which
+     * they were placed.
+     * @see placeOrder
+     */
+    private var nextChildPlaceOrder: Int = 0
 
     /**
      * Remembers how the node was measured by the parent.
@@ -862,6 +873,8 @@ class LayoutNode : Measurable, Remeasurement {
      * Invoked when the parent placed the node. It will trigger the layout.
      */
     internal fun onNodePlaced() {
+        val parent = parent
+
         if (!isPlaced) {
             isPlaced = true
             // when the visibility of a child has been changed we need to invalidate
@@ -875,7 +888,23 @@ class LayoutNode : Measurable, Remeasurement {
             }
             markSubtreeAsPlaced()
         }
-        isPlacedByParent = true
+
+        if (parent != null) {
+            if (parent.layoutState == LayingOut) {
+                // the parent is currently placing its children
+                check(placeOrder == NotPlacedPlaceOrder) {
+                    "Place was called on a node which was placed already"
+                }
+                placeOrder = parent.nextChildPlaceOrder
+                parent.nextChildPlaceOrder++
+            }
+            // if parent is not laying out we were asked to be relaid out without affecting the
+            // parent. this means our placeOrder didn't change since the last time parent placed us
+        } else {
+            // parent is null for the root node
+            placeOrder = 0
+        }
+
         layoutChildren()
     }
 
@@ -889,8 +918,11 @@ class LayoutNode : Measurable, Remeasurement {
             layoutState = LayoutState.LayingOut
             val owner = requireOwner()
             owner.observeLayoutModelReads(this) {
+                // reset the place order counter which will be used by the children
+                nextChildPlaceOrder = 0
                 _children.forEach { child ->
-                    child.isPlacedByParent = false
+                    // and reset the place order for all the children before placing them
+                    child.placeOrder = NotPlacedPlaceOrder
                     if (alignmentLinesRequired && child.layoutState == Ready &&
                         !child.alignmentLinesCalculatedDuringLastLayout
                     ) {
@@ -903,10 +935,10 @@ class LayoutNode : Measurable, Remeasurement {
                 }
                 innerLayoutNodeWrapper.measureResult.placeChildren()
                 _children.forEach { child ->
-                    // we set `isPlacedByParent` to false for all the children, then
-                    // during the placeChildren() invocation it will be set to true for all
-                    // the placed children.
-                    if (!child.isPlacedByParent) {
+                    // we set `placeOrder` to NotPlacedPlaceOrder for all the children, then
+                    // during the placeChildren() invocation the real order will be assigned for
+                    // all the placed children.
+                    if (child.placeOrder == NotPlacedPlaceOrder) {
                         child.markSubtreeAsNotPlaced()
                     }
                     child.alignmentLinesRead = child.alignmentLinesQueriedSinceLastLayout
@@ -946,7 +978,7 @@ class LayoutNode : Measurable, Remeasurement {
     private fun markSubtreeAsPlaced() {
         _children.forEach {
             // if the layout state is not Ready then isPlaced will be set during the layout
-            if (it.layoutState == Ready && it.isPlacedByParent) {
+            if (it.layoutState == Ready && it.placeOrder != NotPlacedPlaceOrder) {
                 it.isPlaced = true
                 it.markSubtreeAsPlaced()
             }
@@ -1221,6 +1253,18 @@ class LayoutNode : Measurable, Remeasurement {
         error("innerLayerWrapper should have been reached.")
     }
 
+    /**
+     * Comparator allowing to sort nodes by zIndex and placement order.
+     */
+    private val ZComparator = Comparator<LayoutNode> { node1, node2 ->
+        if (node1.zIndex == node2.zIndex) {
+            // if zIndex is the same we use the placement order
+            node1.placeOrder.compareTo(node2.placeOrder)
+        } else {
+            node1.zIndex.compareTo(node2.zIndex)
+        }
+    }
+
     internal companion object {
         private val ErrorMeasureBlocks: NoIntrinsicsMeasureBlocks =
             object : NoIntrinsicsMeasureBlocks(
@@ -1232,6 +1276,11 @@ class LayoutNode : Measurable, Remeasurement {
                     constraints: Constraints
                 ) = error("Undefined measure and it is required")
             }
+
+        /**
+         * Constant used by [placeOrder].
+         */
+        private const val NotPlacedPlaceOrder = Int.MAX_VALUE
     }
 
     /**
@@ -1281,14 +1330,6 @@ internal object LayoutEmitHelper {
         { this.measureBlocks = it }
     val setRef: LayoutNode.(Ref<LayoutNode>) -> Unit = { it.value = this }
     val setLayoutDirection: LayoutNode.(LayoutDirection) -> Unit = { this.layoutDirection = it }
-}
-
-/**
- * Comparator allowing to sort nodes by zIndex
- */
-@OptIn(ExperimentalLayoutNodeApi::class)
-private val ZIndexComparator = Comparator<LayoutNode> { node1, node2 ->
-    sign(node1.zIndex - node2.zIndex).toInt()
 }
 
 /**

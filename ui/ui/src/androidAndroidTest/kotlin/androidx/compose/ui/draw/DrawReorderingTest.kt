@@ -44,6 +44,7 @@ import androidx.compose.ui.zIndex
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -72,6 +73,192 @@ class DrawReorderingTest {
         activity = rule.activity
         activity.hasFocusLatch.await(5, TimeUnit.SECONDS)
         drawLatch = CountDownLatch(1)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testDrawingOrderWhenWePlaceItemsInTheNaturalOrder() {
+        rule.runOnUiThread {
+            activity.setContent {
+                Layout(children = {
+                    FixedSize(
+                        10,
+                        PaddingModifier(10)
+                            .background(Color.White)
+                    )
+                    FixedSize(
+                        30,
+                        Modifier.drawLayer()
+                            .background(Color.Red)
+                            .drawLatchModifier()
+                    )
+                }) { measurables, _ ->
+                    val newConstraints = Constraints.fixed(30, 30)
+                    val placeables = measurables.map { m ->
+                        m.measure(newConstraints)
+                    }
+                    layout(newConstraints.maxWidth, newConstraints.maxWidth) {
+                        placeables.forEach { child ->
+                            child.placeRelative(0, 0)
+                        }
+                    }
+                }
+            }
+        }
+        rule.validateSquareColors(
+            outerColor = Color.Red,
+            innerColor = Color.Red,
+            size = 10,
+            drawLatch = drawLatch
+        )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testDrawingOrderWhenWePlaceItemsInTheReverseOrder() {
+        rule.runOnUiThread {
+            activity.setContent {
+                Layout(children = {
+                    FixedSize(
+                        10,
+                        PaddingModifier(10)
+                            .background(Color.White)
+                    )
+                    FixedSize(
+                        30,
+                        Modifier.drawLayer()
+                            .background(Color.Red)
+                            .drawLatchModifier()
+                    )
+                }) { measurables, _ ->
+                    val newConstraints = Constraints.fixed(30, 30)
+                    val placeables = measurables.map { m ->
+                        m.measure(newConstraints)
+                    }
+                    layout(newConstraints.maxWidth, newConstraints.maxWidth) {
+                        placeables.reversed().forEach { child ->
+                            child.placeRelative(0, 0)
+                        }
+                    }
+                }
+            }
+        }
+        rule.validateSquareColors(
+            outerColor = Color.Red,
+            innerColor = Color.White,
+            size = 10,
+            drawLatch = drawLatch
+        )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testDrawingOrderIsOverriddenWithZIndexWhenWePlaceItemsInTheReverseOrder() {
+        rule.runOnUiThread {
+            activity.setContent {
+                Layout(children = {
+                    FixedSize(
+                        10,
+                        PaddingModifier(10)
+                            .background(Color.White)
+                    )
+                    FixedSize(
+                        30,
+                        Modifier.drawLayer()
+                            .background(Color.Red)
+                            .zIndex(1f)
+                            .drawLatchModifier()
+                    )
+                }) { measurables, _ ->
+                    val newConstraints = Constraints.fixed(30, 30)
+                    val placeables = measurables.map { m ->
+                        m.measure(newConstraints)
+                    }
+                    layout(newConstraints.maxWidth, newConstraints.maxWidth) {
+                        placeables.reversed().forEach { child ->
+                            child.placeRelative(0, 0)
+                        }
+                    }
+                }
+            }
+        }
+        rule.validateSquareColors(
+            outerColor = Color.Red,
+            innerColor = Color.Red,
+            size = 10,
+            drawLatch = drawLatch
+        )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testCustomDrawingOrderForThreeItems() {
+        rule.runOnUiThread {
+            activity.setContent {
+                Layout(children = {
+                    FixedSize(
+                        30,
+                        Modifier.drawLayer()
+                            .background(Color.Red)
+                            .drawLatchModifier()
+                    )
+                    FixedSize(
+                        10,
+                        PaddingModifier(10)
+                            .background(Color.White)
+                    )
+                    FixedSize(
+                        30,
+                        Modifier.drawLayer()
+                            .background(Color.Blue)
+                            .drawLatchModifier()
+                    )
+                }) { measurables, _ ->
+                    val newConstraints = Constraints.fixed(30, 30)
+                    val placeables = measurables.map { m ->
+                        m.measure(newConstraints)
+                    }
+                    layout(newConstraints.maxWidth, newConstraints.maxWidth) {
+                        placeables[2].place(0, 0)
+                        placeables[0].place(0, 0)
+                        placeables[1].place(0, 0)
+                    }
+                }
+            }
+        }
+        rule.validateSquareColors(
+            outerColor = Color.Red,
+            innerColor = Color.White,
+            size = 10,
+            drawLatch = drawLatch
+        )
+    }
+
+    @Test
+    fun placingTheSameItemTwiceIsNotAllowedAsItBreaksTheDrawingOrder() {
+        var exception: Throwable? = null
+        val latch = CountDownLatch(1)
+        rule.runOnUiThread {
+            activity.setContent {
+                Layout(children = {
+                    FixedSize(30)
+                }) { measurables, constraints ->
+                    val placeables = measurables.first().measure(constraints)
+                    layout(30, 30) {
+                        placeables.place(0, 0)
+                        try {
+                            placeables.place(0, 0)
+                        } catch (e: Throwable) {
+                            exception = e
+                        }
+                        latch.countDown()
+                    }
+                }
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertNotNull(exception)
     }
 
     @Test
