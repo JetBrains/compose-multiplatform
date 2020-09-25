@@ -391,20 +391,20 @@ private class PointerInputModifierImpl(override val pointerInputFilter: PointerI
     PointerInputModifier
 
 private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : PointerInputFilter() {
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ) =
         if (consumeMovement) {
-            changes.map {
+            pointerEvent.changes.map {
                 it.consumePositionChange(
                     it.positionChange().x,
                     it.positionChange().y
                 )
             }
         } else {
-            changes
+            pointerEvent.changes
         }
 
     override fun onCancel() {}
@@ -412,11 +412,11 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
 
 private class ConsumeDownChangeFilter : PointerInputFilter() {
     var onDown by mutableStateOf<(Offset) -> Unit>({})
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = changes.map {
+    ) = pointerEvent.changes.map {
         if (it.changedToDown()) {
             onDown(it.current.position!!)
             it.consumeDownChange()
@@ -431,11 +431,12 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
 private class LogEventsGestureFilter(val log: MutableList<List<PointerInputChange>>) :
     PointerInputFilter() {
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
+        val changes = pointerEvent.changes
         if (pass == PointerEventPass.Initial) {
             log.add(changes.map { it.copy() })
         }

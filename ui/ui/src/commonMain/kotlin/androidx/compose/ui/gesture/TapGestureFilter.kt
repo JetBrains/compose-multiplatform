@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.DelayUpEvent
 import androidx.compose.ui.gesture.customevents.DelayUpMessage
 import androidx.compose.ui.input.pointer.CustomEvent
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -105,11 +106,13 @@ internal class TapGestureFilter : PointerInputFilter() {
     private var upBlockedPointers: MutableSet<PointerId> = mutableSetOf()
     private var lastPxPosition: Offset? = null
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
+
+        val changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Main) {
 

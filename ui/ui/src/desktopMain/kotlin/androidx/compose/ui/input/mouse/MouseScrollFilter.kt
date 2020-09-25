@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.unit.IntSize
 
@@ -102,11 +102,11 @@ fun Modifier.mouseScrollFilter(
 internal class MouseScrollEventFilter : PointerInputFilter() {
     lateinit var onMouseScroll: (MouseScrollEvent, IntSize) -> Boolean
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = changes
+    ) = pointerEvent.changes
 
     override fun onCancel() = Unit
 

@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.LongPressFiredEvent
 import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -83,23 +84,27 @@ internal class LongPressGestureFilter(
         this.customEventDispatcher = customEventDispatcher
     }
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
 
-        var changesToReturn = changes
+        val changes = pointerEvent.changes
 
-        if (pass == PointerEventPass.Initial && state == State.Fired) {
-            // If we fired and have not reset, we should prevent other pointer input nodes from
-            // responding to up, so consume it early on.
-            changesToReturn = changesToReturn.map {
-                if (it.changedToUp()) {
-                    it.consumeDownChange()
-                } else {
-                    it
+        if (pass == PointerEventPass.Initial) {
+            return if (state == State.Fired) {
+                // If we fired and have not reset, we should prevent other pointer input nodes from
+                // responding to up, so consume it early on.
+                changes.map {
+                    if (it.changedToUp()) {
+                        it.consumeDownChange()
+                    } else {
+                        it
+                    }
                 }
+            } else {
+                changes
             }
         }
 
@@ -111,7 +116,7 @@ internal class LongPressGestureFilter(
             } else if (state != State.Idle && changes.all { it.changedToUpIgnoreConsumed() }) {
                 // If we have started and all of the changes changed to up, reset to idle.
                 resetToIdle()
-            } else if (!changesToReturn.anyPointersInBounds(bounds)) {
+            } else if (!changes.anyPointersInBounds(bounds)) {
                 // If all pointers have gone out of bounds, reset to idle.
                 resetToIdle()
             }
@@ -138,7 +143,7 @@ internal class LongPressGestureFilter(
             resetToIdle()
         }
 
-        return changesToReturn
+        return changes
     }
 
     override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {

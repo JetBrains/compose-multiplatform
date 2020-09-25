@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -289,12 +290,12 @@ class SelectionContainerTest {
     }
 }
 
-private class PointerInputChangeLog : (List<PointerInputChange>, PointerEventPass) -> Unit {
+private class PointerInputChangeLog : (PointerEvent, PointerEventPass) -> Unit {
 
     val entries = mutableListOf<PointerInputChangeLogEntry>()
 
-    override fun invoke(p1: List<PointerInputChange>, p2: PointerEventPass) {
-        entries.add(PointerInputChangeLogEntry(p1.map { it }, p2))
+    override fun invoke(p1: PointerEvent, p2: PointerEventPass) {
+        entries.add(PointerInputChangeLogEntry(p1.changes.map { it }, p2))
     }
 }
 
@@ -304,7 +305,7 @@ private data class PointerInputChangeLogEntry(
 )
 
 private fun Modifier.gestureSpy(
-    onPointerInput: (List<PointerInputChange>, PointerEventPass) -> Unit
+    onPointerInput: (PointerEvent, PointerEventPass) -> Unit
 ): Modifier = composed {
     val spy = remember { GestureSpy() }
     spy.onPointerInput = onPointerInput
@@ -313,16 +314,16 @@ private fun Modifier.gestureSpy(
 
 private class GestureSpy : PointerInputModifier {
 
-    lateinit var onPointerInput: (List<PointerInputChange>, PointerEventPass) -> Unit
+    lateinit var onPointerInput: (PointerEvent, PointerEventPass) -> Unit
 
     override val pointerInputFilter = object : PointerInputFilter() {
-        override fun onPointerInput(
-            changes: List<PointerInputChange>,
+        override fun onPointerEvent(
+            pointerEvent: PointerEvent,
             pass: PointerEventPass,
             bounds: IntSize
         ): List<PointerInputChange> {
-            onPointerInput(changes, pass)
-            return changes
+            onPointerInput(pointerEvent, pass)
+            return pointerEvent.changes
         }
 
         override fun onCancel() {

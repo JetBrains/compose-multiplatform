@@ -172,16 +172,6 @@ internal class PointerInteropFilter : PointerInputModifier {
 
             private var state = DispatchToViewState.Unknown
 
-            override fun onPointerInput(
-                changes: List<PointerInputChange>,
-                pass: PointerEventPass,
-                bounds: IntSize
-            ): List<PointerInputChange> {
-                // No implementation as onPointerEvent is overridden.
-                // The super method will eventually be removed so this is just temporary.
-                throw NotImplementedError("This method is temporary and should never be called")
-            }
-
             override fun onPointerEvent(
                 pointerEvent: PointerEvent,
                 pass: PointerEventPass,
