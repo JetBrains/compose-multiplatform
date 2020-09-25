@@ -104,9 +104,14 @@ interface Owner {
     fun onRequestMeasure(layoutNode: LayoutNode)
 
     /**
-     * Called by [LayoutNode] to request the Owner a new measurement+layout.
+     * Called by [LayoutNode] to request the Owner a new layout.
      */
     fun onRequestRelayout(layoutNode: LayoutNode)
+
+    /**
+     * Whether the Owner has pending layout work.
+     */
+    val hasPendingMeasureOrLayout: Boolean
 
     /**
      * Called by [LayoutNode] when it is attached to the view system and now has an owner.
