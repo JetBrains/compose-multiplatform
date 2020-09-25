@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.FontLoaderAmbient
 import androidx.compose.ui.selection.Selectable
@@ -151,7 +151,7 @@ fun CoreText(
                     TextDelegate.paint(canvas, layoutResult)
                 }
             }
-        }.onPositioned {
+        }.onGloballyPositioned {
             // Get the layout coordinates of the text composable. This is for hit test of
             // cross-composable selection.
             state.layoutCoordinates = it

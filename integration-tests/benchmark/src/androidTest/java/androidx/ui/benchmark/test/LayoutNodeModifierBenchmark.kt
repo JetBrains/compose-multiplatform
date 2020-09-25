@@ -31,7 +31,7 @@ import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
@@ -82,7 +82,7 @@ class LayoutNodeModifierBenchmark(
             Modifier.pressIndicatorGestureFilter(),
             Modifier.layoutId("Hello"),
             Modifier.padding(10.dp),
-            Modifier.onPositioned { _ -> },
+            Modifier.onGloballyPositioned { _ -> },
             Modifier.zIndex(1f)
         ).subList(0, numberOfModifiers)
 

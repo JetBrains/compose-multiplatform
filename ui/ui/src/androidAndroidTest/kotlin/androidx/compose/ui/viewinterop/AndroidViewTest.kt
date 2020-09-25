@@ -37,7 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
@@ -301,7 +301,10 @@ class AndroidViewTest {
         var obtainedSize: IntSize = IntSize.Zero
         rule.setContent {
             Box {
-                AndroidView(::View, Modifier.onPositioned { obtainedSize = it.size }) { view ->
+                AndroidView(
+                    ::View,
+                    Modifier.onGloballyPositioned { obtainedSize = it.size }
+                ) { view ->
                     view.layoutParams = ViewGroup.LayoutParams(size, size)
                 }
             }
@@ -324,7 +327,7 @@ class AndroidViewTest {
             Providers(DensityAmbient provides density) {
                 AndroidView(
                     { FrameLayout(it) },
-                    Modifier.size(size).onPositioned {
+                    Modifier.size(size).onGloballyPositioned {
                         assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
                     }
                 )

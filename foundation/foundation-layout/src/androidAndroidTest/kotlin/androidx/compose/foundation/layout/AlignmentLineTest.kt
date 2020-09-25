@@ -27,7 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -57,14 +57,14 @@ class AlignmentLineTest : LayoutTest() {
         val childPosition = Ref<Offset>()
         show {
             Box(
-                Modifier.onPositioned {
+                Modifier.onGloballyPositioned {
                     parentSize.value = it.size
                     layoutLatch.countDown()
                 }
             ) {
                 AlignmentLineLayout(
                     childDp, 0.dp, testLine, lineDp,
-                    Modifier.onPositioned {
+                    Modifier.onGloballyPositioned {
                         childSize.value = it.size
                         childPosition.value = it.positionInRoot
                         layoutLatch.countDown()
@@ -103,14 +103,14 @@ class AlignmentLineTest : LayoutTest() {
         val childPosition = Ref<Offset>()
         show {
             Box(
-                modifier = Modifier.onPositioned {
+                modifier = Modifier.onGloballyPositioned {
                     parentSize.value = it.size
                     layoutLatch.countDown()
                 }
             ) {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
-                    Modifier.onPositioned {
+                    Modifier.onGloballyPositioned {
                         childSize.value = it.size
                         childPosition.value = it.positionInRoot
                         layoutLatch.countDown()
@@ -323,7 +323,7 @@ class AlignmentLineTest : LayoutTest() {
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredWidth(incomingSize)
                         .relativePaddingFrom(testLine, before = before)
-                        .onPositioned {
+                        .onGloballyPositioned {
                             Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.x)
                             latch.countDown()
                         }
@@ -332,7 +332,7 @@ class AlignmentLineTest : LayoutTest() {
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredWidth(incomingSize)
                         .relativePaddingFrom(testLine, after = after)
-                        .onPositioned {
+                        .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
                                 it.positionInParent.x
@@ -366,7 +366,7 @@ class AlignmentLineTest : LayoutTest() {
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredHeight(incomingSize)
                         .relativePaddingFrom(testLine, before = before)
-                        .onPositioned {
+                        .onGloballyPositioned {
                             Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.y)
                             latch.countDown()
                         }
@@ -375,7 +375,7 @@ class AlignmentLineTest : LayoutTest() {
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredHeight(incomingSize)
                         .relativePaddingFrom(testLine, after = after)
-                        .onPositioned {
+                        .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
                                 it.positionInParent.y

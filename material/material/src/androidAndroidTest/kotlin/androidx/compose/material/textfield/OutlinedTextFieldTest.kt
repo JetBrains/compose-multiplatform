@@ -41,7 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -167,7 +167,7 @@ class OutlinedTextFieldTest {
                     value = "",
                     onValueChange = {},
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
+                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
                             labelPosition.value = it.positionInRoot
                             labelSize.value = it.size
                         })
@@ -203,7 +203,7 @@ class OutlinedTextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {
-                    Text(text = "label", modifier = Modifier.onPositioned {
+                    Text(text = "label", modifier = Modifier.onGloballyPositioned {
                         labelPosition.value = it.positionInRoot
                         labelSize.value = it.size
                     })
@@ -236,7 +236,7 @@ class OutlinedTextFieldTest {
                 value = "input",
                 onValueChange = {},
                 label = {
-                    Text(text = "label", modifier = Modifier.onPositioned {
+                    Text(text = "label", modifier = Modifier.onGloballyPositioned {
                         labelPosition.value = it.positionInRoot
                         labelSize.value = it.size
                     })
@@ -269,7 +269,7 @@ class OutlinedTextFieldTest {
                     onValueChange = {},
                     label = { Text("label") },
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.onPositioned {
+                        Text(text = "placeholder", modifier = Modifier.onGloballyPositioned {
                             placeholderPosition.value = it.positionInRoot
                             placeholderSize.value = it.size
                         })
@@ -311,7 +311,7 @@ class OutlinedTextFieldTest {
                     onValueChange = {},
                     label = {},
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.onPositioned {
+                        Text(text = "placeholder", modifier = Modifier.onGloballyPositioned {
                             placeholderPosition.value = it.positionInRoot
                             placeholderSize.value = it.size
                         })
@@ -353,7 +353,7 @@ class OutlinedTextFieldTest {
                     onValueChange = {},
                     label = {},
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.onPositioned {
+                        Text(text = "placeholder", modifier = Modifier.onGloballyPositioned {
                             placeholderPosition.value = it.positionInRoot
                             placeholderSize.value = it.size
                         })
@@ -413,13 +413,13 @@ class OutlinedTextFieldTest {
                 modifier = Modifier.preferredWidth(textFieldWidth),
                 label = {},
                 leadingIcon = {
-                    Box(Modifier.preferredSize(size).onPositioned {
+                    Box(Modifier.preferredSize(size).onGloballyPositioned {
                         leadingPosition.value = it.positionInRoot
                         leadingSize.value = it.size
                     })
                 },
                 trailingIcon = {
-                    Box(Modifier.preferredSize(size).onPositioned {
+                    Box(Modifier.preferredSize(size).onGloballyPositioned {
                         trailingPosition.value = it.positionInRoot
                         trailingSize.value = it.size
                     })
@@ -457,7 +457,7 @@ class OutlinedTextFieldTest {
                     value = "",
                     onValueChange = {},
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
+                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
                             labelPosition.value = it.positionInRoot
                         })
                     },
@@ -484,7 +484,7 @@ class OutlinedTextFieldTest {
                     value = "",
                     onValueChange = {},
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
+                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
                             labelPosition.value = it.positionInRoot
                         })
                     },

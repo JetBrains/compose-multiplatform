@@ -26,7 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -660,7 +660,7 @@ class ListItemTest {
         coords: Ref<Offset>,
         size: Ref<IntSize>,
         baseline: Ref<Float> = Ref()
-    ): Modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+    ): Modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
         coords.value = coordinates.localToRoot(Offset.Zero)
         baseline.value = coordinates[FirstBaseline].toFloat() + coords.value!!.y
         size.value = coordinates.size

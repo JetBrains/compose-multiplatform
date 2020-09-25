@@ -36,7 +36,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntSize
@@ -89,10 +89,10 @@ class ScaffoldTest {
         rule.setMaterialContent {
             Scaffold {
                 Text("One",
-                    Modifier.onPositioned { child1 = it.positionInParent }
+                    Modifier.onGloballyPositioned { child1 = it.positionInParent }
                 )
                 Text("Two",
-                    Modifier.onPositioned { child2 = it.positionInParent }
+                    Modifier.onGloballyPositioned { child2 = it.positionInParent }
                 )
             }
         }
@@ -109,7 +109,7 @@ class ScaffoldTest {
             Scaffold(
                 topBar = {
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             appbarPosition = positioned.localToGlobal(Offset.Zero)
                             appbarSize = positioned.size
                         }
@@ -120,7 +120,7 @@ class ScaffoldTest {
                 }
             ) {
                 Box(Modifier
-                    .onPositioned { contentPosition = it.localToGlobal(Offset.Zero) }
+                    .onGloballyPositioned { contentPosition = it.localToGlobal(Offset.Zero) }
                     .fillMaxWidth()
                     .preferredHeight(50.dp)
                     .background(Color.Blue)
@@ -141,7 +141,7 @@ class ScaffoldTest {
             Scaffold(
                 bottomBar = {
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             appbarPosition = positioned.positionInParent
                             appbarSize = positioned.size
                         }
@@ -152,7 +152,7 @@ class ScaffoldTest {
                 }
             ) {
                 Box(Modifier
-                    .onPositioned { positioned: LayoutCoordinates ->
+                    .onGloballyPositioned { positioned: LayoutCoordinates ->
                         contentPosition = positioned.positionInParent
                         contentSize = positioned.size
                     }
@@ -179,7 +179,7 @@ class ScaffoldTest {
                     scaffoldState = scaffoldState,
                     drawerContent = {
                         Box(Modifier
-                            .onPositioned { positioned: LayoutCoordinates ->
+                            .onGloballyPositioned { positioned: LayoutCoordinates ->
                                 drawerChildPosition = positioned.positionInParent
                             }
                             .fillMaxWidth()
@@ -233,7 +233,7 @@ class ScaffoldTest {
                     scaffoldState = scaffoldState,
                     drawerContent = {
                         Box(Modifier
-                            .onPositioned { positioned: LayoutCoordinates ->
+                            .onGloballyPositioned { positioned: LayoutCoordinates ->
                                 drawerChildPosition = positioned.positionInParent
                             }
                             .fillMaxWidth()
@@ -271,7 +271,7 @@ class ScaffoldTest {
             Scaffold(
                 floatingActionButton = {
                     FloatingActionButton(
-                        modifier = Modifier.onPositioned { positioned: LayoutCoordinates ->
+                        modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
                             fabPosition = positioned.localToGlobal(positioned.positionInParent)
                         },
@@ -283,7 +283,7 @@ class ScaffoldTest {
                 isFloatingActionButtonDocked = true,
                 bottomBar = {
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             bottomBarPosition =
                                 positioned.localToGlobal(positioned.positionInParent)
                         }
@@ -309,7 +309,7 @@ class ScaffoldTest {
             Scaffold(
                 floatingActionButton = {
                     FloatingActionButton(
-                        modifier = Modifier.onPositioned { positioned: LayoutCoordinates ->
+                        modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
                             fabPosition = positioned.localToGlobal(positioned.positionInParent)
                         },
@@ -322,7 +322,7 @@ class ScaffoldTest {
                 isFloatingActionButtonDocked = true,
                 bottomBar = {
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             bottomBarPosition =
                                 positioned.localToGlobal(positioned.positionInParent)
                         }
@@ -386,7 +386,7 @@ class ScaffoldTest {
             val fab: @Composable (() -> Unit)? = if (showFab.value) {
                 @Composable {
                     FloatingActionButton(
-                        modifier = Modifier.onPositioned { positioned: LayoutCoordinates ->
+                        modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
                         },
                         onClick = {}
@@ -426,7 +426,7 @@ class ScaffoldTest {
             val bottom: @Composable (() -> Unit)? = if (showBottom.value) {
                 @Composable {
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             bottomBarSize = positioned.size
                         }
                         .fillMaxWidth()
@@ -466,7 +466,7 @@ class ScaffoldTest {
             val top: @Composable (() -> Unit)? = if (showTop.value) {
                 @Composable {
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             topBarSize = positioned.size
                         }
                         .fillMaxWidth()
@@ -508,7 +508,7 @@ class ScaffoldTest {
                 scaffoldState = scaffoldState,
                 bottomBar = {
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             bottomBarSize = positioned.size
                         }
                         .fillMaxWidth()
@@ -541,7 +541,7 @@ class ScaffoldTest {
                 bottomBar = {
                     geometry = AmbientScaffoldGeometry.current
                     Box(Modifier
-                        .onPositioned { positioned: LayoutCoordinates ->
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
                             bottomBarSize = positioned.size
                         }
                         .fillMaxWidth()

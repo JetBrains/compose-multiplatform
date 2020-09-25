@@ -26,7 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.gesture.rawPressStartGestureFilter
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionRegistrarAmbient
 import kotlin.math.max
@@ -105,7 +105,7 @@ fun DesktopSelectionContainer(
         Modifier.selectionFilter(manager.observer)
 
     val modifier = remember {
-        gestureModifiers.onPositioned {
+        gestureModifiers.onGloballyPositioned {
             manager.containerLayoutCoordinates = it
         }
     }

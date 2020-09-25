@@ -34,7 +34,7 @@ import androidx.compose.ui.Placeable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
@@ -139,7 +139,7 @@ open class LayoutTest {
         size: Ref<IntSize>,
         position: Ref<Offset>,
         positionedLatch: CountDownLatch
-    ): Modifier = this.onPositioned { coordinates ->
+    ): Modifier = this.onGloballyPositioned { coordinates ->
         size.value = IntSize(coordinates.size.width, coordinates.size.height)
         position.value = coordinates.localToRoot(Offset(0f, 0f))
         positionedLatch.countDown()

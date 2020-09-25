@@ -24,7 +24,7 @@ import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
@@ -234,7 +234,7 @@ class RtlLayoutTest {
     private fun saveLayoutInfo(
         position: Ref<Offset>,
         countDownLatch: CountDownLatch
-    ): Modifier = Modifier.onPositioned {
+    ): Modifier = Modifier.onGloballyPositioned {
         position.value = it.localToRoot(Offset(0f, 0f))
         countDownLatch.countDown()
     }

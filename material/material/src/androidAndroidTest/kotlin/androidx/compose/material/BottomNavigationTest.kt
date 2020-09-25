@@ -24,7 +24,7 @@ import androidx.compose.material.samples.BottomNavigationSample
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
@@ -73,7 +73,7 @@ class BottomNavigationTest {
     fun bottomNavigationItem_sizeAndPositions() {
         lateinit var parentCoords: LayoutCoordinates
         val itemCoords = mutableMapOf<Int, LayoutCoordinates>()
-        rule.setMaterialContent(Modifier.onPositioned { coords: LayoutCoordinates ->
+        rule.setMaterialContent(Modifier.onGloballyPositioned { coords: LayoutCoordinates ->
             parentCoords = coords
         }) {
             Box {
@@ -84,7 +84,7 @@ class BottomNavigationTest {
                             label = { Text("Item $index") },
                             selected = index == 0,
                             onClick = {},
-                            modifier = Modifier.onPositioned { coords: LayoutCoordinates ->
+                            modifier = Modifier.onGloballyPositioned { coords ->
                                 itemCoords[index] = coords
                             }
                         )

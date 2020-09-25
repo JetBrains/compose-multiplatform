@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.LayoutDirection
@@ -66,7 +66,7 @@ class LayoutOffsetTest : LayoutTest() {
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
                     .offset(offsetX, offsetY)
-                    .onPositioned { coordinates: LayoutCoordinates ->
+                    .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x.roundToInt()
                         positionY = coordinates.positionInRoot.y.roundToInt()
                     }
@@ -97,7 +97,7 @@ class LayoutOffsetTest : LayoutTest() {
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
                         .offset(offsetX, offsetY)
-                        .onPositioned { coordinates: LayoutCoordinates ->
+                        .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x.roundToInt()
                             positionY = coordinates.positionInRoot.y.roundToInt()
                         }
@@ -126,7 +126,7 @@ class LayoutOffsetTest : LayoutTest() {
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
                     .absoluteOffset(offsetX, offsetY)
-                    .onPositioned { coordinates: LayoutCoordinates ->
+                    .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x.roundToInt()
                         positionY = coordinates.positionInRoot.y.roundToInt()
                     }
@@ -157,7 +157,7 @@ class LayoutOffsetTest : LayoutTest() {
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
                         .absoluteOffset(offsetX, offsetY)
-                        .onPositioned { coordinates: LayoutCoordinates ->
+                        .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x.roundToInt()
                             positionY = coordinates.positionInRoot.y.roundToInt()
                         }
@@ -189,7 +189,7 @@ class LayoutOffsetTest : LayoutTest() {
                         remember { mutableStateOf(offsetX) },
                         remember { mutableStateOf(offsetY) }
                     )
-                    .onPositioned { coordinates: LayoutCoordinates ->
+                    .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x
                         positionY = coordinates.positionInRoot.y
                     }
@@ -223,7 +223,7 @@ class LayoutOffsetTest : LayoutTest() {
                             remember { mutableStateOf(offsetX) },
                             remember { mutableStateOf(offsetY) }
                         )
-                        .onPositioned { coordinates: LayoutCoordinates ->
+                        .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x
                             positionY = coordinates.positionInRoot.y
                         }
@@ -258,7 +258,7 @@ class LayoutOffsetTest : LayoutTest() {
                         remember { mutableStateOf(offsetX) },
                         remember { mutableStateOf(offsetY) }
                     )
-                    .onPositioned { coordinates: LayoutCoordinates ->
+                    .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x
                         positionY = coordinates.positionInRoot.y
                     }
@@ -292,7 +292,7 @@ class LayoutOffsetTest : LayoutTest() {
                             remember { mutableStateOf(offsetX) },
                             remember { mutableStateOf(offsetY) }
                         )
-                        .onPositioned { coordinates: LayoutCoordinates ->
+                        .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x
                             positionY = coordinates.positionInRoot.y
                         }

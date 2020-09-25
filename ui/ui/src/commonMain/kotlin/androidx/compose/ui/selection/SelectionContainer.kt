@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.platform.TextToolbarAmbient
@@ -61,7 +61,7 @@ fun SelectionContainer(
         Modifier
             .noConsumptionTapGestureFilter { manager.onRelease() }
             .longPressDragGestureFilter(manager.longPressDragObserver)
-            .onPositioned { manager.containerLayoutCoordinates = it }
+            .onGloballyPositioned { manager.containerLayoutCoordinates = it }
     }
 
     Providers(SelectionRegistrarAmbient provides registrarImpl) {

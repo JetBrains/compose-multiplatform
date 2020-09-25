@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.InspectableParameter
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.Constraints
@@ -251,7 +251,7 @@ class LayoutPaddingTest : LayoutTest() {
                     Box(
                         Modifier.padding(start = padding1Dp, end = padding2Dp)
                             .preferredSize(sizeDp, sizeDp)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[0] = coordinates.size
                                 childPosition[0] = coordinates.positionInRoot
                                 drawLatch.countDown()
@@ -262,7 +262,7 @@ class LayoutPaddingTest : LayoutTest() {
                     Box(
                         Modifier.padding(end = padding3Dp)
                             .preferredSize(sizeDp, sizeDp)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[1] = coordinates.size
                                 childPosition[1] = coordinates.positionInRoot
                                 drawLatch.countDown()
@@ -273,7 +273,7 @@ class LayoutPaddingTest : LayoutTest() {
                     Box(
                         Modifier.padding(start = padding1Dp)
                             .preferredSize(sizeDp, sizeDp)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[2] = coordinates.size
                                 childPosition[2] = coordinates.positionInRoot
                                 drawLatch.countDown()
@@ -327,7 +327,7 @@ class LayoutPaddingTest : LayoutTest() {
                     Box(
                         Modifier.absolutePadding(left = padding1Dp, right = padding2Dp)
                             .preferredSize(sizeDp, sizeDp)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childPosition[0] = coordinates.positionInRoot
                                 drawLatch.countDown()
                             }
@@ -336,7 +336,7 @@ class LayoutPaddingTest : LayoutTest() {
                     Box(
                         Modifier.absolutePadding(right = padding3Dp)
                             .preferredSize(sizeDp, sizeDp)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childPosition[1] = coordinates.positionInRoot
                                 drawLatch.countDown()
                             }
@@ -415,7 +415,7 @@ class LayoutPaddingTest : LayoutTest() {
                 ) {
                     val children = @Composable {
                         Container(
-                            Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                            Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
                                 childPosition = coordinates.positionInRoot
                                 drawLatch.countDown()
@@ -463,7 +463,7 @@ class LayoutPaddingTest : LayoutTest() {
                 ) {
                     val children = @Composable {
                         Container(
-                            Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                            Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
                                 childPosition = coordinates.positionInRoot
                                 drawLatch.countDown()
@@ -518,7 +518,7 @@ class LayoutPaddingTest : LayoutTest() {
                 ) {
                     paddingContainer {
                         Container(
-                            Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                            Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
                                 childPosition = coordinates.positionInRoot
                                 drawLatch.countDown()
