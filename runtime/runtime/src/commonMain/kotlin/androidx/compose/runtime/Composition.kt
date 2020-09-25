@@ -36,6 +36,11 @@ interface Composition {
      * Clear the hierarchy that was created from the composition.
      */
     fun dispose()
+
+    /**
+     * Returns true if any pending invalidations have been scheduled.
+     */
+    fun hasInvalidations(): Boolean
 }
 
 /**
@@ -118,6 +123,8 @@ private class CompositionImpl(
             onDispose()
         }
     }
+
+    override fun hasInvalidations() = composer.hasInvalidations()
 }
 
 /**

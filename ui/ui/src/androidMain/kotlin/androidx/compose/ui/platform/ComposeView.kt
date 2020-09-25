@@ -68,6 +68,8 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         override fun dispose() {
             // No-op
         }
+
+        override fun hasInvalidations() = false
     }
 
     /**
