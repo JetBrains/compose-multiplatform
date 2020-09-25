@@ -21,7 +21,6 @@ import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
@@ -49,12 +48,9 @@ class AndroidXUiPlugin : Plugin<Project> {
                     // TODO: figure out how to apply this to multiplatform modules
                     project.dependencies.add(
                         "lintChecks",
-                        project.dependencies.project(
-                            mapOf(
-                                "path" to ":compose:internal-lint-checks",
-                                "configuration" to "shadow"
-                            )
-                        )
+                        project.dependencies.project(mapOf(
+                            "path" to ":compose:internal-lint-checks", "configuration" to "shadow"
+                        ))
                     )
 
                     library.lintOptions.apply {
@@ -86,109 +82,56 @@ class AndroidXUiPlugin : Plugin<Project> {
             }
         }
     }
+}
 
-    companion object {
-        @JvmStatic
-        fun Project.isMultiplatformEnabled(): Boolean {
-            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
+/**
+ * General configuration for MPP projects. In the future, these workarounds should either be
+ * generified and added to AndroidXPlugin, or removed as/when the underlying issues have been
+ * resolved.
+ */
+private fun Project.configureForMultiplatform() {
+    val libraryExtension = project.extensions.findByType<LibraryExtension>() ?: return
+
+    // TODO: b/148416113: AGP doesn't know about Kotlin-MPP's sourcesets yet, so add
+    // them to its source directories (this fixes lint, and code completion in
+    // Android Studio on versions >= 4.0canary8)
+    libraryExtension.apply {
+        sourceSets.findByName("main")?.apply {
+            java.srcDirs("src/commonMain/kotlin", "src/jvmMain/kotlin",
+                "src/androidMain/kotlin")
+            res.srcDirs("src/androidMain/res")
         }
-
-        @JvmStatic
-        fun Project.applyAndConfigureKotlinPlugin() {
-            if (isMultiplatformEnabled()) {
-                apply(plugin = "kotlin-multiplatform")
-            } else {
-                apply(plugin = "org.jetbrains.kotlin.android")
-            }
-
-            configureManifests()
-            configureForKotlinMultiplatformSourceStructure()
-            if (isMultiplatformEnabled()) {
-                configureForMultiplatform()
-            }
-
-            tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                // Needed to enable `expect` and `actual` keywords
-                compile.kotlinOptions.freeCompilerArgs += "-Xmulti-platform"
-            }
+        sourceSets.findByName("test")?.apply {
+            java.srcDirs("src/test/kotlin")
+            res.srcDirs("src/test/res")
         }
-
-        private fun Project.configureManifests() {
-            val libraryExtension = project.extensions.findByType<LibraryExtension>() ?: return
-            libraryExtension.apply {
-                sourceSets.findByName("main")!!.manifest
-                    .srcFile("src/androidMain/AndroidManifest.xml")
-                sourceSets.findByName("androidTest")!!.manifest
-                    .srcFile("src/androidAndroidTest/AndroidManifest.xml")
-            }
+        sourceSets.findByName("androidTest")?.apply {
+            java.srcDirs("src/androidAndroidTest/kotlin")
+            res.srcDirs("src/androidAndroidTest/res")
         }
+    }
 
-        /**
-         * General configuration for MPP projects. In the future, these workarounds should either be
-         * generified and added to AndroidXPlugin, or removed as/when the underlying issues have been
-         * resolved.
-         */
-        private fun Project.configureForKotlinMultiplatformSourceStructure() {
-            val libraryExtension = project.extensions.findByType<LibraryExtension>() ?: return
+    /*
+    The following configures source sets - note:
 
-            // TODO: b/148416113: AGP doesn't know about Kotlin-MPP's sourcesets yet, so add
-            // them to its source directories (this fixes lint, and code completion in
-            // Android Studio on versions >= 4.0canary8)
-            libraryExtension.apply {
-                sourceSets.findByName("main")?.apply {
-                    java.srcDirs(
-                        "src/commonMain/kotlin", "src/jvmMain/kotlin",
-                        "src/androidMain/kotlin"
-                    )
-                    res.srcDirs("src/androidMain/res")
-                }
-                sourceSets.findByName("test")?.apply {
-                    java.srcDirs("src/test/kotlin")
-                    res.srcDirs("src/test/res")
-                }
-                sourceSets.findByName("androidTest")?.apply {
-                    java.srcDirs("src/androidAndroidTest/kotlin")
-                    res.srcDirs("src/androidAndroidTest/res")
-                }
-            }
-        }
+    1. The common unit test source set, commonTest, is included by default in both android
+    unit and instrumented tests. This causes unnecessary duplication, so we explicitly do
+    _not_ use commonTest, instead choosing to just use the unit test variant.
+    TODO: Consider using commonTest for unit tests if a usable feature is added for
+    https://youtrack.jetbrains.com/issue/KT-34662.
 
-        /**
-         * General configuration for MPP projects. In the future, these workarounds should either be
-         * generified and added to AndroidXPlugin, or removed as/when the underlying issues have been
-         * resolved.
-         */
-        private fun Project.configureForMultiplatform() {
-            if (multiplatformExtension == null) {
-                throw IllegalStateException(
-                    "Unable to configureForMultiplatform() when " +
-                        "multiplatformExtension is null (multiplatform plugin not enabled?)"
-                )
-            }
-
-            /*
-            The following configures source sets - note:
-
-            1. The common unit test source set, commonTest, is included by default in both android
-            unit and instrumented tests. This causes unnecessary duplication, so we explicitly do
-            _not_ use commonTest, instead choosing to just use the unit test variant.
-            TODO: Consider using commonTest for unit tests if a usable feature is added for
-            https://youtrack.jetbrains.com/issue/KT-34662.
-
-            2. The default (android) unit test source set is named 'androidTest', which conflicts / is
-            confusing as this shares the same name / expected directory as AGP's 'androidTest', which
-            represents _instrumented_ tests.
-            TODO: Consider changing unitTest to androidLocalTest and androidAndroidTest to
-            androidDeviceTest when https://github.com/JetBrains/kotlin/pull/2829 rolls in.
-            */
-            multiplatformExtension!!.sourceSets {
-                // Allow all experimental APIs, since MPP projects are themselves experimental
-                (this as DomainObjectCollection<KotlinSourceSet>).all {
-                    it.languageSettings.apply {
-                        useExperimentalAnnotation("kotlin.Experimental")
-                        useExperimentalAnnotation("kotlin.ExperimentalMultiplatform")
-                    }
-                }
+    2. The default (android) unit test source set is named 'androidTest', which conflicts / is
+    confusing as this shares the same name / expected directory as AGP's 'androidTest', which
+    represents _instrumented_ tests.
+    TODO: Consider changing unitTest to androidLocalTest and androidAndroidTest to
+    androidDeviceTest when https://github.com/JetBrains/kotlin/pull/2829 rolls in.
+    */
+    multiplatformExtension!!.sourceSets {
+        // Allow all experimental APIs, since MPP projects are themselves experimental
+        (this as DomainObjectCollection<KotlinSourceSet>).all {
+            it.languageSettings.apply {
+                useExperimentalAnnotation("kotlin.Experimental")
+                useExperimentalAnnotation("kotlin.ExperimentalMultiplatform")
             }
         }
     }
