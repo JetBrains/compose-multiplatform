@@ -27,7 +27,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin project(path: ":compose:compiler:compiler")
 }
 
 kotlin {
