@@ -45,10 +45,12 @@ open class AndroidXExtension(val project: Project) {
         val mavenVersion: Version? = mavenVersion
         if (mavenVersion != null) {
             if (groupVersion != null && !isGroupVersionOverrideAllowed()) {
-                throw GradleException("Cannot set mavenVersion (" + mavenVersion +
-                    ") for a project (" + project +
-                    ") whose mavenGroup already specifies forcedVersion (" + groupVersion +
-                ")")
+                throw GradleException(
+                    "Cannot set mavenVersion (" + mavenVersion +
+                        ") for a project (" + project +
+                        ") whose mavenGroup already specifies forcedVersion (" + groupVersion +
+                        ")"
+                )
             } else {
                 verifyVersionExtraFormat(mavenVersion)
                 version = mavenVersion
@@ -76,18 +78,23 @@ open class AndroidXExtension(val project: Project) {
                     for (potentialPrefix in ALLOWED_EXTRA_PREFIXES) {
                         if (extra.startsWith(potentialPrefix)) {
                             val secondExtraPart = extra.removePrefix(
-                                potentialPrefix)
+                                potentialPrefix
+                            )
                             if (secondExtraPart.toIntOrNull() == null) {
-                                throw IllegalArgumentException("Version $version is not" +
+                                throw IllegalArgumentException(
+                                    "Version $version is not" +
                                         " a properly formatted version, please ensure that " +
-                                        "$potentialPrefix is followed by a number only")
+                                        "$potentialPrefix is followed by a number only"
+                                )
                             }
                         }
                     }
                 } else {
-                    throw IllegalArgumentException("Version $version is not a proper " +
+                    throw IllegalArgumentException(
+                        "Version $version is not a proper " +
                             "version, version suffixes following major.minor.patch should " +
-                            "be one of ${ALLOWED_EXTRA_PREFIXES.joinToString(", ")}")
+                            "be one of ${ALLOWED_EXTRA_PREFIXES.joinToString(", ")}"
+                    )
                 }
             }
         }
@@ -98,7 +105,7 @@ open class AndroidXExtension(val project: Project) {
         // stable API surface, e.g. 1.0.0-alphaXX, to allow for rapid early-stage development.
         val version = mavenVersion
         return version != null && version.major == 1 && version.minor == 0 && version.patch == 0 &&
-                version.isAlpha()
+            version.isAlpha()
     }
 
     private var versionIsSet = false

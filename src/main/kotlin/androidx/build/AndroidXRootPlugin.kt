@@ -104,12 +104,15 @@ class AndroidXRootPlugin : Plugin<Project> {
             // In AndroidX build, this is always enforsed to the project while in Playground
             // builds, they are converted to the latest SNAPSHOT artifact if the project is
             // not included in that playground. see: AndroidXPlaygroundRootPlugin
-            project.extra.set(PROJECT_OR_ARTIFACT_EXT_NAME, KotlinClosure1<String, Project>(
-                function = {
-                    // this refers to the first parameter of the closure.
-                    project.project(this)
-                }
-            ))
+            project.extra.set(
+                PROJECT_OR_ARTIFACT_EXT_NAME,
+                KotlinClosure1<String, Project>(
+                    function = {
+                        // this refers to the first parameter of the closure.
+                        project.project(this)
+                    }
+                )
+            )
             if (project.path == ":docs-runner") {
                 project.tasks.all { task ->
                     if (DokkaPublicDocs.ARCHIVE_TASK_NAME == task.name ||

@@ -60,8 +60,10 @@ enum class LibraryType(
     PUBLISHED_LIBRARY(Publish.SNAPSHOT_AND_RELEASE, true, true, RunApiTasks.Yes()),
     SAMPLES(Publish.SNAPSHOT_AND_RELEASE, true, false, RunApiTasks.No("Sample Library")),
     LINT(Publish.NONE, false, false, RunApiTasks.No("Lint Library"), CompilationTarget.HOST),
-    ANNOTATION_PROCESSOR(Publish.SNAPSHOT_AND_RELEASE, false, true,
-        RunApiTasks.No("Annotation Processor"), CompilationTarget.HOST),
+    ANNOTATION_PROCESSOR(
+        Publish.SNAPSHOT_AND_RELEASE, false, true,
+        RunApiTasks.No("Annotation Processor"), CompilationTarget.HOST
+    ),
     UNSET()
 }
 

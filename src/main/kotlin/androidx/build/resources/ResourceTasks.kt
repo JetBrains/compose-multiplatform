@@ -88,7 +88,7 @@ object ResourceTasks {
         ) { task ->
             task.group = TASK_GROUP_API
             task.description = "Checks that the resource API generated from source matches the " +
-                    "checked in resource API file"
+                "checked in resource API file"
             task.apiLocation.set(generateResourceApi.flatMap { it.apiLocation })
             // Since apiLocation isn't a File, we have to manually set up the dependency.
             task.dependsOn(generateResourceApi)

@@ -38,20 +38,26 @@ object JavaApiTaskConfig : ApiTaskConfig()
 
 private fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
     if (!project.state.executed) {
-        throw GradleException("Project ${project.name} has not been evaluated. Extension" +
-                "properties may only be accessed after the project has been evaluated.")
+        throw GradleException(
+            "Project ${project.name} has not been evaluated. Extension" +
+                "properties may only be accessed after the project has been evaluated."
+        )
     }
 
     when (runApiTasks) {
         is RunApiTasks.No -> {
-            project.logger.info("Project ${project.name} has explicitly disabled API tasks with " +
-                    "reason: ${(runApiTasks as RunApiTasks.No).reason}")
+            project.logger.info(
+                "Project ${project.name} has explicitly disabled API tasks with " +
+                    "reason: ${(runApiTasks as RunApiTasks.No).reason}"
+            )
             return false
         }
         is RunApiTasks.Yes -> {
             (runApiTasks as RunApiTasks.Yes).reason?.let { reason ->
-                project.logger.info("Project ${project.name} has explicitly enabled API tasks " +
-                        "with reason: $reason")
+                project.logger.info(
+                    "Project ${project.name} has explicitly enabled API tasks " +
+                        "with reason: $reason"
+                )
             }
             return true
         }
@@ -72,15 +78,19 @@ private fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
     // If the project has an "api" directory, either because they used to track APIs or they
     // added one manually to force tracking (as recommended below), continue tracking APIs.
     if (project.hasApiFileDirectory() && !publish.shouldRelease()) {
-        project.logger.error("Project ${project.name} is not published, but has an existing API " +
-                "directory. Forcing API tasks enabled. Please migrate to runApiTasks=Yes.")
+        project.logger.error(
+            "Project ${project.name} is not published, but has an existing API " +
+                "directory. Forcing API tasks enabled. Please migrate to runApiTasks=Yes."
+        )
         return true
     }
 
     if (!publish.shouldRelease()) {
-        project.logger.info("Project ${project.name} is not published, ignoring API tasks. " +
+        project.logger.info(
+            "Project ${project.name} is not published, ignoring API tasks. " +
                 "If you still want to track APIs, create an \"api\" directory in your project" +
-                " root and run the updateApi task.")
+                " root and run the updateApi task."
+        )
         return false
     }
 
@@ -104,7 +114,8 @@ private fun Project.shouldWriteVersionedApiFile(): Boolean {
     // versions that should only exist in dead-end release branches, ex. rc or stable.
     if (!project.version().isFinalApi() ||
         project.version().isRC() ||
-        project.version().isStable()) {
+        project.version().isStable()
+    ) {
         return false
     }
 

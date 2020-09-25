@@ -31,22 +31,28 @@ private fun Project.getKtlintConfiguration(): Configuration {
     }
 }
 
-/**
- * Import ordering check does not match IJ default ordering.
- * New line check at the end of file is not useful for our project.
- * TODO: https://github.com/pinterest/ktlint/issues/737
- * Paren spacing doesn't understand @Composable () -> Unit, as it thinks the () is part of the
- * annotation and not the function type of the lambda, so disabling this for now.
- */
-private const val DisabledRules = "import-ordering,final-newline,paren-spacing"
+private val DisabledRules = listOf(
+    // does not match IJ default ordering
+    "import-ordering",
+    // not useful for our projects
+    "final-newline",
+    // Paren spacing doesn't understand @Composable () -> Unit, as it thinks the () is part of the
+    //  annotation and not the function type of the lambda, so disabling this for now.
+    // TODO: https://github.com/pinterest/ktlint/issues/737
+    "paren-spacing"
+).joinToString(",")
 
 fun Project.configureKtlint() {
     val outputDir = "${project.buildDir}/reports/ktlint/"
     val inputDir = "src"
     val includeFiles = "**/*.kt"
     val excludeFiles = "**/test-data/**/*.kt"
-    val inputFiles = project.fileTree(mutableMapOf("dir" to inputDir, "include" to includeFiles,
-        "exclude" to excludeFiles))
+    val inputFiles = project.fileTree(
+        mutableMapOf(
+            "dir" to inputDir, "include" to includeFiles,
+            "exclude" to excludeFiles
+        )
+    )
     val outputFile = "${outputDir}ktlint-checkstyle-report.xml"
 
     val lintProvider = tasks.register("ktlint", JavaExec::class.java) { task ->
@@ -98,14 +104,15 @@ open class KtlintCheckFileTask : JavaExec() {
     @set:Option(
         option = "file",
         description = "File to check. This option can be used multiple times: --file file1.kt " +
-                "--file file2.kt")
+            "--file file2.kt"
+    )
     var files: List<String> = emptyList()
 
     @get:Input
     @set:Option(
         option = "format",
         description = "Use --format to auto-correct style violations (if some errors cannot be " +
-                "fixed automatically they will be printed to stderr)"
+            "fixed automatically they will be printed to stderr)"
     )
     var format = false
 }
@@ -122,7 +129,8 @@ fun Project.configureKtlintCheckFile() {
                 throw StopExecutionException()
             }
             val kotlinFiles = task.files.filter { file ->
-                file.endsWith(".kt") || file.endsWith(".ktx") }
+                file.endsWith(".kt") || file.endsWith(".ktx")
+            }
             if (kotlinFiles.isNullOrEmpty()) {
                 throw StopExecutionException()
             }

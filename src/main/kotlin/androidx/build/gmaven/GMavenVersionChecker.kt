@@ -97,8 +97,10 @@ class GMavenVersionChecker(private val logger: Logger) {
                 logger.info("could not find version data for $group, seems like a new file")
                 return null
             } catch (ioException: IOException) {
-                logger.warn("failed to fetch the maven info, retrying in 2 seconds. " +
-                        "Run $run of $retryCount")
+                logger.warn(
+                    "failed to fetch the maven info, retrying in 2 seconds. " +
+                        "Run $run of $retryCount"
+                )
                 Thread.sleep(RETRY_DELAY)
             }
         }
@@ -114,7 +116,7 @@ class GMavenVersionChecker(private val logger: Logger) {
          * @return The URL of the XML file
          */
         private fun buildGroupUrl(group: String) =
-                "$BASE${group.replace(".","/")}/$GROUP_FILE"
+            "$BASE${group.replace(".","/")}/$GROUP_FILE"
     }
 }
 
