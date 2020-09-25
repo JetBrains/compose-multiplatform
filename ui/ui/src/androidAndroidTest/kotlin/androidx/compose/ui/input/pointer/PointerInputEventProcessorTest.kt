@@ -22,6 +22,8 @@ import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
@@ -2970,7 +2972,10 @@ private fun mockOwner(
 ): Owner = MockOwner(position, targetRoot)
 
 @ExperimentalLayoutNodeApi
-@OptIn(InternalCoreApi::class)
+@OptIn(
+    ExperimentalFocus::class,
+    InternalCoreApi::class
+)
 private class MockOwner(
     private val position: IntOffset,
     private val targetRoot: LayoutNode
@@ -3002,6 +3007,8 @@ private class MockOwner(
     override val semanticsOwner: SemanticsOwner
         get() = TODO("Not yet implemented")
     override val textInputService: TextInputService
+        get() = TODO("Not yet implemented")
+    override val focusManager: FocusManager
         get() = TODO("Not yet implemented")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")

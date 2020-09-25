@@ -50,6 +50,7 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
@@ -139,7 +140,9 @@ internal class AndroidComposeView constructor(
         properties = {}
     )
 
-    private val focusManager: FocusManager = FocusManager()
+    private val _focusManager: FocusManagerImpl = FocusManagerImpl()
+    override val focusManager: FocusManager
+        get() = _focusManager
 
     private val keyInputModifier = KeyInputModifier(null, null)
 
@@ -150,7 +153,7 @@ internal class AndroidComposeView constructor(
         it.modifier = Modifier
             .drawLayer()
             .then(semanticsModifier)
-            .then(focusManager.modifier)
+            .then(_focusManager.modifier)
             .then(keyInputModifier)
     }
 
@@ -187,7 +190,7 @@ internal class AndroidComposeView constructor(
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         Log.d(FOCUS_TAG, "Owner FocusChanged($gainFocus)")
-        with(focusManager) {
+        with(_focusManager) {
             if (gainFocus) takeFocus() else releaseFocus()
         }
     }

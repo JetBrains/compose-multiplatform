@@ -48,7 +48,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
     }
 
     private val focusModifier = FocusModifier(Inactive)
-    private val focusManager = FocusManager(focusModifier)
+    private val focusManager = FocusManagerImpl(focusModifier)
 
     @Before
     fun setup() {
