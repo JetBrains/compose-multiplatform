@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastFirstOrNull
@@ -105,7 +105,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
         .pointerInteropFilter(this)
         .drawBehind {
             drawIntoCanvas { canvas -> draw(canvas.nativeCanvas) }
-        }.onPositioned {
+        }.onGloballyPositioned {
             // The global position of this LayoutNode can change with it being replaced. For these
             // cases, we need to inform the View.
             layoutAccordingTo(layoutNode)

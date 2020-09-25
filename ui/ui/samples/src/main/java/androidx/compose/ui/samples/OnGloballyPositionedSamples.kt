@@ -26,14 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
-fun OnPositionedSample() {
+fun onGloballyPositionedSample() {
     Column(
-        Modifier.onPositioned { coordinates ->
+        Modifier.onGloballyPositioned { coordinates ->
             // This will be the size of the Column.
             coordinates.size
             // The position of the Column relative to the application window.

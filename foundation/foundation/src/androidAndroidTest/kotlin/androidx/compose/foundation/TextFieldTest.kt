@@ -40,7 +40,7 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -344,7 +344,7 @@ class TextFieldTest {
                 BaseTextField(
                     value = TextFieldValue(),
                     onValueChange = {},
-                    modifier = Modifier.onPositioned {
+                    modifier = Modifier.onGloballyPositioned {
                         size = it.size.width
                     }
                 )
@@ -367,7 +367,7 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier
                         .preferredWidth(textFieldWidth)
-                        .onPositioned {
+                        .onGloballyPositioned {
                             size = it.size.width
                         }
                 )
@@ -392,7 +392,7 @@ class TextFieldTest {
                         onValueChange = {},
                         modifier = Modifier
                             .weight(1f)
-                            .onPositioned {
+                            .onGloballyPositioned {
                                 size = it.size.width
                             }
                     )

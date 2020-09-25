@@ -70,7 +70,7 @@ private class DeepHierarchyOnPositionedTestCase :
     private fun StaticChildren(count: Int) {
         if (count > 0) {
             val modifier = if (count == 1) {
-                Modifier.onPositioned { it.size }
+                Modifier.onGloballyPositioned { it.size }
             } else {
                 Modifier
             }

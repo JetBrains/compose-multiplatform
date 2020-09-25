@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.selection.SimpleContainer
@@ -116,7 +116,7 @@ class PopupTest {
                                     SimpleContainer(
                                         width = popupWidthDp,
                                         height = popupHeightDp,
-                                        modifier = Modifier.onPositioned {
+                                        modifier = Modifier.onGloballyPositioned {
                                             measureLatch.countDown()
                                         },
                                         children = emptyContent()
@@ -231,9 +231,10 @@ class PopupTest {
                         // This is called after the OnChildPosition method in Popup() which
                         // updates the popup to its final position
                         Box(
-                            modifier = Modifier.width(200.dp).height(200.dp).onPositioned {
-                                measureLatch.countDown()
-                            }
+                            modifier = Modifier.width(200.dp).height(200.dp)
+                                .onGloballyPositioned {
+                                    measureLatch.countDown()
+                                }
                         ) {}
                     }
                 }

@@ -22,7 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
@@ -75,14 +75,14 @@ class TextLayoutTest {
         show {
             TestingText(
                 "aa",
-                modifier = Modifier.onPositioned { coordinates ->
+                modifier = Modifier.onGloballyPositioned { coordinates ->
                     textSize.value = coordinates.size
                     layoutLatch.countDown()
                 }
             )
             TestingText(
                 "aaaa",
-                modifier = Modifier.onPositioned { coordinates ->
+                modifier = Modifier.onGloballyPositioned { coordinates ->
                     doubleTextSize.value = coordinates.size
                     layoutLatch.countDown()
                 }
@@ -105,14 +105,14 @@ class TextLayoutTest {
         show {
             TestingText(
                 "aa ",
-                modifier = Modifier.onPositioned { coordinates ->
+                modifier = Modifier.onGloballyPositioned { coordinates ->
                     textSize.value = coordinates.size
                     layoutLatch.countDown()
                 }
             )
             TestingText(
                 "aa aa ",
-                modifier = Modifier.onPositioned { coordinates ->
+                modifier = Modifier.onGloballyPositioned { coordinates ->
                     doubleTextSize.value = coordinates.size
                     layoutLatch.countDown()
                 }

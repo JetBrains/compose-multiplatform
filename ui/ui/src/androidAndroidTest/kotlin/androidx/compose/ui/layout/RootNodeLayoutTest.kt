@@ -23,7 +23,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
@@ -83,7 +83,7 @@ class RootNodeLayoutTest {
             activity.setContent {
                 Layout(
                     {},
-                    Modifier.onPositioned {
+                    Modifier.onGloballyPositioned {
                         coordinates = it
                         latch.countDown()
                     }
@@ -118,7 +118,7 @@ class RootNodeLayoutTest {
             child.setContent(Recomposer.current()) {
                 Layout(
                     {},
-                    Modifier.onPositioned {
+                    Modifier.onGloballyPositioned {
                         latch.countDown()
                     }
                 ) { _, _ ->
@@ -149,7 +149,7 @@ class RootNodeLayoutTest {
             child.setContent(Recomposer.current()) {
                 Layout(
                     {},
-                    Modifier.fillMaxSize().onPositioned {
+                    Modifier.fillMaxSize().onGloballyPositioned {
                         latch.countDown()
                     }
                 ) { _, _ ->

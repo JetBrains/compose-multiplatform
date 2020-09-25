@@ -36,7 +36,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntSize
@@ -94,7 +94,7 @@ class AndroidPointerInputTest {
                 container.setContent(Recomposer.current()) {
                     FillLayout(
                         Modifier
-                            .onPositioned { latch.countDown() }
+                            .onGloballyPositioned { latch.countDown() }
                     )
                 }
             }
@@ -131,7 +131,7 @@ class AndroidPointerInputTest {
                     FillLayout(
                         Modifier
                             .consumeMovementGestureFilter()
-                            .onPositioned { latch.countDown() }
+                            .onGloballyPositioned { latch.countDown() }
                     )
                 }
             }
@@ -191,7 +191,7 @@ class AndroidPointerInputTest {
                         .consumeDownGestureFilter {
                             consumedDownPosition = it
                         }
-                        .onPositioned {
+                        .onGloballyPositioned {
                             latch.countDown()
                         }
                 ) { _, _ ->
@@ -254,7 +254,7 @@ class AndroidPointerInputTest {
                                     {},
                                     Modifier
                                         .logEventsGestureFilter(log)
-                                        .onPositioned {
+                                        .onGloballyPositioned {
                                             latch.countDown()
                                         }
                                 ) { _, _ ->
@@ -311,7 +311,7 @@ class AndroidPointerInputTest {
                     FillLayout(
                         Modifier
                             .consumeMovementGestureFilter(consumeMovement)
-                            .onPositioned { latch.countDown() }
+                            .onGloballyPositioned { latch.countDown() }
                     )
                 }
             }

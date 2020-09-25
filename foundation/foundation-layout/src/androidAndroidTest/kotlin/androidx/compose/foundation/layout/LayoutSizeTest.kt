@@ -24,7 +24,7 @@ import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.InspectableParameter
 import androidx.compose.ui.platform.ParameterElement
 import androidx.compose.ui.unit.Constraints
@@ -269,7 +269,7 @@ class LayoutSizeTest : LayoutTest() {
                     Container(
                         Modifier.preferredWidth(sizeDp * 2)
                             .preferredHeight(sizeDp * 3)
-                            .onPositioned { coordinates: LayoutCoordinates ->
+                            .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 constrainedBoxSize.value = coordinates.size
                                 positionedLatch.countDown()
                             }

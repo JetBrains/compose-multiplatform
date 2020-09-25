@@ -28,7 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -74,7 +74,7 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
-                Box(Modifier.onPositioned {
+                Box(Modifier.onGloballyPositioned {
                     offset = it.localToRoot(Offset.Zero)
                 }.size(100.dp, 100.dp)) {
                     onDispose {
@@ -176,7 +176,7 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
-                Box(Modifier.onPositioned {
+                Box(Modifier.onGloballyPositioned {
                     offset = it.localToRoot(Offset.Zero)
                 }.size(100.dp, 100.dp)) {
                     onDispose {

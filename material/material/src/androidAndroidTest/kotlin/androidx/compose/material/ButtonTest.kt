@@ -47,7 +47,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
@@ -527,10 +527,10 @@ class ButtonTest {
         var contentCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
             Box {
-                Button({}, Modifier.onPositioned { buttonCoordinates = it }) {
+                Button({}, Modifier.onGloballyPositioned { buttonCoordinates = it }) {
                     Box(
                         Modifier.preferredSize(2.dp)
-                            .onPositioned { contentCoordinates = it }
+                            .onGloballyPositioned { contentCoordinates = it }
                     )
                 }
             }
@@ -610,11 +610,11 @@ class ButtonTest {
         var buttonBounds = Rect(0f, 0f, 0f, 0f)
         rule.setMaterialContent {
             Column {
-                Spacer(Modifier.size(10.dp).weight(1f).onPositioned {
+                Spacer(Modifier.size(10.dp).weight(1f).onGloballyPositioned {
                     item1Bounds = it.boundsInRoot
                 })
 
-                Button(onClick = {}, modifier = Modifier.weight(1f).onPositioned {
+                Button(onClick = {}, modifier = Modifier.weight(1f).onGloballyPositioned {
                     buttonBounds = it.boundsInRoot
                 }) {
                     Text("Button")
@@ -634,13 +634,13 @@ class ButtonTest {
         var item1Bounds = Rect(0f, 0f, 0f, 0f)
         var item2Bounds = Rect(0f, 0f, 0f, 0f)
         rule.setMaterialContent {
-            Button(onClick = {}, modifier = Modifier.onPositioned {
+            Button(onClick = {}, modifier = Modifier.onGloballyPositioned {
                 buttonBounds = it.boundsInRoot
             }) {
-                Spacer(Modifier.size(10.dp).onPositioned {
+                Spacer(Modifier.size(10.dp).onGloballyPositioned {
                     item1Bounds = it.boundsInRoot
                 })
-                Spacer(Modifier.width(10.dp).height(5.dp).onPositioned {
+                Spacer(Modifier.width(10.dp).height(5.dp).onGloballyPositioned {
                     item2Bounds = it.boundsInRoot
                 })
             }
@@ -660,9 +660,9 @@ class ButtonTest {
         var childCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
             Box {
-                button(Modifier.onPositioned { parentCoordinates = it }) {
+                button(Modifier.onGloballyPositioned { parentCoordinates = it }) {
                     Text("Test button",
-                        Modifier.onPositioned { childCoordinates = it }
+                        Modifier.onGloballyPositioned { childCoordinates = it }
                     )
                 }
             }

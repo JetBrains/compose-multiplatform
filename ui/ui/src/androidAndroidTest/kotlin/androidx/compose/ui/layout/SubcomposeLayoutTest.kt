@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
@@ -446,7 +446,7 @@ class SubcomposeLayoutTest {
             val sizeIpx = with(density) { size.toIntPx() }
             Providers(DensityAmbient provides density) {
                 SubcomposeLayout<Unit>(
-                    Modifier.size(size).onPositioned {
+                    Modifier.size(size).onGloballyPositioned {
                         assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
                     }
                 ) { constraints ->

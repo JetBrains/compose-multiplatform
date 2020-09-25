@@ -28,7 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -46,7 +46,7 @@ import kotlin.math.roundToInt
 
 @SmallTest
 @RunWith(JUnit4::class)
-class OnPositionedTest : LayoutTest() {
+class OnGloballyPositionedTest : LayoutTest() {
 
     @Test
     fun simplePadding() = with(density) {
@@ -60,7 +60,7 @@ class OnPositionedTest : LayoutTest() {
             Container(
                 Modifier.fillMaxSize()
                     .padding(start = paddingLeftPx.toDp(), top = paddingTopPx.toDp())
-                    .onPositioned {
+                    .onGloballyPositioned {
                         realLeft = it.positionInParent.x
                         realTop = it.positionInParent.y
                         positionedLatch.countDown()
@@ -86,7 +86,7 @@ class OnPositionedTest : LayoutTest() {
         show {
             Container(
                 Modifier.padding(start = firstPaddingPx.toDp()).then(
-                    Modifier.onPositioned {
+                    Modifier.onGloballyPositioned {
                         gpCoordinates = it
                         positionedLatch.countDown()
                     }
@@ -96,7 +96,7 @@ class OnPositionedTest : LayoutTest() {
                     Container(
                         Modifier.fillMaxSize()
                             .padding(start = thirdPaddingPx.toDp())
-                            .onPositioned {
+                            .onGloballyPositioned {
                                 childCoordinates = it
                                 positionedLatch.countDown()
                             }
@@ -139,7 +139,7 @@ class OnPositionedTest : LayoutTest() {
 
                 frameLayout.setContent(Recomposer.current()) {
                     Container(
-                        Modifier.onPositioned {
+                        Modifier.onGloballyPositioned {
                             realGlobalPosition = it.localToGlobal(localPosition)
                             realLocalPosition = it.globalToLocal(
                                 framePadding +
@@ -166,7 +166,7 @@ class OnPositionedTest : LayoutTest() {
         val positionedLatch = CountDownLatch(1)
         show {
             val modifier = if (needCallback.value) {
-                Modifier.onPositioned { positionedLatch.countDown() }
+                Modifier.onGloballyPositioned { positionedLatch.countDown() }
             } else {
                 Modifier
             }
@@ -187,7 +187,7 @@ class OnPositionedTest : LayoutTest() {
         show {
             Box {
                 Container(
-                    Modifier.onPositioned {
+                    Modifier.onGloballyPositioned {
                         realLeft = it.positionInParent.x
                         positionedLatch.countDown()
                     }
@@ -222,7 +222,7 @@ class OnPositionedTest : LayoutTest() {
                     Container(width = 10.dp, height = 10.dp) {
                         Container(width = 10.dp, height = 10.dp) {
                             Container(
-                                Modifier.onPositioned {
+                                Modifier.onGloballyPositioned {
                                     realLeft = it.positionInRoot.x
                                     positionedLatch.countDown()
                                 },
@@ -252,7 +252,7 @@ class OnPositionedTest : LayoutTest() {
         val line = VerticalAlignmentLine(::min)
         val lineValue = 10
         show {
-            val onPositioned = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+            val onPositioned = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                 Assert.assertEquals(1, coordinates.providedAlignmentLines.size)
                 Assert.assertEquals(lineValue, coordinates[line])
                 latch.countDown()

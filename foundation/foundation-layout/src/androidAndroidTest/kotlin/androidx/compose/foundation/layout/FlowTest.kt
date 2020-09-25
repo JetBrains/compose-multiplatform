@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
@@ -53,7 +53,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -110,7 +110,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -170,7 +170,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -230,7 +230,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -293,7 +293,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -356,7 +356,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -419,7 +419,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -483,7 +483,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -546,7 +546,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -610,7 +610,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -678,7 +678,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -746,7 +746,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -816,7 +816,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -876,7 +876,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -941,7 +941,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1005,7 +1005,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1071,7 +1071,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxWidth = flowWidthDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1131,7 +1131,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1191,7 +1191,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1251,7 +1251,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1311,7 +1311,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1374,7 +1374,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1437,7 +1437,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1500,7 +1500,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1564,7 +1564,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1627,7 +1627,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1691,7 +1691,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1759,7 +1759,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1827,7 +1827,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1897,7 +1897,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -1957,7 +1957,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -2022,7 +2022,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -2083,7 +2083,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -2150,7 +2150,7 @@ class FlowTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     constraints = DpConstraints(maxHeight = flowHeightDp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         flowSize.value = coordinates.size
                         positionedLatch.countDown()
                     }

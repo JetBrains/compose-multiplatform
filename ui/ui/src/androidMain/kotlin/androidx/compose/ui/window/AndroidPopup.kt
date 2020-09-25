@@ -39,7 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.setContent
@@ -94,7 +94,7 @@ internal actual fun ActualPopup(
     // Get the parent's global position, size and layout direction
     Layout(
         children = emptyContent(),
-        modifier = Modifier.onPositioned { childCoordinates ->
+        modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
             // Get the global position of the parent
             val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
@@ -116,7 +116,7 @@ internal actual fun ActualPopup(
     onCommit {
         composition = popupLayout.setContent(recomposer, parentComposition) {
             SimpleStack(
-                Modifier.semantics { this.popup() }.onPositioned {
+                Modifier.semantics { this.popup() }.onGloballyPositioned {
                     // Get the size of the content
                     popupLayout.popupContentSize = it.size
 
