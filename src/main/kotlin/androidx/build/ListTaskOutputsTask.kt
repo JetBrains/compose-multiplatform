@@ -134,10 +134,12 @@ fun Project.findAllTasksByOutput(): Map<File, Task> {
             val existingTask = tasksByOutput[otherTaskOutput]
             if (existingTask != null) {
                 if (!taskNamesKnownToDuplicateOutputs.contains(otherTask.name) ||
-                    !taskNamesKnownToDuplicateOutputs.contains(existingTask.name)) {
-                    throw GradleException("Output file " + otherTaskOutput +
-                        " was declared as an output of multiple tasks: " + otherTask + " and " +
-                        existingTask)
+                    !taskNamesKnownToDuplicateOutputs.contains(existingTask.name)
+                ) {
+                    throw GradleException(
+                        "Output file " + otherTaskOutput + " was declared as an output of " +
+                            "multiple tasks: " + otherTask + " and " + existingTask
+                    )
                 }
             }
             tasksByOutput.put(otherTaskOutput, otherTask)

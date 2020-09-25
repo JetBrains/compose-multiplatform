@@ -49,9 +49,12 @@ class AndroidXUiPlugin : Plugin<Project> {
                     // TODO: figure out how to apply this to multiplatform modules
                     project.dependencies.add(
                         "lintChecks",
-                        project.dependencies.project(mapOf(
-                            "path" to ":compose:internal-lint-checks", "configuration" to "shadow"
-                        ))
+                        project.dependencies.project(
+                            mapOf(
+                                "path" to ":compose:internal-lint-checks",
+                                "configuration" to "shadow"
+                            )
+                        )
                     )
 
                     library.lintOptions.apply {
@@ -133,8 +136,10 @@ class AndroidXUiPlugin : Plugin<Project> {
             // Android Studio on versions >= 4.0canary8)
             libraryExtension.apply {
                 sourceSets.findByName("main")?.apply {
-                    java.srcDirs("src/commonMain/kotlin", "src/jvmMain/kotlin",
-                        "src/androidMain/kotlin")
+                    java.srcDirs(
+                        "src/commonMain/kotlin", "src/jvmMain/kotlin",
+                        "src/androidMain/kotlin"
+                    )
                     res.srcDirs("src/androidMain/res")
                 }
                 sourceSets.findByName("test")?.apply {
@@ -155,8 +160,10 @@ class AndroidXUiPlugin : Plugin<Project> {
          */
         private fun Project.configureForMultiplatform() {
             if (multiplatformExtension == null) {
-                throw IllegalStateException("Unable to configureForMultiplatform() when " +
-                        "multiplatformExtension is null (multiplatform plugin not enabled?)")
+                throw IllegalStateException(
+                    "Unable to configureForMultiplatform() when " +
+                        "multiplatformExtension is null (multiplatform plugin not enabled?)"
+                )
             }
 
             /*

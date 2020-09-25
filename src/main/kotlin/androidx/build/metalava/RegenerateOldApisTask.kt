@@ -93,7 +93,8 @@ abstract class RegenerateOldApisTask @Inject constructor(
             project.logger.lifecycle("Regenerating $mavenId")
             project.generateApi(
                 inputs, outputApiLocation, ApiLintMode.Skip, generateRestrictToLibraryGroupAPIs,
-                workerExecutor)
+                workerExecutor
+            )
         }
     }
 

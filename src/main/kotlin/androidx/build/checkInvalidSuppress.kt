@@ -105,7 +105,7 @@ open class CheckInvalidSuppressTask : DefaultTask() {
         if (report != "") {
             throw GradleException(
                 "Invalid, IDEA-specific warning suppression found. These cause " +
-                        "warnings during compilation." + "\n" + report
+                    "warnings during compilation." + "\n" + report
             )
         }
     }
@@ -114,7 +114,7 @@ open class CheckInvalidSuppressTask : DefaultTask() {
 fun Project.configureCheckInvalidSuppress() {
     tasks.register("checkInvalidSuppress", CheckInvalidSuppressTask::class.java) { task ->
         task.description = "Task used to find IDEA-specific warning suppressions that do not " +
-                "work for command line builds."
+            "work for command line builds."
         task.group = "Verification"
     }
 }

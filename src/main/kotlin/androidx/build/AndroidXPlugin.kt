@@ -171,8 +171,10 @@ class AndroidXPlugin : Plugin<Project> {
                 it.doLast {
                     // If the test itself didn't display output, then the report task should
                     // remind the user where to find its output
-                    project.logger.lifecycle("Html results of ${task.name} zipped into " +
-                        "$destinationDirectory/$archiveName")
+                    project.logger.lifecycle(
+                        "Html results of ${task.name} zipped into " +
+                            "$destinationDirectory/$archiveName"
+                    )
                 }
             }
             task.finalizedBy(zipHtmlTask)
@@ -279,9 +281,12 @@ class AndroidXPlugin : Plugin<Project> {
             // yes in AGP 4.1, that will allow just excludes -= "...".
             // This reflection enables us to be source compatible with both for now.
 
-            javaClass.getMethod("setExcludes", Set::class.java).invoke(this, excludes.also {
-                it.remove("/META-INF/*.kotlin_module")
-            })
+            javaClass.getMethod("setExcludes", Set::class.java).invoke(
+                this,
+                excludes.also {
+                    it.remove("/META-INF/*.kotlin_module")
+                }
+            )
 
             check(!excludes.contains("/META-INF/*.kotlin_module"))
         }
@@ -300,13 +305,16 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         val reportLibraryMetrics = project.tasks.register<ReportLibraryMetricsTask>(
-            REPORT_LIBRARY_METRICS_TASK, ReportLibraryMetricsTask::class.java)
+            REPORT_LIBRARY_METRICS_TASK, ReportLibraryMetricsTask::class.java
+        )
         project.addToBuildOnServer(reportLibraryMetrics)
         libraryExtension.defaultPublishVariant { libraryVariant ->
             reportLibraryMetrics.configure {
-                it.jarFiles.from(libraryVariant.packageLibraryProvider.map { zip ->
-                    zip.inputs.files
-                })
+                it.jarFiles.from(
+                    libraryVariant.packageLibraryProvider.map { zip ->
+                        zip.inputs.files
+                    }
+                )
             }
 
             verifyDependencyVersionsTask?.configure { task ->
@@ -420,17 +428,19 @@ class AndroidXPlugin : Plugin<Project> {
                     // Enforce the ban on declaring dependencies with version ranges.
                     if (version != null && Version.isDependencyRange(version)) {
                         throw IllegalArgumentException(
-                                "Dependency ${dep.target} declares its version as " +
-                                        "version range ${dep.target.version} however the use of " +
-                                        "version ranges is not allowed, please update the " +
-                                        "dependency to list a fixed version.")
+                            "Dependency ${dep.target} declares its version as " +
+                                "version range ${dep.target.version} however the use of " +
+                                "version ranges is not allowed, please update the " +
+                                "dependency to list a fixed version."
+                        )
                     }
                 }
             }
 
             if (androidXExtension.compilationTarget != CompilationTarget.DEVICE) {
                 throw IllegalStateException(
-                    "Android libraries must use a compilation target of DEVICE")
+                    "Android libraries must use a compilation target of DEVICE"
+                )
             }
         }
 
@@ -476,7 +486,7 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun CommonExtension<*, *, *, *, *, *, *, *>
-            .configureTestConfigGeneration(project: Project) {
+    .configureTestConfigGeneration(project: Project) {
         onVariants {
             val variant = this
             androidTestProperties {
@@ -486,8 +496,12 @@ class AndroidXPlugin : Plugin<Project> {
                 ) {
                     it.testFolder.set(artifacts.get(ArtifactType.APK))
                     it.testLoader.set(artifacts.getBuiltArtifactsLoader())
-                    it.outputXml.fileValue(File(project.getTestConfigDirectory(),
-                        "${project.asFilenamePrefix()}${variant.name}AndroidTest.xml"))
+                    it.outputXml.fileValue(
+                        File(
+                            project.getTestConfigDirectory(),
+                            "${project.asFilenamePrefix()}${variant.name}AndroidTest.xml"
+                        )
+                    )
                 }
                 project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                     .dependsOn(generateTestConfigurationTask)
@@ -496,7 +510,7 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun ApplicationExtension<*, *, *, *, *>
-            .addAppApkToTestConfigGeneration(project: Project) {
+    .addAppApkToTestConfigGeneration(project: Project) {
         onVariantProperties.withBuildType("debug") {
             project.tasks.withType(GenerateTestConfigurationTask::class.java) {
                 it.appFolder.set(artifacts.get(ArtifactType.APK))
@@ -515,8 +529,8 @@ class AndroidXPlugin : Plugin<Project> {
         // check kotlin-android androidTest source set
         project.extensions.findByType(KotlinAndroidProjectExtension::class.java)
             ?.sourceSets?.findByName("androidTest")?.let {
-            if (it.kotlin.files.isNotEmpty()) return true
-        }
+                if (it.kotlin.files.isNotEmpty()) return true
+            }
 
         // check kotlin-multiplatform androidAndroidTest source set
         project.multiplatformExtension?.apply {
@@ -540,12 +554,12 @@ class AndroidXPlugin : Plugin<Project> {
                 return
             }
 
-                project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK)
-                    .configure { task ->
-                        task as Zip
-                        task.from(packageTask.outputDirectory)
-                        task.dependsOn(packageTask)
-                    }
+            project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK)
+                .configure { task ->
+                    task as Zip
+                    task.from(packageTask.outputDirectory)
+                    task.dependsOn(packageTask)
+                }
 
             packageTask.doLast {
                 project.copy {
@@ -590,7 +604,8 @@ class AndroidXPlugin : Plugin<Project> {
                     if (isTestConfig ||
                         group == "com.google.guava" &&
                         name == "listenablefuture" &&
-                        version == "1.0") {
+                        version == "1.0"
+                    ) {
                         version { versionConstraint ->
                             versionConstraint.strictly("")
                         }
@@ -652,22 +667,22 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.createVerifyDependencyVersionsTask():
-            TaskProvider<VerifyDependencyVersionsTask>? {
-        /**
-         * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
-         * hypothetical build which is only intended to check for forward compatibility.
-         */
-        if (hasProperty(USE_MAX_DEP_VERSIONS)) {
-            return null
-        }
+        TaskProvider<VerifyDependencyVersionsTask>? {
+            /**
+             * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
+             * hypothetical build which is only intended to check for forward compatibility.
+             */
+            if (hasProperty(USE_MAX_DEP_VERSIONS)) {
+                return null
+            }
 
-        val taskProvider = tasks.register(
-            "verifyDependencyVersions",
-            VerifyDependencyVersionsTask::class.java
-        )
-        addToBuildOnServer(taskProvider)
-        return taskProvider
-    }
+            val taskProvider = tasks.register(
+                "verifyDependencyVersions",
+                VerifyDependencyVersionsTask::class.java
+            )
+            addToBuildOnServer(taskProvider)
+            return taskProvider
+        }
 
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
@@ -678,8 +693,12 @@ class AndroidXPlugin : Plugin<Project> {
                     CREATE_LIBRARY_BUILD_INFO_FILES_TASK,
                     CreateLibraryBuildInfoFileTask::class.java
                 ) {
-                    it.outputFile.set(File(project.getBuildInfoDirectory(),
-                        "${group}_${name}_build_info.txt"))
+                    it.outputFile.set(
+                        File(
+                            project.getBuildInfoDirectory(),
+                            "${group}_${name}_build_info.txt"
+                        )
+                    )
                 }
                 rootProject.tasks.named(CREATE_LIBRARY_BUILD_INFO_FILES_TASK).configure {
                     it.dependsOn(task)
@@ -694,7 +713,7 @@ class AndroidXPlugin : Plugin<Project> {
     ) {
         rootProject.tasks.named(CREATE_AGGREGATE_BUILD_INFO_FILES_TASK).configure {
             val aggregateLibraryBuildInfoFileTask: CreateAggregateLibraryBuildInfoFileTask = it
-                    as CreateAggregateLibraryBuildInfoFileTask
+                as CreateAggregateLibraryBuildInfoFileTask
             aggregateLibraryBuildInfoFileTask.dependsOn(task)
             aggregateLibraryBuildInfoFileTask.libraryBuildInfoFiles.add(
                 task.flatMap { task -> task.outputFile }
@@ -717,8 +736,10 @@ class AndroidXPlugin : Plugin<Project> {
                 it.html.isEnabled = false
                 it.csv.isEnabled = false
 
-                it.xml.destination = File(getHostTestCoverageDirectory(),
-                    "${project.asFilenamePrefix()}.xml")
+                it.xml.destination = File(
+                    getHostTestCoverageDirectory(),
+                    "${project.asFilenamePrefix()}.xml"
+                )
             }
         }
     }

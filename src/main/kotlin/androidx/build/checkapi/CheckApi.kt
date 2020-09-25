@@ -61,9 +61,11 @@ fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
 fun getApiFileVersion(version: Version): Version {
     if (!isValidArtifactVersion(version)) {
         val suggestedVersion = Version("${version.major}.${version.minor}.${version.patch}-rc01")
-        throw GradleException("Illegal version $version . It is not allowed to have a nonzero " +
+        throw GradleException(
+            "Illegal version $version . It is not allowed to have a nonzero " +
                 "patch number and be alpha or beta at the same time.\n" +
-                "Did you mean $suggestedVersion?")
+                "Did you mean $suggestedVersion?"
+        )
     }
     var extra = ""
     if (version.patch == 0 && version.extra != null) {
@@ -97,15 +99,16 @@ fun getRequiredCompatibilityApiFileFromDir(
     apiDir.listFiles()
         ?.filter { file ->
             (apiType == ApiType.RESOURCEAPI && isResourceApiFile(file)) ||
-                    (apiType == ApiType.CLASSAPI && !isResourceApiFile(file))
+                (apiType == ApiType.CLASSAPI && !isResourceApiFile(file))
         }
         ?.forEach { file ->
             val parsed = Version.parseOrNull(file)
             parsed?.let { otherVersion ->
                 if ((lastFile == null || lastVersion!! < otherVersion) &&
-                        (otherVersion < version) &&
-                        (otherVersion.isFinalApi()) &&
-                        (otherVersion.major == version.major)) {
+                    (otherVersion < version) &&
+                    (otherVersion.isFinalApi()) &&
+                    (otherVersion.major == version.major)
+                ) {
                     lastFile = file
                     lastVersion = otherVersion
                 }

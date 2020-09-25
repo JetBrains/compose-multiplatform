@@ -38,37 +38,39 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
         val checkerConfig = project.configurations.getByName(CONFIGURATION_NAME)
 
         project
-                .configurations
-                .flatMap {
-                    it.allDependencies
-                            .filterIsInstance(ExternalDependency::class.java)
-                            .filterNot {
-                                it.group?.startsWith("com.android") == true
-                            }
-                            .filterNot {
-                                it.group?.startsWith("android.arch") == true
-                            }
-                            .filterNot {
-                                it.group?.startsWith("androidx") == true
-                            }
-                }
-                .forEach {
-                    checkerConfig.dependencies.add(it)
-                }
+            .configurations
+            .flatMap {
+                it.allDependencies
+                    .filterIsInstance(ExternalDependency::class.java)
+                    .filterNot {
+                        it.group?.startsWith("com.android") == true
+                    }
+                    .filterNot {
+                        it.group?.startsWith("android.arch") == true
+                    }
+                    .filterNot {
+                        it.group?.startsWith("androidx") == true
+                    }
+            }
+            .forEach {
+                checkerConfig.dependencies.add(it)
+            }
         val missingLicenses = checkerConfig.resolve().filter {
             findLicenseFile(it.canonicalFile, prebuiltsRoot) == null
         }
         if (missingLicenses.isNotEmpty()) {
             val suggestions = missingLicenses.joinToString("\n") {
                 "$it does not have a license file. It should probably live in " +
-                        "${it.parentFile.parentFile}"
+                    "${it.parentFile.parentFile}"
             }
-            throw GradleException("""
+            throw GradleException(
+                """
                 Any external library referenced in the support library
                 build must have a LICENSE or NOTICE file next to it in the prebuilts.
                 The following libraries are missing it:
                 $suggestions
-                """.trimIndent())
+                """.trimIndent()
+            )
         }
     }
 
@@ -92,7 +94,7 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
 
             val found = folder.listFiles().firstOrNull {
                 it.name.startsWith("NOTICE", ignoreCase = true) ||
-                        it.name.startsWith("LICENSE", ignoreCase = true)
+                    it.name.startsWith("LICENSE", ignoreCase = true)
             }
             return found ?: recurse(folder.parentFile)
         }
@@ -106,8 +108,10 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
 }
 
 fun Project.configureExternalDependencyLicenseCheck() {
-    tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME,
-            CheckExternalDependencyLicensesTask::class.java)
+    tasks.register(
+        CheckExternalDependencyLicensesTask.TASK_NAME,
+        CheckExternalDependencyLicensesTask::class.java
+    )
     configurations.create(CheckExternalDependencyLicensesTask.CONFIGURATION_NAME) {
         it.attributes {
             it.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))

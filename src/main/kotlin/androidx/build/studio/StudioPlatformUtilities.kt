@@ -100,7 +100,7 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
         get() {
             val file = studioInstallationDir.walk().maxDepth(1).find { file ->
                 file.nameWithoutExtension.startsWith("Android Studio") &&
-                        file.extension == "app"
+                    file.extension == "app"
             }
             return requireNotNull(file) { "Android Studio*.app not found!" }
         }

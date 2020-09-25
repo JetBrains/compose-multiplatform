@@ -92,7 +92,8 @@ private fun Project.configureComponent(
                 metadata.writeText(
                     text.replace(
                         "\"buildId\": .*".toRegex(),
-                        "\"buildId:\": \"${getBuildId()}\"")
+                        "\"buildId:\": \"${getBuildId()}\""
+                    )
                 )
             }
         }
@@ -129,12 +130,14 @@ private fun Project.removePreviouslyUploadedArchives(group: String) {
 private fun Project.addInformativeMetadata(pom: MavenPom, extension: AndroidXExtension) {
     pom.name.set(provider { extension.name })
     pom.description.set(provider { extension.description })
-    pom.url.set(provider {
-        "https://developer.android.com/jetpack/androidx/releases/" +
+    pom.url.set(
+        provider {
+            "https://developer.android.com/jetpack/androidx/releases/" +
                 extension.mavenGroup!!.group.removePrefix("androidx.")
                     .replace(".", "-") +
                 "#" + extension.project.version()
-    })
+        }
+    )
     pom.inceptionYear.set(provider { extension.inceptionYear })
     pom.licenses { licenses ->
         licenses.license { license ->
@@ -181,19 +184,25 @@ private fun Project.assignAarTypes(xml: XmlProvider) {
     collectDependenciesForConfiguration(androidxDependencies, "implementation")
     collectDependenciesForConfiguration(androidxDependencies, "compile")
 
-    val dependencies = xml.asNode().children().find { it is Node && it.name().toString()
-        .endsWith("dependencies") } as Node?
+    val dependencies = xml.asNode().children().find {
+        it is Node && it.name().toString().endsWith("dependencies")
+    } as Node?
 
     dependencies?.children()?.forEach { dep ->
         if (dep !is Node) {
             return@forEach
         }
-        val groupId = dep.children().first { it is Node && it.name().toString()
-            .endsWith("groupId") } as Node
-        val artifactId = dep.children().first { it is Node && it.name().toString()
-            .endsWith("artifactId") } as Node
-        if (isAndroidProject(groupId.children()[0] as String,
-                artifactId.children()[0] as String, androidxDependencies)) {
+        val groupId = dep.children().first {
+            it is Node && it.name().toString().endsWith("groupId")
+        } as Node
+        val artifactId = dep.children().first {
+            it is Node && it.name().toString().endsWith("artifactId")
+        } as Node
+        if (isAndroidProject(
+                groupId.children()[0] as String,
+                artifactId.children()[0] as String, androidxDependencies
+            )
+        ) {
             dep.appendNode("type", "aar")
         }
     }
@@ -216,21 +225,26 @@ private fun assignSingleVersionDependenciesInGroupForPom(
         return
     }
 
-    val dependencies = xml.asNode().children().find { it is Node && it.name().toString()
-        .endsWith("dependencies") } as Node?
+    val dependencies = xml.asNode().children().find {
+        it is Node && it.name().toString().endsWith("dependencies")
+    } as Node?
     dependencies?.children()?.forEach { dep ->
         if (dep !is Node) {
             return@forEach
         }
-        val groupId = dep.children().first { it is Node && it.name().toString()
-            .endsWith("groupId") } as Node
+        val groupId = dep.children().first {
+            it is Node && it.name().toString().endsWith("groupId")
+        } as Node
         if (groupId.children()[0].toString() == group.group) {
-            val versionNode = dep.children().first { it is Node && it.name().toString()
-                .endsWith("version") } as Node
+            val versionNode = dep.children().first {
+                it is Node && it.name().toString().endsWith("version")
+            } as Node
             val declaredVersion = versionNode.children()[0].toString()
             if (isVersionRange(declaredVersion)) {
-                throw GradleException("Unsupported version '$declaredVersion': " +
-                        "already is a version range")
+                throw GradleException(
+                    "Unsupported version '$declaredVersion': " +
+                        "already is a version range"
+                )
             }
             val pinnedVersion = "[$declaredVersion]"
             versionNode.setValue(pinnedVersion)
@@ -280,4 +294,4 @@ private fun Project.isAndroidProject(
 private fun Project.appliesJavaGradlePluginPlugin() = pluginManager.hasPlugin("java-gradle-plugin")
 
 private const val ANDROID_GIT_URL =
-        "scm:git:https://android.googlesource.com/platform/frameworks/support"
+    "scm:git:https://android.googlesource.com/platform/frameworks/support"

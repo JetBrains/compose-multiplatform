@@ -55,7 +55,8 @@ object Jacoco {
     fun registerClassFilesTask(project: Project, extension: TestedExtension) {
         extension.testVariants.all { v ->
             if (v.buildType.isTestCoverageEnabled &&
-                v.sourceSets.any { it.javaDirectories.isNotEmpty() }) {
+                v.sourceSets.any { it.javaDirectories.isNotEmpty() }
+            ) {
                 val jarifyTask = project.tasks.register(
                     "package${v.name.capitalize()}ClassFilesForCoverageReport",
                     Jar::class.java
@@ -97,15 +98,19 @@ object Jacoco {
         // "./out/androidx/ads-identifier-common/build/outputs/code_coverage/debugAndroidTest/connected/coverage.ec"
         // ./out/androidx/lifecycle/lifecycle-runtime-ktx-lint/build/jacoco/test.exec
         Preconditions.checkArgument(project.isRoot, "Must be root project")
-        var ecFilesTree: ConfigurableFileTree = project.fileTree(mapOf("dir" to project
-            .getRootOutDirectory(), "include" to listOf("**/jacoco/*.exec", "**/coverage.ec")))
+        var ecFilesTree: ConfigurableFileTree = project.fileTree(
+            mapOf(
+                "dir" to project.getRootOutDirectory(),
+                "include" to listOf("**/jacoco/*.exec", "**/coverage.ec")
+            )
+        )
         val zipTask = project.tasks.register(EC_FILE_ZIP_TASK_NAME, Zip::class.java) {
             it.from(ecFilesTree)
             it.archiveFileName.set("coverage_ec_files.zip")
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.includeEmptyDirs = false
             it.description = "Task for creating a zip file from all of the .ec and .exec files " +
-                    "created as part of host-side test coverage analysis with jacoco."
+                "created as part of host-side test coverage analysis with jacoco."
         }
         return zipTask
     }

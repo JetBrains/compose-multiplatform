@@ -65,18 +65,22 @@ object Dokka {
             throw Exception("Illegal project passed to createDocsTask: " + project.name)
         }
 
-        val kotlinDocsTask = createDokkaTask(project,
+        val kotlinDocsTask = createDokkaTask(
+            project,
             docsType,
             hiddenPackages,
             "Kotlin",
             "dac",
-            "/reference/kotlin")
-        val javaDocsTask = createDokkaTask(project,
+            "/reference/kotlin"
+        )
+        val javaDocsTask = createDokkaTask(
+            project,
             docsType,
             hiddenPackages,
             "Java",
             "dac-as-java",
-            "/reference/")
+            "/reference/"
+        )
 
         project.tasks.register(archiveTaskName, Zip::class.java) { zipTask ->
 
@@ -141,7 +145,7 @@ object Dokka {
             task.moduleName = project.name
             task.outputDirectory = File(project.buildDir, docTaskName).absolutePath
             task.description = "Generates $docsType $language documentation in the style of " +
-                    "d.android.com.  Places docs in ${task.outputDirectory}"
+                "d.android.com.  Places docs in ${task.outputDirectory}"
             task.outputFormat = outputFormat
             task.outlineRoot = "androidx/"
             task.dacRoot = dacRoot

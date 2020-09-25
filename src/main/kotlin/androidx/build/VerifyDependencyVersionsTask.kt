@@ -54,28 +54,40 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         // version is unspecified then it won't matter, and if the dependency's version is
         // unspecified then any non alpha project won't be able to depend on it to ensure safety.
         val projectVersionExtra = if (project.version ==
-            AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION) "-alpha01"
-            else Version(project.version.toString()).extra ?: ""
+            AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION
+        ) {
+            "-alpha01"
+        } else {
+            Version(project.version.toString()).extra ?: ""
+        }
         val dependencyVersionExtra = if (dependency.version!! ==
-            AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION) "-alpha01" else
+            AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION
+        ) {
+            "-alpha01"
+        } else {
             Version(dependency.version!!).extra ?: ""
+        }
         val projectReleasePhase = releasePhase(projectVersionExtra)
         if (projectReleasePhase < 0) {
-            throw GradleException("Project ${project.name} has unexpected release phase " +
-                    projectVersionExtra
+            throw GradleException(
+                "Project ${project.name} has unexpected release phase " + projectVersionExtra
             )
         }
         val dependencyReleasePhase = releasePhase(dependencyVersionExtra)
         if (dependencyReleasePhase < 0) {
-            throw GradleException("Dependency ${dependency.group}:${dependency.name}" +
-                    ":${dependency.version} has unexpected release phase $dependencyVersionExtra")
+            throw GradleException(
+                "Dependency ${dependency.group}:${dependency.name}" +
+                    ":${dependency.version} has unexpected release phase $dependencyVersionExtra"
+            )
         }
         if (dependencyReleasePhase < projectReleasePhase) {
-            throw GradleException("Project ${project.name} with version ${project.version} may " +
+            throw GradleException(
+                "Project ${project.name} with version ${project.version} may " +
                     "not take a dependency on less-stable artifact ${dependency.group}:" +
                     "${dependency.name}:${dependency.version} for configuration " +
                     "${configuration.name}. Dependency versions must be at least as stable as " +
-                    "the project version.")
+                    "the project version."
+            )
         }
     }
 
@@ -87,7 +99,8 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         } else if (versionExtra.startsWith("-beta")) {
             2
         } else if (versionExtra.startsWith("-alpha") || versionExtra.startsWith("-qpreview") ||
-            versionExtra.startsWith("-dev")) {
+            versionExtra.startsWith("-dev")
+        ) {
             1
         } else {
             -1
