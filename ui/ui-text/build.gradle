@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-
-import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -27,123 +25,67 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
+    id("kotlin-multiplatform")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+kotlin {
+    android()
+    jvm("desktop")
 
-if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
-    dependencies {
-        /*
-         * When updating dependencies, make sure to make the an an analogous update in the
-         * corresponding block below
-         */
-        implementation(KOTLIN_STDLIB_COMMON)
+    sourceSets {
+        commonMain.dependencies {
+            implementation(KOTLIN_STDLIB_COMMON)
 
-        api project(":compose:ui:ui-graphics")
-        api project(":compose:ui:ui-unit")
-        api "androidx.annotation:annotation:1.1.0"
+            api project(":compose:ui:ui-graphics")
+            api project(":compose:ui:ui-unit")
 
-        implementation project(":compose:runtime:runtime")
-        implementation project(":compose:runtime:runtime-saved-instance-state")
-        implementation project(":compose:ui:ui-util")
-        implementation(KOTLIN_STDLIB)
-        implementation "androidx.collection:collection:1.1.0"
-        implementation "androidx.core:core:1.5.0-alpha01"
-        implementation project(":compose:ui:ui-text-android")
-
-        testImplementation project(":compose:ui:ui-test-font")
-        testImplementation(ANDROIDX_TEST_RULES)
-        testImplementation(ANDROIDX_TEST_RUNNER)
-        testImplementation(JUNIT)
-        testImplementation(MOCKITO_CORE)
-        testImplementation(TRUTH)
-        testImplementation(KOTLIN_REFLECT)
-        testImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
+            implementation project(":compose:runtime:runtime")
+            implementation project(":compose:runtime:runtime-saved-instance-state")
+            implementation project(":compose:ui:ui-util")
         }
 
-        androidTestImplementation project(":compose:ui:ui-test-font")
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ESPRESSO_CORE)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation project(":ui:ui-test")
-        androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
-        // DexMaker has it"s own MockMaker
-        androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy)
-        androidTestImplementation(TRUTH)
-        androidTestImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
+        jvmMain.dependencies {
+            implementation(KOTLIN_STDLIB)
         }
 
-    }
-}
+        desktopMain.dependencies {
+            implementation(SKIKO)
+        }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
-    kotlin {
-        android()
-        jvm("desktop")
+        desktopMain.dependsOn jvmMain
 
-        /*
-         * When updating dependencies, make sure to make the an an analogous update in the
-         * corresponding block below
-         */
-        sourceSets {
-            commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+        androidMain.dependencies {
+            api "androidx.annotation:annotation:1.1.0"
+            implementation "androidx.collection:collection:1.1.0"
+            implementation "androidx.core:core:1.5.0-alpha01"
+            implementation project(":compose:ui:ui-text-android")
+        }
 
-                api project(":compose:ui:ui-graphics")
-                api project(":compose:ui:ui-unit")
-
-                implementation project(":compose:runtime:runtime")
-                implementation project(":compose:runtime:runtime-saved-instance-state")
-                implementation project(":compose:ui:ui-util")
+        androidTest.dependencies {
+            implementation project(":compose:ui:ui-test-font")
+            implementation(ANDROIDX_TEST_RULES)
+            implementation(ANDROIDX_TEST_RUNNER)
+            implementation(JUNIT)
+            implementation(MOCKITO_CORE)
+            implementation(TRUTH)
+            implementation(KOTLIN_REFLECT)
+            implementation MOCKITO_KOTLIN, {
+                exclude group: 'org.mockito' // to keep control on the mockito version
             }
+        }
 
-            jvmMain.dependencies {
-                implementation(KOTLIN_STDLIB)
-            }
-
-            desktopMain.dependencies {
-                implementation(SKIKO)
-            }
-
-            desktopMain.dependsOn jvmMain
-
-            androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
-                implementation "androidx.collection:collection:1.1.0"
-                implementation "androidx.core:core:1.5.0-alpha01"
-                implementation project(":compose:ui:ui-text-android")
-            }
-
-            androidTest.dependencies {
-                implementation project(":compose:ui:ui-test-font")
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(MOCKITO_CORE)
-                implementation(TRUTH)
-                implementation(KOTLIN_REFLECT)
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
-            }
-
-            androidAndroidTest.dependencies {
-                implementation project(":compose:ui:ui-test-font")
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(ESPRESSO_CORE)
-                implementation(JUNIT)
-                implementation project(":ui:ui-test")
-                implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
-                // DexMaker has it"s own MockMaker
-                implementation(MOCKITO_CORE, libs.exclude_bytebuddy)
-                implementation(TRUTH)
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
+        androidAndroidTest.dependencies {
+            implementation project(":compose:ui:ui-test-font")
+            implementation(ANDROIDX_TEST_RULES)
+            implementation(ANDROIDX_TEST_RUNNER)
+            implementation(ESPRESSO_CORE)
+            implementation(JUNIT)
+            implementation project(":ui:ui-test")
+            implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
+            implementation(MOCKITO_CORE, libs.exclude_bytebuddy)
+            implementation(TRUTH)
+            implementation MOCKITO_KOTLIN, {
+                exclude group: 'org.mockito' // to keep control on the mockito version
             }
         }
     }
