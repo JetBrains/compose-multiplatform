@@ -1179,4 +1179,17 @@ class MeasureAndLayoutDelegateTest {
             }
         }
     }
+
+    @Test
+    fun hasRelayoutNodes() {
+        val root = root {
+            add(node())
+        }
+        val delegate = createDelegate(root)
+        assertThat(delegate.hasPendingMeasureOrLayout).isFalse()
+        delegate.requestRemeasure(root.first)
+        assertThat(delegate.hasPendingMeasureOrLayout).isTrue()
+        delegate.measureAndLayout()
+        assertThat(delegate.hasPendingMeasureOrLayout).isFalse()
+    }
 }

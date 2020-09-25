@@ -3024,6 +3024,8 @@ private class MockOwner(
     override fun onRequestRelayout(layoutNode: LayoutNode) {
     }
 
+    override val hasPendingMeasureOrLayout = false
+
     override fun onAttach(node: LayoutNode) {
     }
 
