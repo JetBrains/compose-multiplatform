@@ -17,7 +17,11 @@
 package androidx.compose.ui
 
 import android.os.Build
+import android.text.SpannableString
+import android.view.ViewGroup
+import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InnerPlaceable
@@ -25,8 +29,10 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.accessibilityValueRange
@@ -38,21 +44,32 @@ import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
+import androidx.compose.ui.semantics.verticalAccessibilityScrollState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.core.os.BuildCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.ui.test.createAndroidComposeRule
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.mockito.ArgumentMatcher
+import org.mockito.ArgumentMatchers
 
+@OptIn(ExperimentalLayoutNodeApi::class)
 @SmallTest
 @RunWith(JUnit4::class)
 class AndroidComposeViewAccessibilityDelegateCompatTest {
@@ -63,19 +80,31 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     )
 
     private lateinit var accessibilityDelegate: AndroidComposeViewAccessibilityDelegateCompat
+    private lateinit var container: ViewGroup
+    private lateinit var androidComposeView: AndroidComposeView
 
     @Before
     fun setup() {
+        // Use uiAutomation to enable accessibility manager.
+        InstrumentationRegistry.getInstrumentation().uiAutomation
         rule.activityRule.scenario.onActivity {
+            androidComposeView = AndroidComposeView(it, null, null, null)
+            container = spy(FrameLayout(it)) {
+                on {
+                    onRequestSendAccessibilityEvent(
+                        ArgumentMatchers.any(),
+                        ArgumentMatchers.any()
+                    )
+                } doReturn false
+            }
+            container.addView(androidComposeView)
             accessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(
-                AndroidComposeView(it, null, null, null)
+                androidComposeView
             )
         }
     }
 
-    @ExperimentalLayoutNodeApi
     @Test
-    @Ignore("Test broke while presubmit wasn't running tests, TODO: Fix!")
     fun testPopulateAccessibilityNodeInfoProperties() {
         var info = AccessibilityNodeInfoCompat.obtain()
         val clickActionLabel = "click"
@@ -164,7 +193,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         )
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.EditText", info.className)
-        assertEquals(text, info.text)
+        assertEquals(SpannableString(text), info.text)
         assertTrue(info.isFocusable)
         assertTrue(info.isFocused)
         assertTrue(info.isEditable)
@@ -214,6 +243,90 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 info.unwrap().availableExtraData
             )
         }
+    }
+
+    @Test
+    fun notSendScrollEvent_whenOnlyAccessibilityScrollStateMaxValueChanges() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
+            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 0f, false)
+        }
+        accessibilityDelegate.semanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, true) {
+            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 5f, false)
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, never()).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED
+                }
+            )
+        )
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendScrollEvent_whenAccessibilityScrollStateValueChanges() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
+            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 5f, false)
+        }
+        accessibilityDelegate.semanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        val newSemanticsNode = createSemanticsNodeWithProperties(2, false) {
+            this.verticalAccessibilityScrollState = AccessibilityScrollState(2f, 5f, false)
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                }
+            )
+        )
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED && it.scrollY == 2 &&
+                            it.maxScrollY == 5 &&
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                it.scrollDeltaY == 2
+                            } else {
+                                true
+                            }
+                }
+            )
+        )
+    }
+
+    private fun createSemanticsNodeWithProperties(
+        id: Int,
+        mergeAllDescendants: Boolean,
+        properties: (SemanticsPropertyReceiver.() -> Unit)
+    ): SemanticsNode {
+        val semanticsModifier = SemanticsModifierCore(id, mergeAllDescendants, properties)
+        return SemanticsNode(
+            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
+            true
+        )
     }
 
     private fun containsAction(
