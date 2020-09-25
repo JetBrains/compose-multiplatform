@@ -315,6 +315,14 @@ package androidx.compose.material {
     method public static void animateElevation-K5VTZl0(androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,?>, androidx.compose.foundation.Interaction? from = null, androidx.compose.foundation.Interaction? to = null, float target);
   }
 
+  public interface ElevationOverlay {
+    method @androidx.compose.runtime.Composable public long apply-_fH6D24(long color, float elevation);
+  }
+
+  public final class ElevationOverlayKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ElevationOverlay> getAmbientElevationOverlay();
+  }
+
   @androidx.compose.runtime.Immutable public interface Emphasis {
     method public long applyEmphasis-8_81llA(long color);
   }
