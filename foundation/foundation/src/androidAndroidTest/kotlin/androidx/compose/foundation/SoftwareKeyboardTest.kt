@@ -25,7 +25,8 @@ import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasInputMethodsSupport
 import androidx.ui.test.performClick
@@ -37,9 +38,8 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalFoundationApi::class)
 class SoftwareKeyboardTest {

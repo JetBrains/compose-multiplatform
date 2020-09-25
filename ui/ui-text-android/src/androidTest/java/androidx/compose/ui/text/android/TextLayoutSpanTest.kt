@@ -25,21 +25,21 @@ import androidx.compose.ui.text.android.style.BaselineShiftSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.font.test.R
 import androidx.core.content.res.ResourcesCompat
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.spy
 import org.mockito.stubbing.Answer
 
 @OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
-@SmallTest
+@MediumTest
 class TextLayoutSpanTest {
     lateinit var sampleTypeface: Typeface
     @Before

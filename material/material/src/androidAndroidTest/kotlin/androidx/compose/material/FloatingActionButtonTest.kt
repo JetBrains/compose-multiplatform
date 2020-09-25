@@ -17,8 +17,8 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredSize
@@ -35,6 +35,8 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.ui.test.assertHeightIsEqualTo
@@ -51,7 +53,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -168,6 +169,7 @@ class FloatingActionButtonTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun fab_shapeAndColorFromThemeIsUsed() {
         val themeShape = CutCornerShape(4.dp)
         val realShape = CutCornerShape(50)
@@ -204,6 +206,7 @@ class FloatingActionButtonTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun extendedFab_shapeAndColorFromThemeIsUsed() {
         val themeShape = CutCornerShape(4.dp)
         val realShape = CutCornerShape(50)

@@ -17,9 +17,9 @@
 package androidx.compose.material
 
 import android.os.SystemClock.sleep
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.ui.test.assertLeftPositionInRootIsEqualTo
@@ -48,7 +49,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -183,6 +183,7 @@ class DrawerTest {
     }
 
     @Test
+    @LargeTest
     fun modalDrawer_bodyContent_clickable() {
         var drawerClicks = 0
         var bodyClicks = 0
@@ -303,6 +304,7 @@ class DrawerTest {
     }
 
     @Test
+    @LargeTest
     fun modalDrawer_openBySwipe() {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
@@ -337,6 +339,7 @@ class DrawerTest {
     }
 
     @Test
+    @LargeTest
     fun modalDrawer_openBySwipe_rtl() {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
@@ -373,6 +376,7 @@ class DrawerTest {
     }
 
     @Test
+    @LargeTest
     fun bottomDrawer_openBySwipe() {
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {

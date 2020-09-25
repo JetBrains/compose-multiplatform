@@ -30,7 +30,8 @@ import androidx.compose.ui.text.input.SetComposingRegionEditOp
 import androidx.compose.ui.text.input.SetComposingTextEditOp
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextInputService
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.ui.test.click
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasInputMethodsSupport
@@ -48,9 +49,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalFoundationApi::class)
 class TextFieldOnValueChangeTextFieldValueTest {

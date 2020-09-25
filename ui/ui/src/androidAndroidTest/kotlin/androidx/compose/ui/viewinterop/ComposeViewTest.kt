@@ -33,9 +33,11 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
-import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertTextEquals
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.onNodeWithTag
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertNotNull
@@ -43,9 +45,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ComposeViewTest {
     @get:Rule
@@ -130,6 +131,7 @@ class ComposeViewTest {
     }
 
     @Test
+    @SmallTest
     fun throwsOnAddView() {
         rule.activityRule.scenario.onActivity { activity ->
             with(TestComposeView(activity)) {

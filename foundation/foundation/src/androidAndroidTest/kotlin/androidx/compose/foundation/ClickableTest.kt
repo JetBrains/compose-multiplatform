@@ -23,6 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.ui.test.SemanticsMatcher
 import androidx.ui.test.assert
@@ -46,7 +48,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -176,6 +177,7 @@ class ClickableTest {
     }
 
     @Test
+    @LargeTest
     fun clickableTest_longClick() {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
@@ -292,6 +294,7 @@ class ClickableTest {
     }
 
     @Test
+    @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick() {
         val clickLatch = CountDownLatch(1)
         var doubleClickCounter = 0
@@ -455,6 +458,7 @@ class ClickableTest {
     }
 
     @Test
+    @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick_disabled() {
         val enabled = mutableStateOf(false)
         val clickLatch = CountDownLatch(1)

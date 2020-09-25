@@ -26,6 +26,8 @@ import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.waitAndScreenShot
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -34,10 +36,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.TimeUnit
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(InternalTextApi::class)
 class SelectionHandlesTest {
@@ -181,6 +182,7 @@ class SelectionHandlesTest {
     }
 
     @Test
+    @SmallTest
     fun isHandleLtrDirection_ltr_handles_not_cross_return_true() {
         assertThat(
             isHandleLtrDirection(direction = ResolvedTextDirection.Ltr, areHandlesCrossed = false)
@@ -188,6 +190,7 @@ class SelectionHandlesTest {
     }
 
     @Test
+    @SmallTest
     fun isHandleLtrDirection_ltr_handles_cross_return_false() {
         assertThat(
             isHandleLtrDirection(direction = ResolvedTextDirection.Ltr, areHandlesCrossed = true)
@@ -195,6 +198,7 @@ class SelectionHandlesTest {
     }
 
     @Test
+    @SmallTest
     fun isHandleLtrDirection_rtl_handles_not_cross_return_false() {
         assertThat(
             isHandleLtrDirection(direction = ResolvedTextDirection.Rtl, areHandlesCrossed = false)
@@ -202,6 +206,7 @@ class SelectionHandlesTest {
     }
 
     @Test
+    @SmallTest
     fun isHandleLtrDirection_rtl_handles_cross_return_true() {
         assertThat(
             isHandleLtrDirection(direction = ResolvedTextDirection.Rtl, areHandlesCrossed = true)

@@ -22,6 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.assertIsInMutuallyExclusiveGroup
@@ -34,7 +36,6 @@ import androidx.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -135,6 +136,7 @@ class RadioButtonTest {
     }
 
     @Test
+    @LargeTest
     fun radioGroupTest_clickSelectTwoDifferentItems() {
         val selected = mutableStateOf(itemOne)
 

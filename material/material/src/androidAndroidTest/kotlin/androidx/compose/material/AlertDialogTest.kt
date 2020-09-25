@@ -17,14 +17,15 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.ui.test.assertContainsColor
 import androidx.ui.test.captureToBitmap
@@ -34,9 +35,8 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P) // Should be O: b/163023027
 class AlertDialogTest {

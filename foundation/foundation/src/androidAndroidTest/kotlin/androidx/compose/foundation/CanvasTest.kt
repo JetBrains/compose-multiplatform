@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.ui.test.assertHeightIsEqualTo
@@ -41,7 +43,6 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -170,6 +171,7 @@ class CanvasTest {
     }
 
     @Test
+    @LargeTest
     fun canvas_exactSizes() {
         rule.setContentForSizeAssertions {
             Canvas(Modifier.preferredSize(100.dp)) {
@@ -188,6 +190,7 @@ class CanvasTest {
     }
 
     @Test
+    @LargeTest
     fun canvas_exactSizes_drawCircle() {
         rule.setContentForSizeAssertions {
             Canvas(Modifier.preferredSize(100.dp)) {

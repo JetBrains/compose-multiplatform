@@ -30,6 +30,8 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.center
@@ -43,7 +45,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.sign
 
 @MediumTest
@@ -368,6 +369,7 @@ class SwipeableTest {
      * Tests that fixed thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fixed_small() {
         val state = SwipeableState("A", clock)
         val offsetDp = with(rule.density) { 35.toDp() }
@@ -421,6 +423,7 @@ class SwipeableTest {
      * Tests that fixed thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fixed_large() {
         val state = SwipeableState("A", clock)
         val offsetDp = with(rule.density) { 65.toDp() }
@@ -474,6 +477,7 @@ class SwipeableTest {
      * Tests that fractional thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fractional_half() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -526,6 +530,7 @@ class SwipeableTest {
      * Tests that fractional thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fractional_quarter() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -578,6 +583,7 @@ class SwipeableTest {
      * Tests that fractional thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fractional_threeQuarters() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -630,6 +636,7 @@ class SwipeableTest {
      * Tests that mixing fixed and fractional thresholds works correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_mixed() {
         val state = SwipeableState("A", clock)
         val offsetDp = with(rule.density) { 35.toDp() }
@@ -689,6 +696,7 @@ class SwipeableTest {
      * Tests that a custom implementation of [ThresholdConfig] works correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_custom() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -941,6 +949,7 @@ class SwipeableTest {
      * Tests that the target works correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_targetValue() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {

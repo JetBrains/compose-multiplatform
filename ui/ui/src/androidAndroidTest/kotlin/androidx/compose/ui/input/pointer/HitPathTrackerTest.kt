@@ -16,21 +16,21 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class HitPathTrackerTest {
 

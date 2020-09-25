@@ -43,7 +43,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.ui.test.createAndroidComposeRule
 import com.google.common.truth.Truth.assertThat
@@ -52,7 +53,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 val BASIC_MEASURE_FONT = font(
     resId = R.font.sample_font,
@@ -62,7 +62,7 @@ val BASIC_MEASURE_FONT = font(
 
 @OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
-@SmallTest
+@MediumTest
 class MultiWidgetSelectionDelegateTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

@@ -27,6 +27,8 @@ import androidx.compose.ui.drawBehind
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -35,7 +37,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -104,6 +105,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun useDifferentModelsInDrawAndPosition() {
         val drawModel = mutableStateOf(5)
         val positionModel = mutableStateOf(5)
@@ -300,6 +302,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun drawStopsReactingOnModelsAfterDetaching() {
         val enabled = mutableStateOf(true)
         val model = mutableStateOf(0)
@@ -321,6 +324,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun measureStopsReactingOnModelsAfterDetaching() {
         val enabled = mutableStateOf(true)
         val model = mutableStateOf(0)
@@ -342,6 +346,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun layoutStopsReactingOnModelsAfterDetaching() {
         val enabled = mutableStateOf(true)
         val model = mutableStateOf(0)

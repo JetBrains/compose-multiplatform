@@ -30,6 +30,8 @@ import androidx.compose.ui.text.font.font
 import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.test.R
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -42,7 +44,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -275,6 +276,7 @@ class AndroidTypefaceTest {
     }
 
     @Test
+    @MediumTest
     fun customSinglefontFamilyExactMatch() {
         val fontFamily = fontFamily(
             FontTestData.FONT_100_REGULAR,
@@ -309,6 +311,7 @@ class AndroidTypefaceTest {
     }
 
     @Test
+    @MediumTest
     fun fontMatcherCalledForCustomFont() {
         // customSinglefontFamilyExactMatch tests all the possible outcomes that FontMatcher
         // might return. Therefore for the best effort matching we just make sure that FontMatcher

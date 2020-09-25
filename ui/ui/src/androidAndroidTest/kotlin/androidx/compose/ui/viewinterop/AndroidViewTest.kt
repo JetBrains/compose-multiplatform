@@ -27,8 +27,8 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
@@ -51,11 +51,13 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertPixels
 import androidx.ui.test.captureToBitmap
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.endsWith
@@ -64,10 +66,9 @@ import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.roundToInt
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class AndroidViewTest {
     @get:Rule
@@ -155,6 +156,7 @@ class AndroidViewTest {
     }
 
     @Test
+    @LargeTest
     fun androidView_attachedAfterDetached_addsViewBack() {
         lateinit var root: FrameLayout
         lateinit var composeView: ComposeView
@@ -234,6 +236,7 @@ class AndroidViewTest {
     }
 
     @Test
+    @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun androidViewWithView_drawModifierIsApplied() {
         val size = 300
