@@ -21,7 +21,7 @@ import android.view.MotionEvent
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
  */
-actual class PointerEvent internal constructor(
+actual data class PointerEvent internal constructor(
     /**
      * The changes.
      */

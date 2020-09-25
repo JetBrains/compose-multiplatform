@@ -58,26 +58,8 @@ abstract class PointerInputFilter {
      * @see PointerInputChange
      * @see PointerEventPass
      */
-    open fun onPointerEvent(
+    abstract fun onPointerEvent(
         pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ): List<PointerInputChange> = onPointerInput(pointerEvent.changes, pass, bounds)
-
-    /**
-     * Invoked when pointers that previously hit this [PointerInputFilter] have changed.
-     *
-     * @param changes The list of [PointerInputChange]s with positions relative to this
-     * [PointerInputFilter].
-     * @param pass The [PointerEventPass] in which this function is being called.
-     * @param bounds The width and height associated with this [PointerInputFilter].
-     * @return The list of [PointerInputChange]s after any aspect of the changes have been consumed.
-     *
-     * @see PointerInputChange
-     * @see PointerEventPass
-     */
-    abstract fun onPointerInput(
-        changes: List<PointerInputChange>,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange>
@@ -241,7 +223,7 @@ enum class PointerEventPass {
  * A function used to react to and modify [PointerInputChange]s.
  */
 typealias PointerInputHandler =
-    (List<PointerInputChange>, PointerEventPass, IntSize) -> List<PointerInputChange>
+    (PointerEvent, PointerEventPass, IntSize) -> List<PointerInputChange>
 
 /**
  * The base type for all custom events.

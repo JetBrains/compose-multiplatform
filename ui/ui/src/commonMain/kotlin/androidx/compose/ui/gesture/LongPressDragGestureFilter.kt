@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -129,7 +130,7 @@ fun Modifier.longPressDragGestureFilter(
 
 /**
  * Glues together the logic of [rawDragGestureFilter], [longPressGestureFilter],
- * and a custom [PointerInputHandler] to make LongPressDragGestureDetector work.
+ * and a custom [PointerInputFilter] to make LongPressDragGestureDetector work.
  */
 private class LongPressDragGestureDetectorGlue : PointerInputFilter() {
     lateinit var longPressDragObserver: LongPressDragObserver
@@ -164,8 +165,8 @@ private class LongPressDragGestureDetectorGlue : PointerInputFilter() {
 
     // This handler ensures that onStop will be called after long press happened, but before
     // dragging actually has begun.
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
@@ -173,12 +174,12 @@ private class LongPressDragGestureDetectorGlue : PointerInputFilter() {
         if (pass == PointerEventPass.Main &&
             dragEnabled &&
             !dragStarted &&
-            changes.all { it.changedToUpIgnoreConsumed() }
+            pointerEvent.changes.all { it.changedToUpIgnoreConsumed() }
         ) {
             dragEnabled = false
             longPressDragObserver.onStop(Offset.Zero)
         }
-        return changes
+        return pointerEvent.changes
     }
 
     // This handler ensures that onCancel is called if onLongPress was previously called but

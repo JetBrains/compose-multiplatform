@@ -88,24 +88,15 @@ internal fun PointerInputChange.consume(
         )
     )
 
+/**
+ * Accepts:
+ * 1. Single PointerEvent
+ */
 internal fun PointerInputHandler.invokeOverAllPasses(
-    pointerInputChanges: PointerInputChange,
+    pointerEvent: PointerEvent,
     size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
 ) = invokeOverPasses(
-    listOf(pointerInputChanges),
-    listOf(
-        PointerEventPass.Initial,
-        PointerEventPass.Main,
-        PointerEventPass.Final
-    ),
-    size = size
-).first()
-
-internal fun PointerInputHandler.invokeOverAllPasses(
-    vararg pointerInputChanges: PointerInputChange,
-    size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
-) = invokeOverPasses(
-    pointerInputChanges.toList(),
+    pointerEvent,
     listOf(
         PointerEventPass.Initial,
         PointerEventPass.Main,
@@ -115,37 +106,46 @@ internal fun PointerInputHandler.invokeOverAllPasses(
 )
 
 // TODO(shepshapard): Rename to invokeOverPass
-internal fun PointerInputHandler.invokeOverPasses(
-    pointerInputChange: PointerInputChange,
+/**
+ * Accepts:
+ * 1. Single PointerEvent
+ * 2. Single PointerEventPass
+ */
+internal fun PointerInputHandler.invokeOverPass(
+    pointerEvent: PointerEvent,
     pointerEventPass: PointerEventPass,
     size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
-) = invokeOverPasses(listOf(pointerInputChange), listOf(pointerEventPass), size).first()
+) = invokeOverPasses(pointerEvent, listOf(pointerEventPass), size)
 
-// TODO(shepshapard): Rename to invokeOverPass
+/**
+ * Accepts:
+ * 1. Single PointerEvent
+ * 2. vararg of PointerEventPass
+ */
 internal fun PointerInputHandler.invokeOverPasses(
-    vararg pointerInputChanges: PointerInputChange,
-    pointerEventPass: PointerEventPass,
-    size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
-) = invokeOverPasses(pointerInputChanges.toList(), listOf(pointerEventPass), size)
-
-internal fun PointerInputHandler.invokeOverPasses(
-    pointerInputChange: PointerInputChange,
+    pointerEvent: PointerEvent,
     vararg pointerEventPasses: PointerEventPass,
     size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
-) = invokeOverPasses(listOf(pointerInputChange), pointerEventPasses.toList(), size).first()
+) = invokeOverPasses(pointerEvent, pointerEventPasses.toList(), size)
 
+/**
+ * Accepts:
+ * 1. Single PointerEvent
+ * 2. List of PointerEventPass
+ */
 internal fun PointerInputHandler.invokeOverPasses(
-    pointerInputChanges: List<PointerInputChange>,
+    pointerEvent: PointerEvent,
     pointerEventPasses: List<PointerEventPass>,
     size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
-): List<PointerInputChange> {
-    require(pointerInputChanges.isNotEmpty())
+): PointerEvent {
+    require(pointerEvent.changes.isNotEmpty())
     require(pointerEventPasses.isNotEmpty())
-    var localPointerInputChanges = pointerInputChanges
+    var localPointerEvent = pointerEvent
     pointerEventPasses.forEach {
-        localPointerInputChanges = this.invoke(localPointerInputChanges, it, size)
+        val changes = this.invoke(localPointerEvent, it, size)
+        localPointerEvent = PointerEvent(changes)
     }
-    return localPointerInputChanges
+    return localPointerEvent
 }
 
 /**
@@ -182,3 +182,5 @@ internal fun ((CustomEvent, PointerEventPass) -> Unit).invokeOverPasses(
         this.invoke(event, pass)
     }
 }
+
+internal fun pointerEventOf(vararg changes: PointerInputChange) = PointerEvent(changes.toList())

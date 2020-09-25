@@ -191,8 +191,8 @@ class PointerInputEventProcessorTest {
         inOrder(pointerInputFilter) {
             for (expected in expectedChanges) {
                 for (pass in PointerEventPass.values()) {
-                    verify(pointerInputFilter).onPointerInputMock(
-                        eq(listOf(expected)),
+                    verify(pointerInputFilter).onPointerEventMock(
+                        eq(pointerEventOf(expected)),
                         eq(pass),
                         any()
                     )
@@ -261,8 +261,8 @@ class PointerInputEventProcessorTest {
         )
         // Verify call values
         for (expected in expectedChanges) {
-            verify(pointerInputFilter).onPointerInputMock(
-                eq(listOf(expected)),
+            verify(pointerInputFilter).onPointerEventMock(
+                eq(pointerEventOf(expected)),
                 eq(PointerEventPass.Initial),
                 any()
             )
@@ -470,13 +470,13 @@ class PointerInputEventProcessorTest {
 
         val pointerInputFilter =
             spy(
-                TestPointerInputFilter { changes, pass, _ ->
-                    if (changes == listOf(input) &&
+                TestPointerInputFilter { pointerEvent, pass, _ ->
+                    if (pointerEvent.changes == listOf(input) &&
                         pass == PointerEventPass.Initial
                     ) {
                         listOf(output)
                     } else {
-                        changes
+                        pointerEvent.changes
                     }
                 }
             )
@@ -512,9 +512,9 @@ class PointerInputEventProcessorTest {
         // Assert
 
         verify(pointerInputFilter)
-            .onPointerInputMock(eq(listOf(input)), eq(PointerEventPass.Initial), any())
+            .onPointerEventMock(eq(pointerEventOf(input)), eq(PointerEventPass.Initial), any())
         verify(pointerInputFilter)
-            .onPointerInputMock(eq(listOf(output)), eq(PointerEventPass.Main), any())
+            .onPointerEventMock(eq(pointerEventOf(output)), eq(PointerEventPass.Main), any())
     }
 
     @Test
@@ -685,8 +685,8 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pass in PointerEventPass.values()) {
             for (i in pointerInputHandlers.indices) {
-                verify(pointerInputHandlers[i]).onPointerInputMock(
-                    listOf(expectedPointerInputChanges[i]),
+                verify(pointerInputHandlers[i]).onPointerEventMock(
+                    pointerEventOf(expectedPointerInputChanges[i]),
                     pass,
                     expectedSizes[i]
                 )
@@ -796,14 +796,14 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pointerEventPass in PointerEventPass.values()) {
             verify(childPointerInputFilter1)
-                .onPointerInputMock(
-                    listOf(expectedChange1),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange1),
                     pointerEventPass,
                     IntSize(50, 50)
                 )
             verify(childPointerInputFilter2)
-                .onPointerInputMock(
-                    listOf(expectedChange2),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange2),
                     pointerEventPass,
                     IntSize(50, 50)
                 )
@@ -940,20 +940,20 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pointerEventPass in PointerEventPass.values()) {
             verify(childPointerInputFilter1)
-                .onPointerInputMock(
-                    listOf(expectedChange1),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange1),
                     pointerEventPass,
                     IntSize(100, 100)
                 )
             verify(childPointerInputFilter2)
-                .onPointerInputMock(
-                    listOf(expectedChange2),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange2),
                     pointerEventPass,
                     IntSize(100, 100)
                 )
             verify(childPointerInputFilter3)
-                .onPointerInputMock(
-                    listOf(expectedChange3),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange3),
                     pointerEventPass,
                     IntSize(100, 100)
                 )
@@ -1079,14 +1079,14 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pointerEventPass in PointerEventPass.values()) {
             verify(childPointerInputFilter1)
-                .onPointerInputMock(
-                    listOf(expectedChange1, expectedChange3),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange1, expectedChange3),
                     pointerEventPass,
                     IntSize(100, 150)
                 )
             verify(childPointerInputFilter2)
-                .onPointerInputMock(
-                    listOf(expectedChange2),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange2),
                     pointerEventPass,
                     IntSize(50, 50)
                 )
@@ -1207,14 +1207,14 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pointerEventPass in PointerEventPass.values()) {
             verify(childPointerInputFilter1)
-                .onPointerInputMock(
-                    listOf(expectedChange1, expectedChange3),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange1, expectedChange3),
                     pointerEventPass,
                     IntSize(150, 100)
                 )
             verify(childPointerInputFilter2)
-                .onPointerInputMock(
-                    listOf(expectedChange2),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange2),
                     pointerEventPass,
                     IntSize(50, 50)
                 )
@@ -1417,23 +1417,23 @@ class PointerInputEventProcessorTest {
 
         // Verify call values
         PointerEventPass.values().forEach { pointerEventPass ->
-            verify(pointerInputFilterTopLeft).onPointerInputMock(
-                eq(expectedChangesTopLeft),
+            verify(pointerInputFilterTopLeft).onPointerEventMock(
+                eq(pointerEventOf(*expectedChangesTopLeft.toTypedArray())),
                 eq(pointerEventPass),
                 any()
             )
-            verify(pointerInputFilterTopRight).onPointerInputMock(
-                eq(expectedChangesTopRight),
+            verify(pointerInputFilterTopRight).onPointerEventMock(
+                eq(pointerEventOf(*expectedChangesTopRight.toTypedArray())),
                 eq(pointerEventPass),
                 any()
             )
-            verify(pointerInputFilterBottomLeft).onPointerInputMock(
-                eq(expectedChangesBottomLeft),
+            verify(pointerInputFilterBottomLeft).onPointerEventMock(
+                eq(pointerEventOf(*expectedChangesBottomLeft.toTypedArray())),
                 eq(pointerEventPass),
                 any()
             )
-            verify(pointerInputFilterBottomRight).onPointerInputMock(
-                eq(expectedChangesBottomRight),
+            verify(pointerInputFilterBottomRight).onPointerEventMock(
+                eq(pointerEventOf(*expectedChangesBottomRight.toTypedArray())),
                 eq(pointerEventPass),
                 any()
             )
@@ -1526,8 +1526,8 @@ class PointerInputEventProcessorTest {
 
         // Verify call values
         PointerEventPass.values().forEach { pointerEventPass ->
-            verify(singlePointerInputFilter).onPointerInputMock(
-                eq(expectedChanges),
+            verify(singlePointerInputFilter).onPointerEventMock(
+                eq(pointerEventOf(*expectedChanges.toTypedArray())),
                 eq(pointerEventPass),
                 any()
             )
@@ -1596,20 +1596,20 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pointerEventPass in PointerEventPass.values()) {
             verify(pointerInputFilter1)
-                .onPointerInputMock(
-                    listOf(expectedChange),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange),
                     pointerEventPass,
                     IntSize(50, 50)
                 )
             verify(pointerInputFilter2)
-                .onPointerInputMock(
-                    listOf(expectedChange),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange),
                     pointerEventPass,
                     IntSize(50, 50)
                 )
             verify(pointerInputFilter3)
-                .onPointerInputMock(
-                    listOf(expectedChange),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange),
                     pointerEventPass,
                     IntSize(50, 50)
                 )
@@ -1677,8 +1677,8 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pointerEventPass in PointerEventPass.values()) {
             verify(pointerInputFilter)
-                .onPointerInputMock(
-                    listOf(expectedChange),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange),
                     pointerEventPass,
                     IntSize(499, 495)
                 )
@@ -1784,26 +1784,26 @@ class PointerInputEventProcessorTest {
         // Verify call values
         for (pointerEventPass in PointerEventPass.values()) {
             verify(pointerInputFilter1)
-                .onPointerInputMock(
-                    listOf(expectedChange1),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange1),
                     pointerEventPass,
                     IntSize(499, 494)
                 )
             verify(pointerInputFilter2)
-                .onPointerInputMock(
-                    listOf(expectedChange1),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange1),
                     pointerEventPass,
                     IntSize(499, 494)
                 )
             verify(pointerInputFilter3)
-                .onPointerInputMock(
-                    listOf(expectedChange2),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange2),
                     pointerEventPass,
                     IntSize(497, 492)
                 )
             verify(pointerInputFilter4)
-                .onPointerInputMock(
-                    listOf(expectedChange2),
+                .onPointerEventMock(
+                    pointerEventOf(expectedChange2),
                     pointerEventPass,
                     IntSize(497, 492)
                 )
@@ -1931,8 +1931,8 @@ class PointerInputEventProcessorTest {
         // Verify call values
         inOrder(pointerInputFilter) {
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(listOf(expectedChange)),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(expectedChange)),
                     eq(pass),
                     any()
                 )
@@ -2049,15 +2049,15 @@ class PointerInputEventProcessorTest {
         // Verify call values
         inOrder(pointerInputFilter) {
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(expectedChanges1),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(*expectedChanges1.toTypedArray())),
                     eq(pass),
                     any()
                 )
             }
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(expectedChanges2),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(*expectedChanges2.toTypedArray())),
                     eq(pass),
                     any()
                 )
@@ -2155,8 +2155,8 @@ class PointerInputEventProcessorTest {
         // Verify call values
         inOrder(pointerInputFilter1) {
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter1).onPointerInputMock(
-                    eq(listOf(expectedChange1)),
+                verify(pointerInputFilter1).onPointerEventMock(
+                    eq(pointerEventOf(expectedChange1)),
                     eq(pass),
                     any()
                 )
@@ -2165,8 +2165,8 @@ class PointerInputEventProcessorTest {
         }
         inOrder(pointerInputFilter2) {
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter2).onPointerInputMock(
-                    eq(listOf(expectedChange2)),
+                verify(pointerInputFilter2).onPointerEventMock(
+                    eq(pointerEventOf(expectedChange2)),
                     eq(pass),
                     any()
                 )
@@ -2251,15 +2251,15 @@ class PointerInputEventProcessorTest {
         // Verify call values
         inOrder(pointerInputFilter) {
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(listOf(expectedDown)),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(expectedDown)),
                     eq(pass),
                     any()
                 )
             }
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(listOf(expectedMove)),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(expectedMove)),
                     eq(pass),
                     any()
                 )
@@ -2319,8 +2319,8 @@ class PointerInputEventProcessorTest {
         // Verify call values
         inOrder(pointerInputFilter) {
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(listOf(expectedDown)),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(expectedDown)),
                     eq(pass),
                     any()
                 )
@@ -2407,16 +2407,16 @@ class PointerInputEventProcessorTest {
         // Verify call values
         inOrder(pointerInputFilter) {
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(listOf(expectedDown1)),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(expectedDown1)),
                     eq(pass),
                     any()
                 )
             }
             verify(pointerInputFilter).onCancel()
             for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerInputMock(
-                    eq(listOf(expectedDown2)),
+                verify(pointerInputFilter).onPointerEventMock(
+                    eq(pointerEventOf(expectedDown2)),
                     eq(pass),
                     any()
                 )
@@ -2499,11 +2499,11 @@ class PointerInputEventProcessorTest {
         // Verify call values
         PointerEventPass.values().forEach {
             verify(parentPointerInputFilter)
-                .onPointerInputMock(eq(listOf(expectedDownChange)), eq(it), any())
+                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
             verify(childPointerInputFilter)
-                .onPointerInputMock(eq(listOf(expectedDownChange)), eq(it), any())
+                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
             verify(parentPointerInputFilter)
-                .onPointerInputMock(eq(listOf(expectedUpChange)), eq(it), any())
+                .onPointerEventMock(eq(pointerEventOf(expectedUpChange)), eq(it), any())
         }
     }
 
@@ -2623,11 +2623,11 @@ class PointerInputEventProcessorTest {
         // Verify call values
         PointerEventPass.values().forEach {
             verify(parentPointerInputFilter)
-                .onPointerInputMock(eq(listOf(expectedDownChange)), eq(it), any())
+                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
             verify(childPointerInputFilter)
-                .onPointerInputMock(eq(listOf(expectedDownChange)), eq(it), any())
+                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
             verify(parentPointerInputFilter)
-                .onPointerInputMock(eq(listOf(expectedUpChange)), eq(it), any())
+                .onPointerEventMock(eq(pointerEventOf(expectedUpChange)), eq(it), any())
         }
     }
 
@@ -2830,11 +2830,11 @@ class PointerInputEventProcessorTest {
 
         val pointerInputFilter: PointerInputFilter =
             spy(
-                TestPointerInputFilter { changes, pass, _ ->
+                TestPointerInputFilter { pointerEvent, pass, _ ->
                     if (pass == PointerEventPass.Initial) {
-                        changes.map { it.consumePositionChange(1f, 0f) }
+                        pointerEvent.changes.map { it.consumePositionChange(1f, 0f) }
                     } else {
-                        changes
+                        pointerEvent.changes
                     }
                 }
             )
@@ -2918,21 +2918,21 @@ abstract class TestOwner : Owner {
 }
 
 open class TestPointerInputFilter(
-    val pointerInputHandler: PointerInputHandler = { changes, _, _ -> changes }
+    val pointerInputHandler: PointerInputHandler = { pointerEvent, _, _ -> pointerEvent.changes }
 ) : PointerInputFilter() {
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> = onPointerInputMock(changes, pass, bounds as Any)
+    ): List<PointerInputChange> = onPointerEventMock(pointerEvent, pass, bounds as Any)
 
-    open fun onPointerInputMock(
-        changes: List<PointerInputChange>,
+    open fun onPointerEventMock(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: Any
     ): List<PointerInputChange> {
-        return pointerInputHandler(changes, pass, bounds as IntSize)
+        return pointerInputHandler(pointerEvent, pass, bounds as IntSize)
     }
 
     override fun onCancel() {}
@@ -3067,24 +3067,6 @@ private class MockOwner(
 }
 
 open class DummyPointerInputFilter : PointerInputFilter() {
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ): List<PointerInputChange> {
-        return onPointerInputMock(changes, pass, bounds as Any)
-    }
-
-    override fun onCancel() {
-    }
-
-    open fun onPointerInputMock(
-        changes: List<PointerInputChange>,
-        pass: PointerEventPass,
-        bounds: Any
-    ): List<PointerInputChange> {
-        return emptyList()
-    }
 
     override fun onPointerEvent(
         pointerEvent: PointerEvent,
@@ -3094,11 +3076,13 @@ open class DummyPointerInputFilter : PointerInputFilter() {
         return onPointerEventMock(pointerEvent, pass, bounds as Any)
     }
 
+    override fun onCancel() {}
+
     open fun onPointerEventMock(
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: Any
     ): List<PointerInputChange> {
-        return super.onPointerEvent(pointerEvent, pass, bounds as IntSize)
+        return pointerEvent.changes
     }
 }

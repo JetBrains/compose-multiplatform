@@ -19,6 +19,7 @@ package androidx.compose.ui.gesture
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -133,18 +134,18 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
     lateinit var scaleObserver: RawScaleObserver
     var canStartScaling: (() -> Boolean)? = null
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
 
-        var changesToReturn = changes
+        var changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Initial && active) {
             // If we are currently scaling, we want to prevent any children from reacting to any
             // down change.
-            changesToReturn = changesToReturn.map {
+            changes = changes.map {
                 if (it.changedToDown() || it.changedToUp()) {
                     it.consumeDownChange()
                 } else {
@@ -155,7 +156,7 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
 
         if (pass == PointerEventPass.Main) {
 
-            var (currentlyDownChanges, otherChanges) = changesToReturn.partition {
+            var (currentlyDownChanges, otherChanges) = changes.partition {
                 it.current.down && it.previous.down
             }
 
@@ -221,10 +222,10 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
                 }
             }
 
-            changesToReturn = currentlyDownChanges + otherChanges
+            changes = currentlyDownChanges + otherChanges
         }
 
-        return changesToReturn
+        return changes
     }
 
     override fun onCancel() {
