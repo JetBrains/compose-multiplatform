@@ -18,7 +18,6 @@ package androidx.compose.material.icons.generator.tasks
 
 import androidx.compose.material.icons.generator.CoreIcons
 import androidx.compose.material.icons.generator.IconWriter
-import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
@@ -33,14 +32,12 @@ open class CoreIconGenerationTask : IconGenerationTask() {
         /**
          * Registers [CoreIconGenerationTask] in [project].
          */
-        fun register(project: Project, variant: BaseVariant? = null) {
+        fun register(project: Project) {
             val task = project.createGenerationTask(
                 "generateCoreIcons",
-                CoreIconGenerationTask::class.java,
-                variant
+                CoreIconGenerationTask::class.java
             )
-            if (variant == null) registerIconGenerationTask(project, task) // multiplatform
-            else variant.registerIconGenerationTask(task) // agp
+            registerIconGenerationTask(project, task)
         }
     }
 }
@@ -54,16 +51,14 @@ open class ExtendedIconGenerationTask : IconGenerationTask() {
 
     companion object {
         /**
-         * Registers [ExtendedIconGenerationTask] in [project]. (for use with mpp)
+         * Registers [ExtendedIconGenerationTask] in [project].
          */
-        fun register(project: Project, variant: BaseVariant? = null) {
+        fun register(project: Project) {
             val task = project.createGenerationTask(
                 "generateExtendedIcons",
-                ExtendedIconGenerationTask::class.java,
-                variant
+                ExtendedIconGenerationTask::class.java
             )
-            if (variant == null) registerIconGenerationTask(project, task) // multiplatform
-            else variant.registerIconGenerationTask(task) // agp
+            registerIconGenerationTask(project, task)
         }
     }
 }
@@ -77,13 +72,4 @@ private fun registerIconGenerationTask(
 ) {
     val sourceSet = project.getMultiplatformSourceSet(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME)
     sourceSet.kotlin.srcDir(project.files(task.generatedSrcMainDirectory).builtBy(task))
-}
-
-/**
- * Helper to register [task] as the java source generating task.
- */
-private fun BaseVariant.registerIconGenerationTask(
-    task: IconGenerationTask
-) {
-    registerJavaGeneratingTask(task, task.generatedSrcMainDirectory)
 }

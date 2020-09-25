@@ -94,18 +94,8 @@ abstract class IconGenerationTask : DefaultTask() {
          * [androidx.compose.material.icons.generator.CoreIcons], and no tests.
          */
         @JvmStatic
-        fun registerCoreIconProject(
-            project: Project,
-            libraryExtension: LibraryExtension,
-            isMpp: Boolean
-        ) {
-            if (isMpp) {
-                CoreIconGenerationTask.register(project, null)
-            } else {
-                libraryExtension.libraryVariants.all { variant ->
-                    CoreIconGenerationTask.register(project, variant)
-                }
-            }
+        fun registerCoreIconProject(project: Project) {
+            CoreIconGenerationTask.register(project)
         }
 
         /**
@@ -114,18 +104,8 @@ abstract class IconGenerationTask : DefaultTask() {
          * test for every icon in both the core and extended project.
          */
         @JvmStatic
-        fun registerExtendedIconProject(
-            project: Project,
-            libraryExtension: LibraryExtension,
-            isMpp: Boolean
-        ) {
-            if (isMpp) {
-                ExtendedIconGenerationTask.register(project, null)
-            } else {
-                libraryExtension.libraryVariants.all { variant ->
-                    ExtendedIconGenerationTask.register(project, variant)
-                }
-            }
+        fun registerExtendedIconProject(project: Project, libraryExtension: LibraryExtension) {
+            ExtendedIconGenerationTask.register(project)
 
             libraryExtension.testVariants.all { variant ->
                 IconTestingGenerationTask.register(project, variant)
