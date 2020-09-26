@@ -21,8 +21,6 @@ import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentListOf
 
-internal actual typealias BitSet = java.util.BitSet
-
 actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
 
 internal actual open class ThreadLocal<T> actual constructor(
