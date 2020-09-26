@@ -25,6 +25,8 @@ build_versions.lint = '27.2.0-alpha06'
 build_versions.kotlin = "1.4.0"
 build_versions.kotlin_coroutines = "1.3.9"
 
+build_versions.hilt = "2.29.1-alpha"
+
 def agpOverride = System.getenv("GRADLE_PLUGIN_VERSION")
 if (agpOverride != null) {
     logger.warn("Using custom version ${agpOverride} of AGP due to GRADLE_PLUGIN_VERSION being set.")
@@ -68,5 +70,7 @@ build_libs.dokka_gradle = [
     "org.jetbrains.dokka:dokka-android-gradle-plugin:${build_versions.dokka}",
 ]
 build_libs.kotlinpoet = "com.squareup:kotlinpoet:1.4.0"
+
+build_libs.hilt_plugin = "com.google.dagger:hilt-android-gradle-plugin:${build_versions.hilt}"
 
 rootProject.ext['build_libs'] = build_libs
