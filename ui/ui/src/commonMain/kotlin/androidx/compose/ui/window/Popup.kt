@@ -42,8 +42,7 @@ import androidx.compose.ui.unit.width
  * Ltr/Rtl context, thus in Ltr it will be added to the original aligned position and in Rtl it
  * will be subtracted from it.
  * @param isFocusable Indicates if the popup can grab the focus.
- * @param onDismissRequest Executes when the popup tries to dismiss itself. This happens when
- * the popup is focusable and the user clicks outside.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
  * @param children The content to be displayed inside the popup.
  */
 @Composable
@@ -78,8 +77,7 @@ fun Popup(
  * @param dropDownAlignment The start or end alignment below the parent.
  * @param offset An offset from the original aligned position of the popup.
  * @param isFocusable Indicates if the popup can grab the focus.
- * @param onDismissRequest Executes when the popup tries to dismiss itself. This happens when
- * the popup is focusable and the user clicks outside.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
  * @param children The content to be displayed inside the popup.
  */
 @Composable

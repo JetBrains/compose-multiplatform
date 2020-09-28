@@ -65,8 +65,7 @@ import org.jetbrains.annotations.TestOnly
  *
  * @param popupPositionProvider Provides the screen position of the popup.
  * @param isFocusable Indicates if the popup can grab the focus.
- * @param onDismissRequest Executes when the popup tries to dismiss itself. This happens when
- * the popup is focusable and the user clicks outside.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
  * @param children The content to be displayed inside the popup.
  */
 @Composable
@@ -299,6 +298,10 @@ private class PopupLayout(
      * users clicks outside the popup.
      */
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        // Note that this implementation is taken from PopupWindow. It actually does not seem to
+        // matter whether we return true or false as some upper layer decides on whether the
+        // event is propagated to other windows or not. So for focusable the event is consumed but
+        // for not focusable it is propagated to other windows.
         if ((event?.action == MotionEvent.ACTION_DOWN) &&
             ((event.x < 0) || (event.x >= width) || (event.y < 0) || (event.y >= height))
         ) {
@@ -325,11 +328,13 @@ private class PopupLayout(
                 WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH or
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
                     WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
                     WindowManager.LayoutParams.FLAG_SPLIT_TOUCH
                 ).inv()
+
+            // Enables us to intercept outside clicks even when popup is not focusable
+            flags = flags or WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
 
             type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL
 
