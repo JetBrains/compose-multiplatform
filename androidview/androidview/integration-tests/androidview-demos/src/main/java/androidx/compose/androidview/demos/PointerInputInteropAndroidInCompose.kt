@@ -47,23 +47,26 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-val AndroidInComposeDemos = DemoCategory("Android In Compose Interop", listOf(
-    ComposableDemo("4 Android tap in Compose") { FourAndroidTapInCompose() },
-    ComposableDemo("Android tap in Compose tap") { AndroidTapInComposeTap() },
-    ComposableDemo("Android tap in Compose scroll") { AndroidTapInComposeScroll() },
-    ComposableDemo("Android scroll in Compose scroll (different orientation)") {
-        AndroidScrollInComposeScrollDifferentOrientation()
-    },
-    ComposableDemo("Android scroll in Compose scroll (same orientation)") {
-        AndroidScrollInComposeScrollSameOrientation()
-    },
-    ComposableDemo("2 ScrollViews as separate children of Compose") {
-        TwoAndroidScrollViewsInCompose()
-    },
-    ComposableDemo("MotionEventPointerInputFilter") {
-        PointerInteropFilterDemo()
-    }
-))
+val AndroidInComposeDemos = DemoCategory(
+    "Android In Compose Interop",
+    listOf(
+        ComposableDemo("4 Android tap in Compose") { FourAndroidTapInCompose() },
+        ComposableDemo("Android tap in Compose tap") { AndroidTapInComposeTap() },
+        ComposableDemo("Android tap in Compose scroll") { AndroidTapInComposeScroll() },
+        ComposableDemo("Android scroll in Compose scroll (different orientation)") {
+            AndroidScrollInComposeScrollDifferentOrientation()
+        },
+        ComposableDemo("Android scroll in Compose scroll (same orientation)") {
+            AndroidScrollInComposeScrollSameOrientation()
+        },
+        ComposableDemo("2 ScrollViews as separate children of Compose") {
+            TwoAndroidScrollViewsInCompose()
+        },
+        ComposableDemo("MotionEventPointerInputFilter") {
+            PointerInteropFilterDemo()
+        }
+    )
+)
 
 @Composable
 private fun FourAndroidTapInCompose() {
@@ -71,7 +74,7 @@ private fun FourAndroidTapInCompose() {
         Text("Demonstrates that pointer locations are dispatched to Android correctly.")
         Text(
             "Below is a ViewGroup with 4 Android buttons in it.  When each button is tapped, the" +
-                    " background of the ViewGroup is updated."
+                " background of the ViewGroup is updated."
         )
         Box(
             Modifier
@@ -113,14 +116,14 @@ private fun AndroidTapInComposeTap() {
     Column {
         Text(
             "Demonstrates that pointer input interop is working correctly in the simple case of " +
-                    "tapping."
+                "tapping."
         )
         Text(
             "Below there is an Android ViewGroup with a button in it.  The whole thing is wrapped" +
-                    " in a Box with a tapGestureFilter modifier on it.  When you click the " +
-                    "button, the ViewGroup's background turns red.  When you click anywhere else " +
-                    "in the ViewGroup, the tapGestureFilter \"fires\" and the background turns " +
-                    "Blue."
+                " in a Box with a tapGestureFilter modifier on it.  When you click the " +
+                "button, the ViewGroup's background turns red.  When you click anywhere else " +
+                "in the ViewGroup, the tapGestureFilter \"fires\" and the background turns " +
+                "Blue."
         )
         Box(
             Modifier
@@ -149,14 +152,14 @@ private fun AndroidTapInComposeScroll() {
     Column {
         Text(
             "Demonstrates that pointer input interop is working correctly when tappable things in" +
-                    " Android are put inside of something scrollable in Compose."
+                " Android are put inside of something scrollable in Compose."
         )
         Text(
             "Below is a Compose HorizontalScroller with a wide horizontal LinearLayout in it, " +
-                    "that is comprised of 4 buttons.  Clicking buttons changes the LinearLayout's" +
-                    " background color.  When you drag horizontally, the HorizontalScroller drags" +
-                    ". If a pointer starts on a button and then drags horizontally, the button " +
-                    "will not be clicked when released."
+                "that is comprised of 4 buttons.  Clicking buttons changes the LinearLayout's" +
+                " background color.  When you drag horizontally, the HorizontalScroller drags" +
+                ". If a pointer starts on a button and then drags horizontally, the button " +
+                "will not be clicked when released."
         )
         ScrollableRow {
             AndroidView({ context ->
@@ -199,12 +202,14 @@ private fun AndroidScrollInComposeScrollDifferentOrientation() {
     Column {
         Text(
             "Demonstrates correct \"scroll orientation\" locking when something scrollable in " +
-                    "Android is nested inside something scrollable in Compose."
+                "Android is nested inside something scrollable in Compose."
         )
         Text("You should only be able to scroll in one orientation at a time.")
         ScrollableRow(modifier = Modifier.background(androidx.compose.ui.graphics.Color.Blue)) {
-            Box(modifier = Modifier.padding(96.dp)
-                .background(androidx.compose.ui.graphics.Color.Red)) {
+            Box(
+                modifier = Modifier.padding(96.dp)
+                    .background(androidx.compose.ui.graphics.Color.Red)
+            ) {
                 AndroidView({ context ->
                     LayoutInflater.from(context).inflate(
                         R.layout.android_scroll_in_compose_scroll_different_orientation,
@@ -221,15 +226,15 @@ private fun AndroidScrollInComposeScrollSameOrientation() {
     Column {
         Text(
             "Supposed to demonstrate correct nested scrolling when something scrollable in " +
-                    "Android is inside something scrollable in Compose."
+                "Android is inside something scrollable in Compose."
         )
         Text(
             "This doesn't actually work because nested scrolling isn't implemented between " +
-                    "Compose and Android.  Normally, this lack of implementation would mean the " +
-                    "parent would always intercept first and thus block the child from ever " +
-                    "scrolling. However, currently, the touch slop for Android is smaller than " +
-                    "that for Compose, and thus the child scrolls and prevents the parent from " +
-                    "intercepting. "
+                "Compose and Android.  Normally, this lack of implementation would mean the " +
+                "parent would always intercept first and thus block the child from ever " +
+                "scrolling. However, currently, the touch slop for Android is smaller than " +
+                "that for Compose, and thus the child scrolls and prevents the parent from " +
+                "intercepting. "
         )
         ScrollableColumn(modifier = Modifier.background(androidx.compose.ui.graphics.Color.Blue)) {
             Box(
@@ -281,8 +286,10 @@ private fun PointerInteropFilterDemo() {
 
     Column {
         Text("Demonstrates the functionality of pointerInteropFilter.")
-        Text("Touch the grey space below and it will be updated with the String representation of" +
-            " the MotionEvent that the pointerInteropFilter outputs.")
+        Text(
+            "Touch the grey space below and it will be updated with the String representation of" +
+                " the MotionEvent that the pointerInteropFilter outputs."
+        )
         Box(
             Modifier
                 .fillMaxSize()

@@ -84,14 +84,16 @@ fun renderViews(webContext: WebContext) {
                 onValueChange = { inputUrl = it },
                 label = { Text("Url") }
             )
-            OutlinedButton(onClick = {
-                if (inputUrl.isNotBlank()) {
-                    if (WebContext.debug) {
-                        Log.d("WebCompAct", "setting url to " + inputUrl)
+            OutlinedButton(
+                onClick = {
+                    if (inputUrl.isNotBlank()) {
+                        if (WebContext.debug) {
+                            Log.d("WebCompAct", "setting url to " + inputUrl)
+                        }
+                        url = inputUrl
                     }
-                    url = inputUrl
                 }
-            }) {
+            ) {
                 Text("Go")
             }
         }
