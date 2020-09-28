@@ -107,9 +107,9 @@ private fun UiSavedStateRegistry.requireCanBeSaved(value: Any?) {
                 "Please use savedInstanceState() if you want to save a MutableState"
             } else {
                 "$value cannot be saved using the current UiSavedStateRegistry. The default " +
-                        "implementation only supports types which can be stored inside the Bundle" +
-                        ". Please consider implementing a custom Saver for this class and pass it" +
-                        " to savedInstanceState() or rememberSavedInstanceState()."
+                    "implementation only supports types which can be stored inside the Bundle" +
+                    ". Please consider implementing a custom Saver for this class and pass it" +
+                    " to savedInstanceState() or rememberSavedInstanceState()."
             }
         )
     }
