@@ -177,6 +177,13 @@ class SnapshotStateListTests {
     }
 
     @Test
+    fun validate_subList_size() {
+        val list = mutableStateListOf(0, 1, 2, 3, 4, 5, 6)
+        val subList = list.subList(0, list.size)
+        assertEquals(list.size, subList.size)
+    }
+
+    @Test
     fun validate_subList_contains() {
         val list = mutableStateListOf(0, 1, 2, 3, 4, 5, 6)
         val subList = list.subList(2, 5)
