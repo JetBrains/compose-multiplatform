@@ -84,10 +84,10 @@ class AndroidUiDispatcher private constructor(
                 task = nextTask()
             }
         } while (
-        // We don't dispatch holding the lock so that other tasks can get in on our
-        // trampolining time slice, but once we're done, make sure nothing added a new task
-        // before we set scheduledDispatch = false, which would prevent the next dispatch
-        // from being correctly scheduled. Loop to run these stragglers now.
+            // We don't dispatch holding the lock so that other tasks can get in on our
+            // trampolining time slice, but once we're done, make sure nothing added a new task
+            // before we set scheduledDispatch = false, which would prevent the next dispatch
+            // from being correctly scheduled. Loop to run these stragglers now.
             synchronized(lock) {
                 if (toRunTrampolined.isEmpty()) {
                     scheduledTrampolineDispatch = false
@@ -168,8 +168,10 @@ class AndroidUiDispatcher private constructor(
             object : ThreadLocal<CoroutineContext>() {
                 override fun initialValue(): CoroutineContext = AndroidUiDispatcher(
                     Choreographer.getInstance(),
-                    HandlerCompat.createAsync(Looper.myLooper()
-                        ?: error("no Looper on this thread"))
+                    HandlerCompat.createAsync(
+                        Looper.myLooper()
+                            ?: error("no Looper on this thread")
+                    )
                 ).let { it + it.frameClock }
             }
 
