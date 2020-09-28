@@ -95,6 +95,23 @@ class MutableVectorTest {
     }
 
     @Test
+    fun reversedAny() {
+        val reversedList = mutableListOf<Int>()
+        assertFalse(list.reversedAny {
+            reversedList.add(it)
+            false
+        })
+        assertEquals(reversedList, list.asMutableList().reversed())
+
+        val reversedSublist = mutableListOf<Int>()
+        assertTrue(list.reversedAny {
+            reversedSublist.add(it)
+            reversedSublist.size == 2
+        })
+        assertEquals(reversedSublist, listOf(5, 4))
+    }
+
+    @Test
     fun forEach() {
         val copy = mutableVectorOf<Int>()
         list.forEach { copy += it }

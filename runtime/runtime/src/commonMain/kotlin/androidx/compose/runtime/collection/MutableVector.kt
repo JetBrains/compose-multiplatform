@@ -210,6 +210,18 @@ class MutableVector<T> @PublishedApi internal constructor(
     }
 
     /**
+     * Returns `true` if any of the elements give a `true` return value for [predicate] while
+     * iterating in the reverse order.
+     */
+    inline fun reversedAny(predicate: (T) -> Boolean): Boolean {
+        contract { callsInPlace(predicate) }
+        for (i in lastIndex downTo 0) {
+            if (predicate(get(i))) return true
+        }
+        return false
+    }
+
+    /**
      * Returns [MutableList] interface access to the [MutableVector].
      */
     fun asMutableList(): MutableList<T> {
