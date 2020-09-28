@@ -70,25 +70,25 @@ private fun <T> mutableStateSaver(
     inner: Saver<T, out Any>,
     policy: SnapshotMutationPolicy<T>
 ) = Saver<MutableState<T>, Any>(
-        save = { state ->
-            with(inner) {
-                val value = state.value
-                if (value == null) {
-                    EmptyStateValue
-                } else {
-                    save(value)
-                }
-            }
-        },
-        restore = @Suppress("UNCHECKED_CAST") {
-            val restored = if (it == EmptyStateValue) {
-                null
+    save = { state ->
+        with(inner) {
+            val value = state.value
+            if (value == null) {
+                EmptyStateValue
             } else {
-                (inner as Saver<T, Any>).restore(it)
+                save(value)
             }
-            mutableStateOf(restored as T, policy)
         }
-    )
+    },
+    restore = @Suppress("UNCHECKED_CAST") {
+        val restored = if (it == EmptyStateValue) {
+            null
+        } else {
+            (inner as Saver<T, Any>).restore(it)
+        }
+        mutableStateOf(restored as T, policy)
+    }
+)
 
 /**
  * The object we save to indicate that we will need to restore the state with a null value.

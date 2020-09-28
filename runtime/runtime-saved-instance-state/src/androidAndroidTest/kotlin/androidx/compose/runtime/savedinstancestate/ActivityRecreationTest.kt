@@ -169,8 +169,11 @@ class RecreationTest3Activity : ComponentActivity() {
         val linear = LinearLayout(this)
         linear.orientation = LinearLayout.VERTICAL
         val params = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
-                .LayoutParams.WRAP_CONTENT, 1f)
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup
+                .LayoutParams.WRAP_CONTENT,
+            1f
+        )
         val child1 = FrameLayout(this)
         child1.id = R.id.child1
         linear.addView(child1, params)
@@ -196,8 +199,10 @@ class RecreationTest4Activity : FragmentActivity() {
         val linear = LinearLayout(this)
         linear.orientation = LinearLayout.VERTICAL
         val params = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
-                .LayoutParams.WRAP_CONTENT, 1f
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup
+                .LayoutParams.WRAP_CONTENT,
+            1f
         )
         val child1 = FrameLayout(this)
         child1.id = R.id.child1
