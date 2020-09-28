@@ -356,6 +356,67 @@ class AndroidPointerInputTest {
             }
         }
     }
+
+    /**
+     * This test verifies that if the AndroidComposeView is offset directly by a call to
+     * "offsetTopAndBottom(int)", that pointer locations are correct when dispatched down to a child
+     * PointerInputModifier.
+     */
+    @Test
+    fun dispatchTouchEvent_androidComposeViewOffset_positionIsCorrect() {
+
+        // Arrange
+
+        val offset = 50
+        val log = mutableListOf<List<PointerInputChange>>()
+
+        countDown { latch ->
+            rule.runOnUiThread {
+                container.setContent(Recomposer.current()) {
+                    FillLayout(
+                        Modifier
+                            .logEventsGestureFilter(log)
+                            .onGloballyPositioned { latch.countDown() }
+                    )
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+
+            androidComposeView = container.getChildAt(0) as AndroidComposeView
+
+            // Get the current location in window.
+            val locationInWindow = IntArray(2).also {
+                androidComposeView.getLocationInWindow(it)
+            }
+
+            // Offset the androidComposeView.
+            androidComposeView.offsetTopAndBottom(offset)
+
+            // Create a motion event that is also offset.
+            val motionEvent = MotionEvent(
+                0,
+                MotionEvent.ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(
+                    PointerCoords(
+                        locationInWindow[0].toFloat(),
+                        locationInWindow[1].toFloat() + offset
+                    )
+                )
+            )
+
+            // Act
+            androidComposeView.dispatchTouchEvent(motionEvent)
+
+            // Assert
+            assertThat(log).hasSize(1)
+            assertThat(log[0]).isEqualTo(listOf(down(0, 0.milliseconds, 0f, 0f)))
+        }
+    }
 }
 
 @Suppress("TestFunctionName")
