@@ -1230,6 +1230,11 @@ internal class NestedMutableSnapshot(
                     ).addAll(modified)
             }
 
+            // Ensure the parent is newer than the current snapshot
+            if (parent.id < id) {
+                parent.advance()
+            }
+
             // Make the snapshot visible in the parent snapshot
             parent.invalid = parent.invalid.clear(id).andNot(previousIds)
 
