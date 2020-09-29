@@ -145,6 +145,7 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
             changes = changes.map {
                 if (it.changedToDown()) {
                     it.consumeDownChange()
+                    it
                 } else {
                     it
                 }
@@ -173,7 +174,10 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
             }
 
             if (state == State.Started) {
-                changes = changes.map { it.consumeDownChange() }
+                changes = changes.map {
+                    it.consumeDownChange()
+                    it
+                }
             }
         }
 

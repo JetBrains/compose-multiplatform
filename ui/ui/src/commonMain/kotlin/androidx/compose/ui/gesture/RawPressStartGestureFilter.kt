@@ -91,7 +91,10 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
 
             if (active) {
                 // If we have started, we should consume the down change on all changes.
-                changes = changes.map { it.consumeDownChange() }
+                changes = changes.map {
+                    it.consumeDownChange()
+                    it
+                }
             }
         }
 

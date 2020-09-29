@@ -30,7 +30,6 @@ import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPass
 import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.input.pointer.pointerEventOf
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
@@ -68,7 +67,7 @@ class TapGestureFilterTest {
 
     @Test
     fun onPointerEvent_downConsumedUp_onReleaseNotCalled() {
-        var pointer = down(0, 0.milliseconds).consumeDownChange()
+        var pointer = down(0, 0.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         pointer = pointer.up(100.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
@@ -90,9 +89,9 @@ class TapGestureFilterTest {
 
     @Test
     fun onPointerEvent_downUpConsumed_onReleaseNotCalled() {
-        var pointer = down(0, 0.milliseconds).consumeDownChange()
+        var pointer = down(0, 0.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.up(100.milliseconds).consumeDownChange()
+        pointer = pointer.up(100.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         verify(filter.onTap, never()).invoke(any())

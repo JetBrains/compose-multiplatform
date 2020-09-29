@@ -126,7 +126,10 @@ internal class TapGestureFilter : PointerInputFilter() {
                     reset()
                     onTap.invoke(pointerPxPosition)
                     return if (consumeChanges) {
-                        changes.map { it.consumeDownChange() }
+                        changes.map {
+                            it.consumeDownChange()
+                            it
+                        }
                     } else {
                         changes
                     }

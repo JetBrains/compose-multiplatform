@@ -99,6 +99,7 @@ internal class LongPressGestureFilter(
                 changes.map {
                     if (it.changedToUp()) {
                         it.consumeDownChange()
+                        it
                     } else {
                         it
                     }

@@ -25,7 +25,6 @@ import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.input.pointer.pointerEventOf
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
@@ -60,16 +59,18 @@ class PressIndicatorGestureFilterTest {
 
     @Test
     fun onPointerInput_downConsumed_onStartNotCalled() {
-        filter::onPointerEvent
-            .invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds).consumeDownChange()))
+        filter::onPointerEvent.invokeOverAllPasses(
+            pointerEventOf(down(0, 0.milliseconds).apply { consumeDownChange() })
+        )
         verify(filter.onStart!!, never()).invoke(any())
     }
 
     @Test
     fun onPointerInput_disabledDown_onStartNotCalled() {
         filter.setEnabled(false)
-        filter::onPointerEvent
-            .invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds).consumeDownChange()))
+        filter::onPointerEvent.invokeOverAllPasses(
+            pointerEventOf(down(0, 0.milliseconds).apply { consumeDownChange() })
+        )
         verify(filter.onStart!!, never()).invoke(any())
     }
 
@@ -137,7 +138,7 @@ class PressIndicatorGestureFilterTest {
 
     @Test
     fun onPointerInput_downConsumedUp_onStopNotCalled() {
-        var pointer = down(0, 0.milliseconds).consumeDownChange()
+        var pointer = down(0, 0.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         pointer = pointer.up(100.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
@@ -196,7 +197,7 @@ class PressIndicatorGestureFilterTest {
     fun onPointerInput_downUpConsumed_onStopCalledOnce() {
         var pointer = down(0, 0.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.up(100.milliseconds).consumeDownChange()
+        pointer = pointer.up(100.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         verify(filter.onStop!!).invoke()
@@ -230,7 +231,7 @@ class PressIndicatorGestureFilterTest {
 
     @Test
     fun onPointerInput_downConsumedMoveConsumed_onCancelNotCalled() {
-        var pointer = down(0, 0.milliseconds).consumeDownChange()
+        var pointer = down(0, 0.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         pointer = pointer.moveBy(100.milliseconds, 5f).consume(1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
@@ -457,15 +458,15 @@ class PressIndicatorGestureFilterTest {
     fun onPointerInput_down_downChangeConsumedDuringMain() {
         var pointer = down(0, 0.milliseconds)
         pointer = filter::onPointerEvent.invokeOverPasses(
-                pointerEventOf(pointer),
-                PointerEventPass.Initial
+            pointerEventOf(pointer),
+            PointerEventPass.Initial
         ).changes.first()
         assertThat(pointer.consumed.downChange, `is`(false))
 
         pointer = filter::onPointerEvent.invoke(
-                pointerEventOf(pointer),
-                PointerEventPass.Main,
-                IntSize(0, 0)
+            pointerEventOf(pointer),
+            PointerEventPass.Main,
+            IntSize(0, 0)
         ).first()
         assertThat(pointer.consumed.downChange, `is`(true))
     }
@@ -490,8 +491,9 @@ class PressIndicatorGestureFilterTest {
 
     @Test
     fun onCancel_downConsumedCancel_noCallbacksCalled() {
-        filter::onPointerEvent
-            .invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds).consumeDownChange()))
+        filter::onPointerEvent.invokeOverAllPasses(
+            pointerEventOf(down(0, 0.milliseconds).apply { consumeDownChange() })
+        )
         filter.onCancel()
 
         verifyNoMoreInteractions(filter.onStart, filter.onStop, filter.onCancel)
