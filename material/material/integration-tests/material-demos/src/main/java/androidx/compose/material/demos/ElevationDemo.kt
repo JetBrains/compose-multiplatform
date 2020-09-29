@@ -88,10 +88,12 @@ private val elevations = listOf(
     24.dp
 )
 
-private fun getMessage(isLight: Boolean) = (if (isLight) {
-    "In a light theme elevation is represented by shadows"
-} else {
-    "In a dark theme elevation is represented by shadows and a translucent white overlay " +
+private fun getMessage(isLight: Boolean) = (
+    if (isLight) {
+        "In a light theme elevation is represented by shadows"
+    } else {
+        "In a dark theme elevation is represented by shadows and a translucent white overlay " +
             "applied to the surface"
-}) + "\n\nnote: drawing a small border around 0.dp elevation to make it visible where the card " +
-        "edges end"
+    }
+    ) + "\n\nnote: drawing a small border around 0.dp elevation to make it visible where the " +
+    "card edges end"

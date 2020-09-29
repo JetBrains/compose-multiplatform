@@ -269,8 +269,10 @@ private fun calculateTransformOrigin(
         menuBounds.width == 0 -> 0f
         else -> {
             val intersectionCenter =
-                (max(parentBounds.left, menuBounds.left) +
-                        min(parentBounds.right, menuBounds.right)) / 2
+                (
+                    max(parentBounds.left, menuBounds.left) +
+                        min(parentBounds.right, menuBounds.right)
+                    ) / 2
             (intersectionCenter - menuBounds.left).toFloat() / menuBounds.width
         }
     }
@@ -280,8 +282,10 @@ private fun calculateTransformOrigin(
         menuBounds.height == 0 -> 0f
         else -> {
             val intersectionCenter =
-                (max(parentBounds.top, menuBounds.top) +
-                        min(parentBounds.bottom, menuBounds.bottom)) / 2
+                (
+                    max(parentBounds.top, menuBounds.top) +
+                        min(parentBounds.bottom, menuBounds.bottom)
+                    ) / 2
             (intersectionCenter - menuBounds.top).toFloat() / menuBounds.height
         }
     }
@@ -332,7 +336,7 @@ internal data class DropdownMenuPositionProvider(
         val toDisplayBottom = windowGlobalBounds.height - popupContentSize.height - verticalMargin
         val y = sequenceOf(toBottom, toTop, toCenter, toDisplayBottom).firstOrNull {
             it >= verticalMargin &&
-                    it + popupContentSize.height <= windowGlobalBounds.height - verticalMargin
+                it + popupContentSize.height <= windowGlobalBounds.height - verticalMargin
         } ?: toTop
 
         onPositionCalculated(

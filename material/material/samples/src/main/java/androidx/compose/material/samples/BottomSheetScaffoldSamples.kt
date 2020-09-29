@@ -96,12 +96,14 @@ fun BottomSheetScaffoldSample() {
         },
         floatingActionButton = {
             var clickCount by remember { mutableStateOf(0) }
-            FloatingActionButton(onClick = {
-                // show snackbar as a suspend function
-                scope.launch {
-                    scaffoldState.snackbarHostState.showSnackbar("Snackbar #${++clickCount}")
+            FloatingActionButton(
+                onClick = {
+                    // show snackbar as a suspend function
+                    scope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar("Snackbar #${++clickCount}")
+                    }
                 }
-            }) {
+            ) {
                 Icon(Icons.Default.Favorite)
             }
         },

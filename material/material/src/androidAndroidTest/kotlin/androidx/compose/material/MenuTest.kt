@@ -113,7 +113,7 @@ class MenuTest {
         rule.onNodeWithTag("MenuContent2").assertExists()
         val node = rule.onNode(
             isPopup() and hasAnyDescendant(hasTestTag("MenuContent1")) and
-                    hasAnyDescendant(hasTestTag("MenuContent2"))
+                hasAnyDescendant(hasTestTag("MenuContent2"))
         ).assertExists().fetchSemanticsNode()
         with(rule.density) {
             assertThat(node.size.width).isEqualTo(130)

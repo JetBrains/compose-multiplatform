@@ -203,10 +203,11 @@ object TabConstants {
         height: Dp = DefaultIndicatorHeight,
         color: Color = AmbientContentColor.current
     ) {
-        Box(modifier
-            .fillMaxWidth()
-            .preferredHeight(height)
-            .background(color = color)
+        Box(
+            modifier
+                .fillMaxWidth()
+                .preferredHeight(height)
+                .background(color = color)
         )
     }
 

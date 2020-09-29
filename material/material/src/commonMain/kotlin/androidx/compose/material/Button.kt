@@ -116,7 +116,8 @@ fun Button(
             onClick = onClick,
             enabled = enabled,
             interactionState = interactionState,
-            indication = null)
+            indication = null
+        )
     ) {
         ProvideTextStyle(
             value = MaterialTheme.typography.button

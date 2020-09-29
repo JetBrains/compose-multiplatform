@@ -150,13 +150,16 @@ open class SwipeableState<T>(
                 maxBound = Float.POSITIVE_INFINITY
                 val targetOffset = anchors.getOffset(value)
                     ?: anchors.keys.minByOrNull { abs(it - offset.value) }!!
-                holder.animateTo(targetOffset, animationSpec, onEnd = { endReason, _ ->
-                    value = anchors.getValue(targetOffset)
-                    minBound = anchors.keys.minOrNull()!!
-                    maxBound = anchors.keys.maxOrNull()!!
-                    // If the animation was interrupted for any reason, snap as a last resort.
-                    if (endReason == AnimationEndReason.Interrupted) holder.snapTo(targetOffset)
-                })
+                holder.animateTo(
+                    targetOffset, animationSpec,
+                    onEnd = { endReason, _ ->
+                        value = anchors.getValue(targetOffset)
+                        minBound = anchors.keys.minOrNull()!!
+                        maxBound = anchors.keys.maxOrNull()!!
+                        // If the animation was interrupted for any reason, snap as a last resort.
+                        if (endReason == AnimationEndReason.Interrupted) holder.snapTo(targetOffset)
+                    }
+                )
             }
             anchorsState.value = anchors
         }

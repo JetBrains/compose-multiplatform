@@ -99,7 +99,8 @@ class CheckboxScreenshotTest {
                 TriStateCheckbox(
                     state = ToggleableState.Indeterminate,
                     modifier = wrap,
-                    onClick = {})
+                    onClick = {}
+                )
             }
         }
         assertToggeableAgainstGolden("checkbox_indeterminate")
@@ -133,7 +134,8 @@ class CheckboxScreenshotTest {
                     state = ToggleableState.Indeterminate,
                     enabled = false,
                     modifier = wrap,
-                    onClick = {})
+                    onClick = {}
+                )
             }
         }
         assertToggeableAgainstGolden("checkbox_disabled_indeterminate")

@@ -83,6 +83,6 @@ private val copyright
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-""".trimIndent()
+    """.trimIndent()
 
 private val currentYear: String get() = SimpleDateFormat("yyyy").format(Date())

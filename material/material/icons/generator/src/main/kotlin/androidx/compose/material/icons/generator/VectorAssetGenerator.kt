@@ -81,16 +81,20 @@ class VectorAssetGenerator(
      */
     private fun iconGetter(backingProperty: PropertySpec): FunSpec {
         return FunSpec.getterBuilder()
-            .addCode(buildCodeBlock {
-                beginControlFlow("if (%N != null)", backingProperty)
-                addStatement("return %N!!", backingProperty)
-                endControlFlow()
-            })
-            .addCode(buildCodeBlock {
-                beginControlFlow("%N = %M", backingProperty, MemberNames.MaterialIcon)
-                vector.nodes.forEach { node -> addRecursively(node) }
-                endControlFlow()
-            })
+            .addCode(
+                buildCodeBlock {
+                    beginControlFlow("if (%N != null)", backingProperty)
+                    addStatement("return %N!!", backingProperty)
+                    endControlFlow()
+                }
+            )
+            .addCode(
+                buildCodeBlock {
+                    beginControlFlow("%N = %M", backingProperty, MemberNames.MaterialIcon)
+                    vector.nodes.forEach { node -> addRecursively(node) }
+                    endControlFlow()
+                }
+            )
             .addStatement("return %N!!", backingProperty)
             .build()
     }

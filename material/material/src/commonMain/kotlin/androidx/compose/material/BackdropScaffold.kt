@@ -112,11 +112,14 @@ class BackdropScaffoldState(
      * @param onRevealed Optional callback invoked when the back layer has been revealed.
      */
     fun reveal(onRevealed: (() -> Unit)? = null) {
-        animateTo(targetValue = Revealed, onEnd = { endReason, endValue ->
-            if (endReason != Interrupted && endValue == Revealed) {
-                onRevealed?.invoke()
+        animateTo(
+            targetValue = Revealed,
+            onEnd = { endReason, endValue ->
+                if (endReason != Interrupted && endValue == Revealed) {
+                    onRevealed?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -125,11 +128,14 @@ class BackdropScaffoldState(
      * @param onConcealed Optional callback invoked when the back layer has been concealed.
      */
     fun conceal(onConcealed: (() -> Unit)? = null) {
-        animateTo(targetValue = Concealed, onEnd = { endReason, endValue ->
-            if (endReason != Interrupted && endValue == Concealed) {
-                onConcealed?.invoke()
+        animateTo(
+            targetValue = Concealed,
+            onEnd = { endReason, endValue ->
+                if (endReason != Interrupted && endValue == Concealed) {
+                    onConcealed?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -341,8 +347,11 @@ fun BackdropScaffold(
             Box(
                 Modifier
                     .zIndex(Float.POSITIVE_INFINITY)
-                    .padding(bottom = if (scaffoldState.isRevealed &&
-                        revealedHeight == fullHeight - headerHeightPx) headerHeight else 0.dp),
+                    .padding(
+                        bottom = if (scaffoldState.isRevealed &&
+                            revealedHeight == fullHeight - headerHeightPx
+                        ) headerHeight else 0.dp
+                    ),
                 alignment = Alignment.BottomCenter
             ) {
                 snackbarHost(scaffoldState.snackbarHostState)

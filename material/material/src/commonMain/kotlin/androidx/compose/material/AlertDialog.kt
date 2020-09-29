@@ -79,19 +79,21 @@ fun AlertDialog(
         onDismissRequest = onDismissRequest,
         buttons = {
             @OptIn(ExperimentalLayout::class)
-            (Box(Modifier.fillMaxWidth().padding(all = 8.dp)) {
-        FlowRow(
-            mainAxisSize = SizeMode.Expand,
-            mainAxisAlignment = MainAxisAlignment.End,
-            mainAxisSpacing = 8.dp,
-            crossAxisSpacing = 12.dp
-        ) {
-            if (dismissButton != null) {
-                dismissButton()
-            }
-            confirmButton()
-        }
-    })
+            (
+                Box(Modifier.fillMaxWidth().padding(all = 8.dp)) {
+                    FlowRow(
+                        mainAxisSize = SizeMode.Expand,
+                        mainAxisAlignment = MainAxisAlignment.End,
+                        mainAxisSpacing = 8.dp,
+                        crossAxisSpacing = 12.dp
+                    ) {
+                        if (dismissButton != null) {
+                            dismissButton()
+                        }
+                        confirmButton()
+                    }
+                }
+                )
         },
         modifier = modifier,
         title = title,

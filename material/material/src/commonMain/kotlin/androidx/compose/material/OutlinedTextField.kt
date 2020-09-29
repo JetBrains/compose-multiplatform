@@ -550,10 +550,12 @@ private fun Placeable.PlacementScope.place(
     // horizontally it is placed after the leading icon
     if (labelPlaceable != null) {
         val labelPositionY =
-            Alignment.CenterVertically.align(height - labelPlaceable.height) * (1 -
-                    animationProgress) - (labelPlaceable.height / 2) * animationProgress
+            Alignment.CenterVertically.align(height - labelPlaceable.height) * (
+                1 -
+                    animationProgress
+                ) - (labelPlaceable.height / 2) * animationProgress
         val labelPositionX = (TextFieldPadding.value * density) +
-                widthOrZero(leadingPlaceable) * (1 - animationProgress)
+            widthOrZero(leadingPlaceable) * (1 - animationProgress)
         labelPlaceable.placeRelative(labelPositionX.roundToInt(), labelPositionY.roundToInt())
     }
 

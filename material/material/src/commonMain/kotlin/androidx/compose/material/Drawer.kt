@@ -118,11 +118,14 @@ class DrawerState(
      * @param onOpened Optional callback invoked when the drawer has finished opening.
      */
     fun open(onOpened: (() -> Unit)? = null) {
-        animateTo(DrawerValue.Open, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Open) {
-                onOpened?.invoke()
+        animateTo(
+            DrawerValue.Open,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Open) {
+                    onOpened?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -131,11 +134,14 @@ class DrawerState(
      * @param onClosed Optional callback invoked when the drawer has finished closing.
      */
     fun close(onClosed: (() -> Unit)? = null) {
-        animateTo(DrawerValue.Closed, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Closed) {
-                onClosed?.invoke()
+        animateTo(
+            DrawerValue.Closed,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Closed) {
+                    onClosed?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -195,13 +201,16 @@ class BottomDrawerState(
      * @param onOpened Optional callback invoked when the drawer has finished opening.
      */
     fun open(onOpened: (() -> Unit)? = null) {
-        animateTo(BottomDrawerValue.Open, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted &&
-                endValue == BottomDrawerValue.Open
-            ) {
-                onOpened?.invoke()
+        animateTo(
+            BottomDrawerValue.Open,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted &&
+                    endValue == BottomDrawerValue.Open
+                ) {
+                    onOpened?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -210,13 +219,16 @@ class BottomDrawerState(
      * @param onClosed Optional callback invoked when the drawer has finished closing.
      */
     fun close(onClosed: (() -> Unit)? = null) {
-        animateTo(BottomDrawerValue.Closed, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted &&
-                endValue == BottomDrawerValue.Closed
-            ) {
-                onClosed?.invoke()
+        animateTo(
+            BottomDrawerValue.Closed,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted &&
+                    endValue == BottomDrawerValue.Closed
+                ) {
+                    onClosed?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -225,13 +237,16 @@ class BottomDrawerState(
      * @param onExpanded Optional callback invoked when the drawer has finished expanding.
      */
     fun expand(onExpanded: (() -> Unit)? = null) {
-        animateTo(BottomDrawerValue.Expanded, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted &&
-                endValue == BottomDrawerValue.Expanded
-            ) {
-                onExpanded?.invoke()
+        animateTo(
+            BottomDrawerValue.Expanded,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted &&
+                    endValue == BottomDrawerValue.Expanded
+                ) {
+                    onExpanded?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -350,7 +365,8 @@ fun ModalDrawerLayout(
                 reverseDirection = isRtl,
                 velocityThreshold = DrawerVelocityThreshold,
                 resistance = null
-        )) {
+            )
+        ) {
             Box {
                 bodyContent()
             }

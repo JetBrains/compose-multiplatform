@@ -290,7 +290,7 @@ class TabTest {
                         .fillMaxWidth()
                         .preferredHeight(indicatorHeight)
                         .background(color = Color.Red)
-                    .testTag("indicator")
+                        .testTag("indicator")
                 )
             }
 
