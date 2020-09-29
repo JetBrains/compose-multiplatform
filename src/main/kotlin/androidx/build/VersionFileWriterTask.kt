@@ -85,6 +85,13 @@ fun Project.configureVersionFileWriter(
             // We only add version file if is a library that is publishing.
             it.enabled = androidXExtension.publish.shouldPublish()
         }
+        val resources = library.sourceSets.getByName("main").resources
+        resources.srcDirs(setOf(resources.srcDirs, File(buildDir, RESOURCE_DIRECTORY)))
+        val includes = resources.includes
+        if (includes.isNotEmpty()) {
+            includes.add("META-INF/*.version")
+            resources.setIncludes(includes)
+        }
     }
 
     library.libraryVariants.all { variant ->
@@ -92,10 +99,4 @@ fun Project.configureVersionFileWriter(
             it.dependsOn(writeVersionFile)
         }
     }
-
-    val resources = library.sourceSets.getByName("main").resources
-    resources.srcDirs(setOf(resources.srcDirs, File(buildDir, RESOURCE_DIRECTORY)))
-    val includes = resources.includes
-    includes.add("META-INF/*.version")
-    resources.setIncludes(includes)
 }
