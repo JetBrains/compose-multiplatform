@@ -17,7 +17,7 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
-import java.util.Random
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
