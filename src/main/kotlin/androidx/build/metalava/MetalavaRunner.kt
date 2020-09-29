@@ -79,7 +79,7 @@ abstract class MetalavaWorkAction @Inject constructor (
 
 fun Project.getMetalavaConfiguration(): Configuration {
     return configurations.findByName("metalava") ?: configurations.create("metalava") {
-        val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha01")
+        val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha02")
         it.dependencies.add(dependency)
     }
 }
