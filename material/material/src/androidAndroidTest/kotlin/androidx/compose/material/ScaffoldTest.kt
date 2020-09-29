@@ -17,12 +17,12 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.size
@@ -36,12 +36,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.zIndex
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.ui.test.assertHeightIsEqualTo
@@ -162,7 +164,7 @@ class ScaffoldTest {
                             contentPosition = positioned.positionInParent
                             contentSize = positioned.size
                         }
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .preferredHeight(50.dp)
                         .background(color = Color.Blue)
                 )
@@ -281,7 +283,7 @@ class ScaffoldTest {
                     FloatingActionButton(
                         modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
-                            fabPosition = positioned.localToGlobal(positioned.positionInParent)
+                            fabPosition = positioned.positionInRoot
                         },
                         onClick = {}
                     ) {
@@ -291,16 +293,12 @@ class ScaffoldTest {
                 floatingActionButtonPosition = FabPosition.Center,
                 isFloatingActionButtonDocked = true,
                 bottomBar = {
-                    Box(
+                    BottomAppBar(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                bottomBarPosition =
-                                    positioned.localToGlobal(positioned.positionInParent)
+                                bottomBarPosition = positioned.positionInRoot
                             }
-                            .fillMaxWidth()
-                            .preferredHeight(100.dp)
-                            .background(color = Color.Red)
-                    )
+                    ) {}
                 }
             ) {
                 Text("body")
@@ -321,7 +319,7 @@ class ScaffoldTest {
                     FloatingActionButton(
                         modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
-                            fabPosition = positioned.localToGlobal(positioned.positionInParent)
+                            fabPosition = positioned.positionInRoot
                         },
                         onClick = {}
                     ) {
@@ -331,16 +329,12 @@ class ScaffoldTest {
                 floatingActionButtonPosition = FabPosition.End,
                 isFloatingActionButtonDocked = true,
                 bottomBar = {
-                    Box(
+                    BottomAppBar(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                bottomBarPosition =
-                                    positioned.localToGlobal(positioned.positionInParent)
+                                bottomBarPosition = positioned.positionInRoot
                             }
-                            .fillMaxWidth()
-                            .preferredHeight(100.dp)
-                            .background(color = Color.Red)
-                    )
+                    ) {}
                 }
             ) {
                 Text("body")
@@ -365,6 +359,7 @@ class ScaffoldTest {
                         Box(
                             Modifier.size(10.dp)
                                 .drawShadow(4.dp)
+                                .zIndex(4f)
                                 .background(color = Color.White)
                         )
                     }
@@ -391,11 +386,10 @@ class ScaffoldTest {
     fun scaffold_geometry_fabSize() {
         var fabSize: IntSize = IntSize.Zero
         val showFab = mutableStateOf(true)
-        lateinit var scaffoldState: ScaffoldState
+        var fabPlacement: FabPlacement? = null
         rule.setContent {
-            scaffoldState = rememberScaffoldState()
-            val fab: @Composable (() -> Unit)? = if (showFab.value) {
-                @Composable {
+            val fab = @Composable {
+                if (showFab.value) {
                     FloatingActionButton(
                         modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
@@ -405,107 +399,26 @@ class ScaffoldTest {
                         Icon(Icons.Filled.Favorite)
                     }
                 }
-            } else {
-                null
             }
             Scaffold(
-                scaffoldState = scaffoldState,
                 floatingActionButton = fab,
-                floatingActionButtonPosition = FabPosition.End
+                floatingActionButtonPosition = FabPosition.End,
+                bottomBar = {
+                    fabPlacement = AmbientFabPlacement.current
+                }
             ) {
                 Text("body")
             }
         }
         rule.runOnIdle {
-            assertThat(scaffoldState.scaffoldGeometry.fabBounds?.size)
-                .isEqualTo(fabSize.toSize())
+            assertThat(fabPlacement?.width).isEqualTo(fabSize.width)
+            assertThat(fabPlacement?.height).isEqualTo(fabSize.height)
             showFab.value = false
         }
 
         rule.runOnIdle {
-            assertThat(scaffoldState.scaffoldGeometry.fabBounds?.size).isEqualTo(null)
-        }
-    }
-
-    @Test
-    fun scaffold_geometry_bottomBarSize() {
-        var bottomBarSize: IntSize = IntSize.Zero
-        val showBottom = mutableStateOf(true)
-        lateinit var scaffoldState: ScaffoldState
-        rule.setContent {
-            scaffoldState = rememberScaffoldState()
-            val bottom: @Composable (() -> Unit)? = if (showBottom.value) {
-                @Composable {
-                    Box(
-                        Modifier
-                            .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                bottomBarSize = positioned.size
-                            }
-                            .fillMaxWidth()
-                            .preferredHeight(100.dp)
-                            .background(color = Color.Red)
-                    )
-                }
-            } else {
-                null
-            }
-            Scaffold(
-                scaffoldState = scaffoldState,
-                bottomBar = bottom
-            ) {
-                Text("body")
-            }
-        }
-        rule.runOnIdle {
-            assertThat(scaffoldState.scaffoldGeometry.bottomBarBounds?.size)
-                .isEqualTo(bottomBarSize.toSize())
-            showBottom.value = false
-        }
-
-        rule.runOnIdle {
-            assertThat(scaffoldState.scaffoldGeometry.bottomBarBounds?.size)
-                .isEqualTo(null)
-        }
-    }
-
-    @Test
-    fun scaffold_geometry_topBarSize() {
-        var topBarSize: IntSize = IntSize.Zero
-        val showTop = mutableStateOf(true)
-        lateinit var scaffoldState: ScaffoldState
-        rule.setContent {
-            scaffoldState = rememberScaffoldState()
-            val top: @Composable (() -> Unit)? = if (showTop.value) {
-                @Composable {
-                    Box(
-                        Modifier
-                            .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                topBarSize = positioned.size
-                            }
-                            .fillMaxWidth()
-                            .preferredHeight(100.dp)
-                            .background(color = Color.Red)
-                    )
-                }
-            } else {
-                null
-            }
-            Scaffold(
-                scaffoldState = scaffoldState,
-                topBar = top
-            ) {
-                Text("body")
-            }
-        }
-        rule.runOnIdle {
-            assertThat(scaffoldState.scaffoldGeometry.topBarBounds?.size)
-                .isEqualTo(topBarSize.toSize())
-            showTop.value = false
-        }
-
-        rule.runOnIdle {
-            assertThat(scaffoldState.scaffoldGeometry.topBarBounds?.size)
-                .isEqualTo(null)
+            assertThat(fabPlacement).isEqualTo(null)
+            assertThat(fabPlacement).isEqualTo(null)
         }
     }
 
@@ -539,38 +452,6 @@ class ScaffoldTest {
             with(rule.density) {
                 assertThat(innerPadding.bottom).isEqualTo(bottomBarSize.toSize().height.toDp())
             }
-        }
-    }
-
-    @Test
-    fun scaffold_bottomBar_geometryPropagation() {
-        var bottomBarSize: IntSize = IntSize.Zero
-        lateinit var geometry: ScaffoldGeometry
-
-        lateinit var scaffoldState: ScaffoldState
-        rule.setContent {
-            scaffoldState = rememberScaffoldState()
-            Scaffold(
-                scaffoldState = scaffoldState,
-                bottomBar = {
-                    geometry = AmbientScaffoldGeometry.current
-                    Box(
-                        Modifier
-                            .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                bottomBarSize = positioned.size
-                            }
-                            .fillMaxWidth()
-                            .preferredHeight(100.dp)
-                            .background(color = Color.Red)
-                    )
-                }
-            ) {
-                Text("body")
-            }
-        }
-        rule.runOnIdle {
-            assertThat(geometry.bottomBarBounds?.size).isEqualTo(bottomBarSize.toSize())
-            assertThat(geometry.bottomBarBounds?.width).isNotEqualTo(0f)
         }
     }
 }
