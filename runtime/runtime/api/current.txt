@@ -158,7 +158,7 @@ package androidx.compose.runtime {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  public interface CompositionCoroutineScope extends kotlinx.coroutines.CoroutineScope {
+  @Deprecated public interface CompositionCoroutineScope extends kotlinx.coroutines.CoroutineScope {
     method @Deprecated public default suspend Object? awaitFrame(kotlin.coroutines.Continuation<? super java.lang.Long> p);
   }
 
@@ -507,12 +507,17 @@ package androidx.compose.runtime {
   }
 
   public final class SuspendingEffectsKt {
-    method public static suspend Object? awaitDispose(androidx.compose.runtime.CompositionCoroutineScope, kotlin.jvm.functions.Function0<kotlin.Unit> onDispose = {}, kotlin.coroutines.Continuation<?> p = {});
-    method @androidx.compose.runtime.Composable public static void launchInComposition(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable public static void launchInComposition(Object? key, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable public static void launchInComposition(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable public static void launchInComposition(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable public static void launchInComposition(Object![]? keys, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable public static void LaunchedTask(kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable public static void LaunchedTask(Object![]? keys, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @Deprecated public static suspend Object? awaitDispose(androidx.compose.runtime.CompositionCoroutineScope, kotlin.jvm.functions.Function0<kotlin.Unit> onDispose = {}, kotlin.coroutines.Continuation<?> p = {});
+    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object? key, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object![]? keys, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @androidx.compose.runtime.Composable public static inline kotlinx.coroutines.CoroutineScope rememberCoroutineScope(kotlin.jvm.functions.Function0<? extends kotlin.coroutines.CoroutineContext> getContext = { return EmptyCoroutineContext });
   }
 
