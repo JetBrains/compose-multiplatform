@@ -19,13 +19,6 @@ package androidx.compose.runtime
 // TODO(aelias): Mark the typealiases internal when https://youtrack.jetbrains.com/issue/KT-36695 is fixed.
 // Currently, they behave as internal because the actual is internal, even though the expect is public.
 
-expect class BitSet() {
-    fun set(bitIndex: Int)
-    fun or(set: BitSet)
-    fun clear(bitIndex: Int)
-    operator fun get(bitIndex: Int): Boolean
-}
-
 internal expect open class ThreadLocal<T>(initialValue: () -> T) {
     fun get(): T
     fun set(value: T)
