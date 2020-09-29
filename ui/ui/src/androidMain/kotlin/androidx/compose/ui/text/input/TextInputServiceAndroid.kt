@@ -29,6 +29,8 @@ import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextRange
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlin.math.roundToInt
 
 /**
@@ -55,6 +57,12 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
      * The editable buffer used for BaseInputConnection.
      */
     private lateinit var imm: InputMethodManager
+
+    /**
+     * A channel that is used to send ShowKeyboard/HideKeyboard commands. Send 'true' for
+     * show Keyboard and 'false' to hide keyboard.
+     */
+    private val showKeyboardChannel = Channel<Boolean>(Channel.CONFLATED)
 
     private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
         // focusedRect is null if there is not ongoing text input session. So safe to request
@@ -138,11 +146,26 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     override fun showSoftwareKeyboard() {
-        imm.showSoftInput(view, 0)
+        showKeyboardChannel.offer(true)
     }
 
     override fun hideSoftwareKeyboard() {
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
+        showKeyboardChannel.offer(false)
+    }
+
+    @OptIn(FlowPreview::class)
+    suspend fun keyboardVisibilityEventLoop() {
+        for (showKeyboard in showKeyboardChannel) {
+            // Even though we are using a conflated channel, and the producers and consumers are
+            // on the same thread, there is a possibility that we have a stale value in the channel
+            // because we start consuming from it before we finish producing all the values. We poll
+            // to make sure that we use the most recent value.
+            if (showKeyboardChannel.poll() ?: showKeyboard) {
+                imm.showSoftInput(view, 0)
+            } else {
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+            }
+        }
     }
 
     override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
