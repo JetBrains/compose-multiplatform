@@ -44,7 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.junit.After
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -58,7 +58,7 @@ import kotlin.test.assertTrue
 @Suppress("unused")
 class CompositionTests {
 
-    @After
+    @AfterTest
     fun teardown() {
         clearRoots()
     }

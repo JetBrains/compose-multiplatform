@@ -16,7 +16,6 @@
 
 package androidx.compose.runtime.snapshots
 
-import java.util.BitSet
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -147,47 +146,45 @@ class SnapshotIdSetTests {
     }
 
     @Test
-    fun shouldMatchBitSet() {
+    fun shouldMatchBooleanArray() {
         val random = Random(10)
-        val bitSet = BitSet()
+        val booleans = BooleanArray(1000)
         val set = (0..100).fold(SnapshotIdSet.EMPTY) { prev, _ ->
             val value = random.nextInt(0, 1000)
-            bitSet.set(value)
+            booleans[value] = true
             prev.set(value)
         }
 
         val clear = (0..100).fold(set) { prev, _ ->
             val value = random.nextInt(0, 1000)
-            bitSet.clear(value)
+            booleans[value] = false
             prev.clear(value)
         }
 
         repeat(1000) {
-            clear.shouldBe(it, bitSet[it])
+            clear.shouldBe(it, booleans[it])
         }
     }
 
     @Test
     fun shouldBeAbleToAndNotBits() {
         val random = Random(11)
-        val bitSetA = BitSet()
+        val booleans = BooleanArray(1000)
         val setA = (0..100).fold(SnapshotIdSet.EMPTY) { prev, _ ->
             val value = random.nextInt(0, 1000)
-            bitSetA.set(value)
+            booleans[value] = true
             prev.set(value)
         }
 
-        val bitSetB = BitSet()
         val setB = (0..100).fold(SnapshotIdSet.EMPTY) { prev, _ ->
             val value = random.nextInt(0, 1000)
-            bitSetB.set(value)
+            booleans[value] = false
             prev.set(value)
         }
 
         val set = setA.andNot(setB)
-        bitSetA.andNot(bitSetB)
         repeat(1000) {
-            set.shouldBe(it, bitSetA[it])
+            set.shouldBe(it, booleans[it])
         }
     }
 
@@ -195,22 +192,22 @@ class SnapshotIdSetTests {
     fun shouldBeAbleToAndNot() {
         fun test(size: Int) {
             val random = Random(size)
-            val bitSet = BitSet()
+            val booleans = BooleanArray(1024)
             val setA = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
                 if (random.nextInt(0, 1000) > 500) {
-                    bitSet.set(index)
+                    booleans[index] = true
                     prev.set(index)
                 } else prev
             }
             val setB = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
                 if (random.nextInt(0, 1000) > 500) {
-                    bitSet.clear(index)
+                    booleans[index] = false
                     prev.set(index)
                 } else prev
             }
             val set = setA.andNot(setB)
             repeat(size) {
-                set.shouldBe(it, bitSet[it])
+                set.shouldBe(it, booleans[it])
             }
         }
         test(32)
@@ -224,22 +221,22 @@ class SnapshotIdSetTests {
     fun shouldBeAbleToOr() {
         fun test(size: Int) {
             val random = Random(size)
-            val bitSet = BitSet()
+            val booleans = BooleanArray(1024)
             val setA = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
                 if (random.nextInt(0, 1000) > 500) {
-                    bitSet.set(index)
+                    booleans[index] = true
                     prev.set(index)
                 } else prev
             }
             val setB = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
                 if (random.nextInt(0, 1000) > 500) {
-                    bitSet.set(index)
+                    booleans[index] = true
                     prev.set(index)
                 } else prev
             }
             val set = setA.or(setB)
             repeat(size) {
-                set.shouldBe(it, bitSet[it])
+                set.shouldBe(it, booleans[it])
             }
         }
         test(32)

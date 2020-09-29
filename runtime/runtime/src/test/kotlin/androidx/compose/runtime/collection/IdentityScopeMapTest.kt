@@ -16,26 +16,17 @@
 
 package androidx.compose.runtime.collection
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 @OptIn(ExperimentalCollectionApi::class)
-@RunWith(JUnit4::class)
 class IdentityScopeMapTest {
     private val map = IdentityScopeMap<Scope>()
 
     private val scopeList = listOf(Scope(10), Scope(12), Scope(1), Scope(30), Scope(10))
     private val valueList = listOf("A", "B")
-
-    @Before
-    fun setUp() {
-        map.clear()
-    }
 
     @Test
     fun emptyConstruction() {
