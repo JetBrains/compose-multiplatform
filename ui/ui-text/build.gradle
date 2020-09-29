@@ -104,10 +104,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(KOTLIN_STDLIB)
             }
 
-            desktopMain.dependencies {
-                implementation(SKIKO)
-            }
-
             desktopMain.dependsOn jvmMain
 
             androidMain.dependencies {
