@@ -20,6 +20,9 @@ import androidx.compose.material.studies.rally.RallyActivity
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-val MaterialStudies = DemoCategory("Material Studies", listOf(
-    ActivityDemo("Rally", RallyActivity::class)
-))
+val MaterialStudies = DemoCategory(
+    "Material Studies",
+    listOf(
+        ActivityDemo("Rally", RallyActivity::class)
+    )
+)
