@@ -62,8 +62,9 @@ inline class TextUnit(val packedValue: Long) {
      * equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun plus(other: TextUnit) = checkArithmetic(this, other) {
-        pack(rawType, value + other.value)
+    inline operator fun plus(other: TextUnit): TextUnit {
+        checkArithmetic(this, other)
+        return pack(rawType, value + other.value)
     }
 
     /**
@@ -73,8 +74,9 @@ inline class TextUnit(val packedValue: Long) {
      * equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun minus(other: TextUnit) = checkArithmetic(this, other) {
-        pack(rawType, value - other.value)
+    inline operator fun minus(other: TextUnit): TextUnit {
+        checkArithmetic(this, other)
+        return pack(rawType, value - other.value)
     }
 
     /**
@@ -83,8 +85,9 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if the operand is not equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun unaryMinus() = checkArithmetic(this) {
-        pack(rawType, -value)
+    inline operator fun unaryMinus(): TextUnit {
+        checkArithmetic(this)
+        return pack(rawType, -value)
     }
 
     /**
@@ -93,8 +96,9 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if the left operand is not equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun div(other: Float): TextUnit = checkArithmetic(this) {
-        pack(rawType, value / other)
+    inline operator fun div(other: Float): TextUnit {
+        checkArithmetic(this)
+        return pack(rawType, value / other)
     }
 
     /**
@@ -103,8 +107,9 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if the left operand is not equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun div(other: Double): TextUnit = checkArithmetic(this) {
-        pack(rawType, (value / other).toFloat())
+    inline operator fun div(other: Double): TextUnit {
+        checkArithmetic(this)
+        return pack(rawType, (value / other).toFloat())
     }
 
     /**
@@ -113,8 +118,9 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if the left operand is not equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun div(other: Int): TextUnit = checkArithmetic(this) {
-        pack(rawType, value / other)
+    inline operator fun div(other: Int): TextUnit {
+        checkArithmetic(this)
+        return pack(rawType, value / other)
     }
 
     /**
@@ -123,8 +129,9 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if all the operands are the same unit type and they are not
      * equal to [TextUnit.Inherit].
      */
-    inline operator fun div(other: TextUnit): Float = checkArithmetic(this, other) {
-        value / other.value
+    inline operator fun div(other: TextUnit): Float {
+        checkArithmetic(this, other)
+        return value / other.value
     }
 
     /**
@@ -133,8 +140,9 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if the left operand is not equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun times(other: Float): TextUnit = checkArithmetic(this) {
-        pack(rawType, value * other)
+    inline operator fun times(other: Float): TextUnit {
+        checkArithmetic(this)
+        return pack(rawType, value * other)
     }
 
     /**
@@ -143,8 +151,9 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if the left operand is not equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun times(other: Double): TextUnit = checkArithmetic(this) {
-        pack(rawType, (value * other).toFloat())
+    inline operator fun times(other: Double): TextUnit {
+        checkArithmetic(this)
+        return pack(rawType, (value * other).toFloat())
     }
 
     /**
@@ -153,15 +162,17 @@ inline class TextUnit(val packedValue: Long) {
      * This operation works only if the left operand is not equal to [TextUnit.Inherit].
      * The result of this operation is the same unit type of the given one.
      */
-    inline operator fun times(other: Int): TextUnit = checkArithmetic(this) {
-        pack(rawType, value * other)
+    inline operator fun times(other: Int): TextUnit {
+        checkArithmetic(this)
+        return pack(rawType, value * other)
     }
 
     /**
      * Support comparing Dimensions with comparison operators.
      */
-    inline operator fun compareTo(other: TextUnit): Int = checkArithmetic(this, other) {
-        value.compareTo(other.value)
+    inline operator fun compareTo(other: TextUnit): Int {
+        checkArithmetic(this, other)
+        return value.compareTo(other.value)
     }
 
     override fun toString(): String {
@@ -291,8 +302,9 @@ val Int.em: TextUnit get() = pack(UNIT_TYPE_EM, this.toFloat())
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
-inline operator fun Float.times(other: TextUnit) = checkArithmetic(other) {
-    pack(other.rawType, this * other.value)
+inline operator fun Float.times(other: TextUnit): TextUnit {
+    checkArithmetic(other)
+    return pack(other.rawType, this * other.value)
 }
 
 /**
@@ -302,8 +314,9 @@ inline operator fun Float.times(other: TextUnit) = checkArithmetic(other) {
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
-inline operator fun Double.times(other: TextUnit) = checkArithmetic(other) {
-    pack(other.rawType, this.toFloat() * other.value)
+inline operator fun Double.times(other: TextUnit): TextUnit {
+    checkArithmetic(other)
+    return pack(other.rawType, this.toFloat() * other.value)
 }
 
 /**
@@ -313,8 +326,9 @@ inline operator fun Double.times(other: TextUnit) = checkArithmetic(other) {
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
-inline operator fun Int.times(other: TextUnit) = checkArithmetic(other) {
-    pack(other.rawType, this * other.value)
+inline operator fun Int.times(other: TextUnit): TextUnit {
+    checkArithmetic(other)
+    return pack(other.rawType, this * other.value)
 }
 
 /**
@@ -325,8 +339,9 @@ inline operator fun Int.times(other: TextUnit) = checkArithmetic(other) {
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
-inline fun min(a: TextUnit, b: TextUnit): TextUnit = checkArithmetic(a, b) {
-    if (a.value < b.value) a else b
+inline fun min(a: TextUnit, b: TextUnit): TextUnit {
+    checkArithmetic(a, b)
+    return if (a.value < b.value) a else b
 }
 
 /**
@@ -337,8 +352,9 @@ inline fun min(a: TextUnit, b: TextUnit): TextUnit = checkArithmetic(a, b) {
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
-inline fun max(a: TextUnit, b: TextUnit): TextUnit = checkArithmetic(a, b) {
-    if (a.value < b.value) b else a
+inline fun max(a: TextUnit, b: TextUnit): TextUnit {
+    checkArithmetic(a, b)
+    return if (a.value < b.value) b else a
 }
 
 /**
@@ -353,10 +369,10 @@ inline fun max(a: TextUnit, b: TextUnit): TextUnit = checkArithmetic(a, b) {
  * [minimumValue], or [maximumValue] if this value is greater than [maximumValue].
  */
 @Stable
-inline fun TextUnit.coerceIn(minimumValue: TextUnit, maximumValue: TextUnit): TextUnit =
-    checkArithmetic(this, minimumValue, maximumValue) {
-        pack(rawType, value.coerceIn(minimumValue.value, maximumValue.value))
-    }
+inline fun TextUnit.coerceIn(minimumValue: TextUnit, maximumValue: TextUnit): TextUnit {
+    checkArithmetic(this, minimumValue, maximumValue)
+    return pack(rawType, value.coerceIn(minimumValue.value, maximumValue.value))
+}
 
 /**
  * Ensures that the value of [TextUnit] is not less than the specified [minimumValue].
@@ -365,10 +381,10 @@ inline fun TextUnit.coerceIn(minimumValue: TextUnit, maximumValue: TextUnit): Te
  * [minimumValue] otherwise.
  */
 @Stable
-inline fun TextUnit.coerceAtLeast(minimumValue: TextUnit): TextUnit =
-    checkArithmetic(this, minimumValue) {
-        pack(rawType, value.coerceAtLeast(minimumValue.value))
-    }
+inline fun TextUnit.coerceAtLeast(minimumValue: TextUnit): TextUnit {
+    checkArithmetic(this, minimumValue)
+    return pack(rawType, value.coerceAtLeast(minimumValue.value))
+}
 
 /**
  * Ensures that the value of [TextUnit] is not greater than the specified [maximumValue].
@@ -377,38 +393,35 @@ inline fun TextUnit.coerceAtLeast(minimumValue: TextUnit): TextUnit =
  * [maximumValue] otherwise.
  */
 @Stable
-inline fun TextUnit.coerceAtMost(maximumValue: TextUnit): TextUnit =
-    checkArithmetic(this, maximumValue) {
-        pack(rawType, value.coerceAtMost(maximumValue.value))
-    }
+inline fun TextUnit.coerceAtMost(maximumValue: TextUnit): TextUnit {
+    checkArithmetic(this, maximumValue)
+    return pack(rawType, value.coerceAtMost(maximumValue.value))
+}
 
 @PublishedApi
 internal inline fun pack(unitType: Long, v: Float): TextUnit =
     TextUnit(unitType or (v.toBits().toLong() and 0xFFFF_FFFFL))
 
 @PublishedApi
-internal inline fun <T> checkArithmetic(a: TextUnit, block: () -> T): T {
+internal fun checkArithmetic(a: TextUnit) {
     require(a.type != TextUnitType.Inherit) {
         "Cannot perform operation for Inherit type."
     }
-    return block()
 }
 
 @PublishedApi
-internal inline fun <T> checkArithmetic(a: TextUnit, b: TextUnit, block: () -> T): T {
+internal fun checkArithmetic(a: TextUnit, b: TextUnit) {
     require(a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit) {
         "Cannot perform operation for Inherit type."
     }
     require(a.type == b.type) {
         "Cannot perform operation for ${a.type} and ${b.type}"
     }
-    return block()
 }
 
 @PublishedApi
-internal inline fun <T> checkArithmetic(a: TextUnit, b: TextUnit, c: TextUnit, block: () -> T): T {
-    require(
-        a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit &&
+internal fun checkArithmetic(a: TextUnit, b: TextUnit, c: TextUnit) {
+    require(a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit &&
             c.type != TextUnitType.Inherit
     ) {
         "Cannot perform operation for Inherit type."
@@ -416,10 +429,10 @@ internal inline fun <T> checkArithmetic(a: TextUnit, b: TextUnit, c: TextUnit, b
     require(a.type == b.type && b.type == c.type) {
         "Cannot perform operation for ${a.type} and ${b.type}"
     }
-    return block()
 }
 
 @Stable
-fun lerp(a: TextUnit, b: TextUnit, t: Float): TextUnit = checkArithmetic(a, b) {
+fun lerp(a: TextUnit, b: TextUnit, t: Float): TextUnit {
+    checkArithmetic(a, b)
     return pack(a.rawType, lerp(a.value, b.value, t))
 }
