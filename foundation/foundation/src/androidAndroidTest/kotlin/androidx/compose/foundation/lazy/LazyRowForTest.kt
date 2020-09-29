@@ -43,19 +43,18 @@ import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertIsEqualTo
+import androidx.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.ui.test.assertPositionInRootIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.getUnclippedBoundsInRoot
 import androidx.ui.test.onNodeWithTag
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(JUnit4::class)
@@ -195,10 +194,10 @@ class LazyRowForTest {
         var itemBounds = rule.onNodeWithTag(itemTag)
             .getUnclippedBoundsInRoot()
 
-        Truth.assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
-        Truth.assertThat(itemBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
-        Truth.assertThat(itemBounds.top.toIntPx()).isWithin1PixelFrom(10.dp.toIntPx())
-        Truth.assertThat(itemBounds.bottom.toIntPx())
+        assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
+        assertThat(itemBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+        assertThat(itemBounds.top.toIntPx()).isWithin1PixelFrom(10.dp.toIntPx())
+        assertThat(itemBounds.bottom.toIntPx())
             .isWithin1PixelFrom(100.dp.toIntPx() - 10.dp.toIntPx())
 
         rule.onNodeWithTag(LazyRowForTag)
@@ -207,8 +206,8 @@ class LazyRowForTest {
         itemBounds = rule.onNodeWithTag(itemTag)
             .getUnclippedBoundsInRoot()
 
-        Truth.assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(0)
-        Truth.assertThat(itemBounds.right.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
+        assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(0)
+        assertThat(itemBounds.right.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
     }
 
     @Test
@@ -242,10 +241,10 @@ class LazyRowForTest {
         var lazyRowBounds = rule.onNodeWithTag(LazyRowForTag)
             .getUnclippedBoundsInRoot()
 
-        Truth.assertThat(lazyRowBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        Truth.assertThat(lazyRowBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
-        Truth.assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        Truth.assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
+        assertThat(lazyRowBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
+        assertThat(lazyRowBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+        assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
+        assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
 
         rule.runOnIdle {
             sameSizeItems = false
@@ -262,10 +261,10 @@ class LazyRowForTest {
         lazyRowBounds = rule.onNodeWithTag(LazyRowForTag)
             .getUnclippedBoundsInRoot()
 
-        Truth.assertThat(lazyRowBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        Truth.assertThat(lazyRowBounds.right.toIntPx()).isWithin1PixelFrom(120.dp.toIntPx())
-        Truth.assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        Truth.assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(70.dp.toIntPx())
+        assertThat(lazyRowBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
+        assertThat(lazyRowBounds.right.toIntPx()).isWithin1PixelFrom(120.dp.toIntPx())
+        assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
+        assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(70.dp.toIntPx())
     }
 
     private val firstItemTag = "firstItemTag"
@@ -297,8 +296,8 @@ class LazyRowForTest {
 
         with(rule.density) {
             // Verify the height of the row
-            Truth.assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-            Truth.assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+            assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
+            assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
         }
     }
 
@@ -430,7 +429,7 @@ class LazyRowForTest {
 
     @Test
     fun whenNotAnymoreAvailableItemWasDisplayed() {
-        var items by mutableStateOf ((1..30).toList())
+        var items by mutableStateOf((1..30).toList())
         rule.setContent {
             LazyRowFor(
                 items = items,
@@ -455,7 +454,7 @@ class LazyRowForTest {
 
     @Test
     fun whenFewDisplayedItemsWereRemoved() {
-        var items by mutableStateOf ((1..10).toList())
+        var items by mutableStateOf((1..10).toList())
         rule.setContent {
             LazyRowFor(
                 items = items,
@@ -480,7 +479,7 @@ class LazyRowForTest {
 
     @Test
     fun whenItemsBecameEmpty() {
-        var items by mutableStateOf ((1..10).toList())
+        var items by mutableStateOf((1..10).toList())
         rule.setContent {
             LazyRowFor(
                 items = items,
@@ -512,7 +511,7 @@ class LazyRowForTest {
 
     @Test
     fun scrollBackAndForth() {
-        val items by mutableStateOf ((1..20).toList())
+        val items by mutableStateOf((1..20).toList())
         rule.setContent {
             LazyRowFor(
                 items = items,
@@ -536,7 +535,7 @@ class LazyRowForTest {
 
     @Test
     fun tryToScrollBackwardWhenAlreadyOnTop() {
-        val items by mutableStateOf ((1..20).toList())
+        val items by mutableStateOf((1..20).toList())
         rule.setContent {
             LazyRowFor(
                 items = items,
@@ -580,22 +579,22 @@ class LazyRowForTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(firstItemRecomposed).isEqualTo(1)
-            Truth.assertThat(secondItemRecomposed).isEqualTo(1)
+            assertThat(firstItemRecomposed).isEqualTo(1)
+            assertThat(secondItemRecomposed).isEqualTo(1)
         }
 
         rule.onNodeWithTag(LazyRowForTag)
             .scrollBy(x = (50).dp, density = rule.density)
 
         rule.runOnIdle {
-            Truth.assertThat(firstItemRecomposed).isEqualTo(1)
-            Truth.assertThat(secondItemRecomposed).isEqualTo(1)
+            assertThat(firstItemRecomposed).isEqualTo(1)
+            assertThat(secondItemRecomposed).isEqualTo(1)
         }
     }
 
     @Test
     fun onlyOneMeasurePassForScrollEvent() {
-        val items by mutableStateOf ((1..20).toList())
+        val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
         rule.setContent {
             state = rememberLazyListState()
@@ -623,7 +622,7 @@ class LazyRowForTest {
 
     @Test
     fun stateUpdatedAfterScroll() {
-        val items by mutableStateOf ((1..20).toList())
+        val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
         rule.setContent {
             state = rememberLazyListState()
@@ -636,27 +635,86 @@ class LazyRowForTest {
             }
         }
 
-        assertThat(state.firstVisibleItemIndex).isEqualTo(0)
-        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
 
         rule.onNodeWithTag(LazyRowForTag)
             .scrollBy(x = 30.dp, density = rule.density)
 
-        assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
 
-        with (rule.density) {
-            // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
-            //  number of pixels
-            //  assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10.dp.toPx().roundToInt())
-            assertThat(state.firstVisibleItemScrollOffset).isGreaterThan(5.dp.toPx().roundToInt())
+            with(rule.density) {
+                // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
+                //  number of pixels
+                val expectedOffset = 10.dp.toIntPx()
+                val tolerance = 2.dp.toIntPx()
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset, tolerance)
+            }
         }
+    }
+
+    @Test
+    fun stateUpdatedAfterScrollWithinTheSameItem() {
+        val items by mutableStateOf((1..20).toList())
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = 10.dp, density = rule.density)
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            with(rule.density) {
+                val expectedOffset = 10.dp.toIntPx()
+                val tolerance = 2.dp.toIntPx()
+                assertThat(state.firstVisibleItemScrollOffset)
+                    .isEqualTo(expectedOffset, tolerance)
+            }
+        }
+    }
+
+    @Test
+    fun initialScrollIsApplied() {
+        val items by mutableStateOf((0..20).toList())
+        lateinit var state: LazyListState
+        val expectedOffset = with(rule.density) { 10.dp.toIntPx() }
+        rule.setContent {
+            state = rememberLazyListState(2, expectedOffset)
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(2)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset)
+        }
+
+        rule.onNodeWithTag("2")
+            .assertLeftPositionInRootIsEqualTo((-10).dp)
     }
 
     @Test
     fun stateIsRestored() {
         val restorationTester = StateRestorationTester(rule)
-        val items by mutableStateOf ((1..20).toList())
-        var state: LazyListState?
+        val items by mutableStateOf((1..20).toList())
+        var state: LazyListState? = null
         restorationTester.setContent {
             state = rememberLazyListState()
             LazyRowFor(
@@ -671,18 +729,17 @@ class LazyRowForTest {
         rule.onNodeWithTag(LazyRowForTag)
             .scrollBy(x = 30.dp, density = rule.density)
 
+        val (index, scrollOffset) = rule.runOnIdle {
+            state!!.firstVisibleItemIndex to state!!.firstVisibleItemScrollOffset
+        }
+
         state = null
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        assertThat(state!!.firstVisibleItemIndex).isEqualTo(1)
-
-        with (rule.density) {
-            // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
-            //  number of pixels
-            //  assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10.dp.toPx().roundToInt())
-            assertThat(state!!.firstVisibleItemScrollOffset).isGreaterThan(5.dp.toPx()
-                .roundToInt())
+        rule.runOnIdle {
+            assertThat(state!!.firstVisibleItemIndex).isEqualTo(index)
+            assertThat(state!!.firstVisibleItemScrollOffset).isEqualTo(scrollOffset)
         }
     }
 }
