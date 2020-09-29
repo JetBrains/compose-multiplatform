@@ -77,7 +77,7 @@ dependencies {
     cacheableImplementation "org.anarres.jarjar:jarjar-gradle:1.0.1"
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
-    cacheableRuntime "com.google.dagger:hilt-android-gradle-plugin:DEV-SNAPSHOT"
+    cacheableRuntime build_libs.hilt_plugin
     // dependencies whose resolutions we don't need to cache
     compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
     implementation project("jetpad-integration") // Doesn't have a .pom, so not slow to load
