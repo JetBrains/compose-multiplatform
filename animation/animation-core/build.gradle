@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -25,44 +27,75 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("kotlin-multiplatform")
 }
+
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
+
+    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+
+        api "androidx.annotation:annotation:1.1.0"
+
+        implementation project(":compose:runtime:runtime")
+        implementation project(":compose:runtime:runtime-dispatch")
+        implementation project(":compose:ui:ui-util")
+        implementation (KOTLIN_STDLIB)
+
+        testImplementation(ANDROIDX_TEST_RULES)
+        testImplementation(ANDROIDX_TEST_RUNNER)
+        testImplementation(JUNIT)
+        testImplementation(TRUTH)
+        testImplementation(KOTLIN_COROUTINES_CORE)
+
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(JUNIT)
+    }
 }
 
-kotlin {
-    android()
-    jvm("desktop")
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation project(":compose:runtime:runtime")
-            implementation project(":compose:runtime:runtime-dispatch")
-            implementation project(":compose:ui:ui-util")
-            implementation (KOTLIN_STDLIB_COMMON)
-        }
-        androidMain.dependencies {
-            api "androidx.annotation:annotation:1.1.0"
-            implementation (KOTLIN_STDLIB)
-        }
-        desktopMain.dependencies {
-            implementation (KOTLIN_STDLIB)
-        }
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation project(":compose:runtime:runtime")
+                implementation project(":compose:runtime:runtime-dispatch")
+                implementation project(":compose:ui:ui-util")
+                implementation(KOTLIN_STDLIB_COMMON)
+            }
+            androidMain.dependencies {
+                api "androidx.annotation:annotation:1.1.0"
+                implementation(KOTLIN_STDLIB)
+            }
+            desktopMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+            }
 
-        androidTest.dependencies {
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(JUNIT)
-            implementation(TRUTH)
-            implementation(KOTLIN_COROUTINES_CORE)
-        }
+            androidTest.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(JUNIT)
+                implementation(TRUTH)
+                implementation(KOTLIN_COROUTINES_CORE)
+            }
 
-        androidAndroidTest.dependencies {
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(JUNIT)
+            androidAndroidTest.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(JUNIT)
+            }
         }
     }
 }

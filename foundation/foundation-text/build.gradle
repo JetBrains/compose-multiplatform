@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -25,61 +27,109 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("kotlin-multiplatform")
 }
+
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
+
+    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+
+        api project(":compose:ui:ui")
+        api project(":compose:ui:ui-text")
+        api project(":compose:ui:ui-util")
+
+        implementation(KOTLIN_STDLIB)
+        implementation(KOTLIN_COROUTINES_CORE)
+
+        testImplementation(ANDROIDX_TEST_RULES)
+        testImplementation(ANDROIDX_TEST_RUNNER)
+        testImplementation(JUNIT)
+        testImplementation(MOCKITO_CORE)
+        testImplementation(TRUTH)
+        testImplementation(KOTLIN_REFLECT)
+        testImplementation MOCKITO_KOTLIN, {
+            exclude group: 'org.mockito' // to keep control on the mockito version
+        }
+
+        androidTestImplementation project(":compose:foundation:foundation-layout")
+        androidTestImplementation project(":compose:ui:ui-test-font")
+        androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation "androidx.core:core:1.5.0-alpha01"
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
+        androidTestImplementation(ESPRESSO_CORE)
+        androidTestImplementation(JUNIT)
+        androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
+        androidTestImplementation(TRUTH)
+        androidTestImplementation MOCKITO_KOTLIN, {
+            exclude group: 'org.mockito' // to keep control on the mockito version
+        }
+    }
 }
 
-kotlin {
-    android()
-    jvm("desktop")
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
-            implementation(KOTLIN_COROUTINES_CORE)
-            api project(":compose:ui:ui")
-            api project(":compose:ui:ui-text")
-            api project(":compose:ui:ui-util")
-        }
-
-        androidMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-        }
-
-        desktopMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-            implementation(SKIKO)
-        }
-
-        test.dependencies {
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(JUNIT)
-            implementation(MOCKITO_CORE)
-            implementation(TRUTH)
-            implementation(KOTLIN_REFLECT)
-            implementation MOCKITO_KOTLIN, {
-                exclude group: 'org.mockito' // to keep control on the mockito version
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(KOTLIN_COROUTINES_CORE)
+                api project(":compose:ui:ui")
+                api project(":compose:ui:ui-text")
+                api project(":compose:ui:ui-util")
             }
-        }
 
-        androidAndroidTest.dependencies {
-            implementation project(":compose:foundation:foundation-layout")
-            implementation project(":compose:ui:ui-test-font")
-            implementation project(":ui:ui-test")
-            implementation "androidx.core:core:1.5.0-alpha01"
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-            implementation(ESPRESSO_CORE)
-            implementation(JUNIT)
-            implementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-            implementation(TRUTH)
-            implementation MOCKITO_KOTLIN, {
-                exclude group: 'org.mockito' // to keep control on the mockito version
+            androidMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+            }
+
+            desktopMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+                implementation(SKIKO)
+            }
+
+            test.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(JUNIT)
+                implementation(MOCKITO_CORE)
+                implementation(TRUTH)
+                implementation(KOTLIN_REFLECT)
+                implementation MOCKITO_KOTLIN, {
+                    exclude group: 'org.mockito' // to keep control on the mockito version
+                }
+            }
+
+            androidAndroidTest.dependencies {
+                implementation project(":compose:foundation:foundation-layout")
+                implementation project(":compose:ui:ui-test-font")
+                implementation project(":ui:ui-test")
+                implementation "androidx.core:core:1.5.0-alpha01"
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
+                // DexMaker has it"s own MockMaker
+                implementation(ESPRESSO_CORE)
+                implementation(JUNIT)
+                implementation(MOCKITO_CORE, libs.exclude_bytebuddy)
+                // DexMaker has it"s own MockMaker
+                implementation(TRUTH)
+                implementation MOCKITO_KOTLIN, {
+                    exclude group: 'org.mockito' // to keep control on the mockito version
+                }
             }
         }
     }
@@ -109,24 +159,25 @@ android {
     }
 }
 
-// An ugly hack to workaround b/159426957 causing MPP+AGP to conflict.
-// See also: https://youtrack.jetbrains.com/issue/KT-34650
-// See also: https://youtrack.jetbrains.com/issue/KT-39712
-afterEvaluate {
-    ["Api", "Implementation", "CompileOnly", "RuntimeOnly"].each { scope ->
-        def erroneousExtendsFrom = [
-                "androidTest$scope",
-                "androidTestDebug$scope"
-        ].collect { configurations[it] }
-        [
-                "androidDebugUnitTest$scope",
-                "test$scope",
-                "testDebug$scope",
-                "testRelease$scope"
-        ].each {
-            def configuration = configurations[it]
-            configuration.setExtendsFrom(configuration.extendsFrom - erroneousExtendsFrom)
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    // An ugly hack to workaround b/159426957 causing MPP+AGP to conflict.
+    // See also: https://youtrack.jetbrains.com/issue/KT-34650
+    // See also: https://youtrack.jetbrains.com/issue/KT-39712
+    afterEvaluate {
+        ["Api", "Implementation", "CompileOnly", "RuntimeOnly"].each { scope ->
+            def erroneousExtendsFrom = [
+                    "androidTest$scope",
+                    "androidTestDebug$scope"
+            ].collect { configurations[it] }
+            [
+                    "androidDebugUnitTest$scope",
+                    "test$scope",
+                    "testDebug$scope",
+                    "testRelease$scope"
+            ].each {
+                def configuration = configurations[it]
+                configuration.setExtendsFrom(configuration.extendsFrom - erroneousExtendsFrom)
+            }
         }
     }
 }
-
