@@ -211,10 +211,12 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         }
     }
 
+    @Suppress("DEPRECATION")
     private class CompositionCoroutineScopeImpl(
         override val coroutineContext: CoroutineContext
     ) : CompositionCoroutineScope
 
+    @Suppress("DEPRECATION")
     @OptIn(ExperimentalCoroutinesApi::class)
     internal fun launchEffect(
         block: suspend CompositionCoroutineScope.() -> Unit
