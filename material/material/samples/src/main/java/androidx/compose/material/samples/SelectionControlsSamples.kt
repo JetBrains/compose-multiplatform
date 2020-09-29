@@ -126,14 +126,15 @@ fun RadioGroupSample() {
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
     Column {
         radioOptions.forEach { text ->
-            Row(Modifier
-                .fillMaxWidth()
-                .preferredHeight(56.dp)
-                .selectable(
-                    selected = (text == selectedOption),
-                    onClick = { onOptionSelected(text) }
-                )
-                .padding(horizontal = 16.dp),
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .preferredHeight(56.dp)
+                    .selectable(
+                        selected = (text == selectedOption),
+                        onClick = { onOptionSelected(text) }
+                    )
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(

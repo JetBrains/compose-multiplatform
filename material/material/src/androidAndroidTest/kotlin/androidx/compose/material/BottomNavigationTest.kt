@@ -73,9 +73,11 @@ class BottomNavigationTest {
     fun bottomNavigationItem_sizeAndPositions() {
         lateinit var parentCoords: LayoutCoordinates
         val itemCoords = mutableMapOf<Int, LayoutCoordinates>()
-        rule.setMaterialContent(Modifier.onGloballyPositioned { coords: LayoutCoordinates ->
-            parentCoords = coords
-        }) {
+        rule.setMaterialContent(
+            Modifier.onGloballyPositioned { coords: LayoutCoordinates ->
+                parentCoords = coords
+            }
+        ) {
             Box {
                 BottomNavigation {
                     repeat(4) { index ->
@@ -118,7 +120,8 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(Icons.Filled.Favorite,
+                            Icon(
+                                Icons.Filled.Favorite,
                                 Modifier.testTag("icon")
                             )
                         },
@@ -165,7 +168,8 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(Icons.Filled.Favorite,
+                            Icon(
+                                Icons.Filled.Favorite,
                                 Modifier.testTag("icon")
                             )
                         },
@@ -201,7 +205,8 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(Icons.Filled.Favorite,
+                            Icon(
+                                Icons.Filled.Favorite,
                                 Modifier.testTag("icon")
                             )
                         },

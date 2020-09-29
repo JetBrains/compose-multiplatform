@@ -98,13 +98,16 @@ private fun DynamicThemeApp(scrollFraction: ScrollFraction, palette: Colors) {
             floatingActionButtonPosition = FabPosition.Center,
             isFloatingActionButtonDocked = true,
             bodyContent = { innerPadding ->
-                ScrollableColumn(scrollState = scrollState, children = {
-                    Column(Modifier.padding(innerPadding)) {
-                        repeat(20) { index ->
-                            Card(index)
+                ScrollableColumn(
+                    scrollState = scrollState,
+                    children = {
+                        Column(Modifier.padding(innerPadding)) {
+                            repeat(20) { index ->
+                                Card(index)
+                            }
                         }
                     }
-                })
+                )
             }
         )
     }

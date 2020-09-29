@@ -104,11 +104,14 @@ class BottomSheetState(
      * @param onExpanded Optional callback invoked when the bottom sheet has been expanded.
      */
     fun expand(onExpanded: (() -> Unit)? = null) {
-        animateTo(BottomSheetValue.Expanded, onEnd = { endReason, _ ->
-            if (endReason == AnimationEndReason.TargetReached) {
-                onExpanded?.invoke()
+        animateTo(
+            BottomSheetValue.Expanded,
+            onEnd = { endReason, _ ->
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onExpanded?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -117,11 +120,14 @@ class BottomSheetState(
      * @param onCollapsed Optional callback invoked when the bottom sheet has been collapsed.
      */
     fun collapse(onCollapsed: (() -> Unit)? = null) {
-        animateTo(BottomSheetValue.Collapsed, onEnd = { endReason, _ ->
-            if (endReason == AnimationEndReason.TargetReached) {
-                onCollapsed?.invoke()
+        animateTo(
+            BottomSheetValue.Collapsed,
+            onEnd = { endReason, _ ->
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onCollapsed?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -375,12 +381,14 @@ private fun BottomSheetScaffoldStack(
     bottomSheetOffset: State<Float>,
     floatingActionButtonPosition: FabPosition
 ) {
-    Layout(children = {
-        body()
-        bottomSheet()
-        floatingActionButton()
-        snackbarHost()
-    }) { measurables, constraints ->
+    Layout(
+        children = {
+            body()
+            bottomSheet()
+            floatingActionButton()
+            snackbarHost()
+        }
+    ) { measurables, constraints ->
         val placeable = measurables.first().measure(constraints)
 
         layout(placeable.width, placeable.height) {

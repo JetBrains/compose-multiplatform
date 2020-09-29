@@ -85,7 +85,8 @@ fun FloatingActionButton(
         modifier = modifier.clickable(
             onClick = onClick,
             interactionState = interactionState,
-            indication = null),
+            indication = null
+        ),
         shape = shape,
         color = backgroundColor,
         contentColor = contentColor,

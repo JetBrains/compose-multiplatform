@@ -106,11 +106,14 @@ class ModalBottomSheetState(
         val targetValue =
             if (isHalfExpandedEnabled) ModalBottomSheetValue.HalfExpanded
             else ModalBottomSheetValue.Expanded
-        animateTo(targetValue = targetValue, onEnd = { endReason, _ ->
-            if (endReason == AnimationEndReason.TargetReached) {
-                onShown?.invoke()
+        animateTo(
+            targetValue = targetValue,
+            onEnd = { endReason, _ ->
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onShown?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -119,11 +122,14 @@ class ModalBottomSheetState(
      * @param onHidden Optional callback invoked when the bottom sheet has been hidden.
      */
     fun hide(onHidden: (() -> Unit)? = null) {
-        animateTo(targetValue = ModalBottomSheetValue.Hidden, onEnd = { endReason, _ ->
-            if (endReason == AnimationEndReason.TargetReached) {
-                onHidden?.invoke()
+        animateTo(
+            targetValue = ModalBottomSheetValue.Hidden,
+            onEnd = { endReason, _ ->
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onHidden?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {

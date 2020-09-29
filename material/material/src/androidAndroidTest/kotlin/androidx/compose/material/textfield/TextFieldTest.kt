@@ -305,10 +305,13 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier.preferredHeight(height),
                     label = {
-                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
-                            labelPosition.value = it.positionInRoot
-                            labelSize.value = it.size
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                                labelSize.value = it.size
+                            }
+                        )
                     }
                 )
             }
@@ -341,11 +344,15 @@ class TextFieldTest {
                     value = "",
                     onValueChange = {},
                     label = {
-                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
-                            labelPosition.value = it.positionInRoot
-                            labelSize.value = it.size
-                            baseline.value = it[FirstBaseline].toFloat() + labelPosition.value!!.y
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                                labelSize.value = it.size
+                                baseline.value = it[FirstBaseline].toFloat() +
+                                    labelPosition.value!!.y
+                            }
+                        )
                     }
                 )
             }
@@ -380,12 +387,15 @@ class TextFieldTest {
                     value = "input",
                     onValueChange = {},
                     label = {
-                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
-                            labelPosition.value = it.positionInRoot
-                            labelSize.value = it.size
-                            baseline.value =
-                                it[FirstBaseline].toFloat() + labelPosition.value!!.y
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                                labelSize.value = it.size
+                                baseline.value =
+                                    it[FirstBaseline].toFloat() + labelPosition.value!!.y
+                            }
+                        )
                     }
                 )
             }
@@ -420,10 +430,13 @@ class TextFieldTest {
                     onValueChange = {},
                     label = { Text("label") },
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.onGloballyPositioned {
-                            placeholderPosition.value = it.positionInRoot
-                            placeholderSize.value = it.size
-                        })
+                        Text(
+                            text = "placeholder",
+                            modifier = Modifier.onGloballyPositioned {
+                                placeholderPosition.value = it.positionInRoot
+                                placeholderSize.value = it.size
+                            }
+                        )
                     }
                 )
             }
@@ -461,11 +474,13 @@ class TextFieldTest {
                     onValueChange = {},
                     label = {},
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.height(20.dp)
-                            .onGloballyPositioned {
-                                placeholderPosition.value = it.positionInRoot
-                                placeholderSize.value = it.size
-                            }
+                        Text(
+                            text = "placeholder",
+                            modifier = Modifier.height(20.dp)
+                                .onGloballyPositioned {
+                                    placeholderPosition.value = it.positionInRoot
+                                    placeholderSize.value = it.size
+                                }
                         )
                     }
                 )
@@ -503,10 +518,13 @@ class TextFieldTest {
                     onValueChange = {},
                     label = {},
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.onGloballyPositioned {
-                            placeholderPosition.value = it.positionInRoot
-                            placeholderSize.value = it.size
-                        })
+                        Text(
+                            text = "placeholder",
+                            modifier = Modifier.onGloballyPositioned {
+                                placeholderPosition.value = it.positionInRoot
+                                placeholderSize.value = it.size
+                            }
+                        )
                     }
                 )
             }
@@ -564,16 +582,20 @@ class TextFieldTest {
                 modifier = Modifier.preferredSize(textFieldWidth, textFieldHeight),
                 label = {},
                 leadingIcon = {
-                    Box(Modifier.preferredSize(size).onGloballyPositioned {
-                        leadingPosition.value = it.positionInRoot
-                        leadingSize.value = it.size
-                    })
+                    Box(
+                        Modifier.preferredSize(size).onGloballyPositioned {
+                            leadingPosition.value = it.positionInRoot
+                            leadingSize.value = it.size
+                        }
+                    )
                 },
                 trailingIcon = {
-                    Box(Modifier.preferredSize(size).onGloballyPositioned {
-                        trailingPosition.value = it.positionInRoot
-                        trailingSize.value = it.size
-                    })
+                    Box(
+                        Modifier.preferredSize(size).onGloballyPositioned {
+                            trailingPosition.value = it.positionInRoot
+                            trailingSize.value = it.size
+                        }
+                    )
                 }
             )
         }
@@ -612,9 +634,12 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier.preferredHeight(height),
                     label = {
-                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
-                            labelPosition.value = it.positionInRoot
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                            }
+                        )
                     },
                     trailingIcon = { Box(Modifier.preferredSize(iconSize)) },
                     leadingIcon = { Box(Modifier.preferredSize(iconSize)) }
@@ -641,9 +666,12 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier.preferredHeight(height),
                     label = {
-                        Text(text = "label", modifier = Modifier.onGloballyPositioned {
-                            labelPosition.value = it.positionInRoot
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                            }
+                        )
                     },
                     trailingIcon = {},
                     leadingIcon = {}

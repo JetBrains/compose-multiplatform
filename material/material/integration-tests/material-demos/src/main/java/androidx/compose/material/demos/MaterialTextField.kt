@@ -135,15 +135,16 @@ fun MaterialTextFieldDemo() {
             Title("Text field type")
             Column {
                 TextFieldType.values().map { it.name }.forEach { textType ->
-                    Row(Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = (textType == selectedTextField.name),
-                            onClick = {
-                                selectedTextField = TextFieldType.valueOf(textType)
-                            }
-                        )
-                        .padding(horizontal = 16.dp)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (textType == selectedTextField.name),
+                                onClick = {
+                                    selectedTextField = TextFieldType.valueOf(textType)
+                                }
+                            )
+                            .padding(horizontal = 16.dp)
                     ) {
                         RadioButton(
                             selected = (textType == selectedTextField.name),
@@ -181,13 +182,14 @@ fun MaterialTextFieldDemo() {
             Title("Assistive text")
             Column {
                 Option.values().map { it.name }.forEach { text ->
-                    Row(Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = (text == selectedOption.name),
-                            onClick = { selectedOption = Option.valueOf(text) }
-                        )
-                        .padding(horizontal = 16.dp)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (text == selectedOption.name),
+                                onClick = { selectedOption = Option.valueOf(text) }
+                            )
+                            .padding(horizontal = 16.dp)
                     ) {
                         RadioButton(
                             selected = (text == selectedOption.name),

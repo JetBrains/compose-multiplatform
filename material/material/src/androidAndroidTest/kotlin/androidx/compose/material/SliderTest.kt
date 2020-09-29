@@ -93,14 +93,20 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                Slider(modifier = Modifier.testTag(tag), value = state.value,
-                    onValueChange = { state.value = it })
-            }
+            Slider(
+                modifier = Modifier.testTag(tag), value = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
 
         rule.onNodeWithTag(tag)
             .assertValueEquals("0 percent")
-            .assert(SemanticsMatcher.expectValue(
-                SemanticsProperties.AccessibilityRangeInfo, AccessibilityRangeInfo(0f, 0f..1f, 0)))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.AccessibilityRangeInfo,
+                    AccessibilityRangeInfo(0f, 0f..1f, 0)
+                )
+            )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
 
         rule.runOnUiThread {
@@ -122,14 +128,20 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                Slider(modifier = Modifier.testTag(tag), value = state.value,
-                    onValueChange = { state.value = it }, steps = 4)
-            }
+            Slider(
+                modifier = Modifier.testTag(tag), value = state.value,
+                onValueChange = { state.value = it }, steps = 4
+            )
+        }
 
         rule.onNodeWithTag(tag)
             .assertValueEquals("0 percent")
-            .assert(SemanticsMatcher.expectValue(
-                SemanticsProperties.AccessibilityRangeInfo, AccessibilityRangeInfo(0f, 0f..1f, 4)))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.AccessibilityRangeInfo,
+                    AccessibilityRangeInfo(0f, 0f..1f, 4)
+                )
+            )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
 
         rule.runOnUiThread {
@@ -151,12 +163,12 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                Slider(
-                    modifier = Modifier.testTag(tag),
-                    value = state.value,
-                    onValueChange = { state.value = it }
-                )
-            }
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
 
         rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)
@@ -181,12 +193,12 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                Slider(
-                    modifier = Modifier.testTag(tag),
-                    value = state.value,
-                    onValueChange = { state.value = it }
-                )
-            }
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
 
         rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)
@@ -210,14 +222,14 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                    Slider(
-                        modifier = Modifier.testTag(tag),
-                        value = state.value,
-                        onValueChange = { state.value = it }
-                    )
-                }
+            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+                Slider(
+                    modifier = Modifier.testTag(tag),
+                    value = state.value,
+                    onValueChange = { state.value = it }
+                )
             }
+        }
 
         rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)
@@ -243,14 +255,14 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-                Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                    Slider(
-                        modifier = Modifier.testTag(tag),
-                        value = state.value,
-                        onValueChange = { state.value = it }
-                    )
-                }
+            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+                Slider(
+                    modifier = Modifier.testTag(tag),
+                    value = state.value,
+                    onValueChange = { state.value = it }
+                )
             }
+        }
 
         rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)

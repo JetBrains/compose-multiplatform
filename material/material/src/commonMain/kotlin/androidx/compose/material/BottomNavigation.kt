@@ -160,16 +160,19 @@ fun BottomNavigationItem(
     val ripple = RippleIndication(bounded = false, color = selectedContentColor)
 
     // TODO This composable has magic behavior within a Row; reconsider this behavior later
-    Box(with(RowScope) {
-        modifier
-            .selectable(
-                selected = selected,
-                onClick = onClick,
-                interactionState = interactionState,
-                indication = ripple
-            )
-            .weight(1f)
-    }, alignment = Alignment.Center) {
+    Box(
+        with(RowScope) {
+            modifier
+                .selectable(
+                    selected = selected,
+                    onClick = onClick,
+                    interactionState = interactionState,
+                    indication = ripple
+                )
+                .weight(1f)
+        },
+        alignment = Alignment.Center
+    ) {
         BottomNavigationTransition(
             selectedContentColor,
             unselectedContentColor,

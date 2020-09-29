@@ -610,13 +610,18 @@ class ButtonTest {
         var buttonBounds = Rect(0f, 0f, 0f, 0f)
         rule.setMaterialContent {
             Column {
-                Spacer(Modifier.size(10.dp).weight(1f).onGloballyPositioned {
-                    item1Bounds = it.boundsInRoot
-                })
+                Spacer(
+                    Modifier.size(10.dp).weight(1f).onGloballyPositioned {
+                        item1Bounds = it.boundsInRoot
+                    }
+                )
 
-                Button(onClick = {}, modifier = Modifier.weight(1f).onGloballyPositioned {
-                    buttonBounds = it.boundsInRoot
-                }) {
+                Button(
+                    onClick = {},
+                    modifier = Modifier.weight(1f).onGloballyPositioned {
+                        buttonBounds = it.boundsInRoot
+                    }
+                ) {
                     Text("Button")
                 }
 
@@ -634,15 +639,22 @@ class ButtonTest {
         var item1Bounds = Rect(0f, 0f, 0f, 0f)
         var item2Bounds = Rect(0f, 0f, 0f, 0f)
         rule.setMaterialContent {
-            Button(onClick = {}, modifier = Modifier.onGloballyPositioned {
-                buttonBounds = it.boundsInRoot
-            }) {
-                Spacer(Modifier.size(10.dp).onGloballyPositioned {
-                    item1Bounds = it.boundsInRoot
-                })
-                Spacer(Modifier.width(10.dp).height(5.dp).onGloballyPositioned {
-                    item2Bounds = it.boundsInRoot
-                })
+            Button(
+                onClick = {},
+                modifier = Modifier.onGloballyPositioned {
+                    buttonBounds = it.boundsInRoot
+                }
+            ) {
+                Spacer(
+                    Modifier.size(10.dp).onGloballyPositioned {
+                        item1Bounds = it.boundsInRoot
+                    }
+                )
+                Spacer(
+                    Modifier.width(10.dp).height(5.dp).onGloballyPositioned {
+                        item2Bounds = it.boundsInRoot
+                    }
+                )
             }
         }
 
@@ -661,7 +673,8 @@ class ButtonTest {
         rule.setMaterialContent {
             Box {
                 button(Modifier.onGloballyPositioned { parentCoordinates = it }) {
-                    Text("Test button",
+                    Text(
+                        "Test button",
                         Modifier.onGloballyPositioned { childCoordinates = it }
                     )
                 }
@@ -670,7 +683,7 @@ class ButtonTest {
 
         rule.runOnIdle {
             val topLeft = childCoordinates!!.localToGlobal(Offset.Zero).x -
-                    parentCoordinates!!.localToGlobal(Offset.Zero).x
+                parentCoordinates!!.localToGlobal(Offset.Zero).x
             val currentPadding = with(rule.density) {
                 padding.toIntPx().toFloat()
             }

@@ -360,24 +360,26 @@ private fun Modifier.sliderSemantics(
     return semantics {
         accessibilityValue = Strings.TemplatePercent.format(percent)
         accessibilityValueRange = AccessibilityRangeInfo(coerced, valueRange, steps)
-        setProgress(action = { targetValue ->
-            val newValue = targetValue.coerceIn(position.startValue, position.endValue)
-            val resolvedValue = if (steps > 0) {
-                position.tickFractions
-                    .map { lerp(position.startValue, position.endValue, it) }
-                    .minByOrNull { abs(it - newValue) } ?: newValue
-            } else {
-                newValue
+        setProgress(
+            action = { targetValue ->
+                val newValue = targetValue.coerceIn(position.startValue, position.endValue)
+                val resolvedValue = if (steps > 0) {
+                    position.tickFractions
+                        .map { lerp(position.startValue, position.endValue, it) }
+                        .minByOrNull { abs(it - newValue) } ?: newValue
+                } else {
+                    newValue
+                }
+                // This is to keep it consistent with AbsSeekbar.java: return false if no
+                // change from current.
+                if (resolvedValue == coerced) {
+                    false
+                } else {
+                    onValueChange(resolvedValue)
+                    true
+                }
             }
-            // This is to keep it consistent with AbsSeekbar.java: return false if no
-            // change from current.
-            if (resolvedValue == coerced) {
-                false
-            } else {
-                onValueChange(resolvedValue)
-                true
-            }
-        })
+        )
     }
 }
 
