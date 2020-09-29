@@ -17,35 +17,52 @@
 package androidx.compose.foundation.text.demos
 
 import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.VerbatimTtsAnnotation
 import androidx.compose.ui.text.annotatedString
 import androidx.compose.ui.text.intl.LocaleList
 
 @Composable
 fun TextAccessibilityDemo() {
-    Text(
-        text = annotatedString {
-            pushStyle(SpanStyle(localeList = LocaleList("en-us")))
-            append("Hello!\n")
-            pop()
-            pushStyle(SpanStyle(localeList = LocaleList("en-gb")))
-            append("Hello!\n")
-            pop()
-            pushStyle(SpanStyle(localeList = LocaleList("fr")))
-            append("Bonjour!\n")
-            pop()
-            pushStyle(SpanStyle(localeList = LocaleList("tr-TR")))
-            append("Merhaba!\n")
-            pop()
-            pushStyle(SpanStyle(localeList = LocaleList("ja-JP")))
-            append("こんにちは!\n")
-            pop()
-            pushStyle(SpanStyle(localeList = LocaleList("zh")))
-            append("你好!\n")
-            pop()
-        },
-        style = TextStyle(fontSize = fontSize8)
-    )
+    Column {
+        TagLine("Text to speech with different locales.")
+        Text(
+            text = annotatedString {
+                pushStyle(SpanStyle(localeList = LocaleList("en-us")))
+                append("Hello!\n")
+                pop()
+                pushStyle(SpanStyle(localeList = LocaleList("en-gb")))
+                append("Hello!\n")
+                pop()
+                pushStyle(SpanStyle(localeList = LocaleList("fr")))
+                append("Bonjour!\n")
+                pop()
+                pushStyle(SpanStyle(localeList = LocaleList("tr-TR")))
+                append("Merhaba!\n")
+                pop()
+                pushStyle(SpanStyle(localeList = LocaleList("ja-JP")))
+                append("こんにちは!\n")
+                pop()
+                pushStyle(SpanStyle(localeList = LocaleList("zh")))
+                append("你好!")
+                pop()
+            },
+            style = TextStyle(fontSize = fontSize8)
+        )
+
+        TagLine("VerbatimTtsAnnotation ")
+        Text(
+            text = annotatedString {
+                append("This word is read verbatim: ")
+                pushTtsAnnotation(VerbatimTtsAnnotation(verbatim = "hello"))
+                append("hello\n")
+                pop()
+                append("This word is read normally: hello")
+            },
+            style = TextStyle(fontSize = fontSize8)
+        )
+    }
 }
