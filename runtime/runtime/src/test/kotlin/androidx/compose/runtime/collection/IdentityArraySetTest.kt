@@ -17,27 +17,18 @@
 package androidx.compose.runtime.collection
 
 import androidx.compose.runtime.identityHashCode
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotSame
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCollectionApi::class)
-@RunWith(JUnit4::class)
 class IdentityArraySetTest {
     private val set: IdentityArraySet<Stuff> = IdentityArraySet()
 
     private val list = listOf(Stuff(10), Stuff(12), Stuff(1), Stuff(30), Stuff(10))
-
-    @Before
-    fun setUp() {
-        set.clear()
-    }
 
     @Test
     fun emptyConstruction() {
