@@ -165,7 +165,6 @@ private fun CustomLayout(rtlSupport: Boolean) {
         layout(w, h) {
             var xPosition = 0
             for (child in p) {
-                child.place(IntOffset(xPosition, 0))
                 if (rtlSupport) {
                     child.placeRelative(IntOffset(xPosition, 0))
                 } else {
