@@ -13,10 +13,6 @@ CallbackName: androidx.compose.animation.core.AnimationClockObserver:
     Class should be named AnimationClockCallback
 
 
-HiddenTypeParameter: androidx.compose.animation.core.BaseAnimationClock#Companion:
-    Field BaseAnimationClock.Companion references hidden type androidx.compose.animation.core.BaseAnimationClock.Companion.
-
-
 MissingNullability: androidx.compose.animation.core.CubicBezierEasing#invoke(float):
     Missing nullability on method `invoke` return
 
