@@ -2,7 +2,7 @@
 package androidx.compose.foundation.text {
 
   public final class CoreTextFieldKt {
-    method @androidx.compose.runtime.Composable public static void CoreTextField(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.text.TextStyle textStyle = TextStyle.Default, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed = {}, androidx.compose.ui.text.input.VisualTransformation visualTransformation = VisualTransformation.None, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = {}, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = {});
+    method @androidx.compose.runtime.Composable public static void CoreTextField(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.text.TextStyle textStyle = TextStyle.Default, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed = { it ->  }, androidx.compose.ui.text.input.VisualTransformation visualTransformation = androidx.compose.ui.text.input.VisualTransformation.Companion.None, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = { it ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = { it ->  });
   }
 
   public final class CoreTextKt {
@@ -18,6 +18,8 @@ package androidx.compose.foundation.text {
     method @androidx.compose.runtime.Immutable public androidx.compose.foundation.text.InlineTextContent copy(androidx.compose.ui.text.Placeholder placeholder, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> children);
     method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit> getChildren();
     method public androidx.compose.ui.text.Placeholder getPlaceholder();
+    property public final kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit> children;
+    property public final androidx.compose.ui.text.Placeholder placeholder;
   }
 
   public final class InlineTextContentKt {

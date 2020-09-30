@@ -9,6 +9,7 @@ package androidx.compose.runtime.dispatch {
     method public void dispatch(kotlin.coroutines.CoroutineContext context, Runnable block);
     method public android.view.Choreographer getChoreographer();
     method public androidx.compose.runtime.dispatch.MonotonicFrameClock getFrameClock();
+    property public final android.view.Choreographer choreographer;
     property public final androidx.compose.runtime.dispatch.MonotonicFrameClock frameClock;
     field public static final androidx.compose.runtime.dispatch.AndroidUiDispatcher.Companion Companion;
   }
@@ -27,6 +28,7 @@ package androidx.compose.runtime.dispatch {
     ctor public AndroidUiFrameClock(android.view.Choreographer choreographer);
     method public android.view.Choreographer getChoreographer();
     method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    property public final android.view.Choreographer choreographer;
   }
 
   public final class BroadcastFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {

@@ -8,7 +8,7 @@ package androidx.compose.ui.geometry {
     method public inline float getHeight();
     method public float getLeft();
     method public float getRight();
-    method public long getSize();
+    method public long getSize-NH-jbRc();
     method public float getTop();
     method public inline float getWidth();
     method @androidx.compose.runtime.Stable public void intersect(float left, float top, float right, float bottom);
@@ -18,9 +18,13 @@ package androidx.compose.ui.geometry {
     method public void setLeft(float p);
     method public void setRight(float p);
     method public void setTop(float p);
+    property public final float bottom;
     property public final inline float height;
     property public final boolean isEmpty;
+    property public final float left;
+    property public final float right;
     property public final long size;
+    property public final float top;
     property public final inline float width;
   }
 
@@ -33,8 +37,8 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator float component2-impl(long $this);
     method public static long constructor-impl(long packedValue);
-    method public static long copy-impl(long $this, float x = this.x, float y = this.y);
-    method @androidx.compose.runtime.Stable public static operator long div-impl(long $this, float operand);
+    method public static long copy-F1C5BW0(long $this, float x = this.x, float y = this.y);
+    method @androidx.compose.runtime.Stable public static operator long div-F1C5BW0(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
     method @androidx.compose.runtime.Stable public static float getDistance-impl(long $this);
@@ -46,16 +50,17 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static boolean isValid-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator long minus-k-4lQ0M(long $this, long other);
     method @androidx.compose.runtime.Stable public static operator long plus-k-4lQ0M(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long rem-impl(long $this, float operand);
-    method @androidx.compose.runtime.Stable public static operator long times-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long rem-F1C5BW0(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long times-F1C5BW0(long $this, float operand);
     method public static String toString-impl(long $this);
-    method @androidx.compose.runtime.Stable public static operator long unaryMinus-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator long unaryMinus-F1C5BW0(long $this);
+    property public final long packedValue;
     field public static final androidx.compose.ui.geometry.Offset.Companion Companion;
   }
 
   public static final class Offset.Companion {
-    method public long getInfinite();
-    method public long getZero();
+    method public long getInfinite-F1C5BW0();
+    method public long getZero-F1C5BW0();
     property public final long Infinite;
     property public final long Zero;
   }
@@ -70,8 +75,8 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
     method public static long constructor-impl(internal long packedValue);
-    method public static long copy-impl(long $this, float x = this.x, float y = this.y);
-    method @androidx.compose.runtime.Stable public static operator long div-impl(long $this, float operand);
+    method public static long copy-QM5bGvM(long $this, float x = this.x, float y = this.y);
+    method @androidx.compose.runtime.Stable public static operator long div-QM5bGvM(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
     method public static float getX-impl(long $this);
@@ -79,16 +84,16 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method @androidx.compose.runtime.Stable public static operator long minus-OoK_8eo(long $this, long other);
     method @androidx.compose.runtime.Stable public static operator long plus-OoK_8eo(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long rem-impl(long $this, float operand);
-    method @androidx.compose.runtime.Stable public static operator long times-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long rem-QM5bGvM(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long times-QM5bGvM(long $this, float operand);
     method public static String toString-impl(long $this);
-    method public static long truncDiv-impl(long $this, float operand);
-    method @androidx.compose.runtime.Stable public static operator long unaryMinus-impl(long $this);
+    method public static long truncDiv-QM5bGvM(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long unaryMinus-QM5bGvM(long $this);
     field public static final androidx.compose.ui.geometry.Radius.Companion Companion;
   }
 
   public static final class Radius.Companion {
-    method public long getZero();
+    method public long getZero-QM5bGvM();
     property public final long Zero;
   }
 
@@ -107,22 +112,22 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.geometry.Rect copy(float left, float top, float right, float bottom);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect deflate(float delta);
     method public float getBottom();
-    method public long getBottomCenter();
-    method public long getBottomLeft();
-    method public long getBottomRight();
-    method public long getCenter();
-    method public long getCenterLeft();
-    method public long getCenterRight();
+    method public long getBottomCenter-F1C5BW0();
+    method public long getBottomLeft-F1C5BW0();
+    method public long getBottomRight-F1C5BW0();
+    method public long getCenter-F1C5BW0();
+    method public long getCenterLeft-F1C5BW0();
+    method public long getCenterRight-F1C5BW0();
     method public float getHeight();
     method public float getLeft();
     method public float getMaxDimension();
     method public float getMinDimension();
     method public float getRight();
-    method public long getSize();
+    method public long getSize-NH-jbRc();
     method public float getTop();
-    method public long getTopCenter();
-    method public long getTopLeft();
-    method public long getTopRight();
+    method public long getTopCenter-F1C5BW0();
+    method public long getTopLeft-F1C5BW0();
+    method public long getTopRight-F1C5BW0();
     method public float getWidth();
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect inflate(float delta);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect intersect(androidx.compose.ui.geometry.Rect other);
@@ -133,6 +138,7 @@ package androidx.compose.ui.geometry {
     method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect shift-k-4lQ0M(long offset);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate(float translateX, float translateY);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate-k-4lQ0M(long offset);
+    property public final float bottom;
     property public final long bottomCenter;
     property public final long bottomLeft;
     property public final long bottomRight;
@@ -143,9 +149,12 @@ package androidx.compose.ui.geometry {
     property public final boolean isEmpty;
     property public final boolean isFinite;
     property public final boolean isInfinite;
+    property public final float left;
     property public final float maxDimension;
     property public final float minDimension;
+    property public final float right;
     property public final long size;
+    property public final float top;
     property public final long topCenter;
     property public final long topLeft;
     property public final long topRight;
@@ -170,24 +179,32 @@ package androidx.compose.ui.geometry {
     method public float component2();
     method public float component3();
     method public float component4();
-    method public long component5();
-    method public long component6();
-    method public long component7();
-    method public long component8();
+    method public long component5-QM5bGvM();
+    method public long component6-QM5bGvM();
+    method public long component7-QM5bGvM();
+    method public long component8-QM5bGvM();
     method public boolean contains-k-4lQ0M(long point);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.geometry.RoundRect copy-HepwI24(float left, float top, float right, float bottom, long topLeftRadius, long topRightRadius, long bottomRightRadius, long bottomLeftRadius);
     method public float getBottom();
-    method public long getBottomLeftRadius();
-    method public long getBottomRightRadius();
+    method public long getBottomLeftRadius-QM5bGvM();
+    method public long getBottomRightRadius-QM5bGvM();
     method public float getHeight();
     method public float getLeft();
     method public float getRight();
     method public float getTop();
-    method public long getTopLeftRadius();
-    method public long getTopRightRadius();
+    method public long getTopLeftRadius-QM5bGvM();
+    method public long getTopRightRadius-QM5bGvM();
     method public float getWidth();
     method public static androidx.compose.ui.geometry.RoundRect getZero();
+    property public final float bottom;
+    property public final long bottomLeftRadius;
+    property public final long bottomRightRadius;
     property public final float height;
+    property public final float left;
+    property public final float right;
+    property public final float top;
+    property public final long topLeftRadius;
+    property public final long topRightRadius;
     property public final float width;
     field public static final androidx.compose.ui.geometry.RoundRect.Companion Companion;
   }
@@ -233,27 +250,27 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
     method public static long constructor-impl(internal long packedValue);
-    method public static long copy-impl(long $this, float width = this.width, float height = this.height);
-    method @androidx.compose.runtime.Stable public static operator long div-impl(long $this, float operand);
+    method public static long copy-NH-jbRc(long $this, float width = this.width, float height = this.height);
+    method @androidx.compose.runtime.Stable public static operator long div-NH-jbRc(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
-    method @androidx.compose.runtime.Stable public static long getFlipped-impl(long $this);
+    method @androidx.compose.runtime.Stable public static long getFlipped-NH-jbRc(long $this);
     method public static float getHeight-impl(long $this);
     method public static float getMaxDimension-impl(long $this);
     method public static float getMinDimension-impl(long $this);
     method public static float getWidth-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method @androidx.compose.runtime.Stable public static boolean isEmpty-impl(long $this);
-    method @androidx.compose.runtime.Stable public static operator long rem-impl(long $this, float operand);
-    method @androidx.compose.runtime.Stable public static operator long times-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long rem-NH-jbRc(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long times-NH-jbRc(long $this, float operand);
     method public static String toString-impl(long $this);
-    method @androidx.compose.runtime.Stable public static long truncDiv-impl(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static long truncDiv-NH-jbRc(long $this, float operand);
     field public static final androidx.compose.ui.geometry.Size.Companion Companion;
   }
 
   public static final class Size.Companion {
-    method public long getUnspecified();
-    method public long getZero();
+    method public long getUnspecified-NH-jbRc();
+    method public long getZero-NH-jbRc();
     property public final long Unspecified;
     property public final long Zero;
   }

@@ -27,8 +27,8 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.AnimatedFloat AnimatedFloat(float initVal, androidx.compose.animation.core.AnimationClockObservable clock, float visibilityThreshold = 0.01f);
     method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> AnimatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, T? visibilityThreshold = null);
     method public static <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<V,V> AnimatedVector(V initVal, androidx.compose.animation.core.AnimationClockObservable clock, V visibilityThreshold = initVal.newInstanceOfValue(Spring.DefaultDisplacementThreshold));
-    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = androidx.compose.animation.core.ExponentialDecay(), kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
-    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = androidx.compose.animation.core.ExponentialDecay(), kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
+    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = ExponentialDecay(), kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
+    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = ExponentialDecay(), kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
   }
 
   public interface AnimationClockObservable {
@@ -47,8 +47,6 @@ package androidx.compose.animation.core {
   }
 
   public enum AnimationEndReason {
-    method public static androidx.compose.animation.core.AnimationEndReason valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.animation.core.AnimationEndReason[] values();
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason BoundReached;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason Interrupted;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason TargetReached;
@@ -153,7 +151,6 @@ package androidx.compose.animation.core {
     ctor public BaseAnimationClock();
     method public void subscribe(androidx.compose.animation.core.AnimationClockObserver observer);
     method public void unsubscribe(androidx.compose.animation.core.AnimationClockObserver observer);
-    field @Deprecated public static final androidx.compose.animation.core.BaseAnimationClock.Companion Companion;
   }
 
   public final class ComplexDoubleKt {
@@ -225,6 +222,7 @@ package androidx.compose.animation.core {
     ctor public FloatPropKey(String label);
     ctor public FloatPropKey();
     method public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getTypeConverter();
+    property public String label;
     property public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> typeConverter;
   }
 
@@ -236,6 +234,8 @@ package androidx.compose.animation.core {
     method public float getStiffness();
     method public float getValue(long playTime, float start, float end, float startVelocity);
     method public float getVelocity(long playTime, float start, float end, float startVelocity);
+    property public final float dampingRatio;
+    property public final float stiffness;
   }
 
   public final class FloatTweenSpec implements androidx.compose.animation.core.FloatAnimationSpec {
@@ -246,21 +246,22 @@ package androidx.compose.animation.core {
     method public long getDurationMillis(float start, float end, float startVelocity);
     method public float getValue(long playTime, float start, float end, float startVelocity);
     method public float getVelocity(long playTime, float start, float end, float startVelocity);
+    property public final int delay;
+    property public final int duration;
   }
 
   public final class IntPropKey implements androidx.compose.animation.core.PropKey<java.lang.Integer,androidx.compose.animation.core.AnimationVector1D> {
     ctor public IntPropKey(String label);
     ctor public IntPropKey();
     method public androidx.compose.animation.core.TwoWayConverter<java.lang.Integer,androidx.compose.animation.core.AnimationVector1D> getTypeConverter();
+    property public String label;
     property public androidx.compose.animation.core.TwoWayConverter<java.lang.Integer,androidx.compose.animation.core.AnimationVector1D> typeConverter;
   }
 
-  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface InternalAnimationApi {
+  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalAnimationApi {
   }
 
   public enum InterruptionHandling {
-    method public static androidx.compose.animation.core.InterruptionHandling valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.animation.core.InterruptionHandling[] values();
     enum_constant public static final androidx.compose.animation.core.InterruptionHandling PHYSICS;
     enum_constant public static final androidx.compose.animation.core.InterruptionHandling SNAP_TO_END;
     enum_constant public static final androidx.compose.animation.core.InterruptionHandling TWEEN;
@@ -271,6 +272,7 @@ package androidx.compose.animation.core {
     ctor public KeyframesSpec(androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig<T> config);
     method public androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig<T> getConfig();
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedKeyframesSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
+    property public final androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig<T> config;
   }
 
   public static final class KeyframesSpec.KeyframeEntity<T> {
@@ -338,8 +340,6 @@ package androidx.compose.animation.core {
   }
 
   public enum RepeatMode {
-    method public static androidx.compose.animation.core.RepeatMode valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.animation.core.RepeatMode[] values();
     enum_constant public static final androidx.compose.animation.core.RepeatMode Restart;
     enum_constant public static final androidx.compose.animation.core.RepeatMode Reverse;
   }
@@ -350,6 +350,9 @@ package androidx.compose.animation.core {
     method public int getIterations();
     method public androidx.compose.animation.core.RepeatMode getRepeatMode();
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedAnimationSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
+    property public final androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation;
+    property public final int iterations;
+    property public final androidx.compose.animation.core.RepeatMode repeatMode;
   }
 
   @androidx.compose.runtime.Immutable public final class SnapSpec<T> implements androidx.compose.animation.core.AnimationSpec<T> {
@@ -357,6 +360,7 @@ package androidx.compose.animation.core {
     ctor public SnapSpec();
     method public int getDelay();
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
+    property public final int delay;
   }
 
   public final class Spring {
@@ -385,6 +389,9 @@ package androidx.compose.animation.core {
     method public float getStiffness();
     method public T? getVisibilityThreshold();
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedSpringSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
+    property public final float dampingRatio;
+    property public final float stiffness;
+    property public final T? visibilityThreshold;
   }
 
   public final class TargetAnimation {
@@ -394,6 +401,8 @@ package androidx.compose.animation.core {
     method public androidx.compose.animation.core.TargetAnimation copy(float target, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animation);
     method public androidx.compose.animation.core.AnimationSpec<java.lang.Float> getAnimation();
     method public float getTarget();
+    property public final androidx.compose.animation.core.AnimationSpec<java.lang.Float> animation;
+    property public final float target;
   }
 
   public final class TargetBasedAnimation<T, V extends androidx.compose.animation.core.AnimationVector> {
@@ -403,7 +412,9 @@ package androidx.compose.animation.core {
     method public T! getEndValue();
     method public T! getValue(long playTime);
     method public V getVelocityVector(long playTime);
+    property public androidx.compose.animation.core.TwoWayConverter<T,V> converter;
     property public long durationMillis;
+    property public final T! endValue;
   }
 
   public final class ToolingGlueKt {
@@ -421,6 +432,7 @@ package androidx.compose.animation.core {
     method public void setOnUpdate(kotlin.jvm.functions.Function0<kotlin.Unit>? p);
     method public void toState(T? name);
     property public final boolean isRunning;
+    property public final String? label;
     property public final kotlin.jvm.functions.Function1<T,kotlin.Unit>? onStateChangeFinished;
     property public final kotlin.jvm.functions.Function0<kotlin.Unit>? onUpdate;
   }
@@ -468,6 +480,9 @@ package androidx.compose.animation.core {
     method public int getDurationMillis();
     method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getEasing();
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedTweenSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
+    property public final int delay;
+    property public final int durationMillis;
+    property public final kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> easing;
   }
 
   public interface TwoWayConverter<T, V extends androidx.compose.animation.core.AnimationVector> {
@@ -508,6 +523,8 @@ package androidx.compose.animation.core {
     method public int getDurationMillis();
     method public V getValue(long playTime, V start, V end, V startVelocity);
     method public V getVelocity(long playTime, V start, V end, V startVelocity);
+    property public int delayMillis;
+    property public int durationMillis;
   }
 
   public final class VectorizedRepeatableSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedAnimationSpec<V> {
@@ -524,6 +541,7 @@ package androidx.compose.animation.core {
     method public int getDurationMillis();
     method public V getValue(long playTime, V start, V end, V startVelocity);
     method public V getVelocity(long playTime, V start, V end, V startVelocity);
+    property public int delayMillis;
     property public int durationMillis;
   }
 
@@ -531,6 +549,8 @@ package androidx.compose.animation.core {
     ctor public VectorizedSpringSpec(float dampingRatio, float stiffness, V? visibilityThreshold);
     method public float getDampingRatio();
     method public float getStiffness();
+    property public final float dampingRatio;
+    property public final float stiffness;
   }
 
   public final class VectorizedTweenSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> {
@@ -541,6 +561,9 @@ package androidx.compose.animation.core {
     method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getEasing();
     method public V getValue(long playTime, V start, V end, V startVelocity);
     method public V getVelocity(long playTime, V start, V end, V startVelocity);
+    property public int delayMillis;
+    property public int durationMillis;
+    property public final kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> easing;
   }
 
 }
