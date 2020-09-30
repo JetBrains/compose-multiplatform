@@ -2042,11 +2042,11 @@ package androidx.compose.ui.platform {
   public final class DisposableUiSavedStateRegistryKt {
   }
 
-  public interface InspectableParameter {
-    method public kotlin.sequences.Sequence<androidx.compose.ui.platform.ParameterElement> getInspectableElements();
+  public interface InspectableValue {
+    method public default kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> getInspectableElements();
     method public default String? getNameFallback();
     method public default Object? getValueOverride();
-    property public abstract kotlin.sequences.Sequence<androidx.compose.ui.platform.ParameterElement> inspectableElements;
+    property public default kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> inspectableElements;
     property public default String? nameFallback;
     property public default Object? valueOverride;
   }
@@ -2056,15 +2056,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class JvmActualsKt {
-  }
-
-  public final class ParameterElement {
-    ctor public ParameterElement(String name, Object? value);
-    method public String component1();
-    method public Object? component2();
-    method public androidx.compose.ui.platform.ParameterElement copy(String name, Object? value);
-    method public String getName();
-    method public Object? getValue();
   }
 
   public final class SubcompositionKt {
@@ -2094,6 +2085,15 @@ package androidx.compose.ui.platform {
 
   public interface UriHandler {
     method public void openUri(String uri);
+  }
+
+  public final class ValueElement {
+    ctor public ValueElement(String name, Object? value);
+    method public String component1();
+    method public Object? component2();
+    method public androidx.compose.ui.platform.ValueElement copy(String name, Object? value);
+    method public String getName();
+    method public Object? getValue();
   }
 
   public final class WrapperKt {

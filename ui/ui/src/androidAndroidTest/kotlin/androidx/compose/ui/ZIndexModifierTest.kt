@@ -16,14 +16,14 @@
 
 package androidx.compose.ui
 
-import androidx.compose.ui.platform.InspectableParameter
+import androidx.compose.ui.platform.InspectableValue
 import com.google.common.truth.Truth
 import org.junit.Test
 
 class ZIndexModifierTest {
     @Test
     fun testInspectable() {
-        val modifier = Modifier.zIndex(3f) as InspectableParameter
+        val modifier = Modifier.zIndex(3f) as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("zIndex")
         Truth.assertThat(modifier.valueOverride).isEqualTo(3.0f)
         Truth.assertThat(modifier.inspectableElements.toList()).isEmpty()

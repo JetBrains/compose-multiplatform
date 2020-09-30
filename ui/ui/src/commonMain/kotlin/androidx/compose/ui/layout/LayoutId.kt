@@ -21,8 +21,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Measurable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.ParentDataModifier
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.unit.Density
 
 /**
@@ -42,14 +42,14 @@ fun Modifier.layoutId(id: Any) = this.then(LayoutId(id))
 @Immutable
 private data class LayoutId(
     override val id: Any
-) : ParentDataModifier, LayoutIdParentData, InspectableParameter {
+) : ParentDataModifier, LayoutIdParentData, InspectableValue {
     override fun Density.modifyParentData(parentData: Any?): Any? {
         return this@LayoutId
     }
 
     override val nameFallback = "layoutId"
-    override val inspectableElements: Sequence<ParameterElement>
-        get() = sequenceOf(ParameterElement("id", id))
+    override val inspectableElements: Sequence<ValueElement>
+        get() = sequenceOf(ValueElement("id", id))
 }
 
 /**

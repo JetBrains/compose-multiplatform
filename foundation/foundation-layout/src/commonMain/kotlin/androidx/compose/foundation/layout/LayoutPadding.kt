@@ -22,8 +22,8 @@ import androidx.compose.ui.LayoutModifier
 import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -152,7 +152,7 @@ private data class PaddingModifier(
     val end: Dp = 0.dp,
     val bottom: Dp = 0.dp,
     val rtlAware: Boolean
-) : LayoutModifier, InspectableParameter {
+) : LayoutModifier, InspectableValue {
     init {
         require(start.value >= 0f && top.value >= 0f && end.value >= 0f && bottom.value >= 0f) {
             "Padding must be non-negative"
@@ -184,12 +184,12 @@ private data class PaddingModifier(
     override val valueOverride: Any?
         get() = if (start == top && top == end && end == bottom) start else null
 
-    override val inspectableElements: Sequence<ParameterElement>
+    override val inspectableElements: Sequence<ValueElement>
         get() = sequenceOf(
-            ParameterElement(if (rtlAware) "start" else "left", start),
-            ParameterElement("top", top),
-            ParameterElement(if (rtlAware) "end" else "right", end),
-            ParameterElement("bottom", bottom)
+            ValueElement(if (rtlAware) "start" else "left", start),
+            ValueElement("top", top),
+            ValueElement(if (rtlAware) "end" else "right", end),
+            ValueElement("bottom", bottom)
         )
 }
 
