@@ -120,7 +120,10 @@ fun MovingTargetExample(clock: ManualAnimationClock) {
 fun DrawSeekBar(modifier: Modifier = Modifier, x: Float, clock: ManualAnimationClock) {
     Canvas(modifier.fillMaxWidth().preferredHeight(60.dp)) {
         val xConstraint = x.coerceIn(0f, size.width)
-        clock.clockTimeMillis = (400 * (x / size.width)).toLong().coerceIn(0, 399)
+        val clockTimeMillis = (400 * (x / size.width)).toLong().coerceIn(0, 399)
+        if (clock.clockTimeMillis != clockTimeMillis) {
+            clock.clockTimeMillis = clockTimeMillis
+        }
         // draw bar
         val barHeight = 10.0f
         val offset = Offset(0.0f, center.y - 5)
