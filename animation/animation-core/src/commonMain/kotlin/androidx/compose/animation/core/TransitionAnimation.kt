@@ -314,10 +314,8 @@ internal fun <T, V : AnimationVector> PropKey<T, V>.createAnimationWrapper(
     start: T,
     startVelocity: V?,
     end: T
-): Animation<T, V> {
-    val velocity: V = startVelocity ?: typeConverter.convertToVector(start).newInstance()
-    return TargetBasedAnimation(anim, start, end, velocity, typeConverter)
-}
+): Animation<T, V> =
+    TargetBasedAnimation(anim, start, end, typeConverter, startVelocity)
 
 /**
  * Private class allows mutation on the prop values.
