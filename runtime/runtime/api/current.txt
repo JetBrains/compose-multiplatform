@@ -631,6 +631,7 @@ package androidx.compose.runtime.collection {
     method public inline <reified R> R![]! mapIndexed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
     method public inline <reified R> androidx.compose.runtime.collection.MutableVector<R>! mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
     method public inline <reified R> androidx.compose.runtime.collection.MutableVector<R>! mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R> transform);
+    method public inline operator void minusAssign(T? element);
     method public inline operator void plusAssign(T? element);
     method public boolean remove(T? element);
     method public boolean removeAll(java.util.List<? extends T> elements);

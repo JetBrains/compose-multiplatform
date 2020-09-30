@@ -249,7 +249,8 @@ internal class PointerInteropFilter : PointerInputModifier {
                         if (state === DispatchToViewState.Dispatching) {
                             // If we were dispatching, send ACTION_CANCEL.
                             pointerEvent.toCancelMotionEventScope(
-                                this.layoutCoordinates.localToRoot(Offset.Zero)
+                                this.layoutCoordinates?.localToRoot(Offset.Zero)
+                                    ?: error("layoutCoordinates not set")
                             ) { motionEvent ->
                                 onTouchEvent(motionEvent)
                             }
@@ -258,7 +259,8 @@ internal class PointerInteropFilter : PointerInputModifier {
                     } else {
                         // Dispatch and update our state with the result.
                         pointerEvent.toMotionEventScope(
-                            this.layoutCoordinates.localToRoot(Offset.Zero)
+                            this.layoutCoordinates?.localToRoot(Offset.Zero)
+                                ?: error("layoutCoordinates not set")
                         ) { motionEvent ->
                             state = if (onTouchEvent(motionEvent)) {
                                 DispatchToViewState.Dispatching
