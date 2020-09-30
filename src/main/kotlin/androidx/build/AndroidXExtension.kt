@@ -36,6 +36,7 @@ open class AndroidXExtension(val project: Project) {
             field = value
             chooseProjectVersion()
         }
+    private val ALLOWED_EXTRA_PREFIXES = listOf("-alpha", "-beta", "-rc", "-dev", "-SNAPSHOT")
 
     private fun chooseProjectVersion() {
         val version: Version
@@ -49,10 +50,12 @@ open class AndroidXExtension(val project: Project) {
                     ") whose mavenGroup already specifies forcedVersion (" + groupVersion +
                 ")")
             } else {
+                verifyVersionExtraFormat(mavenVersion)
                 version = mavenVersion
             }
         } else {
             if (groupVersion != null) {
+                verifyVersionExtraFormat(groupVersion)
                 version = groupVersion
             } else {
                 return
@@ -63,6 +66,31 @@ open class AndroidXExtension(val project: Project) {
         }
         project.version = if (isSnapshotBuild()) version.copy(extra = "-SNAPSHOT") else version
         versionIsSet = true
+    }
+
+    private fun verifyVersionExtraFormat(version: Version) {
+        val extra = version.extra
+        if (extra != null) {
+            if (!version.isSnapshot()) {
+                if (ALLOWED_EXTRA_PREFIXES.any { extra.startsWith(it) }) {
+                    for (potentialPrefix in ALLOWED_EXTRA_PREFIXES) {
+                        if (extra.startsWith(potentialPrefix)) {
+                            val secondExtraPart = extra.removePrefix(
+                                potentialPrefix)
+                            if (secondExtraPart.toIntOrNull() == null) {
+                                throw IllegalArgumentException("Version $version is not" +
+                                        " a properly formatted version, please ensure that " +
+                                        "$potentialPrefix is followed by a number only")
+                            }
+                        }
+                    }
+                } else {
+                    throw IllegalArgumentException("Version $version is not a proper " +
+                            "version, version suffixes following major.minor.patch should " +
+                            "be one of ${ALLOWED_EXTRA_PREFIXES.joinToString(", ")}")
+                }
+            }
+        }
     }
 
     private fun isGroupVersionOverrideAllowed(): Boolean {
@@ -93,36 +121,52 @@ open class AndroidXExtension(val project: Project) {
                 // the following project is not intended to be accessed from Java
                 // ":annotation:annotation" -> return false
             }
+            // TODO: rework this to use LibraryType. Fork Library and KolinOnlyLibrary?
             if (project.path.contains("-ktx")) return false
             if (project.path.startsWith(":compose")) return false
             if (project.path.startsWith(":ui")) return false
             return field
         }
     private var licenses: MutableCollection<License> = ArrayList()
-    var publish: Publish = Publish.NONE
 
+    // Should only be used to override LibraryType.publish, if a library isn't ready to publish yet
+    var publish: Publish = Publish.NONE
+        // Allow gradual transition from publish to library type
+        get() = if (type != LibraryType.UNSET) type.publish else field
     /**
      * Whether to run API tasks such as tracking and linting. The default value is
      * [RunApiTasks.Auto], which automatically picks based on the project's properties.
      */
+    // TODO: decide whether we want to support overriding runApiTasks
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.runApiTasks")
     var runApiTasks: RunApiTasks = RunApiTasks.Auto
+        get() = if (type != LibraryType.UNSET) type.checkApi else field
+    var type: LibraryType = LibraryType.UNSET
     var failOnDeprecationWarnings = true
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.compilationTarget")
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
+        get() = if (type != LibraryType.UNSET) type.compilationTarget else field
 
     /**
      * It disables docs generation and api tracking for tooling modules like annotation processors.
      * We don't expect such modules to be used by developers as libraries, so we don't guarantee
      * any api stability and don't expose any docs about them.
      */
+    // This is now deprecated in favor of LibraryType
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.LINT and ANNOTATION_PROCESSOR")
     var toolingProject = false
 
     /**
      * Disables just docs generation for modules that are published and should have their API
      * tracked to ensure intra-library versioning compatibility, but are not expected to be
      * directly used by developers.
+     * Now deprecated and should not be used in new code. New code should read type.generateDocs.
      */
+    // TODO: decide whether we want to support overriding generateDocs
+    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.generateDocs")
     var generateDocs = true
         get() {
+            if (type != LibraryType.UNSET) return type.generateDocs
             if (toolingProject) return false
             if (!publish.shouldRelease()) return false
             return field
@@ -141,36 +185,6 @@ open class AndroidXExtension(val project: Project) {
     companion object {
         const val DEFAULT_UNSPECIFIED_VERSION = "unspecified"
     }
-}
-
-enum class CompilationTarget {
-    /** This library is meant to run on the host machine (like an annotation processor). */
-    HOST,
-    /** This library is meant to run on an Android device. */
-    DEVICE
-}
-
-/**
- * Publish Enum:
- * Publish.NONE -> Generates no aritfacts; does not generate snapshot artifacts
- *                 or releasable maven artifacts
- * Publish.SNAPSHOT_ONLY -> Only generates snapshot artifacts
- * Publish.SNAPSHOT_AND_RELEASE -> Generates both snapshot artifacts and releasable maven artifact
-*/
-enum class Publish {
-    NONE, SNAPSHOT_ONLY, SNAPSHOT_AND_RELEASE;
-
-    fun shouldRelease() = this == SNAPSHOT_AND_RELEASE
-    fun shouldPublish() = this == SNAPSHOT_ONLY || this == SNAPSHOT_AND_RELEASE
-}
-
-sealed class RunApiTasks {
-    /** Automatically determine whether API tasks should be run. */
-    object Auto : RunApiTasks()
-    /** Always run API tasks regardless of other project properties. */
-    data class Yes(val reason: String? = null) : RunApiTasks()
-    /** Do not run any API tasks. */
-    data class No(val reason: String) : RunApiTasks()
 }
 
 class License {

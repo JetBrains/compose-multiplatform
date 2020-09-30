@@ -371,7 +371,7 @@ class AndroidXPlugin : Plugin<Project> {
         )
 
         project.afterEvaluate {
-            if (extension.publish.shouldRelease()) {
+            if (extension.type.publish.shouldRelease()) {
                 project.extra.set("publish", true)
             }
         }

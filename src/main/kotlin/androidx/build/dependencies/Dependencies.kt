@@ -83,7 +83,7 @@ const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.
 const val LEAKCANARY = "com.squareup.leakcanary:leakcanary-android:2.2"
 const val LEAKCANARY_INSTRUMENTATION =
     "com.squareup.leakcanary:leakcanary-android-instrumentation:2.2"
-const val MATERIAL = "com.google.android.material:material:1.0.0"
+const val MATERIAL = "com.google.android.material:material:1.2.1"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.25.0"
 const val MOCKITO_KOTLIN = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
 const val MULTIDEX = "androidx.multidex:multidex:2.0.1"
@@ -153,8 +153,6 @@ val KOTLIN_COROUTINES_SWING
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-swing:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_CORE
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
-val KOTLIN_COROUTINES_CORE_COMMON
-    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_GUAVA
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_TEST
