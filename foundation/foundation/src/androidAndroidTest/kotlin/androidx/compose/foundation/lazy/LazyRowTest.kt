@@ -212,7 +212,7 @@ class LazyRowTest {
 
         rule.setContent {
             LazyRow {
-                items(emptyList()) { }
+                items(emptyList<Any>()) { }
                 item {
                     Spacer(Modifier.preferredSize(10.dp).testTag(itemTag))
                 }
@@ -221,5 +221,33 @@ class LazyRowTest {
 
         rule.onNodeWithTag(itemTag)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun lazyRowAllowsNullableItems() {
+        val items = listOf("1", null, "3")
+        val nullTestTag = "nullTestTag"
+
+        rule.setContent {
+            LazyRow(Modifier.preferredWidth(200.dp)) {
+                items(items) {
+                    if (it != null) {
+                        Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
+                    } else {
+                        Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                            .testTag(nullTestTag))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag(nullTestTag)
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("3")
+            .assertDoesNotExist()
     }
 }
