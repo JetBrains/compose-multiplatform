@@ -25,8 +25,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.onGloballyPositioned
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -1120,64 +1120,64 @@ class LayoutSizeTest : LayoutTest() {
     fun testInspectableParameter() {
         checkModifier(
             Modifier.width(200.0.dp), "width", 200.0.dp,
-            listOf(ParameterElement("width", 200.0.dp))
+            listOf(ValueElement("width", 200.0.dp))
         )
         checkModifier(
             Modifier.height(300.0.dp), "height", 300.0.dp,
-            listOf(ParameterElement("height", 300.0.dp))
+            listOf(ValueElement("height", 300.0.dp))
         )
         checkModifier(
             Modifier.size(400.0.dp), "size", 400.0.dp,
-            listOf(ParameterElement("size", 400.0.dp))
+            listOf(ValueElement("size", 400.0.dp))
         )
         checkModifier(
             Modifier.size(100.0.dp, 200.0.dp), "size", null,
-            listOf(ParameterElement("width", 100.0.dp), ParameterElement("height", 200.0.dp))
+            listOf(ValueElement("width", 100.0.dp), ValueElement("height", 200.0.dp))
         )
         checkModifier(
             Modifier.widthIn(100.0.dp, 200.0.dp), "widthIn", null,
-            listOf(ParameterElement("minWidth", 100.0.dp), ParameterElement("maxWidth", 200.0.dp))
+            listOf(ValueElement("minWidth", 100.0.dp), ValueElement("maxWidth", 200.0.dp))
         )
         checkModifier(
             Modifier.heightIn(10.0.dp, 200.0.dp), "heightIn", null,
-            listOf(ParameterElement("minHeight", 10.0.dp), ParameterElement("maxHeight", 200.0.dp))
+            listOf(ValueElement("minHeight", 10.0.dp), ValueElement("maxHeight", 200.0.dp))
         )
         checkModifier(
             Modifier.sizeIn(10.dp, 20.dp, 30.dp, 40.dp), "sizeIn", null,
             listOf(
-                ParameterElement("minWidth", 10.dp), ParameterElement("minHeight", 20.dp),
-                ParameterElement("maxWidth", 30.dp), ParameterElement("maxHeight", 40.dp)
+                ValueElement("minWidth", 10.dp), ValueElement("minHeight", 20.dp),
+                ValueElement("maxWidth", 30.dp), ValueElement("maxHeight", 40.dp)
             )
         )
         checkModifier(
             Modifier.preferredWidth(200.0.dp), "preferredWidth", 200.0.dp,
-            listOf(ParameterElement("width", 200.0.dp))
+            listOf(ValueElement("width", 200.0.dp))
         )
         checkModifier(
             Modifier.preferredHeight(300.0.dp), "preferredHeight", 300.0.dp,
-            listOf(ParameterElement("height", 300.0.dp))
+            listOf(ValueElement("height", 300.0.dp))
         )
         checkModifier(
             Modifier.preferredSize(400.0.dp), "preferredSize", 400.0.dp,
-            listOf(ParameterElement("size", 400.0.dp))
+            listOf(ValueElement("size", 400.0.dp))
         )
         checkModifier(
             Modifier.preferredSize(100.0.dp, 200.0.dp), "preferredSize", null,
-            listOf(ParameterElement("width", 100.0.dp), ParameterElement("height", 200.0.dp))
+            listOf(ValueElement("width", 100.0.dp), ValueElement("height", 200.0.dp))
         )
         checkModifier(
             Modifier.preferredWidthIn(100.0.dp, 200.0.dp), "preferredWidthIn", null,
-            listOf(ParameterElement("minWidth", 100.0.dp), ParameterElement("maxWidth", 200.0.dp))
+            listOf(ValueElement("minWidth", 100.0.dp), ValueElement("maxWidth", 200.0.dp))
         )
         checkModifier(
             Modifier.preferredHeightIn(10.0.dp, 200.0.dp), "preferredHeightIn", null,
-            listOf(ParameterElement("minHeight", 10.0.dp), ParameterElement("maxHeight", 200.0.dp))
+            listOf(ValueElement("minHeight", 10.0.dp), ValueElement("maxHeight", 200.0.dp))
         )
         checkModifier(
             Modifier.preferredSizeIn(10.dp, 20.dp, 30.dp, 40.dp), "preferredSizeIn", null,
             listOf(
-                ParameterElement("minWidth", 10.dp), ParameterElement("minHeight", 20.dp),
-                ParameterElement("maxWidth", 30.dp), ParameterElement("maxHeight", 40.dp)
+                ValueElement("minWidth", 10.dp), ValueElement("minHeight", 20.dp),
+                ValueElement("maxWidth", 30.dp), ValueElement("maxHeight", 40.dp)
             )
         )
 
@@ -1187,21 +1187,21 @@ class LayoutSizeTest : LayoutTest() {
 
         checkModifier(
             Modifier.wrapContentWidth(), "wrapContentWidth", null,
-            listOf(ParameterElement("alignment", Alignment.CenterHorizontally))
+            listOf(ValueElement("alignment", Alignment.CenterHorizontally))
         )
         checkModifier(
             Modifier.wrapContentHeight(), "wrapContentHeight", null,
-            listOf(ParameterElement("alignment", Alignment.CenterVertically))
+            listOf(ValueElement("alignment", Alignment.CenterVertically))
         )
         checkModifier(
             Modifier.wrapContentSize(), "wrapContentSize", null,
-            listOf(ParameterElement("alignment", Alignment.Center))
+            listOf(ValueElement("alignment", Alignment.Center))
         )
 
         checkModifier(
             Modifier.defaultMinSizeConstraints(10.0.dp, 20.0.dp),
             "defaultMinSizeConstraints", null,
-            listOf(ParameterElement("minWidth", 10.dp), ParameterElement("minHeight", 20.dp))
+            listOf(ValueElement("minWidth", 10.dp), ValueElement("minHeight", 20.dp))
         )
     }
 
@@ -1209,10 +1209,10 @@ class LayoutSizeTest : LayoutTest() {
         modifier: Modifier,
         expectedName: String,
         expectedValue: Any?,
-        expectedElements: List<ParameterElement>
+        expectedElements: List<ValueElement>
     ) {
-        assertThat(modifier).isInstanceOf(InspectableParameter::class.java)
-        val parameter = modifier as InspectableParameter
+        assertThat(modifier).isInstanceOf(InspectableValue::class.java)
+        val parameter = modifier as InspectableValue
         assertThat(parameter.nameFallback).isEqualTo(expectedName)
         assertThat(parameter.valueOverride).isEqualTo(expectedValue)
         assertThat(parameter.inspectableElements.toList()).isEqualTo(expectedElements)

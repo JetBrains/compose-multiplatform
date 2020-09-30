@@ -25,7 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.onGloballyPositioned
-import androidx.compose.ui.platform.InspectableParameter
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -362,7 +362,7 @@ class LayoutPaddingTest : LayoutTest() {
     @Test
     fun testInspectableParameter() {
         val exclusions = listOf("nameFallback", "rtlAware")
-        val modifier = Modifier.padding(10.dp, 20.dp, 30.dp, 40.dp) as InspectableParameter
+        val modifier = Modifier.padding(10.dp, 20.dp, 30.dp, 40.dp) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("padding")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.toList())
@@ -375,7 +375,7 @@ class LayoutPaddingTest : LayoutTest() {
 
     @Test
     fun testInspectableParameterForAbsolute() {
-        val modifier = Modifier.absolutePadding(10.dp, 20.dp, 30.dp, 40.dp) as InspectableParameter
+        val modifier = Modifier.absolutePadding(10.dp, 20.dp, 30.dp, 40.dp) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("absolutePadding")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.toList())
@@ -385,7 +385,7 @@ class LayoutPaddingTest : LayoutTest() {
     @Test
     fun testInspectableParameterWithSameOverallValue() {
         val exclusions = listOf("nameFallback", "rtlAware")
-        val modifier = Modifier.padding(40.dp) as InspectableParameter
+        val modifier = Modifier.padding(40.dp) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("padding")
         assertThat(modifier.valueOverride).isEqualTo(40.dp)
         assertThat(modifier.inspectableElements.map { it.name }.toList())

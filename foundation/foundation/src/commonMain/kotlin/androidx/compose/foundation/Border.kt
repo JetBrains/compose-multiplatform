@@ -39,8 +39,8 @@ import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.nativeClass
@@ -147,7 +147,7 @@ private class BorderModifier(
     private val shape: Shape,
     private val borderWidth: Dp,
     private val brush: Brush
-) : DrawModifier, InspectableParameter {
+) : DrawModifier, InspectableValue {
 
     // put params to constructor to ensure proper equals and update cache after construction
     init {
@@ -224,17 +224,17 @@ private class BorderModifier(
         return result
     }
 
-    override val inspectableElements: Sequence<ParameterElement>
+    override val inspectableElements: Sequence<ValueElement>
         get() {
             val brushParam = if (brush is SolidColor) {
-                ParameterElement("color", brush.value)
+                ValueElement("color", brush.value)
             } else {
-                ParameterElement("brush", brush)
+                ValueElement("brush", brush)
             }
             return sequenceOf(
                 brushParam,
-                ParameterElement("shape", shape),
-                ParameterElement("width", borderWidth)
+                ValueElement("shape", shape),
+                ValueElement("width", borderWidth)
             )
         }
     override val nameFallback = "border"

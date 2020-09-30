@@ -26,8 +26,8 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.util.annotation.FloatRange
 
 /**
@@ -74,7 +74,7 @@ private data class Background internal constructor(
     private val brush: Brush? = null,
     private val alpha: Float = 1.0f,
     private val shape: Shape
-) : DrawModifier, InspectableParameter {
+) : DrawModifier, InspectableValue {
 
     // naive cache outline calculation if size is the same
     private var lastSize: Size? = null
@@ -113,11 +113,11 @@ private data class Background internal constructor(
     override val valueOverride: Any?
         get() = color ?: brush
 
-    override val inspectableElements: Sequence<ParameterElement>
+    override val inspectableElements: Sequence<ValueElement>
         get() = sequenceOf(
-            ParameterElement("color", color),
-            ParameterElement("brush", brush),
-            ParameterElement("alpha", alpha),
-            ParameterElement("shape", shape)
+            ValueElement("color", color),
+            ValueElement("brush", brush),
+            ValueElement("alpha", alpha),
+            ValueElement("shape", shape)
         )
 }

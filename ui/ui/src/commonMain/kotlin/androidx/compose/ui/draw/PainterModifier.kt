@@ -31,8 +31,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -83,7 +83,7 @@ private data class PainterModifier(
     val contentScale: ContentScale = ContentScale.Inside,
     val alpha: Float = DefaultAlpha,
     val colorFilter: ColorFilter? = null
-) : LayoutModifier, DrawModifier, InspectableParameter {
+) : LayoutModifier, DrawModifier, InspectableValue {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -264,13 +264,13 @@ private data class PainterModifier(
 
     override val nameFallback = "paint"
 
-    override val inspectableElements: Sequence<ParameterElement>
+    override val inspectableElements: Sequence<ValueElement>
         get() = sequenceOf(
-            ParameterElement("painter", painter),
-            ParameterElement("sizeToIntrinsics", sizeToIntrinsics),
-            ParameterElement("alignment", alignment),
-            ParameterElement("contentScale", contentScale),
-            ParameterElement("alpha", alpha),
-            ParameterElement("colorFilter", colorFilter)
+            ValueElement("painter", painter),
+            ValueElement("sizeToIntrinsics", sizeToIntrinsics),
+            ValueElement("alignment", alignment),
+            ValueElement("contentScale", contentScale),
+            ValueElement("alpha", alpha),
+            ValueElement("colorFilter", colorFilter)
         )
 }
