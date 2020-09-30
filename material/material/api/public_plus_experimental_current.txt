@@ -13,11 +13,11 @@ package androidx.compose.material {
   }
 
   public final class BackdropScaffoldConstants {
-    method public float getDefaultFrontLayerElevation();
-    method public long getDefaultFrontLayerScrimColor();
+    method public float getDefaultFrontLayerElevation-D9Ej5fM();
+    method public long getDefaultFrontLayerScrimColor-0d7_KjU();
     method public androidx.compose.ui.graphics.Shape getDefaultFrontLayerShape();
-    method public float getDefaultHeaderHeight();
-    method public float getDefaultPeekHeight();
+    method public float getDefaultHeaderHeight-D9Ej5fM();
+    method public float getDefaultPeekHeight-D9Ej5fM();
     property public final float DefaultFrontLayerElevation;
     property public final long DefaultFrontLayerScrimColor;
     property public final androidx.compose.ui.graphics.Shape DefaultFrontLayerShape;
@@ -27,8 +27,8 @@ package androidx.compose.material {
   }
 
   public final class BackdropScaffoldKt {
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void BackdropScaffold-n7o2bDw(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BackdropScaffoldState scaffoldState = rememberBackdropScaffoldState(Concealed), boolean gesturesEnabled = true, float peekHeight = BackdropScaffoldConstants.DefaultPeekHeight, float headerHeight = BackdropScaffoldConstants.DefaultHeaderHeight, boolean persistentAppBar = true, boolean stickyFrontLayer = true, long backLayerBackgroundColor = MaterialTheme.colors.primary, long backLayerContentColor = contentColorFor(backLayerBackgroundColor), androidx.compose.ui.graphics.Shape frontLayerShape = BackdropScaffoldConstants.DefaultFrontLayerShape, float frontLayerElevation = BackdropScaffoldConstants.DefaultFrontLayerElevation, long frontLayerBackgroundColor = MaterialTheme.colors.surface, long frontLayerContentColor = contentColorFor(frontLayerBackgroundColor), long frontLayerScrimColor = BackdropScaffoldConstants.DefaultFrontLayerScrimColor, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit> appBar, kotlin.jvm.functions.Function0<kotlin.Unit> backLayerContent, kotlin.jvm.functions.Function0<kotlin.Unit> frontLayerContent);
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BackdropScaffoldState rememberBackdropScaffoldState(androidx.compose.material.BackdropValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock = AnimationClockAmbient.current, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange = { return true }, androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState());
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void BackdropScaffold-n7o2bDw(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BackdropScaffoldState scaffoldState = rememberBackdropScaffoldState(Concealed), boolean gesturesEnabled = true, float peekHeight = BackdropScaffoldConstants.DefaultPeekHeight, float headerHeight = BackdropScaffoldConstants.DefaultHeaderHeight, boolean persistentAppBar = true, boolean stickyFrontLayer = true, long backLayerBackgroundColor = MaterialTheme.colors.primary, long backLayerContentColor = contentColorFor(backLayerBackgroundColor), androidx.compose.ui.graphics.Shape frontLayerShape = BackdropScaffoldConstants.DefaultFrontLayerShape, float frontLayerElevation = BackdropScaffoldConstants.DefaultFrontLayerElevation, long frontLayerBackgroundColor = MaterialTheme.colors.surface, long frontLayerContentColor = contentColorFor(frontLayerBackgroundColor), long frontLayerScrimColor = BackdropScaffoldConstants.DefaultFrontLayerScrimColor, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { it -> SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit> appBar, kotlin.jvm.functions.Function0<kotlin.Unit> backLayerContent, kotlin.jvm.functions.Function0<kotlin.Unit> frontLayerContent);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BackdropScaffoldState rememberBackdropScaffoldState(androidx.compose.material.BackdropValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock = AnimationClockAmbient.current, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange = { it -> return true }, androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState());
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public final class BackdropScaffoldState extends androidx.compose.material.SwipeableState<androidx.compose.material.BackdropValue> {
@@ -40,6 +40,7 @@ package androidx.compose.material {
     method public void reveal(kotlin.jvm.functions.Function0<kotlin.Unit>? onRevealed = null);
     property public final boolean isConcealed;
     property public final boolean isRevealed;
+    property public final androidx.compose.material.SnackbarHostState snackbarHostState;
     field public static final androidx.compose.material.BackdropScaffoldState.Companion Companion;
   }
 
@@ -48,8 +49,6 @@ package androidx.compose.material {
   }
 
   public enum BackdropValue {
-    method public static androidx.compose.material.BackdropValue valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.BackdropValue[] values();
     enum_constant public static final androidx.compose.material.BackdropValue Concealed;
     enum_constant public static final androidx.compose.material.BackdropValue Revealed;
   }
@@ -73,8 +72,6 @@ package androidx.compose.material {
   }
 
   public enum BottomDrawerValue {
-    method public static androidx.compose.material.BottomDrawerValue valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.BottomDrawerValue[] values();
     enum_constant public static final androidx.compose.material.BottomDrawerValue Closed;
     enum_constant public static final androidx.compose.material.BottomDrawerValue Expanded;
     enum_constant public static final androidx.compose.material.BottomDrawerValue Open;
@@ -88,17 +85,17 @@ package androidx.compose.material {
   }
 
   public final class BottomSheetScaffoldConstants {
-    method public float getDefaultSheetElevation();
-    method public float getDefaultSheetPeekHeight();
+    method public float getDefaultSheetElevation-D9Ej5fM();
+    method public float getDefaultSheetPeekHeight-D9Ej5fM();
     property public final float DefaultSheetElevation;
     property public final float DefaultSheetPeekHeight;
     field public static final androidx.compose.material.BottomSheetScaffoldConstants INSTANCE;
   }
 
   public final class BottomSheetScaffoldKt {
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void BottomSheetScaffold-0Ttp7_s(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> sheetContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BottomSheetScaffoldState scaffoldState = rememberBottomSheetScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean sheetGesturesEnabled = true, androidx.compose.ui.graphics.Shape sheetShape = large, float sheetElevation = BottomSheetScaffoldConstants.DefaultSheetElevation, long sheetBackgroundColor = MaterialTheme.colors.surface, long sheetContentColor = contentColorFor(sheetBackgroundColor), float sheetPeekHeight = BottomSheetScaffoldConstants.DefaultSheetPeekHeight, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, boolean drawerGesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = DrawerConstants.defaultScrimColor, long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void BottomSheetScaffold-0Ttp7_s(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> sheetContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BottomSheetScaffoldState scaffoldState = rememberBottomSheetScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { it -> SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean sheetGesturesEnabled = true, androidx.compose.ui.graphics.Shape sheetShape = large, float sheetElevation = BottomSheetScaffoldConstants.DefaultSheetElevation, long sheetBackgroundColor = MaterialTheme.colors.surface, long sheetContentColor = contentColorFor(sheetBackgroundColor), float sheetPeekHeight = BottomSheetScaffoldConstants.DefaultSheetPeekHeight, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, boolean drawerGesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = DrawerConstants.defaultScrimColor, long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BottomSheetScaffoldState rememberBottomSheetScaffoldState(androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), androidx.compose.material.BottomSheetState bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed), androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState());
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BottomSheetState rememberBottomSheetState(androidx.compose.material.BottomSheetValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock = AnimationClockAmbient.current, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange = { return true });
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BottomSheetState rememberBottomSheetState(androidx.compose.material.BottomSheetValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock = AnimationClockAmbient.current, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange = { it -> return true });
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public final class BottomSheetScaffoldState {
@@ -106,6 +103,9 @@ package androidx.compose.material {
     method public androidx.compose.material.BottomSheetState getBottomSheetState();
     method public androidx.compose.material.DrawerState getDrawerState();
     method public androidx.compose.material.SnackbarHostState getSnackbarHostState();
+    property public final androidx.compose.material.BottomSheetState bottomSheetState;
+    property public final androidx.compose.material.DrawerState drawerState;
+    property public final androidx.compose.material.SnackbarHostState snackbarHostState;
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public final class BottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomSheetValue> {
@@ -124,8 +124,6 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public enum BottomSheetValue {
-    method public static androidx.compose.material.BottomSheetValue valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.BottomSheetValue[] values();
     enum_constant public static final androidx.compose.material.BottomSheetValue Collapsed;
     enum_constant public static final androidx.compose.material.BottomSheetValue Expanded;
   }
@@ -137,15 +135,15 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public long defaultOutlinedButtonContentColor-Q31_wr0(boolean enabled, long defaultColor = MaterialTheme.colors.primary, long disabledColor = defaultDisabledContentColor);
     method @androidx.compose.runtime.Composable public long defaultTextButtonContentColor-Q31_wr0(boolean enabled, long defaultColor = MaterialTheme.colors.primary, long disabledColor = defaultDisabledContentColor);
     method public androidx.compose.foundation.layout.PaddingValues getDefaultContentPadding();
-    method public long getDefaultDisabledBackgroundColor();
-    method public long getDefaultDisabledContentColor();
-    method public float getDefaultIconSize();
-    method public float getDefaultIconSpacing();
-    method public float getDefaultMinHeight();
-    method public float getDefaultMinWidth();
+    method public long getDefaultDisabledBackgroundColor-0d7_KjU();
+    method public long getDefaultDisabledContentColor-0d7_KjU();
+    method public float getDefaultIconSize-D9Ej5fM();
+    method public float getDefaultIconSpacing-D9Ej5fM();
+    method public float getDefaultMinHeight-D9Ej5fM();
+    method public float getDefaultMinWidth-D9Ej5fM();
     method public androidx.compose.foundation.BorderStroke getDefaultOutlinedBorder();
     method public androidx.compose.foundation.layout.PaddingValues getDefaultTextContentPadding();
-    method public float getOutlinedBorderSize();
+    method public float getOutlinedBorderSize-D9Ej5fM();
     property public final androidx.compose.foundation.layout.PaddingValues DefaultContentPadding;
     property public final float DefaultIconSize;
     property public final float DefaultIconSpacing;
@@ -181,8 +179,8 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public long animateDefaultBoxColor-4eRnVYk(androidx.compose.foundation.selection.ToggleableState state, boolean enabled, long checkedColor = MaterialTheme.colors.secondary, long uncheckedColor = checkedColor.copy(0.0), long disabledCheckedColor = defaultDisabledColor, long disabledUncheckedColor = Color.Transparent, long disabledIndeterminateColor = defaultDisabledIndeterminateColor(checkedColor));
     method @androidx.compose.runtime.Composable public long animateDefaultCheckmarkColor-9THJUkw(androidx.compose.foundation.selection.ToggleableState state, long checkedColor = MaterialTheme.colors.surface, long uncheckedColor = checkedColor.copy(0.0));
     method @androidx.compose.runtime.Composable public long defaultDisabledIndeterminateColor-8_81llA(long checkedColor);
-    method public long getDefaultDisabledColor();
-    method public long getDefaultUncheckedColor();
+    method public long getDefaultDisabledColor-0d7_KjU();
+    method public long getDefaultUncheckedColor-0d7_KjU();
     property public final long defaultDisabledColor;
     property public final long defaultUncheckedColor;
     field public static final androidx.compose.material.CheckboxConstants INSTANCE;
@@ -199,18 +197,18 @@ package androidx.compose.material {
 
   @androidx.compose.runtime.Stable public final class Colors {
     method public androidx.compose.material.Colors copy-7EMdAJ8(long primary = this.primary, long primaryVariant = this.primaryVariant, long secondary = this.secondary, long secondaryVariant = this.secondaryVariant, long background = this.background, long surface = this.surface, long error = this.error, long onPrimary = this.onPrimary, long onSecondary = this.onSecondary, long onBackground = this.onBackground, long onSurface = this.onSurface, long onError = this.onError, boolean isLight = this.isLight);
-    method public long getBackground();
-    method public long getError();
-    method public long getOnBackground();
-    method public long getOnError();
-    method public long getOnPrimary();
-    method public long getOnSecondary();
-    method public long getOnSurface();
-    method public long getPrimary();
-    method public long getPrimaryVariant();
-    method public long getSecondary();
-    method public long getSecondaryVariant();
-    method public long getSurface();
+    method public long getBackground-0d7_KjU();
+    method public long getError-0d7_KjU();
+    method public long getOnBackground-0d7_KjU();
+    method public long getOnError-0d7_KjU();
+    method public long getOnPrimary-0d7_KjU();
+    method public long getOnSecondary-0d7_KjU();
+    method public long getOnSurface-0d7_KjU();
+    method public long getPrimary-0d7_KjU();
+    method public long getPrimaryVariant-0d7_KjU();
+    method public long getSecondary-0d7_KjU();
+    method public long getSecondaryVariant-0d7_KjU();
+    method public long getSurface-0d7_KjU();
     method public boolean isLight();
     property public final long background;
     property public final long error;
@@ -235,8 +233,6 @@ package androidx.compose.material {
   }
 
   public enum DismissDirection {
-    method public static androidx.compose.material.DismissDirection valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.DismissDirection[] values();
     enum_constant public static final androidx.compose.material.DismissDirection EndToStart;
     enum_constant public static final androidx.compose.material.DismissDirection StartToEnd;
   }
@@ -256,8 +252,6 @@ package androidx.compose.material {
   }
 
   public enum DismissValue {
-    method public static androidx.compose.material.DismissValue valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.DismissValue[] values();
     enum_constant public static final androidx.compose.material.DismissValue Default;
     enum_constant public static final androidx.compose.material.DismissValue DismissedToEnd;
     enum_constant public static final androidx.compose.material.DismissValue DismissedToStart;
@@ -268,8 +262,8 @@ package androidx.compose.material {
   }
 
   public final class DrawerConstants {
-    method public float getDefaultElevation();
-    method public long getDefaultScrimColor();
+    method public float getDefaultElevation-D9Ej5fM();
+    method public long getDefaultScrimColor-0d7_KjU();
     property public final float DefaultElevation;
     property public final long defaultScrimColor;
     field public static final androidx.compose.material.DrawerConstants INSTANCE;
@@ -279,8 +273,8 @@ package androidx.compose.material {
   public final class DrawerKt {
     method @androidx.compose.runtime.Composable public static void BottomDrawerLayout--6CoO6E(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> drawerContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BottomDrawerState drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed), boolean gesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long scrimColor = DrawerConstants.defaultScrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> bodyContent);
     method @androidx.compose.runtime.Composable public static void ModalDrawerLayout-TlzqArY(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> drawerContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), boolean gesturesEnabled = true, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long scrimColor = DrawerConstants.defaultScrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> bodyContent);
-    method @androidx.compose.runtime.Composable public static androidx.compose.material.BottomDrawerState rememberBottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange = { return true });
-    method @androidx.compose.runtime.Composable public static androidx.compose.material.DrawerState rememberDrawerState(androidx.compose.material.DrawerValue initialValue, kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange = { return true });
+    method @androidx.compose.runtime.Composable public static androidx.compose.material.BottomDrawerState rememberBottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange = { it -> return true });
+    method @androidx.compose.runtime.Composable public static androidx.compose.material.DrawerState rememberDrawerState(androidx.compose.material.DrawerValue initialValue, kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange = { it -> return true });
   }
 
   public final class DrawerState extends androidx.compose.material.SwipeableState<androidx.compose.material.DrawerValue> {
@@ -299,8 +293,6 @@ package androidx.compose.material {
   }
 
   public enum DrawerValue {
-    method public static androidx.compose.material.DrawerValue valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.DrawerValue[] values();
     enum_constant public static final androidx.compose.material.DrawerValue Closed;
     enum_constant public static final androidx.compose.material.DrawerValue Open;
   }
@@ -345,8 +337,6 @@ package androidx.compose.material {
   }
 
   public enum FabPosition {
-    method public static androidx.compose.material.FabPosition valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.FabPosition[] values();
     enum_constant public static final androidx.compose.material.FabPosition Center;
     enum_constant public static final androidx.compose.material.FabPosition End;
   }
@@ -411,8 +401,8 @@ package androidx.compose.material {
   }
 
   public final class ModalBottomSheetConstants {
-    method public float getDefaultElevation();
-    method public long getDefaultScrimColor();
+    method public float getDefaultElevation-D9Ej5fM();
+    method public long getDefaultScrimColor-0d7_KjU();
     property public final float DefaultElevation;
     property public final long DefaultScrimColor;
     field public static final androidx.compose.material.ModalBottomSheetConstants INSTANCE;
@@ -420,7 +410,7 @@ package androidx.compose.material {
 
   public final class ModalBottomSheetKt {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void ModalBottomSheetLayout-dpadJcU(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> sheetContent, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ModalBottomSheetState sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden), androidx.compose.ui.graphics.Shape sheetShape = large, float sheetElevation = ModalBottomSheetConstants.DefaultElevation, long sheetBackgroundColor = MaterialTheme.colors.surface, long sheetContentColor = contentColorFor(sheetBackgroundColor), long scrimColor = ModalBottomSheetConstants.DefaultScrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.ModalBottomSheetState rememberModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock = AnimationClockAmbient.current, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange = { return true });
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.ModalBottomSheetState rememberModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock = AnimationClockAmbient.current, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange = { it -> return true });
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public final class ModalBottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.ModalBottomSheetValue> {
@@ -437,25 +427,23 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public enum ModalBottomSheetValue {
-    method public static androidx.compose.material.ModalBottomSheetValue valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.ModalBottomSheetValue[] values();
     enum_constant public static final androidx.compose.material.ModalBottomSheetValue Expanded;
     enum_constant public static final androidx.compose.material.ModalBottomSheetValue HalfExpanded;
     enum_constant public static final androidx.compose.material.ModalBottomSheetValue Hidden;
   }
 
   public final class OutlinedTextFieldKt {
-    method @androidx.compose.runtime.Composable public static void OutlinedTextField-NT1NBPE(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = VisualTransformation.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = {}, androidx.compose.foundation.InteractionState interactionState = remember({ 
+    method @androidx.compose.runtime.Composable public static void OutlinedTextField-NT1NBPE(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = androidx.compose.ui.text.input.VisualTransformation.Companion.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = { it ->  }, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
 }), long activeColor = MaterialTheme.colors.primary, long inactiveColor = MaterialTheme.colors.onSurface, long errorColor = MaterialTheme.colors.error);
-    method @androidx.compose.runtime.Composable public static void OutlinedTextField-OHK2xX0(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = VisualTransformation.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = {}, androidx.compose.foundation.InteractionState interactionState = remember({ 
+    method @androidx.compose.runtime.Composable public static void OutlinedTextField-OHK2xX0(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = androidx.compose.ui.text.input.VisualTransformation.Companion.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = { it ->  }, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
 }), long activeColor = MaterialTheme.colors.primary, long inactiveColor = MaterialTheme.colors.onSurface, long errorColor = MaterialTheme.colors.error);
   }
 
   public final class ProgressIndicatorConstants {
     method public androidx.compose.animation.core.SpringSpec<java.lang.Float> getDefaultProgressAnimationSpec();
-    method public float getDefaultStrokeWidth();
+    method public float getDefaultStrokeWidth-D9Ej5fM();
     property public final androidx.compose.animation.core.SpringSpec<java.lang.Float> DefaultProgressAnimationSpec;
     property public final float DefaultStrokeWidth;
     field public static final float DefaultIndicatorBackgroundOpacity = 0.24f;
@@ -471,8 +459,8 @@ package androidx.compose.material {
 
   public final class RadioButtonConstants {
     method @androidx.compose.runtime.Composable public long animateDefaultColor-tRWe6DU(boolean selected, boolean enabled, long selectedColor = MaterialTheme.colors.secondary, long unselectedColor = defaultUnselectedColor, long disabledColor = defaultDisabledColor);
-    method public long getDefaultDisabledColor();
-    method public long getDefaultUnselectedColor();
+    method public long getDefaultDisabledColor-0d7_KjU();
+    method public long getDefaultUnselectedColor-0d7_KjU();
     property public final long defaultDisabledColor;
     property public final long defaultUnselectedColor;
     field public static final androidx.compose.material.RadioButtonConstants INSTANCE;
@@ -494,10 +482,13 @@ package androidx.compose.material {
     method public float getBasis();
     method public float getFactorAtMax();
     method public float getFactorAtMin();
+    property public final float basis;
+    property public final float factorAtMax;
+    property public final float factorAtMin;
   }
 
   public final class ScaffoldKt {
-    method @androidx.compose.runtime.Composable public static void Scaffold-qcZBNiw(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ScaffoldState scaffoldState = rememberScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit> topBar = emptyContent(), kotlin.jvm.functions.Function0<kotlin.Unit> bottomBar = emptyContent(), kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit> floatingActionButton = emptyContent(), androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean isFloatingActionButtonDocked = false, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = DrawerConstants.defaultScrimColor, long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
+    method @androidx.compose.runtime.Composable public static void Scaffold-qcZBNiw(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ScaffoldState scaffoldState = rememberScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit> topBar = emptyContent(), kotlin.jvm.functions.Function0<kotlin.Unit> bottomBar = emptyContent(), kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { it -> SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit> floatingActionButton = emptyContent(), androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean isFloatingActionButtonDocked = false, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = DrawerConstants.defaultScrimColor, long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
     method @androidx.compose.runtime.Composable public static androidx.compose.material.ScaffoldState rememberScaffoldState(androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState(), boolean isDrawerGesturesEnabled = true);
   }
 
@@ -507,7 +498,9 @@ package androidx.compose.material {
     method public androidx.compose.material.SnackbarHostState getSnackbarHostState();
     method public boolean isDrawerGesturesEnabled();
     method public void setDrawerGesturesEnabled(boolean p);
+    property public final androidx.compose.material.DrawerState drawerState;
     property public final boolean isDrawerGesturesEnabled;
+    property public final androidx.compose.material.SnackbarHostState snackbarHostState;
   }
 
   @androidx.compose.runtime.Immutable public final class Shapes {
@@ -520,6 +513,9 @@ package androidx.compose.material {
     method public androidx.compose.foundation.shape.CornerBasedShape getLarge();
     method public androidx.compose.foundation.shape.CornerBasedShape getMedium();
     method public androidx.compose.foundation.shape.CornerBasedShape getSmall();
+    property public final androidx.compose.foundation.shape.CornerBasedShape large;
+    property public final androidx.compose.foundation.shape.CornerBasedShape medium;
+    property public final androidx.compose.foundation.shape.CornerBasedShape small;
   }
 
   public final class ShapesKt {
@@ -538,8 +534,8 @@ package androidx.compose.material {
   }
 
   public final class SnackbarConstants {
-    method public long getDefaultActionPrimaryColor();
-    method public long getDefaultBackgroundColor();
+    method public long getDefaultActionPrimaryColor-0d7_KjU();
+    method public long getDefaultBackgroundColor-0d7_KjU();
     property public final long defaultActionPrimaryColor;
     property public final long defaultBackgroundColor;
     field public static final androidx.compose.material.SnackbarConstants INSTANCE;
@@ -557,15 +553,13 @@ package androidx.compose.material {
   }
 
   public enum SnackbarDuration {
-    method public static androidx.compose.material.SnackbarDuration valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.SnackbarDuration[] values();
     enum_constant public static final androidx.compose.material.SnackbarDuration Indefinite;
     enum_constant public static final androidx.compose.material.SnackbarDuration Long;
     enum_constant public static final androidx.compose.material.SnackbarDuration Short;
   }
 
   public final class SnackbarHostKt {
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void SnackbarHost(androidx.compose.material.SnackbarHostState hostState, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarData,kotlin.Unit> snackbar = { Snackbar(it) });
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void SnackbarHost(androidx.compose.material.SnackbarHostState hostState, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarData,kotlin.Unit> snackbar = { it -> Snackbar(it) });
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public final class SnackbarHostState {
@@ -581,8 +575,6 @@ package androidx.compose.material {
   }
 
   public enum SnackbarResult {
-    method public static androidx.compose.material.SnackbarResult valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.material.SnackbarResult[] values();
     enum_constant public static final androidx.compose.material.SnackbarResult ActionPerformed;
     enum_constant public static final androidx.compose.material.SnackbarResult Dismissed;
   }
@@ -601,17 +593,20 @@ package androidx.compose.material {
     method public float getFraction();
     method public T! getFrom();
     method public T! getTo();
+    property public final float fraction;
+    property public final T! from;
+    property public final T! to;
   }
 
   public final class SwipeToDismissKt {
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void SwipeToDismiss(androidx.compose.material.DismissState state, androidx.compose.ui.Modifier modifier = Modifier, java.util.Set<? extends androidx.compose.material.DismissDirection> directions = setOf(EndToStart, StartToEnd), kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissDirection,? extends androidx.compose.material.ThresholdConfig> dismissThresholds = { return <init>(0.5) }, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> background, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> dismissContent);
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.DismissState rememberDismissState(androidx.compose.material.DismissValue initialValue = androidx.compose.material.DismissValue.Default, kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissValue,java.lang.Boolean> confirmStateChange = { return true });
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void SwipeToDismiss(androidx.compose.material.DismissState state, androidx.compose.ui.Modifier modifier = Modifier, java.util.Set<? extends androidx.compose.material.DismissDirection> directions = setOf(EndToStart, StartToEnd), kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissDirection,? extends androidx.compose.material.ThresholdConfig> dismissThresholds = { it -> return <init>(0.5) }, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> background, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> dismissContent);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.DismissState rememberDismissState(androidx.compose.material.DismissValue initialValue = androidx.compose.material.DismissValue.Default, kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissValue,java.lang.Boolean> confirmStateChange = { it -> return true });
   }
 
   public final class SwipeableConstants {
     method public androidx.compose.material.ResistanceConfig? defaultResistanceConfig(java.util.Set<java.lang.Float> anchors, float factorAtMin = 10.0f, float factorAtMax = 10.0f);
     method public androidx.compose.animation.core.SpringSpec<java.lang.Float> getDefaultAnimationSpec();
-    method public float getDefaultVelocityThreshold();
+    method public float getDefaultVelocityThreshold-D9Ej5fM();
     property public final androidx.compose.animation.core.SpringSpec<java.lang.Float> DefaultAnimationSpec;
     property public final float DefaultVelocityThreshold;
     field public static final androidx.compose.material.SwipeableConstants INSTANCE;
@@ -620,7 +615,7 @@ package androidx.compose.material {
   }
 
   public final class SwipeableKt {
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static <T> androidx.compose.material.SwipeableState<T> rememberSwipeableState(T initialValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange = { return true });
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static <T> androidx.compose.material.SwipeableState<T> rememberSwipeableState(T initialValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange = { it -> return true });
     method @androidx.compose.material.ExperimentalMaterialApi public static <T> androidx.compose.ui.Modifier swipeable-VaXUQxo(androidx.compose.ui.Modifier, androidx.compose.material.SwipeableState<T> state, java.util.Map<java.lang.Float,? extends T> anchors, kotlin.jvm.functions.Function2<? super T,? super T,? extends androidx.compose.material.ThresholdConfig> thresholds, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, boolean enabled = true, boolean reverseDirection = false, androidx.compose.foundation.InteractionState? interactionState = null, androidx.compose.material.ResistanceConfig? resistance = defaultResistanceConfig(anchors.keys), float velocityThreshold = DefaultVelocityThreshold);
   }
 
@@ -659,9 +654,9 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public void DefaultDivider-Z-uBYeE(androidx.compose.ui.Modifier modifier = Modifier, float thickness = DefaultDividerThickness, long color = AmbientContentColor.current.copy(DefaultDividerOpacity));
     method @androidx.compose.runtime.Composable public void DefaultIndicator-Z-uBYeE(androidx.compose.ui.Modifier modifier = Modifier, float height = DefaultIndicatorHeight, long color = AmbientContentColor.current);
     method public androidx.compose.ui.Modifier defaultTabIndicatorOffset(androidx.compose.ui.Modifier, androidx.compose.material.TabPosition currentTabPosition);
-    method public float getDefaultDividerThickness();
-    method public float getDefaultIndicatorHeight();
-    method public float getDefaultScrollableTabRowPadding();
+    method public float getDefaultDividerThickness-D9Ej5fM();
+    method public float getDefaultIndicatorHeight-D9Ej5fM();
+    method public float getDefaultScrollableTabRowPadding-D9Ej5fM();
     property public final float DefaultDividerThickness;
     property public final float DefaultIndicatorHeight;
     property public final float DefaultScrollableTabRowPadding;
@@ -679,13 +674,15 @@ package androidx.compose.material {
   }
 
   @androidx.compose.runtime.Immutable public final class TabPosition {
-    method public float component1();
-    method public float component2();
+    method public float component1-D9Ej5fM();
+    method public float component2-D9Ej5fM();
     method @androidx.compose.runtime.Immutable public androidx.compose.material.TabPosition copy-ioHfwGI(float left, float width);
-    method public float getLeft();
-    method public float getRight();
-    method public float getWidth();
+    method public float getLeft-D9Ej5fM();
+    method public float getRight-D9Ej5fM();
+    method public float getWidth-D9Ej5fM();
+    property public final float left;
     property public final float right;
+    property public final float width;
   }
 
   public final class TabRowKt {
@@ -697,10 +694,10 @@ package androidx.compose.material {
   }
 
   public final class TextFieldKt {
-    method @androidx.compose.runtime.Composable public static void TextField-LTmrouY(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = VisualTransformation.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = {}, androidx.compose.foundation.InteractionState interactionState = remember({ 
+    method @androidx.compose.runtime.Composable public static void TextField-LTmrouY(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = androidx.compose.ui.text.input.VisualTransformation.Companion.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = { it ->  }, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
 }), long activeColor = MaterialTheme.colors.primary, long inactiveColor = MaterialTheme.colors.onSurface, long errorColor = MaterialTheme.colors.error, long backgroundColor = MaterialTheme.colors.onSurface.copy(ContainerAlpha), androidx.compose.ui.graphics.Shape shape = MaterialTheme.shapes.small.copy(ZeroCornerSize, ZeroCornerSize));
-    method @androidx.compose.runtime.Composable public static void TextField-WI3iwFk(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = VisualTransformation.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = {}, androidx.compose.foundation.InteractionState interactionState = remember({ 
+    method @androidx.compose.runtime.Composable public static void TextField-WI3iwFk(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle textStyle = AmbientTextStyle.current, kotlin.jvm.functions.Function0<kotlin.Unit>? label = null, kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder = null, kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon = null, kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon = null, boolean isErrorValue = false, androidx.compose.ui.text.input.VisualTransformation visualTransformation = androidx.compose.ui.text.input.VisualTransformation.Companion.None, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed = { _, _ ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = { it ->  }, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
 }), long activeColor = MaterialTheme.colors.primary, long inactiveColor = MaterialTheme.colors.onSurface, long errorColor = MaterialTheme.colors.error, long backgroundColor = MaterialTheme.colors.onSurface.copy(ContainerAlpha), androidx.compose.ui.graphics.Shape shape = MaterialTheme.shapes.small.copy(ZeroCornerSize, ZeroCornerSize));
     field public static final float ContainerAlpha = 0.12f;
@@ -739,6 +736,19 @@ package androidx.compose.material {
     method public androidx.compose.ui.text.TextStyle getOverline();
     method public androidx.compose.ui.text.TextStyle getSubtitle1();
     method public androidx.compose.ui.text.TextStyle getSubtitle2();
+    property public final androidx.compose.ui.text.TextStyle body1;
+    property public final androidx.compose.ui.text.TextStyle body2;
+    property public final androidx.compose.ui.text.TextStyle button;
+    property public final androidx.compose.ui.text.TextStyle caption;
+    property public final androidx.compose.ui.text.TextStyle h1;
+    property public final androidx.compose.ui.text.TextStyle h2;
+    property public final androidx.compose.ui.text.TextStyle h3;
+    property public final androidx.compose.ui.text.TextStyle h4;
+    property public final androidx.compose.ui.text.TextStyle h5;
+    property public final androidx.compose.ui.text.TextStyle h6;
+    property public final androidx.compose.ui.text.TextStyle overline;
+    property public final androidx.compose.ui.text.TextStyle subtitle1;
+    property public final androidx.compose.ui.text.TextStyle subtitle2;
   }
 
   public final class TypographyKt {
@@ -764,7 +774,7 @@ package androidx.compose.material.ripple {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public interface RippleTheme {
-    method @androidx.compose.runtime.Composable public long defaultColor();
+    method @androidx.compose.runtime.Composable public long defaultColor-0d7_KjU();
     method @androidx.compose.runtime.Composable public androidx.compose.material.ripple.RippleOpacity rippleOpacity();
   }
 
