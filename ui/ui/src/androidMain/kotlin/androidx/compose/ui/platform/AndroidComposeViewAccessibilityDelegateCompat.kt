@@ -127,7 +127,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private var labelToActionId = SparseArrayCompat<Map<CharSequence, Int>>()
     private var accessibilityCursorPosition = AccessibilityCursorPositionUndefined
 
-    private class SemanticsNodeCopy(
+    @VisibleForTesting
+    internal class SemanticsNodeCopy(
         semanticsNode: SemanticsNode
     ) {
         val config = semanticsNode.config
@@ -140,7 +141,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
-    private var semanticsNodes: MutableMap<Int, SemanticsNodeCopy> = mutableMapOf()
+    @VisibleForTesting
+    internal var semanticsNodes: MutableMap<Int, SemanticsNodeCopy> = mutableMapOf()
     private var semanticsRoot = SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode)
     private var checkingForSemanticsChanges = false
 
@@ -1090,7 +1092,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         semanticsRoot = SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode)
     }
 
-    private fun sendSemanticsPropertyChangeEvents(newSemanticsNodes: Map<Int, SemanticsNode>) {
+    @VisibleForTesting
+    internal fun sendSemanticsPropertyChangeEvents(newSemanticsNodes: Map<Int, SemanticsNode>) {
         for (id in newSemanticsNodes.keys) {
             if (!semanticsNodes.contains(id)) {
                 continue
@@ -1216,12 +1219,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         val deltaX = if (newXState != null && oldXState != null) {
                             newXState.value - oldXState.value
                         } else {
-                            0
+                            0f
                         }
                         val deltaY = if (newYState != null && oldYState != null) {
                             newYState.value - oldYState.value
                         } else {
-                            0
+                            0f
                         }
                         if (deltaX != 0f || deltaY != 0f) {
                             val event = createEvent(
