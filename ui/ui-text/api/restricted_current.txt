@@ -23,7 +23,7 @@ package androidx.compose.ui.text {
     ctor public AnnotatedString.Builder();
     ctor public AnnotatedString.Builder(String text);
     ctor public AnnotatedString.Builder(androidx.compose.ui.text.AnnotatedString text);
-    method public void addStringAnnotation(String scope, String annotation, int start, int end);
+    method public void addStringAnnotation(String tag, String annotation, int start, int end);
     method public void addStyle(androidx.compose.ui.text.SpanStyle style, int start, int end);
     method public void addStyle(androidx.compose.ui.text.ParagraphStyle style, int start, int end);
     method public void append(String text);

@@ -266,15 +266,15 @@ data class AnnotatedString internal constructor(
         /**
          * Set an Annotation for the given [range].
          *
-         * @param scope the scope used to distinguish annotations
+         * @param tag the tag used to distinguish annotations
          * @param annotation the string annotation that is attached
          * @param start the inclusive starting offset of the range
          * @param end the exclusive end offset of the range
          * @see getStringAnnotations
          * @sample androidx.compose.ui.text.samples.AnnotatedStringAddStringAnnotationSample
          */
-        fun addStringAnnotation(scope: String, annotation: String, start: Int, end: Int) {
-            annotations.add(MutableRange(annotation, start, end, scope))
+        fun addStringAnnotation(tag: String, annotation: String, start: Int, end: Int) {
+            annotations.add(MutableRange(annotation, start, end, tag))
         }
 
         /**
