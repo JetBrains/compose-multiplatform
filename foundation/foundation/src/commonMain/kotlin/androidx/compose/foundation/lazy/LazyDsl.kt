@@ -39,7 +39,7 @@ interface LazyListScope {
      * @param items the data list
      * @param itemContent the content displayed by a single item
      */
-    fun <T : Any> items(
+    fun <T> items(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(item: T) -> Unit
     )
@@ -57,7 +57,7 @@ interface LazyListScope {
      * @param items the data list
      * @param itemContent the content displayed by a single item
      */
-    fun <T : Any> itemsIndexed(
+    fun <T> itemsIndexed(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     )
@@ -81,7 +81,7 @@ internal class LazyListScopeImpl : LazyListScope {
         return interval.content(scope, localIntervalIndex)
     }
 
-    override fun <T : Any> items(
+    override fun <T> items(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(item: T) -> Unit
     ) {
@@ -113,7 +113,7 @@ internal class LazyListScopeImpl : LazyListScope {
         intervals.add(interval)
     }
 
-    override fun <T : Any> itemsIndexed(
+    override fun <T> itemsIndexed(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     ) {

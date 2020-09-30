@@ -212,7 +212,7 @@ class LazyColumnTest {
 
         rule.setContent {
             LazyColumn {
-                items(emptyList()) { }
+                items(emptyList<Any>()) { }
                 item {
                     Spacer(Modifier.preferredSize(10.dp).testTag(itemTag))
                 }
@@ -221,5 +221,33 @@ class LazyColumnTest {
 
         rule.onNodeWithTag(itemTag)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun lazyColumnAllowsNullableItems() {
+        val items = listOf("1", null, "3")
+        val nullTestTag = "nullTestTag"
+
+        rule.setContent {
+            LazyColumn(Modifier.preferredHeight(200.dp)) {
+                items(items) {
+                    if (it != null) {
+                        Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
+                    } else {
+                        Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                            .testTag(nullTestTag))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag(nullTestTag)
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("3")
+            .assertDoesNotExist()
     }
 }
