@@ -353,6 +353,29 @@ class SnapshotTests {
     }
 
     @Test
+    fun aParentSnapshotCanAccessAStatObjectedCreateByANestedSnapshot() {
+        val snapshot = takeMutableSnapshot()
+        val state = try {
+            val nested = snapshot.takeNestedMutableSnapshot()
+            val state = try {
+                nested.notifyObjectsInitialized()
+                val state = nested.enter { mutableStateOf(1) }
+                assertEquals(1, nested.enter { state.value })
+                nested.apply().check()
+                state
+            } finally {
+                nested.dispose()
+            }
+            assertEquals(1, snapshot.enter { state.value })
+            snapshot.apply().check()
+            state
+        } finally {
+            snapshot.dispose()
+        }
+        assertEquals(1, state.value)
+    }
+
+    @Test
     fun atomicChangesNest() {
         val state = mutableStateOf(0)
         atomic {
