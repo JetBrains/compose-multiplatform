@@ -24,13 +24,11 @@ import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.listSaver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Placeable
@@ -106,26 +104,21 @@ class LazyListState constructor(
     animationClock: AnimationClockObservable
 ) {
     /**
+     * The holder class for the current scroll position.
+     */
+    private val scrollPosition =
+        ItemRelativeScrollPosition(firstVisibleItemIndex, firstVisibleItemScrollOffset)
+
+    /**
      * The index of the first item that is visible
      */
-    var firstVisibleItemIndex: Int by mutableStateOf(firstVisibleItemIndex)
-        private set
+    val firstVisibleItemIndex: Int get() = scrollPosition.observableIndex
 
     /**
-     * Internal copy to avoid model reads triggering unnecessary remeasures
+     * The scroll offset of the first visible item. Scrolling forward is positive - i.e., the
+     * amount that the item is offset backwards
      */
-    private var _firstVisibleItemIndex = DataIndex(firstVisibleItemIndex)
-
-    /**
-     * Scrolling forward is positive - i.e., the amount that the item is offset backwards
-     */
-    var firstVisibleItemScrollOffset by mutableStateOf(firstVisibleItemScrollOffset)
-        internal set
-
-    /**
-     * Internal copy to avoid model reads triggering unnecessary remeasures
-     */
-    private var _firstVisibleItemScrollOffset = firstVisibleItemScrollOffset
+    val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
 
     /**
      * The amount of scroll to be consumed in the next layout pass.  Scrolling forward is negative
@@ -204,19 +197,21 @@ class LazyListState constructor(
         constraints.assertNotNestingScrollableContainers(isVertical)
         if (itemsCount <= 0) {
             // empty data set. reset the current scroll and report zero size
-            _firstVisibleItemIndex = DataIndex(0)
-            _firstVisibleItemScrollOffset = 0
+            scrollPosition.update(DataIndex(0), 0)
             layout(constraints.constrainWidth(0), constraints.constrainHeight(0)) {}
         } else {
-            // assert for the incorrect initial state
-            require(_firstVisibleItemScrollOffset >= 0f)
-            require(_firstVisibleItemIndex.value >= 0f)
+            var currentFirstItemIndex = scrollPosition.index
+            var currentFirstItemScrollOffset = scrollPosition.scrollOffset
 
-            if (_firstVisibleItemIndex.value >= itemsCount) {
+            // assert for the incorrect initial state
+            require(currentFirstItemScrollOffset >= 0f)
+            require(currentFirstItemIndex.value >= 0f)
+
+            if (currentFirstItemIndex.value >= itemsCount) {
                 // the data set has been updated and now we have less items that we were
                 // scrolled to before
-                _firstVisibleItemIndex = DataIndex(itemsCount - 1)
-                _firstVisibleItemScrollOffset = 0
+                currentFirstItemIndex = DataIndex(itemsCount - 1)
+                currentFirstItemScrollOffset = 0
             }
 
             // represents the real amount of consumed pixels
@@ -224,12 +219,12 @@ class LazyListState constructor(
 
             // applying the whole requested scroll offset. we will figure out if we can't consume
             // all of it later
-            _firstVisibleItemScrollOffset -= consumedScroll
+            currentFirstItemScrollOffset -= consumedScroll
 
             // if the current scroll offset is less than minimally possible
-            if (_firstVisibleItemIndex == DataIndex(0) && _firstVisibleItemScrollOffset < 0) {
-                consumedScroll += _firstVisibleItemScrollOffset
-                _firstVisibleItemScrollOffset = 0
+            if (currentFirstItemIndex == DataIndex(0) && currentFirstItemScrollOffset < 0) {
+                consumedScroll += currentFirstItemScrollOffset
+                currentFirstItemScrollOffset = 0
             }
 
             // the constraints we will measure child with. the cross axis are not restricted
@@ -239,31 +234,31 @@ class LazyListState constructor(
             )
             // saving it into the field as we first go backward and after that want to go forward
             // again from the initial position
-            val goingForwardInitialIndex = _firstVisibleItemIndex
-            var goingForwardInitialScrollOffset = _firstVisibleItemScrollOffset
+            val goingForwardInitialIndex = currentFirstItemIndex
+            var goingForwardInitialScrollOffset = currentFirstItemScrollOffset
 
             // this will contain all the placeables representing the visible items
             val visibleItemsPlaceables = mutableListOf<Placeable>()
 
             // we had scrolled backward, which means items before current firstItemScrollOffset
             // became visible. compose them and update firstItemScrollOffset
-            while (_firstVisibleItemScrollOffset < 0 && _firstVisibleItemIndex > DataIndex(0)) {
-                val previous = DataIndex(_firstVisibleItemIndex.value - 1)
+            while (currentFirstItemScrollOffset < 0 && currentFirstItemIndex > DataIndex(0)) {
+                val previous = DataIndex(currentFirstItemIndex.value - 1)
                 val placeables =
                     subcompose(previous, itemContentFactory(previous.value)).fastMap {
                         it.measure(childConstraints)
                     }
                 visibleItemsPlaceables.addAll(0, placeables)
                 val size = placeables.fastSumBy { if (isVertical) it.height else it.width }
-                _firstVisibleItemScrollOffset += size
-                _firstVisibleItemIndex = previous
+                currentFirstItemScrollOffset += size
+                currentFirstItemIndex = previous
             }
             // if we were scrolled backward, but there were not enough items before. this means
             // not the whole scroll was consumed
-            if (_firstVisibleItemScrollOffset < 0) {
-                consumedScroll += _firstVisibleItemScrollOffset
-                goingForwardInitialScrollOffset += _firstVisibleItemScrollOffset
-                _firstVisibleItemScrollOffset = 0
+            if (currentFirstItemScrollOffset < 0) {
+                consumedScroll += currentFirstItemScrollOffset
+                goingForwardInitialScrollOffset += currentFirstItemScrollOffset
+                currentFirstItemScrollOffset = 0
             }
 
             // remembers the composed placeables which we are not currently placing as they are out
@@ -291,8 +286,8 @@ class LazyListState constructor(
 
                 if (mainAxisUsed < 0f) {
                     // this item is offscreen and will not be placed. advance firstVisibleItemIndex
-                    _firstVisibleItemIndex = index + 1
-                    _firstVisibleItemScrollOffset -= size
+                    currentFirstItemIndex = index + 1
+                    currentFirstItemScrollOffset -= size
                     // but remember the corresponding placeables in case we will be forced to
                     // scroll back as there were not enough items to fill the viewport
                     if (notUsedButComposedItems == null) {
@@ -310,10 +305,10 @@ class LazyListState constructor(
             // lets try to scroll back if we have enough items before firstVisibleItemIndex.
             if (mainAxisUsed < maxMainAxis) {
                 val toScrollBack = maxMainAxis - mainAxisUsed
-                _firstVisibleItemScrollOffset -= toScrollBack
+                currentFirstItemScrollOffset -= toScrollBack
                 mainAxisUsed += toScrollBack
-                while (_firstVisibleItemScrollOffset < 0 && _firstVisibleItemIndex > DataIndex(0)) {
-                    val previous = DataIndex(_firstVisibleItemIndex.value - 1)
+                while (currentFirstItemScrollOffset < 0 && currentFirstItemIndex > DataIndex(0)) {
+                    val previous = DataIndex(currentFirstItemIndex.value - 1)
                     val alreadyComposedIndex = notUsedButComposedItems?.lastIndex ?: -1
                     val placeables = if (alreadyComposedIndex >= 0) {
                         notUsedButComposedItems!!.removeAt(alreadyComposedIndex)
@@ -324,14 +319,14 @@ class LazyListState constructor(
                     }
                     visibleItemsPlaceables.addAll(0, placeables)
                     val size = placeables.fastSumBy { if (isVertical) it.height else it.width }
-                    _firstVisibleItemScrollOffset += size
-                    _firstVisibleItemIndex = previous
+                    currentFirstItemScrollOffset += size
+                    currentFirstItemIndex = previous
                 }
                 consumedScroll += toScrollBack
-                if (_firstVisibleItemScrollOffset < 0) {
-                    consumedScroll += _firstVisibleItemScrollOffset
-                    mainAxisUsed += _firstVisibleItemScrollOffset
-                    _firstVisibleItemScrollOffset = 0
+                if (currentFirstItemScrollOffset < 0) {
+                    consumedScroll += currentFirstItemScrollOffset
+                    mainAxisUsed += currentFirstItemScrollOffset
+                    currentFirstItemScrollOffset = 0
                 }
             }
 
@@ -346,12 +341,11 @@ class LazyListState constructor(
                 if (!isVertical) maxCrossAxis else mainAxisUsed
             )
 
-            // Copy values to public MutableState
-            firstVisibleItemIndex = _firstVisibleItemIndex.value
-            firstVisibleItemScrollOffset = _firstVisibleItemScrollOffset
+            // update state with the new calculated scroll position
+            scrollPosition.update(currentFirstItemIndex, currentFirstItemScrollOffset)
 
             return layout(layoutWidth, layoutHeight) {
-                var currentMainAxis = -_firstVisibleItemScrollOffset
+                var currentMainAxis = -currentFirstItemScrollOffset
                 visibleItemsPlaceables.fastForEach {
                     if (isVertical) {
                         val x = horizontalAlignment.align(layoutWidth - it.width, layoutDirection)
@@ -389,5 +383,41 @@ class LazyListState constructor(
                 )
             }
         )
+    }
+}
+
+/**
+ * Contains the current scroll position represented by the first visible item index and the first
+ * visible item scroll offset.
+ *
+ * Allows reading the values without recording the state read: [index] and [scrollOffset].
+ * And with recording the state read which makes such reads observable: [observableIndex] and
+ * [observableScrollOffset].
+ *
+ * To update the values use [update].
+ *
+ * The whole purpose of this class is to allow reading the scroll position without recording the
+ * model read as if we do so inside the measure block the extra remeasurement will be scheduled
+ * once we update the values in the end of the measure block. Abstracting the variables
+ * duplication into a separate class allows us maintain the contract of keeping them in sync.
+ */
+private class ItemRelativeScrollPosition(initialIndex: Int = 0, initialScrollOffset: Int = 0) {
+    var index = DataIndex(initialIndex)
+        private set
+
+    var scrollOffset = initialScrollOffset
+        private set
+
+    private val indexState = mutableStateOf(index.value)
+    val observableIndex get() = indexState.value
+
+    private val scrollOffsetState = mutableStateOf(scrollOffset)
+    val observableScrollOffset get() = scrollOffsetState.value
+
+    fun update(index: DataIndex, scrollOffset: Int) {
+        this.index = index
+        indexState.value = index.value
+        this.scrollOffset = scrollOffset
+        scrollOffsetState.value = scrollOffset
     }
 }
