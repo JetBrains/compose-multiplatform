@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredSize
@@ -75,15 +75,15 @@ fun RtlDemo() {
 
 @Composable
 fun StackExample() {
-    Stack(Modifier.fillMaxSize().background(Color.LightGray)) {
-        Stack(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
-            Stack(boxSize.then(Modifier.background(Color.Red))) {}
+    Box(Modifier.fillMaxSize().background(Color.LightGray)) {
+        Box(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
+            Box(boxSize.then(Modifier.background(Color.Red))) {}
         }
-        Stack(Modifier.fillMaxSize().wrapContentHeight(Alignment.CenterVertically)) {
-            Stack(boxSize.then(Modifier.background(Color.Green))) {}
+        Box(Modifier.fillMaxSize().wrapContentHeight(Alignment.CenterVertically)) {
+            Box(boxSize.then(Modifier.background(Color.Green))) {}
         }
-        Stack(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
-            Stack(boxSize.then(Modifier.background(Color.Blue))) {}
+        Box(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
+            Box(boxSize.then(Modifier.background(Color.Blue))) {}
         }
     }
 }
@@ -94,30 +94,30 @@ private val size = Modifier.preferredSize(10.dp, 10.dp)
 @Composable
 private fun testRow() {
     Row {
-        Stack(boxSize.background(color = Color.Red)) {}
-        Stack(boxSize.background(color = Color.Green)) {}
+        Box(boxSize.background(color = Color.Red)) {}
+        Box(boxSize.background(color = Color.Green)) {}
         Row {
-            Stack(boxSize.background(color = Color.Magenta)) {}
-            Stack(boxSize.background(color = Color.Yellow)) {}
-            Stack(boxSize.background(color = Color.Cyan)) {}
+            Box(boxSize.background(color = Color.Magenta)) {}
+            Box(boxSize.background(color = Color.Yellow)) {}
+            Box(boxSize.background(color = Color.Cyan)) {}
         }
-        Stack(boxSize.background(color = Color.Blue)) {}
+        Box(boxSize.background(color = Color.Blue)) {}
     }
 }
 
 @Composable
 private fun testRow_modifier() {
     Row {
-        Stack(boxSize.background(Color.Red)) {}
-        Stack(boxSize.background(Color.Green)) {}
+        Box(boxSize.background(Color.Red)) {}
+        Box(boxSize.background(Color.Green)) {}
         Providers(LayoutDirectionAmbient provides LayoutDirection.Ltr) {
             Row {
-                Stack(boxSize.background(Color.Magenta)) {}
-                Stack(boxSize.background(Color.Yellow)) {}
-                Stack(boxSize.background(Color.Cyan)) {}
+                Box(boxSize.background(Color.Magenta)) {}
+                Box(boxSize.background(Color.Yellow)) {}
+                Box(boxSize.background(Color.Cyan)) {}
             }
         }
-        Stack(boxSize.background(color = Color.Blue)) {}
+        Box(boxSize.background(color = Color.Blue)) {}
     }
 }
 
@@ -136,22 +136,27 @@ private fun testText() {
 @Composable
 private fun testSiblings() {
     Column {
-        Stack(boxSize.background(color = Color.Red).alignWithSiblings { p -> p.width }
+        Box(
+            boxSize.background(color = Color.Red).alignWithSiblings { p -> p.width }
         ) {}
-        Stack(boxSize.background(color = Color.Green).alignWithSiblings { p -> p.width / 2 }
+        Box(
+            boxSize.background(color = Color.Green).alignWithSiblings { p -> p.width / 2 }
         ) {}
-        Stack(boxSize.background(color = Color.Blue).alignWithSiblings { p -> p.width / 4 }
+        Box(
+            boxSize.background(color = Color.Blue).alignWithSiblings { p -> p.width / 4 }
         ) {}
     }
 }
 
 @Composable
 private fun CustomLayout(rtlSupport: Boolean) {
-    Layout(children = @Composable {
-        Stack(boxSize.background(color = Color.Red)) {}
-        Stack(boxSize.background(color = Color.Green)) {}
-        Stack(boxSize.background(color = Color.Blue)) {}
-    }) { measurables, constraints ->
+    Layout(
+        children = @Composable {
+            Box(boxSize.background(color = Color.Red)) {}
+            Box(boxSize.background(color = Color.Green)) {}
+            Box(boxSize.background(color = Color.Blue)) {}
+        }
+    ) { measurables, constraints ->
         val p = measurables.map { e ->
             e.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }
@@ -181,7 +186,7 @@ private fun LayoutWithConstraints(text: String) {
         } else {
             Color.Magenta
         }
-        Stack(Modifier.preferredSize(w, 20.dp).background(color)) {
+        Box(Modifier.preferredSize(w, 20.dp).background(color)) {
             Text(text, Modifier.align(Alignment.Center))
         }
     }

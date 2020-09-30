@@ -35,11 +35,7 @@ import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.tooling.InspectionTables
-import androidx.compose.ui.Layout
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
-import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.UiApplier
@@ -48,7 +44,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import java.util.Collections
 import java.util.WeakHashMap
-import kotlin.math.max
 
 /**
  * Composes the children of the view with the passed in [composable].
@@ -229,13 +224,15 @@ private fun doSetContent(
     content: @Composable () -> Unit
 ): Composition {
     if (inspectionWanted(owner)) {
-        owner.view.setTag(R.id.inspection_slot_table_set,
-                Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>()))
+        owner.view.setTag(
+            R.id.inspection_slot_table_set,
+            Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>())
+        )
     }
     @OptIn(ExperimentalComposeApi::class)
     val original = compositionFor(owner.root, UiApplier(owner.root), recomposer, parentComposition)
     val wrapped = owner.view.getTag(R.id.wrapped_composition_tag)
-            as? WrappedComposition
+        as? WrappedComposition
         ?: WrappedComposition(owner, original).also {
             owner.view.setTag(R.id.wrapped_composition_tag, it)
         }
@@ -266,22 +263,10 @@ private class WrappedComposition(
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
                             owner.view.getTag(R.id.inspection_slot_table_set) as?
-                                    MutableSet<SlotTable>
-                        if (inspectionTable != null) {
-                            inspectionTable.add(currentComposer.slotTable)
-                        }
+                                MutableSet<SlotTable>
+                        inspectionTable?.add(currentComposer.slotTable)
                         Providers(InspectionTables provides inspectionTable) {
-                            ProvideAndroidAmbients(owner) {
-                                // TODO(ralu): Please move the modifier to the root layout and
-                                //  remove the [simpleLayout].
-                                simpleLayout(
-                                    modifier = Modifier.noConsumptionTapGestureFilter {
-                                        @OptIn(ExperimentalFocus::class)
-                                        owner.focusManager.clearFocus()
-                                    },
-                                    children = content
-                                )
-                            }
+                            ProvideAndroidAmbients(owner, content)
                         }
                     }
                 } else {
@@ -312,29 +297,6 @@ private class WrappedComposition(
     }
 }
 
-@Composable
-private fun simpleLayout(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
-    Layout(modifier = modifier, children = children) { measurables, constraints ->
-        val placeables = measurables.map { measurable ->
-            measurable.measure(constraints)
-        }
-
-        val width = placeables.fold(0) { maxWidth, placeable ->
-            max(maxWidth, (placeable.width))
-        }
-
-        val height = placeables.fold(0) { minWidth, placeable ->
-            max(minWidth, (placeable.height))
-        }
-
-        layout(width, height) {
-            placeables.forEach { placeable ->
-                placeable.place(0, 0)
-            }
-        }
-    }
-}
-
 private val DefaultLayoutParams = ViewGroup.LayoutParams(
     ViewGroup.LayoutParams.WRAP_CONTENT,
     ViewGroup.LayoutParams.WRAP_CONTENT
@@ -352,4 +314,4 @@ private val DefaultLayoutParams = ViewGroup.LayoutParams(
  */
 private fun inspectionWanted(owner: AndroidOwner): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-            owner.view.attributeSourceResourceMap.isNotEmpty()
+        owner.view.attributeSourceResourceMap.isNotEmpty()

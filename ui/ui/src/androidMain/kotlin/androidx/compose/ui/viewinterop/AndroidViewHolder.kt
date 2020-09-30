@@ -137,14 +137,15 @@ abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         snapshotObserver.enableStateUpdatesObserving(false)
-        snapshotObserver.clear(this)
+        // remove all observations:
+        snapshotObserver.clear()
     }
 }
 
 @RequiresOptIn(
     level = RequiresOptIn.Level.ERROR,
     message = "This is an experimental API for Compose UI LayoutNode and is likely to change " +
-            "before becoming stable."
+        "before becoming stable."
 )
 @Target(
     AnnotationTarget.CLASS,

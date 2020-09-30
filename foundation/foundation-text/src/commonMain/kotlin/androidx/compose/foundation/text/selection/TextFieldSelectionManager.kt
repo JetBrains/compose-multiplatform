@@ -255,7 +255,7 @@ internal class TextFieldSelectionManager() {
 
         clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
 
-        val newCursorOffset = value.selection.end
+        val newCursorOffset = value.selection.max
         val newValue = TextFieldValue(
             text = value.text,
             selection = TextRange(newCursorOffset, newCursorOffset)
@@ -277,9 +277,9 @@ internal class TextFieldSelectionManager() {
         val text = clipboardManager?.getText()?.text ?: return
 
         val newText = value.getTextBeforeSelection(value.text.length) +
-                text +
-                value.getTextAfterSelection(value.text.length)
-        val newCursorOffset = value.selection.start + text.length
+            text +
+            value.getTextAfterSelection(value.text.length)
+        val newCursorOffset = value.selection.min + text.length
 
         val newValue = TextFieldValue(
             text = newText,
@@ -304,8 +304,8 @@ internal class TextFieldSelectionManager() {
         clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
 
         val newText = value.getTextBeforeSelection(value.text.length) +
-                value.getTextAfterSelection(value.text.length)
-        val newCursorOffset = value.selection.start
+            value.getTextAfterSelection(value.text.length)
+        val newCursorOffset = value.selection.min
 
         val newValue = TextFieldValue(
             text = newText,
@@ -421,7 +421,7 @@ internal class TextFieldSelectionManager() {
             val right = max(startOffset.x, endOffset.x)
             val top = min(startTop, endTop)
             val bottom = max(startOffset.y, endOffset.y) +
-                    25.dp.value * it.textDelegate.density.density
+                25.dp.value * it.textDelegate.density.density
 
             return Rect(left, top, right, bottom)
         }
@@ -492,7 +492,7 @@ internal fun SelectionHandle(
     ) {
         SelectionHandle(
             modifier =
-            Modifier.dragGestureFilter(manager.handleDragObserver(isStartHandle)),
+                Modifier.dragGestureFilter(manager.handleDragObserver(isStartHandle)),
             isStartHandle = isStartHandle,
             directions = directions,
             handlesCrossed = manager.value.selection.reversed

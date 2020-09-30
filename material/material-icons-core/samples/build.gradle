@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import androidx.build.LibraryGroups
+import androidx.build.LibraryType
+import androidx.build.LibraryVersions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
@@ -43,4 +46,13 @@ android {
             useIR = true
         }
     }
+}
+
+androidx {
+    name = "AndroidX Compose UI Core Material Icons Samples"
+    type = LibraryType.SAMPLES
+    mavenVersion = LibraryVersions.COMPOSE
+    mavenGroup = LibraryGroups.Compose.MATERIAL
+    inceptionYear = "2019"
+    description = "Contains the sample code for the Androidx Compose UI Core Material Icons"
 }

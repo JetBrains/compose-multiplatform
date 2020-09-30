@@ -30,7 +30,7 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -442,8 +442,10 @@ class AndroidViewCompatTest {
                 Box(Modifier.padding(paddingDp)) {
                     AndroidView(::FrameLayout) {
                         it.setContent {
-                            Box(Modifier.padding(paddingDp)
-                                .onPositioned { inner = it.globalPosition })
+                            Box(
+                                Modifier.padding(paddingDp)
+                                    .onPositioned { inner = it.globalPosition }
+                            )
                         }
                     }
                 }
@@ -509,14 +511,18 @@ class AndroidViewCompatTest {
         var inner2: Offset = Offset.Zero
         rule.setContent {
             Box(Modifier.onPositioned { outer = it.globalPosition }) {
-                Box(paddingStart = paddingDp, paddingTop = paddingDp) {
+                Box(Modifier.padding(start = paddingDp, top = paddingDp)) {
                     emitView(::LinearLayout, {}) {
-                        Box(Modifier.size(sizeDp).background(Color.Blue).onPositioned {
-                            inner1 = it.globalPosition
-                        })
-                        Box(Modifier.size(sizeDp).background(Color.Gray).onPositioned {
-                            inner2 = it.globalPosition
-                        })
+                        Box(
+                            Modifier.size(sizeDp).background(Color.Blue).onPositioned {
+                                inner1 = it.globalPosition
+                            }
+                        )
+                        Box(
+                            Modifier.size(sizeDp).background(Color.Gray).onPositioned {
+                                inner2 = it.globalPosition
+                            }
+                        )
                     }
                 }
             }
@@ -539,7 +545,7 @@ class AndroidViewCompatTest {
 
         rule.setContent {
             Box(Modifier.testTag("box")) {
-                Box(padding = paddingDp, backgroundColor = Color.Blue) {
+                Box(Modifier.background(Color.Blue).padding(paddingDp)) {
                     emitView(::LinearLayout, {}) {
                         Box(Modifier.size(sizeDp).background(Color.White))
                         Box(Modifier.size(sizeDp).background(Color.Gray))
@@ -552,7 +558,8 @@ class AndroidViewCompatTest {
             IntSize((padding * 2 + size * 2).roundToInt(), (padding * 2 + size).roundToInt())
         ) { offset ->
             if (offset.y < padding || offset.y >= padding + size || offset.x < padding ||
-                offset.x >= padding + size * 2) {
+                offset.x >= padding + size * 2
+            ) {
                 Color.Blue
             } else if (offset.x >= padding && offset.x < padding + size) {
                 Color.White
@@ -633,9 +640,9 @@ class AndroidViewCompatTest {
             Box(Modifier.testTag("view")) {
                 emitView(::LinearLayout, {}) {
                     if (first) {
-                        Box(Modifier.size(size), backgroundColor = Color.Green)
+                        Box(Modifier.size(size).background(Color.Green))
                     } else {
-                        Box(Modifier.size(size), backgroundColor = Color.Blue)
+                        Box(Modifier.size(size).background(Color.Blue))
                     }
                 }
             }
@@ -663,17 +670,17 @@ class AndroidViewCompatTest {
                 emitView(::LinearLayout, {}) {
                     if (first) {
                         key("green") {
-                            Box(Modifier.size(size), backgroundColor = Color.Green)
+                            Box(Modifier.size(size).background(Color.Green))
                         }
                         key("blue") {
-                            Box(Modifier.size(size), backgroundColor = Color.Blue)
+                            Box(Modifier.size(size).background(Color.Blue))
                         }
                     } else {
                         key("blue") {
-                            Box(Modifier.size(size), backgroundColor = Color.Blue)
+                            Box(Modifier.size(size).background(Color.Blue))
                         }
                         key("green") {
-                            Box(Modifier.size(size), backgroundColor = Color.Green)
+                            Box(Modifier.size(size).background(Color.Green))
                         }
                     }
                 }

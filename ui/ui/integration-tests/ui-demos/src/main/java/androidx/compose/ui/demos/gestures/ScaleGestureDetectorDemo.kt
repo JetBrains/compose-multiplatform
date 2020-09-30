@@ -16,8 +16,9 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
@@ -52,8 +53,8 @@ fun ScaleGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(size.value)
-                .scaleGestureFilter(scaleObserver),
-            backgroundColor = Color(0xFF9e9e9e.toInt())
+                .scaleGestureFilter(scaleObserver)
+                .background(Color(0xFF9e9e9e.toInt()))
         )
     }
 }

@@ -59,17 +59,20 @@ class ParentDataModifierTest {
         val parentData = Ref<Any?>()
         runOnUiThread {
             activity.setContent {
-                Layout(children = {
-                    SimpleDrawChild(drawLatch = drawLatch)
-                }, measureBlock = { measurables, constraints ->
-                    assertEquals(1, measurables.size)
-                    parentData.value = measurables[0].parentData
+                Layout(
+                    children = {
+                        SimpleDrawChild(drawLatch = drawLatch)
+                    },
+                    measureBlock = { measurables, constraints ->
+                        assertEquals(1, measurables.size)
+                        parentData.value = measurables[0].parentData
 
-                    val placeable = measurables[0].measure(constraints)
-                    layout(placeable.width, placeable.height) {
-                        placeable.place(0, 0)
+                        val placeable = measurables[0].measure(constraints)
+                        layout(placeable.width, placeable.height) {
+                            placeable.place(0, 0)
+                        }
                     }
-                })
+                )
             }
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
@@ -143,8 +146,11 @@ class ParentDataModifierTest {
 
 @Composable
 fun SimpleDrawChild(drawLatch: CountDownLatch) {
-    AtLeastSize(size = 10, modifier = Modifier.drawBehind {
-        drawRect(Color(0xFF008000))
-        drawLatch.countDown()
-    }) {}
+    AtLeastSize(
+        size = 10,
+        modifier = Modifier.drawBehind {
+            drawRect(Color(0xFF008000))
+            drawLatch.countDown()
+        }
+    ) {}
 }

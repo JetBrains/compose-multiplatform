@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.input.key
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Color
 import androidx.test.filters.SmallTest

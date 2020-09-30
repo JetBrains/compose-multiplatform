@@ -40,12 +40,14 @@ import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
+import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
@@ -180,6 +182,14 @@ class DesktopOwner(
         snapshotObserver.observeReads(node, onCommitAffectingMeasure, block)
     }
 
+    override fun <T : OwnerScope> observeReads(
+        target: T,
+        onChanged: (T) -> Unit,
+        block: () -> Unit
+    ) {
+        snapshotObserver.observeReads(target, onChanged, block)
+    }
+
     private fun observeDrawModelReads(layer: SkijaLayer, block: () -> Unit) {
         snapshotObserver.observeReads(layer, onCommitAffectingLayer, block)
     }
@@ -227,10 +237,11 @@ class DesktopOwner(
         val inputFilters = mutableListOf<PointerInputFilter>()
         root.hitTest(position, inputFilters)
 
-        for (filter in inputFilters
-            .asReversed()
-            .asSequence()
-            .filterIsInstance<MouseScrollEventFilter>()
+        for (
+            filter in inputFilters
+                .asReversed()
+                .asSequence()
+                .filterIsInstance<MouseScrollEventFilter>()
         ) {
             val isConsumed = filter.onMouseScroll(event)
             if (isConsumed) break
@@ -256,13 +267,16 @@ class DesktopOwner(
         var onEnterConsumed = false
         var onExitConsumed = false
 
-        for (filter in newMoveFilters
-            .asReversed()
-            .asSequence()
-            .filterIsInstance<PointerMoveEventFilter>()
+        for (
+            filter in newMoveFilters
+                .asReversed()
+                .asSequence()
+                .filterIsInstance<PointerMoveEventFilter>()
         ) {
-            if (!onMoveConsumed)
-                onMoveConsumed = filter.onMoveHandler(position)
+            if (!onMoveConsumed) {
+                val relative = position - filter.layoutCoordinates.globalBounds.topLeft
+                onMoveConsumed = filter.onMoveHandler(relative)
+            }
             if (!onEnterConsumed && !oldMoveFilters.contains(filter))
                 onEnterConsumed = filter.onEnterHandler()
         }

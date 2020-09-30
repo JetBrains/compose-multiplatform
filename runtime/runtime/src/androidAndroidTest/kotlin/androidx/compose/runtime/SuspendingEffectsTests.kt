@@ -91,8 +91,10 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
             assertNotEquals(awaitFrameTime, Long.MAX_VALUE, "awaitFrameNanos callback never ran")
-            assertEquals(choreographerTime, awaitFrameTime,
-                "expected same values from choreographer post and awaitFrameNanos")
+            assertEquals(
+                choreographerTime, awaitFrameTime,
+                "expected same values from choreographer post and awaitFrameNanos"
+            )
         }
     }
 
@@ -115,8 +117,10 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
             assertNotEquals(awaitFrameTime, Long.MAX_VALUE, "awaitFrameNanos callback never ran")
-            assertEquals(choreographerTime, awaitFrameTime,
-                "expected same values from choreographer post and awaitFrameNanos")
+            assertEquals(
+                choreographerTime, awaitFrameTime,
+                "expected same values from choreographer post and awaitFrameNanos"
+            )
         }
     }
 
@@ -144,13 +148,17 @@ class SuspendingEffectsTests : BaseComposeTest() {
                 coroutineScope = rememberCoroutineScope()
             }
         }.then {
-            assertTrue(coroutineScope?.isActive == true,
-                "coroutine scope should be active after initial composition")
+            assertTrue(
+                coroutineScope?.isActive == true,
+                "coroutine scope should be active after initial composition"
+            )
         }.then {
             toggle = false
         }.then {
-            assertTrue(coroutineScope?.isActive == false,
-                "coroutine scope should be cancelled after leaving composition")
+            assertTrue(
+                coroutineScope?.isActive == false,
+                "coroutine scope should be cancelled after leaving composition"
+            )
         }
     }
 
@@ -174,8 +182,10 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }.then {
             assertNotNull(recomposerClock, "Recomposer frameClock")
             assertSame(recomposerClock, launchInCompositionClock, "launchInComposition clock")
-            assertSame(recomposerClock, rememberCoroutineScopeFrameClock,
-                "rememberCoroutineScope clock")
+            assertSame(
+                recomposerClock, rememberCoroutineScopeFrameClock,
+                "rememberCoroutineScope clock"
+            )
         }
     }
 

@@ -56,7 +56,8 @@ fun TextDemoSelection() {
         "\nكلمة شين في قاموس المعاني الفوري مجال البحث مصطلحات المعجم الوسيط ،اللغة"
     SelectionContainer(
         selection = selection.value,
-        onSelectionChange = { selection.value = it }) {
+        onSelectionChange = { selection.value = it }
+    ) {
         Text(
             style = TextStyle(
                 color = Color(0xFFFF0000),
@@ -99,7 +100,8 @@ fun TextDemoSelectionWithStringInput() {
     val selection = remember { mutableStateOf<Selection?>(null) }
     SelectionContainer(
         selection = selection.value,
-        onSelectionChange = { selection.value = it }) {
+        onSelectionChange = { selection.value = it }
+    ) {
         Text(
             text = "$displayText    $displayTextChinese    $displayTextHindi",
             color = Color(0xFFFF0000),
@@ -132,7 +134,8 @@ fun TextDemoSelection2DArrayVertical() {
     val selection = remember { mutableStateOf<Selection?>(null) }
     SelectionContainer(
         selection = selection.value,
-        onSelectionChange = { selection.value = it }) {
+        onSelectionChange = { selection.value = it }
+    ) {
         Column(Modifier.fillMaxHeight()) {
             for (i in 0..2) {
                 Row(Modifier.fillMaxWidth()) {

@@ -54,15 +54,21 @@ internal actual fun ActualRadialGradientShader(
     )
 }
 
-@Suppress("UNUSED_PARAMETER")
 internal actual fun ActualImageShader(
     image: ImageAsset,
     tileModeX: TileMode,
     tileModeY: TileMode
 ): Shader {
-    // TODO(demin): implement ImageShader
-    println("ImageShader not implemented yet")
-    return Shader(0)
+    return image.asDesktopBitmap().makeShader(
+        tileModeX.toSkijaTileMode(),
+        tileModeY.toSkijaTileMode()
+    )
+}
+
+private fun TileMode.toSkijaTileMode() = when (this) {
+    TileMode.Clamp -> FilterTileMode.CLAMP
+    TileMode.Repeated -> FilterTileMode.REPEAT
+    TileMode.Mirror -> FilterTileMode.MIRROR
 }
 
 private fun List<Color>.toIntArray(): IntArray =
@@ -73,13 +79,13 @@ private fun validateColorStops(colors: List<Color>, colorStops: List<Float>?) {
         if (colors.size < 2) {
             throw IllegalArgumentException(
                 "colors must have length of at least 2 if colorStops " +
-                        "is omitted."
+                    "is omitted."
             )
         }
     } else if (colors.size != colorStops.size) {
         throw IllegalArgumentException(
             "colors and colorStops arguments must have" +
-                    " equal length."
+                " equal length."
         )
     }
 }

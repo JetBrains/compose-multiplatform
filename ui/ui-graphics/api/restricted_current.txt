@@ -921,9 +921,12 @@ package androidx.compose.ui.graphics.drawscope {
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float left, float top, float right, float bottom, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float inset, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float horizontal = 0.0f, float vertical = 0.0f, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method public static inline void rotate(androidx.compose.ui.graphics.drawscope.DrawScope, float degrees, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method @Deprecated public static inline void rotate(androidx.compose.ui.graphics.drawscope.DrawScope, float degrees, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public static inline void rotate-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float degrees, long pivot = center, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void rotateRad(androidx.compose.ui.graphics.drawscope.DrawScope, float radians, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method public static inline void scale(androidx.compose.ui.graphics.drawscope.DrawScope, float scaleX, float scaleY = scaleX, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method @Deprecated public static inline void scale(androidx.compose.ui.graphics.drawscope.DrawScope, float scaleX, float scaleY = scaleX, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public static inline void scale-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float scale, long pivot = center, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public static inline void scale-LCqtnZ0(androidx.compose.ui.graphics.drawscope.DrawScope, float scaleX, float scaleY, long pivot = center, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void translate(androidx.compose.ui.graphics.drawscope.DrawScope, float left = 0.0f, float top = 0.0f, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void withTransform(androidx.compose.ui.graphics.drawscope.DrawScope, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawTransform,kotlin.Unit> transformBlock, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> drawBlock);
   }
@@ -940,8 +943,10 @@ package androidx.compose.ui.graphics.drawscope {
     method public default long getCenter();
     method public long getSize();
     method public void inset(float left, float top, float right, float bottom);
-    method public void rotate(float degrees, float pivotX = center.x, float pivotY = center.y);
-    method public void scale(float scaleX, float scaleY = scaleX, float pivotX = center.x, float pivotY = center.y);
+    method @Deprecated public default void rotate(float degrees, float pivotX = center.x, float pivotY = center.y);
+    method public void rotate-KYFOyyg(float degrees, long pivot);
+    method @Deprecated public default void scale(float scaleX, float scaleY = scaleX, float pivotX = center.x, float pivotY = center.y);
+    method public void scale-QguGWxw(float scaleX, float scaleY, long pivot = center);
     method public void transform-58bKbWc(float[] matrix);
     method public void translate(float left = 0.0f, float top = 0.0f);
     property public default long center;
@@ -951,7 +956,9 @@ package androidx.compose.ui.graphics.drawscope {
   public final class DrawTransformKt {
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawTransform, float horizontal = 0.0f, float vertical = 0.0f);
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawTransform, float inset);
-    method public static inline void rotateRad(androidx.compose.ui.graphics.drawscope.DrawTransform, float radians, float pivotX = center.x, float pivotY = center.y);
+    method @Deprecated public static inline void rotateRad(androidx.compose.ui.graphics.drawscope.DrawTransform, float radians, float pivotX = center.x, float pivotY = center.y);
+    method public static inline void rotateRad-kdYHfaE(androidx.compose.ui.graphics.drawscope.DrawTransform, float radians, long pivot = center);
+    method public static inline void scale-kdYHfaE(androidx.compose.ui.graphics.drawscope.DrawTransform, float scale, long pivot = center);
   }
 
   public final class Fill extends androidx.compose.ui.graphics.drawscope.DrawStyle {

@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Layout
@@ -58,13 +58,13 @@ class LayoutIdTest {
                 Layout(
                     {
                         AtLeastSize(0, Modifier.layoutId("first"), children = emptyContent())
-                        Stack(Modifier.layoutId("second")) {
+                        Box(Modifier.layoutId("second")) {
                             AtLeastSize(
                                 0,
                                 children = emptyContent()
                             )
                         }
-                        Stack(Modifier.layoutId("third")) {
+                        Box(Modifier.layoutId("third")) {
                             AtLeastSize(0, children = emptyContent())
                         }
                     }
@@ -87,8 +87,10 @@ class LayoutIdTest {
         Truth.assertThat(modifier.nameFallback).isEqualTo("layoutId")
         Truth.assertThat(modifier.valueOverride).isNull()
         Truth.assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(modifier.javaClass.declaredFields
-                .filter { !it.isSynthetic && it.name != "nameFallback" }
-                .map { it.name })
+            .containsExactlyElementsIn(
+                modifier.javaClass.declaredFields
+                    .filter { !it.isSynthetic && it.name != "nameFallback" }
+                    .map { it.name }
+            )
     }
 }

@@ -97,11 +97,11 @@ class ParagraphBenchmark(
     private fun paragraph(
         text: String,
         spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-        constraints: ParagraphConstraints
+        width: Float
     ): Paragraph {
         return Paragraph(
             paragraphIntrinsics = paragraphIntrinsics(text, spanStyles),
-            constraints = constraints
+            width = width
         )
     }
 
@@ -167,7 +167,7 @@ class ParagraphBenchmark(
                 paragraph(
                     text = annotatedString.text,
                     spanStyles = annotatedString.spanStyles,
-                    constraints = ParagraphConstraints(width)
+                    width = width
                 )
             }
         }
@@ -182,7 +182,7 @@ class ParagraphBenchmark(
             benchmarkRule.measureRepeated {
                 val (paragraph, canvas) = runWithTimingDisabled {
                     val (text, style) = text(textGenerator)
-                    val paragraph = paragraph(text, style, ParagraphConstraints(width))
+                    val paragraph = paragraph(text, style, width)
                     val canvas = Canvas(
                         ImageAsset(paragraph.width.roundToInt(), paragraph.height.roundToInt())
                     )
@@ -202,7 +202,7 @@ class ParagraphBenchmark(
             val (text, style) = text(textGenerator)
             // create a new paragraph and use a smaller width to get
             // some line breaking in the result
-            val paragraph = paragraph(text, style, ParagraphConstraints(width))
+            val paragraph = paragraph(text, style, width)
             val canvas = Canvas(
                 ImageAsset(paragraph.width.roundToInt(), paragraph.height.roundToInt())
             )

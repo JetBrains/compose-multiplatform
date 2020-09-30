@@ -65,7 +65,8 @@ class ParagraphIntrinsicIntegrationTest {
 
             val paragraphIntrinsics = paragraphIntrinsics(
                 text = text,
-                fontSize = fontSize)
+                fontSize = fontSize
+            )
 
             assertThat(paragraphIntrinsics.maxIntrinsicWidth)
                 .isEqualTo(text.length * fontSize.toPx())

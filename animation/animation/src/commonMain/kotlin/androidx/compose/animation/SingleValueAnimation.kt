@@ -241,7 +241,7 @@ fun animate(
     animSpec: AnimationSpec<Bounds> = remember {
         SpringSpec(
             visibilityThreshold = Bounds.VectorConverter.convertFromVector
-                (DpVisibilityThreshold4D)
+            (DpVisibilityThreshold4D)
         )
     },
     endListener: ((Bounds) -> Unit)? = null
@@ -304,7 +304,7 @@ fun animate(
     animSpec: AnimationSpec<Rect> = remember {
         SpringSpec(
             visibilityThreshold =
-            Rect.VectorConverter.convertFromVector(PxVisibilityThreshold4D)
+                Rect.VectorConverter.convertFromVector(PxVisibilityThreshold4D)
         )
     },
     endListener: ((Rect) -> Unit)? = null
@@ -330,10 +330,15 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
-@Deprecated("Consider usage of Rect instead",
-    ReplaceWith("animate(target: Rect, animSpec: AnimationSpec<Rect>, " +
+@Deprecated(
+    "Consider usage of Rect instead",
+    ReplaceWith(
+        "animate(target: Rect, animSpec: AnimationSpec<Rect>, " +
             "endListener: ((Rect) -> " +
-            "Unit)?", "androidx.compose.animation.animation"))
+            "Unit)?",
+        "androidx.compose.animation.animation"
+    )
+)
 @Suppress("DEPRECATION")
 @Composable
 fun animate(
@@ -341,7 +346,7 @@ fun animate(
     animSpec: AnimationSpec<PxBounds> = remember {
         SpringSpec(
             visibilityThreshold =
-            PxBounds.VectorConverter.convertFromVector(PxVisibilityThreshold4D)
+                PxBounds.VectorConverter.convertFromVector(PxVisibilityThreshold4D)
         )
     },
     endListener: ((PxBounds) -> Unit)? = null

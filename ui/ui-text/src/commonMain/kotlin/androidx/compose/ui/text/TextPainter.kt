@@ -31,7 +31,7 @@ object TextPainter {
      */
     fun paint(canvas: Canvas, textLayoutResult: TextLayoutResult) {
         val needClipping = textLayoutResult.hasVisualOverflow &&
-                textLayoutResult.layoutInput.overflow == TextOverflow.Clip
+            textLayoutResult.layoutInput.overflow == TextOverflow.Clip
         if (needClipping) {
             val width = textLayoutResult.size.width.toFloat()
             val height = textLayoutResult.size.height.toFloat()

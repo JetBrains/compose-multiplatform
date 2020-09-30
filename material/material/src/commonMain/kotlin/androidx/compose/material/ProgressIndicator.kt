@@ -101,15 +101,15 @@ fun LinearProgressIndicator(
         initState = 0,
         toState = 1
     )
-    val firstLineHead = state[FirstLineHeadProp]
-    val firstLineTail = state[FirstLineTailProp]
-    val secondLineHead = state[SecondLineHeadProp]
-    val secondLineTail = state[SecondLineTailProp]
     Canvas(
         modifier
             .progressSemantics()
             .preferredSize(LinearIndicatorWidth, LinearIndicatorHeight)
     ) {
+        val firstLineHead = state[FirstLineHeadProp]
+        val firstLineTail = state[FirstLineTailProp]
+        val secondLineHead = state[SecondLineHeadProp]
+        val secondLineTail = state[SecondLineTailProp]
         val strokeWidth = ProgressIndicatorConstants.DefaultStrokeWidth.toPx()
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
         if (firstLineHead - firstLineTail > 0) {
@@ -213,25 +213,24 @@ fun CircularProgressIndicator(
         initState = 0,
         toState = 1
     )
-    val currentRotation = state[IterationProp]
-    val baseRotation = state[BaseRotationProp]
-
-    val currentRotationAngleOffset = (currentRotation * RotationAngleOffset) % 360f
-
-    var startAngle = state[TailRotationProp]
-    val endAngle = state[HeadRotationProp]
-    // How long a line to draw using the start angle as a reference point
-    val sweep = abs(endAngle - startAngle)
-
-    // Offset by the constant offset and the per rotation offset
-    startAngle += StartAngleOffset + currentRotationAngleOffset
-    startAngle += baseRotation
-
     Canvas(
         modifier
             .progressSemantics()
             .preferredSize(CircularIndicatorDiameter)
     ) {
+        val currentRotation = state[IterationProp]
+        val baseRotation = state[BaseRotationProp]
+
+        val currentRotationAngleOffset = (currentRotation * RotationAngleOffset) % 360f
+
+        var startAngle = state[TailRotationProp]
+        val endAngle = state[HeadRotationProp]
+        // How long a line to draw using the start angle as a reference point
+        val sweep = abs(endAngle - startAngle)
+
+        // Offset by the constant offset and the per rotation offset
+        startAngle += StartAngleOffset + currentRotationAngleOffset
+        startAngle += baseRotation
         drawIndeterminateCircularIndicator(startAngle, strokeWidth, sweep, color, stroke)
     }
 }

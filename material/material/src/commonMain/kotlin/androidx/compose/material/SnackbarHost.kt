@@ -23,7 +23,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -277,7 +277,7 @@ private fun FadeInFadeOutWithScale(
                     ),
                     visible = isVisible
                 )
-                Stack(
+                Box(
                     Modifier
                         .drawLayer(
                             alpha = opacity.value,
@@ -290,7 +290,7 @@ private fun FadeInFadeOutWithScale(
             }
         }
     }
-    Stack(modifier) {
+    Box(modifier) {
         state.invalidate = invalidate
         state.items.fastForEach { (item, opacity) ->
             key(item) {

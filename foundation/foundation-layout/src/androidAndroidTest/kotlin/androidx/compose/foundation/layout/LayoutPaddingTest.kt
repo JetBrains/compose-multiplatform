@@ -173,11 +173,13 @@ class LayoutPaddingTest : LayoutTest() {
 
         val latch = CountDownLatch(1)
         var error: Throwable? = null
-        testIntrinsics(@Composable {
-            TestBox(modifier = Modifier.padding(padding)) {
-                Container(Modifier.aspectRatio(2f)) { }
+        testIntrinsics(
+            @Composable {
+                TestBox(modifier = Modifier.padding(padding)) {
+                    Container(Modifier.aspectRatio(2f)) { }
+                }
             }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Spacing is applied on both sides of an axis
             val totalAxisSpacing = (padding * 2).toIntPx()
 
@@ -246,7 +248,7 @@ class LayoutPaddingTest : LayoutTest() {
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
-                    Stack(
+                    Box(
                         Modifier.padding(start = padding1Dp, end = padding2Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -257,7 +259,7 @@ class LayoutPaddingTest : LayoutTest() {
                     ) {
                     }
 
-                    Stack(
+                    Box(
                         Modifier.padding(end = padding3Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -268,7 +270,7 @@ class LayoutPaddingTest : LayoutTest() {
                     ) {
                     }
 
-                    Stack(
+                    Box(
                         Modifier.padding(start = padding1Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -322,7 +324,7 @@ class LayoutPaddingTest : LayoutTest() {
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
-                    Stack(
+                    Box(
                         Modifier.absolutePadding(left = padding1Dp, right = padding2Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -331,7 +333,7 @@ class LayoutPaddingTest : LayoutTest() {
                             }
                     ) {
                     }
-                    Stack(
+                    Box(
                         Modifier.absolutePadding(right = padding3Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onPositioned { coordinates: LayoutCoordinates ->
@@ -364,9 +366,11 @@ class LayoutPaddingTest : LayoutTest() {
         assertThat(modifier.nameFallback).isEqualTo("padding")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(modifier.javaClass.declaredFields
-                .filter { !it.isSynthetic && !exclusions.contains(it.name) }
-                .map { it.name })
+            .containsExactlyElementsIn(
+                modifier.javaClass.declaredFields
+                    .filter { !it.isSynthetic && !exclusions.contains(it.name) }
+                    .map { it.name }
+            )
     }
 
     @Test
@@ -385,9 +389,11 @@ class LayoutPaddingTest : LayoutTest() {
         assertThat(modifier.nameFallback).isEqualTo("padding")
         assertThat(modifier.valueOverride).isEqualTo(40.dp)
         assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(modifier.javaClass.declaredFields
-                .filter { !it.isSynthetic && !exclusions.contains(it.name) }
-                .map { it.name })
+            .containsExactlyElementsIn(
+                modifier.javaClass.declaredFields
+                    .filter { !it.isSynthetic && !exclusions.contains(it.name) }
+                    .map { it.name }
+            )
     }
 
     private fun testPaddingIsAppliedImplementation(
@@ -402,17 +408,19 @@ class LayoutPaddingTest : LayoutTest() {
         var childSize = IntSize(-1, -1)
         var childPosition = Offset(-1f, -1f)
         show {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)
                 ) {
                     val children = @Composable {
-                        Container(Modifier.onPositioned { coordinates: LayoutCoordinates ->
-                            childSize = coordinates.size
-                            childPosition = coordinates.positionInRoot
-                            drawLatch.countDown()
-                        }) {
+                        Container(
+                            Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                                childSize = coordinates.size
+                                childPosition = coordinates.positionInRoot
+                                drawLatch.countDown()
+                            }
+                        ) {
                         }
                     }
                     paddingContainer(children)
@@ -448,17 +456,19 @@ class LayoutPaddingTest : LayoutTest() {
         var childSize = IntSize(-1, -1)
         var childPosition = Offset(-1f, -1f)
         show {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)
                 ) {
                     val children = @Composable {
-                        Container(Modifier.onPositioned { coordinates: LayoutCoordinates ->
-                            childSize = coordinates.size
-                            childPosition = coordinates.positionInRoot
-                            drawLatch.countDown()
-                        }) {
+                        Container(
+                            Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                                childSize = coordinates.size
+                                childPosition = coordinates.positionInRoot
+                                drawLatch.countDown()
+                            }
+                        ) {
                         }
                     }
                     paddingContainer(children)
@@ -501,17 +511,19 @@ class LayoutPaddingTest : LayoutTest() {
         var childSize = IntSize(-1, -1)
         var childPosition = Offset(-1f, -1f)
         show {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)
                 ) {
                     paddingContainer {
-                        Container(Modifier.onPositioned { coordinates: LayoutCoordinates ->
-                            childSize = coordinates.size
-                            childPosition = coordinates.positionInRoot
-                            drawLatch.countDown()
-                        }) {
+                        Container(
+                            Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                                childSize = coordinates.size
+                                childPosition = coordinates.positionInRoot
+                                drawLatch.countDown()
+                            }
+                        ) {
                         }
                     }
                 }

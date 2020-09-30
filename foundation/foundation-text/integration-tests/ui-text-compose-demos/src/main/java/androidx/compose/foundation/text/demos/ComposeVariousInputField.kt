@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text.demos
 
 import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
@@ -166,7 +166,7 @@ private val phoneNumberFilter = object : VisualTransformation {
         val trimmed = if (text.text.length >= 10) text.text.substring(0..9) else text.text
         val filled = trimmed + "_".repeat(10 - trimmed.length)
         val res = "(" + filled.substring(0..2) + ") " + filled.substring(3..5) + "-" +
-                filled.substring(6..9)
+            filled.substring(6..9)
         return TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslater)
     }
 }
@@ -306,7 +306,7 @@ private fun HintEditText(hintText: @Composable () -> Unit) {
     } else {
         Layout({
             inputField()
-            Box(Modifier.layoutId("hintText"), children = hintText)
+            Box(Modifier.layoutId("hintText")) { hintText() }
         }) { measurable, constraints ->
             val inputFieldPlacable =
                 measurable.first { it.id == "inputField" }.measure(constraints)
@@ -332,7 +332,7 @@ private fun CustomCursorTextField(cursor: @Composable () -> Unit) {
             textStyle = TextStyle(fontSize = fontSize8),
             onTextLayout = { layoutResult.value = it }
         )
-        Box(Modifier.layoutId("cursor"), children = cursor)
+        Box(Modifier.layoutId("cursor")) { cursor() }
     }) { measurable, constraints ->
         val inputFieldPlacable =
             measurable.first { it.id == "inputField" }.measure(constraints)
@@ -353,7 +353,7 @@ private fun CustomCursorTextField(cursor: @Composable () -> Unit) {
                     )
                 // Place the custom cursor aligned with center of the original cursor.
                 val cursorX = (cursorRect.left + cursorRect.right) / 2 -
-                        (cursorPlacable.width / 2)
+                    (cursorPlacable.width / 2)
                 cursorPlacable.placeRelative(cursorX.roundToInt(), cursorRect.top.roundToInt())
             }
         }

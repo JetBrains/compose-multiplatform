@@ -72,7 +72,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
     private val supportsRenderNode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     private val supportsMRenderNode = Build.VERSION.SDK_INT < Build.VERSION_CODES.P &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
     private val screenWithSpec: Int
     private val screenHeightSpec: Int
@@ -167,7 +167,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     override fun drawPrepare() {
         require(
             simulationState == SimulationState.LayoutDone ||
-                    simulationState == SimulationState.DrawDone
+                simulationState == SimulationState.DrawDone
         ) {
             "Draw can be only executed after layout or draw, current state is '$simulationState'"
         }

@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focusObserver
@@ -98,7 +98,8 @@ class CaptureFocusTest {
                 modifier = Modifier
                     .focusObserver { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(focusState)) )
+                    .then(FocusModifier(focusState))
+            )
         }
 
         // Act.
@@ -123,7 +124,8 @@ class CaptureFocusTest {
                 modifier = Modifier
                     .focusObserver { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(focusState)) )
+                    .then(FocusModifier(focusState))
+            )
         }
 
         // Act.
@@ -148,7 +150,8 @@ class CaptureFocusTest {
                 modifier = Modifier
                     .focusObserver { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(focusState)) )
+                    .then(FocusModifier(focusState))
+            )
         }
 
         // Act.

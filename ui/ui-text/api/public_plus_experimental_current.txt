@@ -72,8 +72,8 @@ package androidx.compose.ui.text {
   }
 
   public final class MultiParagraph {
-    ctor public MultiParagraph(androidx.compose.ui.text.MultiParagraphIntrinsics intrinsics, int maxLines, boolean ellipsis, androidx.compose.ui.text.ParagraphConstraints constraints);
-    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean ellipsis, androidx.compose.ui.text.ParagraphConstraints constraints, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    ctor public MultiParagraph(androidx.compose.ui.text.MultiParagraphIntrinsics intrinsics, int maxLines, boolean ellipsis, float width);
+    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
@@ -103,7 +103,7 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.graphics.Path getPathForRange(int start, int end);
     method public java.util.List<androidx.compose.ui.geometry.Rect> getPlaceholderRects();
     method public float getWidth();
-    method public androidx.compose.ui.text.TextRange getWordBoundary(int offset);
+    method public long getWordBoundary(int offset);
     method public boolean isLineEllipsized(int lineIndex);
     method public void paint-TAOIQ28(androidx.compose.ui.graphics.Canvas canvas, long color = Color.Unset, androidx.compose.ui.graphics.Shadow? shadow = null, androidx.compose.ui.text.style.TextDecoration? decoration = null);
     property public final boolean didExceedMaxLines;
@@ -161,7 +161,7 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.graphics.Path getPathForRange(int start, int end);
     method public java.util.List<androidx.compose.ui.geometry.Rect> getPlaceholderRects();
     method public float getWidth();
-    method public androidx.compose.ui.text.TextRange getWordBoundary(int offset);
+    method public long getWordBoundary(int offset);
     method public boolean isLineEllipsized(int lineIndex);
     method public void paint-TAOIQ28(androidx.compose.ui.graphics.Canvas canvas, long color = Color.Unset, androidx.compose.ui.graphics.Shadow? shadow = null, androidx.compose.ui.text.style.TextDecoration? textDecoration = null);
     property public abstract boolean didExceedMaxLines;
@@ -173,13 +173,6 @@ package androidx.compose.ui.text {
     property public abstract float minIntrinsicWidth;
     property public abstract java.util.List<androidx.compose.ui.geometry.Rect> placeholderRects;
     property public abstract float width;
-  }
-
-  public final class ParagraphConstraints {
-    ctor public ParagraphConstraints(float width);
-    method public float component1();
-    method public androidx.compose.ui.text.ParagraphConstraints copy(float width);
-    method public float getWidth();
   }
 
   public interface ParagraphIntrinsics {
@@ -194,8 +187,8 @@ package androidx.compose.ui.text {
   }
 
   public final class ParagraphKt {
-    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles = listOf(), java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders = listOf(), int maxLines = 2147483647, boolean ellipsis = false, androidx.compose.ui.text.ParagraphConstraints constraints, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
-    method public static androidx.compose.ui.text.Paragraph Paragraph(androidx.compose.ui.text.ParagraphIntrinsics paragraphIntrinsics, int maxLines = 2147483647, boolean ellipsis = false, androidx.compose.ui.text.ParagraphConstraints constraints);
+    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles = listOf(), java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders = listOf(), int maxLines = 2147483647, boolean ellipsis = false, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    method public static androidx.compose.ui.text.Paragraph Paragraph(androidx.compose.ui.text.ParagraphIntrinsics paragraphIntrinsics, int maxLines = 2147483647, boolean ellipsis = false, float width);
   }
 
   @androidx.compose.runtime.Immutable public final class ParagraphStyle {
@@ -350,7 +343,7 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.graphics.Path getPathForRange(int start, int end);
     method public java.util.List<androidx.compose.ui.geometry.Rect> getPlaceholderRects();
     method public long getSize();
-    method public androidx.compose.ui.text.TextRange getWordBoundary(int offset);
+    method public long getWordBoundary(int offset);
     method public boolean isLineEllipsized(int lineIndex);
     property public final boolean didOverflowHeight;
     property public final boolean didOverflowWidth;
@@ -362,7 +355,7 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutResultKt {
-    method @VisibleForTesting public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(androidx.compose.ui.text.TextLayoutInput layoutInput = androidx.compose.ui.text.TextLayoutInput(androidx.compose.ui.text.AnnotatedString(""), androidx.compose.ui.text.TextStyle(), emptyList(), 1, false, androidx.compose.ui.text.style.TextOverflow.Clip, Density(1.0), LayoutDirection.Ltr, null(), Constraints()), androidx.compose.ui.text.MultiParagraph multiParagraph = androidx.compose.ui.text.MultiParagraph(text, style, androidx.compose.ui.text.ParagraphConstraints(0.0), density, resourceLoader), long size = IntSize.Zero);
+    method @VisibleForTesting public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(androidx.compose.ui.text.TextLayoutInput layoutInput = androidx.compose.ui.text.TextLayoutInput(androidx.compose.ui.text.AnnotatedString(""), androidx.compose.ui.text.TextStyle(), emptyList(), 1, false, androidx.compose.ui.text.style.TextOverflow.Clip, Density(1.0), LayoutDirection.Ltr, null(), Constraints()), androidx.compose.ui.text.MultiParagraph multiParagraph = androidx.compose.ui.text.MultiParagraph(text, style, 0.0, density, resourceLoader), long size = IntSize.Zero);
   }
 
   public final class TextPainter {
@@ -370,37 +363,36 @@ package androidx.compose.ui.text {
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;
   }
 
-  @androidx.compose.runtime.Immutable public final class TextRange {
-    ctor public TextRange(@IntRange(from=0) int start, @IntRange(from=0) int end);
-    method public int component1();
-    method public int component2();
-    method public operator boolean contains(androidx.compose.ui.text.TextRange other);
-    method public operator boolean contains(int offset);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.TextRange copy(int start, int end);
-    method public boolean getCollapsed();
-    method public int getEnd();
-    method public int getLength();
-    method public int getMax();
-    method public int getMin();
-    method public boolean getReversed();
-    method public int getStart();
-    method public boolean intersects(androidx.compose.ui.text.TextRange other);
-    property public final boolean collapsed;
-    property public final int length;
-    property public final int max;
-    property public final int min;
-    property public final boolean reversed;
+  @androidx.compose.runtime.Immutable public final inline class TextRange {
+    ctor public TextRange();
+    method public static long constructor-impl(long packedValue);
+    method public static long constructor-impl(int start, int end);
+    method public static operator boolean contains-5zc-tL8(long $this, long other);
+    method public static operator boolean contains-impl(long $this, int offset);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static boolean getCollapsed-impl(long $this);
+    method public static int getEnd-impl(long $this);
+    method public static int getLength-impl(long $this);
+    method public static int getMax-impl(long $this);
+    method public static int getMin-impl(long $this);
+    method public long getPackedValue();
+    method public static boolean getReversed-impl(long $this);
+    method public static int getStart-impl(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method public static boolean intersects-5zc-tL8(long $this, long other);
+    method public static String toString-impl(long $this);
     field public static final androidx.compose.ui.text.TextRange.Companion Companion;
   }
 
   public static final class TextRange.Companion {
-    method public androidx.compose.ui.text.TextRange getZero();
-    property public final androidx.compose.ui.text.TextRange Zero;
+    method public long getZero();
+    property public final long Zero;
   }
 
   public final class TextRangeKt {
-    method public static androidx.compose.ui.text.TextRange TextRange(int index);
-    method public static String substring(CharSequence, androidx.compose.ui.text.TextRange range);
+    method public static long TextRange(int index);
+    method public static String substring-cWlJSyE(CharSequence, long range);
   }
 
   @androidx.compose.runtime.Immutable public final class TextStyle {
@@ -674,20 +666,17 @@ package androidx.compose.ui.text.input {
   }
 
   public final class EditingBuffer {
-    ctor public EditingBuffer(String initialText, androidx.compose.ui.text.TextRange initialSelection);
     field public static final int NOWHERE = -1; // 0xffffffff
   }
 
   @Deprecated @androidx.compose.runtime.Immutable public final class EditorValue {
-    ctor @Deprecated public EditorValue(String text, androidx.compose.ui.text.TextRange selection, androidx.compose.ui.text.TextRange? composition);
-    ctor @Deprecated public EditorValue();
     method @Deprecated public String component1();
-    method @Deprecated public androidx.compose.ui.text.TextRange component2();
+    method @Deprecated public long component2();
     method @Deprecated public androidx.compose.ui.text.TextRange? component3();
-    method @Deprecated @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.EditorValue copy(String text, androidx.compose.ui.text.TextRange selection, androidx.compose.ui.text.TextRange? composition);
+    method @Deprecated @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.EditorValue copy-Dr2r1M0(String text, long selection, androidx.compose.ui.text.TextRange? composition);
     method @Deprecated public androidx.compose.ui.text.TextRange? getComposition();
     method @Deprecated public String getSelectedText();
-    method @Deprecated public androidx.compose.ui.text.TextRange getSelection();
+    method @Deprecated public long getSelection();
     method @Deprecated public String getText();
     method @Deprecated public String getTextAfterSelection(int maxChars);
     method @Deprecated public String getTextBeforeSelection(int maxChars);
@@ -800,14 +789,12 @@ package androidx.compose.ui.text.input {
   }
 
   @androidx.compose.runtime.Immutable public final class TextFieldValue {
-    ctor public TextFieldValue(@androidx.compose.runtime.Stable String text, @androidx.compose.runtime.Stable androidx.compose.ui.text.TextRange selection, @androidx.compose.runtime.Stable androidx.compose.ui.text.TextRange? composition);
-    ctor public TextFieldValue();
     method public String component1();
-    method public androidx.compose.ui.text.TextRange component2();
+    method public long component2();
     method public androidx.compose.ui.text.TextRange? component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.TextFieldValue copy(String text, androidx.compose.ui.text.TextRange selection, androidx.compose.ui.text.TextRange? composition);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.TextFieldValue copy-Dr2r1M0(String text, long selection, androidx.compose.ui.text.TextRange? composition);
     method public androidx.compose.ui.text.TextRange? getComposition();
-    method public androidx.compose.ui.text.TextRange getSelection();
+    method public long getSelection();
     method public String getText();
     field public static final androidx.compose.ui.text.input.TextFieldValue.Companion Companion;
   }

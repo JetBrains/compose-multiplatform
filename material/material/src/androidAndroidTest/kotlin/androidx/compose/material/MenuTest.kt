@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -116,10 +116,8 @@ class MenuTest {
                     hasAnyDescendant(hasTestTag("MenuContent2"))
         ).assertExists().fetchSemanticsNode()
         with(rule.density) {
-            assertThat(node.size.width).isEqualTo(130 + MenuElevationInset.toIntPx() * 2)
-            assertThat(node.size.height).isEqualTo(200 +
-                    DropdownMenuVerticalPadding.toIntPx() * 2 + MenuElevationInset.toIntPx() * 2
-            )
+            assertThat(node.size.width).isEqualTo(130)
+            assertThat(node.size.height).isEqualTo(DropdownMenuVerticalPadding.toIntPx() * 2 + 200)
         }
     }
 
@@ -131,7 +129,6 @@ class MenuTest {
         val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
         val anchorPosition = IntOffset(100, 200)
         val anchorSize = IntSize(10, 20)
-        val inset = with(density) { MenuElevationInset.toIntPx() }
         val offsetX = 20
         val offsetY = 40
         val popupSize = IntSize(50, 80)
@@ -147,10 +144,10 @@ class MenuTest {
         )
 
         assertThat(ltrPosition.x).isEqualTo(
-            anchorPosition.x + anchorSize.width - inset + offsetX
+            anchorPosition.x + anchorSize.width + offsetX
         )
         assertThat(ltrPosition.y).isEqualTo(
-            anchorPosition.y + anchorSize.height - inset + offsetY
+            anchorPosition.y + anchorSize.height + offsetY
         )
 
         val rtlPosition = DropdownMenuPositionProvider(
@@ -164,10 +161,10 @@ class MenuTest {
         )
 
         assertThat(rtlPosition.x).isEqualTo(
-            anchorPosition.x - popupSize.width + inset - offsetX
+            anchorPosition.x - popupSize.width - offsetX
         )
         assertThat(rtlPosition.y).isEqualTo(
-            anchorPosition.y + anchorSize.height - inset + offsetY
+            anchorPosition.y + anchorSize.height + offsetY
         )
     }
 
@@ -180,7 +177,6 @@ class MenuTest {
         val anchorPosition = IntOffset(450, 950)
         val anchorPositionRtl = IntOffset(50, 950)
         val anchorSize = IntSize(10, 20)
-        val inset = with(density) { MenuElevationInset.toIntPx() }
         val offsetX = 20
         val offsetY = 40
         val popupSize = IntSize(150, 80)
@@ -196,10 +192,10 @@ class MenuTest {
         )
 
         assertThat(ltrPosition.x).isEqualTo(
-            anchorPosition.x - popupSize.width + inset - offsetX
+            anchorPosition.x - popupSize.width - offsetX
         )
         assertThat(ltrPosition.y).isEqualTo(
-            anchorPosition.y - popupSize.height + inset - offsetY
+            anchorPosition.y - popupSize.height - offsetY
         )
 
         val rtlPosition = DropdownMenuPositionProvider(
@@ -213,10 +209,10 @@ class MenuTest {
         )
 
         assertThat(rtlPosition.x).isEqualTo(
-            anchorPositionRtl.x + anchorSize.width - inset + offsetX
+            anchorPositionRtl.x + anchorSize.width + offsetX
         )
         assertThat(rtlPosition.y).isEqualTo(
-            anchorPositionRtl.y - popupSize.height + inset - offsetY
+            anchorPositionRtl.y - popupSize.height - offsetY
         )
     }
 
@@ -228,7 +224,6 @@ class MenuTest {
         val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
         val anchorPosition = IntOffset(100, 200)
         val anchorSize = IntSize(10, 20)
-        val inset = with(density) { MenuElevationInset.toIntPx() }
         val offsetX = 20
         val offsetY = 40
         val popupSize = IntSize(50, 80)
@@ -251,10 +246,10 @@ class MenuTest {
         assertThat(obtainedParentBounds).isEqualTo(IntBounds(anchorPosition, anchorSize))
         assertThat(obtainedMenuBounds).isEqualTo(
             IntBounds(
-                anchorPosition.x + anchorSize.width - inset + offsetX,
-                anchorPosition.y + anchorSize.height - inset + offsetY,
-                anchorPosition.x + anchorSize.width - inset + offsetX + popupSize.width,
-                anchorPosition.y + anchorSize.height - inset + offsetY + popupSize.height
+                anchorPosition.x + anchorSize.width + offsetX,
+                anchorPosition.y + anchorSize.height + offsetY,
+                anchorPosition.x + anchorSize.width + offsetX + popupSize.width,
+                anchorPosition.y + anchorSize.height + offsetY + popupSize.height
             )
         )
     }

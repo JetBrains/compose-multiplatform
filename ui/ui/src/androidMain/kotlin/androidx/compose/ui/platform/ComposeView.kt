@@ -91,8 +91,10 @@ abstract class AbstractComposeView @JvmOverloads constructor(
     private var creatingComposition = false
     private fun checkAddView() {
         if (!creatingComposition) {
-            throw UnsupportedOperationException("Cannot add views to " +
-                    "${javaClass.simpleName}; only Compose content is supported")
+            throw UnsupportedOperationException(
+                "Cannot add views to " +
+                    "${javaClass.simpleName}; only Compose content is supported"
+            )
         }
     }
 
@@ -175,9 +177,9 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         super.onAttachedToWindow()
         val newLifecycleOwner = checkNotNull(ViewTreeLifecycleOwner.get(this)) {
             "ViewTreeLifecycleOwner is not present in this window. Use ComponentActivity, " +
-                    "FragmentActivity or AppCompatActivity to configure ViewTreeLifecycleOwner " +
-                    "automatically, or call ViewTreeLifecycleOwner.set() for this View or an " +
-                    "ancestor in the same window."
+                "FragmentActivity or AppCompatActivity to configure ViewTreeLifecycleOwner " +
+                "automatically, or call ViewTreeLifecycleOwner.set() for this View or an " +
+                "ancestor in the same window."
         }
         val newLifecycle = newLifecycleOwner.lifecycle
         if (newLifecycle !== lastLifecycle) {

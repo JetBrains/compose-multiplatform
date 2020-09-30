@@ -163,14 +163,18 @@ internal class DragSlopExceededGestureFilter(
                     // our tracking back to zero so that a user doesn't have to later scroll the slop
                     // + the extra distance they scrolled in the wrong direction.
                     if (!canDragX &&
-                        ((directionX == Direction.LEFT && dxUnderSlop < 0) ||
-                                (directionX == Direction.RIGHT && dxUnderSlop > 0))
+                        (
+                            (directionX == Direction.LEFT && dxUnderSlop < 0) ||
+                                (directionX == Direction.RIGHT && dxUnderSlop > 0)
+                            )
                     ) {
                         dxUnderSlop = 0f
                     }
                     if (!canDragY &&
-                        ((directionY == Direction.UP && dyUnderSlop < 0) ||
-                                (directionY == Direction.DOWN && dyUnderSlop > 0))
+                        (
+                            (directionY == Direction.UP && dyUnderSlop < 0) ||
+                                (directionY == Direction.DOWN && dyUnderSlop > 0)
+                            )
                     ) {
                         dyUnderSlop = 0f
                     }

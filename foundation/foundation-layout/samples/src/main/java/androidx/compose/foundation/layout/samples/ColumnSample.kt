@@ -17,7 +17,7 @@
 package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,15 +39,15 @@ import kotlin.math.min
 fun SimpleColumn() {
     Column {
         // The child with no weight will have the specified size.
-        Box(Modifier.preferredSize(40.dp, 80.dp), backgroundColor = Color.Magenta)
+        Box(Modifier.preferredSize(40.dp, 80.dp).background(Color.Magenta))
         // Has weight, the child will occupy half of the remaining height.
-        Box(Modifier.preferredWidth(40.dp).weight(1f), backgroundColor = Color.Yellow)
+        Box(Modifier.preferredWidth(40.dp).weight(1f).background(Color.Yellow))
         // Has weight and does not fill, the child will occupy at most half of the remaining height.
         // Therefore it will occupy 80.dp (its preferred height) if the assigned height is larger.
         Box(
             Modifier.preferredSize(40.dp, 80.dp)
-                .weight(1f, fill = false),
-            backgroundColor = Color.Green
+                .weight(1f, fill = false)
+                .background(Color.Green)
         )
     }
 }
@@ -58,27 +58,28 @@ fun SimpleAlignInColumn() {
     Column(Modifier.fillMaxWidth()) {
         // The child with no align modifier is positioned by default so that its start edge
         // aligned with the start edge of the horizontal axis.
-        Box(Modifier.preferredSize(80.dp, 40.dp), backgroundColor = Color.Magenta)
+
+        Box(Modifier.preferredSize(80.dp, 40.dp).background(Color.Magenta))
         // Alignment.Start, the child will be positioned so that its start edge is aligned with
         // the start edge of the horizontal axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .align(Alignment.Start),
-            backgroundColor = Color.Red
+                .align(Alignment.Start)
+                .background(Color.Red)
         )
         // Alignment.Center, the child will be positioned so that its center is in the middle of
         // the horizontal axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .align(Alignment.CenterHorizontally),
-            backgroundColor = Color.Yellow
+                .align(Alignment.CenterHorizontally)
+                .background(Color.Yellow)
         )
         // Alignment.End, the child will be positioned so that its end edge aligned to the end of
         // the horizontal axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .align(Alignment.End),
-            backgroundColor = Color.Green
+                .align(Alignment.End)
+                .background(Color.Green)
         )
     }
 }
@@ -90,16 +91,19 @@ fun SimpleRelativeToSiblings() {
         // Center of the first rectangle is aligned to the right edge of the second rectangle and
         // left edge of the third one.
         Box(
-            Modifier.preferredSize(80.dp, 40.dp).alignWithSiblings { it.width / 2 },
-            backgroundColor = Color.Blue
+            Modifier.preferredSize(80.dp, 40.dp)
+                .alignWithSiblings { it.width / 2 }
+                .background(Color.Blue)
         )
         Box(
-            Modifier.preferredSize(80.dp, 40.dp).alignWithSiblings { it.width },
-            backgroundColor = Color.Magenta
+            Modifier.preferredSize(80.dp, 40.dp)
+                .alignWithSiblings { it.width }
+                .background(Color.Magenta)
         )
         Box(
-            Modifier.preferredSize(80.dp, 40.dp).alignWithSiblings { 0 },
-            backgroundColor = Color.Red
+            Modifier.preferredSize(80.dp, 40.dp)
+                .alignWithSiblings { 0 }
+                .background(Color.Red)
         )
     }
 }
@@ -134,8 +138,9 @@ fun SimpleRelativeToSiblingsInColumn() {
         // Center of the first rectangle is aligned to the right edge of the second rectangle and
         // left edge of the third one.
         Box(
-            Modifier.preferredSize(80.dp, 40.dp).alignWithSiblings { it.width / 2 },
-            backgroundColor = Color.Blue
+            Modifier.preferredSize(80.dp, 40.dp)
+                .alignWithSiblings { it.width / 2 }
+                .background(Color.Blue)
         )
         RectangleWithStartEnd(
             Modifier.alignWithSiblings(end),

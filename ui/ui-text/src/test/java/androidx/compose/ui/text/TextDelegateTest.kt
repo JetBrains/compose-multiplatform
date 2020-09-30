@@ -118,13 +118,15 @@ class TextDelegateTest {
         assertThat(
             resolveTextDirection(
                 LayoutDirection.Ltr,
-                null)
+                null
+            )
         ).isEqualTo(TextDirection.Ltr)
 
         assertThat(
             resolveTextDirection(
                 LayoutDirection.Rtl,
-                null)
+                null
+            )
         ).isEqualTo(TextDirection.Rtl)
     }
 
@@ -138,7 +140,8 @@ class TextDelegateTest {
         ).isEqualTo(TextDirection.ContentOrLtr)
 
         assertThat(
-            resolveTextDirection(LayoutDirection.Rtl,
+            resolveTextDirection(
+                LayoutDirection.Rtl,
                 TextDirection.Content
             )
         ).isEqualTo(TextDirection.ContentOrRtl)
@@ -154,7 +157,8 @@ class TextDelegateTest {
         ).isEqualTo(TextDirection.ContentOrLtr)
 
         assertThat(
-            resolveTextDirection(LayoutDirection.Rtl,
+            resolveTextDirection(
+                LayoutDirection.Rtl,
                 TextDirection.ContentOrLtr
             )
         ).isEqualTo(TextDirection.ContentOrLtr)
@@ -170,7 +174,8 @@ class TextDelegateTest {
         ).isEqualTo(TextDirection.ContentOrRtl)
 
         assertThat(
-            resolveTextDirection(LayoutDirection.Rtl,
+            resolveTextDirection(
+                LayoutDirection.Rtl,
                 TextDirection.ContentOrRtl
             )
         ).isEqualTo(TextDirection.ContentOrRtl)

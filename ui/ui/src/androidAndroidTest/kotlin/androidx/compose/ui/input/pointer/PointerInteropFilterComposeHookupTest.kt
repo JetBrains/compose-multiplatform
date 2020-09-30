@@ -23,7 +23,7 @@ import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Modifier
@@ -70,15 +70,16 @@ class PointerInteropFilterComposeHookupTest {
                 )
                 setContent(Recomposer.current()) {
                     with(DensityAmbient.current) {
-                        Box(modifier = Modifier
-                            .spyGestureFilter {
-                                eventStringLog.add(it.name)
-                            }
-                            .pointerInteropFilter(
-                                disallowInterceptRequester,
-                                motionEventCallback
-                            )
-                            .size(100f.toDp(), 100f.toDp())
+                        Box(
+                            modifier = Modifier
+                                .spyGestureFilter {
+                                    eventStringLog.add(it.name)
+                                }
+                                .pointerInteropFilter(
+                                    disallowInterceptRequester,
+                                    motionEventCallback
+                                )
+                                .size(100f.toDp(), 100f.toDp())
                         )
                     }
                 }

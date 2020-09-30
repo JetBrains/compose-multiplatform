@@ -335,7 +335,7 @@ abstract class AnimatedFloat(
  */
 // TODO: Consolidate onAnimationEnd and onEnd
 typealias OnAnimationEnd =
-            (endReason: AnimationEndReason, endValue: Float, remainingVelocity: Float) -> Unit
+    (endReason: AnimationEndReason, endValue: Float, remainingVelocity: Float) -> Unit
 
 /**
  * Starts a fling animation with the specified starting velocity.

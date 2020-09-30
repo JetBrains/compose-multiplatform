@@ -76,9 +76,9 @@ class TransitionAnimation<T>(
     // velocities to be dynamic. The stateless animation that the wrapper wraps around will be
     // re-used as they are stateless.
     private var currentAnimWrappers: MutableMap<
-            PropKey<Any, AnimationVector>,
-            Animation<Any, AnimationVector>
-            > = mutableMapOf()
+        PropKey<Any, AnimationVector>,
+        Animation<Any, AnimationVector>
+        > = mutableMapOf()
     private var startVelocityMap: MutableMap<PropKey<Any, AnimationVector>, Any> = mutableMapOf()
 
     /**

@@ -62,14 +62,16 @@ class PathTest {
 
         val pixelmap = image.toPixelMap()
         val x = (50.0 * Math.cos(PI / 4)).toInt()
-        assertEquals(arcColor,
+        assertEquals(
+            arcColor,
             pixelmap[
                 width / 2 + x - 1,
                 height / 2 + x - 1
             ]
         )
 
-        assertEquals(arcColor,
+        assertEquals(
+            arcColor,
             pixelmap[
                 width / 2 - x,
                 height / 2 - x

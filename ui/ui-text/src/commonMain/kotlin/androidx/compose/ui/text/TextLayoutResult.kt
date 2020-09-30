@@ -125,7 +125,7 @@ data class TextLayoutResult internal constructor(
      * Returns true if the text is too tall and couldn't fit with given height.
      */
     val didOverflowHeight: Boolean get() = multiParagraph.didExceedMaxLines ||
-            size.height < multiParagraph.height
+        size.height < multiParagraph.height
 
     /**
      * Returns true if the text is too wide and couldn't fit with given width.
@@ -359,7 +359,7 @@ fun createTextLayoutResult(
     multiParagraph: MultiParagraph = MultiParagraph(
         annotatedString = layoutInput.text,
         style = layoutInput.style,
-        constraints = ParagraphConstraints(width = 0f),
+        width = 0f,
         density = layoutInput.density,
         resourceLoader = layoutInput.resourceLoader
     ),

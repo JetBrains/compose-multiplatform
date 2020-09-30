@@ -43,8 +43,10 @@ object FrameManager {
     /**
      * TODO: This will be merged later with the scopes used by [Recomposer]
      */
-    private val scheduleScope = CoroutineScope(Recomposer.current().embeddingContext
-        .mainThreadCompositionContext() + SupervisorJob())
+    private val scheduleScope = CoroutineScope(
+        Recomposer.current().embeddingContext
+            .mainThreadCompositionContext() + SupervisorJob()
+    )
 
     fun ensureStarted() {
         if (!started) {

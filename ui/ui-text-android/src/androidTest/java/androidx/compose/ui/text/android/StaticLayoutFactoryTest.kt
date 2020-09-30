@@ -364,7 +364,7 @@ class StaticLayoutFactoryTest {
         )
 
         val fontMetrics = paint.fontMetricsInt
-            assertThat(staticLayout.height).isEqualTo(fontMetrics.descent - fontMetrics.ascent)
+        assertThat(staticLayout.height).isEqualTo(fontMetrics.descent - fontMetrics.ascent)
     }
 
     @Test

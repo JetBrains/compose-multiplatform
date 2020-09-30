@@ -16,13 +16,16 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -44,6 +47,10 @@ import androidx.compose.ui.unit.dp
  * @param modifier optional [Modifier] for this IconButton
  * @param enabled whether or not this IconButton will handle input events and appear enabled for
  * semantics purposes
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this IconButton. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this IconButton in different [Interaction]s.
  * @param icon the content (icon) to be drawn inside the IconButton. This is typically an
  * [androidx.compose.foundation.Icon].
  */
@@ -52,6 +59,7 @@ fun IconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     icon: @Composable () -> Unit
 ) {
     Box(
@@ -59,12 +67,12 @@ fun IconButton(
             .clickable(
                 onClick = onClick,
                 enabled = enabled,
+                interactionState = interactionState,
                 indication = RippleIndication(bounded = false, radius = RippleRadius)
             )
             .then(IconButtonSizeModifier),
-        gravity = ContentGravity.Center,
-        children = icon
-    )
+        alignment = Alignment.Center
+    ) { icon() }
 }
 
 /**
@@ -78,6 +86,10 @@ fun IconButton(
  * @param modifier optional [Modifier] for this IconToggleButton
  * @param enabled enabled whether or not this [IconToggleButton] will handle input events and appear
  * enabled for semantics purposes
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this IconToggleButton. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this IconToggleButton in different [Interaction]s.
  * @param icon the content (icon) to be drawn inside the IconToggleButton. This is typically an
  * [androidx.compose.foundation.Icon].
  */
@@ -87,6 +99,7 @@ fun IconToggleButton(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     icon: @Composable () -> Unit
 ) {
     Box(
@@ -94,11 +107,11 @@ fun IconToggleButton(
             value = checked,
             onValueChange = onCheckedChange,
             enabled = enabled,
+            interactionState = interactionState,
             indication = RippleIndication(bounded = false, radius = RippleRadius)
         ).then(IconButtonSizeModifier),
-        gravity = ContentGravity.Center,
-        children = icon
-    )
+        alignment = Alignment.Center
+    ) { icon() }
 }
 
 // Default radius of an unbounded ripple in an IconButton

@@ -16,9 +16,10 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -48,26 +49,26 @@ val langContent = arrayOf(
     arrayOf(
         "Jetpack يؤلف أساسيات",
         "Jetpack Compose عبارة عن مجموعة أدوات حديثة لبناء واجهة مستخدم " +
-                "Android الأصلية. يعمل Jetpack Compose على تبسيط وتسريع " +
-                "تطوير واجهة المستخدم على نظام Android باستخدام " +
-                "رموز أقل وأدوات قوية وواجهات برمجة تطبيقات Kotlin البديهية."
+            "Android الأصلية. يعمل Jetpack Compose على تبسيط وتسريع " +
+            "تطوير واجهة المستخدم على نظام Android باستخدام " +
+            "رموز أقل وأدوات قوية وواجهات برمجة تطبيقات Kotlin البديهية."
     ),
     arrayOf(
         "添加文本元素",
         "Jetpack Compose是用于构建本机Android UI的现代工具包。 Jetpack " +
-                "Compose使用更少的代码，强大的工具和直观的Kotlin API简化并加速了Android上的UI开发。"
+            "Compose使用更少的代码，强大的工具和直观的Kotlin API简化并加速了Android上的UI开发。"
     ),
     arrayOf(
         "एक पाठ तत्व जोड़ें",
         "रचना योग्य कार्यों को केवल अन्य रचना कार्यों के " +
-                "दायरे में से बुलाया जा सकता है। किसी फंक्शन को " +
-                "कंपोजिटेबल बनाने के लिए, @ कम्\u200Dपोजिट " +
-                "एनोटेशन जोड़ें।"
+            "दायरे में से बुलाया जा सकता है। किसी फंक्शन को " +
+            "कंपोजिटेबल बनाने के लिए, @ कम्\u200Dपोजिट " +
+            "एनोटेशन जोड़ें।"
     ),
     arrayOf(
         "ข้อมูลพื้นฐานเกี่ยวกับการเขียน Jetpack",
         "ฟังก์ชั่น Composable สามารถเรียกใช้ได้จากภายในขอบเขตของฟังก์ชั่นอื่น ๆ เท่านั้น " +
-                "ในการสร้างฟังก์ชั่นคอมโพสิตให้เพิ่มคำอธิบายประกอบ @Composable"
+            "ในการสร้างฟังก์ชั่นคอมโพสิตให้เพิ่มคำอธิบายประกอบ @Composable"
     )
 )
 
@@ -100,11 +101,11 @@ private fun Basics() {
         style = commonStyle.merge(header)
     )
     Row {
-        Box(Modifier.padding(8.dp).preferredSize(48.dp), backgroundColor = rectColor)
+        Box(Modifier.padding(8.dp).preferredSize(48.dp).background(rectColor))
         Text(
             text = "Jetpack Compose is a modern toolkit for building native Android UI." +
-                    " Jetpack Compose simplifies and accelerates UI development on Android " +
-                    "with less code, powerful tools, and intuitive Kotlin APIs.",
+                " Jetpack Compose simplifies and accelerates UI development on Android " +
+                "with less code, powerful tools, and intuitive Kotlin APIs.",
             modifier = Modifier.weight(1f),
             style = commonStyle
         )
@@ -127,35 +128,37 @@ private fun AddTextElement() {
                     }
                     append(
                         ", and create an app using the Empty Compose Activity template. Then " +
-                                "add a text element to your blank activity. You do this by " +
-                                "defining a content block, and calling the Text() function."
+                            "add a text element to your blank activity. You do this by " +
+                            "defining a content block, and calling the Text() function."
                     )
                 },
                 style = commonStyle
             )
         }
-        Box(Modifier.padding(8.dp).preferredSize(48.dp), backgroundColor = rectColor)
+        Box(Modifier.padding(8.dp).preferredSize(48.dp).background(rectColor))
     }
     Box(
-        Modifier.padding(top = 20.dp, bottom = 20.dp).preferredSize(200.dp, 60.dp),
-        backgroundColor = rectColor
+        Modifier
+            .padding(top = 20.dp, bottom = 20.dp)
+            .preferredSize(200.dp, 60.dp)
+            .background(rectColor)
     )
     Text(
         text = annotatedString {
             withStyle(commonStyle.toSpanStyle()) {
                 append(
                     "The setContent block defines the activity's layout. Instead of " +
-                            "defining the layout contents with an XML file, we call " +
-                            "composable functions. Jetpack Compose uses a custom " +
-                            "Kotlin compiler plugin to transform these composable " +
-                            "functions into the app's UI elements. For example, the"
+                        "defining the layout contents with an XML file, we call " +
+                        "composable functions. Jetpack Compose uses a custom " +
+                        "Kotlin compiler plugin to transform these composable " +
+                        "functions into the app's UI elements. For example, the"
                 )
                 withStyle(highlight) {
                     append(" Text() ")
                 }
                 append(
                     " function is defined by the Compose UI library; you call that " +
-                            "function to declare a text element in your app."
+                        "function to declare a text element in your app."
                 )
             }
         }
@@ -174,14 +177,14 @@ private fun MultiParagraph() {
                 withStyle(commonStyle.toParagraphStyle()) {
                     append(
                         "Composable functions can only be called from within the scope of " +
-                                "other composable functions. To make a function composable, add " +
-                                "the @Composable annotation. "
+                            "other composable functions. To make a function composable, add " +
+                            "the @Composable annotation. "
                     )
                 }
                 withStyle(commonStyle.toParagraphStyle()) {
                     append(
                         "To try this out, define a Greeting() function which is passed a " +
-                                "name, and uses that name to configure the text element."
+                            "name, and uses that name to configure the text element."
                     )
                 }
                 withStyle(highlight) {
@@ -189,7 +192,7 @@ private fun MultiParagraph() {
                 }
                 append(
                     " function is defined by the Compose UI library; you call that " +
-                            "function to declare a text element in your app."
+                        "function to declare a text element in your app."
                 )
             }
         }
@@ -203,10 +206,7 @@ private fun MultiLanguage(title: String, content: String) {
         style = commonStyle.merge(header)
     )
     Row {
-        Box(
-            Modifier.padding(8.dp).preferredSize(48.dp),
-            backgroundColor = rectColor
-        )
+        Box(Modifier.padding(8.dp).preferredSize(48.dp).background(rectColor))
         Text(
             text = content,
             modifier = Modifier.weight(1f),

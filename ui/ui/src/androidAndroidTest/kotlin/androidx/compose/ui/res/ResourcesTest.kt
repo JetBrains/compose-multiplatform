@@ -89,8 +89,12 @@ class ResourcesTest {
             assertThat(pendingExecutor.runnable).isNotNull()
             assertThat(res!!.resource).isInstanceOf(PendingResource::class.java)
             assertThat(res!!.resource.resource).isNotNull()
-            assertThat(res!!.resource.resource!!.asAndroidBitmap().sameAs(pendingImage
-                .asAndroidBitmap()))
+            assertThat(
+                res!!.resource.resource!!.asAndroidBitmap().sameAs(
+                    pendingImage
+                        .asAndroidBitmap()
+                )
+            )
         }
 
         rule.runOnIdle {
@@ -104,9 +108,11 @@ class ResourcesTest {
             assertThat(pendingExecutor.runnable).isNull()
             assertThat(res!!.resource).isInstanceOf(LoadedResource::class.java)
             assertThat(res!!.resource.resource).isNotNull()
-            assertThat(res!!.resource.resource!!
-                .asAndroidBitmap()
-                .sameAs(loadedImage.asAndroidBitmap()))
+            assertThat(
+                res!!.resource.resource!!
+                    .asAndroidBitmap()
+                    .sameAs(loadedImage.asAndroidBitmap())
+            )
                 .isTrue()
         }
     }
@@ -146,9 +152,11 @@ class ResourcesTest {
             assertThat(pendingExecutor.runnable).isNotNull()
             assertThat(res!!.resource).isInstanceOf(PendingResource::class.java)
             assertThat(res!!.resource.resource).isNotNull()
-            assertThat(res!!.resource.resource!!
-                .asAndroidBitmap()
-                .sameAs(pendingImage.asAndroidBitmap()))
+            assertThat(
+                res!!.resource.resource!!
+                    .asAndroidBitmap()
+                    .sameAs(pendingImage.asAndroidBitmap())
+            )
                 .isTrue()
         }
 
@@ -163,9 +171,11 @@ class ResourcesTest {
             assertThat(pendingExecutor.runnable).isNull()
             assertThat(res!!.resource).isInstanceOf(FailedResource::class.java)
             assertThat(res!!.resource.resource).isNotNull()
-            assertThat(res!!.resource.resource!!
-                .asAndroidBitmap()
-                .sameAs(failedImage.asAndroidBitmap()))
+            assertThat(
+                res!!.resource.resource!!
+                    .asAndroidBitmap()
+                    .sameAs(failedImage.asAndroidBitmap())
+            )
                 .isTrue()
         }
     }

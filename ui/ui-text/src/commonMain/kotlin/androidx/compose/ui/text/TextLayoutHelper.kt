@@ -49,14 +49,17 @@ internal fun TextLayoutResult.canReuse(
 
     // Check if this is created from the same parameter.
     val layoutInput = this.layoutInput
-    if (!(layoutInput.text == text &&
-                layoutInput.style.canReuseLayout(style) &&
-                layoutInput.maxLines == maxLines &&
-                layoutInput.softWrap == softWrap &&
-                layoutInput.overflow == overflow &&
-                layoutInput.density == density &&
-                layoutInput.layoutDirection == layoutDirection &&
-                layoutInput.resourceLoader == resourceLoader)) {
+    if (!(
+        layoutInput.text == text &&
+            layoutInput.style.canReuseLayout(style) &&
+            layoutInput.maxLines == maxLines &&
+            layoutInput.softWrap == softWrap &&
+            layoutInput.overflow == overflow &&
+            layoutInput.density == density &&
+            layoutInput.layoutDirection == layoutDirection &&
+            layoutInput.resourceLoader == resourceLoader
+        )
+    ) {
         return false
     }
 
@@ -75,18 +78,18 @@ internal fun TextLayoutResult.canReuse(
  */
 internal fun TextStyle.canReuseLayout(other: TextStyle): Boolean {
     return fontSize == other.fontSize &&
-            fontWeight == other.fontWeight &&
-            fontStyle == other.fontStyle &&
-            fontSynthesis == other.fontSynthesis &&
-            fontFamily == other.fontFamily &&
-            fontFeatureSettings == other.fontFeatureSettings &&
-            letterSpacing == other.letterSpacing &&
-            baselineShift == other.baselineShift &&
-            textGeometricTransform == other.textGeometricTransform &&
-            localeList == other.localeList &&
-            background == other.background &&
-            textAlign == other.textAlign &&
-            textDirection == other.textDirection &&
-            lineHeight == other.lineHeight &&
-            textIndent == other.textIndent
+        fontWeight == other.fontWeight &&
+        fontStyle == other.fontStyle &&
+        fontSynthesis == other.fontSynthesis &&
+        fontFamily == other.fontFamily &&
+        fontFeatureSettings == other.fontFeatureSettings &&
+        letterSpacing == other.letterSpacing &&
+        baselineShift == other.baselineShift &&
+        textGeometricTransform == other.textGeometricTransform &&
+        localeList == other.localeList &&
+        background == other.background &&
+        textAlign == other.textAlign &&
+        textDirection == other.textDirection &&
+        lineHeight == other.lineHeight &&
+        textIndent == other.textIndent
 }

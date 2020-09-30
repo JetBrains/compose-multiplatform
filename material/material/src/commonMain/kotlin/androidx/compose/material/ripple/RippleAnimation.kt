@@ -81,7 +81,7 @@ internal class RippleAnimation(
         val startRadius = getRippleStartRadius(surfaceSize)
         val targetRadius = radius
 
-        val center = size.center()
+        val center = Offset(size.width / 2.0f, size.height / 2.0f)
         animation = RippleTransition.definition(
             startRadius = startRadius,
             endRadius = targetRadius,

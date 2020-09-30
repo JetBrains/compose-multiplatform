@@ -40,15 +40,15 @@ import kotlin.jvm.JvmStatic
     ExperimentalLayoutNodeApi::class
 )
 @RunWith(Parameterized::class)
-class FocusManagerTest(val initialFocusState: FocusState) {
+class FocusManagerTest(private val initialFocusState: FocusState) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "rootInitialFocus = {0}")
         fun initParameters() = FocusState.values()
     }
 
-    private val focusManager = FocusManager()
-    private val focusModifier: FocusModifier = focusManager.modifier as FocusModifier
+    private val focusModifier = FocusModifier(Inactive)
+    private val focusManager = FocusManager(focusModifier)
 
     @Before
     fun setup() {

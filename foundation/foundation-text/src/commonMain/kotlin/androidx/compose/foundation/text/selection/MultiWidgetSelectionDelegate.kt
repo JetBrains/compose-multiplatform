@@ -69,7 +69,8 @@ internal class MultiWidgetSelectionDelegate(
     override fun getHandlePosition(selection: Selection, isStartHandle: Boolean): Offset {
         // Check if the selection handles's selectable is the current selectable.
         if (isStartHandle && selection.start.selectable != this ||
-            !isStartHandle && selection.end.selectable != this) {
+            !isStartHandle && selection.end.selectable != this
+        ) {
             return Offset.Zero
         }
 

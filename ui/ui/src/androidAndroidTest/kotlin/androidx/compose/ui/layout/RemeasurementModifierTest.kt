@@ -33,13 +33,15 @@ class RemeasurementModifierTest {
     fun nodeIsRemeasuredAfterForceRemeasureBlocking() {
         var remeasurementObj: Remeasurement? = null
         val root = root {
-            add(node {
-                modifier = object : RemeasurementModifier {
-                    override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
-                        remeasurementObj = remeasurement
+            add(
+                node {
+                    modifier = object : RemeasurementModifier {
+                        override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
+                            remeasurementObj = remeasurement
+                        }
                     }
                 }
-            })
+            )
         }
 
         createDelegate(root)

@@ -179,7 +179,8 @@ private class RippleIndicationInstance constructor(
     private fun ContentDrawScope.addRipple(targetRadius: Float, pressPosition: Offset) {
         currentRipple?.finish()
         val pxSize = Size(size.width, size.height)
-        val position = if (bounded) pressPosition else pxSize.center()
+        val center = Offset(size.width / 2f, size.height / 2f)
+        val position = if (bounded) pressPosition else center
         val ripple = RippleAnimation(pxSize, position, targetRadius, bounded, clock) { ripple ->
             ripples.remove(ripple)
             if (currentRipple == ripple) {

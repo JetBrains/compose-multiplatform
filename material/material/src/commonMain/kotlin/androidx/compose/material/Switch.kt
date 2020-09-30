@@ -21,8 +21,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.indication
-import androidx.compose.foundation.layout.Stack
-import androidx.compose.foundation.layout.StackScope
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.padding
@@ -57,7 +57,11 @@ import androidx.compose.ui.unit.dp
  * therefore the change of checked state is requested.
  * @param modifier Modifier to be applied to the switch layout
  * @param enabled whether or not components is enabled and can be clicked to request state change
- * @param color main color of the track and trumb when the Switch is checked
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Switch. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this Switch in different [Interaction]s.
+ * @param color main color of the track and thumb when the Switch is checked
  */
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
@@ -66,14 +70,14 @@ fun Switch(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     color: Color = MaterialTheme.colors.secondaryVariant
 ) {
     val minBound = 0f
     val maxBound = with(DensityAmbient.current) { ThumbPathLength.toPx() }
     val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange, AnimationSpec)
-    val interactionState = remember { InteractionState() }
     val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
-    Stack(
+    Box(
         modifier
             .toggleable(
                 value = checked,
@@ -107,7 +111,7 @@ fun Switch(
 }
 
 @Composable
-private fun StackScope.SwitchImpl(
+private fun BoxScope.SwitchImpl(
     checked: Boolean,
     enabled: Boolean,
     checkedColor: Color,

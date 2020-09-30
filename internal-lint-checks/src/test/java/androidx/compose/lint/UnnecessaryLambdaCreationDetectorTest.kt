@@ -29,7 +29,8 @@ import org.intellij.lang.annotations.Language
 @RunWith(JUnit4::class)
 class UnnecessaryLambdaCreationDetectorTest {
 
-    private val stub = kt("""
+    private val stub = kt(
+        """
         package test
 
         annotation class Composable
@@ -44,7 +45,8 @@ class UnnecessaryLambdaCreationDetectorTest {
         fun ComposableFunction(children: @Composable () -> Unit) {
             children()
         }
-    """).indented().within("src")
+    """
+    ).indented().within("src")
 
     private fun check(@Language("kotlin") code: String): TestLintResult {
         return TestLintTask.lint()
@@ -56,7 +58,8 @@ class UnnecessaryLambdaCreationDetectorTest {
 
     @Test
     fun warnsForSingleExpressions() {
-        check("""
+        check(
+            """
             package test
 
             @Composable
@@ -81,7 +84,9 @@ class UnnecessaryLambdaCreationDetectorTest {
                     function()
                 }
             }
-        """).expect("""
+        """
+        ).expect(
+            """
 src/test/test.kt:6: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         lambda()
         ~~~~~~
@@ -89,12 +94,14 @@ src/test/test.kt:10: Error: Creating an unnecessary lambda to emit a captured la
         anonymousFunction()
         ~~~~~~~~~~~~~~~~~
 2 errors, 0 warnings
-        """)
+        """
+        )
     }
 
     @Test
     fun warnsForMultipleLambdas() {
-        check("""
+        check(
+            """
             package test
 
             @Composable
@@ -109,7 +116,9 @@ src/test/test.kt:10: Error: Creating an unnecessary lambda to emit a captured la
                     lambda()
                 }
             }
-        """).expect("""
+        """
+        ).expect(
+            """
 src/test/test.kt:11: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
     MultipleChildComposableFunction( { lambda() }) {
                                        ~~~~~~
@@ -117,12 +126,14 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
         lambda()
         ~~~~~~
 2 errors, 0 warnings
-        """)
+        """
+        )
     }
 
     @Test
     fun ignoresMultipleExpressions() {
-        check("""
+        check(
+            """
             package test
 
             @Composable
@@ -132,23 +143,27 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
                     lambda()
                 }
             }
-        """).expectClean()
+        """
+        ).expectClean()
     }
 
     @Test
     fun ignoresPropertyAssignment() {
-        check("""
+        check(
+            """
             package test
 
             val property: @Composable () -> Unit = {
                 lambda()
             }
-        """).expectClean()
+        """
+        ).expectClean()
     }
 
     @Test
     fun ignoresLayoutNodes() {
-        check("""
+        check(
+            """
             package test
 
             class FooNode(val foo: String)
@@ -159,12 +174,14 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
                     lambda()
                 }
             }
-        """).expectClean()
+        """
+        ).expectClean()
     }
 
     @Test
     fun ignoresDifferentFunctionalTypes_parameters() {
-        check("""
+        check(
+            """
             package test 
 
             @Composable
@@ -195,17 +212,21 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
                     differentlyParameterizedLambda(5)
                 }
             }
-        """).expect("""
+        """
+        ).expect(
+            """
 src/test/test.kt:21: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         parameterizedLambda(child)
         ~~~~~~~~~~~~~~~~~~~
 1 errors, 0 warnings
-        """)
+        """
+        )
     }
 
     @Test
     fun ignoresDifferentFunctionalTypes_receiverScopes() {
-        check("""
+        check(
+            """
             package test
 
             class SomeScope
@@ -234,17 +255,21 @@ src/test/test.kt:21: Error: Creating an unnecessary lambda to emit a captured la
                     differentlyScopedLambda()
                 }
             }
-        """).expect("""
+        """
+        ).expect(
+            """
 src/test/SomeScope.kt:22: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         scopedLambda()
         ~~~~~~~~~~~~
 1 errors, 0 warnings
-        """)
+        """
+        )
     }
 
     @Test
     fun ignoresMismatchedComposability() {
-        check("""
+        check(
+            """
             package test
 
             fun uncomposableLambdaFunction(child: () -> Unit) {}
@@ -261,7 +286,8 @@ src/test/SomeScope.kt:22: Error: Creating an unnecessary lambda to emit a captur
                     uncomposableLambda()
                 }
             }
-        """).expectClean()
+        """
+        ).expectClean()
     }
 }
 /* ktlint-enable max-line-length */

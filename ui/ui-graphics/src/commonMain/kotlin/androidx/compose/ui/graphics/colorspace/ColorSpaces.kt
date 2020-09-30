@@ -287,8 +287,10 @@ object ColorSpaces {
         for (colorSpace in ColorSpacesArray) {
             if (colorSpace.model == ColorModel.Rgb) {
                 val rgb = colorSpace.adapt(Illuminant.D50) as Rgb
-                if ((compare(toXYZD50, rgb.transform) &&
-                            compare(function, rgb.transferParameters))
+                if ((
+                    compare(toXYZD50, rgb.transform) &&
+                        compare(function, rgb.transferParameters)
+                    )
                 ) {
                     return colorSpace
                 }

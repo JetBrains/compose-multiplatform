@@ -17,15 +17,16 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
@@ -49,9 +50,9 @@ fun ScrollableSample() {
                     offset.value = offset.value + delta
                     delta
                 }
-            ),
-        backgroundColor = Color.LightGray,
-        gravity = ContentGravity.Center
+            )
+            .background(Color.LightGray),
+        alignment = Alignment.Center
     ) {
         Text(offset.value.roundToInt().toString(), style = TextStyle(fontSize = 50.sp))
     }

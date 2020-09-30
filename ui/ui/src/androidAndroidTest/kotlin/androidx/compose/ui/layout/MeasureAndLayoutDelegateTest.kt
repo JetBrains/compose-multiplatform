@@ -148,9 +148,11 @@ class MeasureAndLayoutDelegateTest {
     fun childRemeasureWithDifferentResult_parentRemeasured() {
         val root = root {
             wrapChildren = true
-            add(node {
-                size = DifferentSize
-            })
+            add(
+                node {
+                    size = DifferentSize
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -290,9 +292,11 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun parentRemeasureRequest_childNotAffected() {
         val root = root {
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -426,9 +430,11 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun parentRelayoutRequest_childNotAffected() {
         val root = root {
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -631,9 +637,11 @@ class MeasureAndLayoutDelegateTest {
     fun remeasureTwoNodesOnDifferentLayers_othersAreNotAffected() {
         val root = root {
             add(node())
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -655,15 +663,21 @@ class MeasureAndLayoutDelegateTest {
     fun changeSizeOfTheLeaf_remeasuresUpToTheFixedSizeParent() {
         val root = root {
             wrapChildren = true
-            add(node {
-                size = DifferentSize
-                add(node {
-                    wrapChildren = true
-                    add(node {
-                        size = DifferentSize
-                    })
-                })
-            })
+            add(
+                node {
+                    size = DifferentSize
+                    add(
+                        node {
+                            wrapChildren = true
+                            add(
+                                node {
+                                    size = DifferentSize
+                                }
+                            )
+                        }
+                    )
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -685,12 +699,16 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun remeasureRequestForItemsOnTheSameLevelButDifferentParents() {
         val root = root {
-            add(node {
-                add(node())
-            })
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -713,12 +731,16 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun relayoutRequestForItemsOnTheSameLevelButDifferentParents() {
         val root = root {
-            add(node {
-                add(node())
-            })
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -741,12 +763,16 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun relayoutAndRemeasureRequestForItemsOnTheSameLevelButDifferentParents() {
         val root = root {
-            add(node {
-                add(node())
-            })
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -790,9 +816,11 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun requestGrandchildRemeasureDuringMeasure() {
         val root = root {
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -832,9 +860,11 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun requestGrandchildRelayoutDuringMeasure() {
         val root = root {
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -874,9 +904,11 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun requestGrandchildRemeasureDuringParentLayout() {
         val root = root {
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -973,9 +1005,11 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun changingParentParamsToTheSameValue_noRemeasures() {
         val root = root {
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -995,9 +1029,11 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun changingParentConstraints_remeasureSubTree() {
         val root = root {
-            add(node {
-                add(node())
-            })
+            add(
+                node {
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -1017,10 +1053,12 @@ class MeasureAndLayoutDelegateTest {
     @Test
     fun changingParentConstraints_remeasureOnlyAffectedNodes() {
         val root = root {
-            add(node {
-                size = DifferentSize2
-                add(node())
-            })
+            add(
+                node {
+                    size = DifferentSize2
+                    add(node())
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -1041,10 +1079,12 @@ class MeasureAndLayoutDelegateTest {
     fun requestRemeasureTriggersModifierRemeasure() {
         val spyModifier = SpyLayoutModifier()
         val root = root {
-            add(node {
-                @OptIn(ExperimentalLayoutNodeApi::class)
-                modifier = spyModifier
-            })
+            add(
+                node {
+                    @OptIn(ExperimentalLayoutNodeApi::class)
+                    modifier = spyModifier
+                }
+            )
         }
 
         val delegate = createDelegate(root)
@@ -1059,10 +1099,12 @@ class MeasureAndLayoutDelegateTest {
     fun requestRelayoutTriggersModifierRelayout() {
         val spyModifier = SpyLayoutModifier()
         val root = root {
-            add(node {
-                @OptIn(ExperimentalLayoutNodeApi::class)
-                modifier = spyModifier
-            })
+            add(
+                node {
+                    @OptIn(ExperimentalLayoutNodeApi::class)
+                    modifier = spyModifier
+                }
+            )
         }
 
         val delegate = createDelegate(root)

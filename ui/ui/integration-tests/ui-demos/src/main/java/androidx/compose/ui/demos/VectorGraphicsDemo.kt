@@ -80,45 +80,45 @@ private fun vectorShape(width: Dp, height: Dp): Painter =
         defaultWidth = width,
         defaultHeight = height
     ) { viewportWidth, viewportHeight ->
-    Group(
-        scaleX = 0.75f,
-        scaleY = 0.75f,
-        rotation = 45.0f,
-        pivotX = (viewportWidth / 2),
-        pivotY = (viewportHeight / 2)
-    ) {
-        BackgroundPath(viewportWidth, viewportHeight)
-        StripePath(viewportWidth, viewportHeight)
         Group(
-            translationX = 50.0f,
-            translationY = 50.0f,
+            scaleX = 0.75f,
+            scaleY = 0.75f,
+            rotation = 45.0f,
             pivotX = (viewportWidth / 2),
-            pivotY = (viewportHeight / 2),
-            rotation = 25.0f
+            pivotY = (viewportHeight / 2)
         ) {
-            val pathData = PathData {
-                moveTo(viewportWidth / 2 - 100, viewportHeight / 2 - 100)
-                horizontalLineToRelative(200.0f)
-                verticalLineToRelative(200.0f)
-                horizontalLineToRelative(-200.0f)
-                close()
-            }
-            Path(
-                fill = HorizontalGradient(
-                    listOf(
-                        Color.Red,
-                        Color.Blue
+            BackgroundPath(viewportWidth, viewportHeight)
+            StripePath(viewportWidth, viewportHeight)
+            Group(
+                translationX = 50.0f,
+                translationY = 50.0f,
+                pivotX = (viewportWidth / 2),
+                pivotY = (viewportHeight / 2),
+                rotation = 25.0f
+            ) {
+                val pathData = PathData {
+                    moveTo(viewportWidth / 2 - 100, viewportHeight / 2 - 100)
+                    horizontalLineToRelative(200.0f)
+                    verticalLineToRelative(200.0f)
+                    horizontalLineToRelative(-200.0f)
+                    close()
+                }
+                Path(
+                    fill = HorizontalGradient(
+                        listOf(
+                            Color.Red,
+                            Color.Blue
+                        ),
+                        startX = 0.0f,
+                        endX = viewportWidth / 2 + 100.0f
                     ),
-                    startX = 0.0f,
-                    endX = viewportWidth / 2 + 100.0f
-                ),
-                pathData = pathData
-            )
+                    pathData = pathData
+                )
+            }
+            Triangle()
+            TriangleWithOffsets()
         }
-        Triangle()
-        TriangleWithOffsets()
     }
-}
 
 @Composable
 private fun BackgroundPath(vectorWidth: Float, vectorHeight: Float) {

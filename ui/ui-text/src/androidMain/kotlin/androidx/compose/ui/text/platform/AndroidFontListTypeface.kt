@@ -79,7 +79,8 @@ internal class AndroidFontListTypeface(
         val typeface = loadedTypefaces.get(font)
         requireNotNull(typeface)
         if ((font.weight == fontWeight && font.style == fontStyle) ||
-            synthesis == FontSynthesis.None) {
+            synthesis == FontSynthesis.None
+        ) {
             return typeface
         }
         return TypefaceAdapter.synthesize(typeface, font, fontWeight, fontStyle, synthesis)

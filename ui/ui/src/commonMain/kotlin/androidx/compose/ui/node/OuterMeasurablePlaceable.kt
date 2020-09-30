@@ -56,7 +56,7 @@ internal class OuterMeasurablePlaceable(
             LayoutState.LayingOut -> LayoutNode.UsageByParent.InLayoutBlock
             else -> throw IllegalStateException(
                 "Measurable could be only measured from the parent's measure or layout block." +
-                        "Parents state is $parentState"
+                    "Parents state is $parentState"
             )
         }
         remeasure(constraints)
@@ -72,7 +72,7 @@ internal class OuterMeasurablePlaceable(
         val parent = layoutNode.parent
         @Suppress("Deprecation")
         layoutNode.canMultiMeasure = layoutNode.canMultiMeasure ||
-                (parent != null && parent.canMultiMeasure)
+            (parent != null && parent.canMultiMeasure)
         @Suppress("Deprecation")
         check(measureIteration != iteration || layoutNode.canMultiMeasure) {
             "measure() may not be called multiple times on the same Measurable"
@@ -110,7 +110,7 @@ internal class OuterMeasurablePlaceable(
 
     override fun placeAt(position: IntOffset) {
         lastPosition = position
-        with(InnerPlacementScope) {
+        with(PlacementScope) {
             outerWrapper.place(position)
         }
     }

@@ -731,19 +731,25 @@ open class MutableSnapshot internal constructor(
                         // obscure the current value so ignore the conflict
                     }
                     current -> {
-                        (mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
-                            mergedRecords = it
-                        }).add(state to current.create())
+                        (
+                            mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
+                                mergedRecords = it
+                            }
+                            ).add(state to current.create())
 
                         // If we revert to current then the state is no longer modified.
-                        (statesToRemove ?: mutableListOf<StateObject>().also {
-                            statesToRemove = it
-                        }).add(state)
+                        (
+                            statesToRemove ?: mutableListOf<StateObject>().also {
+                                statesToRemove = it
+                            }
+                            ).add(state)
                     }
                     else -> {
-                        (mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
-                            mergedRecords = it
-                        }).add(
+                        (
+                            mergedRecords ?: mutableListOf<Pair<StateObject, StateRecord>>().also {
+                                mergedRecords = it
+                            }
+                            ).add(
                             if (merged != previous) state to merged
                             else state to previous.create()
                         )
@@ -778,10 +784,16 @@ open class MutableSnapshot internal constructor(
     internal inline fun <T> advance(block: () -> T): T {
         recordPrevious(id)
         return block().also {
+            val previousId = id
             sync {
                 id = nextSnapshotId++
                 openSnapshots = openSnapshots.set(id)
             }
+            var currentInvald = invalid
+            for (invalidId in previousId + 1 until id) {
+                currentInvald = currentInvald.set(invalidId)
+            }
+            invalid = currentInvald
         }
     }
 
@@ -1102,19 +1114,24 @@ private val emptyLambda: (invalid: SnapshotIdSet) -> Unit = { }
  * A snapshot object that simplifies the code by treating the global state as a mutable snapshot.
  */
 internal class GlobalSnapshot(id: Int, invalid: SnapshotIdSet) :
-    MutableSnapshot(id, invalid, null, sync {
-        // Take a defensive copy of the  globalWriteObservers list. This then avoids having to
-        // synchronized access to writerObserver in places it is called and allows the list to
-        // change while notifications are being dispatched. Changes to globalWriteObservers force
-        // a new global snapshot to be created.
-        (if (globalWriteObservers.isNotEmpty()) {
-            globalWriteObservers.toMutableList()
-        } else null)?.let {
-            it.firstOrNull() ?: { state: Any ->
-                it.forEach { it(state) }
+    MutableSnapshot(
+        id, invalid, null,
+        sync {
+            // Take a defensive copy of the  globalWriteObservers list. This then avoids having to
+            // synchronized access to writerObserver in places it is called and allows the list to
+            // change while notifications are being dispatched. Changes to globalWriteObservers force
+            // a new global snapshot to be created.
+            (
+                if (globalWriteObservers.isNotEmpty()) {
+                    globalWriteObservers.toMutableList()
+                } else null
+                )?.let {
+                it.firstOrNull() ?: { state: Any ->
+                    it.forEach { it(state) }
+                }
             }
         }
-    }) {
+    ) {
 
     override fun takeNestedSnapshot(readObserver: SnapshotReadObserver?): Snapshot =
         takeNewSnapshot { invalid ->
@@ -1206,9 +1223,11 @@ internal class NestedMutableSnapshot(
                 if (result != SnapshotApplyResult.Success) return result
 
                 // Add all modified objects in this set to the parent
-                (parent.modified ?: HashSet<StateObject>().also {
-                    parent.modified = it
-                }).addAll(modified)
+                (
+                    parent.modified ?: HashSet<StateObject>().also {
+                        parent.modified = it
+                    }
+                    ).addAll(modified)
             }
 
             // Make the snapshot visible in the parent snapshot
@@ -1420,11 +1439,13 @@ private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
     // Update the transparent snapshot if necessary
     // This doesn't need to take the sync because it is updating thread local state.
     (threadSnapshot.get() as? TransparentObserverMutableSnapshot)?.let {
-        threadSnapshot.set(TransparentObserverMutableSnapshot(
-            currentGlobalSnapshot,
-            it.specifiedReadObserver,
-            it.specifiedWriteObserver
-        ))
+        threadSnapshot.set(
+            TransparentObserverMutableSnapshot(
+                currentGlobalSnapshot,
+                it.specifiedReadObserver,
+                it.specifiedWriteObserver
+            )
+        )
         it.dispose()
     }
     return result
@@ -1457,7 +1478,7 @@ private fun valid(currentSnapshot: Int, candidateSnapshot: Int, invalid: Snapsho
     //
     // INVALID_SNAPSHOT is reserved as an invalid snapshot id.
     return candidateSnapshot != INVALID_SNAPSHOT && candidateSnapshot <= currentSnapshot &&
-            !invalid.get(candidateSnapshot)
+        !invalid.get(candidateSnapshot)
 }
 
 // Determine if the given data is valid for the snapshot.
@@ -1501,8 +1522,10 @@ fun <T : StateRecord> T.readable(state: StateObject, snapshot: Snapshot): T {
 }
 
 private fun readError(): Nothing {
-    error("Reading a state that was created after the snapshot was taken or in a snapshot that " +
-            "has not yet been applied")
+    error(
+        "Reading a state that was created after the snapshot was taken or in a snapshot that " +
+            "has not yet been applied"
+    )
 }
 
 /**
@@ -1513,6 +1536,7 @@ private fun readError(): Nothing {
 private fun used(state: StateObject, id: Int, invalid: SnapshotIdSet): StateRecord? {
     var current: StateRecord? = state.firstStateRecord
     var validRecord: StateRecord? = null
+    val lowestOpen = invalid.lowest(id)
     while (current != null) {
         val currentId = current.snapshotId
         if (currentId == INVALID_SNAPSHOT) {
@@ -1520,7 +1544,7 @@ private fun used(state: StateObject, id: Int, invalid: SnapshotIdSet): StateReco
             // immediately.
             return current
         }
-        if (valid(current, id - 1, invalid)) {
+        if (valid(current, lowestOpen, invalid)) {
             if (validRecord == null) {
                 validRecord = current
             } else {
@@ -1548,7 +1572,16 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
 
     // Otherwise, make a copy of the readable data and mark it as born in this snapshot, making it
     // writable.
+    @OptIn(ExperimentalComposeApi::class)
+    val newData = newWritableRecord(state, snapshot)
 
+    snapshot.recordModified(state)
+
+    return newData
+}
+
+@ExperimentalComposeApi
+internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot: Snapshot): T {
     // Calling used() on a state object might return the same record for each thread calling
     // used() therefore selecting the record to reuse should be guarded.
 
@@ -1561,18 +1594,15 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
     // cache the result of readable() as the mutating thread calls to writable() can change the
     // result of readable().
     @Suppress("UNCHECKED_CAST")
-    val newData = (used(state, id, openSnapshots) as T?)?.apply {
+    val newData = (used(state, snapshot.id, openSnapshots) as T?)?.apply {
         snapshotId = Int.MAX_VALUE
-    } ?: readData.create().apply {
+    } ?: create().apply {
         snapshotId = Int.MAX_VALUE
         this.next = state.firstStateRecord
         state.prependStateRecord(this as T)
     } as T
-    newData.assign(readData)
-    newData.snapshotId = id
-
-    snapshot.recordModified(state)
-
+    newData.assign(this)
+    newData.snapshotId = snapshot.id
     return newData
 }
 
@@ -1646,9 +1676,11 @@ private fun optimisticMerges(
                 ?: readError()
             val merged = state.mergeRecords(previous, current, applied)
             if (merged != null) {
-                (result ?: hashMapOf<StateRecord, StateRecord>().also {
-                    result = it
-                })[current] = merged
+                (
+                    result ?: hashMapOf<StateRecord, StateRecord>().also {
+                        result = it
+                    }
+                    )[current] = merged
             } else {
                 // If one fails don't bother calculating the others as they are likely not going
                 // to be used. There is an unlikely case that a optimistic merge cannot be

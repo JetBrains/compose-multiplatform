@@ -69,8 +69,7 @@ internal class DesktopSelectionManager(private val selectionRegistrar: DesktopSe
     ): Selection? {
 
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
-            .fold(null) { mergedSelection: Selection?,
-                          handler: Selectable ->
+            .fold(null) { mergedSelection: Selection?, handler: Selectable ->
                 merge(
                     mergedSelection,
                     handler.getSelection(

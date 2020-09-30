@@ -129,7 +129,8 @@ class KeyframeAnimationTest {
                 v2 = lerp(300f, 400f, easing((time - 200) / 200f))
             }
             assertEquals(
-                AnimationVector(v1, v2), animation.getValue(
+                AnimationVector(v1, v2),
+                animation.getValue(
                     time.toLong(), start, end,
                     AnimationVector(0f, 0f)
                 )

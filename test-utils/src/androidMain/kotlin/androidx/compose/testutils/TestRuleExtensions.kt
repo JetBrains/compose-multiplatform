@@ -24,20 +24,20 @@ import androidx.ui.test.AndroidComposeTestRule
  * [ComposeTestCaseSetup].
  */
 fun <T : ComponentActivity> AndroidComposeTestRule<T>.forGivenTestCase(testCase: ComposeTestCase):
-        ComposeTestCaseSetup {
-    fun getActivity(): T {
-        var activity: T? = null
-        if (activity == null) {
-            activityRule.scenario.onActivity { activity = it }
+    ComposeTestCaseSetup {
+        fun getActivity(): T {
+            var activity: T? = null
             if (activity == null) {
-                throw IllegalStateException("Activity was not set in the ActivityScenarioRule!")
+                activityRule.scenario.onActivity { activity = it }
+                if (activity == null) {
+                    throw IllegalStateException("Activity was not set in the ActivityScenarioRule!")
+                }
             }
+            return activity!!
         }
-        return activity!!
-    }
 
-    return AndroidComposeTestCaseSetup(
-        testCase,
-        getActivity()
-    )
-}
+        return AndroidComposeTestCaseSetup(
+            testCase,
+            getActivity()
+        )
+    }

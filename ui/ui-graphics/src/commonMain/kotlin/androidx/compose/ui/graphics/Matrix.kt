@@ -129,7 +129,7 @@ inline class Matrix(
             |${this[1, 0]} ${this[1, 1]} ${this[1, 2]} ${this[1, 3]}|
             |${this[2, 0]} ${this[2, 1]} ${this[2, 2]} ${this[2, 3]}|
             |${this[3, 0]} ${this[3, 1]} ${this[3, 2]} ${this[3, 3]}|
-            """.trimIndent()
+        """.trimIndent()
     }
 
     /**
@@ -336,21 +336,21 @@ inline class Matrix(
     /** Translate this matrix by [x], [y], [z] */
     fun translate(x: Float = 0f, y: Float = 0f, z: Float = 0f) {
         val t1 = this[0, 0] * x +
-                this[1, 0] * y +
-                this[2, 0] * z +
-                this[3, 0]
+            this[1, 0] * y +
+            this[2, 0] * z +
+            this[3, 0]
         val t2 = this[0, 1] * x +
-                this[1, 1] * y +
-                this[2, 1] * z +
-                this[3, 1]
+            this[1, 1] * y +
+            this[2, 1] * z +
+            this[3, 1]
         val t3 = this[0, 2] * x +
-                this[1, 2] * y +
-                this[2, 2] * z +
-                this[3, 2]
+            this[1, 2] * y +
+            this[2, 2] * z +
+            this[3, 2]
         val t4 = this[0, 3] * x +
-                this[1, 3] * y +
-                this[2, 3] * z +
-                this[3, 3]
+            this[1, 3] * y +
+            this[2, 3] * z +
+            this[3, 3]
         this[3, 0] = t1
         this[3, 1] = t2
         this[3, 2] = t3
@@ -360,9 +360,9 @@ inline class Matrix(
 
 private fun dot(m1: Matrix, row: Int, m2: Matrix, column: Int): Float {
     return m1[row, 0] * m2[0, column] +
-            m1[row, 1] * m2[1, column] +
-            m1[row, 2] * m2[2, column] +
-            m1[row, 3] * m2[3, column]
+        m1[row, 1] * m2[1, column] +
+        m1[row, 2] * m2[2, column] +
+        m1[row, 3] * m2[3, column]
 }
 
 /** Whether the given matrix is the identity matrix. */

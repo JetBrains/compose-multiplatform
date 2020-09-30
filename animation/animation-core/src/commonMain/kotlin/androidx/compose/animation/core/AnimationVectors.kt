@@ -307,10 +307,10 @@ class AnimationVector4D(v1: Float, v2: Float, v3: Float, v4: Float) : AnimationV
 
     override fun equals(other: Any?): Boolean =
         other is AnimationVector4D &&
-                other.v1 == v1 &&
-                other.v2 == v2 &&
-                other.v3 == v3 &&
-                other.v4 == v4
+            other.v1 == v1 &&
+            other.v2 == v2 &&
+            other.v3 == v3 &&
+            other.v4 == v4
 
     override fun hashCode(): Int = identityHashCode()
 }

@@ -18,7 +18,7 @@ package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
@@ -26,7 +26,7 @@ import androidx.compose.ui.zIndex
 @Sampled
 @Composable
 fun ZIndexModifierSample() {
-    Stack {
+    Box {
         Text("Drawn second", Modifier.zIndex(1f))
         Text("Drawn first")
     }

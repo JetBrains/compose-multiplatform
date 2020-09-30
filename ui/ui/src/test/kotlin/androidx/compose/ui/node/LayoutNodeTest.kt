@@ -866,27 +866,30 @@ class LayoutNodeTest {
         // Assert.
 
         when (numberOfChildrenHit) {
-            3 -> assertThat(hit)
-                .isEqualTo(
-                    listOf(
-                        parentPointerInputFilter,
-                        middlePointerInputFilter,
-                        childPointerInputFilter
+            3 ->
+                assertThat(hit)
+                    .isEqualTo(
+                        listOf(
+                            parentPointerInputFilter,
+                            middlePointerInputFilter,
+                            childPointerInputFilter
+                        )
                     )
-                )
-            2 -> assertThat(hit)
-                .isEqualTo(
-                    listOf(
-                        parentPointerInputFilter,
-                        middlePointerInputFilter
+            2 ->
+                assertThat(hit)
+                    .isEqualTo(
+                        listOf(
+                            parentPointerInputFilter,
+                            middlePointerInputFilter
+                        )
                     )
-                )
-            1 -> assertThat(hit)
-                .isEqualTo(
-                    listOf(
-                        parentPointerInputFilter
+            1 ->
+                assertThat(hit)
+                    .isEqualTo(
+                        listOf(
+                            parentPointerInputFilter
+                        )
                     )
-                )
             else -> throw IllegalStateException()
         }
     }
@@ -1574,7 +1577,8 @@ class LayoutNodeTest {
             attach(MockOwner())
         }
         parent.insertAt(
-            0, LayoutNode(
+            0,
+            LayoutNode(
                 0, 0, 2, 2,
                 PointerInputModifierImpl(
                     pointerInputFilter1
@@ -1582,7 +1586,8 @@ class LayoutNodeTest {
             )
         )
         parent.insertAt(
-            1, LayoutNode(
+            1,
+            LayoutNode(
                 0, 0, 2, 2,
                 PointerInputModifierImpl(
                     pointerInputFilter2
@@ -1627,9 +1632,11 @@ class LayoutNodeTest {
     @Test
     fun updatingModifierToTheEmptyOneClearsReferenceToThePreviousModifier() {
         val root = LayoutNode()
-        root.attach(mock {
-            on { createLayer(anyOrNull(), anyOrNull(), anyOrNull()) } doReturn mock()
-        })
+        root.attach(
+            mock {
+                on { createLayer(anyOrNull(), anyOrNull(), anyOrNull()) } doReturn mock()
+            }
+        )
 
         root.modifier = Modifier.drawLayer()
 
@@ -1717,6 +1724,14 @@ private class MockOwner(
     }
 
     override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
+        block()
+    }
+
+    override fun <T : OwnerScope> observeReads(
+        target: T,
+        onChanged: (T) -> Unit,
+        block: () -> Unit
+    ) {
         block()
     }
 

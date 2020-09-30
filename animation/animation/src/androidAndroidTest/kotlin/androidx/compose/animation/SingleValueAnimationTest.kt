@@ -23,7 +23,7 @@ import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -293,7 +293,8 @@ class SingleValueAnimationTest {
         var value = Color.Black
         val children: @Composable() (Boolean) -> Unit = { enabled ->
             value = animate(
-                if (enabled) Color.Cyan else Color.Black, TweenSpec(
+                if (enabled) Color.Cyan else Color.Black,
+                TweenSpec(
                     durationMillis = 100,
                     easing = FastOutLinearInEasing
                 )

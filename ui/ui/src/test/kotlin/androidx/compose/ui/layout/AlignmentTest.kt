@@ -166,8 +166,8 @@ class AlignmentTest {
     @Test
     fun testAlign_start() {
         assertEquals(
-                0,
-        Alignment.Start.align(space1D)
+            0,
+            Alignment.Start.align(space1D)
         )
         assertEquals(
             100,

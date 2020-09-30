@@ -16,10 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.LastBaseline
@@ -128,6 +130,10 @@ import kotlin.math.roundToInt
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
  * keyboard
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this TextField. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this TextField in different [Interaction]s.
  * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
  * in focus
  * @param inactiveColor the color of either the input text or placeholder when the text field is in
@@ -153,6 +159,7 @@ fun TextField(
     imeAction: ImeAction = ImeAction.Unspecified,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
+    interactionState: InteractionState = remember { InteractionState() },
     activeColor: Color = MaterialTheme.colors.primary,
     inactiveColor: Color = MaterialTheme.colors.onSurface,
     errorColor: Color = MaterialTheme.colors.error,
@@ -191,6 +198,7 @@ fun TextField(
         imeAction = imeAction,
         onImeActionPerformed = onImeActionPerformed,
         onTextInputStarted = onTextInputStarted,
+        interactionState = interactionState,
         activeColor = activeColor,
         inactiveColor = inactiveColor,
         errorColor = errorColor,
@@ -247,6 +255,10 @@ fun TextField(
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
  * keyboard
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this TextField. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this TextField in different [Interaction]s.
  * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
  * in focus
  * @param inactiveColor the color of either the input text or placeholder when the text field is in
@@ -272,6 +284,7 @@ fun TextField(
     imeAction: ImeAction = ImeAction.Unspecified,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
+    interactionState: InteractionState = remember { InteractionState() },
     activeColor: Color = MaterialTheme.colors.primary,
     inactiveColor: Color = MaterialTheme.colors.onSurface,
     errorColor: Color = MaterialTheme.colors.error,
@@ -295,6 +308,7 @@ fun TextField(
         imeAction = imeAction,
         onImeActionPerformed = onImeActionPerformed,
         onTextInputStarted = onTextInputStarted,
+        interactionState = interactionState,
         activeColor = activeColor,
         inactiveColor = inactiveColor,
         errorColor = errorColor,
@@ -386,9 +400,8 @@ private fun IconsWithTextFieldLayout(
                         .iconPadding(
                             start = TextFieldPadding,
                             end = TextFieldPadding
-                        ),
-                    children = label
-                )
+                        )
+                ) { label() }
             }
             textField(Modifier.layoutId(TextFieldId).then(padding))
         },

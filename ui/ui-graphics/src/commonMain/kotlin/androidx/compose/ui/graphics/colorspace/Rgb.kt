@@ -263,13 +263,19 @@ internal constructor(
 
     init {
         if (primaries.size != 6 && primaries.size != 9) {
-            throw IllegalArgumentException(("The color space's primaries must be " +
-                    "defined as an array of 6 floats in xyY or 9 floats in XYZ"))
+            throw IllegalArgumentException(
+                (
+                    "The color space's primaries must be " +
+                        "defined as an array of 6 floats in xyY or 9 floats in XYZ"
+                    )
+            )
         }
 
         if (min >= max) {
-            throw IllegalArgumentException("Invalid range: min=$min, max=$max; min must " +
-                    "be strictly < max")
+            throw IllegalArgumentException(
+                "Invalid range: min=$min, max=$max; min must " +
+                    "be strictly < max"
+            )
         }
         this.primaries = xyPrimaries(primaries)
 
@@ -277,8 +283,12 @@ internal constructor(
             this.transform = computeXYZMatrix(this.primaries, this.whitePoint)
         } else {
             if (transform.size != 9) {
-                throw IllegalArgumentException(("Transform must have 9 entries! Has " +
-                        "${transform.size}"))
+                throw IllegalArgumentException(
+                    (
+                        "Transform must have 9 entries! Has " +
+                            "${transform.size}"
+                        )
+                )
             }
             this.transform = transform
         }
@@ -518,7 +528,8 @@ internal constructor(
         whitePoint: WhitePoint,
         function: TransferParameters,
         @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
-    ) : this(name, primaries, whitePoint, null,
+    ) : this(
+        name, primaries, whitePoint, null,
         if (function.e == 0.0 && function.f == 0.0) { x ->
             rcpResponse(
                 x,
@@ -575,8 +586,10 @@ internal constructor(
         @Size(min = 1) name: String,
         @Size(9) toXYZ: FloatArray,
         gamma: Double
-    ) : this(name, computePrimaries(toXYZ), computeWhitePoint(toXYZ), gamma, 0.0f, 1.0f,
-        -1 /*MinId*/)
+    ) : this(
+        name, computePrimaries(toXYZ), computeWhitePoint(toXYZ), gamma, 0.0f, 1.0f,
+        -1 /*MinId*/
+    )
 
     /**
      * Creates a new RGB color space using a specified set of primaries
@@ -898,8 +911,10 @@ internal constructor(
         result = 31 * result + primaries.contentHashCode()
         result = 31 * result + (if (min != +0.0f) min.toBits() else 0)
         result = 31 * result + (if (max != +0.0f) max.toBits() else 0)
-        result = (31 * result +
-                if (transferParameters != null) transferParameters.hashCode() else 0)
+        result = (
+            31 * result +
+                if (transferParameters != null) transferParameters.hashCode() else 0
+            )
         if (transferParameters == null) {
             result = 31 * result + oetfOrig.hashCode()
             result = 31 * result + eotfOrig.hashCode()
@@ -1001,12 +1016,18 @@ internal constructor(
             min: Float,
             max: Float
         ): Boolean {
-            return (((area(primaries) / area(
-                ColorSpaces.Ntsc1953Primaries
-            ) > 0.9f && contains(
-                primaries,
-                ColorSpaces.SrgbPrimaries
-            ))) || (min < 0.0f && max > 1.0f))
+            return (
+                (
+                    (
+                        area(primaries) / area(
+                            ColorSpaces.Ntsc1953Primaries
+                        ) > 0.9f && contains(
+                            primaries,
+                            ColorSpaces.SrgbPrimaries
+                        )
+                        )
+                    ) || (min < 0.0f && max > 1.0f)
+                )
         }
 
         /**
@@ -1112,48 +1133,56 @@ internal constructor(
                 p1[4] - p2[4], p1[5] - p2[5]
             )
             // Check the first vertex of p1
-            if ((cross(
-                    p0[0],
-                    p0[1],
-                    p2[0] - p2[4],
-                    p2[1] - p2[5]
-                ) < 0 ||
-                        cross(
-                            p2[0] - p2[2],
-                            p2[1] - p2[3],
-                            p0[0],
-                            p0[1]
-                        ) < 0)) {
+            if ((
+                cross(
+                        p0[0],
+                        p0[1],
+                        p2[0] - p2[4],
+                        p2[1] - p2[5]
+                    ) < 0 ||
+                    cross(
+                        p2[0] - p2[2],
+                        p2[1] - p2[3],
+                        p0[0],
+                        p0[1]
+                    ) < 0
+                )
+            ) {
                 return false
             }
             // Check the second vertex of p1
-            if ((cross(
-                    p0[2],
-                    p0[3],
-                    p2[2] - p2[0],
-                    p2[3] - p2[1]
-                ) < 0 ||
-                        cross(
-                            p2[2] - p2[4],
-                            p2[3] - p2[5],
-                            p0[2],
-                            p0[3]
-                        ) < 0)) {
+            if ((
+                cross(
+                        p0[2],
+                        p0[3],
+                        p2[2] - p2[0],
+                        p2[3] - p2[1]
+                    ) < 0 ||
+                    cross(
+                        p2[2] - p2[4],
+                        p2[3] - p2[5],
+                        p0[2],
+                        p0[3]
+                    ) < 0
+                )
+            ) {
                 return false
             }
             // Check the third vertex of p1
-            return !(cross(
-                p0[4],
-                p0[5],
-                p2[4] - p2[2],
-                p2[5] - p2[3]
-            ) < 0 ||
+            return !(
+                cross(
+                    p0[4],
+                    p0[5],
+                    p2[4] - p2[2],
+                    p2[5] - p2[3]
+                ) < 0 ||
                     cross(
-                        p2[4] - p2[0],
-                        p2[5] - p2[1],
-                        p0[4],
-                        p0[5]
-                    ) < 0)
+                    p2[4] - p2[0],
+                    p2[5] - p2[1],
+                    p0[4],
+                    p0[5]
+                ) < 0
+                )
         }
 
         /**

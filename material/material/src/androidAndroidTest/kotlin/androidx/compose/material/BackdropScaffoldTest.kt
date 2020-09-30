@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.animation.core.ManualAnimationClock
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize

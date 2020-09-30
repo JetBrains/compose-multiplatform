@@ -315,8 +315,10 @@ class ColorSpaceTest {
             }
         }
 
-        val cs = Rgb("Almost sRGB", SRGB_TO_XYZ,
-            { x -> x.pow(1.0 / 2.2) }, { x -> x.pow(2.2) })
+        val cs = Rgb(
+            "Almost sRGB", SRGB_TO_XYZ,
+            { x -> x.pow(1.0 / 2.2) }, { x -> x.pow(2.2) }
+        )
         assertFalse(cs.isSrgb)
     }
 

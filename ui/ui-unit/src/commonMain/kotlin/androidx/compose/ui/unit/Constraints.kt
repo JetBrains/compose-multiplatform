@@ -116,7 +116,7 @@ inline class Constraints(
         }
 
     /**
-     * Whether or not the upper bound on the maximum width.
+     * `false` when [maxWidth] is [Infinity] and `true` if [maxWidth] is a non-[Infinity] value.
      * @see hasBoundedHeight
      */
     val hasBoundedWidth: Boolean
@@ -126,7 +126,7 @@ inline class Constraints(
         }
 
     /**
-     * Whether or not the upper bound on the maximum height.
+     * `false` when [maxHeight] is [Infinity] and `true` if [maxWidth] is a non-[Infinity] value.
      * @see hasBoundedWidth
      */
     val hasBoundedHeight: Boolean
@@ -167,7 +167,7 @@ inline class Constraints(
         val maxHeight = maxHeight
         val maxHeightStr = if (maxHeight == Infinity) "Infinity" else maxHeight.toString()
         return "Constraints(minWidth = $minWidth, maxWidth = $maxWidthStr, " +
-                "minHeight = $minHeight, maxHeight = $maxHeightStr)"
+            "minHeight = $minHeight, maxHeight = $maxHeightStr)"
     }
 
     companion object {
@@ -356,7 +356,7 @@ inline class Constraints(
             if (widthBits + heightBits > 31) {
                 throw IllegalArgumentException(
                     "Can't represent a width of $widthVal and height " +
-                            "of $heightVal in Constraints"
+                        "of $heightVal in Constraints"
                 )
             }
 
@@ -375,10 +375,10 @@ inline class Constraints(
             val maxHeightOffset = minHeightOffset + 31
 
             val value = focus or
-                    (minWidth.toLong() shl 2) or
-                    (maxWidthValue.toLong() shl 33) or
-                    (minHeight.toLong() shl minHeightOffset) or
-                    (maxHeightValue.toLong() shl maxHeightOffset)
+                (minWidth.toLong() shl 2) or
+                (maxWidthValue.toLong() shl 33) or
+                (minHeight.toLong() shl minHeightOffset) or
+                (maxHeightValue.toLong() shl maxHeightOffset)
             return Constraints(value)
         }
 
@@ -390,7 +390,7 @@ inline class Constraints(
                 size < MaxFocusMask -> MaxFocusBits
                 else -> throw IllegalArgumentException(
                     "Can't represent a size of $size in " +
-                            "Constraints"
+                        "Constraints"
                 )
             }
         }

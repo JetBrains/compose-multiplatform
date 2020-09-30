@@ -17,7 +17,7 @@
 package androidx.ui.integration.test.core
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.preferredSize
@@ -64,9 +64,11 @@ private fun Outline.offset(size: Float): Outline {
     return when (this) {
         is Outline.Rectangle -> Outline.Rectangle(rect.translate(offset))
         is Outline.Rounded -> Outline.Rounded(roundRect.translate(offset))
-        is Outline.Generic -> Outline.Generic(Path().apply {
-            addPath(path)
-            translate(offset)
-        })
+        is Outline.Generic -> Outline.Generic(
+            Path().apply {
+                addPath(path)
+                translate(offset)
+            }
+        )
     }
 }

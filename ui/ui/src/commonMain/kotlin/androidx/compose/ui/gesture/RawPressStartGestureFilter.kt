@@ -75,27 +75,27 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
         bounds: IntSize
     ): List<PointerInputChange> {
 
-            var internalChanges = changes
+        var internalChanges = changes
 
-            if (pass == executionPass) {
-                if (enabled && internalChanges.all { it.changedToDown() }) {
-                    // If we have not yet started and all of the changes changed to down, we are
-                    // starting.
-                    active = true
-                    onPressStart(internalChanges.first().current.position!!)
-                } else if (internalChanges.all { it.changedToUp() }) {
-                    // If we have started and all of the changes changed to up, we are stopping.
-                    active = false
-                }
-
-                if (active) {
-                    // If we have started, we should consume the down change on all changes.
-                    internalChanges = internalChanges.map { it.consumeDownChange() }
-                }
+        if (pass == executionPass) {
+            if (enabled && internalChanges.all { it.changedToDown() }) {
+                // If we have not yet started and all of the changes changed to down, we are
+                // starting.
+                active = true
+                onPressStart(internalChanges.first().current.position!!)
+            } else if (internalChanges.all { it.changedToUp() }) {
+                // If we have started and all of the changes changed to up, we are stopping.
+                active = false
             }
 
-            return internalChanges
+            if (active) {
+                // If we have started, we should consume the down change on all changes.
+                internalChanges = internalChanges.map { it.consumeDownChange() }
+            }
         }
+
+        return internalChanges
+    }
 
     override fun onCancel() {
         active = false

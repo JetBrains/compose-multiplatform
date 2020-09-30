@@ -134,12 +134,35 @@ inline fun DrawScope.translate(
  *  @param block lambda that is called to issue drawing commands within the rotated
  *  coordinate space
  */
+@Deprecated("Use rotate(degrees, Offset(pivotX, pivotY)) instead",
+    ReplaceWith(
+        "rotate(degrees, Offset(pivotX, pivotY))",
+        "androidx.compose.ui.graphics.drawscope"
+    )
+)
 inline fun DrawScope.rotate(
     degrees: Float,
     pivotX: Float = center.x,
     pivotY: Float = center.y,
     block: DrawScope.() -> Unit
-) = withTransform({ rotate(degrees, pivotX, pivotY) }, block)
+) = withTransform({ rotate(degrees, Offset(pivotX, pivotY)) }, block)
+
+/**
+ *  Add a rotation (in degrees clockwise) to the current transform at the given pivot point.
+ *  The pivot coordinate remains unchanged by the rotation transformation. After the provided
+ *  lambda is invoked, the rotation transformation is undone.
+ *
+ *  @param degrees to rotate clockwise
+ *  @param pivot The coordinate for the pivot point, defaults to the center of the
+ *  coordinate space
+ *  @param block lambda that is called to issue drawing commands within the rotated
+ *  coordinate space
+ */
+inline fun DrawScope.rotate(
+    degrees: Float,
+    pivot: Offset = center,
+    block: DrawScope.() -> Unit
+) = withTransform({ rotate(degrees, pivot) }, block)
 
 /**
  * Add a rotation (in radians clockwise) to the current transform at the given pivot point.
@@ -159,7 +182,7 @@ inline fun DrawScope.rotateRad(
     pivotY: Float = center.y,
     block: DrawScope.() -> Unit
 ) {
-    withTransform({ rotate(degrees(radians), pivotX, pivotY) }, block)
+    withTransform({ rotate(degrees(radians), Offset(pivotX, pivotY)) }, block)
 }
 
 /**
@@ -179,13 +202,56 @@ inline fun DrawScope.rotateRad(
  * coordinate space vertically
  * @param block lambda used to issue drawing commands within the scaled coordinate space
  */
+@Deprecated("Use scale(scaleX, scaleY, Offset(pivotX, pivotY))",
+    ReplaceWith(
+        "scale(scaleX, scaleY, Offset(pivotX, pivotY))",
+        "androidx.compose.ui.graphics.drawscope"
+    )
+)
 inline fun DrawScope.scale(
     scaleX: Float,
     scaleY: Float = scaleX,
     pivotX: Float = center.x,
     pivotY: Float = center.y,
     block: DrawScope.() -> Unit
-) = withTransform({ scale(scaleX, scaleY, pivotX, pivotY) }, block)
+) = withTransform({ scale(scaleX, scaleY, Offset(pivotX, pivotY)) }, block)
+
+/**
+ * Add an axis-aligned scale to the current transform, scaling by the first
+ * argument in the horizontal direction and the second in the vertical
+ * direction at the given pivot coordinate. The pivot coordinate remains
+ * unchanged by the scale transformation. After this method is invoked, the
+ * coordinate space is returned to the state before the scale was applied.
+ *
+ * @param scaleX The amount to scale in X
+ * @param scaleY The amount to scale in Y
+ * @param pivot The coordinate for the pivot point, defaults to the center of the
+ * coordinate space
+ * @param block lambda used to issue drawing commands within the scaled coordinate space
+ */
+inline fun DrawScope.scale(
+    scaleX: Float,
+    scaleY: Float,
+    pivot: Offset = center,
+    block: DrawScope.() -> Unit
+) = withTransform({ scale(scaleX, scaleY, pivot) }, block)
+
+/**
+ * Add an axis-aligned scale to the current transform, scaling both the horizontal direction and
+ * the vertical direction at the given pivot coordinate. The pivot coordinate remains
+ * unchanged by the scale transformation. After this method is invoked, the
+ * coordinate space is returned to the state before the scale was applied.
+ *
+ * @param scale The amount to scale uniformly in both directions
+ * @param pivot The coordinate for the pivot point, defaults to the center of the
+ * coordinate space
+ * @param block lambda used to issue drawing commands within the scaled coordinate space
+ */
+inline fun DrawScope.scale(
+    scale: Float,
+    pivot: Offset = center,
+    block: DrawScope.() -> Unit
+) = withTransform({ scale(scale, scale, pivot) }, block)
 
 /**
  * Reduces the clip region to the intersection of the current clip and the
@@ -268,16 +334,16 @@ inline fun DrawScope.withTransform(
     transformBlock: DrawTransform.() -> Unit,
     drawBlock: DrawScope.() -> Unit
 ) = canvas.let {
-        // Transformation can include inset calls which change the drawing area
-        // so cache the previous size before the transformation is done
-        // and reset it afterwards
-        val previousSize = size
-        it.save()
-        transformBlock(transform)
-        drawBlock()
-        it.restore()
-        setSize(previousSize)
-    }
+    // Transformation can include inset calls which change the drawing area
+    // so cache the previous size before the transformation is done
+    // and reset it afterwards
+    val previousSize = size
+    it.save()
+    transformBlock(transform)
+    drawBlock()
+    it.restore()
+    setSize(previousSize)
+}
 
 /**
  * Creates a scoped drawing environment with the provided [Canvas]. This provides a
@@ -333,19 +399,19 @@ abstract class DrawScope : Density {
             this@DrawScope.canvas.translate(left, top)
         }
 
-        override fun rotate(degrees: Float, pivotX: Float, pivotY: Float) {
+        override fun rotate(degrees: Float, pivot: Offset) {
             this@DrawScope.canvas.apply {
-                translate(pivotX, pivotY)
+                translate(pivot.x, pivot.y)
                 rotate(degrees)
-                translate(-pivotX, -pivotY)
+                translate(-pivot.x, -pivot.y)
             }
         }
 
-        override fun scale(scaleX: Float, scaleY: Float, pivotX: Float, pivotY: Float) {
+        override fun scale(scaleX: Float, scaleY: Float, pivot: Offset) {
             this@DrawScope.canvas.apply {
-                translate(pivotX, pivotY)
+                translate(pivot.x, pivot.y)
                 scale(scaleX, scaleY)
-                translate(-pivotX, -pivotY)
+                translate(-pivot.x, -pivot.y)
             }
         }
 
@@ -411,20 +477,20 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawLine(
-            start,
-            end,
-            configureStrokePaint(
-                brush,
-                strokeWidth,
-                Stroke.DefaultMiter,
-                cap,
-                StrokeJoin.Miter,
-                pathEffect,
-                alpha,
-                colorFilter,
-                blendMode
-            )
+        start,
+        end,
+        configureStrokePaint(
+            brush,
+            strokeWidth,
+            Stroke.DefaultMiter,
+            cap,
+            StrokeJoin.Miter,
+            pathEffect,
+            alpha,
+            colorFilter,
+            blendMode
         )
+    )
 
     /**
      * Draws a line between the given points using the given paint. The line is
@@ -452,20 +518,20 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawLine(
-            start,
-            end,
-            configureStrokePaint(
-                color,
-                strokeWidth,
-                Stroke.DefaultMiter,
-                cap,
-                StrokeJoin.Miter,
-                pathEffect,
-                alpha,
-                colorFilter,
-                blendMode
-            )
+        start,
+        end,
+        configureStrokePaint(
+            color,
+            strokeWidth,
+            Stroke.DefaultMiter,
+            cap,
+            StrokeJoin.Miter,
+            pathEffect,
+            alpha,
+            colorFilter,
+            blendMode
         )
+    )
 
     /**
      * Draws a rectangle with the given offset and size. If no offset from the top left is provided,
@@ -490,12 +556,12 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawRect(
-            left = topLeft.x,
-            top = topLeft.y,
-            right = topLeft.x + size.width,
-            bottom = topLeft.y + size.height,
-            paint = configurePaint(brush, style, alpha, colorFilter, blendMode)
-        )
+        left = topLeft.x,
+        top = topLeft.y,
+        right = topLeft.x + size.width,
+        bottom = topLeft.y + size.height,
+        paint = configurePaint(brush, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws a rectangle with the given offset and size. If no offset from the top left is provided,
@@ -520,12 +586,12 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawRect(
-            left = topLeft.x,
-            top = topLeft.y,
-            right = topLeft.x + size.width,
-            bottom = topLeft.y + size.height,
-            paint = configurePaint(color, style, alpha, colorFilter, blendMode)
-        )
+        left = topLeft.x,
+        top = topLeft.y,
+        right = topLeft.x + size.width,
+        bottom = topLeft.y + size.height,
+        paint = configurePaint(color, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws the given [ImageAsset] into the canvas with its top-left corner at the
@@ -547,10 +613,10 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawImage(
-            image,
-            topLeft,
-            configurePaint(null, style, alpha, colorFilter, blendMode)
-        )
+        image,
+        topLeft,
+        configurePaint(null, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws the subset of the given image described by the `src` argument into
@@ -585,13 +651,13 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawImageRect(
-            image,
-            srcOffset,
-            srcSize,
-            dstOffset,
-            dstSize,
-            configurePaint(null, style, alpha, colorFilter, blendMode)
-        )
+        image,
+        srcOffset,
+        srcSize,
+        dstOffset,
+        dstSize,
+        configurePaint(null, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws a rounded rectangle with the provided size, offset and radii for the x and y axis
@@ -618,14 +684,14 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawRoundRect(
-            topLeft.x,
-            topLeft.y,
-            topLeft.x + size.width,
-            topLeft.y + size.height,
-            radius.x,
-            radius.y,
-            configurePaint(brush, style, alpha, colorFilter, blendMode)
-        )
+        topLeft.x,
+        topLeft.y,
+        topLeft.x + size.width,
+        topLeft.y + size.height,
+        radius.x,
+        radius.y,
+        configurePaint(brush, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws a rounded rectangle with the given [Paint]. Whether the rectangle is
@@ -651,14 +717,14 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawRoundRect(
-            topLeft.x,
-            topLeft.y,
-            topLeft.x + size.width,
-            topLeft.y + size.height,
-            radius.x,
-            radius.y,
-            configurePaint(color, style, alpha, colorFilter, blendMode)
-        )
+        topLeft.x,
+        topLeft.y,
+        topLeft.x + size.width,
+        topLeft.y + size.height,
+        radius.x,
+        radius.y,
+        configurePaint(color, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws a circle at the provided center coordinate and radius. If no center point is provided
@@ -682,10 +748,10 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawCircle(
-            center,
-            radius,
-            configurePaint(brush, style, alpha, colorFilter, blendMode)
-        )
+        center,
+        radius,
+        configurePaint(brush, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws a circle at the provided center coordinate and radius. If no center point is provided
@@ -709,10 +775,10 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawCircle(
-            center,
-            radius,
-            configurePaint(color, style, alpha, colorFilter, blendMode)
-        )
+        center,
+        radius,
+        configurePaint(color, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws an oval with the given offset and size. If no offset from the top left is provided,
@@ -737,12 +803,12 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawOval(
-            left = topLeft.x,
-            top = topLeft.y,
-            right = topLeft.x + size.width,
-            bottom = topLeft.y + size.height,
-            paint = configurePaint(brush, style, alpha, colorFilter, blendMode)
-        )
+        left = topLeft.x,
+        top = topLeft.y,
+        right = topLeft.x + size.width,
+        bottom = topLeft.y + size.height,
+        paint = configurePaint(brush, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draws an oval with the given offset and size. If no offset from the top left is provided,
@@ -767,12 +833,12 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawOval(
-            left = topLeft.x,
-            top = topLeft.y,
-            right = topLeft.x + size.width,
-            bottom = topLeft.y + size.height,
-            paint = configurePaint(color, style, alpha, colorFilter, blendMode)
-        )
+        left = topLeft.x,
+        top = topLeft.y,
+        right = topLeft.x + size.width,
+        bottom = topLeft.y + size.height,
+        paint = configurePaint(color, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draw an arc scaled to fit inside the given rectangle. It starts from
@@ -808,15 +874,15 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawArc(
-            left = topLeft.x,
-            top = topLeft.y,
-            right = topLeft.x + size.width,
-            bottom = topLeft.y + size.height,
-            startAngle = startAngle,
-            sweepAngle = sweepAngle,
-            useCenter = useCenter,
-            paint = configurePaint(brush, style, alpha, colorFilter, blendMode)
-        )
+        left = topLeft.x,
+        top = topLeft.y,
+        right = topLeft.x + size.width,
+        bottom = topLeft.y + size.height,
+        startAngle = startAngle,
+        sweepAngle = sweepAngle,
+        useCenter = useCenter,
+        paint = configurePaint(brush, style, alpha, colorFilter, blendMode)
+    )
 
     /**
      * Draw an arc scaled to fit inside the given rectangle. It starts from
@@ -934,20 +1000,20 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     ) = canvas.drawPoints(
-            pointMode,
-            points,
-            configureStrokePaint(
-                color,
-                strokeWidth,
-                Stroke.DefaultMiter,
-                cap,
-                StrokeJoin.Miter,
-                pathEffect,
-                alpha,
-                colorFilter,
-                blendMode
-            )
+        pointMode,
+        points,
+        configureStrokePaint(
+            color,
+            strokeWidth,
+            Stroke.DefaultMiter,
+            cap,
+            StrokeJoin.Miter,
+            pathEffect,
+            alpha,
+            colorFilter,
+            blendMode
         )
+    )
 
     /**
      * Draws a sequence of points according to the given [PointMode].
@@ -1057,18 +1123,19 @@ abstract class DrawScope : Density {
     private fun selectPaint(drawStyle: DrawStyle): Paint =
         when (drawStyle) {
             Fill -> obtainFillPaint()
-            is Stroke -> obtainStrokePaint()
-                .apply {
-                    with(drawStyle) {
-                        if (strokeWidth != width) strokeWidth = width
-                        if (strokeCap != cap) strokeCap = cap
-                        if (strokeMiterLimit != miter) strokeMiterLimit = miter
-                        if (strokeJoin != join) strokeJoin = join
+            is Stroke ->
+                obtainStrokePaint()
+                    .apply {
+                        with(drawStyle) {
+                            if (strokeWidth != width) strokeWidth = width
+                            if (strokeCap != cap) strokeCap = cap
+                            if (strokeMiterLimit != miter) strokeMiterLimit = miter
+                            if (strokeJoin != join) strokeJoin = join
 
-                        // TODO b/154550525 add PathEffect to Paint if necessary
-                        nativePathEffect = pathEffect
+                            // TODO b/154550525 add PathEffect to Paint if necessary
+                            nativePathEffect = pathEffect
+                        }
                     }
-                }
         }
 
     /**
@@ -1148,19 +1215,19 @@ abstract class DrawScope : Density {
         colorFilter: ColorFilter?,
         blendMode: BlendMode
     ) = obtainStrokePaint().apply {
-            if (brush != null) {
-                brush.applyTo(this, alpha)
-            } else if (this.alpha != alpha) {
-                this.alpha = alpha
-            }
-            if (this.colorFilter != colorFilter) this.colorFilter = colorFilter
-            if (this.blendMode != blendMode) this.blendMode = blendMode
-            if (this.strokeWidth != strokeWidth) this.strokeWidth = strokeWidth
-            if (this.strokeMiterLimit != miter) this.strokeMiterLimit = miter
-            if (this.strokeCap != cap) this.strokeCap = cap
-            if (this.strokeJoin != join) this.strokeJoin = join
-            this.nativePathEffect = pathEffect
+        if (brush != null) {
+            brush.applyTo(this, alpha)
+        } else if (this.alpha != alpha) {
+            this.alpha = alpha
         }
+        if (this.colorFilter != colorFilter) this.colorFilter = colorFilter
+        if (this.blendMode != blendMode) this.blendMode = blendMode
+        if (this.strokeWidth != strokeWidth) this.strokeWidth = strokeWidth
+        if (this.strokeMiterLimit != miter) this.strokeMiterLimit = miter
+        if (this.strokeCap != cap) this.strokeCap = cap
+        if (this.strokeJoin != join) this.strokeJoin = join
+        this.nativePathEffect = pathEffect
+    }
 
     /**
      * Returns a [Color] modulated with the given alpha value

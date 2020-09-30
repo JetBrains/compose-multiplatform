@@ -32,8 +32,8 @@ actual fun BlendMode.isSupported(): Boolean {
     // Otherwise we attempt to convert to the appropriate PorterDuff mode and we get
     // something other than PorterDuff.Mode.SRC_OVER (the default) then we support this BlendMode.
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ||
-            this == BlendMode.SrcOver ||
-            toPorterDuffMode() != android.graphics.PorterDuff.Mode.SRC_OVER
+        this == BlendMode.SrcOver ||
+        toPorterDuffMode() != android.graphics.PorterDuff.Mode.SRC_OVER
 }
 
 /**
@@ -71,33 +71,33 @@ internal fun BlendMode.toPorterDuffMode(): android.graphics.PorterDuff.Mode = wh
  */
 @RequiresApi(Build.VERSION_CODES.Q)
 internal fun BlendMode.toAndroidBlendMode(): android.graphics.BlendMode = when (this) {
-        BlendMode.Clear -> android.graphics.BlendMode.CLEAR
-        BlendMode.Src -> android.graphics.BlendMode.SRC
-        BlendMode.Dst -> android.graphics.BlendMode.DST
-        BlendMode.SrcOver -> android.graphics.BlendMode.SRC_OVER
-        BlendMode.DstOver -> android.graphics.BlendMode.DST_OVER
-        BlendMode.SrcIn -> android.graphics.BlendMode.SRC_IN
-        BlendMode.DstIn -> android.graphics.BlendMode.DST_IN
-        BlendMode.SrcOut -> android.graphics.BlendMode.SRC_OUT
-        BlendMode.DstOut -> android.graphics.BlendMode.DST_OUT
-        BlendMode.SrcAtop -> android.graphics.BlendMode.SRC_ATOP
-        BlendMode.DstAtop -> android.graphics.BlendMode.DST_ATOP
-        BlendMode.Xor -> android.graphics.BlendMode.XOR
-        BlendMode.Plus -> android.graphics.BlendMode.PLUS
-        BlendMode.Modulate -> android.graphics.BlendMode.MODULATE
-        BlendMode.Screen -> android.graphics.BlendMode.SCREEN
-        BlendMode.Overlay -> android.graphics.BlendMode.OVERLAY
-        BlendMode.Darken -> android.graphics.BlendMode.DARKEN
-        BlendMode.Lighten -> android.graphics.BlendMode.LIGHTEN
-        BlendMode.ColorDodge -> android.graphics.BlendMode.COLOR_DODGE
-        BlendMode.ColorBurn -> android.graphics.BlendMode.COLOR_BURN
-        BlendMode.Hardlight -> android.graphics.BlendMode.HARD_LIGHT
-        BlendMode.Softlight -> android.graphics.BlendMode.SOFT_LIGHT
-        BlendMode.Difference -> android.graphics.BlendMode.DIFFERENCE
-        BlendMode.Exclusion -> android.graphics.BlendMode.EXCLUSION
-        BlendMode.Multiply -> android.graphics.BlendMode.MULTIPLY
-        BlendMode.Hue -> android.graphics.BlendMode.HUE
-        BlendMode.Saturation -> android.graphics.BlendMode.SATURATION
-        BlendMode.Color -> android.graphics.BlendMode.COLOR
-        BlendMode.Luminosity -> android.graphics.BlendMode.LUMINOSITY
-    }
+    BlendMode.Clear -> android.graphics.BlendMode.CLEAR
+    BlendMode.Src -> android.graphics.BlendMode.SRC
+    BlendMode.Dst -> android.graphics.BlendMode.DST
+    BlendMode.SrcOver -> android.graphics.BlendMode.SRC_OVER
+    BlendMode.DstOver -> android.graphics.BlendMode.DST_OVER
+    BlendMode.SrcIn -> android.graphics.BlendMode.SRC_IN
+    BlendMode.DstIn -> android.graphics.BlendMode.DST_IN
+    BlendMode.SrcOut -> android.graphics.BlendMode.SRC_OUT
+    BlendMode.DstOut -> android.graphics.BlendMode.DST_OUT
+    BlendMode.SrcAtop -> android.graphics.BlendMode.SRC_ATOP
+    BlendMode.DstAtop -> android.graphics.BlendMode.DST_ATOP
+    BlendMode.Xor -> android.graphics.BlendMode.XOR
+    BlendMode.Plus -> android.graphics.BlendMode.PLUS
+    BlendMode.Modulate -> android.graphics.BlendMode.MODULATE
+    BlendMode.Screen -> android.graphics.BlendMode.SCREEN
+    BlendMode.Overlay -> android.graphics.BlendMode.OVERLAY
+    BlendMode.Darken -> android.graphics.BlendMode.DARKEN
+    BlendMode.Lighten -> android.graphics.BlendMode.LIGHTEN
+    BlendMode.ColorDodge -> android.graphics.BlendMode.COLOR_DODGE
+    BlendMode.ColorBurn -> android.graphics.BlendMode.COLOR_BURN
+    BlendMode.Hardlight -> android.graphics.BlendMode.HARD_LIGHT
+    BlendMode.Softlight -> android.graphics.BlendMode.SOFT_LIGHT
+    BlendMode.Difference -> android.graphics.BlendMode.DIFFERENCE
+    BlendMode.Exclusion -> android.graphics.BlendMode.EXCLUSION
+    BlendMode.Multiply -> android.graphics.BlendMode.MULTIPLY
+    BlendMode.Hue -> android.graphics.BlendMode.HUE
+    BlendMode.Saturation -> android.graphics.BlendMode.SATURATION
+    BlendMode.Color -> android.graphics.BlendMode.COLOR
+    BlendMode.Luminosity -> android.graphics.BlendMode.LUMINOSITY
+}

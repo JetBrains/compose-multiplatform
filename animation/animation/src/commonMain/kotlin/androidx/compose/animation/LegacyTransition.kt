@@ -59,11 +59,14 @@ import androidx.compose.ui.platform.AnimationClockAmbient
  *
  * @see [TransitionDefinition]
  */
-@Deprecated("Transition has been renamed to transition, which returns a TransitionState instead " +
+@Deprecated(
+    "Transition has been renamed to transition, which returns a TransitionState instead " +
         "of passing it to children",
     replaceWith = ReplaceWith(
         "transition(definition, toState, clock, initState, null, onStateChangeFinished)",
-        "androidx.compose.animation.transition"))
+        "androidx.compose.animation.transition"
+    )
+)
 @Composable
 fun <T> Transition(
     definition: TransitionDefinition<T>,

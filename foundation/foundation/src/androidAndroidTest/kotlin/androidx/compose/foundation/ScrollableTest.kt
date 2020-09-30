@@ -22,12 +22,13 @@ import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -497,9 +498,9 @@ class ScrollableTest {
         )
 
         rule.setContent {
-            Stack {
+            Box {
                 Box(
-                    gravity = ContentGravity.Center,
+                    alignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(scrollableBoxTag)
                         .preferredSize(300.dp)
@@ -541,7 +542,7 @@ class ScrollableTest {
 
     private fun setScrollableContent(scrollableModifierFactory: @Composable () -> Modifier) {
         rule.setContent {
-            Stack {
+            Box {
                 val scrollable = scrollableModifierFactory()
                 Box(
                     modifier = Modifier

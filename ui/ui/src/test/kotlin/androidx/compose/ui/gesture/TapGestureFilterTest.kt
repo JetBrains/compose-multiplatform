@@ -253,18 +253,24 @@ class TapGestureFilterTest {
     @Test
     fun pointerInputHandler_downDelayUpUpDelayUpReleased_pxPositionIsCorrect() {
         val down = down(890, 0.milliseconds, 123f, 456f)
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                890
-            )
-        ))
-        val up = down.up(1.milliseconds)
-        val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
                 PointerId(
                     890
                 )
-            ))
+            )
+        )
+        val up = down.up(1.milliseconds)
+        val delayUpNotConsumed =
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        890
+                    )
+                )
+            )
 
         filter::onPointerInput.invokeOverAllPasses(down)
         filter::onCustomEvent.invokeOverAllPasses(delayUp)
@@ -281,11 +287,14 @@ class TapGestureFilterTest {
         val moveA = downA.moveTo(1.milliseconds, 123f, 456f)
         val downB = down(1, 1.milliseconds, 321f, 654f)
 
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                0
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
+                PointerId(
+                    0
+                )
             )
-        ))
+        )
 
         val upA = moveA.up(2.milliseconds)
         val moveB = downB.moveTo(2.milliseconds, 321f, 654f)
@@ -311,20 +320,26 @@ class TapGestureFilterTest {
         val upA = moveA.up(2.milliseconds)
         val moveB = downB.moveTo(2.milliseconds, 321f, 654f)
 
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                1
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
+                PointerId(
+                    1
+                )
             )
-        ))
+        )
 
         val upB = moveB.up(3.milliseconds)
 
         val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
-                PointerId(
-                    1
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        1
+                    )
                 )
-            ))
+            )
 
         filter::onPointerInput.invokeOverAllPasses(downA)
         filter::onPointerInput.invokeOverAllPasses(moveA, downB)
@@ -470,11 +485,14 @@ class TapGestureFilterTest {
     @Test
     fun onPointerInput_downDelayUpUp_onTapNotCalled() {
         val down = down(0, 0.milliseconds)
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                0
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
+                PointerId(
+                    0
+                )
             )
-        ))
+        )
         val up = down.up(100.milliseconds)
         filter::onPointerInput.invokeOverAllPasses(down)
         filter::onCustomEvent.invokeOverAllPasses(delayUp)
@@ -487,18 +505,24 @@ class TapGestureFilterTest {
     @Test
     fun onPointerInput_downDelayUpUpDelayUpConsumed_onTapNotCalled() {
         val down = down(0, 0.milliseconds)
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                0
-            )
-        ))
-        val up = down.up(100.milliseconds)
-        val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpConsumed, setOf(
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
                 PointerId(
                     0
                 )
-            ))
+            )
+        )
+        val up = down.up(100.milliseconds)
+        val delayUpNotConsumed =
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpConsumed,
+                setOf(
+                    PointerId(
+                        0
+                    )
+                )
+            )
         filter::onPointerInput.invokeOverAllPasses(down)
         filter::onCustomEvent.invokeOverAllPasses(delayUp)
         filter::onPointerInput.invokeOverAllPasses(up)
@@ -511,18 +535,24 @@ class TapGestureFilterTest {
     @Test
     fun onPointerInput_downDelayUpUpDelayUpNotConsumed_onTapCalled() {
         val down = down(0, 0.milliseconds)
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                0
-            )
-        ))
-        val up = down.up(100.milliseconds)
-        val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
                 PointerId(
                     0
                 )
-            ))
+            )
+        )
+        val up = down.up(100.milliseconds)
+        val delayUpNotConsumed =
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        0
+                    )
+                )
+            )
         filter::onPointerInput.invokeOverAllPasses(down)
         filter::onCustomEvent.invokeOverAllPasses(delayUp)
         filter::onPointerInput.invokeOverAllPasses(up)
@@ -535,11 +565,14 @@ class TapGestureFilterTest {
     @Test
     fun onPointerInput_downDelayUpUp_upNotConsumed() {
         val down = down(0, 0.milliseconds)
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                0
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
+                PointerId(
+                    0
+                )
             )
-        ))
+        )
         val up = down.up(100.milliseconds)
         filter::onPointerInput.invokeOverAllPasses(down)
         filter::onCustomEvent.invokeOverAllPasses(delayUp)
@@ -552,18 +585,24 @@ class TapGestureFilterTest {
     @Test
     fun onPointerInput_downDelayUpUpDelayUpNotConsumed_messageChangedToConsumed() {
         val down = down(0, 0.milliseconds)
-        val delayUp = DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-            PointerId(
-                0
-            )
-        ))
-        val up = down.up(100.milliseconds)
-        val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
+        val delayUp = DelayUpEvent(
+            DelayUpMessage.DelayUp,
+            setOf(
                 PointerId(
                     0
                 )
-            ))
+            )
+        )
+        val up = down.up(100.milliseconds)
+        val delayUpNotConsumed =
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        0
+                    )
+                )
+            )
         filter::onPointerInput.invokeOverAllPasses(down)
         filter::onCustomEvent.invokeOverAllPasses(delayUp)
         filter::onPointerInput.invokeOverAllPasses(up)
@@ -587,21 +626,27 @@ class TapGestureFilterTest {
         val bDown = down(456, 1.milliseconds)
 
         val delayUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val aUp = aMove.up(2.milliseconds)
         val bMove = bDown.moveTo(2.milliseconds)
 
         val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         filter::onPointerInput.invokeOverAllPasses(aDown)
         filter::onPointerInput.invokeOverAllPasses(aMove, bDown)
@@ -624,21 +669,27 @@ class TapGestureFilterTest {
         val bDown = down(456, 1.milliseconds)
 
         val delayUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val aUp = aMove.up(2.milliseconds)
         val bMove = bDown.moveTo(2.milliseconds)
 
         val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val bUp = bMove.up(3.milliseconds)
 
@@ -665,11 +716,14 @@ class TapGestureFilterTest {
         val bDown = down(456, 1.milliseconds)
 
         val delayUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val aUp = aMove.up(2.milliseconds)
         val bMove = bDown.moveTo(2.milliseconds)
@@ -698,11 +752,14 @@ class TapGestureFilterTest {
         val bDown = down(456, 1.milliseconds)
 
         val delayUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val aUp = aMove.up(2.milliseconds)
         val bMove = bDown.moveTo(2.milliseconds)
@@ -710,11 +767,14 @@ class TapGestureFilterTest {
         val bUp = bMove.up(3.milliseconds)
 
         val delayUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         filter::onPointerInput.invokeOverAllPasses(aDown)
         filter::onPointerInput.invokeOverAllPasses(aMove, bDown)
@@ -742,11 +802,14 @@ class TapGestureFilterTest {
         val bMove = bDown.moveTo(2.milliseconds)
 
         val delayUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    456
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        456
+                    )
                 )
-            ))
+            )
 
         val bUp = bMove.up(3.milliseconds)
 
@@ -775,20 +838,26 @@ class TapGestureFilterTest {
         val bMove = bDown.moveTo(2.milliseconds)
 
         val delayBUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    456
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        456
+                    )
                 )
-            ))
+            )
 
         val bUp = bMove.up(3.milliseconds)
 
         val releaseBUp =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
-                PointerId(
-                    456
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        456
+                    )
                 )
-            ))
+            )
 
         filter::onPointerInput.invokeOverAllPasses(aDown)
         filter::onPointerInput.invokeOverAllPasses(aMove, bDown)
@@ -811,21 +880,27 @@ class TapGestureFilterTest {
         val bDown = down(456, 1.milliseconds)
 
         val delayAUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val aUp = aMove.up(2.milliseconds)
         val bMove = bDown.moveTo(2.milliseconds)
 
         val delayAUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         filter::onPointerInput.invokeOverAllPasses(aDown)
         filter::onPointerInput.invokeOverAllPasses(aMove, bDown)
@@ -847,21 +922,27 @@ class TapGestureFilterTest {
         val bDown = down(456, 1.milliseconds)
 
         val delayAUp =
-            DelayUpEvent(DelayUpMessage.DelayUp, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayUp,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val aUp = aMove.up(2.milliseconds)
         val bMove = bDown.moveTo(2.milliseconds)
 
         val delayAUpNotConsumed =
-            DelayUpEvent(DelayUpMessage.DelayedUpNotConsumed, setOf(
-                PointerId(
-                    123
+            DelayUpEvent(
+                DelayUpMessage.DelayedUpNotConsumed,
+                setOf(
+                    PointerId(
+                        123
+                    )
                 )
-            ))
+            )
 
         val bUp = bMove.up(3.milliseconds)
 

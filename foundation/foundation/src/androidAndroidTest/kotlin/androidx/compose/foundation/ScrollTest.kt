@@ -21,7 +21,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
@@ -535,7 +535,7 @@ class ScrollTest {
         )
         val itemCount = mutableStateOf(100)
         rule.setContent {
-            Stack {
+            Box {
                 ScrollableColumn(
                     scrollState = scrollState,
                     modifier = Modifier.preferredSize(100.dp).testTag(scrollerTag)
@@ -744,7 +744,7 @@ class ScrollTest {
         // We assume that the height of the device is more than 45 px
         with(rule.density) {
             rule.setContent {
-                Stack {
+                Box {
                     ScrollableColumn(
                         scrollState = scrollState,
                         reverseScrollDirection = isReversed,
@@ -754,8 +754,9 @@ class ScrollTest {
                     ) {
                         colors.forEach { color ->
                             Box(
-                                Modifier.preferredSize(width.toDp(), rowHeight.toDp()),
-                                backgroundColor = color
+                                Modifier
+                                    .preferredSize(width.toDp(), rowHeight.toDp())
+                                    .background(color)
                             )
                         }
                     }
@@ -780,7 +781,7 @@ class ScrollTest {
             rule.setContent {
                 val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                 Providers(LayoutDirectionAmbient provides direction) {
-                    Stack {
+                    Box {
                         ScrollableRow(
                             reverseScrollDirection = isReversed,
                             scrollState = scrollState,
@@ -790,8 +791,9 @@ class ScrollTest {
                         ) {
                             colors.forEach { color ->
                                 Box(
-                                    Modifier.preferredSize(defaultCellSize.toDp(), height.toDp()),
-                                    backgroundColor = color
+                                    Modifier
+                                        .preferredSize(defaultCellSize.toDp(), height.toDp())
+                                        .background(color)
                                 )
                             }
                         }
@@ -852,10 +854,9 @@ class ScrollTest {
                     Text(text = "$it")
                 }
             }
-            Stack {
+            Box {
                 Box(
-                    Modifier.preferredSize(width, height),
-                    backgroundColor = Color.White
+                    Modifier.preferredSize(width, height).background(Color.White)
                 ) {
                     if (isVertical) {
                         ScrollableColumn(

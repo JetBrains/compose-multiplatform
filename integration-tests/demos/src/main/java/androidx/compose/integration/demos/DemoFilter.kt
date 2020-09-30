@@ -57,7 +57,8 @@ fun DemoFilter(launchableDemos: List<Demo>, filterText: String, onNavigate: (Dem
         .sortedBy { it.title }
     ScrollableColumn {
         filteredDemos.forEach { demo ->
-            FilteredDemoListItem(demo,
+            FilteredDemoListItem(
+                demo,
                 filterText = filterText,
                 onNavigate = {
                     onNavigate(it)

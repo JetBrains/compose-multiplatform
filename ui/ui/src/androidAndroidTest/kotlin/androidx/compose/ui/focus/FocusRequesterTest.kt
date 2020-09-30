@@ -17,7 +17,7 @@
 package androidx.compose.ui.focus
 
 import android.view.View
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
@@ -233,13 +233,13 @@ class FocusRequesterTest {
             ) {
                 Box(
                     modifier = Modifier
-                    .focusObserver { focusState1 = it }
-                    .focus()
+                        .focusObserver { focusState1 = it }
+                        .focus()
                 )
                 Box(
                     modifier = Modifier
-                    .focusObserver { focusState2 = it }
-                    .focus()
+                        .focusObserver { focusState2 = it }
+                        .focus()
                 )
             }
         }

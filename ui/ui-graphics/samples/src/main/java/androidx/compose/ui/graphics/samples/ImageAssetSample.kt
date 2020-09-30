@@ -64,11 +64,13 @@ fun ImageAssetReadPixelsSample() {
     val imageAsset = createImageAsset()
 
     val buffer = IntArray(20 * 10)
-    imageAsset.readPixels(buffer = buffer,
+    imageAsset.readPixels(
+        buffer = buffer,
         startX = 8,
         startY = 9,
         width = 20,
-        height = 10)
+        height = 10
+    )
 
     val pixelmap = PixelMap(
         buffer = buffer,

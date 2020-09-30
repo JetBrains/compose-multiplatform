@@ -114,8 +114,8 @@ internal class MotionEventAdapter {
                     motionEventToComposePointerIdMap[motionEventPointerId]
             } ?: throw IllegalStateException(
                 "Compose assumes that all pointer ids in MotionEvents are first provided " +
-                        "alongside ACTION_DOWN or ACTION_POINTER_DOWN.  This appears not " +
-                        "to have been the case"
+                    "alongside ACTION_DOWN or ACTION_POINTER_DOWN.  This appears not " +
+                    "to have been the case"
             )
 
         return PointerInputEventData(

@@ -25,7 +25,7 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -61,7 +61,8 @@ private fun RippleRect() {
     }
     val state = transition(definition = rippleTransDef, toState = toState.value)
     RippleRectFromState(
-        Modifier.pressIndicatorGestureFilter(onStart = onPress, onStop = onRelease), state = state)
+        Modifier.pressIndicatorGestureFilter(onStart = onPress, onStop = onRelease), state = state
+    )
 }
 
 @Composable

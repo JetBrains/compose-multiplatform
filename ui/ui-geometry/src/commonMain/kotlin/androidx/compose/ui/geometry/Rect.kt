@@ -86,17 +86,17 @@ data class Rect(
     @Stable
     val isInfinite: Boolean
         get() = left >= Float.POSITIVE_INFINITY ||
-                top >= Float.POSITIVE_INFINITY ||
-                right >= Float.POSITIVE_INFINITY ||
-                bottom >= Float.POSITIVE_INFINITY
+            top >= Float.POSITIVE_INFINITY ||
+            right >= Float.POSITIVE_INFINITY ||
+            bottom >= Float.POSITIVE_INFINITY
 
     /** Whether all coordinates of this rectangle are finite. */
     @Stable
     val isFinite: Boolean
         get() = left.isFinite() &&
-                top.isFinite() &&
-                right.isFinite() &&
-                bottom.isFinite()
+            top.isFinite() &&
+            right.isFinite() &&
+            bottom.isFinite()
 
     /**
      * Whether this rectangle encloses a non-zero area. Negative areas are
@@ -197,32 +197,24 @@ data class Rect(
 
     /**
      * The offset to the intersection of the top and left edges of this rectangle.
-     *
-     * See also [Size.topLeft].
      */
     val topLeft: Offset
         get() = Offset(left, top)
 
     /**
      * The offset to the center of the top edge of this rectangle.
-     *
-     * See also [Size.topCenter].
      */
     val topCenter: Offset
         get() = Offset(left + width / 2.0f, top)
 
     /**
      * The offset to the intersection of the top and right edges of this rectangle.
-     *
-     * See also [Size.topRight].
      */
     val topRight: Offset
         get() = Offset(right, top)
 
     /**
      * The offset to the center of the left edge of this rectangle.
-     *
-     * See also [Size.centerLeft].
      */
     val centerLeft: Offset
         get() = Offset(left, top + height / 2.0f)
@@ -238,32 +230,24 @@ data class Rect(
 
     /**
      * The offset to the center of the right edge of this rectangle.
-     *
-     * See also [Size.centerLeft].
      */
     val centerRight: Offset
         get() = Offset(right, top + height / 2.0f)
 
     /**
      * The offset to the intersection of the bottom and left edges of this rectangle.
-     *
-     * See also [Size.bottomLeft].
      */
     val bottomLeft: Offset
         get() = Offset(left, bottom)
 
     /**
      * The offset to the center of the bottom edge of this rectangle.
-     *
-     * See also [Size.bottomLeft].
      */
     val bottomCenter: Offset
         get() { return Offset(left + width / 2.0f, bottom) }
 
     /**
      * The offset to the intersection of the bottom and right edges of this rectangle.
-     *
-     * See also [Size.bottomRight].
      */
     val bottomRight: Offset
         get() { return Offset(right, bottom) }
@@ -281,10 +265,10 @@ data class Rect(
     }
 
     override fun toString() = "Rect.fromLTRB(" +
-            "${left.toStringAsFixed(1)}, " +
-            "${top.toStringAsFixed(1)}, " +
-            "${right.toStringAsFixed(1)}, " +
-            "${bottom.toStringAsFixed(1)})"
+        "${left.toStringAsFixed(1)}, " +
+        "${top.toStringAsFixed(1)}, " +
+        "${right.toStringAsFixed(1)}, " +
+        "${bottom.toStringAsFixed(1)})"
 }
 
 /**

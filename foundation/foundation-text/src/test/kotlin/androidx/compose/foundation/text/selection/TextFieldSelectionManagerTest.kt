@@ -49,6 +49,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
 @SmallTest
 @RunWith(JUnit4::class)
@@ -106,8 +108,10 @@ class TextFieldSelectionManagerTest {
             beginOffset
         )
         whenever(state.layoutResult!!.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
-        whenever(state.layoutResult!!.getWordBoundary(beginOffset)).thenReturn(fakeTextRange)
-        whenever(state.layoutResult!!.getWordBoundary(dragOffset)).thenReturn(dragTextRange)
+        whenever(state.layoutResult!!.getWordBoundary(beginOffset))
+            .thenAnswer(TextRangeAnswer(fakeTextRange))
+        whenever(state.layoutResult!!.getWordBoundary(dragOffset))
+            .thenAnswer(TextRangeAnswer(dragTextRange))
         whenever(state.layoutResult!!.getBidiRunDirection(any()))
             .thenReturn(ResolvedTextDirection.Ltr)
         whenever(state.layoutResult!!.getBoundingBox(any())).thenReturn(Rect.Zero)
@@ -285,6 +289,20 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
+    fun copy_selection_reversed() {
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange("Hello".length, "He".length)
+        )
+
+        manager.copy()
+
+        verify(clipboardManager, times(1)).setText(AnnotatedString("llo"))
+        assertThat(value.selection).isEqualTo(TextRange("Hello".length, "Hello".length))
+        assertThat(state.selectionIsOn).isFalse()
+    }
+
+    @Test
     fun paste_clipBoardManager_null() {
         manager.clipboardManager = null
 
@@ -318,6 +336,21 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
+    fun paste_selection_reversed() {
+        whenever(clipboardManager.getText()).thenReturn(AnnotatedString("i"))
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange("Hello".length, "H".length)
+        )
+
+        manager.paste()
+
+        assertThat(value.text).isEqualTo("Hi World")
+        assertThat(value.selection).isEqualTo(TextRange("Hi".length, "Hi".length))
+        assertThat(state.selectionIsOn).isFalse()
+    }
+
+    @Test
     fun cut_selection_collapse() {
         manager.value = TextFieldValue(text = text, selection = TextRange(4, 4))
 
@@ -338,6 +371,21 @@ class TextFieldSelectionManagerTest {
         verify(clipboardManager, times(1)).setText(AnnotatedString(" World"))
         assertThat(value.text).isEqualTo("HelloHello World")
         assertThat(value.selection).isEqualTo(TextRange("Hello".length, "Hello".length))
+        assertThat(state.selectionIsOn).isFalse()
+    }
+
+    @Test
+    fun cut_selection_reversed() {
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange("Hello".length, "He".length)
+        )
+
+        manager.cut()
+
+        verify(clipboardManager, times(1)).setText(AnnotatedString("llo"))
+        assertThat(value.text).isEqualTo("He World")
+        assertThat(value.selection).isEqualTo(TextRange("He".length, "He".length))
         assertThat(state.selectionIsOn).isFalse()
     }
 
@@ -380,4 +428,10 @@ class TextFieldSelectionManagerTest {
 
         assertThat(manager.isTextChanged()).isFalse()
     }
+}
+
+// This class is a workaround for the bug that mockito can't stub a method returning inline class.
+// (https://github.com/nhaarman/mockito-kotlin/issues/309).
+internal class TextRangeAnswer(private val textRange: TextRange) : Answer<Any> {
+    override fun answer(invocation: InvocationOnMock?): Any = textRange.packedValue
 }

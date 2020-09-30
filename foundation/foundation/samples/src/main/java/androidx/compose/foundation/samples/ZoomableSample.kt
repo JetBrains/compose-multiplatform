@@ -17,9 +17,9 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberZoomableController
@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.drawLayer
@@ -42,8 +43,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ZoomableSample() {
     Box(
-        Modifier.preferredSize(300.dp).clipToBounds(),
-        backgroundColor = Color.LightGray
+        Modifier.preferredSize(300.dp).clipToBounds().background(Color.LightGray)
     ) {
         var scale by remember { mutableStateOf(1f) }
         val zoomableController = rememberZoomableController { scale *= it }
@@ -57,7 +57,7 @@ fun ZoomableSample() {
                 )
                 .fillMaxSize()
                 .border(1.dp, Color.Green),
-            gravity = ContentGravity.Center
+            alignment = Alignment.Center
         ) {
             Text(
                 "☠",

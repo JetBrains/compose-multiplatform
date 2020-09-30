@@ -254,7 +254,8 @@ class PartialGapBuffer(var text: String) {
             this.text.toCharArray(charArray, 0, start - leftCopyCount, start)
 
             // Copy right surrounding
-            this.text.toCharArray(charArray,
+            this.text.toCharArray(
+                charArray,
                 charArray.size - rightCopyCount,
                 end,
                 end + rightCopyCount
@@ -263,9 +264,11 @@ class PartialGapBuffer(var text: String) {
             // Copy given text into buffer
             text.toCharArray(charArray, leftCopyCount)
 
-            this.buffer = GapBuffer(charArray,
+            this.buffer = GapBuffer(
+                charArray,
                 leftCopyCount + text.length, // gap start
-                charArray.size - rightCopyCount) // gap end
+                charArray.size - rightCopyCount
+            ) // gap end
             bufStart = start - leftCopyCount
             bufEnd = end + rightCopyCount
             return

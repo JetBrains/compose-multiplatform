@@ -39,25 +39,27 @@ internal fun createDelegate(
     firstMeasureCompleted: Boolean = true
 ): MeasureAndLayoutDelegate {
     val delegate = MeasureAndLayoutDelegate(root)
-    root.attach(mock {
-        on { measureIteration } doAnswer {
-            delegate.measureIteration
+    root.attach(
+        mock {
+            on { measureIteration } doAnswer {
+                delegate.measureIteration
+            }
+            on { onRequestMeasure(any()) } doAnswer {
+                delegate.requestRemeasure(it.arguments[0] as LayoutNode)
+                Unit
+            }
+            on { observeMeasureModelReads(any(), any()) } doAnswer {
+                (it.arguments[1] as () -> Unit).invoke()
+            }
+            on { observeLayoutModelReads(any(), any()) } doAnswer {
+                (it.arguments[1] as () -> Unit).invoke()
+            }
+            on { measureAndLayout() } doAnswer {
+                delegate.measureAndLayout()
+                Unit
+            }
         }
-        on { onRequestMeasure(any()) } doAnswer {
-            delegate.requestRemeasure(it.arguments[0] as LayoutNode)
-            Unit
-        }
-        on { observeMeasureModelReads(any(), any()) } doAnswer {
-            (it.arguments[1] as () -> Unit).invoke()
-        }
-        on { observeLayoutModelReads(any(), any()) } doAnswer {
-            (it.arguments[1] as () -> Unit).invoke()
-        }
-        on { measureAndLayout() } doAnswer {
-            delegate.measureAndLayout()
-            Unit
-        }
-    })
+    )
     if (firstMeasureCompleted) {
         delegate.updateRootConstraints(
             defaultRootConstraints()
@@ -305,8 +307,10 @@ internal class MeasureInLayoutBlock : SmartMeasureBlock() {
         get() = false
         set(value) {
             if (value) {
-                throw IllegalArgumentException("MeasureInLayoutBlock cannot query alignment " +
-                        "lines during measure")
+                throw IllegalArgumentException(
+                    "MeasureInLayoutBlock cannot query alignment " +
+                        "lines during measure"
+                )
             }
         }
 
@@ -343,8 +347,10 @@ internal class NoMeasureBlock : SmartMeasureBlock() {
         get() = false
         set(value) {
             if (value) {
-                throw IllegalArgumentException("MeasureInLayoutBlock cannot query alignment " +
-                        "lines during measure")
+                throw IllegalArgumentException(
+                    "MeasureInLayoutBlock cannot query alignment " +
+                        "lines during measure"
+                )
             }
         }
 

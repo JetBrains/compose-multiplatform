@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,8 +84,8 @@ class SwitchTest {
         rule.setMaterialContent {
             val (checked, onChecked) = remember { mutableStateOf(false) }
 
-            // Stack is needed because otherwise the control will be expanded to fill its parent
-            Stack {
+            // Box is needed because otherwise the control will be expanded to fill its parent
+            Box {
                 Switch(
                     modifier = Modifier.testTag(defaultSwitchTag),
                     checked = checked,
@@ -104,8 +104,8 @@ class SwitchTest {
         rule.setMaterialContent {
             val (checked, onChecked) = remember { mutableStateOf(false) }
 
-            // Stack is needed because otherwise the control will be expanded to fill its parent
-            Stack {
+            // Box is needed because otherwise the control will be expanded to fill its parent
+            Box {
                 Switch(
                     modifier = Modifier.testTag(defaultSwitchTag),
                     checked = checked,
@@ -151,8 +151,8 @@ class SwitchTest {
         val state = mutableStateOf(false)
         rule.setMaterialContent {
 
-            // Stack is needed because otherwise the control will be expanded to fill its parent
-            Stack {
+            // Box is needed because otherwise the control will be expanded to fill its parent
+            Box {
                 Switch(
                     modifier = Modifier.testTag(defaultSwitchTag),
                     checked = state.value,
@@ -181,9 +181,9 @@ class SwitchTest {
         val state = mutableStateOf(false)
         rule.setMaterialContent {
 
-            // Stack is needed because otherwise the control will be expanded to fill its parent
+            // Box is needed because otherwise the control will be expanded to fill its parent
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Stack {
+                Box {
                     Switch(
                         modifier = Modifier.testTag(defaultSwitchTag),
                         checked = state.value,

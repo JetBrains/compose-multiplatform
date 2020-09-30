@@ -102,7 +102,7 @@ fun DrawScope.drawOutline(
             drawRect(color, rect.topLeft(), rect.size(), alpha, style, colorFilter, blendMode)
         },
         { rrect ->
-            val radius = rrect.bottomLeftRadiusX
+            val radius = rrect.bottomLeftRadius.x
             drawRoundRect(
                 color = color,
                 topLeft = rrect.topLeft(),
@@ -141,7 +141,7 @@ fun DrawScope.drawOutline(
             drawRect(brush, rect.topLeft(), rect.size(), alpha, style, colorFilter, blendMode)
         },
         { rrect ->
-            val radius = rrect.bottomLeftRadiusX
+            val radius = rrect.bottomLeftRadius.x
             drawRoundRect(
                 brush = brush,
                 topLeft = rrect.topLeft(),
@@ -186,21 +186,21 @@ private inline fun DrawScope.drawOutlineHelper(
     drawRoundedRectBlock: DrawScope.(rrect: RoundRect) -> Unit,
     drawPathBlock: DrawScope.(path: Path) -> Unit
 ) = when (outline) {
-        is Outline.Rectangle -> drawRectBlock(outline.rect)
-        is Outline.Rounded -> {
-            val path = outline.roundRectPath
-            // If the rounded rect has a path, then the corner radii are not the same across
-            // each of the corners, so we draw the given path.
-            // If there is no path available, then the corner radii are identical so call the
-            // Canvas primitive for drawing a rounded rectangle
-            if (path != null) {
-                drawPathBlock(path)
-            } else {
-                drawRoundedRectBlock(outline.roundRect)
-            }
+    is Outline.Rectangle -> drawRectBlock(outline.rect)
+    is Outline.Rounded -> {
+        val path = outline.roundRectPath
+        // If the rounded rect has a path, then the corner radii are not the same across
+        // each of the corners, so we draw the given path.
+        // If there is no path available, then the corner radii are identical so call the
+        // Canvas primitive for drawing a rounded rectangle
+        if (path != null) {
+            drawPathBlock(path)
+        } else {
+            drawRoundedRectBlock(outline.roundRect)
         }
-        is Outline.Generic -> drawPathBlock(outline.path)
     }
+    is Outline.Generic -> drawPathBlock(outline.path)
+}
 
 /**
  * Draws the [Outline] on a [Canvas].
@@ -224,9 +224,10 @@ fun Canvas.drawOutline(outline: Outline, paint: Paint) = when (outline) {
                 top = outline.roundRect.top,
                 right = outline.roundRect.right,
                 bottom = outline.roundRect.bottom,
-                radiusX = outline.roundRect.bottomLeftRadiusX,
-                radiusY = outline.roundRect.bottomLeftRadiusY,
-                paint = paint)
+                radiusX = outline.roundRect.bottomLeftRadius.x,
+                radiusY = outline.roundRect.bottomLeftRadius.y,
+                paint = paint
+            )
         }
     }
     is Outline.Generic -> drawPath(outline.path, paint)
@@ -238,11 +239,11 @@ fun Canvas.drawOutline(outline: Outline, paint: Paint) = when (outline) {
  * however, the x and y can be different
  */
 private fun RoundRect.hasSameCornerRadius(): Boolean {
-    val sameRadiusX = bottomLeftRadiusX == bottomRightRadiusX &&
-            bottomRightRadiusX == topRightRadiusX &&
-            topRightRadiusX == topLeftRadiusX
-    val sameRadiusY = bottomLeftRadiusY == bottomRightRadiusY &&
-            bottomRightRadiusY == topRightRadiusY &&
-            topRightRadiusY == topLeftRadiusY
+    val sameRadiusX = bottomLeftRadius.x == bottomRightRadius.x &&
+            bottomRightRadius.x == topRightRadius.x &&
+            topRightRadius.x == topLeftRadius.x
+    val sameRadiusY = bottomLeftRadius.y == bottomRightRadius.y &&
+            bottomRightRadius.y == topRightRadius.y &&
+            topRightRadius.y == topLeftRadius.y
     return sameRadiusX && sameRadiusY
 }

@@ -17,8 +17,10 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -42,13 +44,13 @@ fun NestedPressingDemo() {
     Column {
         Text(
             "Demonstrates correct behavior of a nested set of regions that each respond with " +
-                    "press indication, tap, double tap, and long press."
+                "press indication, tap, double tap, and long press."
         )
         Text(
             "Press indication is a darker version of the current color.  Tap changes colors in " +
-                    "one direction.  Double tap changes colors in the opposite direction. Long " +
-                    "press resets the color to white. Based on the implementations of each " +
-                    "gesture detector, you should only be able to interact with one box at a time."
+                "one direction.  Double tap changes colors in the opposite direction. Long " +
+                "press resets the color to white. Based on the implementations of each " +
+                "gesture detector, you should only be able to interact with one box at a time."
         )
         PressableContainer(Modifier.fillMaxSize()) {
             PressableContainer(Modifier.padding(48.dp).fillMaxSize()) {
@@ -103,9 +105,10 @@ private fun PressableContainer(
             .doubleTapGestureFilter(onDoubleTap)
             .longPressGestureFilter(onLongPress)
     Box(
-        modifier.then(gestureDetectors),
-        backgroundColor = color,
-        border = BorderStroke(2.dp, BorderColor),
-        children = children
-    )
+        modifier
+            .then(gestureDetectors)
+            .background(color)
+            .border(BorderStroke(2.dp, BorderColor))
+            .padding(2.dp)
+    ) { children() }
 }

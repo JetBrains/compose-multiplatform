@@ -132,8 +132,10 @@ fun Modifier.preferredHeightIn(
  * the preferred size.
  */
 @Stable
-@Deprecated("DpConstraints-based APIs were deprecated. Please use the overload taking " +
-        "individual constraint values.")
+@Deprecated(
+    "DpConstraints-based APIs were deprecated. Please use the overload taking " +
+        "individual constraint values."
+)
 @Suppress("Deprecation")
 fun Modifier.preferredSizeIn(constraints: DpConstraints) = preferredSizeIn(
     constraints.minWidth,
@@ -267,8 +269,10 @@ fun Modifier.heightIn(
  * the child by the parent layout under the assumption that [Constraints] were respected.
  */
 @Stable
-@Deprecated("DpConstraints-based APIs were deprecated. Please use the overload taking " +
-        "individual constraint values.")
+@Deprecated(
+    "DpConstraints-based APIs were deprecated. Please use the overload taking " +
+        "individual constraint values."
+)
 @Suppress("Deprecation")
 fun Modifier.sizeIn(constraints: DpConstraints) = sizeIn(
     constraints.minWidth,

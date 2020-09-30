@@ -18,8 +18,6 @@ package androidx.compose.ui.platform
 import android.content.res.Configuration
 import android.view.View
 import androidx.annotation.RestrictTo
-import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
@@ -37,12 +35,6 @@ interface AndroidOwner : Owner {
      * The view backing this Owner.
      */
     val view: View
-
-    /**
-     * Provide a focus manager that controls focus within Compose.
-     */
-    @ExperimentalFocus
-    val focusManager: FocusManager
 
     /**
      * Called to inform the owner that a new Android [View] was [attached][Owner.onAttach]

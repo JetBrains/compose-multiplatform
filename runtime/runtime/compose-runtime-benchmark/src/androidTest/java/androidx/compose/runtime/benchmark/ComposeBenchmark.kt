@@ -21,7 +21,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.benchmark.realworld4.RealWorld4_FancyWidget_000
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +33,6 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.FixMethodOrder
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -143,21 +141,6 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    @Ignore("Disabled as it appears to not do anything")
-    fun benchmark_realworld4_mid_recompose() {
-        val model = androidx.compose.runtime.benchmark.realworld4.createSampleData()
-        measureRecompose {
-            compose {
-                RealWorld4_FancyWidget_000(model)
-            }
-            update {
-                model.f2.f15.f1.f1.f1_modified = !model.f2.f15.f1.f1.f1_modified
-            }
-        }
-    }
-
-    @UiThreadTest
-    @Test
     fun benchmark_10_NestedRowColumnsWithModifier() {
         var pad by mutableStateOf(0)
         val modifier = Modifier.composed {
@@ -234,8 +217,7 @@ fun HundredRects(model: ColorModel, narrow: Boolean = false) {
                 }
             } else {
                 Rect(model.color)
-            }
-        else
+            } else
             Rect()
     }
 }

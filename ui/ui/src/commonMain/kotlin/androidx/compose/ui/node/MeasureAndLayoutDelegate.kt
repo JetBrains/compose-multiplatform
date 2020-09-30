@@ -199,8 +199,10 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 val alignmentLinesOwner = layoutNode.alignmentLinesQueryOwner
                 if (layoutNode.isPlaced ||
                     layoutNode.canAffectParent ||
-                    (alignmentLinesOwner != null && alignmentLinesOwner
-                        .alignmentUsageByParent != NotUsed)
+                    (
+                        alignmentLinesOwner != null && alignmentLinesOwner
+                            .alignmentUsageByParent != NotUsed
+                        )
                 ) {
                     if (layoutNode.layoutState == NeedsRemeasure) {
                         if (doRemeasure(layoutNode)) {
@@ -258,5 +260,5 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
 
     private val LayoutNode.canAffectParent
         get() = layoutState == NeedsRemeasure &&
-                (measuredByParent == InMeasureBlock || alignmentLinesQueryOwner != null)
+            (measuredByParent == InMeasureBlock || alignmentLinesQueryOwner != null)
 }

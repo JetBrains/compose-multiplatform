@@ -82,7 +82,8 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         // TODO(shepshapard): Don't allocate on every call.
         return ProcessResult(
             dispatchedToSomething,
-            resultingChanges.changes.any { (_, value) -> value.anyPositionChangeConsumed() })
+            resultingChanges.changes.any { (_, value) -> value.anyPositionChangeConsumed() }
+        )
     }
 
     /**
@@ -110,24 +111,24 @@ private class PointerInputChangeEventProducer {
      * Produces [InternalPointerEvent]s by tracking changes between [PointerInputEvent]s
      */
     internal fun produce(pointerInputEvent: PointerInputEvent):
-            InternalPointerEvent {
-        val changes: MutableMap<PointerId, PointerInputChange> = mutableMapOf()
-        pointerInputEvent.pointers.fastForEach {
-            changes[it.id] =
-                PointerInputChange(
-                    it.id,
-                    it.pointerInputData,
-                    previousPointerInputData[it.id] ?: PointerInputData(),
-                    ConsumedData()
-                )
-            if (it.pointerInputData.down) {
-                previousPointerInputData[it.id] = it.pointerInputData
-            } else {
-                previousPointerInputData.remove(it.id)
+        InternalPointerEvent {
+            val changes: MutableMap<PointerId, PointerInputChange> = mutableMapOf()
+            pointerInputEvent.pointers.fastForEach {
+                changes[it.id] =
+                    PointerInputChange(
+                        it.id,
+                        it.pointerInputData,
+                        previousPointerInputData[it.id] ?: PointerInputData(),
+                        ConsumedData()
+                    )
+                if (it.pointerInputData.down) {
+                    previousPointerInputData[it.id] = it.pointerInputData
+                } else {
+                    previousPointerInputData.remove(it.id)
+                }
             }
+            return InternalPointerEvent(changes, pointerInputEvent)
         }
-        return InternalPointerEvent(changes, pointerInputEvent)
-    }
 
     /**
      * Clears all tracked information.

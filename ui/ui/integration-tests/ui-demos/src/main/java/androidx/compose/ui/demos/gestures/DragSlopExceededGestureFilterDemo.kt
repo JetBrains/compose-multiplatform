@@ -16,8 +16,9 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
@@ -82,21 +83,21 @@ fun DragSlopExceededGestureFilterDemo() {
     Column {
         Text(
             "Demonstrates functionality of Modifier.dragSlopExceededGestureFilter, which calls " +
-                    "its callback when touch slop has been exceeded by the average distance" +
-                    " change of all pointers.  This also demonstrates controlling which" +
-                    " directions can be dragged to exceed touch slop."
+                "its callback when touch slop has been exceeded by the average distance" +
+                " change of all pointers.  This also demonstrates controlling which" +
+                " directions can be dragged to exceed touch slop."
         )
         Text(
             "When red, a drag on the box will turn the box blue only when you drag up or down on" +
-                    " the screen.  When blue, a drag on the box will turn the box red when you" +
-                    " drag to the right or left."
+                " the screen.  When blue, a drag on the box will turn the box red when you" +
+                " drag to the right or left."
         )
         Box(
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .dragSlopExceededGestureFilter(onTouchSlopExceeded, canDrag),
-            backgroundColor = color
+                .dragSlopExceededGestureFilter(onTouchSlopExceeded, canDrag)
+                .background(color)
         )
     }
 }

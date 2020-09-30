@@ -92,8 +92,10 @@ class AndroidPointerInputTest {
         countDown { latch ->
             rule.runOnUiThread {
                 container.setContent(Recomposer.current()) {
-                    FillLayout(Modifier
-                        .onPositioned { latch.countDown() })
+                    FillLayout(
+                        Modifier
+                            .onPositioned { latch.countDown() }
+                    )
                 }
             }
         }
@@ -126,9 +128,11 @@ class AndroidPointerInputTest {
         countDown { latch ->
             rule.runOnUiThread {
                 container.setContent(Recomposer.current()) {
-                    FillLayout(Modifier
-                        .consumeMovementGestureFilter()
-                        .onPositioned { latch.countDown() })
+                    FillLayout(
+                        Modifier
+                            .consumeMovementGestureFilter()
+                            .onPositioned { latch.countDown() }
+                    )
                 }
             }
         }
@@ -304,9 +308,11 @@ class AndroidPointerInputTest {
         countDown { latch ->
             rule.runOnUiThread {
                 container.setContent(Recomposer.current()) {
-                    FillLayout(Modifier
-                        .consumeMovementGestureFilter(consumeMovement)
-                        .onPositioned { latch.countDown() })
+                    FillLayout(
+                        Modifier
+                            .consumeMovementGestureFilter(consumeMovement)
+                            .onPositioned { latch.countDown() }
+                    )
                 }
             }
         }
@@ -391,9 +397,11 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
         bounds: IntSize
     ) =
         if (consumeMovement) {
-            changes.map { it.consumePositionChange(
-                it.positionChange().x,
-                it.positionChange().y)
+            changes.map {
+                it.consumePositionChange(
+                    it.positionChange().x,
+                    it.positionChange().y
+                )
             }
         } else {
             changes

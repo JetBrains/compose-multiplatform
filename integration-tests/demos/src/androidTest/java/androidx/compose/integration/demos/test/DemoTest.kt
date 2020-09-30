@@ -92,8 +92,10 @@ class DemoTest {
 
         // Visit all demos, ensuring we start and end up on the root screen
         assertIsOnRootScreen()
-        AllDemosCategory.visitFirstDemo(visitedDemos = visitedDemos,
-            path = listOf(AllDemosCategory))
+        AllDemosCategory.visitFirstDemo(
+            visitedDemos = visitedDemos,
+            path = listOf(AllDemosCategory)
+        )
         assertIsOnRootScreen()
     }
 
@@ -105,8 +107,10 @@ class DemoTest {
 
         // Visit all demos, ensuring we start and end up on the root screen
         assertIsOnRootScreen()
-        AllDemosCategory.visitDemos(visitedDemos = visitedDemos,
-            path = listOf(AllDemosCategory))
+        AllDemosCategory.visitDemos(
+            visitedDemos = visitedDemos,
+            path = listOf(AllDemosCategory)
+        )
         assertIsOnRootScreen()
 
         // Ensure that we visited all the demos we expected to, in the order we expected to.

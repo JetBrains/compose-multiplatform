@@ -206,9 +206,9 @@ class ModelViewTests : BaseComposeTest() {
     @Test
     fun testModelUpdatesNextFrameVisibility() {
         val president = Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
         val tvName = 204
 
         @Composable fun display(person: Person) {

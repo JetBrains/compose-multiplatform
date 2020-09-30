@@ -17,7 +17,8 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
@@ -31,19 +32,21 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun OnPositionedSample() {
-    Column(Modifier.onPositioned { coordinates ->
-        // This will be the size of the Column.
-        coordinates.size
-        // The position of the Column relative to the application window.
-        coordinates.globalPosition
-        // The position of the Column relative to the Compose root.
-        coordinates.positionInRoot
-        // These will be the alignment lines provided to the layout (empty here for Column).
-        coordinates.providedAlignmentLines
-        // This will a LayoutCoordinates instance corresponding to the parent of Column.
-        coordinates.parentCoordinates
-    }) {
-        Box(Modifier.preferredSize(20.dp), backgroundColor = Color.Green)
-        Box(Modifier.preferredSize(20.dp), backgroundColor = Color.Blue)
+    Column(
+        Modifier.onPositioned { coordinates ->
+            // This will be the size of the Column.
+            coordinates.size
+            // The position of the Column relative to the application window.
+            coordinates.globalPosition
+            // The position of the Column relative to the Compose root.
+            coordinates.positionInRoot
+            // These will be the alignment lines provided to the layout (empty here for Column).
+            coordinates.providedAlignmentLines
+            // This will a LayoutCoordinates instance corresponding to the parent of Column.
+            coordinates.parentCoordinates
+        }
+    ) {
+        Box(Modifier.preferredSize(20.dp).background(Color.Green))
+        Box(Modifier.preferredSize(20.dp).background(Color.Blue))
     }
 }

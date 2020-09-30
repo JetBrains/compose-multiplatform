@@ -55,4 +55,4 @@ interface IntrinsicMeasurable {
  * A function for performing intrinsic measurement.
  */
 typealias IntrinsicMeasureBlock =
-        IntrinsicMeasureScope.(List<IntrinsicMeasurable>, Int) -> Int
+    IntrinsicMeasureScope.(List<IntrinsicMeasurable>, Int) -> Int

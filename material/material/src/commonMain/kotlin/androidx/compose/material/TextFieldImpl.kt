@@ -28,9 +28,10 @@ import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberScrollableController
@@ -108,6 +109,7 @@ internal fun TextFieldImpl(
     imeAction: ImeAction,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
+    interactionState: InteractionState,
     activeColor: Color,
     inactiveColor: Color,
     errorColor: Color,
@@ -161,7 +163,7 @@ internal fun TextFieldImpl(
     val textFieldModifier = modifier
         .focusRequester(focusRequester)
         .focusObserver { isFocused = it.isFocused }
-        .clickable(indication = null) {
+        .clickable(interactionState = interactionState, indication = null) {
             focusRequester.requestFocus()
             // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
             //  The requestFocus() call here should be enough to trigger the software keyboard.

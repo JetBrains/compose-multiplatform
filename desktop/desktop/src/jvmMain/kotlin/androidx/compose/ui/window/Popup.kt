@@ -15,8 +15,9 @@
  */
 package androidx.compose.ui.window
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.onDispose
@@ -40,14 +41,15 @@ fun Popup(
 ) {
     PopupLayout {
         Box(
-            modifier = Modifier.fillMaxSize().tapGestureFilter {
-                if (isFocusable) {
-                    onDismissRequest?.invoke()
+            modifier = Modifier
+                .fillMaxSize()
+                .tapGestureFilter {
+                    if (isFocusable) {
+                        onDismissRequest?.invoke()
+                    }
                 }
-            },
-            paddingStart = offset.x.dp,
-            paddingTop = offset.y.dp,
-            gravity = alignment
+                .padding(start = offset.x.dp, top = offset.y.dp),
+            alignment = alignment
         ) {
             Box(
                 modifier = Modifier.tapGestureFilter {}

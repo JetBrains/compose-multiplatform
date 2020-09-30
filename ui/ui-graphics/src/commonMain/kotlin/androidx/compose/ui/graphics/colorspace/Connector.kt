@@ -215,7 +215,7 @@ internal constructor(
 
                 if (!compare(source.whitePoint, Illuminant.D50)) {
                     val srcAdaptation = chromaticAdaptation(
-                            Adaptation.Bradford.transform,
+                        Adaptation.Bradford.transform,
                         srcXYZ,
                         Illuminant.D50Xyz.copyOf()
                     )
@@ -224,14 +224,16 @@ internal constructor(
 
                 if (!compare(destination.whitePoint, Illuminant.D50)) {
                     val dstAdaptation = chromaticAdaptation(
-                            Adaptation.Bradford.transform,
+                        Adaptation.Bradford.transform,
                         dstXYZ,
                         Illuminant.D50Xyz.copyOf()
                     )
-                    inverseTransform = inverse3x3(mul3x3(
-                        dstAdaptation,
-                        destination.transform
-                    ))
+                    inverseTransform = inverse3x3(
+                        mul3x3(
+                            dstAdaptation,
+                            destination.transform
+                        )
+                    )
                 }
 
                 if (intent == RenderIntent.Absolute) {

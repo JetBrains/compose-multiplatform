@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -35,10 +36,11 @@ fun DeclarativeGraphicsDemo() {
      * Demo that shows how to leverage DrawScope to draw 4 rectangular quadrants
      * inset by a given dimension with a diamond drawn within each of the quadrants
      */
-    Canvas(modifier =
-        Modifier.fillMaxSize()
-            .wrapContentSize(Alignment.Center)
-            .preferredSize(120.dp, 120.dp)
+    Canvas(
+        modifier =
+            Modifier.fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+                .preferredSize(120.dp, 120.dp)
     ) {
         drawRect(color = Color.Gray)
         // Inset content by 10 pixels on the left/right sides and 12 by the
@@ -51,10 +53,10 @@ fun DeclarativeGraphicsDemo() {
             )
             // Scale the drawing environment down by 50% about the center of the square drawn
             // in the top left quadrant
-            scale(0.5f, 0.5f, size.width / 4, size.height / 4) {
+            scale(0.5f, Offset(size.width / 4, size.height / 4)) {
                 // Rotate the drawing environment 45 degrees about the center of the square
                 // drawn in the top left
-                rotate(45.0f, size.width / 4, size.height / 4) {
+                rotate(45.0f, Offset(size.width / 4, size.height / 4)) {
                     drawRect(
                         size = quadrantSize,
                         color = Color.Yellow,
@@ -71,10 +73,10 @@ fun DeclarativeGraphicsDemo() {
                 )
                 // Scale the drawing environment down by 50% about the center of the square drawn
                 // in the top right quadrant
-                scale(0.5f, 0.5f, size.width / 4, size.height / 4) {
+                scale(0.5f, Offset(size.width / 4, size.height / 4)) {
                     // rotate the drawing environment 45 degrees about the center of the drawn
                     // square in the top right
-                    rotate(45.0f, size.width / 4, size.height / 4) {
+                    rotate(45.0f, Offset(size.width / 4, size.height / 4)) {
                         drawRect(
                             size = quadrantSize,
                             color = Color.Red,
@@ -91,10 +93,10 @@ fun DeclarativeGraphicsDemo() {
                 )
                 // Scale the drawing environment down by 50% about the center of the square drawn
                 // in the bottom left quadrant
-                scale(0.5f, 0.5f, size.width / 4, size.height / 4) {
+                scale(0.5f, Offset(size.width / 4, size.height / 4)) {
                     // Rotate the drawing environment by 45 degrees about the center of the
                     // square drawn in the bottom left quadrant
-                    rotate(45.0f, size.width / 4, size.height / 4) {
+                    rotate(45.0f, Offset(size.width / 4, size.height / 4)) {
                         drawRect(
                             size = quadrantSize,
                             color = Color.Blue,
@@ -111,10 +113,10 @@ fun DeclarativeGraphicsDemo() {
                 )
                 // Scale the drawing environment down by 50% about the center of the square drawn
                 // in the bottom right quadrant
-                scale(0.5f, 0.5f, size.width / 4, size.height / 4) {
+                scale(0.5f, Offset(size.width / 4, size.height / 4)) {
                     // Rotate the drawing environment 45 degrees about the center of the drawn
                     // square in the bottom right
-                    rotate(45.0f, size.width / 4, size.height / 4) {
+                    rotate(45.0f, Offset(size.width / 4, size.height / 4)) {
                         drawRect(
                             size = quadrantSize,
                             color = Color.Green,

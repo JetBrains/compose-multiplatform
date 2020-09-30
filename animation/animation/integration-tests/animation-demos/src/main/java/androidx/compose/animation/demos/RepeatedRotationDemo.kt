@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -65,7 +66,7 @@ fun RepeatedRotationDemo() {
             toState = state.value
         )
         Canvas(Modifier.preferredSize(100.dp)) {
-            rotate(transitionState[rotation], 0.0f, 0.0f) {
+            rotate(transitionState[rotation], Offset.Zero) {
                 drawRect(Color(0xFF00FF00))
             }
         }

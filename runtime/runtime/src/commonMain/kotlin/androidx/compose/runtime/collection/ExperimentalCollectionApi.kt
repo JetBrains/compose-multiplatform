@@ -19,7 +19,7 @@ package androidx.compose.runtime.collection
 @RequiresOptIn(
     level = RequiresOptIn.Level.ERROR,
     message = "This is an experimental API for fast access collections and is likely to change " +
-            "before becoming stable."
+        "before becoming stable."
 )
 @Target(
     AnnotationTarget.CLASS,

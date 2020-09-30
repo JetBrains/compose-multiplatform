@@ -106,12 +106,28 @@ class VectorAssetTest {
             assertEquals(Color.Blue.toArgb(), getPixel(width / 2, height / 2))
 
             assertEquals(Color.Red.toArgb(), getPixel(insetRectSize + 2, insetRectSize + 2))
-            assertEquals(Color.Red.toArgb(), getPixel(width - insetRectSize - 2,
-                insetRectSize + 2))
-            assertEquals(Color.Red.toArgb(), getPixel(insetRectSize + 2,
-                height - insetRectSize - 2))
-            assertEquals(Color.Red.toArgb(), getPixel(width - insetRectSize - 2, height -
-                    insetRectSize - 2))
+            assertEquals(
+                Color.Red.toArgb(),
+                getPixel(
+                    width - insetRectSize - 2,
+                    insetRectSize + 2
+                )
+            )
+            assertEquals(
+                Color.Red.toArgb(),
+                getPixel(
+                    insetRectSize + 2,
+                    height - insetRectSize - 2
+                )
+            )
+            assertEquals(
+                Color.Red.toArgb(),
+                getPixel(
+                    width - insetRectSize - 2,
+                    height -
+                        insetRectSize - 2
+                )
+            )
         }
     }
 }

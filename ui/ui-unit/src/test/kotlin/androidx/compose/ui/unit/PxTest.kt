@@ -54,12 +54,6 @@ class PxTest {
     }
 
     @Test
-    fun sizeCenter() {
-        val size = Size(width = 10f, height = 20f)
-        assertEquals(Offset(5f, 10f), size.center())
-    }
-
-    @Test
     fun positionDistance() {
         val position = Offset(3f, 4f)
         assertEquals(5f, position.getDistance())

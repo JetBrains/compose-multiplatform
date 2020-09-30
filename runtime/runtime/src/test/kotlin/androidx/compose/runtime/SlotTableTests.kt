@@ -1277,8 +1277,7 @@ fun narrowTrees(): Pair<SlotTable, List<Anchor>> {
                 if (width > 0)
                     for (childKey in 1..width) {
                         tree(childKey, width - 1, depth + 1)
-                    }
-                else if (depth > 0) {
+                    } else if (depth > 0) {
                     tree(1001, width, depth - 1)
                 } else {
                     repeat(depth + 2) {

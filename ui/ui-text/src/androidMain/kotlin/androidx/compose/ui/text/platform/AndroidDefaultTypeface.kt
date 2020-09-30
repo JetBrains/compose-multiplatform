@@ -38,7 +38,8 @@ internal class AndroidDefaultTypeface : AndroidTypeface {
     ): Typeface {
         return if (Build.VERSION.SDK_INT < 28) {
             Typeface.defaultFromStyle(
-                TypefaceAdapter.getTypefaceStyle(fontWeight, fontStyle))
+                TypefaceAdapter.getTypefaceStyle(fontWeight, fontStyle)
+            )
         } else {
             Typeface.create(Typeface.DEFAULT, fontWeight.weight, fontStyle == FontStyle.Italic)
         }

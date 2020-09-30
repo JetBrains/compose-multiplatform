@@ -33,6 +33,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -1539,8 +1540,8 @@ class PointerInputEventProcessorTest {
         val pointerInputFilter3 = spy(DummyPointerInputFilter())
 
         val modifier = PointerInputModifierImpl2(pointerInputFilter1) then
-                PointerInputModifierImpl2(pointerInputFilter2) then
-                PointerInputModifierImpl2(pointerInputFilter3)
+            PointerInputModifierImpl2(pointerInputFilter2) then
+            PointerInputModifierImpl2(pointerInputFilter3)
 
         val layoutNode = LayoutNode(
             25, 50, 75, 100,
@@ -1693,7 +1694,7 @@ class PointerInputEventProcessorTest {
         val layoutNode1 = LayoutNode(
             1, 6, 500, 500,
             PointerInputModifierImpl2(pointerInputFilter1)
-                    then PointerInputModifierImpl2(pointerInputFilter2)
+                then PointerInputModifierImpl2(pointerInputFilter2)
         )
         val layoutNode2: LayoutNode = LayoutNode(2, 7, 500, 500).apply {
             insertAt(0, layoutNode1)
@@ -1702,7 +1703,7 @@ class PointerInputEventProcessorTest {
             LayoutNode(
                 3, 8, 500, 500,
                 PointerInputModifierImpl2(pointerInputFilter3)
-                        then PointerInputModifierImpl2(pointerInputFilter4)
+                    then PointerInputModifierImpl2(pointerInputFilter4)
             ).apply {
                 insertAt(0, layoutNode2)
             }
@@ -3023,6 +3024,14 @@ private class MockOwner(
     }
 
     override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
+        block()
+    }
+
+    override fun <T : OwnerScope> observeReads(
+        target: T,
+        onChanged: (T) -> Unit,
+        block: () -> Unit
+    ) {
         block()
     }
 

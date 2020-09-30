@@ -17,7 +17,8 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
@@ -53,8 +54,8 @@ class DrawerScreenshotTest {
             Box(Modifier.size(10.dp, 100.dp).testTag("container")) {
                 BottomDrawerLayout(
                     drawerState = rememberBottomDrawerState(drawerValue),
-                    drawerContent = { Box(Modifier.fillMaxSize(), backgroundColor = Color.Red) },
-                    bodyContent = { Box(Modifier.fillMaxSize(), backgroundColor = Color.Yellow) }
+                    drawerContent = { Box(Modifier.fillMaxSize().background(Color.Red)) },
+                    bodyContent = { Box(Modifier.fillMaxSize().background(Color.Yellow)) }
                 )
             }
         }
@@ -65,8 +66,8 @@ class DrawerScreenshotTest {
             Box(Modifier.size(100.dp, 10.dp).testTag("container")) {
                 ModalDrawerLayout(
                     drawerState = rememberDrawerState(drawerValue),
-                    drawerContent = { Box(Modifier.fillMaxSize(), backgroundColor = Color.Red) },
-                    bodyContent = { Box(Modifier.fillMaxSize(), backgroundColor = Color.Yellow) }
+                    drawerContent = { Box(Modifier.fillMaxSize().background(Color.Red)) },
+                    bodyContent = { Box(Modifier.fillMaxSize().background(Color.Yellow)) }
                 )
             }
         }

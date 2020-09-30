@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -110,7 +110,7 @@ class SelectableTest {
         val interactionState = InteractionState()
 
         rule.setContent {
-            Stack {
+            Box {
                 Box(Modifier.selectable(
                     selected = true,
                     interactionState = interactionState,
@@ -146,7 +146,7 @@ class SelectableTest {
         var emitSelectableText by mutableStateOf(true)
 
         rule.setContent {
-            Stack {
+            Box {
                 if (emitSelectableText) {
                     Box(Modifier.selectable(
                         selected = true,

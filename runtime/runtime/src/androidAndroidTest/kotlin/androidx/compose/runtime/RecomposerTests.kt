@@ -104,8 +104,10 @@ class RecomposerTests : BaseComposeTest() {
             val tv1 = activity.findViewById(456) as TextView
             val tv2 = activity.findViewById(567) as TextView
 
-            assertEquals("The linear layout should be the only child of root", 1,
-                activity.root.childCount)
+            assertEquals(
+                "The linear layout should be the only child of root", 1,
+                activity.root.childCount
+            )
             assertEquals("Both children should have been added", 2, ll.childCount)
             assertTrue(
                 "Should be the expected TextView (1)",
@@ -130,8 +132,10 @@ class RecomposerTests : BaseComposeTest() {
         }.then { activity ->
             val ll = activity.findViewById(345) as LinearLayout
 
-            assertEquals("The linear layout should be the only child of root", 1,
-                activity.root.childCount)
+            assertEquals(
+                "The linear layout should be the only child of root", 1,
+                activity.root.childCount
+            )
             assertEquals("Each item in the for loop should be a child", items.size, ll.childCount)
             items.forEachIndexed { index, i ->
                 assertEquals(
@@ -247,35 +251,41 @@ class RecomposerTests : BaseComposeTest() {
 
         val recompose = invalidate
 
-        TextView(id = id, onClickListener = View.OnClickListener {
-            @Suppress("DEPRECATION")
-            when (listener) {
-                is ClickAction.Recompose -> recompose()
-                is ClickAction.PerformOnView -> listener.action.invoke(it)
-            }
-        })
-    }
-
-    @Composable fun RecomposeTestComponentsA(counter: Counter, listener: ClickAction) {
-        counter.inc("A")
-        val recompose = invalidate
-            LinearLayout(id = 99, onClickListener = View.OnClickListener {
+        TextView(
+            id = id,
+            onClickListener = View.OnClickListener {
                 @Suppress("DEPRECATION")
                 when (listener) {
                     is ClickAction.Recompose -> recompose()
                     is ClickAction.PerformOnView -> listener.action.invoke(it)
                 }
-            }) {
-                for (id in 100..102) {
-                    key(id) {
-                        RecomposeTestComponentsB(
-                            counter,
-                            listener,
-                            id
-                        )
-                    }
+            }
+        )
+    }
+
+    @Composable fun RecomposeTestComponentsA(counter: Counter, listener: ClickAction) {
+        counter.inc("A")
+        val recompose = invalidate
+        LinearLayout(
+            id = 99,
+            onClickListener = View.OnClickListener {
+                @Suppress("DEPRECATION")
+                when (listener) {
+                    is ClickAction.Recompose -> recompose()
+                    is ClickAction.PerformOnView -> listener.action.invoke(it)
                 }
             }
+        ) {
+            for (id in 100..102) {
+                key(id) {
+                    RecomposeTestComponentsB(
+                        counter,
+                        listener,
+                        id
+                    )
+                }
+            }
+        }
     }
 
     @Test

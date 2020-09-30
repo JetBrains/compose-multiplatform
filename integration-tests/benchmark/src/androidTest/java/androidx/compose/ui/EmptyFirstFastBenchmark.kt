@@ -16,7 +16,7 @@
 
 package androidx.compose.ui
 
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
@@ -66,7 +66,7 @@ class EmptyLayeredTestCase : LayeredComposeTestCase {
 
     @Composable
     override fun emitContentWrappers(content: @Composable () -> Unit) {
-        Stack {
+        Box {
             content()
         }
     }

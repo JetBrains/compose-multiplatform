@@ -21,7 +21,7 @@ import androidx.compose.animation.ColorPropKey
 import androidx.compose.animation.DpPropKey
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.transition
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
@@ -70,7 +70,8 @@ fun TransitionSample() {
         // This starts the transition going from State.First to State.Second when this composable
         // gets composed for the first time.
         val state = transition(
-            definition = definition, initState = State.First, toState = State.Second)
+            definition = definition, initState = State.First, toState = State.Second
+        )
         Box(
             Modifier
                 .preferredSize(state[widthKey], state[heightKey])

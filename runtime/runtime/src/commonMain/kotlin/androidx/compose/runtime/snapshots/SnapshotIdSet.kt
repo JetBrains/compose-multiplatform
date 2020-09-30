@@ -283,6 +283,14 @@ internal class SnapshotIdSet private constructor(
         }
     }.iterator()
 
+    fun lowest(default: Int): Int {
+        val belowBound = belowBound
+        if (belowBound != null) return belowBound[0]
+        if (lowerSet != 0L) return lowerBound + lowestBitOf(lowerSet)
+        if (upperSet != 0L) return lowerBound + Long.SIZE_BITS + lowestBitOf(upperSet)
+        return default
+    }
+
     override fun toString(): String = "${super.toString()} [${this.map {
         it.toString()
     }.joinToString()}]"
@@ -293,6 +301,32 @@ internal class SnapshotIdSet private constructor(
          */
         val EMPTY = SnapshotIdSet(0, 0, 0, null)
     }
+}
+
+private fun lowestBitOf(bits: Long): Int {
+    var b = bits
+    var base = 0
+    if (b and 0xFFFF_FFFFL == 0L) {
+        base += 32
+        b = b shr 32
+    }
+    if (bits and 0xFFFF == 0L) {
+        base += 16
+        b = b shr 16
+    }
+    if (bits and 0xFF == 0L) {
+        base += 8
+        b = b shr 8
+    }
+    if (bits and 0xF == 0L) {
+        base += 4
+        b = b shr 4
+    }
+    if (b and 0x1 != 0L) return base
+    if (b and 0x2 != 0L) return base + 1
+    if (b and 0x4 != 0L) return base + 2
+    if (b and 0x8 != 0L) return base + 3
+    return -1
 }
 
 internal fun IntArray.binarySearch(value: Int): Int {

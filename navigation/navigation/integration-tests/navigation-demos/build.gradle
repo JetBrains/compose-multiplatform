@@ -35,7 +35,7 @@ dependencies {
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:material:material")
     implementation project(":compose:navigation:navigation")
-    implementation project(":compose:navigation:navigation:samples")
+    implementation project(":compose:navigation:navigation:navigation-samples")
 }
 
 android {

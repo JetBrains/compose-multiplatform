@@ -21,7 +21,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
@@ -126,10 +126,13 @@ class OnPositionedTest {
         rule.runOnUiThreadIR {
             activity.setContent {
                 AtLeastSize(size = 20) {
-                    Wrap(minWidth = size, minHeight = size, modifier = Modifier.onPositioned {
-                        realChildSize = it.size.width
-                        childLatch.countDown()
-                    })
+                    Wrap(
+                        minWidth = size, minHeight = size,
+                        modifier = Modifier.onPositioned {
+                            realChildSize = it.size.width
+                            childLatch.countDown()
+                        }
+                    )
                 }
             }
         }
@@ -242,11 +245,14 @@ class OnPositionedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                FixedSize(10,
-                    PaddingModifier(5).then(Modifier.onPositioned {
-                        coordinates = it
-                        positionedLatch.countDown()
-                    })
+                FixedSize(
+                    10,
+                    PaddingModifier(5).then(
+                        Modifier.onPositioned {
+                            coordinates = it
+                            positionedLatch.countDown()
+                        }
+                    )
                 ) {
                 }
             }
@@ -272,11 +278,14 @@ class OnPositionedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                FixedSize(10,
-                    PaddingModifier(5).then(Modifier.onPositioned {
-                        coordinates = it
-                        positionedLatch.countDown()
-                    })
+                FixedSize(
+                    10,
+                    PaddingModifier(5).then(
+                        Modifier.onPositioned {
+                            coordinates = it
+                            positionedLatch.countDown()
+                        }
+                    )
                 ) {
                 }
             }
@@ -308,10 +317,13 @@ class OnPositionedTest {
             frameLayout = FrameLayout(rule.activity)
             scrollView!!.addView(frameLayout)
             frameLayout?.setContent(Recomposer.current()) {
-                Layout({}, modifier = Modifier.onPositioned {
-                    coordinates = it
-                    positionedLatch.countDown()
-                }) { _, _ ->
+                Layout(
+                    {},
+                    modifier = Modifier.onPositioned {
+                        coordinates = it
+                        positionedLatch.countDown()
+                    }
+                ) { _, _ ->
                     layout(100, 200) {}
                 }
             }
@@ -351,10 +363,13 @@ class OnPositionedTest {
             val frameLayout = FrameLayout(rule.activity)
             linearLayout.addView(frameLayout, ViewGroup.LayoutParams(100, 100))
             frameLayout.setContent(Recomposer.current()) {
-                Layout({}, modifier = Modifier.onPositioned {
-                    coordinates = it
-                    positionedLatch.countDown()
-                }) { _, constraints ->
+                Layout(
+                    {},
+                    modifier = Modifier.onPositioned {
+                        coordinates = it
+                        positionedLatch.countDown()
+                    }
+                ) { _, constraints ->
                     layout(constraints.maxWidth, constraints.maxHeight) {}
                 }
             }
@@ -367,8 +382,10 @@ class OnPositionedTest {
             topView!!.visibility = View.GONE
         }
 
-        assertTrue("OnPositioned is not called when the container moved",
-            positionedLatch.await(1, TimeUnit.SECONDS))
+        assertTrue(
+            "OnPositioned is not called when the container moved",
+            positionedLatch.await(1, TimeUnit.SECONDS)
+        )
         assertEquals(startY - 100f, coordinates!!.globalPosition.y)
     }
 
@@ -384,18 +401,22 @@ class OnPositionedTest {
                 with(DensityAmbient.current) {
                     DelayedMeasure(50) {
                         Box(Modifier.size(25.toDp())) {
-                            Box(Modifier.size(size.toDp())
-                                .onPositioned {
-                                    coordinates1 = it
-                                    positionedLatch.countDown()
-                                })
+                            Box(
+                                Modifier.size(size.toDp())
+                                    .onPositioned {
+                                        coordinates1 = it
+                                        positionedLatch.countDown()
+                                    }
+                            )
                         }
                         Box(Modifier.size(25.toDp())) {
-                            Box(Modifier.size(size.toDp())
-                                .onPositioned {
-                                    coordinates2 = it
-                                    positionedLatch.countDown()
-                                })
+                            Box(
+                                Modifier.size(size.toDp())
+                                    .onPositioned {
+                                        coordinates2 = it
+                                        positionedLatch.countDown()
+                                    }
+                            )
                         }
                     }
                 }

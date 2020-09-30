@@ -20,7 +20,7 @@ import androidx.compose.animation.core.AnimatedFloat
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.key
@@ -69,13 +69,13 @@ fun <T> Crossfade(
                         }
                     }
                 )
-                Stack(Modifier.drawOpacity(opacity.value)) {
+                Box(Modifier.drawOpacity(opacity.value)) {
                     children()
                 }
             }
         }
     }
-    Stack(modifier) {
+    Box(modifier) {
         state.invalidate = invalidate
         state.items.fastForEach { (item, opacity) ->
             key(item) {
@@ -116,7 +116,8 @@ private fun animatedOpacity(
                 if (reason == AnimationEndReason.TargetReached) {
                     onAnimationFinish()
                 }
-            })
+            }
+        )
     }
     return animatedFloat
 }

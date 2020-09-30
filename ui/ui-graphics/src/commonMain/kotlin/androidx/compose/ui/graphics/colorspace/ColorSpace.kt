@@ -198,8 +198,10 @@ abstract class ColorSpace internal constructor(
 
     init { // ColorSpace init
         if (name.isEmpty()) {
-            throw IllegalArgumentException("The name of a color space cannot be null and " +
-                    "must contain at least 1 character")
+            throw IllegalArgumentException(
+                "The name of a color space cannot be null and " +
+                    "must contain at least 1 character"
+            )
         }
 
         if (id < MinId || id > MaxId) {
@@ -459,15 +461,15 @@ fun ColorSpace.adapt(
 
 // Reciprocal piecewise gamma response
 internal fun rcpResponse(x: Double, a: Double, b: Double, c: Double, d: Double, g: Double):
-        Double {
-    return if (x >= d * c) (x.pow(1.0 / g) - b) / a else x / c
-}
+    Double {
+        return if (x >= d * c) (x.pow(1.0 / g) - b) / a else x / c
+    }
 
 // Piecewise gamma response
 internal fun response(x: Double, a: Double, b: Double, c: Double, d: Double, g: Double):
-        Double {
-    return if (x >= d) (a * x + b).pow(g) else c * x
-}
+    Double {
+        return if (x >= d) (a * x + b).pow(g) else c * x
+    }
 
 // Reciprocal piecewise gamma response
 internal fun rcpResponse(
@@ -513,9 +515,9 @@ internal fun absRcpResponse(
 // Piecewise gamma response, encoded as sign(x).f(abs(x)) for color spaces that
 // allow negative values
 internal fun absResponse(x: Double, a: Double, b: Double, c: Double, d: Double, g: Double):
-        Double {
-    return response(if (x < 0.0) -x else x, a, b, c, d, g).withSign(x)
-}
+    Double {
+        return response(if (x < 0.0) -x else x, a, b, c, d, g).withSign(x)
+    }
 
 /**
  * Compares two sets of parametric transfer functions parameters with a precision of 1e-3.
@@ -525,7 +527,8 @@ internal fun absResponse(x: Double, a: Double, b: Double, c: Double, d: Double, 
  * @return True if the two sets are equal, false otherwise
  */
 internal fun compare(a: TransferParameters, b: TransferParameters?): Boolean {
-    return (b != null &&
+    return (
+        b != null &&
             abs(a.a - b.a) < 1e-3 &&
             abs(a.b - b.b) < 1e-3 &&
             abs(a.c - b.c) < 1e-3 &&
@@ -533,7 +536,8 @@ internal fun compare(a: TransferParameters, b: TransferParameters?): Boolean {
 
             abs(a.e - b.e) < 1e-3 &&
             abs(a.f - b.f) < 1e-3 &&
-            abs(a.gamma - b.gamma) < 1e-3)
+            abs(a.gamma - b.gamma) < 1e-3
+        )
 }
 
 /**
@@ -611,19 +615,19 @@ internal fun inverse3x3(@Size(9) m: FloatArray): FloatArray {
  */
 @Size(9)
 internal fun mul3x3(@Size(9) lhs: FloatArray, @Size(9) rhs: FloatArray):
-        FloatArray {
-    val r = FloatArray(9)
-    r[0] = lhs[0] * rhs[0] + lhs[3] * rhs[1] + lhs[6] * rhs[2]
-    r[1] = lhs[1] * rhs[0] + lhs[4] * rhs[1] + lhs[7] * rhs[2]
-    r[2] = lhs[2] * rhs[0] + lhs[5] * rhs[1] + lhs[8] * rhs[2]
-    r[3] = lhs[0] * rhs[3] + lhs[3] * rhs[4] + lhs[6] * rhs[5]
-    r[4] = lhs[1] * rhs[3] + lhs[4] * rhs[4] + lhs[7] * rhs[5]
-    r[5] = lhs[2] * rhs[3] + lhs[5] * rhs[4] + lhs[8] * rhs[5]
-    r[6] = lhs[0] * rhs[6] + lhs[3] * rhs[7] + lhs[6] * rhs[8]
-    r[7] = lhs[1] * rhs[6] + lhs[4] * rhs[7] + lhs[7] * rhs[8]
-    r[8] = lhs[2] * rhs[6] + lhs[5] * rhs[7] + lhs[8] * rhs[8]
-    return r
-}
+    FloatArray {
+        val r = FloatArray(9)
+        r[0] = lhs[0] * rhs[0] + lhs[3] * rhs[1] + lhs[6] * rhs[2]
+        r[1] = lhs[1] * rhs[0] + lhs[4] * rhs[1] + lhs[7] * rhs[2]
+        r[2] = lhs[2] * rhs[0] + lhs[5] * rhs[1] + lhs[8] * rhs[2]
+        r[3] = lhs[0] * rhs[3] + lhs[3] * rhs[4] + lhs[6] * rhs[5]
+        r[4] = lhs[1] * rhs[3] + lhs[4] * rhs[4] + lhs[7] * rhs[5]
+        r[5] = lhs[2] * rhs[3] + lhs[5] * rhs[4] + lhs[8] * rhs[5]
+        r[6] = lhs[0] * rhs[6] + lhs[3] * rhs[7] + lhs[6] * rhs[8]
+        r[7] = lhs[1] * rhs[6] + lhs[4] * rhs[7] + lhs[7] * rhs[8]
+        r[8] = lhs[2] * rhs[6] + lhs[5] * rhs[7] + lhs[8] * rhs[8]
+        return r
+    }
 
 /**
  * Multiplies a vector of 3 components by a 3x3 matrix and stores the

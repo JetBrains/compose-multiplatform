@@ -17,7 +17,7 @@
 package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -62,7 +62,8 @@ class AndroidComposeTestCaseRunnerTest {
             // considered to invalidate the composition.
             count.value++
             assertFailsWith<AssertionError>(
-                "Changes are still pending after '10' frames.") {
+                "Changes are still pending after '10' frames."
+            ) {
                 doFramesAssertAllHadChangesExceptLastOne(10)
             }
         }
@@ -76,7 +77,8 @@ class AndroidComposeTestCaseRunnerTest {
             state.value++
         }.performTestWithEventsControl {
             assertFailsWith<AssertionError>(
-                "Changes are still pending after '10' frames.") {
+                "Changes are still pending after '10' frames."
+            ) {
                 doFramesAssertAllHadChangesExceptLastOne(10)
             }
         }
@@ -92,7 +94,8 @@ class AndroidComposeTestCaseRunnerTest {
             }
         }.performTestWithEventsControl {
             assertFailsWith<AssertionError>(
-                "Changes are still pending after '10' frames.") {
+                "Changes are still pending after '10' frames."
+            ) {
                 doFramesAssertAllHadChangesExceptLastOne(10)
             }
         }
@@ -194,8 +197,10 @@ class AndroidComposeTestCaseRunnerTest {
                 throw AssertionError("Expected exception not thrown, received: $e")
             }
             if (expectedErrorMessage != null && e.localizedMessage != expectedErrorMessage) {
-                throw AssertionError("Expected error message not found, received: '" +
-                        "${e.localizedMessage}'")
+                throw AssertionError(
+                    "Expected error message not found, received: '" +
+                        "${e.localizedMessage}'"
+                )
             }
             return
         }

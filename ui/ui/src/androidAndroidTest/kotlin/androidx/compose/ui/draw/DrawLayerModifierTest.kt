@@ -30,8 +30,10 @@ class DrawLayerModifierTest {
         Truth.assertThat(modifier.nameFallback).isEqualTo("drawLayer")
         Truth.assertThat(modifier.valueOverride).isNull()
         Truth.assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(modifier.javaClass.declaredFields
-                .filter { !it.isSynthetic && it.name != "nameFallback" }
-                .map { it.name })
+            .containsExactlyElementsIn(
+                modifier.javaClass.declaredFields
+                    .filter { !it.isSynthetic && it.name != "nameFallback" }
+                    .map { it.name }
+            )
     }
 }

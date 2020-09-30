@@ -154,6 +154,12 @@ interface Owner {
     fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit)
 
     /**
+     * Observe model reads for any target, allowing consumers to determine how to respond
+     * to state changes
+     */
+    fun <T : OwnerScope> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit)
+
+    /**
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out
      */
     fun measureAndLayout()

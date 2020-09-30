@@ -660,7 +660,8 @@ class CompositionTests {
         val reports = listOf(
             jim_reports_to_sally,
             rob_reports_to_alice,
-            clark_reports_to_lois, r)
+            clark_reports_to_lois, r
+        )
         val result = compose {
             reportsReport(reports)
         }
@@ -725,7 +726,8 @@ class CompositionTests {
         val reports = listOf(
             jim_reports_to_sally,
             rob_reports_to_alice,
-            clark_reports_to_lois, r)
+            clark_reports_to_lois, r
+        )
         val result = compose {
             reportsReport(reports)
         }
@@ -1507,25 +1509,31 @@ class CompositionTests {
         @Composable fun MockComposeScope.composition(a: Boolean, b: Boolean, c: Boolean) {
             linear {
                 if (a) {
-                    key(1) { linear {
-                        val l = remember { lifecycleObject }
-                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                        text("a")
-                    } }
+                    key(1) {
+                        linear {
+                            val l = remember { lifecycleObject }
+                            assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                            text("a")
+                        }
+                    }
                 }
                 if (b) {
-                    key(2) { linear {
-                        val l = remember { lifecycleObject }
-                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                        text("b")
-                    } }
+                    key(2) {
+                        linear {
+                            val l = remember { lifecycleObject }
+                            assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                            text("b")
+                        }
+                    }
                 }
                 if (c) {
-                    key(3) { linear {
-                        val l = remember { lifecycleObject }
-                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                        text("c")
-                    } }
+                    key(3) {
+                        linear {
+                            val l = remember { lifecycleObject }
+                            assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                            text("c")
+                        }
+                    }
                 }
             }
         }
@@ -1686,10 +1694,12 @@ class CompositionTests {
 
         @Composable fun MockComposeScope.composition(obj: Any) {
             linear {
-                key(1) { linear {
-                    remember(obj) { obj }
-                    text("Some value")
-                } }
+                key(1) {
+                    linear {
+                        remember(obj) { obj }
+                        text("Some value")
+                    }
+                }
             }
         }
 
@@ -1729,8 +1739,11 @@ class CompositionTests {
         var order = 0
         val objects = mutableListOf<Any>()
         val newLifecycleObject = { name: String ->
-            object : CompositionLifecycleObserver, Counted,
-                Ordered, Named {
+            object :
+                CompositionLifecycleObserver,
+                Counted,
+                Ordered,
+                Named {
                 override var name = name
                 override var count = 0
                 override var enterOrder = -1
@@ -1921,9 +1934,11 @@ class CompositionTests {
     fun testInsertOnMultipleLevels() {
         val items = mutableListOf(
             1 to mutableListOf(
-                0, 1, 2, 3, 4),
+                0, 1, 2, 3, 4
+            ),
             3 to mutableListOf(
-                0, 1, 2, 3, 4)
+                0, 1, 2, 3, 4
+            )
         )
 
         val invalidates = mutableListOf<() -> Unit>()
@@ -2375,13 +2390,17 @@ class CompositionTests {
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {
     fun Array<T>.getString() = this.joinToString(", ") { it.toString() }
-    fun err(msg: String): Nothing = error("$message: $msg, expected: [${
-    expected.getString()}], received: [${received.getString()}]")
+    fun err(msg: String): Nothing = error(
+        "$message: $msg, expected: [${
+        expected.getString()}], received: [${received.getString()}]"
+    )
     if (expected.size != received.size) err("sizes are different")
     expected.indices.forEach { index ->
         if (expected[index] != received[index])
-            err("item at index $index was different (expected [${
-            expected[index]}], received: [${received[index]}]")
+            err(
+                "item at index $index was different (expected [${
+                expected[index]}], received: [${received[index]}]"
+            )
     }
 }
 
@@ -2423,11 +2442,14 @@ private class CompositionResult(
 
 @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
 private fun <T> doCompose(composer: Composer<*>, block: () -> T): T {
-    val snapshot = takeMutableSnapshot({
-        composer.recordReadOf(it)
-    }, {
-        composer.recordWriteOf(it)
-    })
+    val snapshot = takeMutableSnapshot(
+        {
+            composer.recordReadOf(it)
+        },
+        {
+            composer.recordWriteOf(it)
+        }
+    )
     return try {
         snapshot.enter { block() }.also {
             snapshot.apply().check()

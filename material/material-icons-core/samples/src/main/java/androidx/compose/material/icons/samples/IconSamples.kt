@@ -17,7 +17,7 @@
 package androidx.compose.material.icons.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu

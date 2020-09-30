@@ -44,12 +44,14 @@ internal fun differentBits(slot: Int): Int = bitsForSlot(0b10, slot)
  */
 @Stable
 @ComposeCompilerApi
-class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-        P17, P18, R>(
-            val key: Int,
-            private val tracked: Boolean,
-            private val sourceInformation: String?
-        ) :
+/* ktlint-disable parameter-list-wrapping */ // TODO(https://github.com/pinterest/ktlint/issues/921): reenable
+class ComposableLambda<
+    P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
+    P17, P18, R>(
+    val key: Int,
+    private val tracked: Boolean,
+    private val sourceInformation: String?
+) :
     Function2<Composer<*>, Int, R>,
     Function3<P1, Composer<*>, Int, R>,
     Function4<P1, P2, Composer<*>, Int, R>,
@@ -66,13 +68,13 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
     Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer<*>, Int, R>,
     Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer<*>, Int, R>,
     Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, Composer<*>, Int,
-            R>,
+        R>,
     Function19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-            Composer<*>, Int, Int, R>,
+        Composer<*>, Int, Int, R>,
     Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
-            Composer<*>, Int, Int, R>,
+        Composer<*>, Int, Int, R>,
     Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            Composer<*>, Int, Int, R> {
+        Composer<*>, Int, Int, R> {
     private var _block: Any? = null
     private var scope: RecomposeScope? = null
     private var scopes: MutableList<RecomposeScope>? = null
@@ -148,11 +150,13 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(1) else sameBits(1)
-        val result = (_block as (
-            p1: P1,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             c,
             dirty
@@ -179,13 +183,15 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(3) else sameBits(3)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -207,14 +213,16 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(4) else sameBits(4)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -240,15 +248,17 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(5) else sameBits(5)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -276,16 +286,18 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(6) else sameBits(6)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -315,17 +327,19 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(7) else sameBits(7)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -357,18 +371,20 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(8) else sameBits(8)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            c: Composer<*>,
-            changed: Int
-        ) -> R) (
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            ) (
             p1,
             p2,
             p3,
@@ -402,19 +418,21 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(9) else sameBits(9)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -450,20 +468,22 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(10) else sameBits(10)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -501,21 +521,23 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(11) else sameBits(11)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -555,22 +577,24 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(12) else sameBits(12)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                p12: P12,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -612,23 +636,25 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(13) else sameBits(13)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                p12: P12,
+                p13: P13,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -672,24 +698,26 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(14) else sameBits(14)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                p12: P12,
+                p13: P13,
+                p14: P14,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -735,25 +763,27 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(15) else sameBits(15)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            p15: P15,
-            c: Composer<*>,
-            changed: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                p12: P12,
+                p13: P13,
+                p14: P14,
+                p15: P15,
+                c: Composer<*>,
+                changed: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -820,27 +850,29 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(16) else sameBits(16)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            p15: P15,
-            p16: P16,
-            c: Composer<*>,
-            changed: Int,
-            changed1: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                p12: P12,
+                p13: P13,
+                p14: P14,
+                p15: P15,
+                p16: P16,
+                c: Composer<*>,
+                changed: Int,
+                changed1: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -912,28 +944,30 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(17) else sameBits(17)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            p15: P15,
-            p16: P16,
-            p17: P17,
-            c: Composer<*>,
-            changed: Int,
-            changed1: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                p12: P12,
+                p13: P13,
+                p14: P14,
+                p15: P15,
+                p16: P16,
+                p17: P17,
+                c: Composer<*>,
+                changed: Int,
+                changed1: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -976,7 +1010,8 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
                 p17,
                 nc,
                 changed or 0b1,
-                changed1)
+                changed1
+            )
         }
         return result
     }
@@ -1007,29 +1042,31 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(18) else sameBits(18)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            p15: P15,
-            p16: P16,
-            p17: P17,
-            p18: P18,
-            c: Composer<*>,
-            changed: Int,
-            changed1: Int
-        ) -> R)(
+        val result = (
+            _block as (
+                p1: P1,
+                p2: P2,
+                p3: P3,
+                p4: P4,
+                p5: P5,
+                p6: P6,
+                p7: P7,
+                p8: P8,
+                p9: P9,
+                p10: P10,
+                p11: P11,
+                p12: P12,
+                p13: P13,
+                p14: P14,
+                p15: P15,
+                p16: P16,
+                p17: P17,
+                p18: P18,
+                c: Composer<*>,
+                changed: Int,
+                changed1: Int
+            ) -> R
+            )(
             p1,
             p2,
             p3,
@@ -1086,7 +1123,7 @@ private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
 
 @ComposeCompilerApi
 private typealias CLambda = ComposableLambda<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-        Any, Any, Any, Any, Any, Any, Any, Any, Any>
+    Any, Any, Any, Any, Any, Any, Any, Any, Any>
 
 @Suppress("unused")
 @ComposeCompilerApi

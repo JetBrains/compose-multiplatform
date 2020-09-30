@@ -66,11 +66,13 @@ class DemoActivity : ComponentActivity() {
             }
             val demoColors = remember {
                 DemoColors().also {
-                    lifecycle.addObserver(LifecycleEventObserver { _, event ->
-                        if (event == Lifecycle.Event.ON_RESUME) {
-                            it.loadColorsFromSharedPreferences(this)
+                    lifecycle.addObserver(
+                        LifecycleEventObserver { _, event ->
+                            if (event == Lifecycle.Event.ON_RESUME) {
+                                it.loadColorsFromSharedPreferences(this)
+                            }
                         }
-                    })
+                    )
                 }
             }
             DemoTheme(demoColors, window) {

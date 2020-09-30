@@ -28,14 +28,14 @@ import kotlin.jvm.JvmField
     )
 )
 class ModelList<T>
-        @Deprecated(
-            "Frames have been replaced by snapshots",
-            ReplaceWith(
-                "mutableStateListOf()",
-                "androidx.compose.runtime.mutableStateListOf"
-            )
-        )
-        constructor() : MutableList<T>, Framed {
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "mutableStateListOf()",
+        "androidx.compose.runtime.mutableStateListOf"
+    )
+)
+constructor() : MutableList<T>, Framed {
     private var myFirst: Record =
         ArrayContainer<T>()
     override val firstFrameRecord: Record get() = myFirst
@@ -148,14 +148,14 @@ fun <T> modelListOf(vararg elements: T) = ModelList<T>().apply { addAll(elements
     )
 )
 class ModelMap<K, V>
-    @Deprecated(
-        "Frames have been replaced by snapshots",
-        ReplaceWith(
-            "mutableStateMapOf()",
-            "androidx.compose.runtime.StableMutableMap"
-        )
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "mutableStateMapOf()",
+        "androidx.compose.runtime.StableMutableMap"
     )
-    constructor() : MutableMap<K, V>, Framed {
+)
+constructor() : MutableMap<K, V>, Framed {
     private var myFirst: Record =
         MapContainer<K, V>()
     override val firstFrameRecord: Record get() = myFirst

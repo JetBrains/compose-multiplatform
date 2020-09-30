@@ -17,7 +17,8 @@
 package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.FlowRow
@@ -41,7 +42,7 @@ fun SimpleFlowRow() {
         crossAxisSpacing = 10.dp
     ) {
         sizes.forEach { size ->
-            Box(Modifier.preferredSize(size, 20.dp), backgroundColor = Color.Magenta)
+            Box(Modifier.preferredSize(size, 20.dp).background(Color.Magenta))
         }
     }
 }
@@ -55,7 +56,7 @@ fun SimpleFlowColumn() {
         crossAxisSpacing = 10.dp
     ) {
         sizes.forEach { size ->
-            Box(Modifier.preferredSize(20.dp, size), backgroundColor = Color.Magenta)
+            Box(Modifier.preferredSize(20.dp, size).background(Color.Magenta))
         }
     }
 }

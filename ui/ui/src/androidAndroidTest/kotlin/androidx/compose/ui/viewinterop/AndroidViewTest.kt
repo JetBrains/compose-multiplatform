@@ -27,7 +27,7 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
@@ -288,7 +288,7 @@ class AndroidViewTest {
             Box {
                 AndroidView(::FrameLayout) {
                     it.setContent(Recomposer()) {
-                        Box()
+                        Box(Modifier)
                     }
                 }
             }
@@ -322,9 +322,12 @@ class AndroidViewTest {
             val density = Density(3f)
             val sizeIpx = with(density) { size.toIntPx() }
             Providers(DensityAmbient provides density) {
-                AndroidView({ FrameLayout(it) }, Modifier.size(size).onPositioned {
-                    assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
-                })
+                AndroidView(
+                    { FrameLayout(it) },
+                    Modifier.size(size).onPositioned {
+                        assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                    }
+                )
             }
         }
         rule.waitForIdle()

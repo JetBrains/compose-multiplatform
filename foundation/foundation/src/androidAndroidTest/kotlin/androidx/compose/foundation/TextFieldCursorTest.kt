@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.Modifier

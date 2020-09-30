@@ -46,7 +46,7 @@ import androidx.compose.ui.util.fastForEach
 
 @RequiresOptIn(
     "This is an experimental API for being able to perform subcomposition during the " +
-            "measuring. API is likely to change before becoming stable."
+        "measuring. API is likely to change before becoming stable."
 )
 annotation class ExperimentalSubcomposeLayoutApi
 
@@ -117,7 +117,8 @@ abstract class SubcomposeMeasureScope<T> : MeasureScope() {
 }
 
 @OptIn(ExperimentalLayoutNodeApi::class, ExperimentalSubcomposeLayoutApi::class)
-private class SubcomposeLayoutState<T> : SubcomposeMeasureScope<T>(),
+private class SubcomposeLayoutState<T> :
+    SubcomposeMeasureScope<T>(),
     CompositionLifecycleObserver {
     // Values set during the composition
     var recomposer: Recomposer? = null
@@ -131,8 +132,8 @@ private class SubcomposeLayoutState<T> : SubcomposeMeasureScope<T>(),
     // Pre-allocated lambdas to update LayoutNode
     val setRoot: LayoutNode.(Unit) -> Unit = { root = this }
     val setMeasureBlock:
-            LayoutNode.(SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult) -> Unit =
-        { measureBlocks = createMeasureBlocks(it) }
+        LayoutNode.(SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult) -> Unit =
+            { measureBlocks = createMeasureBlocks(it) }
 
     // inner state
     private var root: LayoutNode? = null

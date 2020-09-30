@@ -49,8 +49,8 @@ class RtlLayoutTest {
     @get:Rule
     val activityTestRule =
         androidx.test.rule.ActivityTestRule<TestActivity>(
-        TestActivity::class.java
-    )
+            TestActivity::class.java
+        )
     private lateinit var activity: TestActivity
     internal lateinit var density: Density
     internal lateinit var countDownLatch: CountDownLatch

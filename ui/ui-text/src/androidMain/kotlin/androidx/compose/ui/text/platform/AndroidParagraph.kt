@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
-import androidx.compose.ui.text.ParagraphConstraints
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
@@ -64,7 +63,7 @@ internal class AndroidParagraph constructor(
     val paragraphIntrinsics: AndroidParagraphIntrinsics,
     val maxLines: Int,
     val ellipsis: Boolean,
-    val constraints: ParagraphConstraints
+    override val width: Float
 ) : Paragraph {
 
     constructor(
@@ -74,7 +73,7 @@ internal class AndroidParagraph constructor(
         placeholders: List<AnnotatedString.Range<Placeholder>>,
         maxLines: Int,
         ellipsis: Boolean,
-        constraints: ParagraphConstraints,
+        width: Float,
         typefaceAdapter: TypefaceAdapter,
         density: Density
     ) : this(
@@ -88,15 +87,14 @@ internal class AndroidParagraph constructor(
         ),
         maxLines = maxLines,
         ellipsis = ellipsis,
-        constraints = constraints
+        width = width
     )
 
     private val layout: TextLayout
 
-    override val width: Float
-
     init {
         require(maxLines >= 1) { "maxLines should be greater than 0" }
+        require(width >= 0f) { "width should not be negative" }
 
         val style = paragraphIntrinsics.style
 
@@ -113,11 +111,9 @@ internal class AndroidParagraph constructor(
             null
         }
 
-        this.width = constraints.width
-
         layout = TextLayout(
             charSequence = paragraphIntrinsics.charSequence,
-            width = constraints.width,
+            width = width,
             textPaint = textPaint,
             ellipsize = ellipsize,
             alignment = alignment,
@@ -167,7 +163,8 @@ internal class AndroidParagraph constructor(
                 val line = layout.getLineForOffset(start)
                 // This Placeholder is ellipsized, return null instead.
                 if (layout.getLineEllipsisCount(line) > 0 &&
-                    end > layout.getLineEllipsisOffset(line)) {
+                    end > layout.getLineEllipsisOffset(line)
+                ) {
                     return@map null
                 }
 
@@ -244,7 +241,7 @@ internal class AndroidParagraph constructor(
         if (start !in 0..end || end > charSequence.length) {
             throw AssertionError(
                 "Start($start) or End($end) is out of Range(0..${charSequence.length})," +
-                        " or start > end!"
+                    " or start > end!"
             )
         }
         val path = android.graphics.Path()
@@ -375,7 +372,7 @@ internal actual fun ActualParagraph(
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     maxLines: Int,
     ellipsis: Boolean,
-    constraints: ParagraphConstraints,
+    width: Float,
     density: Density,
     resourceLoader: Font.ResourceLoader
 ): Paragraph = AndroidParagraph(
@@ -391,17 +388,17 @@ internal actual fun ActualParagraph(
     ),
     maxLines,
     ellipsis,
-    constraints
+    width
 )
 
 internal actual fun ActualParagraph(
     paragraphIntrinsics: ParagraphIntrinsics,
     maxLines: Int,
     ellipsis: Boolean,
-    constraints: ParagraphConstraints
+    width: Float
 ): Paragraph = AndroidParagraph(
     paragraphIntrinsics as AndroidParagraphIntrinsics,
     maxLines,
     ellipsis,
-    constraints
+    width
 )

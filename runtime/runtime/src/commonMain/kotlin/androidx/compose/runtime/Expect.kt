@@ -115,9 +115,11 @@ expect annotation class MainThread()
 )
 expect annotation class TestOnly()
 
-@Target(AnnotationTarget.FUNCTION,
+@Target(
+    AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
-    AnnotationTarget.PROPERTY_SETTER)
+    AnnotationTarget.PROPERTY_SETTER
+)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
 expect annotation class CheckResult(

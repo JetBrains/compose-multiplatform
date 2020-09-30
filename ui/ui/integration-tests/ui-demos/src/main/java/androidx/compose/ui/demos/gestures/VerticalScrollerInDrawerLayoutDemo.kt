@@ -16,14 +16,13 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,7 +64,7 @@ fun VerticalScrollerInDrawerDemo() {
         Text("Demonstrates scroll orientation locking.")
         Text(
             "There is a vertically scrolling column and a drawer layout.  A pointer can only " +
-                    "contribute to dragging the column or the drawer, but not both."
+                "contribute to dragging the column or the drawer, but not both."
         )
         DrawerLayout(280.dp) {
             Scrollable(Orientation.Vertical) {
@@ -108,7 +107,7 @@ private fun DrawerLayout(drawerWidth: Dp, children: @Composable ColumnScope.() -
             }
         }
 
-    Stack(Modifier.scrollGestureFilter(scrollObserver, Orientation.Horizontal, canDrag)) {
+    Box(Modifier.scrollGestureFilter(scrollObserver, Orientation.Horizontal, canDrag)) {
         Column {
             children()
         }
@@ -214,7 +213,8 @@ private fun Scrollable(orientation: Orientation, children: @Composable () -> Uni
                     Orientation.Vertical -> placeable.placeRelative(0, offset.value.roundToInt())
                 }
             }
-        })
+        }
+    )
 }
 
 private val ClipModifier = object : DrawModifier {

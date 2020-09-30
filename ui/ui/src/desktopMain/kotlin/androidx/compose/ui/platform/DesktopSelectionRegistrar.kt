@@ -43,26 +43,28 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
 
     fun sort(containerLayoutCoordinates: LayoutCoordinates): List<Selectable> {
         if (!sorted) {
-            _selectables.sortWith(Comparator { a: Selectable, b: Selectable ->
-                val layoutCoordinatesA = a.getLayoutCoordinates()
-                val layoutCoordinatesB = b.getLayoutCoordinates()
+            _selectables.sortWith(
+                Comparator { a: Selectable, b: Selectable ->
+                    val layoutCoordinatesA = a.getLayoutCoordinates()
+                    val layoutCoordinatesB = b.getLayoutCoordinates()
 
-                val positionA =
-                    if (layoutCoordinatesA != null) containerLayoutCoordinates.childToLocal(
-                        layoutCoordinatesA,
-                        Offset.Zero
-                    )
-                    else Offset.Zero
-                val positionB =
-                    if (layoutCoordinatesB != null) containerLayoutCoordinates.childToLocal(
-                        layoutCoordinatesB,
-                        Offset.Zero
-                    )
-                    else Offset.Zero
+                    val positionA =
+                        if (layoutCoordinatesA != null) containerLayoutCoordinates.childToLocal(
+                            layoutCoordinatesA,
+                            Offset.Zero
+                        )
+                        else Offset.Zero
+                    val positionB =
+                        if (layoutCoordinatesB != null) containerLayoutCoordinates.childToLocal(
+                            layoutCoordinatesB,
+                            Offset.Zero
+                        )
+                        else Offset.Zero
 
-                if (positionA.y == positionB.y) compareValues(positionA.x, positionB.x)
-                else compareValues(positionA.y, positionB.y)
-            })
+                    if (positionA.y == positionB.y) compareValues(positionA.x, positionB.x)
+                    else compareValues(positionA.y, positionB.y)
+                }
+            )
             sorted = true
         }
         return selectables

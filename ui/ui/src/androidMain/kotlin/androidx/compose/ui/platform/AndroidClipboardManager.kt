@@ -27,7 +27,7 @@ private const val PLAIN_TEXT_LABEL = "plain text"
  */
 internal class AndroidClipboardManager(context: Context) : ClipboardManager {
     private val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as
-            android.content.ClipboardManager
+        android.content.ClipboardManager
 
     override fun setText(annotatedString: AnnotatedString) {
         clipboardManager.setPrimaryClip(
@@ -45,13 +45,13 @@ internal class AndroidClipboardManager(context: Context) : ClipboardManager {
     }
 
     private fun convertCharSequenceToAnnotatedString(charSequence: CharSequence?):
-            AnnotatedString? {
-        if (charSequence == null) return null
-        return AnnotatedString(text = charSequence.toString())
-    }
+        AnnotatedString? {
+            if (charSequence == null) return null
+            return AnnotatedString(text = charSequence.toString())
+        }
 
     private fun convertAnnotatedStringToCharSequence(annotatedString: AnnotatedString):
-            CharSequence? {
-        return annotatedString.text
-    }
+        CharSequence? {
+            return annotatedString.text
+        }
 }

@@ -18,6 +18,9 @@ package androidx.compose.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.annotation.IntRange
+import androidx.compose.ui.util.packInts
+import androidx.compose.ui.util.unpackInt1
+import androidx.compose.ui.util.unpackInt2
 
 fun CharSequence.substring(range: TextRange): String = this.substring(range.min, range.max)
 
@@ -25,14 +28,30 @@ fun CharSequence.substring(range: TextRange): String = this.substring(range.min,
  * An immutable text range class, represents a text range from [start] (inclusive) to [end]
  * (exclusive). [end] can be smaller than [start] and in those cases [min] and [max] can be
  * used in order to fetch the values.
- *
- * @param start the inclusive start offset of the range. Must be non-negative, otherwise an
- * exception will be thrown.
- * @param end the exclusive end offset of the range. Must be non-negative, otherwise an
- * exception will be thrown.
  */
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-data class TextRange(@IntRange(from = 0) val start: Int, @IntRange(from = 0) val end: Int) {
+inline class TextRange(val packedValue: Long) {
+
+    /**
+     * An immutable text range class, represents a text range from [start] (inclusive) to [end]
+     * (exclusive). [end] can be smaller than [start] and in those cases [min] and [max] can be
+     * used in order to fetch the values.
+     *
+     * @param start the inclusive start offset of the range. Must be non-negative, otherwise an
+     * exception will be thrown.
+     * @param end the exclusive end offset of the range. Must be non-negative, otherwise an
+     * exception will be thrown.
+     */
+    constructor(
+        @IntRange(from = 0) start: Int,
+        @IntRange(from = 0) end: Int
+    ) : this(packWithCheck(start, end))
+
+    val start: Int get() = unpackInt1(packedValue)
+
+    val end: Int get() = unpackInt2(packedValue)
+
     /** The minimum offset of the range. */
     val min: Int get() = if (start > end) end else start
 
@@ -54,15 +73,6 @@ data class TextRange(@IntRange(from = 0) val start: Int, @IntRange(from = 0) val
      */
     val length: Int get() = max - min
 
-    init {
-        require(start >= 0) {
-            "start cannot be negative. [start: $start]"
-        }
-        require(end >= 0) {
-            "end cannot negative. [end: $end]"
-        }
-    }
-
     /**
      * Returns true if the given range has intersection with this range
      */
@@ -77,6 +87,10 @@ data class TextRange(@IntRange(from = 0) val start: Int, @IntRange(from = 0) val
      * Returns true if the given offset is a part of this range.
      */
     operator fun contains(offset: Int): Boolean = offset in min until max
+
+    override fun toString(): String {
+        return "TextRange($start, $end)"
+    }
 
     companion object {
         val Zero = TextRange(0)
@@ -107,4 +121,14 @@ fun TextRange.constrain(minimumValue: Int, maximumValue: Int): TextRange {
         return TextRange(newStart, newEnd)
     }
     return this
+}
+
+private fun packWithCheck(start: Int, end: Int): Long {
+    require(start >= 0) {
+        "start cannot be negative. [start: $start]"
+    }
+    require(end >= 0) {
+        "end cannot negative. [end: $end]"
+    }
+    return packInts(start, end)
 }

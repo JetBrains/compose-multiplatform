@@ -265,14 +265,16 @@ class SlotReader(val table: SlotTable) {
         while (current < currentEnd) {
             val location = current
             val group = slots[location].asGroup
-            result.add(KeyInfo(
-                group.key,
-                group.dataKey,
-                location,
-                skipGroup(),
-                index++,
-                group
-            ))
+            result.add(
+                KeyInfo(
+                    group.key,
+                    group.dataKey,
+                    location,
+                    skipGroup(),
+                    index++,
+                    group
+                )
+            )
         }
         current = oldCurrent
         this.nodeIndex = oldNodeIndex
@@ -664,8 +666,10 @@ class SlotWriter internal constructor(val table: SlotTable) {
         current = oldCurrent
         nodeCount = oldNodeCount
 
-        slots.copyInto(slots, effectiveIndex(current),
-            effectiveIndex(newMoveLocation), effectiveIndex(newMoveLocation) + moveLen)
+        slots.copyInto(
+            slots, effectiveIndex(current),
+            effectiveIndex(newMoveLocation), effectiveIndex(newMoveLocation) + moveLen
+        )
 
         // Before we remove the old location, move any anchors
         table.moveAnchors(newMoveLocation, current, moveLen)
@@ -877,12 +881,16 @@ class SlotWriter internal constructor(val table: SlotTable) {
                 pendingClear = false
                 if (table.anchors.isNotEmpty()) table.updateAnchors(index)
                 if (index < table.gapStart) {
-                    slots.copyInto(slots, index + table.gapLen,
-                        index, table.gapStart)
+                    slots.copyInto(
+                        slots, index + table.gapLen,
+                        index, table.gapStart
+                    )
                 } else {
-                    slots.copyInto(slots, table.gapStart,
+                    slots.copyInto(
+                        slots, table.gapStart,
                         table.gapStart + table.gapLen,
-                        index + table.gapLen)
+                        index + table.gapLen
+                    )
                 }
                 table.gapStart = index
                 pendingClear = true
@@ -966,9 +974,9 @@ class SlotWriter internal constructor(val table: SlotTable) {
         else
             "none"
         return "SlotWriter" +
-                "(current=$current, " +
-                "size=${slots.size - table.gapLen}, " +
-                "gap=${gap}${if (insertCount > 0) ", inserting" else ""})"
+            "(current=$current, " +
+            "size=${slots.size - table.gapLen}, " +
+            "gap=${gap}${if (insertCount > 0) ", inserting" else ""})"
     }
 }
 
@@ -1212,7 +1220,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
             }
             require(group.nodes == nodeCount) {
                 "Incorrect node count for group at $location, expected ${
-                    group.nodes
+                group.nodes
                 }, received $nodeCount"
             }
             return if (group.isNode) 1 else nodeCount

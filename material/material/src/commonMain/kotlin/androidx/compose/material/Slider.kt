@@ -22,7 +22,6 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -33,7 +32,7 @@ import androidx.compose.foundation.animation.fling
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeightIn
@@ -99,6 +98,10 @@ import kotlin.math.roundToInt
  * @param onValueChangeEnd lambda to be invoked when value change has ended. This callback
  * shouldn't be used to update the slider value (use [onValueChange] for that), but rather to
  * know when the user has completed selecting a new value by ending a drag or a click.
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Slider. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this Slider in different [Interaction]s.
  * @param thumbColor color of thumb of the slider
  * @param activeTrackColor color of the track in the part that is "active", meaning that the
  * thumb is ahead of it
@@ -117,6 +120,7 @@ fun Slider(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     @IntRange(from = 0) steps: Int = 0,
     onValueChangeEnd: () -> Unit = {},
+    interactionState: InteractionState = remember { InteractionState() },
     thumbColor: Color = MaterialTheme.colors.primary,
     activeTrackColor: Color = MaterialTheme.colors.primary,
     inactiveTrackColor: Color = activeTrackColor.copy(alpha = InactiveTrackColorAlpha),
@@ -148,8 +152,6 @@ fun Slider(
                 onValueChangeEnd()
             }
         }
-
-        val interactionState = remember { InteractionState() }
 
         val press = Modifier.pressIndicatorGestureFilter(
             onStart = { pos ->
@@ -221,7 +223,7 @@ private fun SliderImpl(
     val widthDp = with(DensityAmbient.current) {
         width.toDp()
     }
-    Stack(modifier.then(DefaultSliderConstraints)) {
+    Box(modifier.then(DefaultSliderConstraints)) {
         val thumbSize = ThumbRadius * 2
         val offset = (widthDp - thumbSize) * positionFraction
         val center = Modifier.align(Alignment.CenterStart)

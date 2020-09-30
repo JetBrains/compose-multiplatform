@@ -19,6 +19,8 @@ package androidx.compose.material
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +30,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,6 +55,10 @@ import androidx.compose.ui.unit.dp
  * @param modifier Modifier to be applied to the radio button
  * @param enabled Controls the enabled state of the [RadioButton]. When `false`, this button will
  * not be selectable and appears in the disabled ui state
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this RadioButton. You can create and pass in your own remembered
+ * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
+ * behavior of this RadioButton in different [Interaction]s.
  * @param color color of the RadioButton. See [RadioButtonConstants.animateDefaultColor] for
  * customizing the color of the RadioButton in one / multiple states, such as when [selected] or
  * not [enabled].
@@ -62,6 +69,7 @@ fun RadioButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     color: Color = RadioButtonConstants.animateDefaultColor(selected, enabled)
 ) {
     val dotRadius = animate(
@@ -74,6 +82,7 @@ fun RadioButton(
                 selected = selected,
                 onClick = onClick,
                 enabled = enabled,
+                interactionState = interactionState,
                 indication = RippleIndication(bounded = false, radius = RadioButtonRippleRadius)
             )
             .wrapContentSize(Alignment.Center)

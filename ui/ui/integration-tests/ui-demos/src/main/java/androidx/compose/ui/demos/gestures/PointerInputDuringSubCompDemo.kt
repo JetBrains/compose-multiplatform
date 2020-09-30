@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,15 +50,15 @@ fun PointerInputDuringSubComp() {
     Column {
         Text(
             "Demonstrates that PointerInputFilters that are currently receiving pointer input " +
-                    "events can be removed from the hierarchy by sub composition with no difficulty"
+                "events can be removed from the hierarchy by sub composition with no difficulty"
         )
         Text(
             "Below is an AdapterList with many touchable items.  Each item keeps track of the " +
-                    "number of pointers touching it.  If you touch an item and then scroll so " +
-                    "that it goes out of the viewport and then back into the viewport, you will" +
-                    " see that it no longer knows that a finger is touching it.  That is because " +
-                    "it is actually a new item that has not been hit tested yet.  If you keep " +
-                    "your finger there and then add more fingers, it will track those new fingers."
+                "number of pointers touching it.  If you touch an item and then scroll so " +
+                "that it goes out of the viewport and then back into the viewport, you will" +
+                " see that it no longer knows that a finger is touching it.  That is because " +
+                "it is actually a new item that has not been hit tested yet.  If you keep " +
+                "your finger there and then add more fingers, it will track those new fingers."
         )
         LazyColumnFor(
             List(100) { index -> index },
@@ -74,7 +74,7 @@ fun PointerInputDuringSubComp() {
                 Modifier.fillParentMaxSize()
                     .border(width = 1.dp, color = Color.Black)
                     .pointerCounterGestureFilter { newCount -> pointerCount.value = newCount },
-                gravity = Alignment.Center
+                alignment = Alignment.Center
             ) {
                 Text(
                     "${pointerCount.value}",
@@ -109,8 +109,9 @@ internal class PointerCounterGestureFilter : PointerInputFilter() {
     ): List<PointerInputChange> {
         if (pass == PointerEventPass.Main) {
             if (changes.any {
-                    it.changedToDownIgnoreConsumed() || it.changedToUpIgnoreConsumed()
-                }) {
+                it.changedToDownIgnoreConsumed() || it.changedToUpIgnoreConsumed()
+            }
+            ) {
                 onPointerCountChanged.invoke(changes.count { it.current.down })
             }
         }

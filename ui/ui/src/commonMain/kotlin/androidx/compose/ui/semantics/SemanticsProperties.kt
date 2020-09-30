@@ -90,6 +90,14 @@ object SemanticsProperties {
     )
 
     /**
+     * The horizontal scroll state of this node if this node is scrollable.
+     *
+     * @see SemanticsPropertyReceiver.horizontalAccessibilityScrollState
+     */
+    val HorizontalAccessibilityScrollState =
+        SemanticsPropertyKey<AccessibilityScrollState>("HorizontalAccessibilityScrollState")
+
+    /**
      * Whether this semantics node represents a Popup. Not to be confused with if this node is
      * _part of_ a Popup.
      *
@@ -100,7 +108,8 @@ object SemanticsProperties {
         mergePolicy = { _, _ ->
             throw IllegalStateException(
                 "merge function called on unmergeable property IsPopup. " +
-                "A popup should not be a child of a clickable/focusable node.")
+                    "A popup should not be a child of a clickable/focusable node."
+            )
         }
     )
 
@@ -113,7 +122,8 @@ object SemanticsProperties {
         mergePolicy = { _, _ ->
             throw IllegalStateException(
                 "merge function called on unmergeable property IsDialog. " +
-                "A dialog should not be a child of a clickable/focusable node.")
+                    "A dialog should not be a child of a clickable/focusable node."
+            )
         }
     )
 
@@ -159,6 +169,14 @@ object SemanticsProperties {
      * @see SemanticsPropertyReceiver.textSelectionRange
      */
     val TextSelectionRange = SemanticsPropertyKey<TextRange>("TextSelectionRange")
+
+    /**
+     * The vertical scroll state of this node if this node is scrollable.
+     *
+     * @see SemanticsPropertyReceiver.verticalAccessibilityScrollState
+     */
+    val VerticalAccessibilityScrollState =
+        SemanticsPropertyKey<AccessibilityScrollState>("VerticalAccessibilityScrollState")
 }
 
 /**
@@ -173,7 +191,7 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.getTextLayoutResult
      */
     val GetTextLayoutResult = SemanticsPropertyKey<AccessibilityAction<
-                (MutableList<TextLayoutResult>) -> Boolean>>("GetTextLayoutResult")
+            (MutableList<TextLayoutResult>) -> Boolean>>("GetTextLayoutResult")
 
     /**
      * Action to be performed when the node is clicked.
@@ -181,6 +199,13 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.onClick
      */
     val OnClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnClick")
+
+    /**
+     * Action to be performed when the node is long clicked.
+     *
+     * @see SemanticsPropertyReceiver.onLongClick
+     */
+    val OnLongClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnLongClick")
 
     /**
      * Action to scroll to a specified position.
@@ -205,7 +230,7 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.setSelection
      */
     val SetSelection = SemanticsPropertyKey<
-            AccessibilityAction<(Int, Int, Boolean) -> Boolean>>("SetSelection")
+        AccessibilityAction<(Int, Int, Boolean) -> Boolean>>("SetSelection")
 
     /**
      * Action to set the text of this node.
@@ -213,7 +238,7 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.setText
      */
     val SetText = SemanticsPropertyKey<
-            AccessibilityAction<(AnnotatedString) -> Boolean>>("SetText")
+        AccessibilityAction<(AnnotatedString) -> Boolean>>("SetText")
 
     /**
      * Custom actions which are defined by app developers.
@@ -256,7 +281,7 @@ class SemanticsPropertyKey<T>(
     final operator fun getValue(thisRef: SemanticsPropertyReceiver, property: KProperty<*>): T {
         throw UnsupportedOperationException(
             "You cannot retrieve a semantics property directly - " +
-                    "use one of the SemanticsConfiguration.getOr* methods instead"
+                "use one of the SemanticsConfiguration.getOr* methods instead"
         )
     }
 
@@ -305,6 +330,21 @@ data class AccessibilityRangeInfo(
     val current: Float,
     val range: ClosedFloatingPointRange<Float>,
     @IntRange(from = 0) val steps: Int = 0
+)
+
+/**
+ * The scroll state of this node if this node is scrollable.
+ *
+ * @param value current scroll position value in pixels
+ * @param maxValue maximum bound for [value], or [Float.POSITIVE_INFINITY] if still unknown
+ * @param reverseScrolling for horizontal scroll, when this is `true`, 0 [value] will mean right,
+ * when`false`, 0 [value] will mean left. For vertical scroll, when this is `true`, 0 [value] will
+ * mean bottom, when `false`, 0 [value] will mean top
+ */
+data class AccessibilityScrollState(
+    val value: Float = 0f,
+    val maxValue: Float = 0f,
+    val reverseScrolling: Boolean = false
 )
 
 interface SemanticsPropertyReceiver {
@@ -361,6 +401,22 @@ var SemanticsPropertyReceiver.focused by SemanticsProperties.Focused
 fun SemanticsPropertyReceiver.hidden() {
     this[SemanticsProperties.Hidden] = Unit
 }
+
+/**
+ * The horizontal scroll state of this node if this node is scrollable.
+ *
+ * @see SemanticsProperties.HorizontalAccessibilityScrollState
+ */
+var SemanticsPropertyReceiver.horizontalAccessibilityScrollState
+by SemanticsProperties.HorizontalAccessibilityScrollState
+
+/**
+ * The vertical scroll state of this node if this node is scrollable.
+ *
+ * @see SemanticsProperties.VerticalAccessibilityScrollState
+ */
+var SemanticsPropertyReceiver.verticalAccessibilityScrollState
+by SemanticsProperties.VerticalAccessibilityScrollState
 
 /**
  * Whether this semantics node represents a Popup. Not to be confused with if this node is
@@ -430,6 +486,16 @@ fun SemanticsPropertyReceiver.getTextLayoutResult(
  */
 fun SemanticsPropertyReceiver.onClick(label: String? = null, action: () -> Boolean) {
     this[SemanticsActions.OnClick] = AccessibilityAction(label, action)
+}
+
+/**
+ * This function adds the [SemanticsActions.OnLongClick] to the [SemanticsPropertyReceiver].
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.OnLongClick] is called.
+ */
+fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: () -> Boolean) {
+    this[SemanticsActions.OnLongClick] = AccessibilityAction(label, action)
 }
 
 /**

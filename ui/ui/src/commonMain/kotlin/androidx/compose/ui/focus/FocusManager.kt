@@ -20,17 +20,33 @@ import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.gesture.PointerInputModifierImpl
+import androidx.compose.ui.gesture.TapGestureFilter
 
 /**
  * The focus manager is used by different [Owner][androidx.compose.ui.node.Owner] implementations
  * to control focus.
+ *
+ * @param focusModifier The modifier that will be used as the root focus modifier.
  */
 @ExperimentalFocus
-class FocusManager {
+internal class FocusManager(private val focusModifier: FocusModifier = FocusModifier(Inactive)) {
 
-    private val focusModifier = FocusModifier(Inactive)
+    private val passThroughClickModifier = PointerInputModifierImpl(
+        TapGestureFilter().apply {
+            onTap = { clearFocus() }
+            consumeChanges = false
+        }
+    )
+
+    /**
+     * A [Modifier] that can be added to the [Owners][androidx.compose.ui.node.Owner] modifier
+     * list that contains the modifiers required by the foucus system. (Eg, a root focus modifier).
+     */
     val modifier: Modifier
-        get() = focusModifier
+        // TODO(b/168831247): return an empty Modifier when there are no focusable children.
+        get() = passThroughClickModifier
+            .then(focusModifier)
 
     /**
      * The [Owner][androidx.compose.ui.node.Owner] calls this function when it gains focus. This

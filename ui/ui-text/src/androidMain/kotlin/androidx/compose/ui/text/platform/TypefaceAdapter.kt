@@ -68,7 +68,7 @@ internal open class TypefaceAdapter(
         ): Typeface {
 
             val synthesizeWeight = fontSynthesis.isWeightOn &&
-                    (fontWeight >= ANDROID_BOLD && font.weight < ANDROID_BOLD)
+                (fontWeight >= ANDROID_BOLD && font.weight < ANDROID_BOLD)
 
             val synthesizeStyle = fontSynthesis.isStyleOn && fontStyle != font.style
 

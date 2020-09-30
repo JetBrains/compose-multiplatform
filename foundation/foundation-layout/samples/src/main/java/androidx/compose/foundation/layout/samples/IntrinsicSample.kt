@@ -17,13 +17,13 @@
 package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,19 +46,22 @@ fun SameWidthBoxes() {
     // Box. Then preferredWidth min intrinsic will measure the Column with tight width, the
     // same as the premeasured minimum intrinsic width, which due to fillMaxWidth will force
     // the Box's to use the same width.
-    Stack {
+    Box {
         Column(Modifier.preferredWidth(IntrinsicSize.Min).fillMaxHeight()) {
             Box(
-                modifier = Modifier.fillMaxWidth().preferredSize(20.dp, 10.dp),
-                backgroundColor = Color.Gray
+                modifier = Modifier.fillMaxWidth()
+                    .preferredSize(20.dp, 10.dp)
+                    .background(Color.Gray)
             )
             Box(
-                modifier = Modifier.fillMaxWidth().preferredSize(30.dp, 10.dp),
-                backgroundColor = Color.Blue
+                modifier = Modifier.fillMaxWidth()
+                    .preferredSize(30.dp, 10.dp)
+                    .background(Color.Blue)
             )
             Box(
-                modifier = Modifier.fillMaxWidth().preferredSize(10.dp, 10.dp),
-                backgroundColor = Color.Magenta
+                modifier = Modifier.fillMaxWidth()
+                    .preferredSize(10.dp, 10.dp)
+                    .background(Color.Magenta)
             )
         }
     }
@@ -76,16 +79,16 @@ fun MatchParentDividerForText() {
     // preferredHeight min intrinsic will measure the Row with tight height, the same as the
     // premeasured minimum intrinsic height, which due to fillMaxHeight will force the Texts and
     // the divider to use the same height.
-    Stack {
+    Box {
         Row(Modifier.preferredHeight(IntrinsicSize.Min)) {
             Text(
                 text = "This is a really short text",
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )
-            Box(Modifier.preferredWidth(1.dp).fillMaxHeight(), backgroundColor = Color.Black)
+            Box(Modifier.preferredWidth(1.dp).fillMaxHeight().background(Color.Black))
             Text(
                 text = "This is a much much much much much much much much much much" +
-                        " much much much much much much longer text",
+                    " much much much much much much longer text",
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )
         }
@@ -104,15 +107,15 @@ fun SameWidthTextBoxes() {
     // same as the premeasured maximum intrinsic width, which due to fillMaxWidth modifiers will
     // force the Boxs to use the same width.
 
-    Stack {
+    Box {
         Column(Modifier.preferredWidth(IntrinsicSize.Max).fillMaxHeight()) {
-            Box(Modifier.fillMaxWidth(), backgroundColor = Color.Gray) {
+            Box(Modifier.fillMaxWidth().background(Color.Gray)) {
                 Text("Short text")
             }
-            Box(Modifier.fillMaxWidth(), backgroundColor = Color.Blue) {
+            Box(Modifier.fillMaxWidth().background(Color.Blue)) {
                 Text("Extremely long text giving the width of its siblings")
             }
-            Box(Modifier.fillMaxWidth(), backgroundColor = Color.Magenta) {
+            Box(Modifier.fillMaxWidth().background(Color.Magenta)) {
                 Text("Medium length text")
             }
         }
@@ -132,12 +135,12 @@ fun MatchParentDividerForAspectRatio() {
     // the same as the premeasured maximum intrinsic height, which due to fillMaxHeight modifier
     // will force the aspectRatios and the divider to use the same height.
     //
-    Stack {
+    Box {
         Row(Modifier.preferredHeight(IntrinsicSize.Max)) {
             val modifier = Modifier.fillMaxHeight().weight(1f)
-            Box(modifier.aspectRatio(2f), backgroundColor = Color.Gray)
-            Box(Modifier.preferredWidth(1.dp).fillMaxHeight(), backgroundColor = Color.Black)
-            Box(modifier.aspectRatio(1f), backgroundColor = Color.Blue)
+            Box(modifier.aspectRatio(2f).background(Color.Gray))
+            Box(Modifier.preferredWidth(1.dp).fillMaxHeight().background(Color.Black))
+            Box(modifier.aspectRatio(1f).background(Color.Blue))
         }
     }
 }

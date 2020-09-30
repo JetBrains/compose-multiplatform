@@ -93,10 +93,10 @@ class MutableRect(
     }
 
     override fun toString() = "MutableRect(" +
-            "${left.toStringAsFixed(1)}, " +
-            "${top.toStringAsFixed(1)}, " +
-            "${right.toStringAsFixed(1)}, " +
-            "${bottom.toStringAsFixed(1)})"
+        "${left.toStringAsFixed(1)}, " +
+        "${top.toStringAsFixed(1)}, " +
+        "${right.toStringAsFixed(1)}, " +
+        "${bottom.toStringAsFixed(1)})"
 }
 
 fun MutableRect.toRect(): Rect = Rect(left, top, right, bottom)

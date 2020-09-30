@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -47,31 +46,19 @@ object Arrangement {
          * Horizontally places the layout children inside the [Row].
          *
          * @param totalSize Available space that can be occupied by the children.
-         * @param size A list of sizes of all children.
+         * @param size An array of sizes of all children.
          * @param layoutDirection A layout direction, left-to-right or right-to-left, of the parent
          * layout that should be taken into account when determining positions of the children.
          * @param density The current density.
-         * @param outPosition A preallocated list that should return the calculated positions.
+         * @param outPosition An array of the size of [size] that returns the calculated positions.
          */
         fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         )
-
-        @Deprecated("Custom arrangements will not be supported anymore. Please use a provided " +
-                "one instead, or Spacers.")
-        fun arrange(
-            totalSize: Int,
-            size: List<Int>,
-            layoutDirection: LayoutDirection
-        ): List<Int> {
-            val result = MutableList(size.size) { 0 }
-            arrange(totalSize, size, layoutDirection, Density(1f), result)
-            return result
-        }
     }
 
     /**
@@ -88,27 +75,16 @@ object Arrangement {
          * Vertically places the layout children inside the [Column].
          *
          * @param totalSize Available space that can be occupied by the children.
-         * @param size A list of sizes of all children.
+         * @param size An array of sizes of all children.
          * @param density The current density.
-         * @param outPosition A preallocated list that should return the calculated positions.
+         * @param outPosition An array of the size of [size] that returns the calculated positions.
          */
         fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         )
-
-        @Deprecated("Custom arrangements will not be supported anymore. Please use a provided " +
-                "one instead, or Spacers.")
-        fun arrange(
-            totalSize: Int,
-            size: List<Int>
-        ): List<Int> {
-            val result = MutableList(size.size) { 0 }
-            arrange(totalSize, size, Density(1f), result)
-            return result
-        }
     }
 
     /**
@@ -130,14 +106,15 @@ object Arrangement {
     val Start = object : Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
             placeLeftOrTop(size, outPosition)
         } else {
-            placeRightOrBottom(totalSize, size.asReversed(), outPosition)
+            size.reverse()
+            placeRightOrBottom(totalSize, size, outPosition)
             outPosition.reverse()
         }
     }
@@ -149,14 +126,15 @@ object Arrangement {
     val End = object : Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
             placeRightOrBottom(totalSize, size, outPosition)
         } else {
-            placeLeftOrTop(size.asReversed(), outPosition)
+            size.reverse()
+            placeLeftOrTop(size, outPosition)
             outPosition.reverse()
         }
     }
@@ -168,9 +146,9 @@ object Arrangement {
     val Top = object : Vertical {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = placeLeftOrTop(size, outPosition)
     }
 
@@ -181,9 +159,9 @@ object Arrangement {
     val Bottom = object : Vertical {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = placeRightOrBottom(totalSize, size, outPosition)
     }
 
@@ -195,22 +173,23 @@ object Arrangement {
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
             placeCenter(totalSize, size, outPosition)
         } else {
-            placeCenter(totalSize, size.asReversed(), outPosition)
+            size.reverse()
+            placeCenter(totalSize, size, outPosition)
             outPosition.reverse()
         }
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = placeCenter(totalSize, size, outPosition)
     }
 
@@ -223,22 +202,23 @@ object Arrangement {
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
             placeSpaceEvenly(totalSize, size, outPosition)
         } else {
-            placeSpaceEvenly(totalSize, size.asReversed(), outPosition)
+            size.reverse()
+            placeSpaceEvenly(totalSize, size, outPosition)
             outPosition.reverse()
         }
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = placeSpaceEvenly(totalSize, size, outPosition)
     }
 
@@ -251,22 +231,23 @@ object Arrangement {
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
             placeSpaceBetween(totalSize, size, outPosition)
         } else {
-            placeSpaceBetween(totalSize, size.asReversed(), outPosition)
+            size.reverse()
+            placeSpaceBetween(totalSize, size, outPosition)
             outPosition.reverse()
         }
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = placeSpaceBetween(totalSize, size, outPosition)
     }
 
@@ -280,22 +261,23 @@ object Arrangement {
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
             placeSpaceAround(totalSize, size, outPosition)
         } else {
-            placeSpaceAround(totalSize, size.asReversed(), outPosition)
+            size.reverse()
+            placeSpaceAround(totalSize, size, outPosition)
             outPosition.reverse()
         }
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = placeSpaceAround(totalSize, size, outPosition)
     }
 
@@ -368,22 +350,22 @@ object Arrangement {
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) {
             if (size.isEmpty()) return
             val spacePx = with(density) { space.toIntPx() }
 
             var occupied = 0
             var lastSpace = 0
-            (if (layoutDirection == LayoutDirection.Ltr || !rtlMirror) size else size.asReversed())
-                .fastForEachIndexed { index, it ->
-                    outPosition[index] = min(occupied, totalSize - it)
-                    lastSpace = min(spacePx, totalSize - outPosition[index] - it)
-                    occupied = outPosition[index] + it + lastSpace
-                }
+            if (layoutDirection == LayoutDirection.Rtl && rtlMirror) size.reverse()
+            size.forEachIndexed { index, it ->
+                outPosition[index] = min(occupied, totalSize - it)
+                lastSpace = min(spacePx, totalSize - outPosition[index] - it)
+                occupied = outPosition[index] + it + lastSpace
+            }
             occupied -= lastSpace
 
             if (alignment != null && occupied < totalSize) {
@@ -398,53 +380,53 @@ object Arrangement {
 
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = arrange(totalSize, size, LayoutDirection.Ltr, density, outPosition)
     }
 
     internal fun placeRightOrBottom(
         totalSize: Int,
-        size: List<Int>,
-        outPosition: MutableList<Int>
+        size: IntArray,
+        outPosition: IntArray
     ) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         var current = totalSize - consumedSize
-        size.fastForEachIndexed { index, it ->
+        size.forEachIndexed { index, it ->
             outPosition[index] = current
             current += it
         }
     }
 
-    internal fun placeLeftOrTop(size: List<Int>, outPosition: MutableList<Int>) {
+    internal fun placeLeftOrTop(size: IntArray, outPosition: IntArray) {
         var current = 0
-        size.fastForEachIndexed { index, it ->
+        size.forEachIndexed { index, it ->
             outPosition[index] = current
             current += it
         }
     }
 
-    internal fun placeCenter(totalSize: Int, size: List<Int>, outPosition: MutableList<Int>) {
+    internal fun placeCenter(totalSize: Int, size: IntArray, outPosition: IntArray) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         var current = (totalSize - consumedSize).toFloat() / 2
-        size.fastForEachIndexed { index, it ->
+        size.forEachIndexed { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat()
         }
     }
 
-    internal fun placeSpaceEvenly(totalSize: Int, size: List<Int>, outPosition: MutableList<Int>) {
+    internal fun placeSpaceEvenly(totalSize: Int, size: IntArray, outPosition: IntArray) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         val gapSize = (totalSize - consumedSize).toFloat() / (size.size + 1)
         var current = gapSize
-        size.fastForEachIndexed { index, it ->
+        size.forEachIndexed { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat() + gapSize
         }
     }
 
-    internal fun placeSpaceBetween(totalSize: Int, size: List<Int>, outPosition: MutableList<Int>) {
+    internal fun placeSpaceBetween(totalSize: Int, size: IntArray, outPosition: IntArray) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         val gapSize = if (size.size > 1) {
             (totalSize - consumedSize).toFloat() / (size.size - 1)
@@ -452,13 +434,13 @@ object Arrangement {
             0f
         }
         var current = 0f
-        size.fastForEachIndexed { index, it ->
+        size.forEachIndexed { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat() + gapSize
         }
     }
 
-    internal fun placeSpaceAround(totalSize: Int, size: List<Int>, outPosition: MutableList<Int>) {
+    internal fun placeSpaceAround(totalSize: Int, size: IntArray, outPosition: IntArray) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         val gapSize = if (size.isNotEmpty()) {
             (totalSize - consumedSize).toFloat() / size.size
@@ -466,7 +448,7 @@ object Arrangement {
             0f
         }
         var current = gapSize / 2
-        size.fastForEachIndexed { index, it ->
+        size.forEachIndexed { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat() + gapSize
         }
@@ -486,10 +468,10 @@ object AbsoluteArrangement {
     val Left = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = Arrangement.placeLeftOrTop(size, outPosition)
     }
 
@@ -502,10 +484,10 @@ object AbsoluteArrangement {
     val Center = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = Arrangement.placeCenter(totalSize, size, outPosition)
     }
 
@@ -519,10 +501,10 @@ object AbsoluteArrangement {
     val Right = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = Arrangement.placeRightOrBottom(totalSize, size, outPosition)
     }
 
@@ -536,10 +518,10 @@ object AbsoluteArrangement {
     val SpaceBetween = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = Arrangement.placeSpaceBetween(totalSize, size, outPosition)
     }
 
@@ -553,10 +535,10 @@ object AbsoluteArrangement {
     val SpaceEvenly = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = Arrangement.placeSpaceEvenly(totalSize, size, outPosition)
     }
 
@@ -571,10 +553,10 @@ object AbsoluteArrangement {
     val SpaceAround = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
-            size: List<Int>,
+            size: IntArray,
             layoutDirection: LayoutDirection,
             density: Density,
-            outPosition: MutableList<Int>
+            outPosition: IntArray
         ) = Arrangement.placeSpaceAround(totalSize, size, outPosition)
     }
 

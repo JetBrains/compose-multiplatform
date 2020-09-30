@@ -24,7 +24,8 @@ import androidx.compose.ui.platform.simpleIdentityToString
  * The information provided in the configuration is used to to generate the
  * semantics tree.
  */
-class SemanticsConfiguration : SemanticsPropertyReceiver,
+class SemanticsConfiguration :
+    SemanticsPropertyReceiver,
     Iterable<Map.Entry<SemanticsPropertyKey<*>, Any?>> {
 
     private val props: MutableMap<SemanticsPropertyKey<*>, Any?> = mutableMapOf()

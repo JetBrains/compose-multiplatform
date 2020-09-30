@@ -18,7 +18,7 @@ package androidx.compose.ui.demos.autofill
 
 import android.graphics.Rect
 import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
@@ -119,9 +119,11 @@ private fun Autofill(
     val autofillTree = AutofillTreeAmbient.current
     autofillTree += autofillNode
 
-    Box(Modifier.onPositioned {
-        autofillNode.boundingBox = it.boundingBox().toComposeRect()
-    }) {
+    Box(
+        Modifier.onPositioned {
+            autofillNode.boundingBox = it.boundingBox().toComposeRect()
+        }
+    ) {
         children(autofillNode)
     }
 }

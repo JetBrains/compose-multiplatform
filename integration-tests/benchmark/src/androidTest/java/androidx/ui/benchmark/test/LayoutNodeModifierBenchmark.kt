@@ -20,7 +20,7 @@ import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
@@ -91,14 +91,13 @@ class LayoutNodeModifierBenchmark(
         }
 
         rule.activityTestRule.runOnUiThread {
-            rule.activityTestRule.activity.setContent { Box() }
+            rule.activityTestRule.activity.setContent { Box(Modifier) }
         }
         rule.activityTestRule.runOnUiThread {
             val composeView = rule.findAndroidOwner()
             val root = composeView.root
-            val selection = root.children[0]
-            check(selection.children.size == 1) { "Expecting only a Box" }
-            layoutNode = selection.children[0]
+            check(root.children.size == 1) { "Expecting only a Box" }
+            layoutNode = root.children[0]
             check(layoutNode.children.isEmpty()) { "Box should be empty" }
         }
     }
@@ -137,7 +136,8 @@ class LayoutNodeModifierBenchmark(
 
         override fun apply(base: Statement, description: Description?): Statement {
             val statement = benchmarkRule.apply(
-                activityTestRule.apply(base, description), description!!)
+                activityTestRule.apply(base, description), description!!
+            )
             return disableTransitionsRule.apply(statement, description)
         }
 

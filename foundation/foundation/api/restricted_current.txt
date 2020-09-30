@@ -42,9 +42,9 @@ package androidx.compose.foundation {
   }
 
   public final class BoxKt {
-    method @androidx.compose.runtime.Composable public static void Box-0SX22z8(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.graphics.Shape shape = androidx.compose.ui.graphics.RectangleShapeKt.RectangleShape, long backgroundColor = Color.Transparent, androidx.compose.foundation.BorderStroke? border = null, float padding = elvis {
-    var var8dc48da0: androidx.compose.ui.unit.Dp = border?.width
-    if (var8dc48da0 != null) var8dc48da0 else 0.dp
+    method @Deprecated @androidx.compose.runtime.Composable public static void Box-0SX22z8(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.graphics.Shape shape = androidx.compose.ui.graphics.RectangleShapeKt.RectangleShape, long backgroundColor = Color.Transparent, androidx.compose.foundation.BorderStroke? border = null, float padding = elvis {
+    var var8dc44ff7: androidx.compose.ui.unit.Dp = border?.width
+    if (var8dc44ff7 != null) var8dc44ff7 else 0.dp
 }, float paddingStart = Dp.Unspecified, float paddingTop = Dp.Unspecified, float paddingEnd = Dp.Unspecified, float paddingBottom = Dp.Unspecified, androidx.compose.ui.Alignment gravity = ContentGravity.TopStart, kotlin.jvm.functions.Function0<kotlin.Unit> children = emptyContent());
   }
 
@@ -55,7 +55,7 @@ package androidx.compose.foundation {
   public final class ClickableKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, boolean enabled = true, String? onClickLabel = null, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick = null, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+}), androidx.compose.foundation.Indication? indication = IndicationAmbient.invoke(), String? onLongClickLabel = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick = null, kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick = null, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ClickableTextKt {
@@ -68,7 +68,7 @@ package androidx.compose.foundation {
   }
 
   public final class DarkThemeKt {
-    method @androidx.compose.runtime.Composable public static boolean isSystemInDarkTheme();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static boolean isSystemInDarkTheme();
   }
 
   @kotlin.RequiresOptIn(message="This foundation API is experimental and is likely to change or be removed in the " + "future.") public @interface ExperimentalFoundationApi {
@@ -277,24 +277,27 @@ package androidx.compose.foundation.gestures {
 
 package androidx.compose.foundation.lazy {
 
+  public final class CachingItemContentFactoryKt {
+  }
+
   @kotlin.RequiresOptIn(message="This is an experimental API for demonstrating how LazyColumn / LazyRow should work" + "using a DSL implementation. This is a prototype and its implementation is not suited" + " for PagedList or large lists.") public @interface ExperimentalLazyDsl {
   }
 
   public final class LazyDslKt {
-    method @androidx.compose.foundation.lazy.ExperimentalLazyDsl @androidx.compose.runtime.Composable public static void LazyColumn(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Horizontal horizontalAlignment = Alignment.Start, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
-    method @androidx.compose.foundation.lazy.ExperimentalLazyDsl @androidx.compose.runtime.Composable public static void LazyRow(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Vertical verticalAlignment = Alignment.Top, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.foundation.lazy.ExperimentalLazyDsl @androidx.compose.runtime.Composable public static void LazyColumn(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.lazy.LazyListState state = rememberLazyListState(), androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Horizontal horizontalAlignment = Alignment.Start, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.foundation.lazy.ExperimentalLazyDsl @androidx.compose.runtime.Composable public static void LazyRow(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.lazy.LazyListState state = rememberLazyListState(), androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Vertical verticalAlignment = Alignment.Top, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
   }
 
   public final class LazyForKt {
-    method @androidx.compose.runtime.Composable public static <T> void LazyColumnFor(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Horizontal horizontalAlignment = Alignment.Start, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.runtime.Composable public static <T> void LazyColumnForIndexed(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Horizontal horizontalAlignment = Alignment.Start, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.runtime.Composable public static <T> void LazyColumnFor(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.lazy.LazyListState state = rememberLazyListState(), androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Horizontal horizontalAlignment = Alignment.Start, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.runtime.Composable public static <T> void LazyColumnForIndexed(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.lazy.LazyListState state = rememberLazyListState(), androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Horizontal horizontalAlignment = Alignment.Start, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
     method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyColumnItems(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Horizontal horizontalGravity = Alignment.Start, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.runtime.Composable public static <T> void LazyRowFor(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Vertical verticalAlignment = Alignment.Top, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.runtime.Composable public static <T> void LazyRowForIndexed(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Vertical verticalAlignment = Alignment.Top, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.runtime.Composable public static <T> void LazyRowFor(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.lazy.LazyListState state = rememberLazyListState(), androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Vertical verticalAlignment = Alignment.Top, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.runtime.Composable public static <T> void LazyRowForIndexed(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.lazy.LazyListState state = rememberLazyListState(), androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Vertical verticalAlignment = Alignment.Top, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
     method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyRowItems(java.util.List<? extends T> items, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.foundation.layout.PaddingValues contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp), androidx.compose.ui.Alignment.Vertical verticalGravity = Alignment.Top, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> itemContent);
   }
 
-  public final class LazyForStateKt {
+  public final class LazyGridKt {
   }
 
   @androidx.compose.runtime.Stable public interface LazyItemScope {
@@ -307,6 +310,23 @@ package androidx.compose.foundation.lazy {
     method public void item(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method public <T> void items(java.util.List<? extends T> items, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
     method public <T> void itemsIndexed(java.util.List<? extends T> items, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+  }
+
+  @androidx.compose.runtime.Stable public final class LazyListState {
+    ctor public LazyListState(int firstVisibleItemIndex, int firstVisibleItemScrollOffset, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
+    method public int getFirstVisibleItemIndex();
+    method public int getFirstVisibleItemScrollOffset();
+    property public final int firstVisibleItemIndex;
+    property public final int firstVisibleItemScrollOffset;
+    field public static final androidx.compose.foundation.lazy.LazyListState.Companion Companion;
+  }
+
+  public static final class LazyListState.Companion {
+    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.lazy.LazyListState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
+  }
+
+  public final class LazyListStateKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.lazy.LazyListState rememberLazyListState(int initialFirstVisibleItemIndex = 0, int initialFirstVisibleItemScrollOffset = 0);
   }
 
 }

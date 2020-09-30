@@ -75,7 +75,7 @@ class SpacerTest : LayoutTest() {
         val containerWidth = 5.dp
         val containerHeight = 7.dp
         show {
-            Stack {
+            Box {
                 Container(
                     constraints = DpConstraints(
                         maxWidth = containerWidth,
@@ -108,10 +108,12 @@ class SpacerTest : LayoutTest() {
         val drawLatch = CountDownLatch(1)
         show {
             Container(constraints = bigConstraints) {
-                Spacer(Modifier.preferredWidth(width).onPositioned { position: LayoutCoordinates ->
-                    size = position.size
-                    drawLatch.countDown()
-                })
+                Spacer(
+                    Modifier.preferredWidth(width).onPositioned { position: LayoutCoordinates ->
+                        size = position.size
+                        drawLatch.countDown()
+                    }
+                )
             }
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
@@ -131,18 +133,20 @@ class SpacerTest : LayoutTest() {
         val containerWidth = 5.dp
         val containerHeight = 7.dp
         show {
-            Stack {
+            Box {
                 Container(
                     constraints = DpConstraints(
                         maxWidth = containerWidth,
                         maxHeight = containerHeight
                     )
                 ) {
-                    Spacer(Modifier.preferredWidth(width)
-                        .onPositioned { position: LayoutCoordinates ->
-                            size = position.size
-                            drawLatch.countDown()
-                        })
+                    Spacer(
+                        Modifier.preferredWidth(width)
+                            .onPositioned { position: LayoutCoordinates ->
+                                size = position.size
+                                drawLatch.countDown()
+                            }
+                    )
                 }
             }
         }
@@ -162,11 +166,13 @@ class SpacerTest : LayoutTest() {
         val drawLatch = CountDownLatch(1)
         show {
             Container(constraints = bigConstraints) {
-                Spacer(Modifier.preferredHeight(height)
-                    .onPositioned { position: LayoutCoordinates ->
-                        size = position.size
-                        drawLatch.countDown()
-                    })
+                Spacer(
+                    Modifier.preferredHeight(height)
+                        .onPositioned { position: LayoutCoordinates ->
+                            size = position.size
+                            drawLatch.countDown()
+                        }
+                )
             }
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
@@ -186,18 +192,20 @@ class SpacerTest : LayoutTest() {
         val containerWidth = 5.dp
         val containerHeight = 7.dp
         show {
-            Stack {
+            Box {
                 Container(
                     constraints = DpConstraints(
                         maxWidth = containerWidth,
                         maxHeight = containerHeight
                     )
                 ) {
-                    Spacer(Modifier.preferredHeight(height)
-                        .onPositioned { position: LayoutCoordinates ->
-                            size = position.size
-                            drawLatch.countDown()
-                        })
+                    Spacer(
+                        Modifier.preferredHeight(height)
+                            .onPositioned { position: LayoutCoordinates ->
+                                size = position.size
+                                drawLatch.countDown()
+                            }
+                    )
                 }
             }
         }

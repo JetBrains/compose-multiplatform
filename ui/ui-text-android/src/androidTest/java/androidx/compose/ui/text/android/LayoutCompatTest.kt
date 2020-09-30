@@ -32,11 +32,11 @@ import org.junit.runners.JUnit4
 class LayoutCompatTest {
 
     private val LOREM_IPSUM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
-            "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim " +
-            "veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo " +
-            "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum " +
-            "dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, " +
-            "sunt in culpa qui officia deserunt mollit anim id est laborum."
+        "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim " +
+        "veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo " +
+        "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum " +
+        "dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, " +
+        "sunt in culpa qui officia deserunt mollit anim id est laborum."
 
     private val TEXT_PAINT = TextPaint().apply {
         textSize = 48f
@@ -48,8 +48,10 @@ class LayoutCompatTest {
     // Make about 10 lines of layout.
 
     private fun getTestLayout(): Layout = if (Build.VERSION.SDK_INT < 23) {
-        @Suppress("DEPRECATION") StaticLayout(LOREM_IPSUM, TEXT_PAINT, MAX_INTRINSIC_WIDTH / 10,
-            Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
+        @Suppress("DEPRECATION") StaticLayout(
+            LOREM_IPSUM, TEXT_PAINT, MAX_INTRINSIC_WIDTH / 10,
+            Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false
+        )
     } else {
         StaticLayout.Builder.obtain(
             LOREM_IPSUM, 0, LOREM_IPSUM.length, TEXT_PAINT, MAX_INTRINSIC_WIDTH / 10

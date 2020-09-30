@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
@@ -130,23 +129,23 @@ class LayoutAlignTest : LayoutTest() {
         val childPosition = Array(3) { Ref<Offset>() }
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Stack(Modifier.fillMaxSize()) {
-                    Stack(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
-                        Stack(
+                Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
+                        Box(
                             Modifier.preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[0], childPosition[0], positionedLatch)
                         ) {
                         }
                     }
-                    Stack(Modifier.fillMaxSize().wrapContentHeight(Alignment.CenterVertically)) {
-                        Stack(
+                    Box(Modifier.fillMaxSize().wrapContentHeight(Alignment.CenterVertically)) {
+                        Box(
                             Modifier.preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[1], childPosition[1], positionedLatch)
                         ) {
                         }
                     }
-                    Stack(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
-                        Stack(
+                    Box(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
+                        Box(
                             Modifier.preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[2], childPosition[2], positionedLatch)
                         ) {
@@ -371,9 +370,11 @@ class LayoutAlignTest : LayoutTest() {
 
     @Test
     fun test2DAlignedModifier_hasCorrectIntrinsicMeasurements() = with(density) {
-        testIntrinsics(@Composable {
-            Container(Modifier.wrapContentSize(Alignment.TopStart).aspectRatio(2f)) { }
-        }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
+        testIntrinsics(
+            @Composable {
+                Container(Modifier.wrapContentSize(Alignment.TopStart).aspectRatio(2f)) { }
+            }
+        ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(0, minIntrinsicWidth(0))
             assertEquals(25.dp.toIntPx() * 2, minIntrinsicWidth(25.dp.toIntPx()))
@@ -399,8 +400,9 @@ class LayoutAlignTest : LayoutTest() {
     @Test
     fun test1DAlignedModifier_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics({
-            Container(Modifier.wrapContentHeight(Alignment.CenterVertically)
-                .aspectRatio(2f)
+            Container(
+                Modifier.wrapContentHeight(Alignment.CenterVertically)
+                    .aspectRatio(2f)
             ) { }
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
 
@@ -458,7 +460,8 @@ class LayoutAlignTest : LayoutTest() {
                         ) {
                         }
                     }
-                }, measureBlock = { measurables, constraints ->
+                },
+                measureBlock = { measurables, constraints ->
                     val placeable = measurables.first().measure(Constraints())
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         placeable.placeRelative(0, 0)

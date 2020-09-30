@@ -18,7 +18,7 @@ package androidx.compose.ui.graphics.vector
 
 import android.graphics.Bitmap
 import android.os.Build
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.preferredHeight
@@ -141,17 +141,21 @@ class VectorTest {
     @Test
     fun testVectorZeroWidthDoesNotCrash() {
         rule.setContent {
-            Box(modifier = Modifier.preferredWidth(0.dp).preferredHeight(100.dp).paint
-                (createTestVectorPainter()))
+            Box(
+                modifier = Modifier.preferredWidth(0.dp).preferredHeight(100.dp).paint
+                (createTestVectorPainter())
+            )
         }
     }
 
     @Test
     fun testVectorZeroHeightDoesNotCrash() {
         rule.setContent {
-            Box(modifier = Modifier.preferredWidth(50.dp).preferredHeight(0.dp).paint(
-                createTestVectorPainter()
-            ))
+            Box(
+                modifier = Modifier.preferredWidth(50.dp).preferredHeight(0.dp).paint(
+                    createTestVectorPainter()
+                )
+            )
         }
     }
 
@@ -178,11 +182,11 @@ class VectorTest {
         val viewportHeight = 24f
 
         val icon1 = VectorAssetBuilder(
-                defaultWidth = defaultWidth,
-                defaultHeight = defaultHeight,
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight
-            )
+            defaultWidth = defaultWidth,
+            defaultHeight = defaultHeight,
+            viewportWidth = viewportWidth,
+            viewportHeight = viewportHeight
+        )
             .addPath(
                 fill = SolidColor(Color.Black),
                 pathData = PathData {
@@ -194,11 +198,11 @@ class VectorTest {
             ).build()
 
         val icon2 = VectorAssetBuilder(
-                defaultWidth = defaultWidth,
-                defaultHeight = defaultHeight,
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight
-            )
+            defaultWidth = defaultWidth,
+            defaultHeight = defaultHeight,
+            viewportWidth = viewportWidth,
+            viewportHeight = viewportHeight
+        )
             .addPath(
                 fill = SolidColor(Color.Black),
                 pathData = PathData {
@@ -272,7 +276,8 @@ class VectorTest {
         val sizeDp = (size / DensityAmbient.current.density).dp
         return VectorPainter(
             defaultWidth = sizeDp,
-            defaultHeight = sizeDp) { _, _ ->
+            defaultHeight = sizeDp
+        ) { _, _ ->
             Path(
                 pathData = PathData {
                     lineTo(sizePx, 0.0f)

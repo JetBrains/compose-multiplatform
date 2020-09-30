@@ -338,18 +338,22 @@ fun Color(
     alpha: Float = 1f,
     colorSpace: ColorSpace = ColorSpaces.Srgb
 ): Color {
-    require(red in colorSpace.getMinValue(0)..colorSpace.getMaxValue(0) &&
+    require(
+        red in colorSpace.getMinValue(0)..colorSpace.getMaxValue(0) &&
             green in colorSpace.getMinValue(1)..colorSpace.getMaxValue(1) &&
             blue in colorSpace.getMinValue(2)..colorSpace.getMaxValue(2) &&
-            alpha in 0f..1f) {
+            alpha in 0f..1f
+    ) {
         "red = $red, green = $green, blue = $blue, alpha = $alpha outside the range for $colorSpace"
     }
 
     if (colorSpace.isSrgb) {
-        val argb = (((alpha * 255.0f + 0.5f).toInt() shl 24) or
+        val argb = (
+            ((alpha * 255.0f + 0.5f).toInt() shl 24) or
                 ((red * 255.0f + 0.5f).toInt() shl 16) or
                 ((green * 255.0f + 0.5f).toInt() shl 8) or
-                (blue * 255.0f + 0.5f).toInt())
+                (blue * 255.0f + 0.5f).toInt()
+            )
         return Color(value = (argb.toULong() and 0xffffffffUL) shl 32)
     }
 
@@ -370,11 +374,19 @@ fun Color(
     val a = (max(0.0f, min(alpha, 1.0f)) * 1023.0f + 0.5f).toInt()
 
     // Suppress sign extension
-    return Color(value = (((r.halfValue.toULong() and 0xffffUL) shl 48) or (
-            (g.halfValue.toULong() and 0xffffUL) shl 32) or (
-            (b.halfValue.toULong() and 0xffffUL) shl 16) or (
-            (a.toULong() and 0x3ffUL) shl 6) or (
-            id.toULong() and 0x3fUL)))
+    return Color(
+        value = (
+            ((r.halfValue.toULong() and 0xffffUL) shl 48) or (
+                (g.halfValue.toULong() and 0xffffUL) shl 32
+                ) or (
+                (b.halfValue.toULong() and 0xffffUL) shl 16
+                ) or (
+                (a.toULong() and 0x3ffUL) shl 6
+                ) or (
+                id.toULong() and 0x3fUL
+                )
+            )
+    )
 }
 
 /**
@@ -422,9 +434,9 @@ fun Color(
     @IntRange(from = 0, to = 0xFF) alpha: Int = 0xFF
 ): Color {
     @ColorInt val color = ((alpha and 0xFF) shl 24) or
-            ((red and 0xFF) shl 16) or
-            ((green and 0xFF) shl 8) or
-            (blue and 0xFF)
+        ((red and 0xFF) shl 16) or
+        ((green and 0xFF) shl 8) or
+        (blue and 0xFF)
     return Color(color)
 }
 
@@ -525,7 +537,7 @@ fun Color.luminance(): Float {
     val colorSpace = colorSpace
     require(colorSpace.model === ColorModel.Rgb) {
         "The specified color must be encoded in an RGB color space. " +
-                "The supplied color space is ${colorSpace.model}"
+            "The supplied color space is ${colorSpace.model}"
     }
 
     val eotf = (colorSpace as Rgb).eotf
@@ -560,9 +572,9 @@ fun Color.toArgb(): Int {
     colorSpace.connect().transform(color)
 
     return (color[3] * 255.0f + 0.5f).toInt() shl 24 or
-            ((color[0] * 255.0f + 0.5f).toInt() shl 16) or
-            ((color[1] * 255.0f + 0.5f).toInt() shl 8) or
-            (color[2] * 255.0f + 0.5f).toInt()
+        ((color[0] * 255.0f + 0.5f).toInt() shl 16) or
+        ((color[1] * 255.0f + 0.5f).toInt() shl 8) or
+        (color[2] * 255.0f + 0.5f).toInt()
 }
 
 /**

@@ -166,7 +166,7 @@ class XmlVectorParserTest {
     private inline fun <reified T : PathNode> PathNode.assertType(): T {
         assertTrue(
             "Expected type ${T::class.java.simpleName} but was actually " +
-                    this::class.java.simpleName,
+                this::class.java.simpleName,
             this is T
         )
         return this as T
@@ -178,7 +178,7 @@ class XmlVectorParserTest {
     private inline fun <reified T : VectorNode> VectorNode.assertType(): T {
         assertTrue(
             "Expected type ${T::class.java.simpleName} but was actually " +
-                    this::class.java.simpleName,
+                this::class.java.simpleName,
             this is T
         )
         return this as T

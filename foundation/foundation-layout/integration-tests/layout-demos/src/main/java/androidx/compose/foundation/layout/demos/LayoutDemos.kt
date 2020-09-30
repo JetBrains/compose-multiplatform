@@ -20,12 +20,18 @@ import androidx.compose.foundation.layout.samples.SimpleFlowRow
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
-val LayoutDemos = DemoCategory("Layout", listOf(
-    DemoCategory("ConstraintLayout", listOf(
-        ComposableDemo("With inline (modifier based) DSL") { DemoInlineDSL() },
-        ComposableDemo("With ConstraintSet DSL") { DemoConstraintSet() }
-    )),
-    ComposableDemo("Flow layout") { SimpleFlowRow() },
-    ComposableDemo("Row and column") { SimpleLayoutDemo() },
-    ComposableDemo("Rtl support") { RtlDemo() }
-))
+val LayoutDemos = DemoCategory(
+    "Layout",
+    listOf(
+        DemoCategory(
+            "ConstraintLayout",
+            listOf(
+                ComposableDemo("With inline (modifier based) DSL") { DemoInlineDSL() },
+                ComposableDemo("With ConstraintSet DSL") { DemoConstraintSet() }
+            )
+        ),
+        ComposableDemo("Flow layout") { SimpleFlowRow() },
+        ComposableDemo("Row and column") { SimpleLayoutDemo() },
+        ComposableDemo("Rtl support") { RtlDemo() }
+    )
+)

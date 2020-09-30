@@ -19,7 +19,6 @@ package androidx.compose.ui
 import androidx.compose.ui.MeasureScope.MeasureResult
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * The receiver scope of a layout's measure lambda. The return value of the
@@ -67,30 +66,8 @@ abstract class MeasureScope : IntrinsicMeasureScope() {
         override val height = height
         override val alignmentLines = alignmentLines
         override fun placeChildren() {
-            with(InnerPlacementScope) {
-                val previousParentWidth = parentWidth
-                val previousLayoutDirection = parentLayoutDirection
-                updateValuesForRtlMirroring(layoutDirection, width)
-                placementBlock()
-                updateValuesForRtlMirroring(previousLayoutDirection, previousParentWidth)
-            }
-        }
-    }
-
-    internal companion object {
-        object InnerPlacementScope : Placeable.PlacementScope() {
-            override var parentLayoutDirection = LayoutDirection.Ltr
-                private set
-            override var parentWidth = 0
-                private set
-
-            fun updateValuesForRtlMirroring(
-                parentLayoutDirection: LayoutDirection,
-                parentWidth: Int
-            ) {
-                this.parentLayoutDirection = parentLayoutDirection
-                this.parentWidth = parentWidth
-            }
+            Placeable.PlacementScope
+                .executeWithRtlMirroringValues(width, layoutDirection, placementBlock)
         }
     }
 }

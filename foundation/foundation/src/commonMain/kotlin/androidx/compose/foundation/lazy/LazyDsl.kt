@@ -63,13 +63,13 @@ interface LazyListScope {
     )
 }
 
-private class IntervalHolder(
+internal class IntervalHolder(
     val startIndex: Int,
     val content: LazyItemScope.(Int) -> (@Composable () -> Unit)
 )
 
-private class LazyListScopeImpl : LazyListScope {
-    val intervals = mutableListOf<IntervalHolder>()
+internal class LazyListScopeImpl : LazyListScope {
+    private val intervals = mutableListOf<IntervalHolder>()
     var totalSize = 0
 
     fun contentFor(index: Int, scope: LazyItemScope): @Composable () -> Unit {
@@ -174,6 +174,7 @@ private class LazyListScopeImpl : LazyListScope {
 @ExperimentalLazyDsl
 fun LazyRow(
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: LazyListScope.() -> Unit
@@ -184,10 +185,12 @@ fun LazyRow(
     LazyFor(
         itemsCount = scope.totalSize,
         modifier = modifier,
+        state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
         isVertical = false
-    ) { index -> scope.contentFor(index, this) }
+    ) {
+            index -> scope.contentFor(index, this) }
 }
 
 /**
@@ -204,6 +207,7 @@ fun LazyRow(
 @ExperimentalLazyDsl
 fun LazyColumn(
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: LazyListScope.() -> Unit
@@ -214,10 +218,11 @@ fun LazyColumn(
     LazyFor(
         itemsCount = scope.totalSize,
         modifier = modifier,
+        state = state,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
         isVertical = true
-    ) {
-        index -> scope.contentFor(index, this)
+    ) { index ->
+        scope.contentFor(index, this)
     }
 }
