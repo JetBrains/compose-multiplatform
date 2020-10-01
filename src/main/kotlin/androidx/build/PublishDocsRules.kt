@@ -69,8 +69,10 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CORE, "core-role", "1.1.0-alpha02")
     prebuilts(LibraryGroups.CURSORADAPTER, "1.0.0")
     prebuilts(LibraryGroups.CUSTOMVIEW, "1.1.0")
-    // Ignore datastore artifact until the 1.0.0-alpha03 prebuilt is imported
+    // Ignore datastore and datastore-preferences-core artifact until the 1.0.0-alpha03 prebuilt is
+    // imported
     ignore(LibraryGroups.DATASTORE.group, "datastore")
+    ignore(LibraryGroups.DATASTORE.group, "datastore-preferences-core")
     ignore(LibraryGroups.DATASTORE.group, "datastore-preferences-proto")
     ignore(LibraryGroups.DATASTORE.group, "datastore-proto")
     prebuilts(LibraryGroups.DATASTORE, "1.0.0-alpha02")
