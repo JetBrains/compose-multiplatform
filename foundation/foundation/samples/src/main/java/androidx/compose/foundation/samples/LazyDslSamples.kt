@@ -17,10 +17,17 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
@@ -60,6 +67,27 @@ fun LazyRowSample() {
 
         itemsIndexed(itemsIndexedList) { index, item ->
             Text("Item at index $index is $item")
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun StickyHeaderSample() {
+    val sections = listOf("A", "B", "C", "D", "E", "F", "G")
+
+    LazyColumn {
+        sections.forEach { section ->
+            stickyHeader {
+                Text(
+                    "Section $section",
+                    Modifier.fillMaxWidth().background(Color.LightGray).padding(8.dp)
+                )
+            }
+            items((0..9).toList()) {
+                Text("Item $it from the section $section")
+            }
         }
     }
 }
