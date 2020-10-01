@@ -427,11 +427,11 @@ internal fun <T : Any> rememberSwipeableStateFor(
 fun <T> Modifier.swipeable(
     state: SwipeableState<T>,
     anchors: Map<Float, T>,
-    thresholds: (from: T, to: T) -> ThresholdConfig,
     orientation: Orientation,
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
     interactionState: InteractionState? = null,
+    thresholds: (from: T, to: T) -> ThresholdConfig = { _, _ -> FixedThreshold(56.dp) },
     resistance: ResistanceConfig? = defaultResistanceConfig(anchors.keys),
     velocityThreshold: Dp = DefaultVelocityThreshold
 ) = composed {

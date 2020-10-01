@@ -319,7 +319,6 @@ fun BackdropScaffold(
                     peekHeightPx to Concealed,
                     revealedHeight to Revealed
                 ),
-                thresholds = { _, _ -> FixedThreshold(56.dp) },
                 orientation = Orientation.Vertical,
                 enabled = gesturesEnabled
             )

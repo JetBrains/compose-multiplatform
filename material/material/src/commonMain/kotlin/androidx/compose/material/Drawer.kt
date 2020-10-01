@@ -473,7 +473,6 @@ fun BottomDrawerLayout(
             Modifier.swipeable(
                 state = drawerState,
                 anchors = anchors,
-                thresholds = { _, _ -> FixedThreshold(BottomDrawerThreshold) },
                 orientation = Orientation.Vertical,
                 enabled = gesturesEnabled,
                 resistance = null
@@ -564,4 +563,3 @@ private const val DrawerStiffness = 1000f
 private val AnimationSpec = SpringSpec<Float>(stiffness = DrawerStiffness)
 
 internal const val BottomDrawerOpenFraction = 0.5f
-internal val BottomDrawerThreshold = 56.dp

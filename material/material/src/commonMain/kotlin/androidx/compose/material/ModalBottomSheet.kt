@@ -257,7 +257,6 @@ fun ModalBottomSheetLayout(
         val swipeable = Modifier.swipeable(
             state = sheetState,
             anchors = anchors,
-            thresholds = { _, _ -> FixedThreshold(56.dp) },
             orientation = Orientation.Vertical,
             enabled = sheetState.value != ModalBottomSheetValue.Hidden,
             resistance = null
