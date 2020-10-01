@@ -114,7 +114,6 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         this.onEditCommand = onEditCommand
         this.onImeActionPerformed = onImeActionPerformed
 
-        view.requestFocus()
         view.post {
             imm.restartInput(view)
             imm.showSoftInput(view, 0)
