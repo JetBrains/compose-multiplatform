@@ -17,32 +17,22 @@
 package androidx.ui.integration.test.core
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.testutils.ComposeTestCase
-import androidx.compose.testutils.ToggleableTestCase
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.unit.dp
 
-abstract class BaseSimpleRadioButtonTestCase : ComposeTestCase, ToggleableTestCase {
-
-    private var state: MutableState<Dp>? = null
+class ComponentWithRedrawTestCase : SimpleComponentImplenentationTestCase() {
 
     @Composable
-    fun getInnerSize(): MutableState<Dp> {
-        val innerSize = remember { mutableStateOf(10.dp) }
-        state = innerSize
-        return innerSize
-    }
-
-    override fun toggleState() {
-        with(state!!) {
-            value = if (value == 10.dp) {
-                20.dp
-            } else {
-                10.dp
-            }
+    override fun emitContent() {
+        val innerSize = getInnerSize()
+        val stroke = Stroke()
+        Canvas(Modifier.preferredSize(48.dp)) {
+            drawCircle(Color.Black, size.minDimension, style = stroke)
+            drawCircle(Color.Black, innerSize.value.value / 2f, center)
         }
     }
 }

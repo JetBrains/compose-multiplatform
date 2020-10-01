@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,31 @@
 
 package androidx.ui.integration.test.core
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.unit.dp
 
-class SimpleRadioButton3TestCase : BaseSimpleRadioButtonTestCase() {
+class ComponentWithModifiersTestCase : SimpleComponentImplenentationTestCase() {
 
     @Composable
     override fun emitContent() {
         val innerSize = getInnerSize()
-        val stroke = Stroke()
-        Canvas(Modifier.preferredSize(48.dp)) {
-            drawCircle(Color.Black, size.minDimension, style = stroke)
-            drawCircle(Color.Black, innerSize.value.value / 2f, center)
-        }
+        Box(
+            Modifier.preferredSize(48.dp)
+                .background(color = Color.Cyan)
+                .padding(innerSize.value)
+                .border(
+                    color = Color.Cyan,
+                    width = 1.dp,
+                    shape = CircleShape
+                )
+        )
     }
 }
