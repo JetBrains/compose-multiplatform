@@ -248,12 +248,12 @@ class ColorTest {
 
     @Test
     fun noneColor() {
-        assertTrue(Color.Unset.isUnset)
-        assertFalse(Color.Unset.isSet)
-        assertFalse(Color.Red.isUnset)
-        assertTrue(Color.Red.isSet)
-        assertEquals(Color.Transparent.toArgb(), Color.Unset.toArgb())
-        assertNotEquals(Color.Transparent, Color.Unset)
+        assertTrue(Color.Unspecified.isUnspecified)
+        assertFalse(Color.Unspecified.isSpecified)
+        assertFalse(Color.Red.isUnspecified)
+        assertTrue(Color.Red.isSpecified)
+        assertEquals(Color.Transparent.toArgb(), Color.Unspecified.toArgb())
+        assertNotEquals(Color.Transparent, Color.Unspecified)
     }
 
     @Test

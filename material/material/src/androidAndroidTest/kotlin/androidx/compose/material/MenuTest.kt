@@ -256,9 +256,9 @@ class MenuTest {
 
     @Test
     fun dropdownMenuItem_emphasis() {
-        var onSurface = Color.Unset
-        var enabledContentColor = Color.Unset
-        var disabledContentColor = Color.Unset
+        var onSurface = Color.Unspecified
+        var enabledContentColor = Color.Unspecified
+        var disabledContentColor = Color.Unspecified
         lateinit var enabledEmphasis: Emphasis
         lateinit var disabledEmphasis: Emphasis
 

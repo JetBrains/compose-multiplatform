@@ -221,7 +221,7 @@ private fun TextFieldWithMessage(
             AmbientEmphasisLevels.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
         }
         Option.Error -> MaterialTheme.colors.error
-        else -> Color.Unset
+        else -> Color.Unspecified
     }
 
     Column {

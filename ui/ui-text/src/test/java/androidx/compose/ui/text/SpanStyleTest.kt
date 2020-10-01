@@ -42,13 +42,13 @@ class SpanStyleTest {
     fun `constructor with default values`() {
         val style = SpanStyle()
 
-        assertThat(style.color).isEqualTo(Color.Unset)
+        assertThat(style.color).isEqualTo(Color.Unspecified)
         assertThat(style.fontSize.isInherit).isTrue()
         assertThat(style.fontWeight).isNull()
         assertThat(style.fontStyle).isNull()
         assertThat(style.letterSpacing.isInherit).isTrue()
         assertThat(style.localeList).isNull()
-        assertThat(style.background).isEqualTo(Color.Unset)
+        assertThat(style.background).isEqualTo(Color.Unspecified)
         assertThat(style.textDecoration).isNull()
         assertThat(style.fontFamily).isNull()
     }
@@ -156,7 +156,7 @@ class SpanStyleTest {
     fun `merge with other's color is null should use this' color`() {
         val style = SpanStyle(color = Color.Red)
 
-        val newSpanStyle = style.merge(SpanStyle(color = Color.Unset))
+        val newSpanStyle = style.merge(SpanStyle(color = Color.Unspecified))
 
         assertThat(newSpanStyle.color).isEqualTo(style.color)
     }
@@ -327,7 +327,7 @@ class SpanStyleTest {
     fun `merge with other's background is null should use this' background`() {
         val style = SpanStyle(background = Color.Red)
 
-        val newSpanStyle = style.merge(SpanStyle(background = Color.Unset))
+        val newSpanStyle = style.merge(SpanStyle(background = Color.Unspecified))
 
         assertThat(newSpanStyle.background).isEqualTo(style.background)
     }
@@ -413,20 +413,20 @@ class SpanStyleTest {
     }
 
     @Test
-    fun `lerp color with a and b are Unset`() {
-        val style1 = SpanStyle(color = Color.Unset)
-        val style2 = SpanStyle(color = Color.Unset)
+    fun `lerp color with a and b are Unspecified`() {
+        val style1 = SpanStyle(color = Color.Unspecified)
+        val style2 = SpanStyle(color = Color.Unspecified)
 
         val newSpanStyle = lerp(start = style1, stop = style2, fraction = 0.3f)
 
-        assertThat(newSpanStyle.color).isEqualTo(Color.Unset)
+        assertThat(newSpanStyle.color).isEqualTo(Color.Unspecified)
     }
 
     @Test
     fun `lerp color with a is set, and b is Unset`() {
         val t = 0.3f
         val color1 = Color.Red
-        val color2 = Color.Unset
+        val color2 = Color.Unspecified
         val style1 = SpanStyle(color = color1)
         val style2 = SpanStyle(color = color2)
 
@@ -632,18 +632,18 @@ class SpanStyleTest {
 
     @Test
     fun `lerp background with a and b are Null and t is smaller than half`() {
-        val style1 = SpanStyle(background = Color.Unset)
-        val style2 = SpanStyle(background = Color.Unset)
+        val style1 = SpanStyle(background = Color.Unspecified)
+        val style2 = SpanStyle(background = Color.Unspecified)
 
         val newSpanStyle = lerp(start = style1, stop = style2, fraction = 0.1f)
 
-        assertThat(newSpanStyle.background).isEqualTo(Color.Unset)
+        assertThat(newSpanStyle.background).isEqualTo(Color.Unspecified)
     }
 
     @Test
     fun `lerp background with a is Null and b is not Null`() {
         val t = 0.1f
-        val color1 = Color.Unset
+        val color1 = Color.Unspecified
         val style1 = SpanStyle(background = color1)
         val color2 = Color.Red
         val style2 = SpanStyle(background = color2)
@@ -658,11 +658,11 @@ class SpanStyleTest {
         val t = 0.1f
         val color1 = Color.Red
         val style1 = SpanStyle(background = color1)
-        val style2 = SpanStyle(background = Color.Unset)
+        val style2 = SpanStyle(background = Color.Unspecified)
 
         val newSpanStyle = lerp(start = style1, stop = style2, fraction = t)
 
-        assertThat(newSpanStyle.background).isEqualTo(lerp(color1, Color.Unset, t))
+        assertThat(newSpanStyle.background).isEqualTo(lerp(color1, Color.Unspecified, t))
     }
 
     @Test

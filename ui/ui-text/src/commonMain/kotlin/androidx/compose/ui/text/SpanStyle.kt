@@ -69,7 +69,7 @@ import androidx.compose.ui.unit.lerp
  */
 @Immutable
 data class SpanStyle(
-    val color: Color = Color.Unset,
+    val color: Color = Color.Unspecified,
     val fontSize: TextUnit = TextUnit.Inherit,
     val fontWeight: FontWeight? = null,
     val fontStyle: FontStyle? = null,
@@ -80,7 +80,7 @@ data class SpanStyle(
     val baselineShift: BaselineShift? = null,
     val textGeometricTransform: TextGeometricTransform? = null,
     val localeList: LocaleList? = null,
-    val background: Color = Color.Unset,
+    val background: Color = Color.Unspecified,
     val textDecoration: TextDecoration? = null,
     val shadow: Shadow? = null
 ) {

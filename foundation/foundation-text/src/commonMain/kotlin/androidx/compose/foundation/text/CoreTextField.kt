@@ -144,7 +144,7 @@ import kotlin.math.roundToInt
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
- * @param cursorColor Color of the cursor. If [Color.Unset], there will be no cursor drawn
+ * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
  */
 @Composable
 @OptIn(
@@ -162,7 +162,7 @@ fun CoreTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    cursorColor: Color = Color.Unset
+    cursorColor: Color = Color.Unspecified
 ) {
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
@@ -651,7 +651,7 @@ private fun Modifier.cursor(
     val animationClocks = AnimationClockAmbient.current
     val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
 
-    if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unset) {
+    if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unspecified) {
         onCommit(cursorColor, value.text) {
             if (blinkingCursorEnabled) {
                 cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
