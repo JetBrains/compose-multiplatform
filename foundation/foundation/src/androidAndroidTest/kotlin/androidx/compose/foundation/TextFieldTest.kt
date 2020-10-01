@@ -42,6 +42,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarAmbient
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -607,6 +610,33 @@ class TextFieldTest {
         rule.runOnIdle {
             assertThat(value.text).isEqualTo("World")
             assertThat(value.selection).isEqualTo(TextRange(0, 0))
+        }
+    }
+
+    @Test
+    fun semantics_longClick() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(text.length)))
+        var toolbar: TextToolbar? = null
+
+        rule.setContent {
+            toolbar = TextToolbarAmbient.current
+            CoreTextField(
+                modifier = Modifier.testTag(Tag),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(toolbar?.status).isEqualTo(TextToolbarStatus.Hidden)
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.OnLongClick) { it() }
+
+        rule.runOnIdle {
+            assertThat(toolbar?.status).isEqualTo(TextToolbarStatus.Shown)
         }
     }
 
