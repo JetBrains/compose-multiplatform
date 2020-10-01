@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -90,6 +91,7 @@ enum class BottomDrawerValue {
  */
 @Suppress("NotCloseable")
 @OptIn(ExperimentalMaterialApi::class)
+@Stable
 class DrawerState(
     initialValue: DrawerValue,
     clock: AnimationClockObservable,

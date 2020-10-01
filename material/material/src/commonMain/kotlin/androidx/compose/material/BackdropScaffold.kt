@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.BackdropValue.Concealed
 import androidx.compose.material.BackdropValue.Revealed
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -82,6 +83,7 @@ enum class BackdropValue {
  * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
  */
 @ExperimentalMaterialApi
+@Stable
 class BackdropScaffoldState(
     initialValue: BackdropValue,
     clock: AnimationClockObservable,
@@ -178,11 +180,14 @@ fun rememberBackdropScaffoldState(
     clock: AnimationClockObservable = AnimationClockAmbient.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
-    snackbarHostState: SnackbarHostState = SnackbarHostState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BackdropScaffoldState {
     val disposableClock = clock.asDisposableClock()
     return rememberSavedInstanceState(
         disposableClock,
+        animationSpec,
+        confirmStateChange,
+        snackbarHostState,
         saver = BackdropScaffoldState.Saver(
             clock = disposableClock,
             animationSpec = animationSpec,

@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,6 +76,7 @@ enum class BottomSheetValue {
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @ExperimentalMaterialApi
+@Stable
 class BottomSheetState(
     initialValue: BottomSheetValue,
     clock: AnimationClockObservable,
@@ -153,11 +155,9 @@ class BottomSheetState(
 }
 
 /**
- * Create a [BottomSheetState] and [remember] it against the [clock]. If a clock is not
- * specified, the default animation clock will be used, as provided by [AnimationClockAmbient].
+ * Create a [BottomSheetState] and [remember] it.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
@@ -165,11 +165,10 @@ class BottomSheetState(
 @ExperimentalMaterialApi
 fun rememberBottomSheetState(
     initialValue: BottomSheetValue,
-    clock: AnimationClockObservable = AnimationClockAmbient.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
-    val disposableClock = clock.asDisposableClock()
+    val disposableClock = AnimationClockAmbient.current.asDisposableClock()
     return rememberSavedInstanceState(
         disposableClock,
         saver = BottomSheetState.Saver(
@@ -195,6 +194,7 @@ fun rememberBottomSheetState(
  * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
  */
 @ExperimentalMaterialApi
+@Stable
 class BottomSheetScaffoldState(
     val drawerState: DrawerState,
     val bottomSheetState: BottomSheetState,
@@ -213,7 +213,7 @@ class BottomSheetScaffoldState(
 fun rememberBottomSheetScaffoldState(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     bottomSheetState: BottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed),
-    snackbarHostState: SnackbarHostState = SnackbarHostState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BottomSheetScaffoldState {
     return remember(drawerState, bottomSheetState, snackbarHostState) {
         BottomSheetScaffoldState(

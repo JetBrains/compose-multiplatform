@@ -179,12 +179,10 @@ class ScaffoldTest {
     @Ignore("unignore once animation sync is ready (b/147291885)")
     fun scaffold_drawer_gestures() {
         var drawerChildPosition: Offset = Offset.Zero
-        lateinit var scaffoldState: ScaffoldState
+        val drawerGesturedEnabledState = mutableStateOf(false)
         rule.setContent {
-            scaffoldState = rememberScaffoldState(isDrawerGesturesEnabled = false)
             Box(Modifier.testTag(scaffoldTag)) {
                 Scaffold(
-                    scaffoldState = scaffoldState,
                     drawerContent = {
                         Box(
                             Modifier
@@ -195,7 +193,8 @@ class ScaffoldTest {
                                 .preferredHeight(50.dp)
                                 .background(color = Color.Blue)
                         )
-                    }
+                    },
+                    drawerGesturesEnabled = drawerGesturedEnabledState.value
                 ) {
                     Box(
                         Modifier
@@ -217,7 +216,7 @@ class ScaffoldTest {
         assertThat(drawerChildPosition.x).isLessThan(0f)
 
         rule.runOnUiThread {
-            scaffoldState.isDrawerGesturesEnabled = true
+            drawerGesturedEnabledState.value = true
         }
 
         rule.onNodeWithTag(scaffoldTag).performGesture {

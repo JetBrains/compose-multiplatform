@@ -24,10 +24,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.emptyContent
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,21 +48,13 @@ import androidx.compose.ui.zIndex
  * @param drawerState the drawer state
  * @param snackbarHostState instance of [SnackbarHostState] to be used to show [Snackbar]s
  * inside of the [Scaffold]
- * @param isDrawerGesturesEnabled whether or not drawer can be interacted with via gestures
  */
 @Stable
 @OptIn(ExperimentalMaterialApi::class)
 class ScaffoldState(
     val drawerState: DrawerState,
-    val snackbarHostState: SnackbarHostState,
-    isDrawerGesturesEnabled: Boolean = true
-) {
-
-    /**
-     * Whether or not drawer sheet in scaffold (if set) can be interacted by gestures.
-     */
-    var isDrawerGesturesEnabled by mutableStateOf(isDrawerGesturesEnabled)
-}
+    val snackbarHostState: SnackbarHostState
+)
 
 /**
  * Creates a [ScaffoldState] with the default animation clock and memoizes it.
@@ -73,16 +62,14 @@ class ScaffoldState(
  * @param drawerState the drawer state
  * @param snackbarHostState instance of [SnackbarHostState] to be used to show [Snackbar]s
  * inside of the [Scaffold]
- * @param isDrawerGesturesEnabled whether or not drawer can be interacted with via gestures
  */
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun rememberScaffoldState(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
-    snackbarHostState: SnackbarHostState = SnackbarHostState(),
-    isDrawerGesturesEnabled: Boolean = true
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): ScaffoldState = remember {
-    ScaffoldState(drawerState, snackbarHostState, isDrawerGesturesEnabled)
+    ScaffoldState(drawerState, snackbarHostState)
 }
 
 /**
@@ -144,6 +131,7 @@ enum class FabPosition {
  * [floatingActionButton].
  * @param drawerContent content of the Drawer sheet that can be pulled from the left side (right
  * for RTL).
+ * @param drawerGesturesEnabled whether or not drawer (if set) can be interacted with via gestures
  * @param drawerShape shape of the drawer sheet (if set)
  * @param drawerElevation drawer sheet elevation. This controls the size of the shadow
  * below the drawer sheet (if set)
@@ -173,6 +161,7 @@ fun Scaffold(
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     isFloatingActionButtonDocked: Boolean = false,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
+    drawerGesturesEnabled: Boolean = true,
     drawerShape: Shape = MaterialTheme.shapes.large,
     drawerElevation: Dp = DrawerConstants.DefaultElevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
@@ -202,7 +191,7 @@ fun Scaffold(
         ModalDrawerLayout(
             modifier = modifier,
             drawerState = scaffoldState.drawerState,
-            gesturesEnabled = scaffoldState.isDrawerGesturesEnabled,
+            gesturesEnabled = drawerGesturesEnabled,
             drawerContent = drawerContent,
             drawerShape = drawerShape,
             drawerElevation = drawerElevation,
