@@ -45,6 +45,7 @@ import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -108,7 +109,7 @@ class TextFieldDelegate {
             val isEmptyText = textDelegate.text.text.isEmpty()
             val height = if (isEmptyText) {
                 val singleLineHeight = computeLineHeightForEmptyText(
-                    style = textDelegate.style,
+                    style = resolveDefaults(textDelegate.style, layoutDirection),
                     density = textDelegate.density,
                     resourceLoader = textDelegate.resourceLoader
                 )
