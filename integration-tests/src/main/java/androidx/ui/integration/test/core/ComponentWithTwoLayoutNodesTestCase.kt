@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.unit.dp
 
-class SimpleRadioButton1TestCase : BaseSimpleRadioButtonTestCase() {
+class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplenentationTestCase() {
     @Composable
     override fun emitContent() {
         Box(
