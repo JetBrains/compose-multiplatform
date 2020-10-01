@@ -62,9 +62,22 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
         android()
         desktop()
+        js()
     }
 
     kotlin {
+        targets.js {
+            nodejs {}
+            browser() {
+                testTask {
+                    testLogging.showStandardStreams = true
+                    useKarma {
+                        useChromeHeadless()
+                        useFirefox()
+                    }
+                }
+            }
+        }
 
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -100,12 +113,43 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.truth)
                 }
             }
+
+            jsMain {
+                dependencies {
+                    implementation(kotlin("stdlib-js"))
+                }
+            }
+            jvmTest.dependencies {
+                implementation kotlin("test-junit")
+                implementation(libs.kotlinCoroutinesTest)
+            }
+            desktopTest {
+                dependsOn jvmTest
+            }
+            androidTest {
+                dependsOn jvmTest
+            }
+            jsTest.dependencies {
+                implementation kotlin("test-js")
+            }
         }
     }
     dependencies {
         samples(projectOrArtifact(":compose:runtime:runtime:runtime-samples"))
     }
 }
+
+//publishing {
+//     repositories {
+//        maven {
+//            url "https://maven.pkg.jetbrains.space/public/p/compose/dev"
+//            credentials {
+//                username = project.hasProperty("COMPOSE_REPO_USERNAME") ? "$COMPOSE_REPO_USERNAME" : ""
+//                password = project.hasProperty("COMPOSE_REPO_KEY") ? "$COMPOSE_REPO_KEY" : ""
+//            }
+//        }
+//    }
+//}
 
 android {
     defaultConfig {
