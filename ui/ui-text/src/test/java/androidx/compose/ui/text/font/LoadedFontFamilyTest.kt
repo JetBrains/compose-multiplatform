@@ -24,11 +24,11 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class LoadedFontFamilyTest {
-    class DummyTypeface(override val fontFamily: FontFamily) : Typeface
+    class TestTypeface(override val fontFamily: FontFamily) : Typeface
 
     @Test
     fun testCreateAndGetTypeface() {
-        val typeface = DummyTypeface(FontFamily.Monospace)
+        val typeface = TestTypeface(FontFamily.Monospace)
 
         val loadedFontFamily = fontFamily(typeface)
 

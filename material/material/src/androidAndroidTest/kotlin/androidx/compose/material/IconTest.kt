@@ -75,11 +75,11 @@ class IconTest {
         val height = 24.dp
         rule
             .setMaterialContentForSizeAssertions {
-                val dummyImage = with(DensityAmbient.current) {
+                val image = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
                 }
 
-                Icon(dummyImage)
+                Icon(image)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -92,11 +92,11 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val dummyImage = with(DensityAmbient.current) {
+                val image = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
                 }
 
-                Icon(dummyImage)
+                Icon(image)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -122,11 +122,11 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val dummyImage = with(DensityAmbient.current) {
+                val image = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
                 }
 
-                val imagePainter = ImagePainter(dummyImage)
+                val imagePainter = ImagePainter(image)
                 Icon(imagePainter)
             }
             .assertWidthIsEqualTo(width)
