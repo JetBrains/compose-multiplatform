@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.window
 
+import android.os.Build
 import androidx.compose.foundation.ClickableText
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.getUnclippedBoundsInRoot
 import androidx.ui.test.onNodeWithText
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,6 +61,9 @@ class PopupDismissTest(private val isFocusable: Boolean) {
 
     @Test
     fun clickOutsideToDismiss() {
+        // TODO: This test is flaky on cuttlefish 30 => b/169914334
+        Assume.assumeTrue(Build.VERSION.SDK_INT <= 29)
+
         var dismissCounter = 0
         var btnClicksCounter = 0
         var btnPos: Offset = Offset.Zero

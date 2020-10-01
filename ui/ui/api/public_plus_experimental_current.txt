@@ -2569,11 +2569,35 @@ package androidx.compose.ui.viewinterop {
 package androidx.compose.ui.window {
 
   public final class AndroidDialogKt {
-    method @androidx.compose.runtime.Composable public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  @androidx.compose.runtime.Immutable public final class AndroidDialogProperties implements androidx.compose.ui.window.DialogProperties {
+    ctor public AndroidDialogProperties(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    ctor public AndroidDialogProperties();
+    method public androidx.compose.ui.window.SecureFlagPolicy component1();
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.window.AndroidDialogProperties copy(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
   }
 
   public final class AndroidPopupKt {
     method @org.jetbrains.annotations.TestOnly public static boolean isPopupLayout(android.view.View view, String? testTag = null);
+  }
+
+  @androidx.compose.runtime.Immutable public final class AndroidPopupProperties implements androidx.compose.ui.window.PopupProperties {
+    ctor public AndroidPopupProperties(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    ctor public AndroidPopupProperties();
+    method public androidx.compose.ui.window.SecureFlagPolicy component1();
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.window.AndroidPopupProperties copy(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
+  }
+
+  public final class DialogKt {
+    method @androidx.compose.runtime.Composable public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, androidx.compose.ui.window.DialogProperties? properties = null, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  @androidx.compose.runtime.Immutable public interface DialogProperties {
   }
 
   public interface DialogWindowProvider {
@@ -2582,12 +2606,24 @@ package androidx.compose.ui.window {
   }
 
   public final class PopupKt {
-    method @androidx.compose.runtime.Composable public static void Popup(androidx.compose.ui.window.PopupPositionProvider popupPositionProvider, boolean isFocusable = false, kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest = null, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method @androidx.compose.runtime.Composable public static void Popup-aPFkGVo(androidx.compose.ui.Alignment alignment = Alignment.TopStart, long offset = IntOffset(0, 0), boolean isFocusable = false, kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest = null, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method @androidx.compose.runtime.Composable public static void Popup(androidx.compose.ui.window.PopupPositionProvider popupPositionProvider, boolean isFocusable = false, kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest = null, androidx.compose.ui.window.PopupProperties? properties = null, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void Popup-_wmJi10(androidx.compose.ui.Alignment alignment = Alignment.TopStart, long offset = IntOffset(0, 0), boolean isFocusable = false, kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest = null, androidx.compose.ui.window.PopupProperties? properties = null, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   @androidx.compose.runtime.Immutable public interface PopupPositionProvider {
     method public long calculatePosition-pcJl1fs(androidx.compose.ui.unit.IntBounds parentGlobalBounds, androidx.compose.ui.unit.IntBounds windowGlobalBounds, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
+  }
+
+  @androidx.compose.runtime.Immutable public interface PopupProperties {
+  }
+
+  public enum SecureFlagPolicy {
+    enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy Inherit;
+    enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy SecureOff;
+    enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy SecureOn;
+  }
+
+  public final class SecureFlagPolicyKt {
   }
 
 }

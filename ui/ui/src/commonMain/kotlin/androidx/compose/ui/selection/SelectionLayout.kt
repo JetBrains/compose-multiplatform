@@ -64,7 +64,7 @@ fun SelectionHandleLayout(
         Popup(
             alignment = alignment,
             offset = IntOffset(offset.x.roundToInt(), offset.y.roundToInt()),
-            children = handle
+            content = handle
         )
     }
 }
