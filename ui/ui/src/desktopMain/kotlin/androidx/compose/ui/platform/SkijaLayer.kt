@@ -18,21 +18,28 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DesktopCanvas
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asDesktopPath
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import org.jetbrains.skija.Matrix33
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
+import org.jetbrains.skija.Point3
 import org.jetbrains.skija.Rect
+import org.jetbrains.skija.ShadowUtils
 
 class SkijaLayer(
-    density: Density,
+    private val density: Density,
     modifier: DrawLayerModifier,
     private val invalidateParentLayer: () -> Unit,
     private val drawBlock: SkijaLayer.(Canvas) -> Unit
@@ -100,7 +107,8 @@ class SkijaLayer(
         )
     }
 
-    // TODO(demin): implement alpha, rotationX, rotationY, shadowElevation
+    // TODO(demin): implement alpha, rotationX, rotationY
+    @OptIn(ExperimentalUnsignedTypes::class)
     private fun performDrawLayer(canvas: DesktopCanvas) {
         canvas.save()
 
@@ -120,6 +128,10 @@ class SkijaLayer(
 
         canvas.translate(-pivotX, -pivotY)
 
+        if (modifier.shadowElevation > 0 && modifier.alpha != 0f) {
+            drawShadow(canvas)
+        }
+
         if (modifier.clip && size != IntSize.Zero) {
             when (val outline = outlineCache.outline) {
                 is Outline.Rectangle -> canvas.clipRect(outline.rect)
@@ -138,4 +150,33 @@ class SkijaLayer(
     override fun updateDisplayList() = Unit
 
     override fun updateLayerProperties() = Unit
+
+    @ExperimentalUnsignedTypes
+    fun drawShadow(canvas: DesktopCanvas) = with (density) {
+        val path = when (val outline = outlineCache.outline) {
+            is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
+            is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
+            is Outline.Generic -> outline.path
+            else -> return
+        }
+
+        // TODO: perspective?
+        val zParams = Point3(0f, 0f, modifier.shadowElevation)
+
+        // TODO: configurable?
+        val lightPos = Point3(0f, 0f, 600.dp.toPx())
+        val lightRad = 800.dp.toPx()
+
+        val ambientAlpha = 0.039f
+        val spotAlpha = 0.19f
+        val ambientColor = Color.Black.copy(alpha = ambientAlpha)
+        val spotColor = Color.Black.copy(alpha = spotAlpha)
+
+        ShadowUtils.drawShadow(
+            canvas.nativeCanvas, path.asDesktopPath(), zParams, lightPos,
+            lightRad,
+            ambientColor.toArgb(),
+            spotColor.toArgb(), modifier.alpha < 1f, false
+        )
+    }
 }
