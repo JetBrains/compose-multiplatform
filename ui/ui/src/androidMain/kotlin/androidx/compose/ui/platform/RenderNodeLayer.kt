@@ -64,7 +64,7 @@ internal class RenderNodeLayer(
         RenderNodeApi29(ownerView)
     } else {
         RenderNodeApi23(ownerView)
-    }
+    }.apply { setHasOverlappingRendering(true) }
     override val isValid: Boolean
         get() = !isDestroyed
 

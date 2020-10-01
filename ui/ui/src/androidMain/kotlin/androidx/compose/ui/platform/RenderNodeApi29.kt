@@ -165,4 +165,7 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
     override fun drawInto(canvas: android.graphics.Canvas) {
         canvas.drawRenderNode(renderNode)
     }
+
+    override fun setHasOverlappingRendering(hasOverlappingRendering: Boolean): Boolean =
+        renderNode.setHasOverlappingRendering(hasOverlappingRendering)
 }
