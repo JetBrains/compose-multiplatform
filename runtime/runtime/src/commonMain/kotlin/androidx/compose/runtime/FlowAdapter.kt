@@ -50,22 +50,15 @@ inline fun <T> StateFlow<T>.collectAsState(
  *
  * @param context [CoroutineContext] to use for collecting.
  */
+@Suppress("NOTHING_TO_INLINE")
 @Composable
-fun <T : R, R> Flow<T>.collectAsState(
+inline fun <T : R, R> Flow<T>.collectAsState(
     initial: R,
     context: CoroutineContext = EmptyCoroutineContext
-): State<R> {
-    val state = remember { mutableStateOf(initial) }
-    LaunchedTask(this, context) {
-        if (context == EmptyCoroutineContext) {
-            collect {
-                state.value = it
-            }
-        } else withContext(context) {
-            collect {
-                state.value = it
-            }
-        }
+): State<R> = produceState(initial, this, context) {
+    if (context == EmptyCoroutineContext) {
+        collect { value = it }
+    } else withContext(context) {
+        collect { value = it }
     }
-    return state
 }
