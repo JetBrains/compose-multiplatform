@@ -382,6 +382,7 @@ class SelectionManagerTest {
             eq(Rect.Zero),
             any(),
             isNull(),
+            isNull(),
             isNull()
         )
     }

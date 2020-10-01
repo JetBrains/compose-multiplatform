@@ -2193,7 +2193,7 @@ package androidx.compose.ui.platform {
   public interface TextToolbar {
     method public androidx.compose.ui.platform.TextToolbarStatus getStatus();
     method public void hide();
-    method public void showMenu(androidx.compose.ui.geometry.Rect rect, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCopyRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onPasteRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCutRequested);
+    method public void showMenu(androidx.compose.ui.geometry.Rect rect, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCopyRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onPasteRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCutRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onSelectAllRequested);
     property public abstract androidx.compose.ui.platform.TextToolbarStatus status;
   }
 
