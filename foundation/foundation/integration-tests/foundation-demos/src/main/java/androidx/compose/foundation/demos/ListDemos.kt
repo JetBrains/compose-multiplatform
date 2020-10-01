@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
+import androidx.compose.paging.demos.PagingDemos
 
 val LazyListDemos = listOf(
     ComposableDemo("Simple column") { LazyColumnDemo() },
@@ -66,7 +67,8 @@ val LazyListDemos = listOf(
     ComposableDemo("Pager-like list") { PagerLikeDemo() },
     ComposableDemo("Rtl list") { RtlListDemo() },
     ComposableDemo("LazyColumn DSL") { LazyColumnScope() },
-    ComposableDemo("LazyRow DSL") { LazyRowScope() }
+    ComposableDemo("LazyRow DSL") { LazyRowScope() },
+    PagingDemos
 )
 
 @Composable
