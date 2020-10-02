@@ -80,10 +80,18 @@ inline class TransformOrigin(@PublishedApi internal val packedValue: Long) {
 }
 
 /**
- * A [Modifier.Element] that makes content draw into a layer, allowing easily changing
- * properties of the drawn contents.
+ * A [Modifier.Element] that makes content draw into a draw layer. The draw
+ * layer can be invalidated separately from parents. A [drawLayer] should be used when the content
+ * updates independently from anything above it to minimize the invalidated content.
+ *
+ * A [DrawLayerModifier] can also be used to apply effects to content, such as
+ * scaling ([scaleX], [scaleY]), rotation ([rotationX], [rotationY], [rotationZ]),
+ * opacity ([alpha]), shadow ([shadowElevation], [shape]), and clipping ([clip], [shape]).
+ * Changes to most properties will not invalidate the contents. If set up correctly,
+ * animating these properties can avoid composition, layout, and drawing.
  *
  * @sample androidx.compose.ui.samples.AnimateFadeIn
+ * @see drawLayer
  */
 interface DrawLayerModifier : Modifier.Element {
     /**
@@ -154,6 +162,7 @@ interface DrawLayerModifier : Modifier.Element {
     /**
      * The [Shape] of the layer. When [shadowElevation] is non-zero a shadow is produced using
      * this [shape]. When [clip] is `true` contents will be clipped to this [shape].
+     * When clipping, the content will be redrawn when the [shape] changes.
      */
     val shape: Shape get() = RectangleShape
 
@@ -196,7 +205,13 @@ private data class SimpleDrawLayerModifier(
 }
 
 /**
- * Draw the content into a layer. This permits applying special effects and transformations:
+ * Creates a [DrawLayerModifier] to have all content will be drawn into a new draw layer. The draw
+ * layer can be invalidated separately from parents. A [drawLayer] should be used when the content
+ * updates independently from anything above it to minimize the invalidated content.
+ *
+ * [drawLayer] can also be used to apply effects to content, such as scaling ([scaleX], [scaleY]),
+ * rotation ([rotationX], [rotationY], [rotationZ]), opacity ([alpha]), shadow
+ * ([shadowElevation], [shape]), and clipping ([clip], [shape]).
  *
  * @sample androidx.compose.ui.samples.ChangeOpacity
  *
