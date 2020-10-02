@@ -43,6 +43,7 @@ import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
+import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.onGloballyPositioned
@@ -141,7 +142,6 @@ fun CoreTextField(
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose by
     // incrementing generation counter when we callback to the developer and reset the state with
     // the latest state.
-
     // TODO(b/162464429): Remove deprecated state {} function. This can throw, "Expected a group"
     //  exceptions if changed to the suggested equivalent for the deprecated state {} function.
     @Suppress("DEPRECATION")
@@ -247,24 +247,31 @@ fun CoreTextField(
             }
         }
 
+        val focusRequestTapModifier = Modifier.tapGestureFilter {
+            if (!state.hasFocus) {
+                focusRequester.requestFocus()
+            } else {
+                // if already focused make sure tap request keyboard.
+                textInputService?.showSoftwareKeyboard(state.inputSession)
+            }
+        }
+
         val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
             onPress = {
-                state.selectionIsOn = false
-                manager.hideSelectionToolbar()
-                if (!state.hasFocus) focusRequester.requestFocus()
+                if (state.hasFocus) {
+                    state.selectionIsOn = false
+                    manager.hideSelectionToolbar()
+                }
             },
             onRelease = {
-                if (state.selectionIsOn == false) {
+                if (state.hasFocus && !state.selectionIsOn) {
                     state.layoutResult?.let { layoutResult ->
-                        TextFieldDelegate.onRelease(
+                        TextFieldDelegate.setCursorOffset(
                             it,
                             layoutResult,
                             state.processor,
                             offsetMap,
-                            onValueChangeWrapper,
-                            textInputService,
-                            state.inputSession,
-                            state.hasFocus
+                            onValueChangeWrapper
                         )
                     }
                 }
@@ -357,6 +364,7 @@ fun CoreTextField(
             modifier.focusRequester(focusRequester)
                 .then(focusObserver)
                 .then(dragPositionGestureModifier)
+                .then(focusRequestTapModifier)
                 .then(drawModifier)
                 .then(onPositionedModifier)
                 .then(semanticsModifier)
