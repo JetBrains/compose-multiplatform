@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
 import androidx.compose.ui.text.SpanStyle
@@ -46,6 +47,8 @@ fun TextSelectionDemo() {
         TextDemoSelectionWithStringInput()
         TagLine(tag = "selection in 2D Array Vertical")
         TextDemoSelection2DArrayVertical()
+        TagLine(tag = "enable and disable selection")
+        TextDemoSelectionEnableAndDisable()
     }
 }
 
@@ -151,6 +154,49 @@ fun TextDemoSelection2DArrayVertical() {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun TextDemoSelectionEnableAndDisable() {
+    val textSelectable = "This text is selectable."
+    val textNotSelectable = "This text is not selectable."
+
+    val selection = remember { mutableStateOf<Selection?>(null) }
+
+    SelectionContainer(
+        selection = selection.value,
+        onSelectionChange = { selection.value = it }) {
+        Column(Modifier.fillMaxHeight()) {
+            Text(
+                text = textSelectable,
+                style = TextStyle(fontSize = fontSize8)
+            )
+            DisableSelection {
+                Text(
+                    text = textNotSelectable,
+                    style = TextStyle(fontSize = fontSize8)
+                )
+            }
+            Text(
+                text = textSelectable,
+                style = TextStyle(fontSize = fontSize8)
+            )
+            DisableSelection {
+                Text(
+                    text = textNotSelectable,
+                    style = TextStyle(fontSize = fontSize8)
+                )
+                Text(
+                    text = textNotSelectable,
+                    style = TextStyle(fontSize = fontSize8)
+                )
+            }
+            Text(
+                text = textSelectable,
+                style = TextStyle(fontSize = fontSize8)
+            )
         }
     }
 }
