@@ -875,6 +875,33 @@ class LazyColumnForTest {
         }
     }
 
+    @Test
+    fun scroll_makeListSmaller_scroll() {
+        var items by mutableStateOf((1..100).toList())
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(Modifier.size(10.dp).testTag("$it"))
+            }
+        }
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 300.dp, density = rule.density)
+
+        rule.runOnIdle {
+            items = (1..11).toList()
+        }
+
+        // try to scroll after the data set has been updated. this was causing a crash previously
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = (-10).dp, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+    }
+
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
         getUnclippedBoundsInRoot().top.assertIsEqualTo(expected, tolerance = 1.dp)
     }
