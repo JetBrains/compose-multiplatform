@@ -192,6 +192,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                 changesToReturn = changesToReturn.map {
                     if (it.changedToDown()) {
                         it.consumeDownChange()
+                        it
                     } else {
                         it
                     }
@@ -244,6 +245,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                             if (velocityTracker != null) {
                                 changesToReturn = changesToReturn.map {
                                     it.consumeDownChange()
+                                    it
                                 }
                                 velocityTracker!!.calculateVelocity().pixelsPerSecond
                             } else {
@@ -355,6 +357,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
 
                     movedChanges = movedChanges.map {
                         it.consumePositionChange(consumed.x, consumed.y)
+                        it
                     }
                 }
             }

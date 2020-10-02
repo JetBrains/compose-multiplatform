@@ -32,7 +32,6 @@ import androidx.compose.ui.input.pointer.invokeOverPass
 import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.input.pointer.pointerEventOf
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.milliseconds
@@ -451,7 +450,7 @@ class DragSlopExceededGestureFilterTest {
     fun onPointerEvent_downConsumedMovePassedSlop_onTouchSlopExceededCallOnce() {
         val beyondSlop = TestTouchSlop + TinyNum
 
-        val down = down(0).consumeDownChange()
+        val down = down(0).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move = down.moveBy(Duration(milliseconds = 100), beyondSlop, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))

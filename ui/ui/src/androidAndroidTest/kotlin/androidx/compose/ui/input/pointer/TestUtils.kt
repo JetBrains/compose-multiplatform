@@ -92,17 +92,11 @@ internal fun catchThrowable(lambda: () -> Unit): Throwable? {
     return exception
 }
 
-internal fun internalPointerEventOf(vararg changes: PointerInputChange) =
-    InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), MotionEventDouble)
-
-internal fun pointerEventOf(vararg changes: PointerInputChange) =
-    PointerEvent(changes.toList(), MotionEventDouble)
-
 /**
  * To be used to construct types that require a MotionEvent but where no details of the MotionEvent
  * are actually needed.
  */
-private val MotionEventDouble = MotionEvent.obtain(0L, 0L, ACTION_DOWN, 0f, 0f, 0)
+internal val MotionEventDouble = MotionEvent.obtain(0L, 0L, ACTION_DOWN, 0f, 0f, 0)
 
 internal fun Modifier.spyGestureFilter(
     callback: (PointerEventPass) -> Unit
@@ -208,3 +202,24 @@ internal fun PointerCoords(x: Float, y: Float) =
         this.x = x
         this.y = y
     }
+
+internal fun PointerEvent.deepCopy() =
+    PointerEvent(
+        changes.map {
+            it.deepCopy()
+        },
+        motionEvent = motionEvent
+    )
+
+internal fun PointerInputChange.deepCopy() =
+    PointerInputChange(
+        id,
+        current.copy(),
+        previous.copy(),
+        consumed.copy()
+    )
+
+internal fun pointerEventOf(
+    vararg changes: PointerInputChange,
+    motionEvent: MotionEvent = MotionEventDouble
+) = PointerEvent(changes.toList(), motionEvent)

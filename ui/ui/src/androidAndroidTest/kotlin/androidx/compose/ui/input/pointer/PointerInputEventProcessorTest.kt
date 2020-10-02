@@ -2833,6 +2833,7 @@ class PointerInputEventProcessorTest {
                 TestPointerInputFilter { pointerEvent, pass, _ ->
                     if (pass == PointerEventPass.Initial) {
                         pointerEvent.changes.map { it.consumePositionChange(1f, 0f) }
+                        pointerEvent.changes
                     } else {
                         pointerEvent.changes
                     }

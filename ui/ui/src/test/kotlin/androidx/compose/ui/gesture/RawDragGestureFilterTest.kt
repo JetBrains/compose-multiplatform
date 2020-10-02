@@ -30,7 +30,6 @@ import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.input.pointer.pointerEventOf
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
@@ -242,10 +241,10 @@ class RawDragGestureFilterTest {
         change = change.moveBy(100.milliseconds, -3f, 7f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         change = change.moveBy(100.milliseconds, 11f, 13f)
-            .consumePositionChange(5f, 3f)
+            .apply { consumePositionChange(5f, 3f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         change = change.moveBy(100.milliseconds, -13f, -11f)
-            .consumePositionChange(-3f, -5f)
+            .apply { consumePositionChange(-3f, -5f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         // Assert
