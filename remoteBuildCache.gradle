@@ -16,6 +16,7 @@ if (useRemoteBuildCache) {
                         url = 'http://gradle-remote-cache.uplink.goog:999/cache/'
                         break
                 }
+                allowInsecureProtocol = true
                 push = true
             }
         }
