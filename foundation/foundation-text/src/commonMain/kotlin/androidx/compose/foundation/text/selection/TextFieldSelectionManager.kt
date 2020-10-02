@@ -236,8 +236,12 @@ internal class TextFieldSelectionManager() {
     }
 
     internal fun deselect() {
-        val newValue = TextFieldValue(text = value.text, selection = TextRange.Zero)
-        onValueChange(newValue)
+        if (!value.selection.collapsed) {
+            // if selection was not collapsed, set a default cursor location, otherwise
+            // don't change the location of the cursor.
+            val newValue = value.copy(selection = TextRange.Zero)
+            onValueChange(newValue)
+        }
         setSelectionStatus(false)
         hideSelectionToolbar()
     }
