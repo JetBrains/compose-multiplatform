@@ -166,9 +166,9 @@ class TextInputServiceTest {
             {} // onImeActionPerformed
         )
 
-        val dummyEditorModel = TextFieldValue()
-        textInputService.onStateUpdated(firstToken, dummyEditorModel)
-        verify(platformService, times(1)).onStateUpdated(eq(dummyEditorModel))
+        val editorModel = TextFieldValue()
+        textInputService.onStateUpdated(firstToken, editorModel)
+        verify(platformService, times(1)).onStateUpdated(eq(editorModel))
     }
 
     @Test
@@ -194,8 +194,8 @@ class TextInputServiceTest {
             {} // onImeActionPerformed
         )
 
-        val dummyEditorModel = TextFieldValue()
-        textInputService.onStateUpdated(firstToken, dummyEditorModel)
+        val editorModel = TextFieldValue()
+        textInputService.onStateUpdated(firstToken, editorModel)
         verify(platformService, never()).onStateUpdated(any())
     }
 
@@ -213,9 +213,9 @@ class TextInputServiceTest {
             {} // onImeActionPerformed
         )
 
-        val dummyRect = Rect(Offset.Zero, Size(100f, 100f))
-        textInputService.notifyFocusedRect(firstToken, dummyRect)
-        verify(platformService, times(1)).notifyFocusedRect(eq(dummyRect))
+        val rect = Rect(Offset.Zero, Size(100f, 100f))
+        textInputService.notifyFocusedRect(firstToken, rect)
+        verify(platformService, times(1)).notifyFocusedRect(eq(rect))
     }
 
     @Test
@@ -241,8 +241,8 @@ class TextInputServiceTest {
             {} // onImeActionPerformed
         )
 
-        val dummyRect = Rect(Offset.Zero, Size(100f, 100f))
-        textInputService.notifyFocusedRect(firstToken, dummyRect)
+        val rect = Rect(Offset.Zero, Size(100f, 100f))
+        textInputService.notifyFocusedRect(firstToken, rect)
         verify(platformService, never()).notifyFocusedRect(any())
     }
 }

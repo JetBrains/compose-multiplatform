@@ -39,7 +39,7 @@ class AnimationClockBenchmark {
 
         val observers = (0..200).map {
             if (it % 2 == 0)
-                DummyObserver()
+                TestObserver()
             else
                 ResubscribeObserver(clock)
         }
@@ -59,7 +59,7 @@ class AnimationClockBenchmark {
         val clock = ManualAnimationClock(0L)
 
         val observers = (0..300).map {
-            DummyObserver()
+            TestObserver()
         }
 
         observers.forEach {
@@ -73,7 +73,7 @@ class AnimationClockBenchmark {
     }
 }
 
-private class DummyObserver : AnimationClockObserver {
+private class TestObserver : AnimationClockObserver {
     override fun onAnimationFrame(frameTimeMillis: Long) {}
 }
 

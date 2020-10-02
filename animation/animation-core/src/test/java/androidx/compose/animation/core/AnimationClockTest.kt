@@ -139,39 +139,39 @@ class AnimationClockTest {
     fun testResubscriptionObserverOrder() {
         var callIndex = 0
 
-        var dummyACallIndex = -1
-        var dummyBCallIndex = -1
-        var dummyCCallIndex = -1
+        var testACallIndex = -1
+        var testBCallIndex = -1
+        var testCCallIndex = -1
 
-        val dummyA = dummyObserver {
-            dummyACallIndex = callIndex++
+        val testObserverA = testObserver {
+            testACallIndex = callIndex++
         }
-        val dummyB = dummyObserver {
-            dummyBCallIndex = callIndex++
+        val testObserverB = testObserver {
+            testBCallIndex = callIndex++
         }
-        val dummyC = dummyObserver {
-            dummyCCallIndex = callIndex++
+        val testObserverC = testObserver {
+            testCCallIndex = callIndex++
         }
 
-        clock.subscribe(dummyA)
-        clock.subscribe(dummyB)
-        clock.subscribe(dummyC)
+        clock.subscribe(testObserverA)
+        clock.subscribe(testObserverB)
+        clock.subscribe(testObserverC)
 
         clock.clockTimeMillis = 1L
 
         // Starts at 3 since subscribe calls callback in ManualAnimationClock
-        assertEquals(3, dummyACallIndex)
-        assertEquals(4, dummyBCallIndex)
-        assertEquals(5, dummyCCallIndex)
+        assertEquals(3, testACallIndex)
+        assertEquals(4, testBCallIndex)
+        assertEquals(5, testCCallIndex)
 
-        clock.unsubscribe(dummyB)
-        clock.subscribe(dummyB)
+        clock.unsubscribe(testObserverB)
+        clock.subscribe(testObserverB)
 
         clock.clockTimeMillis = 2L
 
-        assertEquals(7, dummyACallIndex)
-        assertEquals(9, dummyBCallIndex)
-        assertEquals(8, dummyCCallIndex)
+        assertEquals(7, testACallIndex)
+        assertEquals(9, testBCallIndex)
+        assertEquals(8, testCCallIndex)
     }
 }
 
@@ -195,7 +195,7 @@ private abstract class IgnoreFirstFrameObserver : AnimationClockObserver {
     }
 }
 
-private fun dummyObserver(onAnimationFrame: (Long) -> Unit = {}): AnimationClockObserver =
+private fun testObserver(onAnimationFrame: (Long) -> Unit = {}): AnimationClockObserver =
     object : AnimationClockObserver {
         override fun onAnimationFrame(frameTimeMillis: Long) {
             onAnimationFrame.invoke(frameTimeMillis)
