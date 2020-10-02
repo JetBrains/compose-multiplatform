@@ -37,6 +37,7 @@ import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
+import androidx.compose.ui.node.isAttached
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.subcomposeInto
@@ -175,7 +176,7 @@ private class SubcomposeLayoutState<T> :
 
     fun subcomposeIfRemeasureNotScheduled() {
         val root = root!!
-        if (root.layoutState != LayoutState.NeedsRemeasure) {
+        if (root.layoutState != LayoutState.NeedsRemeasure && root.isAttached()) {
             root.foldedChildren.fastForEach {
                 subcompose(it, nodeToNodeState.getValue(it))
             }
