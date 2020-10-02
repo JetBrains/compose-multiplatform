@@ -306,7 +306,6 @@ fun BottomSheetScaffold(
                 fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
                 fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
             ),
-            thresholds = { _, _ -> FixedThreshold(56.dp) },
             orientation = Orientation.Vertical,
             enabled = sheetGesturesEnabled,
             resistance = null
