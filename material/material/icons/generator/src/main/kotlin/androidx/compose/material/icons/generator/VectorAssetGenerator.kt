@@ -67,7 +67,7 @@ class VectorAssetGenerator(
         ).addProperty(
             PropertySpec.builder(name = iconName, type = ClassNames.VectorAsset)
                 .receiver(iconTheme.className)
-                .getter(iconGetter(backingProperty))
+                .getter(iconGetter(backingProperty, iconName, iconTheme))
                 .build()
         ).addProperty(
             backingProperty
@@ -79,7 +79,11 @@ class VectorAssetGenerator(
      * property if it is not null, otherwise creates the icon and 'caches' it in the backing
      * property, and then returns the backing property.
      */
-    private fun iconGetter(backingProperty: PropertySpec): FunSpec {
+    private fun iconGetter(
+        backingProperty: PropertySpec,
+        iconName: String,
+        iconTheme: IconTheme
+    ): FunSpec {
         return FunSpec.getterBuilder()
             .addCode(
                 buildCodeBlock {
@@ -90,7 +94,12 @@ class VectorAssetGenerator(
             )
             .addCode(
                 buildCodeBlock {
-                    beginControlFlow("%N = %M", backingProperty, MemberNames.MaterialIcon)
+                    beginControlFlow(
+                        "%N = %M(name = \"%N.%N\")",
+                        backingProperty,
+                        MemberNames.MaterialIcon,
+                        iconTheme.name,
+                        iconName)
                     vector.nodes.forEach { node -> addRecursively(node) }
                     endControlFlow()
                 }

@@ -99,11 +99,14 @@ object Icons {
  * Utility delegate to construct a Material icon with default size information.
  * This is used by generated icons, and should not be used manually.
  *
+ * @param name the full name of the generated icon
  * @param block builder lambda to add paths to this vector asset
  */
 inline fun materialIcon(
+    name: String,
     block: VectorAssetBuilder.() -> VectorAssetBuilder
 ): VectorAsset = VectorAssetBuilder(
+    name = name,
     defaultWidth = MaterialIconDimension.dp,
     defaultHeight = MaterialIconDimension.dp,
     viewportWidth = MaterialIconDimension,
