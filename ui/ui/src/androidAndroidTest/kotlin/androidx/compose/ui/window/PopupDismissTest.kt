@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.ui.test.createComposeRule
@@ -44,7 +44,7 @@ import org.junit.runners.Parameterized
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@MediumTest
+@LargeTest
 @RunWith(Parameterized::class)
 class PopupDismissTest(private val isFocusable: Boolean) {
 
@@ -105,7 +105,7 @@ class PopupDismissTest(private val isFocusable: Boolean) {
         }
 
         // TODO: Unfortunately without the latch this test flakes on cuttlefish
-        if (!latch.await(2, TimeUnit.SECONDS)) {
+        if (!latch.await(5, TimeUnit.SECONDS)) {
             throw AssertionError("Failed to wait for dismiss callback.")
         }
 
