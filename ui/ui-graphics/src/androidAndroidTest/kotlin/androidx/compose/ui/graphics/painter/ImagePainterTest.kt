@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.drawscope.drawPainter
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize

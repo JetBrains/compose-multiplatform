@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawPainter
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.filters.SmallTest

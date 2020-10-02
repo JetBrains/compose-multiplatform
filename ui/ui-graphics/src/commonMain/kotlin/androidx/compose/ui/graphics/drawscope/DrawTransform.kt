@@ -52,30 +52,6 @@ inline fun DrawTransform.inset(
  * The pivot coordinate remains unchanged by the rotation transformation
  *
  * @param radians to rotate clockwise
- * @param pivotX The x-coordinate for the pivot point, defaults to the center of the
- * coordinate space horizontally
- * @param pivotY The y-coordinate for the pivot point, defaults to the center of the
- * coordinate space vertically
- */
-@Deprecated(
-    "use rotateRad(radians, Offset(pivotX, pivotY)) instead",
-    ReplaceWith(
-        "rotateRad(radians, Offset(pivotX, pivotY))",
-        "androidx.compose.ui.graphics.drawscope"
-    )
-)
-@Suppress("NOTHING_TO_INLINE")
-inline fun DrawTransform.rotateRad(
-    radians: Float,
-    pivotX: Float = center.x,
-    pivotY: Float = center.y
-) = rotate(degrees(radians), Offset(pivotX, pivotY))
-
-/**
- * Add a rotation (in radians clockwise) to the current transform at the given pivot point.
- * The pivot coordinate remains unchanged by the rotation transformation
- *
- * @param radians to rotate clockwise
  * @param pivot The coordinate for the pivot point, defaults to the center of the
  * coordinate space
  */
@@ -174,60 +150,10 @@ interface DrawTransform {
      *  The pivot coordinate remains unchanged by the rotation transformation.
      *
      *  @param degrees to rotate clockwise
-     *  @param pivotX The x-coordinate for the pivot point, defaults to the center of the
-     *  coordinate space horizontally
-     *  @param pivotY The y-coordinate for the pivot point, defaults to the center of the
-     *  coordinate space vertically
-     */
-    @Deprecated(
-        "Use rotate(degrees, Offset(pivotX, pivotY))",
-        ReplaceWith(
-            "rotate(degrees, Offset(pivotX, pivotY))",
-            "androidx.compose.ui.graphics.drawscope"
-        )
-    )
-    fun rotate(degrees: Float, pivotX: Float = center.x, pivotY: Float = center.y) =
-        rotate(degrees, Offset(pivotX, pivotY))
-
-    /**
-     *  Add a rotation (in degrees clockwise) to the current transform at the given pivot point.
-     *  The pivot coordinate remains unchanged by the rotation transformation.
-     *
-     *  @param degrees to rotate clockwise
      *  @param pivot The coordinates for the pivot point, defaults to the center of the
      *  coordinate space
      */
     fun rotate(degrees: Float, pivot: Offset)
-
-    /**
-     * Add an axis-aligned scale to the current transform, scaling by the first
-     * argument in the horizontal direction and the second in the vertical
-     * direction at the given pivot coordinate. The pivot coordinate remains
-     * unchanged by the scale transformation.
-     *
-     * If [scaleY] is unspecified, [scaleX] will be used for the scale in both
-     * directions.
-     *
-     * @param scaleX The amount to scale in X
-     * @param scaleY The amount to scale in Y
-     * @param pivotX The x-coordinate for the pivot point, defaults to the center of the
-     * coordinate space horizontally
-     * @param pivotY The y-coordinate for the pivot point, defaults to the center of the
-     * coordinate space vertically
-     */
-    @Deprecated(
-        "Use scale(scaleX, scaleY, Offset(pivotX, pivotY))",
-        ReplaceWith(
-            "scale(scaleX, scaleY, Offset(pivotX, pivotY))",
-            "androidx.compose.ui.graphics.drawscope"
-        )
-    )
-    fun scale(
-        scaleX: Float,
-        scaleY: Float = scaleX,
-        pivotX: Float = center.x,
-        pivotY: Float = center.y
-    ) = scale(scaleX, scaleY, Offset(pivotX, pivotY))
 
     /**
      * Add an axis-aligned scale to the current transform, scaling by the first
