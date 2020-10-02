@@ -17,9 +17,11 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import org.junit.Assert.assertEquals
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 class DesktopPaintTest : DesktopGraphicsTest() {
@@ -88,6 +90,8 @@ class DesktopPaintTest : DesktopGraphicsTest() {
 
     @Test
     fun filterQuality() {
+        assumeTrue(DesktopPlatform.Current == DesktopPlatform.MacOS)
+
         canvas.drawImageRect(
             image = imageFromResource("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),

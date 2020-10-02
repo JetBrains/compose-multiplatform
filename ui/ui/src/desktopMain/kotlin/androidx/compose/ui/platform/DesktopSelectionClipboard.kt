@@ -27,7 +27,7 @@ class SelectionManagerTracker {
 }
 
 val copyToClipboardKeySet by lazy {
-    when (identifyCurrentPlatform()) {
+    when (DesktopPlatform.Current) {
         DesktopPlatform.MacOS -> Key.MetaLeft + Key.C
         else -> Key.CtrlLeft + Key.C
     }

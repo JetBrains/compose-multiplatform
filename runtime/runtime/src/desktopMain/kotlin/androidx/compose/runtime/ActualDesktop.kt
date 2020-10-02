@@ -22,9 +22,6 @@ import kotlinx.coroutines.swing.Swing
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
-// API to allow override embedding context creation mechanism for tests.
-var EmbeddingContextFactory: (() -> EmbeddingContext)? = null
-
 class SwingEmbeddingContext : EmbeddingContext {
     override fun isMainThread(): Boolean {
         return SwingUtilities.isEventDispatchThread()
@@ -35,8 +32,7 @@ class SwingEmbeddingContext : EmbeddingContext {
     }
 }
 
-actual fun EmbeddingContext(): EmbeddingContext =
-    EmbeddingContextFactory?.let { it() } ?: SwingEmbeddingContext()
+actual fun EmbeddingContext(): EmbeddingContext = SwingEmbeddingContext()
 
 internal actual object Trace {
     actual fun beginSection(name: String): Any? {
