@@ -446,6 +446,38 @@ class TextFieldDelegateTest {
         )
     }
 
+    @Test
+    fun apply_composition_decoration_with_offsetmap() {
+        val offsetAmount = 5
+        val offsetMap = object : OffsetMap {
+            override fun originalToTransformed(offset: Int): Int = offsetAmount + offset
+            override fun transformedToOriginal(offset: Int): Int = offset - offsetAmount
+        }
+
+        val input = TransformedText(
+            transformedText = AnnotatedString.Builder().apply {
+                append(" ".repeat(offsetAmount))
+                append("Hello World")
+            }.toAnnotatedString(),
+            offsetMap = offsetMap
+        )
+
+        val range = TextRange(0, 2)
+        val result = TextFieldDelegate.applyCompositionDecoration(
+            compositionRange = range,
+            transformed = input
+        )
+
+        assertThat(result.transformedText.spanStyles.size).isEqualTo(1)
+        assertThat(result.transformedText.spanStyles).contains(
+            AnnotatedString.Range(
+                SpanStyle(textDecoration = TextDecoration.Underline),
+                range.start + offsetAmount,
+                range.end + offsetAmount
+            )
+        )
+    }
+
     private class MockCoordinates(
         override val size: IntSize = IntSize.Zero,
         val localOffset: Offset = Offset.Zero,
