@@ -215,6 +215,9 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         (canvas as DisplayListCanvas).drawRenderNode(renderNode)
     }
 
+    override fun setHasOverlappingRendering(hasOverlappingRendering: Boolean): Boolean =
+        renderNode.setHasOverlappingRendering(hasOverlappingRendering)
+
     companion object {
         // Used by tests to force failing creating a RenderNode to simulate a device that
         // doesn't support RenderNodes before Q.

@@ -61,4 +61,5 @@ internal interface DeviceRenderNode {
     )
     fun getMatrix(matrix: android.graphics.Matrix)
     fun drawInto(canvas: android.graphics.Canvas)
+    fun setHasOverlappingRendering(hasOverlappingRendering: Boolean): Boolean
 }

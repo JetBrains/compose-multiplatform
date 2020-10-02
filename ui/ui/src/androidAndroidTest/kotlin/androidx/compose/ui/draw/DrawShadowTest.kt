@@ -159,15 +159,15 @@ class DrawShadowTest {
                 }
             }
         }
-
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
         takeScreenShot(12).apply {
             val shadowColor = color(width / 2, height - 1)
             // assert the shadow is still visible
             assertNotEquals(shadowColor, Color.White)
             // but the shadow is not as dark as it would be without opacity.
-            // with full opacity it is around 0.85, with 50% opacity it is 0.96
-            assertTrue(shadowColor.luminance() > 0.94f)
+            // Full opacity depends on the device, but is around 0.8 luminance.
+            // At 50%, the luminance is over 0.9
+            assertTrue(shadowColor.luminance() > 0.9f)
         }
     }
 
