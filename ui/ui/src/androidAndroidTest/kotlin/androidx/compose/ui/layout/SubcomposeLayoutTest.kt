@@ -18,11 +18,14 @@ package androidx.compose.ui.layout
 
 import android.graphics.Bitmap
 import android.os.Build
-import androidx.compose.foundation.layout.Spacer
+import android.widget.FrameLayout
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
@@ -33,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -45,14 +49,18 @@ import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertPositionInRootIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(JUnit4::class)
@@ -60,7 +68,7 @@ import org.junit.runners.JUnit4
 class SubcomposeLayoutTest {
 
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createAndroidComposeRule<ComponentActivity>()
     @get:Rule
     val excessiveAssertions = AndroidOwnerExtraAssertionsRule()
 
@@ -483,6 +491,54 @@ class SubcomposeLayoutTest {
         rule.onNodeWithTag(layoutTag)
             .captureToBitmap()
             .assertCenterPixelColor(Color.Red)
+    }
+
+    @Test
+    fun viewWithSubcomposeLayoutCanBeDetached() {
+        // verifies that the View with composed SubcomposeLayout can be detached at any point of
+        // time without runtime crashes and once the view will be attached again the change will
+        // be applied
+
+        val scenario = rule.activityRule.scenario
+
+        lateinit var container1: FrameLayout
+        lateinit var container2: FrameLayout
+        val state = mutableStateOf(10.dp)
+        var stateUsedLatch = CountDownLatch(1)
+
+        scenario.onActivity {
+            container1 = FrameLayout(it)
+            container2 = FrameLayout(it)
+            it.setContentView(container1)
+            container1.addView(container2)
+            container2.setContent(Recomposer.current()) {
+                SubcomposeLayout<Unit> { constraints ->
+                    val first = subcompose(Unit) {
+                        stateUsedLatch.countDown()
+                        Box(Modifier.size(state.value))
+                    }.first().measure(constraints)
+                    layout(first.width, first.height) {
+                        first.place(0, 0)
+                    }
+                }
+            }
+        }
+
+        assertTrue(stateUsedLatch.await(1, TimeUnit.SECONDS))
+
+        stateUsedLatch = CountDownLatch(1)
+        scenario.onActivity {
+            state.value = 15.dp
+            container1.removeView(container2)
+        }
+
+        assertFalse(stateUsedLatch.await(200, TimeUnit.MILLISECONDS))
+
+        scenario.onActivity {
+            container1.addView(container2)
+        }
+
+        assertTrue(stateUsedLatch.await(1, TimeUnit.SECONDS))
     }
 }
 
