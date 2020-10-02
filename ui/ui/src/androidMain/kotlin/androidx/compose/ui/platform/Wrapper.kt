@@ -163,7 +163,7 @@ fun ComponentActivity.setContent(
     val composeView: AndroidOwner = window.decorView
         .findViewById<ViewGroup>(android.R.id.content)
         .getChildAt(0) as? AndroidOwner
-        ?: AndroidComposeView(this, this, this).also {
+        ?: AndroidComposeView(this).also {
             setContentView(it.view, DefaultLayoutParams)
         }
     return doSetContent(composeView, recomposer, null, content)

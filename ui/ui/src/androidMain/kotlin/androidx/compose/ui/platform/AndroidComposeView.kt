@@ -82,11 +82,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 import android.view.KeyEvent as AndroidKeyEvent
@@ -99,12 +96,7 @@ import android.view.KeyEvent as AndroidKeyEvent
     ExperimentalLayoutNodeApi::class
 )
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-internal class AndroidComposeView constructor(
-    context: Context,
-    initialLifecycleOwner: LifecycleOwner? = null,
-    initialViewModelStoreOwner: ViewModelStoreOwner? = null,
-    initialSavedStateRegistryOwner: SavedStateRegistryOwner? = null
-) : ViewGroup(context), AndroidOwner {
+internal class AndroidComposeView(context: Context) : ViewGroup(context), AndroidOwner {
 
     override val view: View = this
 
@@ -494,18 +486,7 @@ internal class AndroidComposeView constructor(
         }
     }
 
-    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? =
-        if (initialLifecycleOwner != null && initialViewModelStoreOwner != null &&
-            initialSavedStateRegistryOwner != null
-        ) {
-            AndroidOwner.ViewTreeOwners(
-                initialLifecycleOwner,
-                initialViewModelStoreOwner,
-                initialSavedStateRegistryOwner
-            )
-        } else {
-            null
-        }
+    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? = null
         private set
 
     override fun setOnViewTreeOwnersAvailable(callback: (AndroidOwner.ViewTreeOwners) -> Unit) {
