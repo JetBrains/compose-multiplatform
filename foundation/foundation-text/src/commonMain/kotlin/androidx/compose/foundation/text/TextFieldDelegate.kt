@@ -322,8 +322,8 @@ class TextFieldDelegate {
                 AnnotatedString.Builder(transformed.transformedText).apply {
                     addStyle(
                         SpanStyle(textDecoration = TextDecoration.Underline),
-                        compositionRange.start,
-                        compositionRange.end
+                        transformed.offsetMap.originalToTransformed(compositionRange.start),
+                        transformed.offsetMap.originalToTransformed(compositionRange.end)
                     )
                 }.toAnnotatedString(),
                 transformed.offsetMap
