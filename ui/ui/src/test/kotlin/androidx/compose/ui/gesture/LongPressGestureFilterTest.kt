@@ -26,7 +26,6 @@ import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.input.pointer.pointerEventOf
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
@@ -113,7 +112,7 @@ class LongPressGestureFilterTest {
     @Test
     fun onPointerEvent_DownUpConsumed_eventNotFired() {
         val down = down(0)
-        val up = down.up(50.milliseconds).consumeDownChange()
+        val up = down.up(50.milliseconds).apply { consumeDownChange() }
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)

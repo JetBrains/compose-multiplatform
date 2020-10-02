@@ -148,6 +148,7 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
             changes = changes.map {
                 if (it.changedToDown() || it.changedToUp()) {
                     it.consumeDownChange()
+                    it
                 } else {
                     it
                 }

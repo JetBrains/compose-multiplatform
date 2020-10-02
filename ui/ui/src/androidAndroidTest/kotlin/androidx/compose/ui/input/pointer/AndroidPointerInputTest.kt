@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit
 class AndroidPointerInputTest {
     @Suppress("DEPRECATION")
     @get:Rule
-    val rule = androidx.test.rule.ActivityTestRule<AndroidPointerInputTestActivity>(
+    val rule = androidx.test.rule.ActivityTestRule(
         AndroidPointerInputTestActivity::class.java
     )
 
@@ -464,6 +464,7 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
                     it.positionChange().y
                 )
             }
+            pointerEvent.changes
         } else {
             pointerEvent.changes
         }
@@ -481,6 +482,7 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
         if (it.changedToDown()) {
             onDown(it.current.position!!)
             it.consumeDownChange()
+            it
         } else {
             it
         }

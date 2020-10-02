@@ -24,7 +24,6 @@ import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.input.pointer.pointerEventOf
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
@@ -56,13 +55,14 @@ class RawPressStartGestureFilterTest {
 
     @Test
     fun onPointerEvent_downConsumed_onPressStartNotCalled() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0).consumeDownChange()))
+        filter::onPointerEvent
+            .invokeOverAllPasses(pointerEventOf(down(0).apply { consumeDownChange() }))
         verify(filter.onPressStart, never()).invoke(any())
     }
 
     @Test
     fun onPointerEvent_downConsumedDown_onPressStartNotCalled() {
-        var pointer1 = down(1, duration = 0.milliseconds).consumeDownChange()
+        var pointer1 = down(1, duration = 0.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
         pointer1 = pointer1.moveBy(10.milliseconds)
         val pointer2 = down(2, duration = 10.milliseconds)
@@ -81,7 +81,7 @@ class RawPressStartGestureFilterTest {
     fun onPointerEvent_disabledDownEnabledDown_onPressStartNotCalled() {
 
         filter.setEnabled(false)
-        var pointer1 = down(1, duration = 0.milliseconds).consumeDownChange()
+        var pointer1 = down(1, duration = 0.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
         filter.setEnabled(true)
         pointer1 = pointer1.moveBy(10.milliseconds)
@@ -184,7 +184,7 @@ class RawPressStartGestureFilterTest {
         filter.setExecutionPass(PointerEventPass.Initial)
 
         val pointer = filter::onPointerEvent.invokeOverPasses(
-                pointerEventOf(down(0)),
+            pointerEventOf(down(0)),
             PointerEventPass.Initial
         )
 
@@ -197,7 +197,7 @@ class RawPressStartGestureFilterTest {
         filter.setExecutionPass(PointerEventPass.Main)
 
         var pointer = filter::onPointerEvent.invokeOverPasses(
-                pointerEventOf(down(0)),
+            pointerEventOf(down(0)),
             PointerEventPass.Initial
         )
 
@@ -205,7 +205,7 @@ class RawPressStartGestureFilterTest {
         assertThat(pointer.changes.first().consumed.downChange, `is`(false))
 
         pointer = filter::onPointerEvent.invokeOverPasses(
-                pointerEventOf(down(1)),
+            pointerEventOf(down(1)),
             PointerEventPass.Main
         )
 
@@ -218,7 +218,7 @@ class RawPressStartGestureFilterTest {
         filter.setExecutionPass(PointerEventPass.Final)
 
         var pointer = filter::onPointerEvent.invokeOverPasses(
-                pointerEventOf(down(0)),
+            pointerEventOf(down(0)),
             PointerEventPass.Initial,
             PointerEventPass.Main
         )
@@ -227,7 +227,7 @@ class RawPressStartGestureFilterTest {
         assertThat(pointer.changes.first().consumed.downChange, `is`(false))
 
         pointer = filter::onPointerEvent.invokeOverPasses(
-                pointerEventOf(down(1)),
+            pointerEventOf(down(1)),
             PointerEventPass.Final
         )
 
@@ -245,7 +245,7 @@ class RawPressStartGestureFilterTest {
         filter::onPointerEvent
             .invokeOverAllPasses(pointerEventOf(down(id = 0, duration = 0.milliseconds)))
         filter.onCancel()
-        var pointer1 = down(id = 1, duration = 10.milliseconds).consumeDownChange()
+        var pointer1 = down(id = 1, duration = 10.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
         pointer1 = pointer1.moveTo(20.milliseconds, 0f, 0f)
         val pointer2 = down(id = 2, duration = 20.milliseconds)

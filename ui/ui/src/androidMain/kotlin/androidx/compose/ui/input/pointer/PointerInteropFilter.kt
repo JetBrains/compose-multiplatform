@@ -268,7 +268,10 @@ internal class PointerInteropFilter : PointerInputModifier {
                         }
                         if (state === DispatchToViewState.Dispatching) {
                             // If the Android View claimed the event, consume all changes.
-                            changes = changes.map { it.consumeAllChanges() }
+                            changes = changes.map {
+                                it.consumeAllChanges()
+                                it
+                            }
                         }
                     }
                     return changes

@@ -182,5 +182,3 @@ internal fun ((CustomEvent, PointerEventPass) -> Unit).invokeOverPasses(
         this.invoke(event, pass)
     }
 }
-
-internal fun pointerEventOf(vararg changes: PointerInputChange) = PointerEvent(changes.toList())

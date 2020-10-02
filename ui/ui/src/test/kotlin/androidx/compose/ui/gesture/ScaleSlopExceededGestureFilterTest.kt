@@ -20,7 +20,6 @@ import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.input.pointer.pointerEventOf
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
