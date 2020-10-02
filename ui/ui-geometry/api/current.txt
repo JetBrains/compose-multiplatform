@@ -254,17 +254,14 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static operator long div-NH-jbRc(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
-    method @androidx.compose.runtime.Stable public static long getFlipped-NH-jbRc(long $this);
     method public static float getHeight-impl(long $this);
     method public static float getMaxDimension-impl(long $this);
     method public static float getMinDimension-impl(long $this);
     method public static float getWidth-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method @androidx.compose.runtime.Stable public static boolean isEmpty-impl(long $this);
-    method @androidx.compose.runtime.Stable public static operator long rem-NH-jbRc(long $this, float operand);
     method @androidx.compose.runtime.Stable public static operator long times-NH-jbRc(long $this, float operand);
     method public static String toString-impl(long $this);
-    method @androidx.compose.runtime.Stable public static long truncDiv-NH-jbRc(long $this, float operand);
     field public static final androidx.compose.ui.geometry.Size.Companion Companion;
   }
 
