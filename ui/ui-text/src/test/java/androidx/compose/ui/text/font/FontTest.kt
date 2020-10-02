@@ -23,11 +23,11 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class FontTest {
 
-    private val dummyResourceId = 1
+    private val resourceId = 1
 
     @Test
     fun `default values`() {
-        val font = font(resId = dummyResourceId)
+        val font = font(resId = resourceId)
         assertThat(font.weight).isEqualTo(FontWeight.Normal)
         assertThat(font.style).isEqualTo(FontStyle.Normal)
     }
@@ -35,13 +35,13 @@ class FontTest {
     @Test
     fun `two equal font declarations are equal`() {
         val font = font(
-            resId = dummyResourceId,
+            resId = resourceId,
             weight = FontWeight.W900,
             style = FontStyle.Italic
         )
 
         val otherFont = font(
-            resId = dummyResourceId,
+            resId = resourceId,
             weight = FontWeight.W900,
             style = FontStyle.Italic
         )
@@ -52,13 +52,13 @@ class FontTest {
     @Test
     fun `two non equal font declarations are not equal`() {
         val font = font(
-            resId = dummyResourceId,
+            resId = resourceId,
             weight = FontWeight.W900,
             style = FontStyle.Italic
         )
 
         val otherFont = font(
-            resId = dummyResourceId,
+            resId = resourceId,
             weight = FontWeight.W800,
             style = FontStyle.Italic
         )
@@ -69,7 +69,7 @@ class FontTest {
     @Test
     fun `asFontFamilyList returns a FontFamily`() {
         val font = font(
-            resId = dummyResourceId,
+            resId = resourceId,
             weight = FontWeight.W900,
             style = FontStyle.Italic
         )

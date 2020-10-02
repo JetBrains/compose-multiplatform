@@ -288,7 +288,7 @@ fun MultiMeasureLayout(
 /**
  * Used to return a fixed sized item for intrinsics measurements in [Layout]
  */
-private class DummyPlaceable(width: Int, height: Int) : Placeable() {
+private class FixedSizeIntrinsicsPlaceable(width: Int, height: Int) : Placeable() {
     init {
         measuredSize = IntSize(width, height)
     }
@@ -334,14 +334,14 @@ internal class DefaultIntrinsicMeasurable(
             } else {
                 measurable.minIntrinsicWidth(constraints.maxHeight)
             }
-            return DummyPlaceable(width, constraints.maxHeight)
+            return FixedSizeIntrinsicsPlaceable(width, constraints.maxHeight)
         }
         val height = if (minMax == IntrinsicMinMax.Max) {
             measurable.maxIntrinsicHeight(constraints.maxWidth)
         } else {
             measurable.minIntrinsicHeight(constraints.maxWidth)
         }
-        return DummyPlaceable(constraints.maxWidth, height)
+        return FixedSizeIntrinsicsPlaceable(constraints.maxWidth, height)
     }
 
     override fun minIntrinsicWidth(height: Int): Int {

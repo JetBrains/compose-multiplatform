@@ -23,8 +23,8 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class FontFamilyTest {
 
-    private val dummyResourceId1 = 1
-    private val dummyResourceId2 = 2
+    private val resourceId1 = 1
+    private val resourceId2 = 2
 
     @Test(expected = IllegalStateException::class)
     fun `cannot be instantiated with empty font list`() {
@@ -35,7 +35,7 @@ class FontFamilyTest {
     fun `two equal family declarations are equal`() {
         val fontFamily = fontFamily(
             font(
-                resId = dummyResourceId1,
+                resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             )
@@ -43,7 +43,7 @@ class FontFamilyTest {
 
         val otherFontFamily = fontFamily(
             font(
-                resId = dummyResourceId1,
+                resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             )
@@ -56,7 +56,7 @@ class FontFamilyTest {
     fun `two non equal family declarations are not equal`() {
         val fontFamily = fontFamily(
             font(
-                resId = dummyResourceId1,
+                resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             )
@@ -64,7 +64,7 @@ class FontFamilyTest {
 
         val otherFontFamily = fontFamily(
             font(
-                resId = dummyResourceId1,
+                resId = resourceId1,
                 weight = FontWeight.W800,
                 style = FontStyle.Italic
             )
@@ -77,12 +77,12 @@ class FontFamilyTest {
     fun `cannot add two fonts that have the same FontWeight and FontStyle`() {
         fontFamily(
             font(
-                resId = dummyResourceId1,
+                resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             ),
             font(
-                resId = dummyResourceId2,
+                resId = resourceId2,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             )
