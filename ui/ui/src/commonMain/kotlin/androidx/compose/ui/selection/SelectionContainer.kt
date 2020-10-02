@@ -97,6 +97,19 @@ fun SelectionContainer(
     }
 }
 
+/**
+ * This is for disabling selection for text when the text is inside a SelectionContainer.
+ *
+ * To use this, simply add this to wrap one or more text composables.
+ */
+@Composable
+fun DisableSelection(content: @Composable () -> Unit) {
+    Providers(
+        SelectionRegistrarAmbient provides null,
+        children = content
+    )
+}
+
 @Composable
 private fun SelectionFloatingToolBar(manager: SelectionManager) {
     manager.showSelectionToolbar()
