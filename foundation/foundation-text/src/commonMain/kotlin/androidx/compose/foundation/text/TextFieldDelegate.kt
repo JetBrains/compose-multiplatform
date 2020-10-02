@@ -217,39 +217,30 @@ class TextFieldDelegate {
         }
 
         /**
-         * Called when onRelease event is fired.
+         * Sets the cursor position. Should be called when TextField has focus.
          *
          * @param position The event position in composable coordinate.
          * @param textLayoutResult The text layout result
          * @param editProcessor The edit processor
          * @param offsetMap The offset map
          * @param onValueChange The callback called when the new editor state arrives.
-         * @param textInputService The text input service
-         * @param token The current input session token.
-         * @param hasFocus True if the composable has input focus, otherwise false.
          */
         @JvmStatic
-        internal fun onRelease(
+        internal fun setCursorOffset(
             position: Offset,
             textLayoutResult: TextLayoutResult,
             editProcessor: EditProcessor,
             offsetMap: OffsetMap,
-            onValueChange: (TextFieldValue) -> Unit,
-            textInputService: TextInputService?,
-            token: InputSessionToken,
-            hasFocus: Boolean
+            onValueChange: (TextFieldValue) -> Unit
         ) {
-            textInputService?.showSoftwareKeyboard(token)
-            if (hasFocus) {
-                val offset = offsetMap.transformedToOriginal(
-                    textLayoutResult.getOffsetForPosition(position)
-                )
-                onEditCommand(
-                    listOf(SetSelectionEditOp(offset, offset)),
-                    editProcessor,
-                    onValueChange
-                )
-            }
+            val offset = offsetMap.transformedToOriginal(
+                textLayoutResult.getOffsetForPosition(position)
+            )
+            onEditCommand(
+                listOf(SetSelectionEditOp(offset, offset)),
+                editProcessor,
+                onValueChange
+            )
         }
 
         /**
@@ -272,13 +263,17 @@ class TextFieldDelegate {
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): InputSessionToken {
-            return textInputService?.startInput(
+            val inputSessionToken = textInputService?.startInput(
                 value = TextFieldValue(value.text, value.selection, value.composition),
                 keyboardType = keyboardType,
                 imeAction = imeAction,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
             ) ?: INVALID_SESSION
+
+            textInputService?.showSoftwareKeyboard(inputSessionToken)
+
+            return inputSessionToken
         }
 
         /**

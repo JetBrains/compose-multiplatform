@@ -122,11 +122,10 @@ class TextFieldDelegateTest {
     }
 
     @Test
-    fun test_on_release() {
+    fun test_setCursorOffset() {
         val position = Offset(100f, 200f)
         val offset = 10
         val dummyEditorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        val dummyInputSessionToken = 10 // We are not using this value in this test. Just dummy.
 
         whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
 
@@ -134,15 +133,12 @@ class TextFieldDelegateTest {
 
         whenever(processor.onEditCommands(captor.capture())).thenReturn(dummyEditorState)
 
-        TextFieldDelegate.onRelease(
+        TextFieldDelegate.setCursorOffset(
             position,
             textLayoutResult,
             processor,
             OffsetMap.identityOffsetMap,
-            onValueChange,
-            textInputService,
-            dummyInputSessionToken,
-            true
+            onValueChange
         )
 
         assertEquals(1, captor.allValues.size)
@@ -156,34 +152,12 @@ class TextFieldDelegateTest {
                 )
             )
         )
-        verify(textInputService).showSoftwareKeyboard(eq(dummyInputSessionToken))
-    }
-
-    @Test
-    fun test_on_release_do_not_place_cursor_if_focus_is_out() {
-        val position = Offset(100f, 200f)
-        val offset = 10
-        val dummyInputSessionToken = 10 // We are not using this value in this test. Just dummy.
-
-        whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
-        TextFieldDelegate.onRelease(
-            position,
-            textLayoutResult,
-            processor,
-            OffsetMap.identityOffsetMap,
-            onValueChange,
-            textInputService,
-            dummyInputSessionToken,
-            false
-        )
-
-        verify(onValueChange, never()).invoke(any())
-        verify(textInputService).showSoftwareKeyboard(eq(dummyInputSessionToken))
     }
 
     @Test
     fun on_focus() {
         val dummyEditorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
+
         TextFieldDelegate.onFocus(
             textInputService, dummyEditorState, processor,
             KeyboardType.Text, ImeAction.Unspecified, onValueChange, onEditorActionPerformed
@@ -200,6 +174,8 @@ class TextFieldDelegateTest {
             any(),
             eq(onEditorActionPerformed)
         )
+
+        verify(textInputService).showSoftwareKeyboard(any())
     }
 
     @Test
@@ -366,11 +342,10 @@ class TextFieldDelegateTest {
     }
 
     @Test
-    fun check_on_release_uses_offset_map() {
+    fun check_setCursorOffset_uses_offset_map() {
         val position = Offset(100f, 200f)
         val offset = 10
         val dummyEditorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        val dummyInputSessionToken = 10 // We are not using this value in this test. Just dummy.
 
         whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
 
@@ -378,15 +353,12 @@ class TextFieldDelegateTest {
 
         whenever(processor.onEditCommands(captor.capture())).thenReturn(dummyEditorState)
 
-        TextFieldDelegate.onRelease(
+        TextFieldDelegate.setCursorOffset(
             position,
             textLayoutResult,
             processor,
             skippingOffsetMap,
-            onValueChange,
-            textInputService,
-            dummyInputSessionToken,
-            true
+            onValueChange
         )
 
         val cursorOffsetInTransformedText = offset / 2
