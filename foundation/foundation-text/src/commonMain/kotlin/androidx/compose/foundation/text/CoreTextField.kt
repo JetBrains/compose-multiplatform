@@ -52,7 +52,6 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
@@ -303,8 +302,11 @@ fun CoreTextField(
                         )
                     }
                 }
-            },
-            longPressDragObserver = manager.longPressDragObserver
+            }
+        )
+
+        val selectionLongPressModifier = Modifier.longPressDragGestureFilter(
+            manager.longPressDragObserver
         )
 
         val drawModifier = Modifier.drawBehind {
@@ -391,17 +393,18 @@ fun CoreTextField(
 
         onDispose { manager.hideSelectionToolbar() }
 
-        SelectionLayout(
-            modifier.focusRequester(focusRequester)
-                .then(focusObserver)
-                .then(cursorModifier)
-                .then(dragPositionGestureModifier)
-                .then(focusRequestTapModifier)
-                .then(drawModifier)
-                .then(onPositionedModifier)
-                .then(semanticsModifier)
-                .focus()
-        ) {
+        val modifiers = modifier.focusRequester(focusRequester)
+            .then(focusObserver)
+            .then(cursorModifier)
+            .then(if (state.hasFocus) dragPositionGestureModifier else Modifier)
+            .then(if (state.hasFocus) selectionLongPressModifier else Modifier)
+            .then(focusRequestTapModifier)
+            .then(drawModifier)
+            .then(onPositionedModifier)
+            .then(semanticsModifier)
+            .focus()
+
+        SelectionLayout(modifiers) {
             Layout(emptyContent()) { _, constraints ->
                 TextFieldDelegate.layout(
                     state.textDelegate,
@@ -571,8 +574,7 @@ internal class DragEventTracker {
 @Composable
 private fun Modifier.dragPositionGestureFilter(
     onPress: (Offset) -> Unit,
-    onRelease: (Offset) -> Unit,
-    longPressDragObserver: LongPressDragObserver
+    onRelease: (Offset) -> Unit
 ): Modifier {
     val tracker = remember { DragEventTracker() }
     // TODO(shepshapard): PressIndicator doesn't seem to be the right thing to use here.  It
@@ -598,7 +600,6 @@ private fun Modifier.dragPositionGestureFilter(
                 }
             }
         )
-        .longPressDragGestureFilter(longPressDragObserver)
 }
 
 private val cursorAnimationSpec: AnimationSpec<Float>
