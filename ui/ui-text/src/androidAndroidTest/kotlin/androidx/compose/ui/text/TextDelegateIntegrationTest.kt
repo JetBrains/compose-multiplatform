@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -389,7 +390,7 @@ class TextDelegateIntegrationTest {
 
         val constraintsFirstLayout = Constraints.fixed(width, heightFirstLayout)
         val resultFirstLayout = textDelegate.layout(constraintsFirstLayout, LayoutDirection.Ltr)
-        assertThat(resultFirstLayout.size.height).isEqualTo(heightFirstLayout)
+        assertThat(resultFirstLayout.size.height).isLessThan(heightFirstLayout)
 
         val constraintsSecondLayout = Constraints.fixed(width, heightSecondLayout)
         val resultSecondLayout = textDelegate.layout(
@@ -397,8 +398,199 @@ class TextDelegateIntegrationTest {
             LayoutDirection.Ltr,
             resultFirstLayout
         )
-        assertThat(resultSecondLayout.size.height).isEqualTo(heightSecondLayout)
+        assertThat(resultSecondLayout.size.height).isEqualTo(resultFirstLayout.size.height)
     }
+
+    @Test
+    fun textReportSize_minWidth_largerThanNeeded() {
+        for (overflow in TextOverflow.values()) {
+            val textDelegate = TextDelegate(
+                text = AnnotatedString(text = "Hello World!"),
+                style = TextStyle.Default,
+                overflow = overflow,
+                density = density,
+                resourceLoader = resourceLoader
+            )
+            textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+            val intrinsicWidth = textDelegate.maxIntrinsicWidth
+            val width = 2 * intrinsicWidth
+            val textLayoutResult = textDelegate.layout(
+                Constraints(minWidth = width),
+                LayoutDirection.Ltr
+            )
+
+            assertThat(textLayoutResult.size.width).isEqualTo(intrinsicWidth)
+        }
+    }
+
+    @Test
+    fun textReportSize_minHeight_largerThanNeeded() {
+        for (overflow in TextOverflow.values()) {
+            val text = "Hello World!"
+            val textDelegate = TextDelegate(
+                text = AnnotatedString(text),
+                style = TextStyle.Default,
+                density = density,
+                resourceLoader = resourceLoader
+            )
+
+            val intrinsicHeight = computeIntrinsicHeight(textDelegate)
+            val height = intrinsicHeight * 2
+            val textLayoutResult = textDelegate.layout(
+                constraints = Constraints(minHeight = height),
+                LayoutDirection.Ltr
+            )
+            assertThat(textLayoutResult.size.height).isEqualTo(intrinsicHeight)
+        }
+    }
+
+    @Test
+    fun textOverflow_clip_maxWidth_smallerThanNeeded() {
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(text = "Hello World!"),
+            style = TextStyle.Default,
+            overflow = TextOverflow.Clip,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+        val intrinsicWidth = textDelegate.maxIntrinsicWidth
+        val width = intrinsicWidth / 2
+        val textLayoutResult = textDelegate.layout(
+            constraints = Constraints(maxWidth = width),
+            LayoutDirection.Ltr
+        )
+
+        assertThat(textLayoutResult.size.width).isEqualTo(width)
+    }
+
+    @Test
+    fun textOverflow_ellipsis_maxWidth_smallerThanNeeded() {
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(text = "Hello World!"),
+            style = TextStyle.Default,
+            overflow = TextOverflow.Ellipsis,
+            softWrap = false,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+        val intrinsicWidth = textDelegate.maxIntrinsicWidth
+        val width = intrinsicWidth / 2
+        val textLayoutResult = textDelegate.layout(
+            constraints = Constraints(maxWidth = width),
+            LayoutDirection.Ltr
+        )
+
+        assertThat(textLayoutResult.size.width).isEqualTo(width)
+    }
+
+    @Test
+    fun textOverflow_null_maxWidth_smallerThanNeeded() {
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(text = "Hello World!"),
+            style = TextStyle.Default,
+            overflow = TextOverflow.None,
+            softWrap = false,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+        val intrinsicWidth = textDelegate.maxIntrinsicWidth
+        val width = intrinsicWidth / 2
+        val textLayoutResult = textDelegate.layout(
+            constraints = Constraints(maxWidth = width),
+            LayoutDirection.Ltr
+        )
+
+        assertThat(textLayoutResult.size.width).isEqualTo(intrinsicWidth)
+    }
+
+    @Test
+    fun textOverflow_clip_maxHeight_smallerThanNeeded() {
+        val text = "Hello World!"
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(text),
+            style = TextStyle.Default,
+            overflow = TextOverflow.Clip,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        val intrinsicHeight = computeIntrinsicHeight(textDelegate)
+        val height = intrinsicHeight / 2
+        val textLayoutResult = textDelegate.layout(
+            constraints = Constraints(maxHeight = height),
+            LayoutDirection.Ltr
+        )
+        assertThat(textLayoutResult.size.height).isEqualTo(height)
+    }
+
+    @Test
+    fun textOverflow_ellipsis_maxHeight_smallerThanNeeded() {
+        val text = "Hello World!"
+        val maxLines = 2
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(text),
+            style = TextStyle.Default,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = maxLines,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+        // Set the width so that text exceeds maxLines.
+        val width = textDelegate.maxIntrinsicWidth / (maxLines + 1)
+
+        // Height is only enough for 1 line.
+        val height = computeIntrinsicHeight(textDelegate)
+        // In this case, ellipsis is applied and there will be only 2 lines.
+        // But maxHeight constraints it to be 1 line only.
+        // Text should still be clipped as the fallback behavior of "ellipsis by height".
+        val textLayoutResult = textDelegate.layout(
+            constraints = Constraints(maxWidth = width, maxHeight = height),
+            LayoutDirection.Ltr
+        )
+
+        // Gut check that the last line is ellipsized.
+        assertThat(textLayoutResult.isLineEllipsized(maxLines - 1)).isTrue()
+        assertThat(textLayoutResult.size.height).isEqualTo(height)
+    }
+
+    @Test
+    fun textOverflow_null_maxHeight_smallerThanNeeded() {
+        val text = "Hello World!"
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(text),
+            style = TextStyle.Default,
+            overflow = TextOverflow.None,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        val intrinsicHeight = computeIntrinsicHeight(textDelegate)
+        val height = intrinsicHeight / 2
+        val textLayoutResult = textDelegate.layout(
+            constraints = Constraints(maxHeight = height),
+            LayoutDirection.Ltr
+        )
+        assertThat(textLayoutResult.size.height).isEqualTo(intrinsicHeight)
+    }
+}
+
+@OptIn(InternalTextApi::class)
+private fun computeIntrinsicHeight(
+    textDelegate: TextDelegate,
+    width: Float = Float.MAX_VALUE
+): Int {
+    return Paragraph(
+        text = textDelegate.text.text,
+        style = resolveDefaults(textDelegate.style, LayoutDirection.Ltr),
+        width = width,
+        density = textDelegate.density,
+        resourceLoader = textDelegate.resourceLoader
+    ).height.toInt()
 }
 
 private fun TextLayoutResult.toBitmap() = Bitmap.createBitmap(
