@@ -64,10 +64,12 @@ internal fun TextLayoutResult.canReuse(
     }
 
     // Check the given constraints can produces the same result.
-    if (constraints.minWidth != layoutInput.constraints.minWidth) return false
+    if (constraints.minWidth != layoutInput.constraints.minWidth) {
+        return false
+    }
 
     if (!(softWrap || overflow == TextOverflow.Ellipsis)) {
-        // If width does not mattter, we can result the same layout.
+        // If width does not matter, we can result the same layout.
         return true
     }
     return constraints.maxWidth == layoutInput.constraints.maxWidth
