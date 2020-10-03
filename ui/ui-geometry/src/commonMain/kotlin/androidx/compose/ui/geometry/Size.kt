@@ -44,11 +44,23 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
 
     @Stable
     val width: Float
-        get() = unpackFloat1(packedValue)
+        get() {
+            // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
+            check(this.packedValue != Unspecified.packedValue) {
+                "Size is unspecified"
+            }
+            return unpackFloat1(packedValue)
+        }
 
     @Stable
     val height: Float
-        get() = unpackFloat2(packedValue)
+        get() {
+            // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
+            check(this.packedValue != Unspecified.packedValue) {
+                "Size is unspecified"
+            }
+            return unpackFloat2(packedValue)
+        }
 
     @Suppress("NOTHING_TO_INLINE")
     @Stable
@@ -73,15 +85,12 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
         val Zero = Size(0.0f, 0.0f)
 
         /**
-         * A size whose [width] and [height] are infinite.
-         *
-         * See also:
-         *
-         *  * [isInfinite], which checks whether either dimension is infinite.
-         *  * [isFinite], which checks whether both dimensions are finite.
+         * A size whose [width] and [height] are unspecified. This is a sentinel
+         * value used to initialize a non-null parameter.
+         * Access to width or height on an unspecified size is not allowed
          */
         @Stable
-        val Unspecified = Size(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+        val Unspecified = Size(Float.NaN, Float.NaN)
     }
 
     /**
