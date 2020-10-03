@@ -94,12 +94,14 @@ fun Icon(
 
 private fun Modifier.defaultSizeFor(painter: Painter) =
     this.then(
-        if (painter.intrinsicSize == Size.Unspecified) {
+        if (painter.intrinsicSize == Size.Unspecified || painter.intrinsicSize.isInfinite()) {
             DefaultIconSizeModifier
         } else {
             Modifier
         }
     )
+
+private fun Size.isInfinite() = width.isInfinite() && height.isInfinite()
 
 // Default icon size, for icons with no intrinsic size information
 private val DefaultIconSizeModifier = Modifier.preferredSize(24.dp)

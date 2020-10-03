@@ -17,6 +17,7 @@
 package androidx.compose.ui.geometry
 
 import org.junit.Assert
+import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -89,5 +90,46 @@ class SizeTest {
         val copy = size.copy(height = 300f)
         Assert.assertEquals(100f, copy.width)
         Assert.assertEquals(300f, copy.height)
+    }
+
+    @Test
+    fun testUnspecifiedWidthQueryThrows() {
+        try {
+            Size.Unspecified.width
+            fail("Size.Unspecified.width is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
+    }
+
+    @Test
+    fun testUnspecifiedHeightQueryThrows() {
+        try {
+            Size.Unspecified.height
+            fail("Size.Unspecified.height is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
+    }
+
+    @Test
+    fun testUnspecifiedCopyThrows() {
+        try {
+            Size.Unspecified.copy(width = 100f)
+            Size.Unspecified.copy(height = 70f)
+            fail("Size.Unspecified.copy is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
+    }
+
+    @Test
+    fun testUnspecifiedComponentAssignmentThrows() {
+        try {
+            val (_, _) = Size.Unspecified
+            fail("Size.Unspecified component assignment is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
     }
 }

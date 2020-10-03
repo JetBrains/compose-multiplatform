@@ -158,18 +158,16 @@ private data class PainterModifier(
         return if (!sizeToIntrinsics) {
             dstSize
         } else {
-            val intrinsicWidth = painter.intrinsicSize.width
-            val intrinsicHeight = painter.intrinsicSize.height
-            val srcWidth = if (intrinsicWidth == Float.POSITIVE_INFINITY) {
+            val srcWidth = if (!painter.intrinsicSize.hasSpecifiedAndFiniteWidth()) {
                 dstSize.width
             } else {
-                intrinsicWidth
+                painter.intrinsicSize.width
             }
 
-            val srcHeight = if (intrinsicHeight == Float.POSITIVE_INFINITY) {
+            val srcHeight = if (!painter.intrinsicSize.hasSpecifiedAndFiniteHeight()) {
                 dstSize.height
             } else {
-                intrinsicHeight
+                painter.intrinsicSize.height
             }
 
             val srcSize = Size(srcWidth, srcHeight)
@@ -189,14 +187,14 @@ private data class PainterModifier(
 
         val intrinsicSize = painter.intrinsicSize
         val intrinsicWidth =
-            if (intrinsicSize.width != Float.POSITIVE_INFINITY) {
+            if (intrinsicSize.hasSpecifiedAndFiniteWidth()) {
                 intrinsicSize.width.roundToInt()
             } else {
                 constraints.minWidth
             }
 
         val intrinsicHeight =
-            if (intrinsicSize.height != Float.POSITIVE_INFINITY) {
+            if (intrinsicSize.hasSpecifiedAndFiniteHeight()) {
                 intrinsicSize.height.roundToInt()
             } else {
                 constraints.minHeight
@@ -223,13 +221,13 @@ private data class PainterModifier(
 
     override fun ContentDrawScope.draw() {
         val intrinsicSize = painter.intrinsicSize
-        val srcWidth = if (intrinsicSize.width != Float.POSITIVE_INFINITY) {
+        val srcWidth = if (intrinsicSize.hasSpecifiedAndFiniteWidth()) {
             intrinsicSize.width
         } else {
             size.width
         }
 
-        val srcHeight = if (intrinsicSize.height != Float.POSITIVE_INFINITY) {
+        val srcHeight = if (intrinsicSize.hasSpecifiedAndFiniteHeight()) {
             intrinsicSize.height
         } else {
             size.height
@@ -261,6 +259,9 @@ private data class PainterModifier(
             }
         }
     }
+
+    private fun Size.hasSpecifiedAndFiniteWidth() = this != Size.Unspecified && width.isFinite()
+    private fun Size.hasSpecifiedAndFiniteHeight() = this != Size.Unspecified && height.isFinite()
 
     override val nameFallback = "paint"
 
