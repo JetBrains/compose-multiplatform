@@ -1,4 +1,4 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package androidx.compose.navigation {
 
   public final class AmbientsKt {
@@ -27,7 +27,7 @@ package androidx.compose.navigation {
   }
 
   public final class NavHostKt {
-    method @androidx.compose.runtime.Composable public static void NavHost(androidx.navigation.NavHostController navController = rememberNavController(), int id = 0, Object startDestination, kotlin.jvm.functions.Function1<? super androidx.navigation.NavGraphBuilder,kotlin.Unit> builder);
+    method @androidx.compose.runtime.Composable public static void NavHost(optional androidx.navigation.NavHostController navController, optional int id, Object startDestination, kotlin.jvm.functions.Function1<? super androidx.navigation.NavGraphBuilder,kotlin.Unit> builder);
   }
 
 }

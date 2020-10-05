@@ -1,4 +1,4 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package android.view {
 
   public final class DisplayListCanvas extends android.graphics.Canvas {
