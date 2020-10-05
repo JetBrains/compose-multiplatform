@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
@@ -160,304 +161,296 @@ fun CoreTextField(
     cursorColor: Color = Color.Unset
 ) {
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
-    // and IME may think it is updated. To fix this inconsistent state, enforce recompose by
-    // incrementing generation counter when we callback to the developer and reset the state with
-    // the latest state.
-    // TODO(b/162464429): Remove deprecated state {} function. This can throw, "Expected a group"
-    //  exceptions if changed to the suggested equivalent for the deprecated state {} function.
-    @Suppress("DEPRECATION")
-    val generation = state { 0 }
-    val Wrapper: @Composable (Int, @Composable () -> Unit) -> Unit = { _, child -> child() }
+    // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
+    val recompose = invalidate
     val focusRequester = FocusRequester()
 
-    Wrapper(generation.value) {
-        // Ambients
-        val textInputService = TextInputServiceAmbient.current
-        val density = DensityAmbient.current
-        val resourceLoader = FontLoaderAmbient.current
+    // Ambients
+    val textInputService = TextInputServiceAmbient.current
+    val density = DensityAmbient.current
+    val resourceLoader = FontLoaderAmbient.current
 
-        // State
-        val (visualText, offsetMap) = remember(value, visualTransformation) {
-            val transformed = visualTransformation.filter(AnnotatedString(value.text))
-            value.composition?.let {
-                TextFieldDelegate.applyCompositionDecoration(it, transformed)
-            } ?: transformed
-        }
-        val state = remember {
-            TextFieldState(
-                TextDelegate(
-                    text = visualText,
-                    style = textStyle,
-                    density = density,
-                    resourceLoader = resourceLoader
-                )
+    // State
+    val (visualText, offsetMap) = remember(value, visualTransformation) {
+        val transformed = visualTransformation.filter(AnnotatedString(value.text))
+        value.composition?.let {
+            TextFieldDelegate.applyCompositionDecoration(it, transformed)
+        } ?: transformed
+    }
+    val state = remember {
+        TextFieldState(
+            TextDelegate(
+                text = visualText,
+                style = textStyle,
+                density = density,
+                resourceLoader = resourceLoader
             )
-        }
-        state.update(
-            visualText,
-            textStyle,
-            density,
-            resourceLoader,
-            onValueChange,
-            onImeActionPerformed
         )
+    }
+    state.update(
+        visualText,
+        textStyle,
+        density,
+        resourceLoader,
+        onValueChange,
+        onImeActionPerformed
+    )
 
-        val onValueChangeWrapper: (TextFieldValue) -> Unit = {
-            state.onValueChange(it)
-            generation.value++
+    val onValueChangeWrapper: (TextFieldValue) -> Unit = {
+        state.onValueChange(it)
+        recompose()
+    }
+    val onImeActionPerformedWrapper: (ImeAction) -> Unit = {
+        state.onImeActionPerformed(it)
+    }
+
+    state.processor.onNewState(value, textInputService, state.inputSession)
+
+    val manager = remember { TextFieldSelectionManager() }
+    manager.offsetMap = offsetMap
+    manager.onValueChange = onValueChangeWrapper
+    manager.state = state
+    manager.value = value
+    manager.clipboardManager = ClipboardManagerAmbient.current
+    manager.textToolbar = TextToolbarAmbient.current
+    manager.hapticFeedBack = HapticFeedBackAmbient.current
+
+    val focusObserver = Modifier.focusObserver {
+        if (state.hasFocus == it.isFocused) {
+            return@focusObserver
         }
-        val onImeActionPerformedWrapper: (ImeAction) -> Unit = {
-            state.onImeActionPerformed(it)
-        }
 
-        state.processor.onNewState(value, textInputService, state.inputSession)
+        state.hasFocus = it.isFocused
 
-        val manager = remember { TextFieldSelectionManager() }
-        manager.offsetMap = offsetMap
-        manager.onValueChange = onValueChangeWrapper
-        manager.state = state
-        manager.value = value
-        manager.clipboardManager = ClipboardManagerAmbient.current
-        manager.textToolbar = TextToolbarAmbient.current
-        manager.hapticFeedBack = HapticFeedBackAmbient.current
-
-        val focusObserver = Modifier.focusObserver {
-            if (state.hasFocus == it.isFocused) {
-                return@focusObserver
-            }
-
-            state.hasFocus = it.isFocused
-
-            if (it.isFocused) {
-                state.inputSession = TextFieldDelegate.onFocus(
-                    textInputService,
-                    value,
-                    state.processor,
-                    keyboardType,
-                    imeAction,
-                    onValueChangeWrapper,
-                    onImeActionPerformedWrapper
-                )
-                if (state.inputSession != NO_SESSION && textInputService != null) {
-                    onTextInputStarted(
-                        SoftwareKeyboardController(
-                            textInputService,
-                            state.inputSession
-                        )
+        if (it.isFocused) {
+            state.inputSession = TextFieldDelegate.onFocus(
+                textInputService,
+                value,
+                state.processor,
+                keyboardType,
+                imeAction,
+                onValueChangeWrapper,
+                onImeActionPerformedWrapper
+            )
+            if (state.inputSession != NO_SESSION && textInputService != null) {
+                onTextInputStarted(
+                    SoftwareKeyboardController(
+                        textInputService,
+                        state.inputSession
                     )
-                }
-                state.layoutCoordinates?.let { coords ->
-                    textInputService?.let { textInputService ->
-                        state.layoutResult?.let { layoutResult ->
-                            TextFieldDelegate.notifyFocusedRect(
-                                value,
-                                state.textDelegate,
-                                layoutResult,
-                                coords,
-                                textInputService,
-                                state.inputSession,
-                                state.hasFocus,
-                                offsetMap
-                            )
-                        }
+                )
+            }
+            state.layoutCoordinates?.let { coords ->
+                textInputService?.let { textInputService ->
+                    state.layoutResult?.let { layoutResult ->
+                        TextFieldDelegate.notifyFocusedRect(
+                            value,
+                            state.textDelegate,
+                            layoutResult,
+                            coords,
+                            textInputService,
+                            state.inputSession,
+                            state.hasFocus,
+                            offsetMap
+                        )
                     }
                 }
-            } else {
-                TextFieldDelegate.onBlur(
+            }
+        } else {
+            TextFieldDelegate.onBlur(
+                textInputService,
+                state.inputSession,
+                state.processor,
+                false,
+                onValueChangeWrapper
+            )
+            manager.deselect()
+        }
+    }
+
+    val focusRequestTapModifier = Modifier.tapGestureFilter {
+        if (!state.hasFocus) {
+            focusRequester.requestFocus()
+        } else {
+            // if already focused make sure tap request keyboard.
+            textInputService?.showSoftwareKeyboard(state.inputSession)
+        }
+    }
+
+    val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
+        onPress = {
+            if (state.hasFocus) {
+                state.selectionIsOn = false
+                manager.hideSelectionToolbar()
+            }
+        },
+        onRelease = {
+            if (state.hasFocus && !state.selectionIsOn) {
+                state.layoutResult?.let { layoutResult ->
+                    TextFieldDelegate.setCursorOffset(
+                        it,
+                        layoutResult,
+                        state.processor,
+                        offsetMap,
+                        onValueChangeWrapper
+                    )
+                }
+            }
+        }
+    )
+
+    val selectionLongPressModifier = Modifier.longPressDragGestureFilter(
+        manager.longPressDragObserver
+    )
+
+    val drawModifier = Modifier.drawBehind {
+        state.layoutResult?.let { layoutResult ->
+            drawIntoCanvas { canvas ->
+                TextFieldDelegate.draw(
+                    canvas,
+                    value,
+                    offsetMap,
+                    layoutResult,
+                    DefaultSelectionColor
+                )
+            }
+        }
+    }
+
+    val onPositionedModifier = Modifier.onGloballyPositioned {
+        if (textInputService != null) {
+            state.layoutCoordinates = it
+            if (state.selectionIsOn) {
+                if (state.showFloatingToolbar) manager.showSelectionToolbar()
+                else manager.hideSelectionToolbar()
+            }
+            state.layoutResult?.let { layoutResult ->
+                TextFieldDelegate.notifyFocusedRect(
+                    value,
+                    state.textDelegate,
+                    layoutResult,
+                    it,
                     textInputService,
                     state.inputSession,
-                    state.processor,
-                    false,
-                    onValueChangeWrapper
+                    state.hasFocus,
+                    offsetMap
                 )
-                manager.deselect()
             }
         }
+    }
 
-        val focusRequestTapModifier = Modifier.tapGestureFilter {
-            if (!state.hasFocus) {
-                focusRequester.requestFocus()
+    val semanticsModifier = Modifier.semantics {
+        this.imeAction = imeAction
+        this.supportsInputMethods()
+        this.text = AnnotatedString(value.text)
+        this.textSelectionRange = value.selection
+        this.focused = state.hasFocus
+        getTextLayoutResult {
+            if (state.layoutResult != null) {
+                it.add(state.layoutResult!!)
+                true
             } else {
-                // if already focused make sure tap request keyboard.
-                textInputService?.showSoftwareKeyboard(state.inputSession)
+                false
+            }
+        }
+        setText {
+            onValueChangeWrapper(TextFieldValue(it.text, TextRange(it.text.length)))
+            true
+        }
+        // TODO: startSelectionActionModeAsync
+        setSelection { start, end, startSelectionActionMode ->
+            if (start == value.selection.start && end == value.selection.end) {
+                false
+            } else if (start.coerceAtMost(end) >= 0 &&
+                start.coerceAtLeast(end) <= value.text.length
+            ) {
+                onValueChangeWrapper(TextFieldValue(value.text, TextRange(start, end)))
+                if (startSelectionActionMode) {
+                    // startSelectionActionModeAsync
+                    // See TextView.java
+                } else {
+                    // stop SelectionActionMode
+                }
+                true
+            } else {
+                false
+            }
+        }
+        onClick {
+            if (!state.hasFocus) focusRequester.requestFocus()
+            true
+        }
+    }
+
+    val cursorModifier =
+        Modifier.cursor(state, value, offsetMap, cursorColor)
+
+    onDispose { manager.hideSelectionToolbar() }
+
+    val modifiers = modifier.focusRequester(focusRequester)
+        .then(focusObserver)
+        .then(cursorModifier)
+        .then(if (state.hasFocus) dragPositionGestureModifier else Modifier)
+        .then(if (state.hasFocus) selectionLongPressModifier else Modifier)
+        .then(focusRequestTapModifier)
+        .then(drawModifier)
+        .then(onPositionedModifier)
+        .then(semanticsModifier)
+        .focus()
+
+    SelectionLayout(modifiers) {
+        Layout(emptyContent()) { _, constraints ->
+            TextFieldDelegate.layout(
+                state.textDelegate,
+                constraints,
+                layoutDirection,
+                state.layoutResult
+            ).let { (width, height, result) ->
+                if (state.layoutResult != result) {
+                    state.layoutResult = result
+                    onTextLayout(result)
+                }
+                layout(
+                    width,
+                    height,
+                    mapOf(
+                        FirstBaseline to result.firstBaseline.roundToInt(),
+                        LastBaseline to result.lastBaseline.roundToInt()
+                    )
+                ) {}
             }
         }
 
-        val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
-            onPress = {
-                if (state.hasFocus) {
-                    state.selectionIsOn = false
-                    manager.hideSelectionToolbar()
-                }
-            },
-            onRelease = {
-                if (state.hasFocus && !state.selectionIsOn) {
-                    state.layoutResult?.let { layoutResult ->
-                        TextFieldDelegate.setCursorOffset(
-                            it,
-                            layoutResult,
-                            state.processor,
-                            offsetMap,
-                            onValueChangeWrapper
+        if (state.hasFocus) {
+            if (state.selectionIsOn) {
+                manager.state?.layoutResult?.let {
+                    if (!value.selection.collapsed) {
+                        val startDirection = it.getBidiRunDirection(value.selection.start)
+                        val endDirection =
+                            it.getBidiRunDirection(max(value.selection.end - 1, 0))
+                        val directions = Pair(startDirection, endDirection)
+                        SelectionHandle(
+                            isStartHandle = true,
+                            directions = directions,
+                            manager = manager
+                        )
+                        SelectionHandle(
+                            isStartHandle = false,
+                            directions = directions,
+                            manager = manager
                         )
                     }
-                }
-            }
-        )
 
-        val selectionLongPressModifier = Modifier.longPressDragGestureFilter(
-            manager.longPressDragObserver
-        )
-
-        val drawModifier = Modifier.drawBehind {
-            state.layoutResult?.let { layoutResult ->
-                drawIntoCanvas { canvas ->
-                    TextFieldDelegate.draw(
-                        canvas,
-                        value,
-                        offsetMap,
-                        layoutResult,
-                        DefaultSelectionColor
-                    )
-                }
-            }
-        }
-
-        val onPositionedModifier = Modifier.onGloballyPositioned {
-            if (textInputService != null) {
-                state.layoutCoordinates = it
-                if (state.selectionIsOn) {
-                    if (state.showFloatingToolbar) manager.showSelectionToolbar()
-                    else manager.hideSelectionToolbar()
-                }
-                state.layoutResult?.let { layoutResult ->
-                    TextFieldDelegate.notifyFocusedRect(
-                        value,
-                        state.textDelegate,
-                        layoutResult,
-                        it,
-                        textInputService,
-                        state.inputSession,
-                        state.hasFocus,
-                        offsetMap
-                    )
-                }
-            }
-        }
-
-        val semanticsModifier = Modifier.semantics {
-            this.imeAction = imeAction
-            this.supportsInputMethods()
-            this.text = AnnotatedString(value.text)
-            this.textSelectionRange = value.selection
-            this.focused = state.hasFocus
-            getTextLayoutResult {
-                if (state.layoutResult != null) {
-                    it.add(state.layoutResult!!)
-                    true
-                } else {
-                    false
-                }
-            }
-            setText {
-                onValueChangeWrapper(TextFieldValue(it.text, TextRange(it.text.length)))
-                true
-            }
-            // TODO: startSelectionActionModeAsync
-            setSelection { start, end, startSelectionActionMode ->
-                if (start == value.selection.start && end == value.selection.end) {
-                    false
-                } else if (start.coerceAtMost(end) >= 0 &&
-                    start.coerceAtLeast(end) <= value.text.length
-                ) {
-                    onValueChangeWrapper(TextFieldValue(value.text, TextRange(start, end)))
-                    if (startSelectionActionMode) {
-                        // startSelectionActionModeAsync
-                        // See TextView.java
-                    } else {
-                        // stop SelectionActionMode
-                    }
-                    true
-                } else {
-                    false
-                }
-            }
-            onClick {
-                if (!state.hasFocus) focusRequester.requestFocus()
-                true
-            }
-        }
-
-        val cursorModifier =
-            Modifier.cursor(state, value, offsetMap, cursorColor)
-
-        onDispose { manager.hideSelectionToolbar() }
-
-        val modifiers = modifier.focusRequester(focusRequester)
-            .then(focusObserver)
-            .then(cursorModifier)
-            .then(if (state.hasFocus) dragPositionGestureModifier else Modifier)
-            .then(if (state.hasFocus) selectionLongPressModifier else Modifier)
-            .then(focusRequestTapModifier)
-            .then(drawModifier)
-            .then(onPositionedModifier)
-            .then(semanticsModifier)
-            .focus()
-
-        SelectionLayout(modifiers) {
-            Layout(emptyContent()) { _, constraints ->
-                TextFieldDelegate.layout(
-                    state.textDelegate,
-                    constraints,
-                    layoutDirection,
-                    state.layoutResult
-                ).let { (width, height, result) ->
-                    if (state.layoutResult != result) {
-                        state.layoutResult = result
-                        onTextLayout(result)
-                    }
-                    layout(
-                        width,
-                        height,
-                        mapOf(
-                            FirstBaseline to result.firstBaseline.roundToInt(),
-                            LastBaseline to result.lastBaseline.roundToInt()
-                        )
-                    ) {}
-                }
-            }
-
-            if (state.hasFocus) {
-                if (state.selectionIsOn) {
-                    manager.state?.layoutResult?.let {
-                        if (!value.selection.collapsed) {
-                            val startDirection = it.getBidiRunDirection(value.selection.start)
-                            val endDirection =
-                                it.getBidiRunDirection(max(value.selection.end - 1, 0))
-                            val directions = Pair(startDirection, endDirection)
-                            SelectionHandle(
-                                isStartHandle = true,
-                                directions = directions,
-                                manager = manager
-                            )
-                            SelectionHandle(
-                                isStartHandle = false,
-                                directions = directions,
-                                manager = manager
-                            )
-                        }
-
-                        manager.state?.let {
-                            if (manager.isTextChanged()) it.showFloatingToolbar = false
-                            if (it.hasFocus) {
-                                if (it.showFloatingToolbar) manager.showSelectionToolbar()
-                                else manager.hideSelectionToolbar()
-                            }
+                    manager.state?.let {
+                        if (manager.isTextChanged()) it.showFloatingToolbar = false
+                        if (it.hasFocus) {
+                            if (it.showFloatingToolbar) manager.showSelectionToolbar()
+                            else manager.hideSelectionToolbar()
                         }
                     }
                 }
-            } else manager.hideSelectionToolbar()
-        }
+            }
+        } else manager.hideSelectionToolbar()
     }
 }
 
