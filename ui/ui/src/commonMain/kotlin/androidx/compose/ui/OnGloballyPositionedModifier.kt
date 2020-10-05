@@ -26,9 +26,8 @@ import androidx.compose.ui.layout.LayoutCoordinates
  * Usage example:
  * @sample androidx.compose.ui.samples.onGloballyPositionedSample
  */
-// TODO: Inline this.
-fun Modifier.onGloballyPositioned(
-    onGloballyPositioned: (LayoutCoordinates) -> Unit
+inline fun Modifier.onGloballyPositioned(
+    crossinline onGloballyPositioned: (LayoutCoordinates) -> Unit
 ) = this.then(object : OnGloballyPositionedModifier {
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
         onGloballyPositioned(coordinates)
