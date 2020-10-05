@@ -1,13 +1,13 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package androidx.compose.foundation.text {
 
   public final class CoreTextFieldKt {
-    method @androidx.compose.runtime.Composable public static void CoreTextField-5rHpvpc(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, androidx.compose.ui.text.TextStyle textStyle = TextStyle.Default, androidx.compose.ui.text.input.KeyboardType keyboardType = KeyboardType.Text, androidx.compose.ui.text.input.ImeAction imeAction = ImeAction.Unspecified, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed = { it ->  }, androidx.compose.ui.text.input.VisualTransformation visualTransformation = androidx.compose.ui.text.input.VisualTransformation.Companion.None, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout = { it ->  }, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted = { it ->  }, long cursorColor = Color.Unset);
+    method @androidx.compose.runtime.Composable public static void CoreTextField-5rHpvpc(androidx.compose.ui.text.input.TextFieldValue value, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
     method @VisibleForTesting public static void setBlinkingCursorEnabled(boolean p);
   }
 
   public final class CoreTextKt {
-    method @androidx.compose.runtime.Composable public static void CoreText(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.text.TextStyle style, boolean softWrap, androidx.compose.ui.text.style.TextOverflow overflow, int maxLines, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout);
+    method @androidx.compose.runtime.Composable public static void CoreText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.text.TextStyle style, boolean softWrap, androidx.compose.ui.text.style.TextOverflow overflow, int maxLines, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout);
     method public static androidx.compose.ui.HorizontalAlignmentLine getFirstBaseline();
     method public static androidx.compose.ui.HorizontalAlignmentLine getLastBaseline();
   }
@@ -24,7 +24,7 @@ package androidx.compose.foundation.text {
   }
 
   public final class InlineTextContentKt {
-    method public static void appendInlineContent(androidx.compose.ui.text.AnnotatedString.Builder, String id, String alternateText = "\ufffd");
+    method public static void appendInlineContent(androidx.compose.ui.text.AnnotatedString.Builder, String id, optional String alternateText);
   }
 
   public final class TextFieldDelegateKt {

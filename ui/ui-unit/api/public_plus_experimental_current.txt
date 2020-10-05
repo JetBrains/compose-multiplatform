@@ -1,4 +1,4 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package androidx.compose.ui.unit {
 
   public final class AndroidDensityKt {
@@ -28,7 +28,7 @@ package androidx.compose.ui.unit {
   @androidx.compose.runtime.Immutable public final inline class Constraints {
     ctor public Constraints();
     method public static long constructor-impl(internal long value);
-    method public static long copy-msEJaDk(long $this, int minWidth = this.minWidth, int maxWidth = this.maxWidth, int minHeight = this.minHeight, int maxHeight = this.maxHeight);
+    method public static long copy-msEJaDk(long $this, optional int minWidth, optional int maxWidth, optional int minHeight, optional int maxHeight);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
     method public static boolean getHasBoundedHeight-impl(long $this);
@@ -50,7 +50,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class ConstraintsKt {
-    method @androidx.compose.runtime.Stable public static long Constraints(int minWidth = 0, int maxWidth = 2147483647, int minHeight = 0, int maxHeight = 2147483647);
+    method @androidx.compose.runtime.Stable public static long Constraints(optional int minWidth, optional int maxWidth, optional int minHeight, optional int maxHeight);
     method @androidx.compose.runtime.Stable public static long constrain-m9CmiCs(long, long size);
     method @androidx.compose.runtime.Stable public static int constrainHeight-4A1wEdY(long, int height);
     method @androidx.compose.runtime.Stable public static int constrainWidth-4A1wEdY(long, int width);
@@ -58,7 +58,7 @@ package androidx.compose.ui.unit {
     method public static boolean getHasFixedHeight-BRTryo0(long);
     method public static boolean getHasFixedWidth-BRTryo0(long);
     method public static boolean isZero-BRTryo0(long);
-    method @androidx.compose.runtime.Stable public static long offset-dAqVMF8(long, int horizontal = 0, int vertical = 0);
+    method @androidx.compose.runtime.Stable public static long offset-dAqVMF8(long, optional int horizontal, optional int vertical);
     method @androidx.compose.runtime.Stable public static boolean satisfiedBy-m9CmiCs(long, long size);
   }
 
@@ -81,7 +81,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class DensityKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.Density Density(float density, float fontScale = 1f);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.Density Density(float density, optional float fontScale);
   }
 
   @androidx.compose.runtime.Immutable public final inline class Dp implements java.lang.Comparable<androidx.compose.ui.unit.Dp> {
@@ -229,7 +229,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class Durations {
-    method public static long Duration(long days = 0, long hours = 0, long minutes = 0, long seconds = 0, long milliseconds = 0, long microseconds = 0, long nanoseconds = 0);
+    method public static long Duration(optional long days, optional long hours, optional long minutes, optional long seconds, optional long milliseconds, optional long microseconds, optional long nanoseconds);
     method public static inline long getDays(long);
     method public static inline long getDays(int);
     method public static inline long getHours(long);
@@ -295,7 +295,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static operator int component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator int component2-impl(long $this);
     method public static long constructor-impl(internal long packedValue);
-    method public static long copy-nOcc-ac(long $this, int x = this.x, int y = this.y);
+    method public static long copy-nOcc-ac(long $this, optional int x, optional int y);
     method @androidx.compose.runtime.Stable public static operator long div-nOcc-ac(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -364,7 +364,7 @@ package androidx.compose.ui.unit {
   @androidx.compose.runtime.Immutable public final inline class Position {
     ctor public Position();
     method public static long constructor-impl(internal long packedValue);
-    method public static long copy-ioHfwGI(long $this, float x = this.x, float y = this.y);
+    method public static long copy-ioHfwGI(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
     method public static float getX-D9Ej5fM(long $this);

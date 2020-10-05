@@ -1,4 +1,4 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package androidx.compose.material.icons {
 
   public final class Icons {
@@ -29,7 +29,7 @@ package androidx.compose.material.icons {
 
   public final class IconsKt {
     method public static inline androidx.compose.ui.graphics.vector.VectorAsset materialIcon(String name, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.VectorAssetBuilder,androidx.compose.ui.graphics.vector.VectorAssetBuilder> block);
-    method public static inline androidx.compose.ui.graphics.vector.VectorAssetBuilder materialPath(androidx.compose.ui.graphics.vector.VectorAssetBuilder, float fillAlpha = 1f, float strokeAlpha = 1f, androidx.compose.ui.graphics.PathFillType pathFillType = androidx.compose.ui.graphics.vector.VectorKt.DefaultFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+    method public static inline androidx.compose.ui.graphics.vector.VectorAssetBuilder materialPath(androidx.compose.ui.graphics.vector.VectorAssetBuilder, optional float fillAlpha, optional float strokeAlpha, optional androidx.compose.ui.graphics.PathFillType pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
     field @kotlin.PublishedApi internal static final float MaterialIconDimension = 24.0f;
   }
 

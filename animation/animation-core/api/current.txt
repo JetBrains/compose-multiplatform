@@ -1,4 +1,4 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package androidx.compose.animation.core {
 
   public final class AndroidAnimationClockKt {
@@ -10,7 +10,7 @@ package androidx.compose.animation.core {
     method public final float getMax();
     method public final float getMin();
     method public final float getVelocity();
-    method public final void setBounds(float min = (-1.0f/0.0f), float max = (1.0f/0.0f));
+    method public final void setBounds(optional float min, optional float max);
     method public void snapTo(float targetValue);
     property public final float max;
     property public final float min;
@@ -24,11 +24,11 @@ package androidx.compose.animation.core {
   }
 
   public final class AnimatedValueKt {
-    method public static androidx.compose.animation.core.AnimatedFloat AnimatedFloat(float initVal, androidx.compose.animation.core.AnimationClockObservable clock, float visibilityThreshold = 0.01f);
-    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> AnimatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, T? visibilityThreshold = null);
-    method public static <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<V,V> AnimatedVector(V initVal, androidx.compose.animation.core.AnimationClockObservable clock, V visibilityThreshold = initVal.newInstanceOfValue(Spring.DefaultDisplacementThreshold));
-    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = ExponentialDecay(), kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
-    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec decay = ExponentialDecay(), kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
+    method public static androidx.compose.animation.core.AnimatedFloat AnimatedFloat(float initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional float visibilityThreshold);
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> AnimatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, optional T? visibilityThreshold);
+    method public static <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<V,V> AnimatedVector(V initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional V visibilityThreshold);
+    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
+    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
   }
 
   public interface AnimationClockObservable {
@@ -134,7 +134,7 @@ package androidx.compose.animation.core {
   }
 
   public abstract sealed class BaseAnimatedValue<T, V extends androidx.compose.animation.core.AnimationVector> {
-    method public final void animateTo(T? targetValue, androidx.compose.animation.core.AnimationSpec<T> anim = androidx.compose.animation.core.BaseAnimatedValue.defaultSpringSpec, kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super T,kotlin.Unit>? onEnd = null);
+    method public final void animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> anim, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super T,kotlin.Unit>? onEnd);
     method protected void checkFinished(long playtime);
     method public final T! getTargetValue();
     method public abstract T! getValue();
@@ -443,20 +443,20 @@ package androidx.compose.animation.core {
   public final class TransitionDefinition<T> {
     ctor public TransitionDefinition();
     method public androidx.compose.animation.core.TransitionState getStateFor(T? name);
-    method public void snapTransition(kotlin.Pair<? extends T,? extends T>![] fromToPairs, T? nextState = null);
+    method public void snapTransition(kotlin.Pair<? extends T,? extends T>![] fromToPairs, optional T? nextState);
     method public void state(T? name, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.MutableTransitionState,kotlin.Unit> init);
-    method public void transition(T? fromState = null, T? toState = null, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.TransitionSpec<T>,kotlin.Unit> init);
+    method public void transition(optional T? fromState, optional T? toState, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.TransitionSpec<T>,kotlin.Unit> init);
     method public void transition(kotlin.Pair<? extends T,? extends T>![] fromToPairs, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.TransitionSpec<T>,kotlin.Unit> init);
   }
 
   public final class TransitionDefinitionKt {
-    method public static <T> androidx.compose.animation.core.TransitionAnimation<T> createAnimation(androidx.compose.animation.core.TransitionDefinition<T>, androidx.compose.animation.core.AnimationClockObservable clock, T? initState = null);
+    method public static <T> androidx.compose.animation.core.TransitionAnimation<T> createAnimation(androidx.compose.animation.core.TransitionDefinition<T>, androidx.compose.animation.core.AnimationClockObservable clock, optional T? initState);
     method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.KeyframesSpec<T> keyframes(kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig<T>,kotlin.Unit> init);
-    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.AnimationSpec<T> repeatable(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, androidx.compose.animation.core.RepeatMode repeatMode = androidx.compose.animation.core.RepeatMode.Restart);
-    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.AnimationSpec<T> snap(int delayMillis = 0);
-    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.SpringSpec<T> spring(float dampingRatio = 1.0f, float stiffness = 1500.0f, T? visibilityThreshold = null);
+    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.AnimationSpec<T> repeatable(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.AnimationSpec<T> snap(optional int delayMillis);
+    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.SpringSpec<T> spring(optional float dampingRatio, optional float stiffness, optional T? visibilityThreshold);
     method public static <T> androidx.compose.animation.core.TransitionDefinition<T> transitionDefinition(kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.TransitionDefinition<T>,kotlin.Unit> init);
-    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.TweenSpec<T> tween(int durationMillis = 300, int delayMillis = 0, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing = FastOutSlowInEasing);
+    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.TweenSpec<T> tween(optional int durationMillis, optional int delayMillis, optional kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing);
   }
 
   public final class TransitionSpec<S> {

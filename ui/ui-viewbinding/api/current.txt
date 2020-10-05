@@ -1,8 +1,8 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package androidx.compose.ui.viewinterop {
 
   public final class AndroidViewBindingKt {
-    method @androidx.compose.runtime.Composable public static <T extends androidx.viewbinding.ViewBinding> void AndroidViewBinding(kotlin.jvm.functions.Function3<? super android.view.LayoutInflater,? super android.view.ViewGroup,? super java.lang.Boolean,? extends T> bindingBlock, androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update = {});
+    method @androidx.compose.runtime.Composable public static <T extends androidx.viewbinding.ViewBinding> void AndroidViewBinding(kotlin.jvm.functions.Function3<? super android.view.LayoutInflater,? super android.view.ViewGroup,? super java.lang.Boolean,? extends T> bindingBlock, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
   }
 
 }
