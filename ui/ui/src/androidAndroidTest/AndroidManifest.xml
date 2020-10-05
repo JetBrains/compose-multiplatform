@@ -24,5 +24,6 @@
         <activity android:name="androidx.appcompat.app.AppCompatActivity"
             android:theme="@style/Theme.AppCompat"/>
         <activity android:name="androidx.fragment.app.FragmentActivity"/>
+        <activity android:name="androidx.compose.ui.window.ActivityWithFlagSecure"/>
     </application>
 </manifest>
