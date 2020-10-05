@@ -329,15 +329,13 @@ class ClipPointerInputTest {
                 pointerEvent: PointerEvent,
                 pass: PointerEventPass,
                 bounds: IntSize
-            ): List<PointerInputChange> {
-                val changes = pointerEvent.changes
+            ) {
                 if (pass == PointerEventPass.Initial) {
-                    changes.forEach {
+                    pointerEvent.changes.forEach {
                         println("testtest, bounds: $bounds")
                         log.add(it.current.position!!)
                     }
                 }
-                return changes
             }
 
             override fun onCancel() {

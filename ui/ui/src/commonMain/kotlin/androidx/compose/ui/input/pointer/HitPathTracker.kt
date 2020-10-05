@@ -20,7 +20,6 @@ import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.plus
 import androidx.compose.ui.util.annotation.VisibleForTesting
-import androidx.compose.ui.util.fastForEach
 
 /**
  * Organizes pointers and the [PointerInputFilter]s that they hit into a hierarchy such that
@@ -533,9 +532,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         //  PointerInputChanges are privately mutable.
         subtractOffset(position)
         val pointerEvent = PointerEvent(this.changes.values.toList(), this)
-        filter.onPointerEvent(pointerEvent, pass, size).fastForEach {
-            this.changes[it.id] = it
-        }
+        filter.onPointerEvent(pointerEvent, pass, size)
         addOffset(position)
     }
 

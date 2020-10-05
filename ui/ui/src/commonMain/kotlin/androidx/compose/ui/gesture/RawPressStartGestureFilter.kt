@@ -22,12 +22,12 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Reacts if the first pointer input change it sees is an unconsumed down change, and if it reacts,
@@ -74,9 +74,8 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-
-        var changes = pointerEvent.changes
+    ) {
+        val changes = pointerEvent.changes
 
         if (pass == executionPass) {
             if (enabled && changes.all { it.changedToDown() }) {
@@ -91,14 +90,11 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
 
             if (active) {
                 // If we have started, we should consume the down change on all changes.
-                changes = changes.map {
+                changes.fastForEach {
                     it.consumeDownChange()
-                    it
                 }
             }
         }
-
-        return changes
     }
 
     override fun onCancel() {

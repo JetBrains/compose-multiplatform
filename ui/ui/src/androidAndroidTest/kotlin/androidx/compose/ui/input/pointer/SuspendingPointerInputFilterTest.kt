@@ -43,7 +43,7 @@ class SuspendingPointerInputFilterTest {
     fun testAwaitSingleEvent(): Unit = runBlocking {
         val filter = SuspendingPointerInputFilter()
 
-        val result = CompletableDeferred<MutablePointerEvent>()
+        val result = CompletableDeferred<PointerEvent>()
         launch {
             with(filter) {
                 handlePointerInput {
@@ -72,7 +72,7 @@ class SuspendingPointerInputFilterTest {
     @Test
     fun testAwaitSeveralEvents(): Unit = runBlocking {
         val filter = SuspendingPointerInputFilter()
-        val results = Channel<MutablePointerEvent>(Channel.UNLIMITED)
+        val results = Channel<PointerEvent>(Channel.UNLIMITED)
         val reader = launch {
             with(filter) {
                 handlePointerInput {
@@ -110,7 +110,7 @@ class SuspendingPointerInputFilterTest {
     @Test
     fun testSyntheticCancelEvent(): Unit = runBlocking {
         val filter = SuspendingPointerInputFilter()
-        val results = Channel<MutablePointerEvent>(Channel.UNLIMITED)
+        val results = Channel<PointerEvent>(Channel.UNLIMITED)
         val reader = launch {
             with(filter) {
                 handlePointerInput {
@@ -175,7 +175,7 @@ class SuspendingPointerInputFilterTest {
 private fun PointerInputChange.toPointerEvent() = PointerEvent(listOf(this))
 
 @ExperimentalPointerInput
-private val MutablePointerEvent.firstChange get() = changes.first()
+private val PointerEvent.firstChange get() = changes.first()
 
 private class PointerInputChangeEmitter(id: Int = 0) {
     val pointerId = PointerId(id.toLong())

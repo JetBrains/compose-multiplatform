@@ -778,14 +778,14 @@ class DragSlopExceededGestureFilterTest {
 
     @Test
     fun onPointerEvent_1Down_nothingConsumed() {
-
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0)))
+        val down = down(0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
         // Assert
 
-        assertThat(result.changes.first().consumed.downChange).isFalse()
-        assertThat(result.changes.first().consumed.positionChange.x).isEqualTo(0f)
-        assertThat(result.changes.first().consumed.positionChange.y).isEqualTo(0f)
+        assertThat(down.consumed.downChange).isFalse()
+        assertThat(down.consumed.positionChange.x).isEqualTo(0f)
+        assertThat(down.consumed.positionChange.y).isEqualTo(0f)
     }
 
     @Test
@@ -795,13 +795,13 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
         val move = down.moveBy(10.milliseconds, TestTouchSlop.toFloat(), TestTouchSlop.toFloat())
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Assert
 
-        assertThat(result.changes.first().consumed.downChange).isFalse()
-        assertThat(result.changes.first().consumed.positionChange.x).isEqualTo(0f)
-        assertThat(result.changes.first().consumed.positionChange.y).isEqualTo(0f)
+        assertThat(move.consumed.downChange).isFalse()
+        assertThat(move.consumed.positionChange.x).isEqualTo(0f)
+        assertThat(move.consumed.positionChange.y).isEqualTo(0f)
     }
 
     @Test
@@ -814,13 +814,13 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         val up = move.up(20.milliseconds)
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         // Assert
 
-        assertThat(result.changes.first().consumed.downChange).isFalse()
-        assertThat(result.changes.first().consumed.positionChange.x).isEqualTo(0f)
-        assertThat(result.changes.first().consumed.positionChange.y).isEqualTo(0f)
+        assertThat(up.consumed.downChange).isFalse()
+        assertThat(up.consumed.positionChange.x).isEqualTo(0f)
+        assertThat(up.consumed.positionChange.y).isEqualTo(0f)
     }
 
     @Test
@@ -831,13 +831,13 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
         val move = down.moveBy(10.milliseconds, beyondSlop, beyondSlop)
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Assert
 
-        assertThat(result.changes.first().consumed.downChange).isFalse()
-        assertThat(result.changes.first().consumed.positionChange.x).isEqualTo(0f)
-        assertThat(result.changes.first().consumed.positionChange.y).isEqualTo(0f)
+        assertThat(move.consumed.downChange).isFalse()
+        assertThat(move.consumed.positionChange.x).isEqualTo(0f)
+        assertThat(move.consumed.positionChange.y).isEqualTo(0f)
     }
 
     @Test
@@ -851,13 +851,13 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         val up = move.up(20.milliseconds)
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         // Assert
 
-        assertThat(result.changes.first().consumed.downChange).isFalse()
-        assertThat(result.changes.first().consumed.positionChange.x).isEqualTo(0f)
-        assertThat(result.changes.first().consumed.positionChange.y).isEqualTo(0f)
+        assertThat(up.consumed.downChange).isFalse()
+        assertThat(up.consumed.positionChange.x).isEqualTo(0f)
+        assertThat(up.consumed.positionChange.y).isEqualTo(0f)
     }
 
     // Verification that TouchSlopExceededGestureDetector resets after up correctly.

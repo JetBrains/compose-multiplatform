@@ -366,11 +366,9 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onPointerEvent_1Down_notConsumed() {
-        val down0 = down(0)
-        val result = filter::onPointerEvent.invokeOverAllPasses(
-            pointerEventOf(down0)
-        )
-        assertThat(result.changes.first().consumed.downChange).isFalse()
+        val down = down(0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        assertThat(down.consumed.downChange).isFalse()
     }
 
     @Test
@@ -388,14 +386,14 @@ class LongPressGestureFilterTest {
         testContext.advanceTimeBy(10, TimeUnit.MILLISECONDS)
         val move0 = down0.moveTo(10.milliseconds, 0f, 0f)
         val down1 = down(0, 10.milliseconds)
-        val result = filter::onPointerEvent.invokeOverAllPasses(
+        filter::onPointerEvent.invokeOverAllPasses(
             pointerEventOf(move0, down1)
         )
 
         // Assert
 
-        assertThat(result.changes[0].consumed.downChange).isFalse()
-        assertThat(result.changes[1].consumed.downChange).isFalse()
+        assertThat(move0.consumed.downChange).isFalse()
+        assertThat(down1.consumed.downChange).isFalse()
     }
 
     @Test
@@ -411,14 +409,12 @@ class LongPressGestureFilterTest {
         // Act
 
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
-        val up0 = down0.up(50.milliseconds)
-        val result = filter::onPointerEvent.invokeOverAllPasses(
-            pointerEventOf(up0)
-        )
+        val up = down0.up(50.milliseconds)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         // Assert
 
-        assertThat(result.changes.first().consumed.downChange).isFalse()
+        assertThat(up.consumed.downChange).isFalse()
     }
 
     @Test
@@ -435,7 +431,7 @@ class LongPressGestureFilterTest {
 
         testContext.advanceTimeBy(101, TimeUnit.MILLISECONDS)
         val up0 = down0.up(100.milliseconds)
-        val result = filter.onPointerEvent(
+        filter.onPointerEvent(
             pointerEventOf(up0),
             PointerEventPass.Initial,
             IntSize(0, 0)
@@ -443,7 +439,7 @@ class LongPressGestureFilterTest {
 
         // Assert
 
-        assertThat(result[0].consumed.downChange).isTrue()
+        assertThat(up0.consumed.downChange).isTrue()
     }
 
     @Test
@@ -461,11 +457,11 @@ class LongPressGestureFilterTest {
 
         testContext.advanceTimeBy(51, TimeUnit.MILLISECONDS)
         pointer = pointer.up(100.milliseconds)
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         // Assert
 
-        assertThat(result.changes.first().consumed.downChange).isFalse()
+        assertThat(pointer.consumed.downChange).isFalse()
     }
 
     // Tests that verify correct behavior around cancellation.

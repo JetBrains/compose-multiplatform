@@ -55,7 +55,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
@@ -435,7 +434,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val input = PointerInputChange(
+        val expectedInput = PointerInputChange(
             id = PointerId(0),
             current = PointerInputData(
                 Uptime.Boot + 5.milliseconds,
@@ -451,7 +450,7 @@ class PointerInputEventProcessorTest {
                 positionChange = Offset(0f, 0f)
             )
         )
-        val output = PointerInputChange(
+        val expectedOutput = PointerInputChange(
             id = PointerId(0),
             current = PointerInputData(
                 Uptime.Boot + 5.milliseconds,
@@ -468,18 +467,17 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        val pointerInputFilter =
-            spy(
-                TestPointerInputFilter { pointerEvent, pass, _ ->
-                    if (pointerEvent.changes == listOf(input) &&
-                        pass == PointerEventPass.Initial
-                    ) {
-                        listOf(output)
-                    } else {
-                        pointerEvent.changes
-                    }
+        val pointerInputFilter = PointerInputFilterMock(
+            mutableListOf(),
+            pointerEventHandler = { pointerEvent, pass, _ ->
+                if (pass == PointerEventPass.Initial) {
+                    pointerEvent
+                        .changes
+                        .first()
+                        .consumePositionChange(13f, 0f)
                 }
-            )
+            }
+        )
 
         val layoutNode = LayoutNode(
             0, 0, 500, 500,
@@ -506,15 +504,16 @@ class PointerInputEventProcessorTest {
         // Act
 
         pointerInputEventProcessor.process(down)
-        reset(pointerInputFilter)
+        pointerInputFilter.log.clear()
         pointerInputEventProcessor.process(move)
 
         // Assert
 
-        verify(pointerInputFilter)
-            .onPointerEventMock(eq(pointerEventOf(input)), eq(PointerEventPass.Initial), any())
-        verify(pointerInputFilter)
-            .onPointerEventMock(eq(pointerEventOf(output)), eq(PointerEventPass.Main), any())
+        val log = pointerInputFilter.log.getOnPointerEventLog()
+
+        assertThat(log).hasSize(3)
+        assertThat(log[0].pointerEvent.changes.first()).isEqualTo(expectedInput)
+        assertThat(log[1].pointerEvent.changes.first()).isEqualTo(expectedOutput)
     }
 
     @Test
@@ -2829,13 +2828,12 @@ class PointerInputEventProcessorTest {
         // Arrange
 
         val pointerInputFilter: PointerInputFilter =
-            spy(
-                TestPointerInputFilter { pointerEvent, pass, _ ->
+            PointerInputFilterMock(
+                pointerEventHandler = { pointerEvent, pass, _ ->
                     if (pass == PointerEventPass.Initial) {
-                        pointerEvent.changes.map { it.consumePositionChange(1f, 0f) }
-                        pointerEvent.changes
-                    } else {
-                        pointerEvent.changes
+                        pointerEvent.changes.forEach {
+                            it.consumePositionChange(1f, 0f)
+                        }
                     }
                 }
             )
@@ -2916,27 +2914,6 @@ abstract class TestOwner : Owner {
     override fun calculatePosition(): IntOffset {
         return position ?: IntOffset.Zero
     }
-}
-
-open class TestPointerInputFilter(
-    val pointerInputHandler: PointerInputHandler = { pointerEvent, _, _ -> pointerEvent.changes }
-) : PointerInputFilter() {
-
-    override fun onPointerEvent(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ): List<PointerInputChange> = onPointerEventMock(pointerEvent, pass, bounds as Any)
-
-    open fun onPointerEventMock(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: Any
-    ): List<PointerInputChange> {
-        return pointerInputHandler(pointerEvent, pass, bounds as IntSize)
-    }
-
-    override fun onCancel() {}
 }
 
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
@@ -3073,8 +3050,8 @@ open class MockPointerInputFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-        return onPointerEventMock(pointerEvent, pass, bounds as Any)
+    ) {
+        onPointerEventMock(pointerEvent, pass, bounds as Any)
     }
 
     override fun onCancel() {}
@@ -3083,7 +3060,7 @@ open class MockPointerInputFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: Any
-    ): List<PointerInputChange> {
-        return pointerEvent.changes
+    ) {
+        pointerEvent.changes
     }
 }

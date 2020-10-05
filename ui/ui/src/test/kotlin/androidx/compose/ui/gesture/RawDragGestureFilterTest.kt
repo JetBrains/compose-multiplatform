@@ -419,8 +419,9 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_down_downNotConsumed() {
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0)))
-        assertThat(result.changes.first().consumed.downChange).isFalse()
+        val down = down(0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        assertThat(down.consumed.downChange).isFalse()
     }
 
     @Test
@@ -434,19 +435,19 @@ class RawDragGestureFilterTest {
             0f
         )
         dragObserver.dragConsume = Offset(7f, -11f)
-        var result = filter::onPointerEvent.invokeOverPasses(
+        filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(change),
             PointerEventPass.Initial,
             PointerEventPass.Main
         )
         dragObserver.dragConsume = Offset.Zero
-        result = filter::onPointerEvent.invokeOverPasses(
-            result,
+        filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(change),
             PointerEventPass.Initial,
             PointerEventPass.Main
         )
 
-        assertThat(result.changes.first().anyPositionChangeConsumed()).isFalse()
+        assertThat(change.anyPositionChangeConsumed()).isFalse()
     }
 
     @Test
@@ -462,9 +463,9 @@ class RawDragGestureFilterTest {
             1f,
             1f
         )
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
-        assertThat(result.changes.first().anyPositionChangeConsumed()).isFalse()
+        assertThat(change.anyPositionChangeConsumed()).isFalse()
     }
 
     @Test
@@ -480,9 +481,9 @@ class RawDragGestureFilterTest {
             1f,
             1f
         )
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
-        assertThat(result.changes.first().anyPositionChangeConsumed()).isFalse()
+        assertThat(change.anyPositionChangeConsumed()).isFalse()
     }
 
     @Test
@@ -497,19 +498,19 @@ class RawDragGestureFilterTest {
             -5f
         )
         dragObserver.dragConsume = Offset(7f, -11f)
-        var result = filter::onPointerEvent.invokeOverPasses(
+        filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(change),
             PointerEventPass.Initial,
             PointerEventPass.Main
         )
         dragObserver.dragConsume = Offset.Zero
-        result = filter::onPointerEvent.invokeOverPasses(
-            result,
+        filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(change),
             PointerEventPass.Final
         )
 
-        assertThat(result.changes.first().consumed.positionChange.x).isEqualTo(7f)
-        assertThat(result.changes.first().consumed.positionChange.y).isEqualTo(-11f)
+        assertThat(change.consumed.positionChange.x).isEqualTo(7f)
+        assertThat(change.consumed.positionChange.y).isEqualTo(-11f)
     }
 
     @Test
@@ -525,9 +526,9 @@ class RawDragGestureFilterTest {
         )
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         change = change.up(20.milliseconds)
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
-        assertThat(result.changes.first().consumed.downChange).isTrue()
+        assertThat(change.consumed.downChange).isTrue()
     }
 
     @Test

@@ -89,6 +89,11 @@ internal fun PointerInputChange.consume(
     )
 
 /**
+ * A function used to react to and modify [PointerInputChange]s.
+ */
+internal typealias PointerInputHandler = (PointerEvent, PointerEventPass, IntSize) -> Unit
+
+/**
  * Accepts:
  * 1. Single PointerEvent
  */
@@ -137,15 +142,12 @@ internal fun PointerInputHandler.invokeOverPasses(
     pointerEvent: PointerEvent,
     pointerEventPasses: List<PointerEventPass>,
     size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
-): PointerEvent {
+) {
     require(pointerEvent.changes.isNotEmpty())
     require(pointerEventPasses.isNotEmpty())
-    var localPointerEvent = pointerEvent
     pointerEventPasses.forEach {
-        val changes = this.invoke(localPointerEvent, it, size)
-        localPointerEvent = PointerEvent(changes)
+        this.invoke(pointerEvent, it, size)
     }
-    return localPointerEvent
 }
 
 /**

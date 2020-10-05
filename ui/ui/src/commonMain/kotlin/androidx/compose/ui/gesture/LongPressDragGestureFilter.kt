@@ -22,7 +22,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.unit.IntSize
@@ -169,8 +168,7 @@ private class LongPressDragGestureDetectorGlue : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-
+    ) {
         if (pass == PointerEventPass.Main &&
             dragEnabled &&
             !dragStarted &&
@@ -179,7 +177,6 @@ private class LongPressDragGestureDetectorGlue : PointerInputFilter() {
             dragEnabled = false
             longPressDragObserver.onStop(Offset.Zero)
         }
-        return pointerEvent.changes
     }
 
     // This handler ensures that onCancel is called if onLongPress was previously called but
