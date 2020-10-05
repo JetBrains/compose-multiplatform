@@ -77,7 +77,7 @@ private val ExpectedFile = """
             if (_testVector != null) {
                 return _testVector!!
             }
-            _testVector = materialIcon {
+            _testVector = materialIcon(name = "Filled.TestVector") {
                 materialPath(fillAlpha = 0.8f) {
                     moveTo(20.0f, 10.0f)
                     lineToRelative(0.0f, 10.0f)
