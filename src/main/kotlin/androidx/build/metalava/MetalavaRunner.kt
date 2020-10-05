@@ -245,7 +245,7 @@ fun Project.getGenerateApiArgs(
         "--source-path",
         sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
-        "--format=v3",
+        "--format=v4",
         "--output-kotlin-nulls=yes"
     )
 
