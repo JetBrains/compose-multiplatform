@@ -16,7 +16,10 @@
 
 package androidx.compose.ui.window
 
+import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.node.Owner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Root
@@ -37,12 +40,28 @@ internal fun ComposeTestRule.popupMatches(popupTestTag: String, viewMatcher: Mat
 }
 
 internal class PopupLayoutMatcher(val testTag: String) : TypeSafeMatcher<Root>() {
+
+    var lastSeenWindowParams: WindowManager.LayoutParams? = null
+
     override fun describeTo(description: Description?) {
         description?.appendText("PopupLayoutMatcher")
     }
 
     // TODO(b/141101446): Find a way to match the window used by the popup
     override fun matchesSafely(item: Root?): Boolean {
-        return item != null && isPopupLayout(item.decorView, testTag)
+        val matches = item != null && isPopupLayout(item.decorView, testTag)
+        if (matches) {
+            lastSeenWindowParams = item!!.windowLayoutParams.get()
+        }
+        return matches
+    }
+}
+
+internal class ActivityWithFlagSecure : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE)
     }
 }
