@@ -21,6 +21,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
@@ -47,10 +48,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @LargeTest
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalFocus::class)
 class TextFieldCursorTest {
 
     @get:Rule
@@ -65,7 +63,7 @@ class TextFieldCursorTest {
         val height = 20.dp
         val latch = CountDownLatch(1)
         rule.setContent {
-            BaseTextField(
+            CoreTextField(
                 value = TextFieldValue(),
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White, background = Color.White),
@@ -100,7 +98,7 @@ class TextFieldCursorTest {
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
-                BaseTextField(
+                CoreTextField(
                     value = TextFieldValue(),
                     onValueChange = {},
                     textStyle = TextStyle(color = Color.White, background = Color.White),
@@ -139,20 +137,74 @@ class TextFieldCursorTest {
             )
     }
 
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun cursorUnsetColor_noCursor() = with(rule.density) {
+        val width = 10.dp
+        val height = 20.dp
+        val latch = CountDownLatch(1)
+        rule.setContent {
+            // The padding helps if the test is run accidentally in landscape. Landscape makes
+            // the cursor to be next to the navigation bar which affects the red color to be a bit
+            // different - possibly anti-aliasing.
+            Box(Modifier.padding(10.dp)) {
+                CoreTextField(
+                    value = TextFieldValue(),
+                    onValueChange = {},
+                    textStyle = TextStyle(color = Color.White, background = Color.White),
+                    modifier = Modifier
+                        .preferredSize(width, height)
+                        .background(Color.White)
+                        .focusObserver { if (it.isFocused) latch.countDown() },
+                    cursorColor = Color.Unset
+                )
+            }
+        }
+
+        rule.onNode(hasInputMethodsSupport()).performClick()
+        assert(latch.await(1, TimeUnit.SECONDS))
+
+        rule.waitForIdle()
+
+        // no cursor when usually shown
+        rule.clockTestRule.advanceClock(100)
+        rule.onNode(hasInputMethodsSupport())
+            .captureToBitmap()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.White,
+                backgroundColor = Color.White,
+                shapeOverlapPixelCount = 0.0f
+            )
+
+        // no cursor when should be no cursor
+        rule.clockTestRule.advanceClock(700)
+        rule.onNode(hasInputMethodsSupport())
+            .captureToBitmap()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.White,
+                backgroundColor = Color.White,
+                shapeOverlapPixelCount = 0.0f
+            )
+    }
+
     private fun Bitmap.assertCursor(cursorWidth: Dp, density: Density) {
-        val сursorWidth = (with(density) { cursorWidth.toIntPx() })
+        val cursorWidthPx = (with(density) { cursorWidth.toIntPx() })
         val width = width
         val height = height
         this.assertPixels(
             IntSize(width, height)
         ) { position ->
-            if (position.x >= сursorWidth - 1 && position.x < сursorWidth + 1) {
+            if (position.x >= cursorWidthPx - 1 && position.x < cursorWidthPx + 1) {
                 // skip some pixels around cursor
                 null
             } else if (position.y < 5 || position.y > height - 5) {
                 // skip some pixels vertically
                 null
-            } else if (position.x in 0..сursorWidth) {
+            } else if (position.x in 0..cursorWidthPx) {
                 // cursor
                 Color.Red
             } else {
