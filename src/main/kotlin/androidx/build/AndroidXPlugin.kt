@@ -219,6 +219,9 @@ class AndroidXPlugin : Plugin<Project> {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
             task.kotlinOptions.jvmTarget = "1.8"
             project.configureCompilationWarnings(task)
+            if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
+                task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
+            }
         }
         if (plugin is KotlinMultiplatformPluginWrapper) {
             project.extensions.findByType<LibraryExtension>()?.apply {
