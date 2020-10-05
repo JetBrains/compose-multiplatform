@@ -17,7 +17,9 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
+import androidx.compose.runtime.CommitScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
@@ -26,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.HorizontalAlignmentLine
 import androidx.compose.ui.Layout
+import androidx.compose.ui.MeasureBlock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
@@ -33,12 +36,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.layout.IntrinsicMeasureBlock
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.FontLoaderAmbient
 import androidx.compose.ui.selection.Selectable
+import androidx.compose.ui.selection.SelectionRegistrar
 import androidx.compose.ui.selection.SelectionRegistrarAmbient
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
@@ -107,7 +112,6 @@ fun CoreText(
 ) {
     require(maxLines > 0) { "maxLines should be greater than 0" }
 
-    // Ambients
     // selection registrar, if no SelectionContainer is added ambient value will be null
     val selectionRegistrar = SelectionRegistrarAmbient.current
     val density = DensityAmbient.current
@@ -140,87 +144,123 @@ fun CoreText(
         maxLines = maxLines,
         placeholders = placeholders
     )
+    state.onTextLayout = onTextLayout
+
+    val controller = remember { TextController(state) }
+    controller.update(selectionRegistrar)
 
     Layout(
-        children = { InlineChildren(text, inlineComposables) },
-        modifier = modifier.drawLayer().drawBehind {
-            state.layoutResult?.let { layoutResult ->
-                drawIntoCanvas { canvas ->
-                    state.selectionRange?.let {
-                        TextDelegate.paintBackground(
-                            it.min,
-                            it.max,
-                            state.selectionPaint,
-                            canvas,
-                            layoutResult
-                        )
-                    }
-                    TextDelegate.paint(canvas, layoutResult)
-                }
-            }
-        }.onGloballyPositioned {
-            // Get the layout coordinates of the text composable. This is for hit test of
-            // cross-composable selection.
-            state.layoutCoordinates = it
+        children = if (inlineComposables.isEmpty()) {
+            emptyContent()
+        } else {
+            { InlineChildren(text, inlineComposables) }
+        },
+        modifier = modifier.then(controller.modifiers),
+        minIntrinsicWidthMeasureBlock = controller.minIntrinsicWidth,
+        minIntrinsicHeightMeasureBlock = controller.minIntrinsicHeight,
+        maxIntrinsicWidthMeasureBlock = controller.maxIntrinsicWidth,
+        maxIntrinsicHeightMeasureBlock = controller.maxIntrinsicHeight,
+        measureBlock = controller.measure
+    )
 
-            if (selectionRegistrar != null && state.selectionRange != null) {
+    onCommit(selectionRegistrar, callback = controller.commit)
+}
+
+@Composable
+internal fun InlineChildren(
+    text: AnnotatedString,
+    inlineContents: List<InlineContentRange>
+) {
+    inlineContents.fastForEach { (content, start, end) ->
+        Layout(
+            children = { content(text.subSequence(start, end).text) }
+        ) { children, constrains ->
+            val placeables = children.map { it.measure(constrains) }
+            layout(width = constrains.maxWidth, height = constrains.maxHeight) {
+                placeables.fastForEach { it.placeRelative(0, 0) }
+            }
+        }
+    }
+}
+
+@OptIn(InternalTextApi::class)
+private class TextController(val state: TextState) {
+    var selectionRegistrar: SelectionRegistrar? = null
+
+    fun update(selectionRegistrar: SelectionRegistrar?) {
+        this.selectionRegistrar = selectionRegistrar
+    }
+
+    val modifiers = Modifier.drawLayer().drawBehind {
+        state.layoutResult?.let { layoutResult ->
+            drawIntoCanvas { canvas ->
+                state.selectionRange?.let {
+                    TextDelegate.paintBackground(
+                        it.min,
+                        it.max,
+                        state.selectionPaint,
+                        canvas,
+                        layoutResult
+                    )
+                }
+                TextDelegate.paint(canvas, layoutResult)
+            }
+        }
+    }.onGloballyPositioned {
+        // Get the layout coordinates of the text composable. This is for hit test of
+        // cross-composable selection.
+        state.layoutCoordinates = it
+        selectionRegistrar?.let { selectionRegistrar ->
+            if (state.selectionRange != null) {
                 val newGlobalPosition = it.globalPosition
                 if (newGlobalPosition != state.previousGlobalPosition) {
                     selectionRegistrar.onPositionChange()
                 }
                 state.previousGlobalPosition = newGlobalPosition
             }
-        }.semantics {
-            getTextLayoutResult {
-                if (state.layoutResult != null) {
-                    it.add(state.layoutResult!!)
-                    true
-                } else {
-                    false
-                }
-            }
-        },
-        minIntrinsicWidthMeasureBlock = { _, _ ->
-            state.textDelegate.layoutIntrinsics(layoutDirection)
-            state.textDelegate.minIntrinsicWidth
-        },
-        minIntrinsicHeightMeasureBlock = { _, width ->
-            // given the width constraint, determine the min height
-            state.textDelegate
-                .layout(
-                    Constraints(
-                        0,
-                        width,
-                        0,
-                        Constraints.Infinity
-                    ),
-                    layoutDirection
-                ).size.height
-        },
-        maxIntrinsicWidthMeasureBlock = { _, _ ->
-            state.textDelegate.layoutIntrinsics(layoutDirection)
-            state.textDelegate.maxIntrinsicWidth
-        },
-        maxIntrinsicHeightMeasureBlock = { _, width ->
-            state.textDelegate
-                .layout(
-                    Constraints(
-                        0,
-                        width,
-                        0,
-                        Constraints.Infinity
-                    ),
-                    layoutDirection
-                ).size.height
         }
-    ) { measurables, constraints ->
+    }.semantics {
+        getTextLayoutResult {
+            if (state.layoutResult != null) {
+                it.add(state.layoutResult!!)
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    val minIntrinsicWidth: IntrinsicMeasureBlock = { _, _ ->
+        state.textDelegate.layoutIntrinsics(layoutDirection)
+        state.textDelegate.minIntrinsicWidth
+    }
+
+    val minIntrinsicHeight: IntrinsicMeasureBlock = { _, width ->
+        // given the width constraint, determine the min height
+        state.textDelegate
+            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
+            .size.height
+    }
+
+    val maxIntrinsicWidth: IntrinsicMeasureBlock = { _, _ ->
+        state.textDelegate.layoutIntrinsics(layoutDirection)
+        state.textDelegate.maxIntrinsicWidth
+    }
+
+    val maxIntrinsicHeight: IntrinsicMeasureBlock = { _, width ->
+        state.textDelegate
+            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
+            .size.height
+    }
+
+    val measure: MeasureBlock = { measurables, constraints ->
         val layoutResult = state.textDelegate.layout(
             constraints,
             layoutDirection,
             state.layoutResult
         )
         if (state.layoutResult != layoutResult) {
-            onTextLayout(layoutResult)
+            state.onTextLayout(layoutResult)
         }
         state.layoutResult = layoutResult
 
@@ -265,10 +305,10 @@ fun CoreText(
         }
     }
 
-    onCommit(selectionRegistrar) {
+    val commit: CommitScope.() -> Unit = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
         val id: Selectable? =
-            selectionRegistrar?.let {
+            selectionRegistrar?.let { selectionRegistrar ->
                 selectionRegistrar.subscribe(
                     MultiWidgetSelectionDelegate(
                         selectionRangeUpdate = { state.selectionRange = it },
@@ -280,24 +320,7 @@ fun CoreText(
 
         onDispose {
             // unregister only if any id was provided by SelectionRegistrar
-            id?.let { selectionRegistrar.unsubscribe(id) }
-        }
-    }
-}
-
-@Composable
-internal fun InlineChildren(
-    text: AnnotatedString,
-    inlineContents: List<InlineContentRange>
-) {
-    inlineContents.fastForEach { (content, start, end) ->
-        Layout(
-            children = { content(text.subSequence(start, end).text) }
-        ) { children, constrains ->
-            val placeables = children.map { it.measure(constrains) }
-            layout(width = constrains.maxWidth, height = constrains.maxHeight) {
-                placeables.fastForEach { it.placeRelative(0, 0) }
-            }
+            id?.let { selectionRegistrar?.unsubscribe(id) }
         }
     }
 }
@@ -316,6 +339,8 @@ val LastBaseline = HorizontalAlignmentLine(::max)
 private class TextState(
     var textDelegate: TextDelegate
 ) {
+    var onTextLayout: (TextLayoutResult) -> Unit = {}
+
     /**
      * The current selection range, used by selection.
      * This should be a state as every time we update the value during the selection we
