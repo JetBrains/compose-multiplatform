@@ -83,6 +83,8 @@ const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
  */
 const val VALIDATE_NO_UNRECOGNIZED_MESSAGES = "androidx.validateNoUnrecognizedMessages"
 
+const val EXPERIMENTAL_KOTLIN_BACKEND_ENABLED = "androidx.experimentalKotlinBackendEnabled"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     COVERAGE_ENABLED,
@@ -99,7 +101,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     AffectedModuleDetector.CHANGED_PROJECTS_ARG,
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
-    PLAYGROUND_DOKKA_BUILD_ID
+    PLAYGROUND_DOKKA_BUILD_ID,
+    EXPERIMENTAL_KOTLIN_BACKEND_ENABLED
 )
 
 /**
