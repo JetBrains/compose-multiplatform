@@ -84,6 +84,7 @@ import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -93,6 +94,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.annotation.VisibleForTesting
+import androidx.compose.ui.unit.Density
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -166,9 +168,7 @@ fun CoreTextField(
     //  exceptions if changed to the suggested equivalent for the deprecated state {} function.
     @Suppress("DEPRECATION")
     val generation = state { 0 }
-
     val Wrapper: @Composable (Int, @Composable () -> Unit) -> Unit = { _, child -> child() }
-    val onValueChangeWrapper: (TextFieldValue) -> Unit = { onValueChange(it); generation.value++ }
     val focusRequester = FocusRequester()
 
     Wrapper(generation.value) {
@@ -194,14 +194,22 @@ fun CoreTextField(
                 )
             )
         }
-        state.textDelegate = updateTextDelegate(
-            current = state.textDelegate,
-            text = visualText,
-            style = textStyle,
-            density = density,
-            resourceLoader = resourceLoader,
-            placeholders = emptyList()
+        state.update(
+            visualText,
+            textStyle,
+            density,
+            resourceLoader,
+            onValueChange,
+            onImeActionPerformed
         )
+
+        val onValueChangeWrapper: (TextFieldValue) -> Unit = {
+            state.onValueChange(it)
+            generation.value++
+        }
+        val onImeActionPerformedWrapper: (ImeAction) -> Unit = {
+            state.onImeActionPerformed(it)
+        }
 
         state.processor.onNewState(value, textInputService, state.inputSession)
 
@@ -228,8 +236,8 @@ fun CoreTextField(
                     state.processor,
                     keyboardType,
                     imeAction,
-                    { manager.onValueChange(it) },
-                    onImeActionPerformed
+                    onValueChangeWrapper,
+                    onImeActionPerformedWrapper
                 )
                 if (state.inputSession != NO_SESSION && textInputService != null) {
                     onTextInputStarted(
@@ -350,7 +358,7 @@ fun CoreTextField(
                 }
             }
             setText {
-                onValueChange(TextFieldValue(it.text, TextRange(it.text.length)))
+                onValueChangeWrapper(TextFieldValue(it.text, TextRange(it.text.length)))
                 true
             }
             // TODO: startSelectionActionModeAsync
@@ -360,7 +368,7 @@ fun CoreTextField(
                 } else if (start.coerceAtMost(end) >= 0 &&
                     start.coerceAtLeast(end) <= value.text.length
                 ) {
-                    onValueChange(TextFieldValue(value.text, TextRange(start, end)))
+                    onValueChangeWrapper(TextFieldValue(value.text, TextRange(start, end)))
                     if (startSelectionActionMode) {
                         // startSelectionActionModeAsync
                         // See TextView.java
@@ -493,6 +501,33 @@ internal class TextFieldState(
      * A flag to check if the floating toolbar should show.
      */
     var showFloatingToolbar = false
+
+    var onImeActionPerformed: (ImeAction) -> Unit = {}
+        private set
+
+    var onValueChange: (TextFieldValue) -> Unit = {}
+        private set
+
+    fun update(
+        visualText: AnnotatedString,
+        textStyle: TextStyle,
+        density: Density,
+        resourceLoader: Font.ResourceLoader,
+        onValueChange: (TextFieldValue) -> Unit,
+        onImeActionPerformed: (ImeAction) -> Unit
+    ) {
+        this.onValueChange = onValueChange
+        this.onImeActionPerformed = onImeActionPerformed
+
+        textDelegate = updateTextDelegate(
+            current = textDelegate,
+            text = visualText,
+            style = textStyle,
+            density = density,
+            resourceLoader = resourceLoader,
+            placeholders = emptyList()
+        )
+    }
 }
 
 /**
