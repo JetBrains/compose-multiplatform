@@ -91,29 +91,6 @@ import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 import android.view.KeyEvent as AndroidKeyEvent
 
-/***
- * This function creates an instance of [AndroidOwner]
- *
- * @param context Context to use to create a View
- * @param lifecycleOwner Current [LifecycleOwner]. When it is not provided we will try to get the
- * owner using [ViewTreeLifecycleOwner] when we will be attached.
- * @param viewModelStoreOwner Current [ViewModelStoreOwner]. When it is not provided we will try
- * to get the owner using [ViewTreeViewModelStoreOwner] when we will be attached.
- * @param savedStateRegistryOwner Current [SavedStateRegistryOwner]. When it is not provided we will try
- * to get the owner using [ViewTreeSavedStateRegistryOwner] when we will be attached.
- */
-fun AndroidOwner(
-    context: Context,
-    lifecycleOwner: LifecycleOwner? = null,
-    viewModelStoreOwner: ViewModelStoreOwner? = null,
-    savedStateRegistryOwner: SavedStateRegistryOwner? = null
-): AndroidOwner = AndroidComposeView(
-    context,
-    lifecycleOwner,
-    viewModelStoreOwner,
-    savedStateRegistryOwner
-)
-
 @SuppressLint("ViewConstructor")
 @OptIn(
     ExperimentalComposeApi::class,
@@ -124,9 +101,9 @@ fun AndroidOwner(
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView constructor(
     context: Context,
-    initialLifecycleOwner: LifecycleOwner?,
-    initialViewModelStoreOwner: ViewModelStoreOwner?,
-    initialSavedStateRegistryOwner: SavedStateRegistryOwner?
+    initialLifecycleOwner: LifecycleOwner? = null,
+    initialViewModelStoreOwner: ViewModelStoreOwner? = null,
+    initialSavedStateRegistryOwner: SavedStateRegistryOwner? = null
 ) : ViewGroup(context), AndroidOwner {
 
     override val view: View = this
