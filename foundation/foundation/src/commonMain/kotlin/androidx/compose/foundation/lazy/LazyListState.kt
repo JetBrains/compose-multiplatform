@@ -46,6 +46,7 @@ import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastSumBy
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 @Suppress("NOTHING_TO_INLINE", "EXPERIMENTAL_FEATURE_WARNING")
 internal inline class DataIndex(val value: Int) {
@@ -165,8 +166,15 @@ class LazyListState constructor(
             "entered drag with non-zero pending scroll: $scrollToBeConsumed"
         }
         scrollToBeConsumed += distance
-        remeasurement.forceRemeasure()
 
+        // scrollToBeConsumed will be consumed synchronously during the forceRemeasure invocation
+        // inside measuring we do scrollToBeConsumed.roundToInt() so there will be no scroll if
+        // we have less than 0.5 pixels
+        if (abs(scrollToBeConsumed) >= 0.5f) {
+            remeasurement.forceRemeasure()
+        }
+
+        // here scrollToBeConsumed is already consumed during the forceRemeasure invocation
         if (abs(scrollToBeConsumed) < 0.5f) {
             // We consumed all of it - we'll hold onto the fractional scroll for later, so report
             // that we consumed the whole thing
@@ -214,16 +222,16 @@ class LazyListState constructor(
                 currentFirstItemScrollOffset = 0
             }
 
-            // represents the real amount of consumed pixels
-            var consumedScroll = scrollToBeConsumed.roundToInt()
+            // represents the real amount of scroll we applied as a result of this measure pass.
+            var scrollDelta = scrollToBeConsumed.roundToInt()
 
             // applying the whole requested scroll offset. we will figure out if we can't consume
             // all of it later
-            currentFirstItemScrollOffset -= consumedScroll
+            currentFirstItemScrollOffset -= scrollDelta
 
             // if the current scroll offset is less than minimally possible
             if (currentFirstItemIndex == DataIndex(0) && currentFirstItemScrollOffset < 0) {
-                consumedScroll += currentFirstItemScrollOffset
+                scrollDelta += currentFirstItemScrollOffset
                 currentFirstItemScrollOffset = 0
             }
 
@@ -256,7 +264,7 @@ class LazyListState constructor(
             // if we were scrolled backward, but there were not enough items before. this means
             // not the whole scroll was consumed
             if (currentFirstItemScrollOffset < 0) {
-                consumedScroll += currentFirstItemScrollOffset
+                scrollDelta += currentFirstItemScrollOffset
                 goingForwardInitialScrollOffset += currentFirstItemScrollOffset
                 currentFirstItemScrollOffset = 0
             }
@@ -322,16 +330,24 @@ class LazyListState constructor(
                     currentFirstItemScrollOffset += size
                     currentFirstItemIndex = previous
                 }
-                consumedScroll += toScrollBack
+                scrollDelta += toScrollBack
                 if (currentFirstItemScrollOffset < 0) {
-                    consumedScroll += currentFirstItemScrollOffset
+                    scrollDelta += currentFirstItemScrollOffset
                     mainAxisUsed += currentFirstItemScrollOffset
                     currentFirstItemScrollOffset = 0
                 }
             }
 
-            // report the amount of pixels we consumed
-            scrollToBeConsumed -= consumedScroll
+            // report the amount of pixels we consumed. scrollDelta can be smaller than
+            // scrollToBeConsumed if there were not enough items to fill the offered space or it
+            // can be larger if items were resized, or if, for example, we were previously
+            // displaying the item 15, but now we have only 10 items in total in the data set.
+            if (scrollToBeConsumed.roundToInt().sign == scrollDelta.sign &&
+                abs(scrollToBeConsumed.roundToInt()) >= abs(scrollDelta)) {
+                scrollToBeConsumed -= scrollDelta
+            } else {
+                scrollToBeConsumed = 0f
+            }
 
             // Wrap the content of the children
             val layoutWidth = constraints.constrainWidth(
