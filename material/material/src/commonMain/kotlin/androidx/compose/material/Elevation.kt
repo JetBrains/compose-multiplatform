@@ -76,7 +76,6 @@ object ElevationConstants {
     fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
             is Interaction.Pressed -> DefaultIncomingSpec
-            // TODO: b/161522042 - clarify specs for dragged state transitions
             is Interaction.Dragged -> DefaultIncomingSpec
             else -> null
         }
@@ -91,7 +90,6 @@ object ElevationConstants {
     fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
             is Interaction.Pressed -> DefaultOutgoingSpec
-            // TODO: b/161522042 - clarify specs for dragged state transitions
             is Interaction.Dragged -> DefaultOutgoingSpec
             // TODO: use [HoveredOutgoingSpec] when hovered
             else -> null
