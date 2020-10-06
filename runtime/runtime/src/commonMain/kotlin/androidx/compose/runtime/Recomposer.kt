@@ -307,7 +307,10 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         }
     }
 
-    fun hasPendingChanges(): Boolean =
+    /**
+     * Returns true if any pending invalidations have been scheduled.
+     */
+    fun hasInvalidations(): Boolean =
         !idlingLatch.isOpen || synchronized(invalidComposers) { invalidComposers.isNotEmpty() }
 
     internal fun scheduleRecompose(composer: Composer<*>) {

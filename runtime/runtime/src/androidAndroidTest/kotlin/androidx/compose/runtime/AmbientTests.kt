@@ -483,8 +483,8 @@ class AmbientTests : BaseComposeTest() {
     @After
     fun ensureNoSubcomposePending() {
         activityRule.activity.uiThread {
-            val hasPendingChanges = Recomposer.current().hasPendingChanges()
-            assertTrue(!hasPendingChanges, "Pending changes detected after test completed")
+            val hasInvalidations = Recomposer.current().hasInvalidations()
+            assertTrue(!hasInvalidations, "Pending changes detected after test completed")
         }
     }
 

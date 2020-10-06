@@ -27,6 +27,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
+import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.Measurable
@@ -167,10 +168,13 @@ private class SubcomposeLayoutState<T> :
         currentIndex++
 
         val nodeState = nodeToNodeState.getOrPut(node) {
-            NodeState(slotId, content)
+            NodeState(slotId, emptyContent())
         }
-        nodeState.content = content
-        subcompose(node, nodeState)
+        val hasPendingChanges = nodeState.composition?.hasInvalidations() ?: true
+        if (nodeState.content !== content || hasPendingChanges) {
+            nodeState.content = content
+            subcompose(node, nodeState)
+        }
         return node.children
     }
 
