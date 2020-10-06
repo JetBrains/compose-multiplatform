@@ -32,12 +32,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.test.core.app.ActivityScenario
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -50,16 +50,13 @@ import java.util.concurrent.TimeUnit
 @MediumTest
 @RunWith(JUnit4::class)
 class WrapperTest {
-    @Suppress("DEPRECATION")
-    @get:Rule
-    val activityTestRule = androidx.test.rule.ActivityTestRule<TestActivity>(
-        TestActivity::class.java
-    )
-    private lateinit var activity: TestActivity
+
+    lateinit var activityScenario: ActivityScenario<TestActivity>
 
     @Before
     fun setup() {
-        activity = activityTestRule.activity
+        activityScenario = ActivityScenario.launch(TestActivity::class.java)
+        activityScenario.moveToState(Lifecycle.State.CREATED)
     }
 
     @Test
@@ -68,8 +65,8 @@ class WrapperTest {
         var composeWrapperCount = 0
         var innerCount = 0
 
-        activityTestRule.runOnUiThread {
-            activity.setContent {
+        activityScenario.onActivity {
+            it.setContent {
                 onCommit { composeWrapperCount++ }
                 Recompose { recompose ->
                     onCommit {
@@ -91,13 +88,11 @@ class WrapperTest {
         val disposeLatch = CountDownLatch(1)
 
         lateinit var owner: RegistryOwner
-        activityTestRule.runOnUiThread {
+        activityScenario.onActivity {
             owner = RegistryOwner()
-        }
 
-        activityTestRule.runOnUiThread {
-            val view = FrameLayout(activity)
-            activity.setContentView(view)
+            val view = FrameLayout(it)
+            it.setContentView(view)
             ViewTreeLifecycleOwner.set(view, owner)
             view.setContent(Recomposer.current()) {
                 onDispose {
@@ -109,7 +104,7 @@ class WrapperTest {
 
         assertTrue(composedLatch.await(1, TimeUnit.SECONDS))
 
-        activityTestRule.runOnUiThread {
+        activityScenario.onActivity {
             assertEquals(1, disposeLatch.count)
             owner.registry.currentState = Lifecycle.State.DESTROYED
         }
@@ -120,15 +115,15 @@ class WrapperTest {
     @Test
     fun detachedFromLifecycleWhenDisposed() {
         lateinit var owner: RegistryOwner
-        activityTestRule.runOnUiThread {
+        activityScenario.onActivity {
             owner = RegistryOwner()
         }
         var composition: Composition? = null
         val composedLatch = CountDownLatch(1)
 
-        activityTestRule.runOnUiThread {
-            val view = FrameLayout(activity)
-            activity.setContentView(view)
+        activityScenario.onActivity {
+            val view = FrameLayout(it)
+            it.setContentView(view)
             ViewTreeLifecycleOwner.set(view, owner)
             composition = view.setContent(Recomposer.current()) {
                 composedLatch.countDown()
@@ -137,7 +132,7 @@ class WrapperTest {
 
         assertTrue(composedLatch.await(1, TimeUnit.SECONDS))
 
-        activityTestRule.runOnUiThread {
+        activityScenario.onActivity {
             assertEquals(1, owner.registry.observerCount)
             composition!!.dispose()
             assertEquals(0, owner.registry.observerCount)
@@ -150,9 +145,9 @@ class WrapperTest {
         val composedLatch = CountDownLatch(1)
         var value = 0f
 
-        activityTestRule.runOnUiThread {
-            val frameLayout = FrameLayout(activity)
-            activity.setContent {
+        activityScenario.onActivity {
+            val frameLayout = FrameLayout(it)
+            it.setContent {
                 val ambient = ambientOf<Float>()
                 Providers(ambient provides 1f) {
                     val recomposer = Recomposer.current()
@@ -170,6 +165,22 @@ class WrapperTest {
         }
         assertTrue(composedLatch.await(1, TimeUnit.SECONDS))
         assertEquals(1f, value)
+    }
+
+    @Test
+    fun activitySetContentIsSynchronouslyComposing() {
+        val activityScenario: ActivityScenario<TestActivity> =
+            ActivityScenario.launch(TestActivity::class.java)
+
+        activityScenario.moveToState(Lifecycle.State.CREATED)
+
+        activityScenario.onActivity {
+            var composed = false
+            it.setContent {
+                composed = true
+            }
+            assertTrue("setContent didn't compose the content synchronously", composed)
+        }
     }
 
     private class RegistryOwner : LifecycleOwner {
