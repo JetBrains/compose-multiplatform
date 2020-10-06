@@ -32,7 +32,11 @@ class BroadcastFrameClock(
     private val onNewAwaiters: (() -> Unit)? = null
 ) : MonotonicFrameClock {
 
-    private data class FrameAwaiter<R>(val onFrame: (Long) -> R, val continuation: Continuation<R>)
+    private class FrameAwaiter<R>(val onFrame: (Long) -> R, val continuation: Continuation<R>) {
+        fun resume(timeNanos: Long) {
+            continuation.resumeWith(runCatching { onFrame(timeNanos) })
+        }
+    }
 
     private val lock = Any()
     private var awaiters = mutableListOf<FrameAwaiter<*>>()
@@ -53,8 +57,7 @@ class BroadcastFrameClock(
             spareList = toResume
 
             for (i in 0 until toResume.size) {
-                val (onFrame, co) = toResume[i] as FrameAwaiter<Any?>
-                co.resumeWith(runCatching { onFrame(timeNanos) })
+                toResume[i].resume(timeNanos)
             }
             toResume.clear()
         }

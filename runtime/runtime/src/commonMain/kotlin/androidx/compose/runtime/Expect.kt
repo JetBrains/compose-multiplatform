@@ -118,11 +118,3 @@ expect annotation class TestOnly()
 expect annotation class CheckResult(
     val suggest: String
 )
-
-// Array<T>.sortWith(comparator, fromIndex, toIndex) is only available on jvm and native
-internal expect fun <T> sortArrayWith(
-    array: Array<T>,
-    comparator: Comparator<T>,
-    fromIndex: Int,
-    toIndex: Int
-)
