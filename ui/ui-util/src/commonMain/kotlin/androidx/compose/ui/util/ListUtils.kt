@@ -39,6 +39,14 @@ inline fun <T> List<T>.fastForEachIndexed(action: (Int, T) -> Unit) {
 }
 
 /**
+ * Returns `true` if all elements match the given [predicate].
+ */
+inline fun <T> List<T>.fastAll(predicate: (T) -> Boolean): Boolean {
+    fastForEach { if (!predicate(it)) return false }
+    return true
+}
+
+/**
  * Returns `true` if at least one element matches the given [predicate].
  */
 inline fun <T> List<T>.fastAny(predicate: (T) -> Boolean): Boolean {

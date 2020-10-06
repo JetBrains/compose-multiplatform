@@ -39,6 +39,7 @@ package androidx.compose.ui.util {
   }
 
   public final class ListUtilsKt {
+    method public static inline <T> boolean fastAll(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
     method public static inline <T> boolean fastAny(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
     method public static inline <T> T? fastFirstOrNull(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
     method public static inline <T> void fastForEach(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> action);

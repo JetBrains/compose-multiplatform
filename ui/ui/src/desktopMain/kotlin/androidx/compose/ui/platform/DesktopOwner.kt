@@ -281,7 +281,7 @@ class DesktopOwner(
                 .filterIsInstance<PointerMoveEventFilter>()
         ) {
             if (!onMoveConsumed) {
-                val relative = position - filter.layoutCoordinates.globalBounds.topLeft
+                val relative = position - filter.layoutCoordinates!!.globalBounds.topLeft
                 onMoveConsumed = filter.onMoveHandler(relative)
             }
             if (!onEnterConsumed && !oldMoveFilters.contains(filter))

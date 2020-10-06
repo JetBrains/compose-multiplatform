@@ -96,14 +96,17 @@ abstract class PointerInputFilter {
      */
     open fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {}
 
-    internal lateinit var layoutCoordinates: LayoutCoordinates
+    internal var layoutCoordinates: LayoutCoordinates? = null
 
-    internal val size: IntSize
-        get() = layoutCoordinates.size
+    /**
+     * The layout size assigned to this [PointerInputFilter].
+     */
+    val size: IntSize
+        get() = layoutCoordinates?.size ?: IntSize.Zero
     internal val position: IntOffset
-        get() = layoutCoordinates.localToGlobal(Offset.Zero).round()
+        get() = layoutCoordinates?.run { localToGlobal(Offset.Zero).round() } ?: IntOffset.Zero
     internal val isAttached: Boolean
-        get() = layoutCoordinates.isAttached
+        get() = layoutCoordinates?.isAttached == true
 }
 
 /**

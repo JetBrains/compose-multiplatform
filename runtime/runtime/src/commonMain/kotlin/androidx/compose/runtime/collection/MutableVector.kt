@@ -623,6 +623,13 @@ class MutableVector<T> @PublishedApi internal constructor(
     }
 
     /**
+     * [remove] [element] from the [MutableVector]
+     */
+    inline operator fun minusAssign(element: T) {
+        remove(element)
+    }
+
+    /**
      * Removes [element] from the [MutableVector]. If [element] was in the [MutableVector]
      * and was removed, `true` will be returned, or `false` will be returned if the element
      * was not found.
