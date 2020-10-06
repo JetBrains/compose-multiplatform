@@ -285,6 +285,8 @@ private class WrappedComposition(
         original.dispose()
     }
 
+    override fun hasInvalidations() = original.hasInvalidations()
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         if (event == Lifecycle.Event.ON_DESTROY) {
             dispose()

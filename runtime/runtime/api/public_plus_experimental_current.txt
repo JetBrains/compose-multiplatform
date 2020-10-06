@@ -164,6 +164,7 @@ package androidx.compose.runtime {
 
   public interface Composition {
     method public void dispose();
+    method public boolean hasInvalidations();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
@@ -348,7 +349,7 @@ package androidx.compose.runtime {
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public androidx.compose.runtime.EmbeddingContext getEmbeddingContext();
     method public androidx.compose.runtime.dispatch.MonotonicFrameClock getFrameClock();
-    method public boolean hasPendingChanges();
+    method public boolean hasInvalidations();
     method public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
     method public void setEmbeddingContext(androidx.compose.runtime.EmbeddingContext p);
