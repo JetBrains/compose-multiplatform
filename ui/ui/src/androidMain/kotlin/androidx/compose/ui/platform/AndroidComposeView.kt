@@ -82,37 +82,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 import android.view.KeyEvent as AndroidKeyEvent
-
-/***
- * This function creates an instance of [AndroidOwner]
- *
- * @param context Context to use to create a View
- * @param lifecycleOwner Current [LifecycleOwner]. When it is not provided we will try to get the
- * owner using [ViewTreeLifecycleOwner] when we will be attached.
- * @param viewModelStoreOwner Current [ViewModelStoreOwner]. When it is not provided we will try
- * to get the owner using [ViewTreeViewModelStoreOwner] when we will be attached.
- * @param savedStateRegistryOwner Current [SavedStateRegistryOwner]. When it is not provided we will try
- * to get the owner using [ViewTreeSavedStateRegistryOwner] when we will be attached.
- */
-fun AndroidOwner(
-    context: Context,
-    lifecycleOwner: LifecycleOwner? = null,
-    viewModelStoreOwner: ViewModelStoreOwner? = null,
-    savedStateRegistryOwner: SavedStateRegistryOwner? = null
-): AndroidOwner = AndroidComposeView(
-    context,
-    lifecycleOwner,
-    viewModelStoreOwner,
-    savedStateRegistryOwner
-)
 
 @SuppressLint("ViewConstructor")
 @OptIn(
@@ -122,12 +96,7 @@ fun AndroidOwner(
     ExperimentalLayoutNodeApi::class
 )
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-internal class AndroidComposeView constructor(
-    context: Context,
-    initialLifecycleOwner: LifecycleOwner?,
-    initialViewModelStoreOwner: ViewModelStoreOwner?,
-    initialSavedStateRegistryOwner: SavedStateRegistryOwner?
-) : ViewGroup(context), AndroidOwner {
+internal class AndroidComposeView(context: Context) : ViewGroup(context), AndroidOwner {
 
     override val view: View = this
 
@@ -517,18 +486,7 @@ internal class AndroidComposeView constructor(
         }
     }
 
-    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? =
-        if (initialLifecycleOwner != null && initialViewModelStoreOwner != null &&
-            initialSavedStateRegistryOwner != null
-        ) {
-            AndroidOwner.ViewTreeOwners(
-                initialLifecycleOwner,
-                initialViewModelStoreOwner,
-                initialSavedStateRegistryOwner
-            )
-        } else {
-            null
-        }
+    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? = null
         private set
 
     override fun setOnViewTreeOwnersAvailable(callback: (AndroidOwner.ViewTreeOwners) -> Unit) {

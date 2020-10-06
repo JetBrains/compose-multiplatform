@@ -2110,7 +2110,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class AndroidComposeViewKt {
-    method public static androidx.compose.ui.platform.AndroidOwner AndroidOwner(android.content.Context context, optional androidx.lifecycle.LifecycleOwner? lifecycleOwner, optional androidx.lifecycle.ViewModelStoreOwner? viewModelStoreOwner, optional androidx.savedstate.SavedStateRegistryOwner? savedStateRegistryOwner);
   }
 
   public interface AndroidOwner extends androidx.compose.ui.node.Owner {

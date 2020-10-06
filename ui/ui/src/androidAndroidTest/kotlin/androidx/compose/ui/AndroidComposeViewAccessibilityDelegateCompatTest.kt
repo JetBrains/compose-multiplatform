@@ -88,7 +88,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         // Use uiAutomation to enable accessibility manager.
         InstrumentationRegistry.getInstrumentation().uiAutomation
         rule.activityRule.scenario.onActivity {
-            androidComposeView = AndroidComposeView(it, null, null, null)
+            androidComposeView = AndroidComposeView(it)
             container = spy(FrameLayout(it)) {
                 on {
                     onRequestSendAccessibilityEvent(
