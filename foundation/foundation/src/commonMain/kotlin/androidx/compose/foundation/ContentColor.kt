@@ -31,10 +31,10 @@ import androidx.compose.ui.graphics.Color
  * unspecified.
  */
 @Deprecated(
-    message = "Use ThemeContentColor.current directly",
+    message = "Use AmbientContentColor.current directly",
     replaceWith = ReplaceWith(
-        "ThemeContentColor.current",
-        "androidx.compose.foundation.ThemeContentColor"
+        "AmbientContentColor.current",
+        "androidx.compose.foundation.AmbientContentColor"
     )
 )
 @Composable
