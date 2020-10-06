@@ -256,7 +256,7 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
     }
 
     private fun performRecompose(composer: Composer<*>): Boolean {
-        if (composer.isComposing) return false
+        if (composer.isComposing || composer.isDisposed) return false
         return composing(composer) {
             composer.recompose().also {
                 Snapshot.notifyObjectsInitialized()
