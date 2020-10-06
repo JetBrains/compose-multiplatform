@@ -29,6 +29,7 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -2812,6 +2813,38 @@ class AndroidLayoutDrawTest {
         drawLatch = CountDownLatch(1)
         showInner = false
         validateSquareColors(outerColor = Color.Blue, innerColor = Color.Blue, size = 10)
+    }
+
+    @Test
+    fun remeasureOnParentDataChanged() {
+        var measuredLatch = CountDownLatch(1)
+        var size = 10
+        var sizeState by mutableStateOf(size)
+
+        class ParentInt(val x: Int) : ParentDataModifier {
+            override fun Density.modifyParentData(parentData: Any?): Any? = x
+        }
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Layout({ Box(ParentInt(sizeState)) }) { measurables, constraints ->
+                    val boxSize = measurables[0].parentData as Int
+                    assertEquals(size, boxSize)
+                    val placeable = measurables[0].measure(constraints)
+                    measuredLatch.countDown()
+                    layout(boxSize, boxSize) {
+                        placeable.place(0, 0)
+                    }
+                }
+            }
+        }
+
+        assertTrue(measuredLatch.await(1, TimeUnit.SECONDS))
+        activityTestRule.runOnUiThread {
+            size = 20
+            sizeState = 20
+            measuredLatch = CountDownLatch(1)
+        }
+        assertTrue(measuredLatch.await(1, TimeUnit.SECONDS))
     }
 
     private fun composeSquares(model: SquareModel) {
