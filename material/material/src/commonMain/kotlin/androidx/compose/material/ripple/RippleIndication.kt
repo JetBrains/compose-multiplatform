@@ -324,7 +324,6 @@ private class StateLayer(
  * TODO: handle hover / focus states
  */
 private val IncomingStateLayerAnimationSpecs: Map<Interaction, AnimationSpec<Float>> = mapOf(
-    // TODO: b/161522042 - clarify specs for dragged state transitions
     Interaction.Dragged to TweenSpec(
         durationMillis = 45,
         easing = LinearEasing
@@ -337,7 +336,6 @@ private val IncomingStateLayerAnimationSpecs: Map<Interaction, AnimationSpec<Flo
  * TODO: handle hover / focus states
  */
 private val OutgoingStateLayerAnimationSpecs: Map<Interaction, AnimationSpec<Float>> = mapOf(
-    // TODO: b/161522042 - clarify specs for dragged state transitions
     Interaction.Dragged to TweenSpec(
         durationMillis = 150,
         easing = LinearEasing
