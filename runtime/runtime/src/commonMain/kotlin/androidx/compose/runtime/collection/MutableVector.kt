@@ -18,7 +18,6 @@
 
 package androidx.compose.runtime.collection
 
-import androidx.compose.runtime.sortArrayWith
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.math.max
@@ -747,7 +746,7 @@ class MutableVector<T> @PublishedApi internal constructor(
      * Sorts the [MutableVector] using [comparator] to order the items.
      */
     fun sortWith(comparator: Comparator<T>) {
-        sortArrayWith(content as Array<T>, comparator = comparator, fromIndex = 0, toIndex = size)
+        (content as Array<T>).sortWith(comparator = comparator, fromIndex = 0, toIndex = size)
     }
 
     /**

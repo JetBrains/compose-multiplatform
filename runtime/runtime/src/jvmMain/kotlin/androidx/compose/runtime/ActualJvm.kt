@@ -107,13 +107,3 @@ private val emptyBuildableList = BuildableList<Any>(emptyPersistentList)
 internal actual fun <T> buildableListOf(): BuildableList<T> = emptyBuildableList as BuildableList<T>
 
 public actual typealias UnsupportedOperationException = java.lang.UnsupportedOperationException
-
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun <T> sortArrayWith(
-    array: Array<T>,
-    comparator: Comparator<T>,
-    fromIndex: Int,
-    toIndex: Int
-) {
-    array.sortWith(comparator, fromIndex, toIndex)
-}
