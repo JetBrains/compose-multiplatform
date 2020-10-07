@@ -17,12 +17,38 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.WindowEvents
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 fun main() {
-    AppManager.onWindowsEmptyAction = onCloseAppEvent
+    AppManager.onEvent(
+        onAppStart = { println("OnAppStart") },
+        onAppExit = { println("OnAppExit") },
+        onWindowsEmpty = onCloseAppEvent
+    )
 
-    AppWindow("Desktop Compose Popup", IntSize(800, 600)).show {
+    AppWindow(
+        title = AppState.wndTitle.value,
+        events = WindowEvents(
+            onOpen = { println("OnOpen") },
+            onClose = { println("OnClose") },
+            onMinimize = { println("OnMinimize") },
+            onMaximize = { println("OnMaximize") },
+            onRestore = { println("OnRestore") },
+            onFocusGet = { println("OnFocusGet") },
+            onFocusLost = { println("OnFocusLost") },
+            onResize = { size ->
+                AppState.wndSize.value = size
+            },
+            onRelocate = { location ->
+                AppState.wndPos.value = location
+            }
+        ),
+        size = IntSize(800, 600),
+        location = IntOffset(200, 200),
+        icon = AppState.image()
+    ).show {
         content()
     }
 }

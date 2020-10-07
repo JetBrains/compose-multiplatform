@@ -17,13 +17,38 @@ package androidx.compose.desktop
 
 object AppManager {
 
+    init {
+        Runtime.getRuntime().addShutdownHook(object : Thread() {
+            public override fun run() {
+                onAppExit?.invoke()
+            }
+        })
+    }
+
+    fun onEvent(
+        onAppStart: (() -> Unit)? = null,
+        onAppExit: (() -> Unit)? = null,
+        onWindowsEmpty: (() -> Unit)? = null
+    ) {
+        this.onAppStart = onAppStart
+        this.onAppExit = onAppExit
+        this.onWindowsEmptyAction = onWindowsEmpty
+    }
+
     val defaultActionOnWindowsEmpty: () -> Unit = { System.exit(0) }
 
-    var onWindowsEmptyAction = defaultActionOnWindowsEmpty
+    private var onWindowsEmptyAction: (() -> Unit)? = defaultActionOnWindowsEmpty
+
+    private var onAppStart: (() -> Unit)? = null
+
+    private var onAppExit: (() -> Unit)? = null
 
     private val windows = mutableSetOf<AppFrame>()
 
     internal fun addWindow(window: AppFrame): Boolean {
+        if (windows.isEmpty()) {
+            onAppStart?.invoke()
+        }
         if (windows.contains(window)) {
             return false
         }
@@ -35,7 +60,7 @@ object AppManager {
         windows.remove(window)
         window.dispose()
         if (windows.isEmpty()) {
-            onWindowsEmptyAction.invoke()
+            onWindowsEmptyAction?.invoke()
         }
     }
 
@@ -50,5 +75,17 @@ object AppManager {
             }
         }
         return null
+    }
+
+    fun exit() {
+        val dialogOrderedWindowsList = mutableListOf<AppFrame>()
+        for (frame in windows) {
+            if (frame.invoker != null) {
+                dialogOrderedWindowsList.add(frame)
+            }
+        }
+        for (frame in dialogOrderedWindowsList.union(windows)) {
+            frame.close()
+        }
     }
 }

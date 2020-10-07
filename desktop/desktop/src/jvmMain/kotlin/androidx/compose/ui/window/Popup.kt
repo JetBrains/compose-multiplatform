@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwnersAmbient
 import androidx.compose.ui.platform.setContent
@@ -63,12 +64,14 @@ fun Popup(
 @Composable
 private fun PopupLayout(children: @Composable () -> Unit) {
     val owners = DesktopOwnersAmbient.current
-    val layout = remember {
-        val owner = DesktopOwner(owners)
+    val density = DensityAmbient.current
+    val owner = remember {
+        val owner = DesktopOwner(owners, density)
         owner.setContent(children)
         owner
     }
+    owner.density = density
     onDispose {
-        layout.dispose()
+        owner.dispose()
     }
 }
