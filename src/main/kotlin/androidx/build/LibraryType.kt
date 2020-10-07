@@ -57,13 +57,28 @@ enum class LibraryType(
     val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
     val compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 ) {
-    PUBLISHED_LIBRARY(Publish.SNAPSHOT_AND_RELEASE, true, true, RunApiTasks.Yes()),
-    SAMPLES(Publish.SNAPSHOT_AND_RELEASE, true, false, RunApiTasks.No("Sample Library")),
-    LINT(Publish.NONE, false, false, RunApiTasks.No("Lint Library"), CompilationTarget.HOST),
+    PUBLISHED_LIBRARY(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = true,
+        generateDocs = true,
+        checkApi = RunApiTasks.Yes()),
+    SAMPLES(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = true,
+        generateDocs = true,
+        checkApi = RunApiTasks.No("Sample Library")),
+    LINT(
+        publish = Publish.NONE,
+        sourceJars = false,
+        generateDocs = false,
+        checkApi = RunApiTasks.No("Lint Library"),
+        compilationTarget = CompilationTarget.HOST),
     ANNOTATION_PROCESSOR(
-        Publish.SNAPSHOT_AND_RELEASE, false, true,
-        RunApiTasks.No("Annotation Processor"), CompilationTarget.HOST
-    ),
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = false,
+        generateDocs = true,
+        checkApi = RunApiTasks.No("Annotation Processor"),
+        compilationTarget = CompilationTarget.HOST),
     UNSET()
 }
 
