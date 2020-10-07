@@ -296,7 +296,8 @@ package androidx.compose.ui.graphics {
     method public long getMagenta-0d7_KjU();
     method public long getRed-0d7_KjU();
     method public long getTransparent-0d7_KjU();
-    method public long getUnset-0d7_KjU();
+    method @Deprecated public long getUnset-0d7_KjU();
+    method public long getUnspecified-0d7_KjU();
     method public long getWhite-0d7_KjU();
     method public long getYellow-0d7_KjU();
     property public final long Black;
@@ -309,7 +310,8 @@ package androidx.compose.ui.graphics {
     property public final long Magenta;
     property public final long Red;
     property public final long Transparent;
-    property public final long Unset;
+    property @Deprecated public final long Unset;
+    property public final long Unspecified;
     property public final long White;
     property public final long Yellow;
   }
@@ -335,8 +337,10 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static long Color(long color);
     method @androidx.compose.runtime.Stable public static long Color(@IntRange(from=0, to=255) int red, @IntRange(from=0, to=255) int green, @IntRange(from=0, to=255) int blue, optional @IntRange(from=0, to=255) int alpha);
     method @androidx.compose.runtime.Stable public static long compositeOver-6xK2E-Q(long, long background);
-    method public static inline boolean isSet-8_81llA(long);
-    method public static inline boolean isUnset-8_81llA(long);
+    method @Deprecated public static inline boolean isSet-8_81llA(long);
+    method public static inline boolean isSpecified-8_81llA(long);
+    method @Deprecated public static inline boolean isUnset-8_81llA(long);
+    method public static inline boolean isUnspecified-8_81llA(long);
     method @androidx.compose.runtime.Stable public static long lerp-m18UwgE(long start, long stop, @FloatRange(from=0.0, to=1.0) float fraction);
     method @androidx.compose.runtime.Stable public static float luminance-8_81llA(long);
     method @ColorInt @androidx.compose.runtime.Stable public static int toArgb-8_81llA(long);

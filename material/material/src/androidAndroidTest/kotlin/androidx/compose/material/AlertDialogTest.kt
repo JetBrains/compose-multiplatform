@@ -45,7 +45,7 @@ class AlertDialogTest {
 
     @Test
     fun customStyleProperties_shouldApply() {
-        var contentColor = Color.Unset
+        var contentColor = Color.Unspecified
         rule.setContent {
             AlertDialog(
                 onDismissRequest = {},

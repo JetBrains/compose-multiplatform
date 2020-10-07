@@ -63,8 +63,8 @@ import androidx.compose.ui.unit.dp
  * @param onValueChange Called when the input service updates values in
  * [TextFieldValue].
  * @param modifier optional [Modifier] for this text field.
- * @param textColor [Color] to apply to the text. If [Color.Unset], and [textStyle] has no color
- * set, this will be [AmbientContentColor].
+ * @param textColor [Color] to apply to the text. If [Color.Unspecified], and [textStyle] has no
+ * color set, this will be [AmbientContentColor].
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * The default [textStyle] uses the [AmbientTextStyle] defined by the theme
  * @param keyboardType The keyboard type to be used in this text field. Note that this input type
@@ -84,7 +84,7 @@ import androidx.compose.ui.unit.dp
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
- * @param cursorColor Color of the cursor. If [Color.Unset], there will be no cursor drawn
+ * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
  *
  * @see TextFieldValue
  * @see ImeAction
@@ -98,7 +98,7 @@ fun BaseTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    textColor: Color = Color.Unset,
+    textColor: Color = Color.Unspecified,
     textStyle: TextStyle = AmbientTextStyle.current,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Unspecified,

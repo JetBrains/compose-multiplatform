@@ -82,7 +82,7 @@ private val DefaultColor = Color.Black
  */
 @Immutable
 data class TextStyle(
-    val color: Color = Color.Unset,
+    val color: Color = Color.Unspecified,
     val fontSize: TextUnit = TextUnit.Inherit,
     val fontWeight: FontWeight? = null,
     val fontStyle: FontStyle? = null,
@@ -93,7 +93,7 @@ data class TextStyle(
     val baselineShift: BaselineShift? = null,
     val textGeometricTransform: TextGeometricTransform? = null,
     val localeList: LocaleList? = null,
-    val background: Color = Color.Unset,
+    val background: Color = Color.Unspecified,
     val textDecoration: TextDecoration? = null,
     val shadow: Shadow? = null,
     val textAlign: TextAlign? = null,
