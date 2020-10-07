@@ -51,6 +51,7 @@ private class GroupInfo(
 internal interface LifecycleManager {
     fun entering(instance: CompositionLifecycleObserver)
     fun leaving(instance: CompositionLifecycleObserver)
+    fun sideEffect(effect: () -> Unit)
 }
 
 /**
@@ -656,6 +657,7 @@ class Composer<N>(
     ) : LifecycleManager {
         private val enters = mutableSetOf<CompositionLifecycleObserverHolder>()
         private val leaves = mutableSetOf<CompositionLifecycleObserverHolder>()
+        private val sideEffects = mutableListOf<() -> Unit>()
 
         override fun entering(instance: CompositionLifecycleObserver) {
             val holder = CompositionLifecycleObserverHolder(instance)
@@ -674,6 +676,10 @@ class Composer<N>(
                 } else null
             }
             if (left != null) lifecycleObservers.remove(left)
+        }
+
+        override fun sideEffect(effect: () -> Unit) {
+            sideEffects += effect
         }
 
         fun dispatchLifecycleObservers() {
@@ -696,6 +702,17 @@ class Composer<N>(
                     for (holder in enters) {
                         holder.instance.onEnter()
                     }
+                }
+            }
+        }
+
+        fun dispatchSideEffects() {
+            trace("Compose:sideEffects") {
+                if (sideEffects.isNotEmpty()) {
+                    for (sideEffect in sideEffects) {
+                        sideEffect()
+                    }
+                    sideEffects.clear()
                 }
             }
         }
@@ -725,7 +742,11 @@ class Composer<N>(
                 invalidation.location = slotTable.anchorLocation(anchor)
             }
 
+            // Side effects run after lifecycle observers so that any remembered objects
+            // that implement CompositionLifecycleObserver receive onEnter before a side effect
+            // that captured it and operates on it can run.
             manager.dispatchLifecycleObservers()
+            manager.dispatchSideEffects()
 
             if (pendingInvalidScopes) {
                 pendingInvalidScopes = false
@@ -1039,6 +1060,13 @@ class Composer<N>(
             // Advance the writers reader location to account for the update above.
             writersReaderDelta++
         }
+    }
+
+    /**
+     * Schedule a side effect to run when we apply composition changes.
+     */
+    internal fun recordSideEffect(effect: () -> Unit) {
+        record { _, _, lifecycleManager -> lifecycleManager.sideEffect(effect) }
     }
 
     /**
