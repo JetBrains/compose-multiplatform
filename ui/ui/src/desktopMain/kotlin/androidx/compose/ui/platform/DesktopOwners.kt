@@ -17,6 +17,8 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.ExperimentalKeyInput
+import androidx.compose.ui.input.key.KeyEventDesktop
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputData
@@ -25,18 +27,19 @@ import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.Uptime
 import org.jetbrains.skija.Canvas
-import java.awt.Component
 import java.awt.event.InputMethodEvent
-import java.awt.im.InputMethodRequests
+import java.awt.event.KeyEvent
 
 val DesktopOwnersAmbient = staticAmbientOf<DesktopOwners>()
 
 @OptIn(InternalCoreApi::class)
 class DesktopOwners(
-    component: Component,
+    component: DesktopComponent = DummyDesktopComponent,
     val invalidate: () -> Unit
 ) {
     val list = LinkedHashSet<DesktopOwner>()
+    @ExperimentalKeyInput
+    var keyboard: Keyboard? = null
 
     private var pointerId = 0L
     private var isMousePressed = false
@@ -62,45 +65,51 @@ class DesktopOwners(
         }
     }
 
+    val lastOwner: DesktopOwner?
+        get() = list.lastOrNull()
+
     fun onMousePressed(x: Int, y: Int) {
         isMousePressed = true
-        list.lastOrNull()?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
     }
 
     fun onMouseReleased(x: Int, y: Int) {
         isMousePressed = false
-        list.lastOrNull()?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
         pointerId += 1
     }
 
     fun onMouseDragged(x: Int, y: Int) {
-        list.lastOrNull()?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
     }
 
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
         val position = Offset(x.toFloat(), y.toFloat())
-        list.lastOrNull()?.onMouseScroll(position, event)
+        lastOwner?.onMouseScroll(position, event)
     }
 
     fun onMouseMoved(x: Int, y: Int) {
         val position = Offset(x.toFloat(), y.toFloat())
-        list.lastOrNull()?.onPointerMove(position)
+        lastOwner?.onPointerMove(position)
     }
 
-    fun onKeyPressed(code: Int, char: Char) {
-        platformInputService.onKeyPressed(code, char)
+    private fun consumeKeyEventOr(event: KeyEvent, or: () -> Unit) {
+        val consumed = list.lastOrNull()?.sendKeyEvent(KeyEventDesktop(event)) ?: false
+        if (!consumed) {
+            or()
+        }
     }
 
-    fun onKeyReleased(code: Int, char: Char) {
-        platformInputService.onKeyReleased(code, char)
+    fun onKeyPressed(event: KeyEvent) = consumeKeyEventOr(event) {
+        platformInputService.onKeyPressed(event.keyCode, event.keyChar)
     }
 
-    fun onKeyTyped(char: Char) {
-        platformInputService.onKeyTyped(char)
+    fun onKeyReleased(event: KeyEvent) = consumeKeyEventOr(event) {
+        platformInputService.onKeyReleased(event.keyCode, event.keyChar)
     }
 
-    fun getInputMethodRequests(): InputMethodRequests? {
-        return platformInputService.getInputMethodRequests()
+    fun onKeyTyped(event: KeyEvent) = consumeKeyEventOr(event) {
+        platformInputService.onKeyTyped(event.keyChar)
     }
 
     fun onInputMethodTextChanged(event: InputMethodEvent) {

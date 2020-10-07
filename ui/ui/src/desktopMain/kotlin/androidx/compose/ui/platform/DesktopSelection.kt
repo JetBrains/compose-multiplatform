@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
@@ -29,6 +30,7 @@ import androidx.compose.ui.gesture.rawPressStartGestureFilter
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionRegistrarAmbient
+import androidx.compose.ui.selection.SelectionRegistrarImpl
 import kotlin.math.max
 
 @Composable
@@ -89,16 +91,22 @@ private class DragGlue(val observer: DragObserver) : DragObserver by observer {
     }
 }
 
+@OptIn(ExperimentalFocus::class)
 @Composable
 fun DesktopSelectionContainer(
     selection: Selection?,
     onSelectionChange: (Selection?) -> Unit,
     children: @Composable () -> Unit
 ) {
-    val registrarImpl = remember { DesktopSelectionRegistrar() }
+    val registrarImpl = remember { SelectionRegistrarImpl() }
     val manager = remember { DesktopSelectionManager(registrarImpl) }
 
-    manager.onSelectionChange = onSelectionChange
+    val managerTracker = SelectionManagerTrackerAmbient.current
+
+    manager.onSelectionChange = {
+        managerTracker.recentManager = manager
+        onSelectionChange(it)
+    }
     manager.selection = selection
 
     val gestureModifiers =
