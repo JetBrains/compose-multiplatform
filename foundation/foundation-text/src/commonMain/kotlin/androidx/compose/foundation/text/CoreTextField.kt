@@ -419,7 +419,7 @@ fun CoreTextField(
     val modifiers = modifier.focusRequester(focusRequester)
         .then(focusObserver)
         .then(cursorModifier)
-        .then(if (state.hasFocus) dragPositionGestureModifier else Modifier)
+        .then(dragPositionGestureModifier)
         .then(if (state.hasFocus) selectionLongPressModifier else Modifier)
         .then(focusRequestTapModifier)
         .then(drawModifier)
