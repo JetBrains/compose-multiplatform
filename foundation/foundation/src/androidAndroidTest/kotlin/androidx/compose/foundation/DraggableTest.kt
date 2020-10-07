@@ -273,7 +273,8 @@ class DraggableTest {
         var outerDrag = 0f
         rule.setContent {
             Box {
-                Box(alignment = Alignment.Center,
+                Box(
+                    alignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(draggableBoxTag)
                         .preferredSize(300.dp)
@@ -281,11 +282,12 @@ class DraggableTest {
                             outerDrag += it
                         }
                 ) {
-                    Box(modifier = Modifier
-                        .preferredSize(300.dp)
-                        .draggable(Orientation.Horizontal) { delta ->
-                            innerDrag += delta / 2
-                        }
+                    Box(
+                        modifier = Modifier
+                            .preferredSize(300.dp)
+                            .draggable(Orientation.Horizontal) { delta ->
+                                innerDrag += delta / 2
+                            }
                     )
                 }
             }
@@ -347,13 +349,14 @@ class DraggableTest {
         rule.setContent {
             Box {
                 if (emitDraggableBox) {
-                    Box(modifier = Modifier
-                        .testTag(draggableBoxTag)
-                        .preferredSize(100.dp)
-                        .draggable(
-                            orientation = Orientation.Horizontal,
-                            interactionState = interactionState
-                        ) {}
+                    Box(
+                        modifier = Modifier
+                            .testTag(draggableBoxTag)
+                            .preferredSize(100.dp)
+                            .draggable(
+                                orientation = Orientation.Horizontal,
+                                interactionState = interactionState
+                            ) {}
                     )
                 }
             }

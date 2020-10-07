@@ -52,5 +52,6 @@ fun TriStateToggleableSample() {
                     if (checked == ToggleableState.On) ToggleableState.Off else ToggleableState.On
             }
         ),
-        text = checked.toString())
+        text = checked.toString()
+    )
 }

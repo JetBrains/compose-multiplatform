@@ -62,24 +62,30 @@ class ToggleableTest {
     fun toggleableTest_defaultSemantics() {
         rule.setContent {
             Column {
-                Box(Modifier
-                    .triStateToggleable(state = ToggleableState.On, onClick = {})
-                    .testTag("checkedToggleable"),
+                Box(
+                    Modifier
+                        .triStateToggleable(state = ToggleableState.On, onClick = {})
+                        .testTag("checkedToggleable"),
                     children = {
                         Text("ToggleableText")
-                    })
-                Box(Modifier
-                    .triStateToggleable(state = ToggleableState.Off, onClick = {})
-                    .testTag("unCheckedToggleable"),
+                    }
+                )
+                Box(
+                    Modifier
+                        .triStateToggleable(state = ToggleableState.Off, onClick = {})
+                        .testTag("unCheckedToggleable"),
                     children = {
                         Text("ToggleableText")
-                    })
-                Box(Modifier
-                    .triStateToggleable(state = ToggleableState.Indeterminate, onClick = {})
-                    .testTag("indeterminateToggleable"),
+                    }
+                )
+                Box(
+                    Modifier
+                        .triStateToggleable(state = ToggleableState.Indeterminate, onClick = {})
+                        .testTag("indeterminateToggleable"),
                     children = {
                         Text("ToggleableText")
-                    })
+                    }
+                )
             }
         }
 
@@ -105,18 +111,22 @@ class ToggleableTest {
     fun toggleableTest_booleanOverload_defaultSemantics() {
         rule.setContent {
             Column {
-                Box(Modifier
-                    .toggleable(value = true, onValueChange = {})
-                    .testTag("checkedToggleable"),
+                Box(
+                    Modifier
+                        .toggleable(value = true, onValueChange = {})
+                        .testTag("checkedToggleable"),
                     children = {
                         Text("ToggleableText")
-                    })
-                Box(Modifier
-                    .toggleable(value = false, onValueChange = {})
-                    .testTag("unCheckedToggleable"),
+                    }
+                )
+                Box(
+                    Modifier
+                        .toggleable(value = false, onValueChange = {})
+                        .testTag("unCheckedToggleable"),
                     children = {
                         Text("ToggleableText")
-                    })
+                    }
+                )
             }
         }
 
@@ -139,9 +149,11 @@ class ToggleableTest {
                         state = ToggleableState.On,
                         onClick = {},
                         enabled = false
-                    ), children = {
+                    ),
+                    children = {
                         Text("ToggleableText")
-                    })
+                    }
+                )
             }
         }
 
@@ -180,11 +192,13 @@ class ToggleableTest {
 
         rule.setContent {
             Box {
-                Box(Modifier.toggleable(
-                    value = true,
-                    interactionState = interactionState,
-                    onValueChange = {}
-                )) {
+                Box(
+                    Modifier.toggleable(
+                        value = true,
+                        interactionState = interactionState,
+                        onValueChange = {}
+                    )
+                ) {
                     Text("ToggleableText")
                 }
             }
@@ -217,11 +231,13 @@ class ToggleableTest {
         rule.setContent {
             Box {
                 if (emitToggleableText) {
-                    Box(Modifier.toggleable(
-                        value = true,
-                        interactionState = interactionState,
-                        onValueChange = {}
-                    )) {
+                    Box(
+                        Modifier.toggleable(
+                            value = true,
+                            interactionState = interactionState,
+                            onValueChange = {}
+                        )
+                    ) {
                         Text("ToggleableText")
                     }
                 }

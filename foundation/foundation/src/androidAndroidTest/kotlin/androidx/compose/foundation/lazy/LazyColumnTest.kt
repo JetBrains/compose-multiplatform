@@ -90,8 +90,10 @@ class LazyColumnTest {
         rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 itemsIndexed(items) { index, item ->
-                    Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
-                            .testTag("$index-$item"))
+                    Spacer(
+                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                            .testTag("$index-$item")
+                    )
                 }
             }
         }
