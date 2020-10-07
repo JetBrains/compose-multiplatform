@@ -652,7 +652,7 @@ private fun Modifier.cursor(
     val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
 
     if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unset) {
-        onCommit(cursorColor) {
+        onCommit(cursorColor, value.text) {
             if (blinkingCursorEnabled) {
                 cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
             } else {
