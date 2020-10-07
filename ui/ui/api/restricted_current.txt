@@ -2202,8 +2202,33 @@ package androidx.compose.ui.platform {
     property public default Object? valueOverride;
   }
 
+  public final class InspectableValueKt {
+    method public static inline kotlin.jvm.functions.Function1<androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> debugInspectorInfo(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> definitions);
+    method public static kotlin.jvm.functions.Function1<androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> getNoInspectorInfo();
+    field public static final boolean DebugInspectorInfo = true;
+  }
+
   public final class InspectionModeKt {
     method public static androidx.compose.runtime.ProvidableAmbient<java.lang.Boolean> getInspectionMode();
+  }
+
+  public final class InspectorInfo {
+    ctor public InspectorInfo();
+    method public String? getName();
+    method public androidx.compose.ui.platform.ValueElementSequence getProperties();
+    method public Object? getValue();
+    method public void setName(String? p);
+    method public void setValue(Object? p);
+    property public final String? name;
+    property public final androidx.compose.ui.platform.ValueElementSequence properties;
+    property public final Object? value;
+  }
+
+  public abstract class InspectorValueInfo implements androidx.compose.ui.platform.InspectableValue {
+    ctor public InspectorValueInfo(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> info);
+    property public kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> inspectableElements;
+    property public String? nameFallback;
+    property public Object? valueOverride;
   }
 
   public final class JvmActualsKt {
@@ -2245,6 +2270,12 @@ package androidx.compose.ui.platform {
     method public Object? getValue();
     property public final String name;
     property public final Object? value;
+  }
+
+  public final class ValueElementSequence implements kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> {
+    ctor public ValueElementSequence();
+    method public java.util.Iterator<androidx.compose.ui.platform.ValueElement> iterator();
+    method public operator void set(String name, Object? value);
   }
 
   public final class WrapperKt {
