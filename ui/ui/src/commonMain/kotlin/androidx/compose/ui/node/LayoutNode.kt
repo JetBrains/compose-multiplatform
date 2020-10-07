@@ -764,6 +764,12 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
                 // a new one.
                 requestRemeasure()
             }
+            // If the parent data has changed, the parent needs remeasurement.
+            val oldParentData = parentData
+            outerMeasurablePlaceable.recalculateParentData()
+            if (oldParentData != parentData) {
+                parent?.requestRemeasure()
+            }
             if (invalidateParentLayer || startZIndex != outerZIndexModifier ||
                 shouldInvalidateParentLayer()
             ) {

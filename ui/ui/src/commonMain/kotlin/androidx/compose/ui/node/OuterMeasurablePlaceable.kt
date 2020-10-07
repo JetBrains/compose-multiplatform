@@ -43,7 +43,8 @@ internal class OuterMeasurablePlaceable(
     var measureIteration = -1L
         private set
 
-    override val parentData: Any? get() = outerWrapper.parentData
+    override var parentData: Any? = null
+        private set
 
     /**
      * The function to be executed when the parent layout measures its children.
@@ -129,4 +130,11 @@ internal class OuterMeasurablePlaceable(
     override fun minIntrinsicHeight(width: Int): Int = outerWrapper.minIntrinsicHeight(width)
 
     override fun maxIntrinsicHeight(width: Int): Int = outerWrapper.maxIntrinsicHeight(width)
+
+    /**
+     * Recalculates the parent data.
+     */
+    fun recalculateParentData() {
+        parentData = outerWrapper.parentData
+    }
 }
