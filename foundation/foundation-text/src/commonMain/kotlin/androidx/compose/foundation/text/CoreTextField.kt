@@ -69,9 +69,12 @@ import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.TextToolbarAmbient
 import androidx.compose.ui.selection.SelectionLayout
+import androidx.compose.ui.semantics.copyText
+import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
@@ -357,24 +360,40 @@ fun CoreTextField(
             onValueChangeWrapper(TextFieldValue(it.text, TextRange(it.text.length)))
             true
         }
-        // TODO: startSelectionActionModeAsync
-        setSelection { start, end, startSelectionActionMode ->
+        setSelection { start, end, traversalMode ->
             if (start == value.selection.start && end == value.selection.end) {
                 false
             } else if (start.coerceAtMost(end) >= 0 &&
                 start.coerceAtLeast(end) <= value.text.length
             ) {
-                onValueChangeWrapper(TextFieldValue(value.text, TextRange(start, end)))
-                if (startSelectionActionMode) {
-                    // startSelectionActionModeAsync
-                    // See TextView.java
+                // Do not show toolbar if it's a traversal mode (with the volume keys), or
+                // if the cursor just moved to beginning or end.
+                if (traversalMode || start == end) {
+                    manager.exitSelectionMode()
                 } else {
-                    // stop SelectionActionMode
+                    manager.enterSelectionMode()
+                    if (!state.hasFocus) focusRequester.requestFocus()
                 }
+                onValueChangeWrapper(TextFieldValue(value.text, TextRange(start, end)))
                 true
             } else {
+                manager.exitSelectionMode()
                 false
             }
+        }
+        if (!value.selection.collapsed) {
+            copyText {
+                manager.copy()
+                true
+            }
+            cutText {
+                manager.cut()
+                true
+            }
+        }
+        pasteText {
+            manager.paste()
+            true
         }
         onClick {
             if (!state.hasFocus) focusRequester.requestFocus()
@@ -421,32 +440,33 @@ fun CoreTextField(
             }
         }
 
-        if (state.hasFocus) {
-            if (state.selectionIsOn) {
-                manager.state?.layoutResult?.let {
-                    if (!value.selection.collapsed) {
-                        val startDirection = it.getBidiRunDirection(value.selection.start)
-                        val endDirection =
-                            it.getBidiRunDirection(max(value.selection.end - 1, 0))
-                        val directions = Pair(startDirection, endDirection)
-                        SelectionHandle(
-                            isStartHandle = true,
-                            directions = directions,
-                            manager = manager
-                        )
-                        SelectionHandle(
-                            isStartHandle = false,
-                            directions = directions,
-                            manager = manager
-                        )
-                    }
+        if (state.hasFocus && state.selectionIsOn) {
+            manager.state?.layoutResult?.let {
+                if (!value.selection.collapsed) {
+                    val startDirection = it.getBidiRunDirection(value.selection.start)
+                    val endDirection =
+                        it.getBidiRunDirection(max(value.selection.end - 1, 0))
+                    val directions = Pair(startDirection, endDirection)
+                    SelectionHandle(
+                        isStartHandle = true,
+                        directions = directions,
+                        manager = manager
+                    )
+                    SelectionHandle(
+                        isStartHandle = false,
+                        directions = directions,
+                        manager = manager
+                    )
+                }
 
-                    manager.state?.let {
-                        if (manager.isTextChanged()) it.showFloatingToolbar = false
-                        if (it.hasFocus) {
-                            if (it.showFloatingToolbar) manager.showSelectionToolbar()
-                            else manager.hideSelectionToolbar()
-                        }
+                manager.state?.let {
+                    // If in selection mode (when the floating toolbar is shown) a new symbol
+                    // from the keyboard is entered, text field should enter the editing mode
+                    // instead.
+                    if (manager.isTextChanged()) it.showFloatingToolbar = false
+                    if (it.hasFocus) {
+                        if (it.showFloatingToolbar) manager.showSelectionToolbar()
+                        else manager.hideSelectionToolbar()
                     }
                 }
             }
@@ -669,7 +689,7 @@ private class AnimatedFloatModel(
 
 // TODO(b/151940543): Remove this variable when we have a solution for idling animations
 @InternalTextApi
-/** @suppress */
+    /** @suppress */
 var blinkingCursorEnabled: Boolean = true
     @VisibleForTesting
     set
