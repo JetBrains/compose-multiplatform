@@ -99,7 +99,8 @@ internal class TextFieldSelectionManager() {
     private var dragTotalDistance = Offset.Zero
 
     /**
-     * The old [TextFieldValue]. Used to compare with the [value].
+     * The old [TextFieldValue] before entering the selection mode on long press. Used to exit
+     * the selection mode.
      */
     private var oldValue: TextFieldValue = TextFieldValue()
 
@@ -111,8 +112,6 @@ internal class TextFieldSelectionManager() {
             state?.let {
                 if (it.draggingHandle) return
             }
-
-            oldValue = value
 
             // Long Press at the blank area, the cursor should show up at the end of the line.
             if (!isPositionOnText(pxPosition)) {
@@ -128,16 +127,15 @@ internal class TextFieldSelectionManager() {
                         text = value.text,
                         selection = TextRange(offset, offset)
                     )
+                    enterSelectionMode()
                     onValueChange(newValue)
-                    state?.showFloatingToolbar = true
-                    setSelectionStatus(true)
                     return
                 }
             }
 
             // selection never started
             if (value.text == "") return
-            setSelectionStatus(true)
+            enterSelectionMode()
             state?.layoutResult?.let { layoutResult ->
                 val offset = offsetMap.transformedToOriginal(
                     layoutResult.getOffsetForPosition(pxPosition)
@@ -150,7 +148,6 @@ internal class TextFieldSelectionManager() {
                     wordBasedSelection = true
                 )
             }
-            state?.showFloatingToolbar = true
             dragBeginPosition = pxPosition
             dragTotalDistance = Offset.Zero
         }
@@ -233,6 +230,27 @@ internal class TextFieldSelectionManager() {
                 showSelectionToolbar()
             }
         }
+    }
+
+    /**
+     * The method to record the required state values on entering the selection mode.
+     *
+     * Is triggered on long press or accessibility action.
+     */
+    internal fun enterSelectionMode() {
+        oldValue = value
+        state?.showFloatingToolbar = true
+        setSelectionStatus(true)
+    }
+
+    /**
+     * The method to record the corresponding state values on exiting the selection mode.
+     *
+     * Is triggered on accessibility action.
+     */
+    internal fun exitSelectionMode() {
+        state?.showFloatingToolbar = false
+        setSelectionStatus(false)
     }
 
     internal fun deselect() {

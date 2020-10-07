@@ -44,6 +44,10 @@ internal class AndroidClipboardManager(context: Context) : ClipboardManager {
         else null
     }
 
+    fun addChangeListener(callback: () -> Unit) {
+        clipboardManager.addPrimaryClipChangedListener(callback)
+    }
+
     private fun convertCharSequenceToAnnotatedString(charSequence: CharSequence?):
         AnnotatedString? {
             if (charSequence == null) return null
