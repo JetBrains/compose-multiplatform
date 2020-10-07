@@ -48,7 +48,7 @@ abstract class CornerBasedShape(
         val bottomLeft = min(bottomLeft.toPx(size, density), minDimension - topLeft)
         require(topLeft >= 0.0f && topRight >= 0.0f && bottomRight >= 0.0f && bottomLeft >= 0.0f) {
             "Corner size in Px can't be negative(topLeft = $topLeft, topRight = $topRight, " +
-                    "bottomRight = $bottomRight, bottomLeft = $bottomLeft)!"
+                "bottomRight = $bottomRight, bottomLeft = $bottomLeft)!"
         }
         return createOutline(size, topLeft, topRight, bottomRight, bottomLeft)
     }

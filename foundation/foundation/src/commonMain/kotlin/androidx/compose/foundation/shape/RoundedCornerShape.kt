@@ -75,7 +75,7 @@ class RoundedCornerShape(
 
     override fun toString(): String {
         return "RoundedCornerShape(topLeft = $topLeft, topRight = $topRight, bottomRight = " +
-                "$bottomRight, bottomLeft = $bottomLeft)"
+            "$bottomRight, bottomLeft = $bottomLeft)"
     }
 
     private /*inline*/ fun Float.toRadius() = Radius(this)

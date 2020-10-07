@@ -87,8 +87,10 @@ internal class AndroidFlingCalculator(
     fun flingDistance(velocity: Float): Float {
         val l = getSplineDeceleration(velocity)
         val decelMinusOne = DecelerationRate - 1.0
-        return (friction * magicPhysicalCoefficient
-                * exp(DecelerationRate / decelMinusOne * l)).toFloat()
+        return (
+            friction * magicPhysicalCoefficient
+                * exp(DecelerationRate / decelMinusOne * l)
+            ).toFloat()
     }
 
     /**
@@ -99,8 +101,10 @@ internal class AndroidFlingCalculator(
         val decelMinusOne = DecelerationRate - 1.0
         return FlingInfo(
             initialVelocity = velocity,
-            distance = (friction * magicPhysicalCoefficient
-                    * exp(DecelerationRate / decelMinusOne * l)).toFloat(),
+            distance = (
+                friction * magicPhysicalCoefficient
+                    * exp(DecelerationRate / decelMinusOne * l)
+                ).toFloat(),
             duration = (1000.0 * exp(l / decelMinusOne)).toLong()
         )
     }
@@ -117,13 +121,13 @@ internal class AndroidFlingCalculator(
         fun position(time: Long): Float {
             val splinePos = if (duration > 0) time / duration.toFloat() else 1f
             return distance * sign(initialVelocity) *
-                    AndroidFlingSpline.flingPosition(splinePos).distanceCoefficient
+                AndroidFlingSpline.flingPosition(splinePos).distanceCoefficient
         }
 
         fun velocity(time: Long): Float {
             val splinePos = if (duration > 0) time / duration.toFloat() else 1f
             return AndroidFlingSpline.flingPosition(splinePos).velocityCoefficient *
-                    distance / duration * 1000.0f
+                distance / duration * 1000.0f
         }
     }
 }

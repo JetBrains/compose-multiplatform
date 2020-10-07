@@ -93,7 +93,8 @@ fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed 
  * @param shape shape of the border
  */
 @Deprecated(
-    "Use Modifier.border instead", replaceWith = ReplaceWith(
+    "Use Modifier.border instead",
+    replaceWith = ReplaceWith(
         "this.border(BorderStroke(border.size, border.brush), shape)",
         "androidx.ui.foundation.border"
     )
@@ -113,7 +114,8 @@ fun Modifier.drawBorder(border: Border, shape: Shape = RectangleShape) =
  * @param shape shape of the border
  */
 @Deprecated(
-    "Use Modifier.border instead", replaceWith = ReplaceWith(
+    "Use Modifier.border instead",
+    replaceWith = ReplaceWith(
         "this.border(size, color, shape)",
         "androidx.ui.foundation.border"
     )
@@ -133,7 +135,8 @@ fun Modifier.drawBorder(size: Dp, color: Color, shape: Shape = RectangleShape) =
  * @param shape shape of the border
  */
 @Deprecated(
-    "Use Modifier.border instead", replaceWith = ReplaceWith(
+    "Use Modifier.border instead",
+    replaceWith = ReplaceWith(
         "this.border(size, brush, shape)",
         "androidx.ui.foundation.border"
     )

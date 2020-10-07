@@ -128,8 +128,10 @@ class LazyRowTest {
                     Spacer(Modifier.preferredWidth(40.dp).fillParentMaxHeight().testTag(it))
                 }
                 itemsIndexed(indexedItems) { index, item ->
-                    Spacer(Modifier.preferredWidth(41.dp).fillParentMaxHeight()
-                        .testTag("$index-$item"))
+                    Spacer(
+                        Modifier.preferredWidth(41.dp).fillParentMaxHeight()
+                            .testTag("$index-$item")
+                    )
                 }
             }
         }

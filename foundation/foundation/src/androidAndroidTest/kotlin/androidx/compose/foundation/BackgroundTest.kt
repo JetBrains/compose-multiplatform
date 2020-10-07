@@ -153,9 +153,11 @@ class BackgroundTest {
         assertThat(modifier.nameFallback).isEqualTo("background")
         assertThat(modifier.valueOverride).isEqualTo(Color.Magenta)
         assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(modifier.javaClass.declaredFields
-                .filter { !it.isSynthetic && !exclusions.contains(it.name) }
-                .map { it.name })
+            .containsExactlyElementsIn(
+                modifier.javaClass.declaredFields
+                    .filter { !it.isSynthetic && !exclusions.contains(it.name) }
+                    .map { it.name }
+            )
     }
 
     @Composable

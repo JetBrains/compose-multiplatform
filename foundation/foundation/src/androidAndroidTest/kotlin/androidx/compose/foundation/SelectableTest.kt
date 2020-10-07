@@ -95,7 +95,8 @@ class SelectableTest {
                 "Text in item",
                 modifier = Modifier.selectable(
                     selected = selected,
-                    onClick = {})
+                    onClick = {}
+                )
             )
         }
 
@@ -111,11 +112,13 @@ class SelectableTest {
 
         rule.setContent {
             Box {
-                Box(Modifier.selectable(
-                    selected = true,
-                    interactionState = interactionState,
-                    onClick = {}
-                )) {
+                Box(
+                    Modifier.selectable(
+                        selected = true,
+                        interactionState = interactionState,
+                        onClick = {}
+                    )
+                ) {
                     Text("SelectableText")
                 }
             }
@@ -148,11 +151,13 @@ class SelectableTest {
         rule.setContent {
             Box {
                 if (emitSelectableText) {
-                    Box(Modifier.selectable(
-                        selected = true,
-                        interactionState = interactionState,
-                        onClick = {}
-                    )) {
+                    Box(
+                        Modifier.selectable(
+                            selected = true,
+                            interactionState = interactionState,
+                            onClick = {}
+                        )
+                    ) {
                         Text("SelectableText")
                     }
                 }

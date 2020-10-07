@@ -43,17 +43,20 @@ class CutCornerShapeTest {
         val cut = CutCornerShape(10.0f)
 
         val outline = cut.toOutline() as Outline.Generic
-        assertPathsEquals(outline.path, Path().apply {
-            moveTo(0f, 10f)
-            lineTo(10f, 0f)
-            lineTo(90f, 0f)
-            lineTo(100f, 10f)
-            lineTo(100f, 140f)
-            lineTo(90f, 150f)
-            lineTo(10f, 150f)
-            lineTo(0f, 140f)
-            close()
-        })
+        assertPathsEquals(
+            outline.path,
+            Path().apply {
+                moveTo(0f, 10f)
+                lineTo(10f, 0f)
+                lineTo(90f, 0f)
+                lineTo(100f, 10f)
+                lineTo(100f, 140f)
+                lineTo(90f, 150f)
+                lineTo(10f, 150f)
+                lineTo(0f, 140f)
+                close()
+            }
+        )
     }
 
     @Test
@@ -70,17 +73,20 @@ class CutCornerShapeTest {
         )
 
         val outline = cut.toOutline() as Outline.Generic
-        assertPathsEquals(outline.path, Path().apply {
-            moveTo(0f, 12f)
-            lineTo(12f, 0f)
-            lineTo(78f, 0f)
-            lineTo(100f, 22f)
-            lineTo(100f, 118f)
-            lineTo(68f, 150f)
-            lineTo(42f, 150f)
-            lineTo(0f, 108f)
-            close()
-        })
+        assertPathsEquals(
+            outline.path,
+            Path().apply {
+                moveTo(0f, 12f)
+                lineTo(12f, 0f)
+                lineTo(78f, 0f)
+                lineTo(100f, 22f)
+                lineTo(100f, 118f)
+                lineTo(68f, 150f)
+                lineTo(42f, 150f)
+                lineTo(0f, 108f)
+                close()
+            }
+        )
     }
 
     @Test
@@ -106,10 +112,11 @@ class CutCornerShapeTest {
     fun cutCornerUpdateAllCornerSize() {
         assertThat(
             CutCornerShape(10.0f).copy(
-            CornerSize(
-                5.0f
+                CornerSize(
+                    5.0f
+                )
             )
-        ))
+        )
             .isEqualTo(CutCornerShape(5.0f))
     }
 
@@ -117,9 +124,10 @@ class CutCornerShapeTest {
     fun cutCornerUpdateTwoCornerSizes() {
         assertThat(
             CutCornerShape(10.0f).copy(
-            topRight = CornerSize(3.dp),
-            bottomLeft = CornerSize(50)
-        )).isEqualTo(
+                topRight = CornerSize(3.dp),
+                bottomLeft = CornerSize(50)
+            )
+        ).isEqualTo(
             CutCornerShape(
                 topLeft = CornerSize(10.0f),
                 topRight = CornerSize(3.dp),
@@ -137,8 +145,8 @@ fun assertPathsEquals(path1: Path, path2: Path) {
     val reverseDiff = Path()
     Assert.assertTrue(
         diff.op(path1, path2, PathOperation.difference) &&
-                reverseDiff.op(path2, path1, PathOperation.difference) &&
-                diff.isEmpty &&
-                reverseDiff.isEmpty
+            reverseDiff.op(path2, path1, PathOperation.difference) &&
+            diff.isEmpty &&
+            reverseDiff.isEmpty
     )
 }

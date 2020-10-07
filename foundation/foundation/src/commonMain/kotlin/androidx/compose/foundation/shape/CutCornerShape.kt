@@ -48,21 +48,23 @@ class CutCornerShape(
         bottomLeft: Float
     ) = if (topLeft + topRight + bottomLeft + bottomRight == 0.0f) {
         Outline.Rectangle(size.toRect())
-    } else Outline.Generic(Path().apply {
-        var cornerSize = topLeft
-        moveTo(0f, cornerSize)
-        lineTo(cornerSize, 0f)
-        cornerSize = topRight
-        lineTo(size.width - cornerSize, 0f)
-        lineTo(size.width, cornerSize)
-        cornerSize = bottomRight
-        lineTo(size.width, size.height - cornerSize)
-        lineTo(size.width - cornerSize, size.height)
-        cornerSize = bottomLeft
-        lineTo(cornerSize, size.height)
-        lineTo(0f, size.height - cornerSize)
-        close()
-    })
+    } else Outline.Generic(
+        Path().apply {
+            var cornerSize = topLeft
+            moveTo(0f, cornerSize)
+            lineTo(cornerSize, 0f)
+            cornerSize = topRight
+            lineTo(size.width - cornerSize, 0f)
+            lineTo(size.width, cornerSize)
+            cornerSize = bottomRight
+            lineTo(size.width, size.height - cornerSize)
+            lineTo(size.width - cornerSize, size.height)
+            cornerSize = bottomLeft
+            lineTo(cornerSize, size.height)
+            lineTo(0f, size.height - cornerSize)
+            close()
+        }
+    )
 
     override fun copy(
         topLeft: CornerSize,
@@ -78,7 +80,7 @@ class CutCornerShape(
 
     override fun toString(): String {
         return "CutCornerShape(topLeft = $topLeft, topRight = $topRight, bottomRight = " +
-                "$bottomRight, bottomLeft = $bottomLeft)"
+            "$bottomRight, bottomLeft = $bottomLeft)"
     }
 }
 

@@ -49,7 +49,8 @@ fun BorderStroke(width: Dp, color: Color) = BorderStroke(width, SolidColor(color
  */
 @Immutable
 @Deprecated(
-    "Use BorderStroke instead", replaceWith = ReplaceWith(
+    "Use BorderStroke instead",
+    replaceWith = ReplaceWith(
         "BorderStroke(size, brush)",
         "androidx.ui.foundation.BorderStroke"
     )
@@ -64,7 +65,8 @@ data class Border(val size: Dp, val brush: Brush)
  */
 @Stable
 @Deprecated(
-    "Use BorderStroke instead", replaceWith = ReplaceWith(
+    "Use BorderStroke instead",
+    replaceWith = ReplaceWith(
         "BorderStroke(size, color)",
         "androidx.ui.foundation.BorderStroke"
     )

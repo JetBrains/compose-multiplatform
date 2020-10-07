@@ -47,14 +47,14 @@ class ProgressSemanticsTest {
         val progress = mutableStateOf(0f)
 
         rule.setContent {
-                Box(
-                    Modifier
-                        .testTag(tag)
-                        .progressSemantics(progress.value)
-                        .preferredSize(50.dp)
-                        .background(color = Color.Cyan)
-                )
-            }
+            Box(
+                Modifier
+                    .testTag(tag)
+                    .progressSemantics(progress.value)
+                    .preferredSize(50.dp)
+                    .background(color = Color.Cyan)
+            )
+        }
 
         rule.onNodeWithTag(tag)
             .assertValueEquals("0 percent")
@@ -82,14 +82,14 @@ class ProgressSemanticsTest {
         val tag = "linear"
 
         rule.setContent {
-                Box(
-                    Modifier
-                        .testTag(tag)
-                        .progressSemantics()
-                        .preferredSize(50.dp)
-                        .background(color = Color.Cyan)
-                )
-            }
+            Box(
+                Modifier
+                    .testTag(tag)
+                    .progressSemantics()
+                    .preferredSize(50.dp)
+                    .background(color = Color.Cyan)
+            )
+        }
 
         rule.onNodeWithTag(tag)
             .assertValueEquals(Strings.InProgress)
