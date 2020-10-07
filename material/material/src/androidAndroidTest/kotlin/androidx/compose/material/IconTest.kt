@@ -38,7 +38,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class IconTest {
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun vector_materialIconSize_dimensions() {

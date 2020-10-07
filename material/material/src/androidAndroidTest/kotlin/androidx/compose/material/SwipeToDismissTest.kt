@@ -46,7 +46,7 @@ import org.junit.runners.JUnit4
 class SwipeToDismissTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val backgroundTag = "background"
     private val dismissContentTag = "dismissContent"

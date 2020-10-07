@@ -42,7 +42,7 @@ class ProgressIndicatorTest {
     private val ExpectedLinearHeight = 4.dp
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun determinateLinearProgressIndicator_Progress() {
@@ -82,6 +82,7 @@ class ProgressIndicatorTest {
     fun indeterminateLinearProgressIndicator_progress() {
         val tag = "linear"
 
+        rule.clockTestRule.pauseClock()
         rule.setMaterialContent {
             LinearProgressIndicator(modifier = Modifier.testTag(tag))
         }
@@ -92,6 +93,7 @@ class ProgressIndicatorTest {
 
     @Test
     fun indeterminateLinearProgressIndicator_Size() {
+        rule.clockTestRule.pauseClock()
         rule
             .setMaterialContentForSizeAssertions {
                 LinearProgressIndicator()
@@ -140,6 +142,7 @@ class ProgressIndicatorTest {
     fun indeterminateCircularProgressIndicator_progress() {
         val tag = "circular"
 
+        rule.clockTestRule.pauseClock()
         rule.setMaterialContent {
             CircularProgressIndicator(modifier = Modifier.testTag(tag))
         }
@@ -150,6 +153,7 @@ class ProgressIndicatorTest {
 
     @Test
     fun indeterminateCircularProgressIndicator_Size() {
+        rule.clockTestRule.pauseClock()
         rule
             .setMaterialContentForSizeAssertions {
                 CircularProgressIndicator()

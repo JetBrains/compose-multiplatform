@@ -48,7 +48,7 @@ import org.junit.runners.JUnit4
 class BackdropScaffoldTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val peekHeight = 75.dp
     private val headerHeight = 100.dp

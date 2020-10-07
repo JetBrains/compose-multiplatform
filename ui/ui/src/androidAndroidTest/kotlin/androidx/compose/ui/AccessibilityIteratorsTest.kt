@@ -51,7 +51,7 @@ import kotlin.math.abs
 @RunWith(JUnit4::class)
 class AccessibilityIteratorsTest {
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val InputText = List(500) { "Line: $it" }.joinToString("\n")
     private val TextFieldTag = "textFieldTag"

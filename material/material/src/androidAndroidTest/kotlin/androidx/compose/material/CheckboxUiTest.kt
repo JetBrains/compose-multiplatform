@@ -45,7 +45,7 @@ import org.junit.runners.JUnit4
 class CheckboxUiTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val defaultTag = "myCheckbox"
 

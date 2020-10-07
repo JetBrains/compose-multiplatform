@@ -64,7 +64,7 @@ class TabTest {
     private val icon = Icons.Filled.Favorite
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun textTab_height() {

@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit
 class PopupAlignmentTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val testTag = "testedPopup"
     private val offset = IntOffset(10, 10)

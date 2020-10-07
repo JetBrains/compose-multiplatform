@@ -22,7 +22,6 @@ import androidx.compose.runtime.key
 import androidx.test.filters.MediumTest
 import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

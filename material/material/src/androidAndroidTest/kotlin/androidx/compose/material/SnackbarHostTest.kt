@@ -42,7 +42,7 @@ import org.junit.runners.JUnit4
 class SnackbarHostTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun snackbarHost_observePushedData() {

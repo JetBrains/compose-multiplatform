@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit
 class PopupTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val testTag = "testedPopup"
     private val offset = IntOffset(10, 10)
