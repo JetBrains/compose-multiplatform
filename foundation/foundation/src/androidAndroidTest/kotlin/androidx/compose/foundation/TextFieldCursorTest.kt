@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
@@ -42,6 +44,7 @@ import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasInputMethodsSupport
 import androidx.ui.test.performClick
+import androidx.ui.test.performTextReplacement
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -189,6 +192,55 @@ class TextFieldCursorTest {
                 backgroundColor = Color.White,
                 shapeOverlapPixelCount = 0.0f
             )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun cursorNotBlinking_whileTyping() = with(rule.density) {
+        val width = 10.dp
+        val height = 20.dp
+        val latch = CountDownLatch(1)
+        rule.setContent {
+            // The padding helps if the test is run accidentally in landscape. Landscape makes
+            // the cursor to be next to the navigation bar which affects the red color to be a bit
+            // different - possibly anti-aliasing.
+            Box(Modifier.padding(10.dp)) {
+                val text = remember { mutableStateOf(TextFieldValue("test")) }
+                CoreTextField(
+                    value = text.value,
+                    onValueChange = { text.value = it },
+                    textStyle = TextStyle(color = Color.White, background = Color.White),
+                    modifier = Modifier
+                        .preferredSize(width, height)
+                        .background(Color.White)
+                        .focusObserver { if (it.isFocused) latch.countDown() },
+                    cursorColor = Color.Red
+                )
+            }
+        }
+
+        rule.onNode(hasInputMethodsSupport()).performClick()
+        assert(latch.await(1, TimeUnit.SECONDS))
+        rule.waitForIdle()
+
+        // cursor visible first 500 ms
+        rule.clockTestRule.advanceClock(500)
+        // TODO(b/170298051) check here that cursor is visible when we have a way to control
+        //  cursor position when sending a text
+
+        // change text field value
+        rule.onNode(hasInputMethodsSupport())
+            .performTextReplacement("", true)
+        rule.waitForIdle()
+
+        // cursor would have been invisible during next 500 ms if cursor blinks while typing.
+        // To prevent blinking while typing we restart animation when new symbol is typed.
+        rule.clockTestRule.advanceClock(400)
+        with(rule.density) {
+            rule.onNode(hasInputMethodsSupport())
+                .captureToBitmap()
+                .assertCursor(2.dp, this)
+        }
     }
 
     private fun Bitmap.assertCursor(cursorWidth: Dp, density: Density) {
