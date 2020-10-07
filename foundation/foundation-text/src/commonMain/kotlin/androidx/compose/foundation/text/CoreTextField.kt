@@ -74,6 +74,7 @@ import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setSelection
@@ -381,6 +382,19 @@ fun CoreTextField(
                 false
             }
         }
+        onClick {
+            if (!state.hasFocus) {
+                focusRequester.requestFocus()
+            } else {
+                textInputService?.showSoftwareKeyboard(state.inputSession)
+            }
+            true
+        }
+        onLongClick {
+            manager.enterSelectionMode()
+            if (!state.hasFocus) focusRequester.requestFocus()
+            true
+        }
         if (!value.selection.collapsed) {
             copyText {
                 manager.copy()
@@ -393,10 +407,6 @@ fun CoreTextField(
         }
         pasteText {
             manager.paste()
-            true
-        }
-        onClick {
-            if (!state.hasFocus) focusRequester.requestFocus()
             true
         }
     }
@@ -503,7 +513,7 @@ internal class TextFieldState(
      * the selection mode, just long press on the screen. In this mode, finger movement on the
      * screen changes selection instead of moving the cursor.
      */
-    var selectionIsOn: Boolean = false
+    var selectionIsOn by mutableStateOf(false)
 
     /**
      * A flag to check if the selection start or end handle is being dragged.
