@@ -67,7 +67,7 @@ import androidx.compose.ui.util.nativeClass
  * @param radius Effects grow up to this size. If null is provided the size would be calculated
  * based on the target layout size.
  * @param color The Ripple color is usually the same color used by the text or iconography in the
- * component. If [Color.Unset] is provided the color will be calculated by
+ * component. If [Color.Unspecified] is provided the color will be calculated by
  * [RippleTheme.defaultColor]. This color will then have [RippleTheme.rippleOpacity] applied
  */
 @Composable
@@ -75,7 +75,7 @@ import androidx.compose.ui.util.nativeClass
 fun RippleIndication(
     bounded: Boolean = true,
     radius: Dp? = null,
-    color: Color = Color.Unset
+    color: Color = Color.Unspecified
 ): RippleIndication {
     val theme = AmbientRippleTheme.current
     val clock = AnimationClockAmbient.current.asDisposableClock()

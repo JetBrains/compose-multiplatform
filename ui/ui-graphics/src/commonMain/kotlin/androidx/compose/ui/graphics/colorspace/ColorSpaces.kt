@@ -259,7 +259,7 @@ object ColorSpaces {
     /**
      * This identifies the 'None' color.
      */
-    internal val Unset = Rgb(
+    internal val Unspecified = Rgb(
         "None",
         SrgbPrimaries,
         Illuminant.D65,
@@ -323,6 +323,6 @@ object ColorSpaces {
         Acescg,
         CieXyz,
         CieLab,
-        Unset
+        Unspecified
     )
 }

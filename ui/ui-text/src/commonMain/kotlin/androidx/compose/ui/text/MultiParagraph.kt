@@ -234,7 +234,7 @@ class MultiParagraph(
     /** Paint the paragraphs to canvas. */
     fun paint(
         canvas: Canvas,
-        color: Color = Color.Unset,
+        color: Color = Color.Unspecified,
         shadow: Shadow? = null,
         decoration: TextDecoration? = null
     ) {

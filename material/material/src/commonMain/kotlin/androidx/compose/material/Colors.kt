@@ -235,7 +235,7 @@ fun darkColors(
  * [Colors.onPrimary]. If [color] is not present in the theme, this will return `null`.
  *
  * @return the matching `on` color for [color]. If [color] is not part of the theme's
- * [Colors], then returns [Color.Unset].
+ * [Colors], then returns [Color.Unspecified].
  *
  * @see contentColorFor
  */
@@ -248,7 +248,7 @@ fun Colors.contentColorFor(color: Color): Color {
         background -> onBackground
         surface -> onSurface
         error -> onError
-        else -> Color.Unset
+        else -> Color.Unspecified
     }
 }
 

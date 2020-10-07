@@ -32,7 +32,7 @@ import android.text.style.StrikethroughSpan
 import android.text.style.UnderlineSpan
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.isSet
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -264,7 +264,7 @@ private fun Spannable.setShadow(shadow: Shadow?, start: Int, end: Int) {
 }
 
 private fun Spannable.setBackground(color: Color, start: Int, end: Int) {
-    if (color.isSet) {
+    if (color.isSpecified) {
         setSpan(
             BackgroundColorSpan(color.toArgb()),
             start,
@@ -358,7 +358,7 @@ private fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: 
 }
 
 private fun Spannable.setColor(color: Color, start: Int, end: Int) {
-    if (color.isSet) {
+    if (color.isSpecified) {
         setSpan(ForegroundColorSpan(color.toArgb()), start, end)
     }
 }

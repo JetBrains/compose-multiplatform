@@ -315,12 +315,26 @@ inline class Color(val value: ULong) {
         /**
          * Because Color is an inline class, this represents an unset value
          * without having to box the Color. It will be treated as [Transparent]
-         * when drawn. A Color can compare with [Unset] for equality or use
-         * [isUnset] to check for the unset value or [isSet] for any color that isn't
-         * [Unset].
+         * when drawn. A Color can compare with [Unspecified] for equality or use
+         * [isUnspecified] to check for the unset value or [isSpecified] for any color that isn't
+         * [Unspecified].
+         */
+        @Deprecated(
+            "Use Color.Unspecified instead",
+            ReplaceWith("Color.Unspecified", "androidx.compose.ui.graphics")
+        )
+        @Stable
+        val Unset = Color(0f, 0f, 0f, 0f, ColorSpaces.Unspecified)
+
+        /**
+         * Because Color is an inline class, this represents an unset value
+         * without having to box the Color. It will be treated as [Transparent]
+         * when drawn. A Color can compare with [Unspecified] for equality or use
+         * [isUnspecified] to check for the unset value or [isSpecified] for any color that isn't
+         * [Unspecified].
          */
         @Stable
-        val Unset = Color(0f, 0f, 0f, 0f, ColorSpaces.Unset)
+        val Unspecified = Color(0f, 0f, 0f, 0f, ColorSpaces.Unspecified)
     }
 }
 
@@ -580,17 +594,37 @@ fun Color.toArgb(): Int {
 /**
  * `false` when this is [Color.Unset].
  */
+@Deprecated(
+    "Use isSpecified instead",
+    ReplaceWith("Color.isSpecified", "androidx.compose.ui.graphics")
+)
 @Stable
-inline val Color.isSet: Boolean get() = value != Color.Unset.value
+inline val Color.isSet: Boolean get() = value != Color.Unspecified.value
+
+/**
+ * `false` when this is [Color.Unspecified].
+ */
+@Stable
+inline val Color.isSpecified: Boolean get() = value != Color.Unspecified.value
 
 /**
  * `true` when this is [Color.Unset].
  */
+@Deprecated(
+    "Use Color.isUnspecified instead",
+    ReplaceWith("Color.isUnspecified", "androidx.compose.ui.graphics")
+)
 @Stable
-inline val Color.isUnset: Boolean get() = value == Color.Unset.value
+inline val Color.isUnset: Boolean get() = value == Color.Unspecified.value
+
+/**
+ * `true` when this is [Color.Unspecified].
+ */
+@Stable
+inline val Color.isUnspecified: Boolean get() = value == Color.Unspecified.value
 
 /**
  * If this [Color] [isSet] then this is returned, otherwise [block] is executed and its result
  * is returned.
  */
-inline fun Color.useOrElse(block: () -> Color): Color = if (isSet) this else block()
+inline fun Color.useOrElse(block: () -> Color): Color = if (isSpecified) this else block()

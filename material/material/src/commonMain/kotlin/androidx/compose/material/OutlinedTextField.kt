@@ -171,7 +171,7 @@ fun OutlinedTextField(
         activeColor = activeColor,
         inactiveColor = inactiveColor,
         errorColor = errorColor,
-        backgroundColor = Color.Unset,
+        backgroundColor = Color.Unspecified,
         shape = RectangleShape
     )
 }
@@ -274,7 +274,7 @@ fun OutlinedTextField(
         activeColor = activeColor,
         inactiveColor = inactiveColor,
         errorColor = errorColor,
-        backgroundColor = Color.Unset,
+        backgroundColor = Color.Unspecified,
         shape = RectangleShape
     )
 }

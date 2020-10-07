@@ -159,7 +159,7 @@ class TextFieldCursorTest {
                         .preferredSize(width, height)
                         .background(Color.White)
                         .focusObserver { if (it.isFocused) latch.countDown() },
-                    cursorColor = Color.Unset
+                    cursorColor = Color.Unspecified
                 )
             }
         }
