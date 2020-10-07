@@ -22,8 +22,9 @@ import androidx.compose.ui.LayoutModifier
 import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -55,7 +56,14 @@ fun Modifier.padding(
         top = top,
         end = end,
         bottom = bottom,
-        rtlAware = true
+        rtlAware = true,
+        inspectorInfo = debugInspectorInfo {
+            name = "padding"
+            properties["start"] = start
+            properties["top"] = top
+            properties["end"] = end
+            properties["bottom"] = bottom
+        }
     )
 )
 
@@ -80,7 +88,12 @@ fun Modifier.padding(
         top = vertical,
         end = horizontal,
         bottom = vertical,
-        rtlAware = true
+        rtlAware = true,
+        inspectorInfo = debugInspectorInfo {
+            name = "padding"
+            properties["horizontal"] = horizontal
+            properties["vertical"] = vertical
+        }
     )
 )
 
@@ -96,7 +109,19 @@ fun Modifier.padding(
  */
 @Stable
 fun Modifier.padding(all: Dp) =
-    this.then(PaddingModifier(start = all, top = all, end = all, bottom = all, rtlAware = true))
+    this.then(
+        PaddingModifier(
+            start = all,
+            top = all,
+            end = all,
+            bottom = all,
+            rtlAware = true,
+            inspectorInfo = debugInspectorInfo {
+                name = "padding"
+                value = all
+            }
+        )
+    )
 
 /**
  * Apply [PaddingValues] to the component as additional space along each edge of the content's left,
@@ -115,7 +140,14 @@ fun Modifier.padding(padding: PaddingValues) =
             top = padding.top,
             end = padding.end,
             bottom = padding.bottom,
-            rtlAware = true
+            rtlAware = true,
+            inspectorInfo = debugInspectorInfo {
+                name = "padding"
+                properties["start"] = padding.start
+                properties["top"] = padding.top
+                properties["end"] = padding.end
+                properties["bottom"] = padding.bottom
+            }
         )
     )
 
@@ -142,17 +174,25 @@ fun Modifier.absolutePadding(
         top = top,
         end = right,
         bottom = bottom,
-        rtlAware = false
+        rtlAware = false,
+        inspectorInfo = debugInspectorInfo {
+            name = "absolutePadding"
+            properties["left"] = left
+            properties["top"] = top
+            properties["right"] = right
+            properties["bottom"] = bottom
+        }
     )
 )
 
-private data class PaddingModifier(
+private class PaddingModifier(
     val start: Dp = 0.dp,
     val top: Dp = 0.dp,
     val end: Dp = 0.dp,
     val bottom: Dp = 0.dp,
-    val rtlAware: Boolean
-) : LayoutModifier, InspectableValue {
+    val rtlAware: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     init {
         require(start.value >= 0f && top.value >= 0f && end.value >= 0f && bottom.value >= 0f) {
             "Padding must be non-negative"
@@ -179,18 +219,23 @@ private data class PaddingModifier(
         }
     }
 
-    override val nameFallback = if (rtlAware) "padding" else "absolutePadding"
+    override fun hashCode(): Int {
+        var result = start.hashCode()
+        result = 31 * result + top.hashCode()
+        result = 31 * result + end.hashCode()
+        result = 31 * result + bottom.hashCode()
+        result = 31 * result + rtlAware.hashCode()
+        return result
+    }
 
-    override val valueOverride: Any?
-        get() = if (start == top && top == end && end == bottom) start else null
-
-    override val inspectableElements: Sequence<ValueElement>
-        get() = sequenceOf(
-            ValueElement(if (rtlAware) "start" else "left", start),
-            ValueElement("top", top),
-            ValueElement(if (rtlAware) "end" else "right", end),
-            ValueElement("bottom", bottom)
-        )
+    override fun equals(other: Any?): Boolean {
+        val otherModifier = other as? PaddingModifier ?: return false
+        return start == otherModifier.start &&
+                top == otherModifier.top &&
+                end == otherModifier.end &&
+                bottom == otherModifier.bottom &&
+                rtlAware == otherModifier.rtlAware
+    }
 }
 
 /**
