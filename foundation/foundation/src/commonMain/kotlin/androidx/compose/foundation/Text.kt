@@ -267,10 +267,10 @@ fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
  * styled explicitly.
  */
 @Deprecated(
-    message = "Use ThemeTextStyle.current explicitly",
+    message = "Use AmbientTextStyle.current explicitly",
     replaceWith = ReplaceWith(
-        "ThemeTextStyle.current",
-        "androidx.compose.foundation.ThemeTextStyle"
+        "AmbientTextStyle.current",
+        "androidx.compose.foundation.AmbientTextStyle"
     )
 )
 @Composable
