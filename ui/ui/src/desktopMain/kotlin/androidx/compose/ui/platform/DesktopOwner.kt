@@ -107,6 +107,7 @@ class DesktopOwner(
         container.register(this)
         snapshotObserver.enableStateUpdatesObserving(true)
         root.attach(this)
+        _focusManager.takeFocus()
     }
 
     fun dispose() {
@@ -123,6 +124,8 @@ class DesktopOwner(
 
     override val clipboardManager = DesktopClipboardManager()
 
+    internal val selectionManager = SelectionManagerTracker()
+
     override val textToolbar = DesktopTextToolbar()
 
     override val semanticsOwner: SemanticsOwner = SemanticsOwner(root)
@@ -131,12 +134,12 @@ class DesktopOwner(
 
     override val autofill: Autofill? get() = null
 
-    // TODO(demin): implement sending key events from OS
-    // (see Ralston Da Silva comment in
-    //  [https://android-review.googlesource.com/c/platform/frameworks/support/+/1372126/6])
-    // implement also key codes in androidx.compose.ui.input.key.Key
+    val keyboard: Keyboard?
+        get() = container.keyboard
+
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
-        return keyInputModifier.processKeyInput(keyEvent)
+        return keyboard?.processKeyInput(keyEvent) ?: false ||
+            keyInputModifier.processKeyInput(keyEvent)
     }
 
     override var showLayoutBounds = false

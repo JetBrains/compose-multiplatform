@@ -18,7 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.staticAmbientOf
 
-val DesktopPlatformAmbient = staticAmbientOf(::identifyCurrent)
+val DesktopPlatformAmbient = staticAmbientOf(::identifyCurrentPlatform)
 
 /**
  * Identify OS on which the application is currently running.
@@ -26,9 +26,9 @@ val DesktopPlatformAmbient = staticAmbientOf(::identifyCurrent)
  * If it is needed to know the current platform in @Composable function,
  * use [DesktopPlatformAmbient] instead of this function.
  *
- * identifyCurrent() should be used preferable only in initialization code.
+ * identifyCurrentPlatform() should be used preferable only in initialization code.
  */
-private fun identifyCurrent(): DesktopPlatform {
+fun identifyCurrentPlatform(): DesktopPlatform {
     val name = System.getProperty("os.name")
     return when {
         name.startsWith("Linux") -> DesktopPlatform.Linux

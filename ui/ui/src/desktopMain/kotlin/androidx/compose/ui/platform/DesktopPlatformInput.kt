@@ -27,13 +27,13 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.SetComposingTextEditOp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.substring
-import java.awt.Component
+import java.awt.Point
 import java.awt.Rectangle
-import java.awt.event.FocusEvent
 import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
 import java.awt.font.TextHitInfo
 import java.awt.im.InputMethodRequests
+import java.lang.UnsupportedOperationException
 import java.text.AttributedCharacterIterator
 import java.text.AttributedString
 import java.text.CharacterIterator
@@ -41,7 +41,14 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
-internal class DesktopPlatformInput(val component: Component) : PlatformTextInputService {
+interface DesktopInputComponent {
+    fun enableInput(inputMethodRequests: InputMethodRequests)
+    fun disableInput()
+    fun locationOnScreen(): Point
+}
+
+internal class DesktopPlatformInput(val component: DesktopComponent) :
+    PlatformTextInputService {
     data class CurrentInput(
         var value: TextFieldValue,
         val onEditCommand: ((List<EditOperation>) -> Unit),
@@ -62,19 +69,16 @@ internal class DesktopPlatformInput(val component: Component) : PlatformTextInpu
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
-        currentInput = CurrentInput(
+        val input = CurrentInput(
             value, onEditCommand, onImeActionPerformed, imeAction
         )
+        currentInput = input
 
-        triggerFocus()
-    }
-
-    private fun triggerFocus() {
-        val focusGainedEvent = FocusEvent(component, FocusEvent.FOCUS_GAINED)
-        component.inputContext.dispatchEvent(focusGainedEvent)
+        component.enableInput(methodRequestsForInput(input))
     }
 
     override fun stopInput() {
+        component.disableInput()
         currentInput = null
     }
 
@@ -176,88 +180,83 @@ internal class DesktopPlatformInput(val component: Component) : PlatformTextInpu
         }
     }
 
-    fun getInputMethodRequests(): InputMethodRequests? {
-        return currentInput?.let { input ->
-            object : InputMethodRequests {
-                override fun getLocationOffset(x: Int, y: Int): TextHitInfo? {
-                    println("InputMethodRequests.getLocationOffset")
-                    return null
+    fun methodRequestsForInput(input: CurrentInput) =
+        object : InputMethodRequests {
+            override fun getLocationOffset(x: Int, y: Int): TextHitInfo? {
+                throw UnsupportedOperationException()
+            }
+
+            override fun cancelLatestCommittedText(
+                attributes: Array<AttributedCharacterIterator.Attribute>?
+            ): AttributedCharacterIterator? {
+                return null
+            }
+
+            override fun getInsertPositionOffset(): Int {
+                val composedStartIndex = input.value.composition?.start ?: 0
+                val composedEndIndex = input.value.composition?.end ?: 0
+
+                val caretIndex = input.value.selection.start
+                if (caretIndex < composedStartIndex) {
+                    return caretIndex
+                }
+                if (caretIndex < composedEndIndex) {
+                    return composedStartIndex
+                }
+                return caretIndex - (composedEndIndex - composedStartIndex)
+            }
+
+            override fun getCommittedTextLength() =
+                input.value.text.length - (input.value.composition?.length ?: 0)
+
+            override fun getSelectedText(
+                attributes: Array<AttributedCharacterIterator.Attribute>?
+            ): AttributedCharacterIterator {
+                if (charKeyPressed) {
+                    needToDeletePreviousChar = true
+                }
+                val str = input.value.text.substring(input.value.selection)
+                return AttributedString(str).iterator
+            }
+
+            override fun getTextLocation(offset: TextHitInfo) =
+                input.focusedRect?.let {
+                    Rectangle(
+                        it.right.toInt() + component.locationOnScreen().x,
+                        it.bottom.toInt() + component.locationOnScreen().y,
+                        0, 0
+                    )
                 }
 
-                override fun cancelLatestCommittedText(
-                    attributes: Array<AttributedCharacterIterator.Attribute>?
-                ): AttributedCharacterIterator? {
-                    println("InputMethodRequests.cancelLatestCommittedText")
-                    return null
+            override fun getCommittedText(
+                beginIndex: Int,
+                endIndex: Int,
+                attributes: Array<AttributedCharacterIterator.Attribute>?
+            ): AttributedCharacterIterator {
+
+                val comp = input.value.composition
+                val text = input.value.text
+                if (comp == null) {
+                    val res = text.substring(beginIndex, endIndex)
+                    return AttributedString(res).iterator
                 }
 
-                override fun getInsertPositionOffset(): Int {
-                    val composedStartIndex = input.value.composition?.start ?: 0
-                    val composedEndIndex = input.value.composition?.end ?: 0
+                val composedStartIndex = comp.start
+                val composedEndIndex = comp.end
 
-                    val caretIndex = input.value.selection.start
-                    if (caretIndex < composedStartIndex) {
-                        return caretIndex
-                    }
-                    if (caretIndex < composedEndIndex) {
-                        return composedStartIndex
-                    }
-                    return caretIndex - (composedEndIndex - composedStartIndex)
+                val committed: String
+                if (beginIndex < composedStartIndex) {
+                    val end = min(endIndex, composedStartIndex)
+                    committed = text.substring(beginIndex, end)
+                } else if (composedEndIndex <= endIndex) {
+                    val begin = max(composedEndIndex, beginIndex)
+                    committed = text.substring(begin, endIndex)
+                } else {
+                    committed = ""
                 }
-
-                override fun getCommittedTextLength() =
-                    input.value.text.length - (input.value.composition?.length ?: 0)
-
-                override fun getSelectedText(
-                    attributes: Array<AttributedCharacterIterator.Attribute>?
-                ): AttributedCharacterIterator {
-                    if (charKeyPressed) {
-                        needToDeletePreviousChar = true
-                    }
-                    val str = input.value.text.substring(input.value.selection)
-                    return AttributedString(str).iterator
-                }
-
-                override fun getTextLocation(offset: TextHitInfo) =
-                    input.focusedRect?.let {
-                        Rectangle(
-                            it.right.toInt() + component.locationOnScreen.x,
-                            it.bottom.toInt() + component.locationOnScreen.y,
-                            0, 0
-                        )
-                    }
-
-                override fun getCommittedText(
-                    beginIndex: Int,
-                    endIndex: Int,
-                    attributes: Array<AttributedCharacterIterator.Attribute>?
-                ): AttributedCharacterIterator {
-
-                    val comp = input.value.composition
-                    val text = input.value.text
-                    if (comp == null) {
-                        val res = text.substring(beginIndex, endIndex)
-                        return AttributedString(res).iterator
-                    }
-
-                    val composedStartIndex = comp.start
-                    val composedEndIndex = comp.end
-
-                    val committed: String
-                    if (beginIndex < composedStartIndex) {
-                        val end = min(endIndex, composedStartIndex)
-                        committed = text.substring(beginIndex, end)
-                    } else if (composedEndIndex <= endIndex) {
-                        val begin = max(composedEndIndex, beginIndex)
-                        committed = text.substring(begin, endIndex)
-                    } else {
-                        committed = ""
-                    }
-                    return AttributedString(committed).iterator
-                }
+                return AttributedString(committed).iterator
             }
         }
-    }
 }
 
 private fun AttributedCharacterIterator.toStringUntil(index: Int): String {

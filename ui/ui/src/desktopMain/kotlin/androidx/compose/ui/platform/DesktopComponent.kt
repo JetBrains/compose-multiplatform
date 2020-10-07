@@ -16,19 +16,13 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.text.AnnotatedString
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
+import java.awt.Point
+import java.awt.im.InputMethodRequests
 
-// TODO(demin): implement ClipboardManager
-class DesktopClipboardManager : ClipboardManager {
-    val systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-    override fun getText(): AnnotatedString? {
-        println("ClipboardManager.getText not implemented yet")
-        return null
-    }
+interface DesktopComponent : DesktopInputComponent
 
-    override fun setText(annotatedString: AnnotatedString) {
-        systemClipboard.setContents(StringSelection(annotatedString.text), null)
-    }
+object DummyDesktopComponent : DesktopComponent {
+    override fun enableInput(inputMethodRequests: InputMethodRequests) {}
+    override fun disableInput() {}
+    override fun locationOnScreen() = Point(0, 0)
 }

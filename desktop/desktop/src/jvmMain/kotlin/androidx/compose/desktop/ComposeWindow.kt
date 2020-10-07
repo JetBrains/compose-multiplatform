@@ -40,7 +40,7 @@ class ComposeWindow : JFrame {
     }
 
     val parent: AppFrame
-    private val layer = FrameSkiaLayer()
+    internal val layer = FrameSkiaLayer()
     private val events = AWTDebounceEventQueue()
 
     var owners: DesktopOwners? = null
@@ -118,15 +118,15 @@ class ComposeWindow : JFrame {
         }
         layer.wrapped.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(event: KeyEvent) = events.post {
-                owners?.onKeyPressed(event.keyCode, event.keyChar)
+                owners?.onKeyPressed(event)
             }
 
             override fun keyReleased(event: KeyEvent) = events.post {
-                owners?.onKeyReleased(event.keyCode, event.keyChar)
+                owners?.onKeyReleased(event)
             }
 
             override fun keyTyped(event: KeyEvent) = events.post {
-                owners?.onKeyTyped(event.keyChar)
+                owners?.onKeyTyped(event)
             }
         })
     }
@@ -134,6 +134,7 @@ class ComposeWindow : JFrame {
     override fun setVisible(value: Boolean) {
         if (value != isVisible) {
             super.setVisible(value)
+            layer.wrapped.requestFocus()
             updateLayer()
             needRedrawLayer()
         }

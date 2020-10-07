@@ -118,6 +118,7 @@ kotlin {
         }
 
         desktopTest.dependencies {
+            implementation project(':ui:ui-test')
             implementation(TRUTH)
             implementation(JUNIT)
             implementation(MOCKITO_CORE)

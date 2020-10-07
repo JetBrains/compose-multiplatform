@@ -16,19 +16,19 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.text.AnnotatedString
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
+import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.plus
 
-// TODO(demin): implement ClipboardManager
-class DesktopClipboardManager : ClipboardManager {
-    val systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-    override fun getText(): AnnotatedString? {
-        println("ClipboardManager.getText not implemented yet")
-        return null
-    }
+val SelectionManagerTrackerAmbient = staticAmbientOf<SelectionManagerTracker>()
 
-    override fun setText(annotatedString: AnnotatedString) {
-        systemClipboard.setContents(StringSelection(annotatedString.text), null)
+class SelectionManagerTracker {
+    internal var recentManager: DesktopSelectionManager? = null
+}
+
+val copyToClipboardKeySet by lazy {
+    when (identifyCurrentPlatform()) {
+        DesktopPlatform.MacOS -> Key.MetaLeft + Key.C
+        else -> Key.CtrlLeft + Key.C
     }
 }

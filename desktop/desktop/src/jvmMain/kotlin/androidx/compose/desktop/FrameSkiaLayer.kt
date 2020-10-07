@@ -16,6 +16,7 @@
 
 package androidx.compose.desktop
 
+import androidx.compose.ui.platform.DesktopComponent
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
@@ -23,6 +24,8 @@ import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import java.awt.DisplayMode
+import java.awt.event.FocusEvent
+import java.awt.im.InputMethodRequests
 
 internal class FrameSkiaLayer {
     var renderer: Renderer? = null
@@ -42,12 +45,31 @@ internal class FrameSkiaLayer {
         wrapped.redrawLayer()
     }
 
-    val wrapped = object : SkiaLayer() {
+    inner class Wrapped : SkiaLayer(), DesktopComponent {
+        var currentInputMethodRequests: InputMethodRequests? = null
+
+        override fun getInputMethodRequests() = currentInputMethodRequests
+
         override fun redrawLayer() {
             preparePicture(frameNanoTime)
             super.redrawLayer()
         }
+
+        override fun enableInput(inputMethodRequests: InputMethodRequests) {
+            currentInputMethodRequests = inputMethodRequests
+            enableInputMethods(true)
+            val focusGainedEvent = FocusEvent(this, FocusEvent.FOCUS_GAINED)
+            inputContext.dispatchEvent(focusGainedEvent)
+        }
+
+        override fun disableInput() {
+            currentInputMethodRequests = null
+        }
+
+        override fun locationOnScreen() = locationOnScreen
     }
+
+    val wrapped = Wrapped()
 
     init {
         wrapped.renderer = object : SkiaRenderer {
