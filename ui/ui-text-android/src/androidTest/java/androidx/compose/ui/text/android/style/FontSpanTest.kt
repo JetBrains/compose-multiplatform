@@ -17,10 +17,15 @@
 package androidx.compose.ui.text.android.style
 
 import android.graphics.Typeface
+import android.graphics.fonts.FontStyle
 import android.text.TextPaint
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -38,5 +43,55 @@ class FontSpanTest {
         assertThat(textPaint.typeface).isNotSameInstanceAs(typeface)
         span.updatePaint(textPaint)
         assertThat(textPaint.typeface).isSameInstanceAs(typeface)
+    }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = 27)
+    fun updatePaint_bold_belowAPI27() {
+        val textPaint = TextPaint()
+        textPaint.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
+        val getFont = mock<(Int, Boolean) -> Typeface>()
+        val span = FontSpan(getFont)
+
+        span.updatePaint(textPaint)
+        verify(getFont, times(1)).invoke(FontStyle.FONT_WEIGHT_BOLD, false)
+    }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = 27)
+    fun updatePaint_italic_belowAPI27() {
+        val textPaint = TextPaint()
+        textPaint.typeface = Typeface.defaultFromStyle(Typeface.ITALIC)
+        val getFont = mock<(Int, Boolean) -> Typeface>()
+        val span = FontSpan(getFont)
+
+        span.updatePaint(textPaint)
+        verify(getFont, times(1)).invoke(FontStyle.FONT_WEIGHT_NORMAL, true)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 28)
+    fun updatePaint_extraLight_aboveAPI28() {
+        val textPaint = TextPaint()
+        val fontWeight = FontStyle.FONT_WEIGHT_EXTRA_LIGHT
+        textPaint.typeface = Typeface.create(null, fontWeight, false)
+        val getFont = mock<(Int, Boolean) -> Typeface>()
+        val span = FontSpan(getFont)
+
+        span.updatePaint(textPaint)
+        verify(getFont, times(1)).invoke(fontWeight, false)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 28)
+    fun updatePaint_italic_aboveAPI28() {
+        val textPaint = TextPaint()
+        val italic = true
+        textPaint.typeface = Typeface.create(null, FontStyle.FONT_WEIGHT_NORMAL, italic)
+        val getFont = mock<(Int, Boolean) -> Typeface>()
+        val span = FontSpan(getFont)
+
+        span.updatePaint(textPaint)
+        verify(getFont, times(1)).invoke(FontStyle.FONT_WEIGHT_NORMAL, italic)
     }
 }
