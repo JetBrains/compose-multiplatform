@@ -420,7 +420,7 @@ fun CoreTextField(
         .then(focusObserver)
         .then(cursorModifier)
         .then(dragPositionGestureModifier)
-        .then(if (state.hasFocus) selectionLongPressModifier else Modifier)
+        .then(selectionLongPressModifier)
         .then(focusRequestTapModifier)
         .then(drawModifier)
         .then(onPositionedModifier)
