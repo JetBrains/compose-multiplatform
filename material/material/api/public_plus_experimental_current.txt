@@ -166,21 +166,20 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void Card-IHU7g64(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface CheckboxColors {
+    method public long borderColor-0d7_KjU(boolean enabled, androidx.compose.foundation.selection.ToggleableState state);
+    method public long boxColor-0d7_KjU(boolean enabled, androidx.compose.foundation.selection.ToggleableState state);
+    method public long checkmarkColor-0d7_KjU(androidx.compose.foundation.selection.ToggleableState state);
+  }
+
   public final class CheckboxConstants {
-    method @androidx.compose.runtime.Composable public long animateDefaultBorderColor-xAuy4YE(androidx.compose.foundation.selection.ToggleableState state, boolean enabled, optional long checkedColor, optional long uncheckedColor, optional long disabledColor, optional long disabledIndeterminateColor);
-    method @androidx.compose.runtime.Composable public long animateDefaultBoxColor-4eRnVYk(androidx.compose.foundation.selection.ToggleableState state, boolean enabled, optional long checkedColor, optional long uncheckedColor, optional long disabledCheckedColor, optional long disabledUncheckedColor, optional long disabledIndeterminateColor);
-    method @androidx.compose.runtime.Composable public long animateDefaultCheckmarkColor-9THJUkw(androidx.compose.foundation.selection.ToggleableState state, optional long checkedColor, optional long uncheckedColor);
-    method @androidx.compose.runtime.Composable public long defaultDisabledIndeterminateColor-8_81llA(long checkedColor);
-    method public long getDefaultDisabledColor-0d7_KjU();
-    method public long getDefaultUncheckedColor-0d7_KjU();
-    property public final long defaultDisabledColor;
-    property public final long defaultUncheckedColor;
+    method @androidx.compose.runtime.Composable public androidx.compose.material.CheckboxColors defaultColors-QGkLkJU(optional long checkedColor, optional long uncheckedColor, optional long checkmarkColor, optional long disabledColor, optional long disabledIndeterminateColor);
     field public static final androidx.compose.material.CheckboxConstants INSTANCE;
   }
 
   public final class CheckboxKt {
-    method @androidx.compose.runtime.Composable public static void Checkbox-JW8VE8g(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional long checkedColor, optional long uncheckedColor);
-    method @androidx.compose.runtime.Composable public static void TriStateCheckbox-yIvEug4(androidx.compose.foundation.selection.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional long checkMarkColor, optional long boxColor, optional long borderColor);
+    method @androidx.compose.runtime.Composable public static void Checkbox(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.CheckboxColors colors);
+    method @androidx.compose.runtime.Composable public static void TriStateCheckbox(androidx.compose.foundation.selection.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.CheckboxColors colors);
   }
 
   @androidx.compose.runtime.Stable public final class Colors {
