@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.draw
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -36,7 +38,6 @@ import androidx.test.filters.SmallTest
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,6 +51,7 @@ class InvalidatingNotPlacedChildTest {
     val composeTestRule = createComposeRule()
 
     @Test
+    @RequiresApi(Build.VERSION_CODES.O)
     fun childIsDisplayedWhenItWasNotPlacedOriginallyButPlacedLater() {
         val shouldPlace = mutableStateOf(false)
         composeTestRule.setContent {
@@ -80,6 +82,7 @@ class InvalidatingNotPlacedChildTest {
     }
 
     @Test
+    @RequiresApi(Build.VERSION_CODES.O)
     fun grandChildIsDisplayedWhenItWasNotPlacedOriginallyButPlacedLater() {
         val shouldPlace = mutableStateOf(false)
         composeTestRule.setContent {
@@ -112,6 +115,7 @@ class InvalidatingNotPlacedChildTest {
     }
 
     @Test
+    @RequiresApi(Build.VERSION_CODES.O)
     fun grandChildIsDisplayedCorrectlyWhenTheColorWasChangedWhileNotPlaced() {
         val shouldPlace = mutableStateOf(false)
         var color by mutableStateOf(Color.Gray)
