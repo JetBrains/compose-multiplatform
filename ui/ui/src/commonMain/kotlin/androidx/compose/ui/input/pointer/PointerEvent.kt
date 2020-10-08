@@ -376,3 +376,17 @@ fun PointerInputChange.consumeAllChanges() {
     this.consumeDownChange()
     this.consumePositionChange(remainingPositionChange.x, remainingPositionChange.y)
 }
+
+/**
+ * Returns `true` if the pointer has moved outside of the region of
+ * `(0, 0, size.width, size.height)` or `false` if the current pointer is up or it is inside the
+ * given bounds.
+ */
+fun PointerInputChange.isOutOfBounds(size: IntSize): Boolean {
+    val position = current.position ?: return false
+    val x = position.x
+    val y = position.y
+    val width = size.width
+    val height = size.height
+    return x < 0f || x > width || y < 0f || y > height
+}
