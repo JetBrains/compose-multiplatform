@@ -36,7 +36,8 @@ interface TextToolbar {
         rect: Rect,
         onCopyRequested: ActionCallback? = null,
         onPasteRequested: ActionCallback? = null,
-        onCutRequested: ActionCallback? = null
+        onCutRequested: ActionCallback? = null,
+        onSelectAllRequested: ActionCallback? = null
     )
 
     /**

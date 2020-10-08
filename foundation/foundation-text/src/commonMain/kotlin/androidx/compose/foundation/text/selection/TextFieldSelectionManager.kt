@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.max
 import kotlin.math.min
 
@@ -176,7 +177,7 @@ internal class TextFieldSelectionManager() {
         override fun onStop(velocity: Offset) {
             super.onStop(velocity)
             state?.showFloatingToolbar = true
-            showSelectionToolbar()
+            if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
         }
     }
 
@@ -227,7 +228,7 @@ internal class TextFieldSelectionManager() {
                 super.onStop(velocity)
                 state?.draggingHandle = false
                 state?.showFloatingToolbar = true
-                showSelectionToolbar()
+                if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
             }
         }
     }
@@ -337,6 +338,17 @@ internal class TextFieldSelectionManager() {
         setSelectionStatus(false)
     }
 
+    @VisibleForTesting
+    internal fun selectAll() {
+        setSelectionStatus(true)
+
+        val newValue = TextFieldValue(
+            text = value.text,
+            selection = TextRange(0, value.text.length)
+        )
+        onValueChange(newValue)
+    }
+
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
         return if (isStartHandle)
             getSelectionHandleCoordinates(
@@ -381,11 +393,18 @@ internal class TextFieldSelectionManager() {
             }
         } else null
 
+        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length) {
+            {
+                selectAll()
+            }
+        } else null
+
         textToolbar?.showMenu(
             rect = getContentRect(),
             onCopyRequested = copy,
             onPasteRequested = paste,
-            onCutRequested = cut
+            onCutRequested = cut,
+            onSelectAllRequested = selectAll
         )
     }
 
