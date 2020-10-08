@@ -16,7 +16,13 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.AnimatedValueModel
+import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animate
+import androidx.compose.animation.asDisposableClock
+import androidx.compose.animation.core.AnimatedValue
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
@@ -30,6 +36,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -59,10 +67,10 @@ import androidx.compose.ui.unit.dp
  * present on this RadioButton. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this RadioButton in different [Interaction]s.
- * @param color color of the RadioButton. See [RadioButtonConstants.animateDefaultColor] for
- * customizing the color of the RadioButton in one / multiple states, such as when [selected] or
- * not [enabled].
+ * @param colors [RadioButtonColors] that will be used to resolve the color used for this
+ * RadioButton in different states. See [RadioButtonConstants.defaultColors].
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RadioButton(
     selected: Boolean,
@@ -70,7 +78,7 @@ fun RadioButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    color: Color = RadioButtonConstants.animateDefaultColor(selected, enabled)
+    colors: RadioButtonColors = RadioButtonConstants.defaultColors()
 ) {
     val dotRadius = animate(
         target = if (selected) RadioButtonDotSize / 2 else 0.dp,
@@ -89,8 +97,28 @@ fun RadioButton(
             .padding(RadioButtonPadding)
             .size(RadioButtonSize)
     ) {
-        drawRadio(color, dotRadius)
+        val radioColor = colors.radioColor(enabled, selected)
+        drawRadio(radioColor, dotRadius)
     }
+}
+
+/**
+ * Represents the color used by a [RadioButton] in different states.
+ *
+ * See [RadioButtonConstants.defaultColors] for the default implementation that follows Material
+ * specifications.
+ */
+@ExperimentalMaterialApi
+@Stable
+interface RadioButtonColors {
+    /**
+     * Represents the main color used to draw the outer and inner circles, depending on whether
+     * the [RadioButton] is [enabled] / [selected].
+     *
+     * @param enabled whether the [RadioButton] is enabled
+     * @param selected whether the [RadioButton] is selected
+     */
+    fun radioColor(enabled: Boolean, selected: Boolean): Color
 }
 
 /**
@@ -98,23 +126,57 @@ fun RadioButton(
  */
 object RadioButtonConstants {
     /**
-     * Represents the default color used for a [RadioButton] as it animates between states.
+     * Creates a [RadioButtonColors] that will animate between the provided colors according to
+     * the Material specification.
      *
-     * @param selected whether the RadioButton is selected
-     * @param enabled whether the RadioButton is enabled
      * @param selectedColor the color to use for the RadioButton when selected and enabled.
      * @param unselectedColor the color to use for the RadioButton when unselected and enabled.
      * @param disabledColor the color to use for the RadioButton when disabled.
      * @return the resulting [Color] used for the RadioButton
      */
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun animateDefaultColor(
-        selected: Boolean,
-        enabled: Boolean,
+    fun defaultColors(
         selectedColor: Color = MaterialTheme.colors.secondary,
-        unselectedColor: Color = defaultUnselectedColor,
-        disabledColor: Color = defaultDisabledColor
-    ): Color {
+        unselectedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+        disabledColor: Color = AmbientEmphasisLevels.current.disabled.applyEmphasis(
+            MaterialTheme.colors.onSurface
+        )
+    ): RadioButtonColors {
+        val clock = AnimationClockAmbient.current.asDisposableClock()
+        return remember(
+            selectedColor,
+            unselectedColor,
+            disabledColor,
+            clock
+        ) {
+            DefaultRadioButtonColors(selectedColor, unselectedColor, disabledColor, clock)
+        }
+    }
+}
+
+private fun DrawScope.drawRadio(color: Color, dotRadius: Dp) {
+    val strokeWidth = RadioStrokeWidth.toPx()
+    drawCircle(color, RadioRadius.toPx() - strokeWidth / 2, style = Stroke(strokeWidth))
+    if (dotRadius > 0.dp) {
+        drawCircle(color, dotRadius.toPx() - strokeWidth / 2, style = Fill)
+    }
+}
+
+/**
+ * Default [RadioButtonColors] implementation.
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Stable
+private class DefaultRadioButtonColors(
+    private val selectedColor: Color,
+    private val unselectedColor: Color,
+    private val disabledColor: Color,
+    private val clock: AnimationClockObservable
+) : RadioButtonColors {
+    private lateinit var animatedColor: AnimatedValue<Color, AnimationVector4D>
+
+    override fun radioColor(enabled: Boolean, selected: Boolean): Color {
         val target = when {
             !enabled -> disabledColor
             !selected -> unselectedColor
@@ -124,32 +186,21 @@ object RadioButtonConstants {
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            animate(target, tween(durationMillis = RadioAnimationDuration))
+            if (!::animatedColor.isInitialized) {
+                animatedColor = AnimatedValueModel(
+                    initialValue = target,
+                    typeConverter = (Color.VectorConverter)(target.colorSpace),
+                    clock = clock
+                )
+            }
+
+            if (animatedColor.targetValue != target) {
+                animatedColor.animateTo(target, tween(durationMillis = RadioAnimationDuration))
+            }
+            animatedColor.value
         } else {
             target
         }
-    }
-
-    /**
-     * Default color that will be used for a RadioButton when unselected
-     */
-    @Composable
-    val defaultUnselectedColor: Color
-        get() = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-
-    /**
-     * Default color that will be used for a RadioButton when disabled
-     */
-    @Composable
-    val defaultDisabledColor: Color
-        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
-}
-
-private fun DrawScope.drawRadio(color: Color, dotRadius: Dp) {
-    val strokeWidth = RadioStrokeWidth.toPx()
-    drawCircle(color, RadioRadius.toPx() - strokeWidth / 2, style = Stroke(strokeWidth))
-    if (dotRadius > 0.dp) {
-        drawCircle(color, dotRadius.toPx() - strokeWidth / 2, style = Fill)
     }
 }
 
