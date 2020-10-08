@@ -53,7 +53,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
     val agpDependency: String = AGP_LATEST
 
     @get:Input
-    val navigationCommon: String = "androidx.navigation:navigation-common:2.3.0"
+    val navigationCommon: String = "androidx.navigation:navigation-common:2.0.0"
 
     @get:Input
     val kotlinStdlib: String = KOTLIN_STDLIB
