@@ -71,19 +71,26 @@ import kotlin.math.roundToInt
  * @sample androidx.compose.foundation.samples.ControlledScrollableRowSample
  *
  * @param initial initial scroller position to start with
+ * @param interactionState [InteractionState] that will be updated when the element with this
+ * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
+ * the fling (or smooth scroll) is in progress, use [ScrollState.isAnimationRunning].
  */
 @Composable
-fun rememberScrollState(initial: Float = 0f): ScrollState {
+fun rememberScrollState(
+    initial: Float = 0f,
+    interactionState: InteractionState? = null
+): ScrollState {
     val clock = AnimationClockAmbient.current.asDisposableClock()
     val config = defaultFlingConfig()
     return rememberSavedInstanceState(
-        clock, config,
-        saver = ScrollState.Saver(config, clock)
+        clock, config, interactionState,
+        saver = ScrollState.Saver(config, clock, interactionState)
     ) {
         ScrollState(
             flingConfig = config,
             initial = initial,
-            animationClock = clock
+            animationClock = clock,
+            interactionState = interactionState
         )
     }
 }
@@ -102,12 +109,16 @@ fun rememberScrollState(initial: Float = 0f): ScrollState {
  * @param initial value of the scroll
  * @param flingConfig fling configuration to use for flinging
  * @param animationClock animation clock to run flinging and smooth scrolling on
+ * @param interactionState [InteractionState] that will be updated when the element with this
+ * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
+ * the fling (or smooth scroll) is in progress, use [ScrollState.isAnimationRunning].
  */
 @Stable
 class ScrollState(
     initial: Float,
     internal val flingConfig: FlingConfig,
-    animationClock: AnimationClockObservable
+    animationClock: AnimationClockObservable,
+    interactionState: InteractionState? = null
 ) {
 
     /**
@@ -141,7 +152,8 @@ class ScrollState(
                 val consumed = newValue - value
                 value += consumed
                 consumed
-            }
+            },
+            interactionState = interactionState
         )
 
     /**
@@ -212,10 +224,11 @@ class ScrollState(
          */
         fun Saver(
             flingConfig: FlingConfig,
-            animationClock: AnimationClockObservable
+            animationClock: AnimationClockObservable,
+            interactionState: InteractionState?
         ): Saver<ScrollState, *> = Saver<ScrollState, Float>(
             save = { it.value },
-            restore = { ScrollState(it, flingConfig, animationClock) }
+            restore = { ScrollState(it, flingConfig, animationClock, interactionState) }
         )
     }
 }

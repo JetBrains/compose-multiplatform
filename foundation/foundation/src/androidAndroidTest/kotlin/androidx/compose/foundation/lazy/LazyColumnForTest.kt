@@ -16,7 +16,10 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -54,6 +57,7 @@ import androidx.ui.test.assertPositionInRootIsEqualTo
 import androidx.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.center
+import androidx.ui.test.click
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.getUnclippedBoundsInRoot
 import androidx.ui.test.onChildren
@@ -785,6 +789,47 @@ class LazyColumnForTest {
                 val tolerance = 2.dp.toIntPx()
                 assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset, tolerance)
             }
+        }
+    }
+
+    @Test
+    fun isAnimationRunningUpdate() {
+        val items by mutableStateOf((1..20).toList())
+        val clock = ManualAnimationClock(0L)
+        val state = LazyListState(
+            flingConfig = FlingConfig(ExponentialDecay()),
+            animationClock = clock
+        )
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.isAnimationRunning).isEqualTo(false)
+        }
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .performGesture { swipeUp() }
+
+        rule.runOnIdle {
+            clock.clockTimeMillis += 100
+            assertThat(state.firstVisibleItemIndex).isNotEqualTo(0)
+            assertThat(state.isAnimationRunning).isEqualTo(true)
+        }
+
+        // TODO (jelle): this should be down, and not click to be 100% fair
+        rule.onNodeWithTag(LazyColumnForTag)
+            .performGesture { click() }
+
+        rule.runOnIdle {
+            assertThat(state.isAnimationRunning).isEqualTo(false)
         }
     }
 

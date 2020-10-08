@@ -40,12 +40,15 @@ import androidx.ui.test.ExperimentalTesting
 import androidx.ui.test.TestUiDispatcher
 import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
+import androidx.ui.test.down
 import androidx.ui.test.monotonicFrameAnimationClockOf
+import androidx.ui.test.moveBy
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
 import androidx.ui.test.runBlockingWithManualClock
 import androidx.ui.test.swipe
 import androidx.ui.test.swipeWithVelocity
+import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.withContext
@@ -537,6 +540,108 @@ class ScrollableTest {
         // and nothing should change as we don't do nested fling
         rule.runOnIdle {
             assertThat(outerDrag).isEqualTo(lastEqualDrag)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_interactionState() = runBlockingWithManualClock { clock ->
+        val interactionState = InteractionState()
+        var total = 0f
+        val controller = ScrollableController(
+            consumeScrollDelta = {
+                total += it
+                it
+            },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock),
+            interactionState = interactionState
+        )
+
+        setScrollableContent {
+            Modifier.scrollable(
+                Orientation.Horizontal,
+                controller = controller
+            ) {}
+        }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag)
+            .performGesture {
+                down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
+                moveBy(Offset(visibleSize.width / 2f, 0f))
+            }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).contains(Interaction.Dragged)
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag)
+            .performGesture {
+                up()
+            }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_interactionState_resetWhenDisposed() = runBlockingWithManualClock { clock ->
+        val interactionState = InteractionState()
+        var emitScrollableBox by mutableStateOf(true)
+        var total = 0f
+        val controller = ScrollableController(
+            consumeScrollDelta = {
+                total += it
+                it
+            },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock),
+            interactionState = interactionState
+        )
+
+        rule.setContent {
+            Box {
+                if (emitScrollableBox) {
+                    Box(
+                        modifier = Modifier
+                            .testTag(scrollableBoxTag)
+                            .preferredSize(100.dp)
+                            .scrollable(
+                                orientation = Orientation.Horizontal,
+                                controller = controller
+                            ) {}
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag)
+            .performGesture {
+                down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
+                moveBy(Offset(visibleSize.width / 2f, 0f))
+            }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).contains(Interaction.Dragged)
+        }
+
+        // Dispose scrollable
+        rule.runOnIdle {
+            emitScrollableBox = false
+        }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
         }
     }
 

@@ -24,6 +24,8 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
@@ -43,18 +45,22 @@ import androidx.compose.ui.platform.AnimationClockAmbient
  * Create and remember [ScrollableController] for [scrollable] with default [FlingConfig] and
  * [AnimationClockObservable]
  *
+ * @param interactionState [InteractionState] that will be updated when this scrollable is
+ * being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether the fling
+ * (or smooth scroll) is in progress, use [ScrollableController.isAnimationRunning].
  * @param consumeScrollDelta callback invoked when scrollable drag/fling/smooth scrolling occurs.
  * The callback receives the delta in pixels. Callers should update their state in this lambda
  * and return amount of delta consumed
  */
 @Composable
 fun rememberScrollableController(
+    interactionState: InteractionState? = null,
     consumeScrollDelta: (Float) -> Float
 ): ScrollableController {
     val clocks = AnimationClockAmbient.current.asDisposableClock()
     val flingConfig = defaultFlingConfig()
-    return remember(clocks, flingConfig) {
-        ScrollableController(consumeScrollDelta, flingConfig, clocks)
+    return remember(clocks, flingConfig, interactionState) {
+        ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)
     }
 }
 
@@ -67,11 +73,15 @@ fun rememberScrollableController(
  * return the amount of delta consumed
  * @param flingConfig fling configuration to use for flinging
  * @param animationClock animation clock to run flinging and smooth scrolling on
+ * @param interactionState [InteractionState] that will be updated when this scrollable is
+ * being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether the fling
+ * (or smooth scroll) is in progress, use [ScrollableController.isAnimationRunning].
  */
 class ScrollableController(
-    val consumeScrollDelta: (Float) -> Float,
-    val flingConfig: FlingConfig,
-    animationClock: AnimationClockObservable
+    internal val consumeScrollDelta: (Float) -> Float,
+    internal val flingConfig: FlingConfig,
+    animationClock: AnimationClockObservable,
+    internal val interactionState: InteractionState? = null
 ) {
     /**
      * Smooth scroll by [value] amount of pixels
@@ -177,6 +187,7 @@ fun Modifier.scrollable(
 ): Modifier = composed {
     onDispose {
         controller.stopAnimation()
+        controller.interactionState?.removeInteraction(Interaction.Dragged)
     }
 
     val scrollCallback = object : ScrollCallback {
@@ -184,6 +195,7 @@ fun Modifier.scrollable(
         override fun onStart(downPosition: Offset) {
             if (enabled) {
                 controller.stopAnimation()
+                controller.interactionState?.addInteraction(Interaction.Dragged)
                 onScrollStarted(downPosition)
             }
         }
@@ -198,10 +210,14 @@ fun Modifier.scrollable(
         }
 
         override fun onCancel() {
-            if (enabled) onScrollStopped(0f)
+            controller.interactionState?.removeInteraction(Interaction.Dragged)
+            if (enabled) {
+                onScrollStopped(0f)
+            }
         }
 
         override fun onStop(velocity: Float) {
+            controller.interactionState?.removeInteraction(Interaction.Dragged)
             if (enabled) {
                 controller.fling(
                     velocity = if (reverseDirection) velocity * -1 else velocity,

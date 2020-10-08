@@ -19,12 +19,13 @@ package androidx.compose.foundation.demos
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.AmbientTextStyle
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -111,14 +112,15 @@ private fun ListAddRemoveItemsDemo() {
 @OptIn(ExperimentalLayout::class)
 @Composable
 private fun ListHoistedStateDemo() {
-    val state = rememberLazyListState()
+    val interactionState = remember { InteractionState() }
+    val state = rememberLazyListState(interactionState = interactionState)
     Column {
-        FlowRow {
-            Text(
-                "First item: ${state.firstVisibleItemIndex}",
-                style = AmbientTextStyle.current.copy(fontSize = 30.sp)
-            )
-        }
+        Text(
+            "First item: ${state.firstVisibleItemIndex}",
+            fontSize = 30.sp
+        )
+        Text("Dragging: ${interactionState.contains(Interaction.Dragged)}", fontSize = 30.sp)
+        Text("Flinging: ${state.isAnimationRunning}", fontSize = 30.sp)
         LazyColumnFor(
             (0..1000).toList(),
             Modifier.fillMaxWidth(),
