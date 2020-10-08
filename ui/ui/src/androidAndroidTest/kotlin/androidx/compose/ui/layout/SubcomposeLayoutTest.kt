@@ -162,7 +162,7 @@ class SubcomposeLayoutTest {
                 measuresCount++
                 val placeable = subcompose(Unit) {
                     recompositionsCount1++
-                    Box(Modifier.size(20.dp)) {
+                    NonInlineBox(Modifier.size(20.dp)) {
                         model.value // model read
                         recompositionsCount2++
                     }
@@ -181,6 +181,11 @@ class SubcomposeLayoutTest {
             assertEquals(1, recompositionsCount1)
             assertEquals(2, recompositionsCount2)
         }
+    }
+
+    @Composable
+    private fun NonInlineBox(modifier: Modifier, children: @Composable () -> Unit) {
+        Box(modifier = modifier) { children() }
     }
 
     @Test
