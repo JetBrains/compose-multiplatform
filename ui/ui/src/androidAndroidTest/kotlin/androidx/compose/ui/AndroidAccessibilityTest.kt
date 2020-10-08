@@ -47,6 +47,8 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -85,11 +87,15 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.any
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(JUnit4::class)
-@OptIn(ExperimentalFoundationApi::class)
-@ExperimentalLayoutNodeApi
+@OptIn(
+    ExperimentalFoundationApi::class,
+    ExperimentalLayoutNodeApi::class
+)
 class AndroidAccessibilityTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>(false, true)
@@ -102,6 +108,8 @@ class AndroidAccessibilityTest {
 
     private val argument = ArgumentCaptor.forClass(AccessibilityEvent::class.java)
     private var isTextFieldVisible by mutableStateOf(true)
+    private var textFieldSelectionOneLatch = CountDownLatch(1)
+    private var textFieldSelectionZeroLatch = CountDownLatch(1)
 
     companion object {
         private const val ToggleableTag = "toggleable"
@@ -140,7 +148,18 @@ class AndroidAccessibilityTest {
                     )
                     if (isTextFieldVisible) {
                         BaseTextField(
-                            modifier = Modifier.testTag(TextFieldTag),
+                            modifier = Modifier
+                                .semantics {
+                                    // Make sure this block will be executed when selection changes.
+                                    this.textSelectionRange = value.selection
+                                    if (value.selection == TextRange(1)) {
+                                        textFieldSelectionOneLatch.countDown()
+                                    }
+                                    if (value.selection == TextRange(0)) {
+                                        textFieldSelectionZeroLatch.countDown()
+                                    }
+                                }
+                                .testTag(TextFieldTag),
                             value = value,
                             onValueChange = { value = it },
                             onTextLayout = { textLayoutResult = it }
@@ -252,7 +271,11 @@ class AndroidAccessibilityTest {
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 1)
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 1)
         rule.runOnUiThread {
+            textFieldSelectionOneLatch = CountDownLatch(1)
             provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument)
+        }
+        if (!textFieldSelectionOneLatch.await(1, TimeUnit.SECONDS)) {
+            throw AssertionError("Failed to wait for text selection change.")
         }
         rule.onNodeWithTag(TextFieldTag)
             .assert(
@@ -271,11 +294,15 @@ class AndroidAccessibilityTest {
             false
         )
         rule.runOnUiThread {
+            textFieldSelectionZeroLatch = CountDownLatch(1)
             provider.performAction(
                 textFieldNode.id,
                 ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY,
                 argument
             )
+        }
+        if (!textFieldSelectionZeroLatch.await(1, TimeUnit.SECONDS)) {
+            throw AssertionError("Failed to wait for text selection change.")
         }
         rule.onNodeWithTag(TextFieldTag)
             .assert(
