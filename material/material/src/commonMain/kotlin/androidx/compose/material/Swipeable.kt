@@ -442,13 +442,15 @@ fun <T> Modifier.swipeable(
         "You cannot have two anchors mapped to the same state."
     }
     val density = DensityAmbient.current
-    onCommit {
+    onCommit(anchors) {
         state.anchors = anchors
         state.thresholds = { a, b ->
             val from = anchors.getValue(a)
             val to = anchors.getValue(b)
             with(thresholds(from, to)) { density.computeThreshold(a, b) }
         }
+    }
+    onCommit {
         state.resistance = resistance
     }
 
