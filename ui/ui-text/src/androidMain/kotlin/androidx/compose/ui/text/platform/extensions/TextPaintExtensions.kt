@@ -18,11 +18,7 @@ package androidx.compose.ui.text.platform.extensions
 
 import android.graphics.Typeface
 import android.os.Build
-import android.text.TextPaint
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -30,15 +26,15 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.platform.AndroidTextPaint
 import androidx.compose.ui.text.platform.TypefaceAdapter
 import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 
-internal fun TextPaint.applySpanStyle(
+internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
     typefaceAdapter: TypefaceAdapter,
     density: Density
@@ -70,10 +66,6 @@ internal fun TextPaint.applySpanStyle(
         }
     }
 
-    if (style.color.isSpecified) {
-        color = style.color.toArgb()
-    }
-
     when (style.letterSpacing.type) {
         TextUnitType.Em -> { letterSpacing = style.letterSpacing.value }
         TextUnitType.Sp -> {} // Sp will be handled by applying a span
@@ -91,23 +83,10 @@ internal fun TextPaint.applySpanStyle(
         textSkewX += style.textGeometricTransform.skewX
     }
 
-    if (style.shadow != null && style.shadow != Shadow.None) {
-        setShadowLayer(
-            style.shadow.blurRadius,
-            style.shadow.offset.x,
-            style.shadow.offset.y,
-            style.shadow.color.toArgb()
-        )
-    }
-
-    if (style.textDecoration != null && style.textDecoration != TextDecoration.None) {
-        if (TextDecoration.Underline in style.textDecoration) {
-            isUnderlineText = true
-        }
-        if (TextDecoration.LineThrough in style.textDecoration) {
-            isStrikeThruText = true
-        }
-    }
+    // these parameters are also updated by the Paragraph.draw
+    setColor(style.color)
+    setShadow(style.shadow)
+    setTextDecoration(style.textDecoration)
 
     // When FontFamily is a custom font(FontListFontFamily), it needs to be applied on Paint to
     // compute empty paragraph height. Meanwhile, we also need a FontSpan for
