@@ -12,6 +12,7 @@ import android.text.style.ScaleXSpan
 import android.text.style.StrikethroughSpan
 import android.text.style.UnderlineSpan
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.toArgb
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
@@ -1129,6 +1131,191 @@ class AndroidParagraphTest {
             .hasSpan(BackgroundColorSpan::class, 0, text.length) { span ->
                 span.backgroundColor == color.toArgb()
             }
+    }
+
+    @Test
+    fun testPaint_can_change_TextDecoration_to_Underline() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(textDecoration = null),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.isUnderlineText).isFalse()
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, textDecoration = TextDecoration.Underline)
+        assertThat(paragraph.textPaint.isUnderlineText).isEqualTo(true)
+    }
+
+    @Test
+    fun testPaint_can_change_TextDecoration_to_None() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(
+                textDecoration = TextDecoration.Underline
+            ),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.isUnderlineText).isTrue()
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, textDecoration = TextDecoration.None)
+        assertThat(paragraph.textPaint.isUnderlineText).isFalse()
+    }
+
+    @Test
+    fun testPaint_can_change_TextDecoration_null() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(
+                textDecoration = TextDecoration.Underline
+            ),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.isUnderlineText).isTrue()
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, textDecoration = null)
+        assertThat(paragraph.textPaint.isUnderlineText).isFalse()
+    }
+
+    @SdkSuppress(minSdkVersion = 29)
+    @Test
+    fun testPaint_can_change_Shadow() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(shadow = null),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(0)
+        assertThat(paragraph.textPaint.shadowLayerDx).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(0f)
+
+        val canvas = Canvas(android.graphics.Canvas())
+        val color = Color.Red
+        val dx = 1f
+        val dy = 2f
+        val radius = 3f
+
+        paragraph.paint(
+            canvas,
+            shadow = Shadow(color = color, offset = Offset(dx, dy), blurRadius = radius)
+        )
+        assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(color.toArgb())
+        assertThat(paragraph.textPaint.shadowLayerDx).isEqualTo(dx)
+        assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(dy)
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(radius)
+    }
+
+    @SdkSuppress(minSdkVersion = 29)
+    @Test
+    fun testPaint_can_change_Shadow_to_None() {
+        val dx = 1f
+        val dy = 2f
+        val radius = 3f
+        val color = Color.Red
+
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(
+                shadow = Shadow(color, Offset(dx, dy), radius)
+            ),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.shadowLayerDx).isEqualTo(dx)
+        assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(dy)
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(radius)
+        assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(color.toArgb())
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, shadow = null)
+        assertThat(paragraph.textPaint.shadowLayerDx).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(0)
+    }
+
+    @SdkSuppress(minSdkVersion = 29)
+    @Test
+    fun testPaint_can_change_Shadow_null() {
+        val dx = 1f
+        val dy = 2f
+        val radius = 3f
+        val color = Color.Red
+
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(
+                shadow = Shadow(color, Offset(dx, dy), radius)
+            ),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.shadowLayerDx).isEqualTo(dx)
+        assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(dy)
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(radius)
+        assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(color.toArgb())
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, shadow = Shadow.None)
+        assertThat(paragraph.textPaint.shadowLayerDx).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(0f)
+        assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(0)
+    }
+
+    @Test
+    fun testPaint_can_change_Color() {
+        val color1 = Color.Red
+
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(color = Color.Red),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.color).isEqualTo(color1.toArgb())
+
+        val color2 = Color.Yellow
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, color = color2)
+        assertThat(paragraph.textPaint.color).isEqualTo(color2.toArgb())
+    }
+
+    @Test
+    fun testPaint_cannot_change_Color_to_Unspecified() {
+        val color1 = Color.Red
+
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(color = Color.Red),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.color).isEqualTo(color1.toArgb())
+
+        val color2 = Color.Unspecified
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, color = color2)
+        assertThat(paragraph.textPaint.color).isEqualTo(color1.toArgb())
+    }
+
+    @Test
+    fun testPaint_can_change_Color_to_Transparent() {
+        val color1 = Color.Red
+
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(color = Color.Red),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.color).isEqualTo(color1.toArgb())
+
+        val color2 = Color.Transparent
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, color = color2)
+        assertThat(paragraph.textPaint.color).isEqualTo(color2.toArgb())
     }
 
     @Test
