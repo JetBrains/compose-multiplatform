@@ -46,7 +46,7 @@ dependencies {
 
 androidx {
     name = "Compose Navigation"
-    publish = Publish.SNAPSHOT_ONLY
+    publish = Publish.SNAPSHOT_AND_RELEASE
     mavenVersion = LibraryVersions.COMPOSE_NAVIGATION
     mavenGroup = LibraryGroups.Compose.NAVIGATION
     inceptionYear = "2020"
