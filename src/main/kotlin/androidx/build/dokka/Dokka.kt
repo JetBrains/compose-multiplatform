@@ -107,7 +107,7 @@ object Dokka {
         }
     }
 
-    private fun createDokkaTask(
+    fun createDokkaTask(
         project: Project,
         docsType: String,
         hiddenPackages: List<String>,
@@ -164,6 +164,7 @@ object Dokka {
             task.noJdkLink = true
             task.noStdlibLink = true
             task.noAndroidSdkLink = true
+            task.dokkaFatJar = "org.jetbrains.dokka:dokka-fatjar:0.9.17-g013"
 
             LogUtils.turnWarningsIntoInfos(task)
         }
@@ -185,7 +186,7 @@ object Dokka {
     ): DokkaConfiguration.ExternalDocumentationLink {
         return DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
             this.url = URL(externalUrl)
-            this.packageListUrl = project.projectDir.toPath()
+            this.packageListUrl = File(project.rootDir, "docs-runner").toPath()
                 .resolve(localMappingFileName).toUri().toURL()
         }.build()
     }

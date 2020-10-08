@@ -190,13 +190,14 @@ class AndroidXRootPlugin : Plugin<Project> {
             subprojects { subproject ->
                 // TODO(153485458) remove most of these exceptions
                 if (subproject.name != "docs-fake" &&
+                    subproject.name != "docs-public" &&
+                    subproject.name != "docs-tip-of-tree" &&
                     !subproject.name.contains("hilt") &&
                     subproject.name != "camera-testapp-timing" &&
                     subproject.name != "room-testapp" &&
                     subproject.name != "support-media2-test-client-previous" &&
                     subproject.name != "support-media2-test-service-previous"
                 ) {
-
                     subproject.configurations.all { configuration ->
                         configuration.resolutionStrategy.dependencySubstitution.apply {
                             for (e in projectModules) {
