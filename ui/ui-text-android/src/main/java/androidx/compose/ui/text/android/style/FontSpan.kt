@@ -42,14 +42,14 @@ class FontSpan(
             textPaint.typeface = getTypeface(FontStyle.FONT_WEIGHT_NORMAL, false)
             return
         }
-        val weight = if (Build.VERSION.SDK_INT <= 28) {
+        val weight = if (Build.VERSION.SDK_INT >= 28) {
+            oldTypeface.weight
+        } else {
             if (oldTypeface.isBold) {
                 FontStyle.FONT_WEIGHT_BOLD
             } else {
                 FontStyle.FONT_WEIGHT_NORMAL
             }
-        } else {
-            oldTypeface.weight
         }
         textPaint.typeface = getTypeface(weight, oldTypeface.isItalic)
     }
