@@ -27,8 +27,8 @@ import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.foundation.text.LastBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape

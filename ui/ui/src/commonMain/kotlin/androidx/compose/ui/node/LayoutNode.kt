@@ -18,24 +18,19 @@ package androidx.compose.ui.node
 import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.ContentDrawScope
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.FocusObserverModifier
 import androidx.compose.ui.FocusRequesterModifier
-import androidx.compose.ui.HorizontalAlignmentLine
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.OnGloballyPositionedModifier
-import androidx.compose.ui.OnRemeasuredModifier
-import androidx.compose.ui.ParentDataModifier
-import androidx.compose.ui.Placeable
-import androidx.compose.ui.Remeasurement
-import androidx.compose.ui.RemeasurementModifier
+import androidx.compose.ui.layout.OnGloballyPositionedModifier
+import androidx.compose.ui.layout.OnRemeasuredModifier
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.Remeasurement
+import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.ZIndexModifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
@@ -47,10 +42,15 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.merge
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.merge
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
@@ -504,7 +504,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
 
     /**
      * The scope used to run the [MeasureBlocks.measure]
-     * [MeasureBlock][androidx.compose.ui.MeasureBlock].
+     * [MeasureBlock][androidx.compose.ui.layout.MeasureBlock].
      */
     val measureScope: MeasureScope = object : MeasureScope, Density {
         override val density: Float get() = this@LayoutNode.density.density

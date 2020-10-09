@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode

@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.semantics
 
-import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.layout.globalPosition

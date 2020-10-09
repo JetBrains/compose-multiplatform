@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
-import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.Modifier
 
 /**
  * Invoke [onGloballyPositioned] with the [LayoutCoordinates] of the element when the

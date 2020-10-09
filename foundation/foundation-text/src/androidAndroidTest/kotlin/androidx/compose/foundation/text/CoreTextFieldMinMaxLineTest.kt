@@ -19,7 +19,7 @@ package androidx.compose.foundation.text
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle

@@ -16,7 +16,7 @@
 
 package androidx.ui.test
 
-import androidx.compose.ui.AlignmentLine
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction

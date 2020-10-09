@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Constraints
@@ -194,13 +194,13 @@ abstract class Placeable {
                 parentLayoutDirection: LayoutDirection,
                 crossinline block: PlacementScope.() -> Unit
             ) {
-                val previousParentWidth = this.parentWidth
-                val previousParentLayoutDirection = this.parentLayoutDirection
-                this.parentWidth = parentWidth
-                this.parentLayoutDirection = parentLayoutDirection
+                val previousParentWidth = Companion.parentWidth
+                val previousParentLayoutDirection = Companion.parentLayoutDirection
+                Companion.parentWidth = parentWidth
+                Companion.parentLayoutDirection = parentLayoutDirection
                 this.block()
-                this.parentWidth = previousParentWidth
-                this.parentLayoutDirection = previousParentLayoutDirection
+                Companion.parentWidth = previousParentWidth
+                Companion.parentLayoutDirection = previousParentLayoutDirection
             }
         }
     }

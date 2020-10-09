@@ -18,9 +18,7 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.Measurable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.ParentDataModifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.unit.Density

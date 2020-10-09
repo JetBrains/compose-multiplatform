@@ -31,7 +31,7 @@ import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics

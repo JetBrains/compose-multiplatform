@@ -32,10 +32,10 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.listSaver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.MeasureScope
-import androidx.compose.ui.Placeable
-import androidx.compose.ui.Remeasurement
-import androidx.compose.ui.RemeasurementModifier
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.Remeasurement
+import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.platform.AnimationClockAmbient

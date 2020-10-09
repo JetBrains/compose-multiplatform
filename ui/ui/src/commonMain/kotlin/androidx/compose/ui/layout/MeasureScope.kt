@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
-import androidx.compose.ui.MeasureScope.MeasureResult
-import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.MeasureScope.MeasureResult
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -40,7 +39,6 @@ interface MeasureScope : IntrinsicMeasureScope {
         val alignmentLines: Map<AlignmentLine, Int>
         fun placeChildren()
     }
-
     /**
      * Sets the size and alignment lines of the measured layout, as well as
      * the positioning block that defines the children positioning logic.

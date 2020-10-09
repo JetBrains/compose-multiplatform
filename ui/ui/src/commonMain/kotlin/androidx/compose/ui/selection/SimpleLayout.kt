@@ -17,8 +17,8 @@
 package androidx.compose.ui.selection
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.InternalTextApi
 import kotlin.math.max
 

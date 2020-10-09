@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.AlignmentLine
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.unit.Bounds
