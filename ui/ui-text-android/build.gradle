@@ -58,4 +58,5 @@ androidx {
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2018"
     description = "Android specific implementations for Text in Compose"
+    legacyDisableKotlinStrictApiMode = true
 }

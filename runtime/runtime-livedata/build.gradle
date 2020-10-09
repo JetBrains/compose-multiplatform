@@ -50,6 +50,7 @@ androidx {
     mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"
     description = "Compose integration with LiveData"
+    legacyDisableKotlinStrictApiMode = true
 }
 
 tasks.withType(KotlinCompile).configureEach {

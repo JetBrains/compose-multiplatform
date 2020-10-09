@@ -43,7 +43,7 @@ import androidx.navigation.NavHostController
  * @param builder the builder used to construct the graph
  */
 @Composable
-fun NavHost(
+public fun NavHost(
     navController: NavHostController = rememberNavController(),
     id: Int = 0,
     startDestination: Any,

@@ -16,6 +16,7 @@
 
 package androidx.compose.navigation
 
+import androidx.compose.runtime.ProvidableAmbient
 import androidx.compose.runtime.ambientOf
 import androidx.navigation.NavHostController
 
@@ -24,4 +25,4 @@ import androidx.navigation.NavHostController
  *
  * @sample androidx.compose.navigation.samples.NavigateButton
  */
-val AmbientNavController = ambientOf<NavHostController>()
+public val AmbientNavController: ProvidableAmbient<NavHostController> = ambientOf()
