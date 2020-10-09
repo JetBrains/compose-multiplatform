@@ -16,7 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.AnimatedValueModel
+import androidx.compose.animation.VectorConverter
+import androidx.compose.animation.asDisposableClock
+import androidx.compose.animation.core.AnimatedValue
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.TransitionSpec
 import androidx.compose.animation.core.keyframes
@@ -35,6 +40,7 @@ import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +54,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 
@@ -69,13 +76,10 @@ import androidx.compose.ui.util.lerp
  * present on this Checkbox. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this Checkbox in different [Interaction]s.
- * @param checkedColor color of the box of the Checkbox when [checked]. See
- * [TriStateCheckbox] to fully customize the color of the checkmark / box / border in different
- * states.
- * @param uncheckedColor color of the border of the Checkbox when not [checked]. See
- * [TriStateCheckbox] to fully customize the color of the checkmark / box / border in different
- * states.
+ * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
+ * / border in different states. See [CheckboxConstants.defaultColors].
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Checkbox(
     checked: Boolean,
@@ -83,25 +87,14 @@ fun Checkbox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    checkedColor: Color = MaterialTheme.colors.secondary,
-    uncheckedColor: Color = CheckboxConstants.defaultUncheckedColor
+    colors: CheckboxColors = CheckboxConstants.defaultColors()
 ) {
     TriStateCheckbox(
         state = ToggleableState(checked),
         onClick = { onCheckedChange(!checked) },
         interactionState = interactionState,
         enabled = enabled,
-        boxColor = CheckboxConstants.animateDefaultBoxColor(
-            state = ToggleableState(checked),
-            enabled = enabled,
-            checkedColor = checkedColor
-        ),
-        borderColor = CheckboxConstants.animateDefaultBorderColor(
-            state = ToggleableState(checked),
-            enabled = enabled,
-            checkedColor = checkedColor,
-            uncheckedColor = uncheckedColor
-        ),
+        colors = colors,
         modifier = modifier
     )
 }
@@ -127,16 +120,10 @@ fun Checkbox(
  * present on this TriStateCheckbox. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this TriStateCheckbox in different [Interaction]s.
- * @param checkMarkColor color of the check mark of the [TriStateCheckbox]. See
- * [CheckboxConstants.animateDefaultCheckmarkColor] for customizing the check mark color in
- * different [state]s.
- * @param boxColor background color of the box containing the checkmark. See
- * [CheckboxConstants.animateDefaultBoxColor] for customizing the box color in different [state]s,
- * such as when [ToggleableState.On] or not [enabled].
- * @param borderColor color of the border of the box containing the checkmark. See
- * [CheckboxConstants.animateDefaultBorderColor] for customizing the border color in different
- * [state]s, such as when [ToggleableState.On] or not [enabled].
+ * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
+ * / border in different states. See [CheckboxConstants.defaultColors].
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TriStateCheckbox(
     state: ToggleableState,
@@ -144,11 +131,10 @@ fun TriStateCheckbox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    checkMarkColor: Color = CheckboxConstants.animateDefaultCheckmarkColor(state),
-    boxColor: Color = CheckboxConstants.animateDefaultBoxColor(state, enabled),
-    borderColor: Color = CheckboxConstants.animateDefaultBorderColor(state, enabled)
+    colors: CheckboxColors = CheckboxConstants.defaultColors()
 ) {
     CheckboxImpl(
+        enabled = enabled,
         value = state,
         modifier = modifier
             .triStateToggleable(
@@ -159,174 +145,116 @@ fun TriStateCheckbox(
                 indication = RippleIndication(bounded = false, radius = CheckboxRippleRadius)
             )
             .padding(CheckboxDefaultPadding),
-        checkColor = checkMarkColor,
-        boxColor = boxColor,
-        borderColor = borderColor
+        colors = colors
     )
+}
+
+/**
+ * Represents the colors used by the three different sections (checkmark, box, and border) of a
+ * [Checkbox] or [TriStateCheckbox] in different states.
+ *
+ * See [CheckboxConstants.defaultColors] for the default implementation that follows Material
+ * specifications.
+ */
+@ExperimentalMaterialApi
+@Stable
+interface CheckboxColors {
+
+    /**
+     * Represents the color used for the checkmark inside the checkbox, depending on [state].
+     *
+     * @param state the [ToggleableState] of the checkbox
+     */
+    fun checkmarkColor(state: ToggleableState): Color
+
+    /**
+     * Represents the color used for the box (background) of the checkbox, depending on [enabled]
+     * and [state].
+     *
+     * @param enabled whether the checkbox is enabled or not
+     * @param state the [ToggleableState] of the checkbox
+     */
+    fun boxColor(enabled: Boolean, state: ToggleableState): Color
+
+    /**
+     * Represents the color used for the border of the checkbox, depending on [enabled] and [state].
+     *
+     * @param enabled whether the checkbox is enabled or not
+     * @param state the [ToggleableState] of the checkbox
+     */
+    fun borderColor(enabled: Boolean, state: ToggleableState): Color
 }
 
 /**
  * Constants used in [Checkbox] and [TriStateCheckbox].
  */
 object CheckboxConstants {
-
     /**
-     * Represents the default color used for the checkmark in a [Checkbox] or [TriStateCheckbox]
-     * as it animates between states.
+     * Creates a [CheckboxColors] that will animate between the provided colors according to the
+     * Material specification.
      *
-     * @param state the [ToggleableState] of the checkbox
-     * @param checkedColor the color to use for the checkmark when the Checkbox is
-     * [ToggleableState.On].
-     * @param uncheckedColor the color to use for the checkmark when the Checkbox is
-     * [ToggleableState.Off] - this is typically transparent, as no checkmark should be displayed
-     * in this state.
-     * @return the [Color] representing the checkmark color
+     * @param checkedColor the color that will be used for the border and box when checked
+     * @param uncheckedColor color that will be used for the border when unchecked
+     * @param checkmarkColor color that will be used for the checkmark when checked
+     * @param disabledColor color that will be used for the box and border when disabled
+     * @param disabledIndeterminateColor color that will be used for the box and
+     * border in a [TriStateCheckbox] when disabled AND in an [ToggleableState.Indeterminate] state.
      */
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun animateDefaultCheckmarkColor(
-        state: ToggleableState,
-        checkedColor: Color = MaterialTheme.colors.surface,
-        uncheckedColor: Color = checkedColor.copy(alpha = 0f)
-    ): Color {
-        val target = if (state == ToggleableState.Off) uncheckedColor else checkedColor
-
-        val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-        return animate(target, tween(durationMillis = duration))
-    }
-
-    /**
-     * Represents the default color used for the background of the box in a [Checkbox] or
-     * [TriStateCheckbox] as it animates between states.
-     *
-     * @param state the [ToggleableState] of the checkbox
-     * @param enabled whether the checkbox is enabled
-     * @param checkedColor the color to use for the background of the box when the Checkbox is
-     * [ToggleableState.On].
-     * @param uncheckedColor the color to use for the background of the box when the Checkbox is
-     * [ToggleableState.Off] - this is typically transparent.
-     * @param disabledCheckedColor the color to use for the background of the box when the Checkbox is
-     * [ToggleableState.On] and not [enabled].
-     * @param disabledUncheckedColor the color to use for the background of the box when the
-     * Checkbox is [ToggleableState.Off] and not [enabled].
-     * @param disabledIndeterminateColor the color to use for the background of the box when the
-     * Checkbox is [ToggleableState.Indeterminate] and not [enabled].
-     * @return the [Color] representing the background color of the box
-     */
-    @Composable
-    fun animateDefaultBoxColor(
-        state: ToggleableState,
-        enabled: Boolean,
+    fun defaultColors(
         checkedColor: Color = MaterialTheme.colors.secondary,
-        uncheckedColor: Color = checkedColor.copy(alpha = 0f),
-        disabledCheckedColor: Color = defaultDisabledColor,
-        disabledUncheckedColor: Color = Color.Transparent,
-        disabledIndeterminateColor: Color = defaultDisabledIndeterminateColor(checkedColor)
-    ): Color {
-        val target = if (enabled) {
-            when (state) {
-                ToggleableState.On, ToggleableState.Indeterminate -> checkedColor
-                ToggleableState.Off -> uncheckedColor
-            }
-        } else {
-            when (state) {
-                ToggleableState.On -> disabledCheckedColor
-                ToggleableState.Indeterminate -> disabledIndeterminateColor
-                ToggleableState.Off -> disabledUncheckedColor
-            }
+        uncheckedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+        checkmarkColor: Color = MaterialTheme.colors.surface,
+        disabledColor: Color = AmbientEmphasisLevels.current.disabled.applyEmphasis(
+            MaterialTheme.colors.onSurface
+        ),
+        disabledIndeterminateColor: Color = AmbientEmphasisLevels.current.disabled.applyEmphasis(
+            checkedColor
+        )
+    ): CheckboxColors {
+        val clock = AnimationClockAmbient.current.asDisposableClock()
+        return remember(
+            checkedColor,
+            uncheckedColor,
+            checkmarkColor,
+            disabledColor,
+            disabledIndeterminateColor,
+            clock
+        ) {
+            DefaultCheckboxColors(
+                checkedBorderColor = checkedColor,
+                checkedBoxColor = checkedColor,
+                checkedCheckmarkColor = checkmarkColor,
+                uncheckedCheckmarkColor = checkmarkColor.copy(alpha = 0f),
+                uncheckedBoxColor = checkedColor.copy(alpha = 0f),
+                disabledCheckedBoxColor = disabledColor,
+                disabledUncheckedBoxColor = disabledColor.copy(alpha = 0f),
+                disabledIndeterminateBoxColor = disabledIndeterminateColor,
+                uncheckedBorderColor = uncheckedColor,
+                disabledBorderColor = disabledColor,
+                disabledIndeterminateBorderColor = disabledIndeterminateColor,
+                clock = clock
+            )
         }
-
-        // If not enabled 'snap' to the disabled state, as there should be no animations between
-        // enabled / disabled.
-        return if (enabled) {
-            val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-            animate(target, tween(durationMillis = duration))
-        } else {
-            target
-        }
-    }
-
-    /**
-     * Represents the default color used for the border of the box in a [Checkbox] or
-     * [TriStateCheckbox]s as it animates between states.
-     *
-     * @param state the [ToggleableState] of the checkbox
-     * @param enabled whether the checkbox is enabled
-     * @param checkedColor the color to use for the border of the box when the Checkbox is
-     * [ToggleableState.On].
-     * @param uncheckedColor the color to use for the border of the box when the Checkbox is
-     * [ToggleableState.Off].
-     * @param disabledColor the color to use for the border of the box when the Checkbox is
-     * [ToggleableState.On] or [ToggleableState.Off], and not [enabled].
-     * @param disabledIndeterminateColor the color to use for the border of the box when the
-     * Checkbox is [ToggleableState.Indeterminate] and not [enabled].
-     * @return the [Color] representing the border color of the box
-     */
-    @Composable
-    fun animateDefaultBorderColor(
-        state: ToggleableState,
-        enabled: Boolean,
-        checkedColor: Color = MaterialTheme.colors.secondary,
-        uncheckedColor: Color = defaultUncheckedColor,
-        disabledColor: Color = defaultDisabledColor,
-        disabledIndeterminateColor: Color = defaultDisabledIndeterminateColor(checkedColor)
-    ): Color {
-        val target = if (enabled) {
-            when (state) {
-                ToggleableState.On, ToggleableState.Indeterminate -> checkedColor
-                ToggleableState.Off -> uncheckedColor
-            }
-        } else {
-            when (state) {
-                ToggleableState.Indeterminate -> disabledIndeterminateColor
-                ToggleableState.On, ToggleableState.Off -> disabledColor
-            }
-        }
-
-        // If not enabled 'snap' to the disabled state, as there should be no animations between
-        // enabled / disabled.
-        return if (enabled) {
-            val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-            animate(target, tween(durationMillis = duration))
-        } else {
-            target
-        }
-    }
-
-    /**
-     * Default color that will be used for a Checkbox when unchecked
-     */
-    @Composable
-    val defaultUncheckedColor: Color
-        get() = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-
-    /**
-     * Default color that will be used for a Checkbox when disabled
-     */
-    @Composable
-    val defaultDisabledColor: Color
-        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
-
-    /**
-     * Default color that will be used for [TriStateCheckbox] when disabled and in a
-     * [ToggleableState.Indeterminate] state.
-     */
-    @Composable
-    fun defaultDisabledIndeterminateColor(checkedColor: Color): Color {
-        return AmbientEmphasisLevels.current.disabled.applyEmphasis(checkedColor)
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CheckboxImpl(
+    enabled: Boolean,
     value: ToggleableState,
     modifier: Modifier,
-    checkColor: Color,
-    boxColor: Color,
-    borderColor: Color
+    colors: CheckboxColors
 ) {
     val state = transition(definition = TransitionDefinition, toState = value)
     val checkCache = remember { CheckDrawingCache() }
     Canvas(modifier.wrapContentSize(Alignment.Center).size(CheckboxSize)) {
+        val checkColor = colors.checkmarkColor(value)
+        val boxColor = colors.boxColor(enabled, value)
+        val borderColor = colors.borderColor(enabled, value)
+
         val strokeWidthPx = StrokeWidth.toPx()
         drawBox(
             boxColor = boxColor,
@@ -412,6 +340,121 @@ private class CheckDrawingCache(
     val pathMeasure: PathMeasure = PathMeasure(),
     val pathToDraw: Path = Path()
 )
+
+/**
+ * Default [CheckboxColors] implementation.
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Stable
+private class DefaultCheckboxColors(
+    private val checkedCheckmarkColor: Color,
+    private val uncheckedCheckmarkColor: Color,
+    private val checkedBoxColor: Color,
+    private val uncheckedBoxColor: Color,
+    private val disabledCheckedBoxColor: Color,
+    private val disabledUncheckedBoxColor: Color,
+    private val disabledIndeterminateBoxColor: Color,
+    private val checkedBorderColor: Color,
+    private val uncheckedBorderColor: Color,
+    private val disabledBorderColor: Color,
+    private val disabledIndeterminateBorderColor: Color,
+    private val clock: AnimationClockObservable
+) : CheckboxColors {
+    private lateinit var animatedCheckmarkColor: AnimatedValue<Color, AnimationVector4D>
+    private lateinit var animatedBoxColor: AnimatedValue<Color, AnimationVector4D>
+    private lateinit var animatedBorderColor: AnimatedValue<Color, AnimationVector4D>
+
+    override fun checkmarkColor(state: ToggleableState): Color {
+        val target = if (state == ToggleableState.Off) {
+            uncheckedCheckmarkColor
+        } else {
+            checkedCheckmarkColor
+        }
+
+        if (!::animatedCheckmarkColor.isInitialized) {
+            animatedCheckmarkColor = AnimatedValueModel(
+                initialValue = target,
+                typeConverter = (Color.VectorConverter)(target.colorSpace),
+                clock = clock
+            )
+        }
+
+        if (animatedCheckmarkColor.targetValue != target) {
+            val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
+            animatedCheckmarkColor.animateTo(target, tween(durationMillis = duration))
+        }
+        return animatedCheckmarkColor.value
+    }
+
+    override fun boxColor(enabled: Boolean, state: ToggleableState): Color {
+        val target = if (enabled) {
+            when (state) {
+                ToggleableState.On, ToggleableState.Indeterminate -> checkedBoxColor
+                ToggleableState.Off -> uncheckedBoxColor
+            }
+        } else {
+            when (state) {
+                ToggleableState.On -> disabledCheckedBoxColor
+                ToggleableState.Indeterminate -> disabledIndeterminateBoxColor
+                ToggleableState.Off -> disabledUncheckedBoxColor
+            }
+        }
+
+        // If not enabled 'snap' to the disabled state, as there should be no animations between
+        // enabled / disabled.
+        return if (enabled) {
+            if (!::animatedBoxColor.isInitialized) {
+                animatedBoxColor = AnimatedValueModel(
+                    initialValue = target,
+                    typeConverter = (Color.VectorConverter)(target.colorSpace),
+                    clock = clock
+                )
+            }
+
+            if (animatedBoxColor.targetValue != target) {
+                val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
+                animatedBoxColor.animateTo(target, tween(durationMillis = duration))
+            }
+            animatedBoxColor.value
+        } else {
+            target
+        }
+    }
+
+    override fun borderColor(enabled: Boolean, state: ToggleableState): Color {
+        val target = if (enabled) {
+            when (state) {
+                ToggleableState.On, ToggleableState.Indeterminate -> checkedBorderColor
+                ToggleableState.Off -> uncheckedBorderColor
+            }
+        } else {
+            when (state) {
+                ToggleableState.Indeterminate -> disabledIndeterminateBorderColor
+                ToggleableState.On, ToggleableState.Off -> disabledBorderColor
+            }
+        }
+
+        // If not enabled 'snap' to the disabled state, as there should be no animations between
+        // enabled / disabled.
+        return if (enabled) {
+            if (!::animatedBorderColor.isInitialized) {
+                animatedBorderColor = AnimatedValueModel(
+                    initialValue = target,
+                    typeConverter = (Color.VectorConverter)(target.colorSpace),
+                    clock = clock
+                )
+            }
+
+            if (animatedBorderColor.targetValue != target) {
+                val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
+                animatedBorderColor.animateTo(target, tween(durationMillis = duration))
+            }
+            animatedBorderColor.value
+        } else {
+            target
+        }
+    }
+}
 
 // all float props are fraction now [0f .. 1f] as it seems convenient
 private val CheckDrawFraction = FloatPropKey()
