@@ -111,7 +111,7 @@ class AndroidXPlugin : Plugin<Project> {
                 is JavaPlugin -> configureWithJavaPlugin(project, extension)
                 is LibraryPlugin -> configureWithLibraryPlugin(project, extension)
                 is AppPlugin -> configureWithAppPlugin(project, extension)
-                is KotlinBasePluginWrapper -> configureWithKotlinPlugin(project, plugin)
+                is KotlinBasePluginWrapper -> configureWithKotlinPlugin(project, extension, plugin)
             }
         }
 
@@ -214,6 +214,7 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun configureWithKotlinPlugin(
         project: Project,
+        extension: AndroidXExtension,
         plugin: KotlinBasePluginWrapper
     ) {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
@@ -221,6 +222,15 @@ class AndroidXPlugin : Plugin<Project> {
             project.configureCompilationWarnings(task)
             if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
                 task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
+            }
+        }
+        project.afterEvaluate {
+            if (extension.shouldEnforceKotlinStrictApiMode()) {
+                project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
+                    // Workaround for https://youtrack.jetbrains.com/issue/KT-37652
+                    if (task.name.endsWith("TestKotlin")) return@configureEach
+                    task.kotlinOptions.freeCompilerArgs += listOf("-Xexplicit-api=strict")
+                }
             }
         }
         if (plugin is KotlinMultiplatformPluginWrapper) {
