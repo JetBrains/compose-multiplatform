@@ -54,4 +54,20 @@ class LocaleListTest {
         assertThat(LocaleList("en-US,ja-JP"))
             .isNotEqualTo(LocaleList("en-US,es-ES"))
     }
+
+    @Test
+    fun getCurrent_afterJavaLocaleSetDefault() {
+        val javaLocales = listOf(
+            java.util.Locale("ar"),
+            java.util.Locale("ja"),
+            java.util.Locale("en")
+        )
+        for (javaLocale in javaLocales) {
+            java.util.Locale.setDefault(javaLocale)
+
+            assertThat(LocaleList.current.first()).isEqualTo(
+                Locale(AndroidLocale(javaLocale))
+            )
+        }
+    }
 }
