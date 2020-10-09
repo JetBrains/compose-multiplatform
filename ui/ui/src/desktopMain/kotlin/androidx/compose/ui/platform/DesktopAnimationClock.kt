@@ -25,11 +25,10 @@ internal class DesktopAnimationClock(
 ) : AnimationClockObservable {
     private val manual = ManualAnimationClock(0, dispatchOnSubscribe = false)
 
+    val hasObservers get() = manual.hasObservers
+
     fun onFrame(nanoTime: Long) {
         manual.clockTimeMillis = nanoTime / 1_000_000L
-        if (manual.hasObservers) {
-            invalidate()
-        }
     }
 
     override fun subscribe(observer: AnimationClockObserver) {

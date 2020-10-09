@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.desktop
+package androidx.compose.ui.platform
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -29,9 +29,9 @@ import kotlin.coroutines.CoroutineContext
  *
  * Frames executed not more frequent than [framesPerSecond]
  */
-internal class FrameDispatcher(
+class FrameDispatcher(
     private val onFrame: suspend (nanoTime: Long) -> Unit,
-    private val framesPerSecond: () -> Int,
+    private val framesPerSecond: () -> Float,
     private val nanoTime: () -> Long = System::nanoTime,
     context: CoroutineContext = Dispatchers.Main
 ) {
@@ -47,7 +47,7 @@ internal class FrameDispatcher(
 
             val elapsed = nanoTime() - frameNanoTime
             val refreshRate = framesPerSecond()
-            val singleFrameNanos = 1_000_000_000 / refreshRate
+            val singleFrameNanos = (1_000_000_000 / refreshRate).toLong()
             val needToWaitMillis = maxOf(0, singleFrameNanos - elapsed) / 1_000_000
             delayOrYield(needToWaitMillis)
         }

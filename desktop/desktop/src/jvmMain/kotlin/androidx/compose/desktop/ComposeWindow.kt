@@ -56,6 +56,7 @@ class ComposeWindow : JFrame {
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
                 layer.reinit()
+                needRedrawLayer()
             }
         })
         initCanvas()
@@ -142,15 +143,8 @@ class ComposeWindow : JFrame {
 }
 
 private class OwnersRenderer(private val owners: DesktopOwners) : FrameSkiaLayer.Renderer {
-    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        try {
-            owners.onRender(canvas, width, height, nanoTime)
-        } catch (e: Throwable) {
-            e.printStackTrace(System.err)
-            if (System.getProperty("compose.desktop.ignore.errors") == null) {
-                System.exit(1)
-            }
-        }
+    override suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        owners.onFrame(canvas, width, height, nanoTime)
     }
 }
 
