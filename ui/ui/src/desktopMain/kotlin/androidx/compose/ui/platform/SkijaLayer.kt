@@ -49,6 +49,7 @@ class SkijaLayer(
     private var outlineCache = OutlineCache(density, size, modifier.shape)
     private val pictureRecorder = PictureRecorder()
     private var picture: Picture? = null
+    private var isDestroyed = false
 
     override var modifier: DrawLayerModifier = modifier
         set(value) {
@@ -62,6 +63,7 @@ class SkijaLayer(
     override fun destroy() {
         picture?.close()
         pictureRecorder.close()
+        isDestroyed = true
     }
 
     override fun resize(size: IntSize) {
@@ -85,8 +87,11 @@ class SkijaLayer(
     }
 
     override fun invalidate() {
-        picture = null
-        invalidateParentLayer()
+        if (!isDestroyed && picture != null) {
+            picture?.close()
+            picture = null
+            invalidateParentLayer()
+        }
     }
 
     override fun drawLayer(canvas: Canvas) {

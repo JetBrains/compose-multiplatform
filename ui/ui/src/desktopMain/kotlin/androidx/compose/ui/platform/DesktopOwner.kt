@@ -159,19 +159,22 @@ class DesktopOwner(
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
 
     override fun measureAndLayout() {
-        measureAndLayoutDelegate.measureAndLayout()
+        if (measureAndLayoutDelegate.measureAndLayout()) {
+            container.invalidate()
+        }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
-        container.invalidate()
     }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
-        measureAndLayoutDelegate.requestRemeasure(layoutNode)
-        container.invalidate()
+        if (measureAndLayoutDelegate.requestRemeasure(layoutNode)) {
+            container.invalidate()
+        }
     }
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
-        measureAndLayoutDelegate.requestRelayout(layoutNode)
-        container.invalidate()
+        if (measureAndLayoutDelegate.requestRelayout(layoutNode)) {
+            container.invalidate()
+        }
     }
 
     override val hasPendingMeasureOrLayout
@@ -211,7 +214,10 @@ class DesktopOwner(
     ) = SkijaLayer(
         density,
         drawLayerModifier,
-        invalidateParentLayer
+        invalidateParentLayer = {
+            invalidateParentLayer()
+            container.invalidate()
+        }
     ) { canvas ->
         observeDrawModelReads(this) {
             drawBlock(canvas)
@@ -229,8 +235,6 @@ class DesktopOwner(
     }
 
     fun draw(canvas: org.jetbrains.skija.Canvas) {
-        measureAndLayoutDelegate.measureAndLayout()
-        measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
         root.draw(DesktopCanvas(canvas))
     }
 
