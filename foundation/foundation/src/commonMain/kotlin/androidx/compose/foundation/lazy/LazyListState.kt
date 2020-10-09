@@ -344,7 +344,8 @@ class LazyListState constructor(
             // can be larger if items were resized, or if, for example, we were previously
             // displaying the item 15, but now we have only 10 items in total in the data set.
             if (scrollToBeConsumed.roundToInt().sign == scrollDelta.sign &&
-                abs(scrollToBeConsumed.roundToInt()) >= abs(scrollDelta)) {
+                abs(scrollToBeConsumed.roundToInt()) >= abs(scrollDelta)
+            ) {
                 scrollToBeConsumed -= scrollDelta
             } else {
                 scrollToBeConsumed = 0f

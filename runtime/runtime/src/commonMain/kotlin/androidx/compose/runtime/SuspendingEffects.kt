@@ -308,8 +308,10 @@ private class LaunchedTaskImpl(
 
     override fun onEnter() {
         job?.cancel("Old job was still running!")
-        val scope = CoroutineScope(recomposer.applyingCoroutineContext
-            ?: error("cannot launch LaunchedTask - Recomposer is not running"))
+        val scope = CoroutineScope(
+            recomposer.applyingCoroutineContext
+                ?: error("cannot launch LaunchedTask - Recomposer is not running")
+        )
         job = scope.launch(block = task)
     }
 

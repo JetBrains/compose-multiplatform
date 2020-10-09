@@ -99,7 +99,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun toggleFlagOnPopup() {
         var properties: AndroidPopupProperties?
-            by mutableStateOf(AndroidPopupProperties(SecureFlagPolicy.SecureOff))
+        by mutableStateOf(AndroidPopupProperties(SecureFlagPolicy.SecureOff))
 
         rule.setContent {
             TestPopup(properties)

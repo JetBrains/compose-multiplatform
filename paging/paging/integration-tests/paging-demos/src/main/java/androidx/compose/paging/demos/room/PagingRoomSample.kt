@@ -55,46 +55,54 @@ fun PagingRoomDemo() {
     }
 
     Column {
-        Button(onClick = {
-            scope.launch(Dispatchers.IO) {
-                val name = Names[Random.nextInt(Names.size)]
-                dao.insert(User(id = 0, name = name))
+        Button(
+            onClick = {
+                scope.launch(Dispatchers.IO) {
+                    val name = Names[Random.nextInt(Names.size)]
+                    dao.insert(User(id = 0, name = name))
+                }
             }
-        }) {
+        ) {
             Text("Add random user")
         }
 
-        Button(onClick = {
-            scope.launch(Dispatchers.IO) {
-                dao.clearAll()
+        Button(
+            onClick = {
+                scope.launch(Dispatchers.IO) {
+                    dao.clearAll()
+                }
             }
-        }) {
+        ) {
             Text("Clear all users")
         }
 
-        Button(onClick = {
-            scope.launch(Dispatchers.IO) {
-                val randomUser = dao.getRandomUser()
-                if (randomUser != null) {
-                    dao.delete(randomUser)
+        Button(
+            onClick = {
+                scope.launch(Dispatchers.IO) {
+                    val randomUser = dao.getRandomUser()
+                    if (randomUser != null) {
+                        dao.delete(randomUser)
+                    }
                 }
             }
-        }) {
+        ) {
             Text("Remove random user")
         }
 
-        Button(onClick = {
-            scope.launch(Dispatchers.IO) {
-                val randomUser = dao.getRandomUser()
-                if (randomUser != null) {
-                    val updatedUser = User(
-                        randomUser.id,
-                        randomUser.name + " updated"
-                    )
-                    dao.update(updatedUser)
+        Button(
+            onClick = {
+                scope.launch(Dispatchers.IO) {
+                    val randomUser = dao.getRandomUser()
+                    if (randomUser != null) {
+                        val updatedUser = User(
+                            randomUser.id,
+                            randomUser.name + " updated"
+                        )
+                        dao.update(updatedUser)
+                    }
                 }
             }
-        }) {
+        ) {
             Text("Update random user")
         }
 

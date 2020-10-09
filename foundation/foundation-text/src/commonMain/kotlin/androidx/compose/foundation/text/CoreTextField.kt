@@ -699,7 +699,7 @@ private class AnimatedFloatModel(
 
 // TODO(b/151940543): Remove this variable when we have a solution for idling animations
 @InternalTextApi
-    /** @suppress */
+/** @suppress */
 var blinkingCursorEnabled: Boolean = true
     @VisibleForTesting
     set

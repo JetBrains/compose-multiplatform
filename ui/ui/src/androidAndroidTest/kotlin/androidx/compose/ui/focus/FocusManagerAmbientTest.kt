@@ -49,10 +49,11 @@ class FocusManagerAmbientTest {
         rule.setFocusableContent {
             focusManager = FocusManagerAmbient.current
             focusRequester = FocusRequester()
-            Box(modifier = Modifier
-                .focusRequester(focusRequester)
-                .focusObserver { focusState = it }
-                .focus()
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusObserver { focusState = it }
+                    .focus()
             )
         }
         rule.runOnIdle {
@@ -78,16 +79,21 @@ class FocusManagerAmbientTest {
         rule.setFocusableContent {
             focusManager = FocusManagerAmbient.current
             focusRequester = FocusRequester()
-            Box(modifier = Modifier
-                .focusObserver { grandparentFocusState = it }
-                .focus()) {
-                Box(modifier = Modifier
-                    .focusObserver { parentFocusState = it }
-                    .focus()) {
-                    Box(modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .focusObserver { focusState = it }
+            Box(
+                modifier = Modifier
+                    .focusObserver { grandparentFocusState = it }
+                    .focus()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .focusObserver { parentFocusState = it }
                         .focus()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .focusObserver { focusState = it }
+                            .focus()
                     )
                 }
             }

@@ -95,11 +95,13 @@ fun SwipeToDismissListItems() {
             },
             background = {
                 val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                val color = animate(when (dismissState.targetValue) {
-                    Default -> Color.LightGray
-                    DismissedToEnd -> Color.Green
-                    DismissedToStart -> Color.Red
-                })
+                val color = animate(
+                    when (dismissState.targetValue) {
+                        Default -> Color.LightGray
+                        DismissedToEnd -> Color.Green
+                        DismissedToStart -> Color.Red
+                    }
+                )
                 val alignment = when (direction) {
                     StartToEnd -> Alignment.CenterStart
                     EndToStart -> Alignment.CenterEnd

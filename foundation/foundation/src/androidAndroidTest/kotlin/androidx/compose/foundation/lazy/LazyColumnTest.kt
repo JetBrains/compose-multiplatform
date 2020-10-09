@@ -236,8 +236,10 @@ class LazyColumnTest {
                     if (it != null) {
                         Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
                     } else {
-                        Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
-                            .testTag(nullTestTag))
+                        Spacer(
+                            Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                                .testTag(nullTestTag)
+                        )
                     }
                 }
             }

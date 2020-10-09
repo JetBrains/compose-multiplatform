@@ -290,11 +290,14 @@ class ListRemeasureTestCase(
 
     @Composable
     fun RemeasurableItem() {
-        Layout(emptyContent(), modifier = object : RemeasurementModifier {
-            override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
-                this@ListRemeasureTestCase.remeasurement = remeasurement
+        Layout(
+            emptyContent(),
+            modifier = object : RemeasurementModifier {
+                override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
+                    this@ListRemeasureTestCase.remeasurement = remeasurement
+                }
             }
-        }) { _, _ ->
+        ) { _, _ ->
             val size = size.toIntPx()
             layout(size, size) {}
         }

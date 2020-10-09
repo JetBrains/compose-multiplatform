@@ -134,7 +134,8 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             }
             Build.VERSION.SDK_INT >= 19 -> {
                 info.extras.getCharSequence(
-                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY")
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY"
+                )
             }
             else -> {
                 null
@@ -231,10 +232,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         )
         assertEquals(
             AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PARAGRAPH or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_LINE or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE,
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PARAGRAPH or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_LINE or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE,
             info.movementGranularities
         )
         if (Build.VERSION.SDK_INT >= 26) {
@@ -272,7 +273,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             argThat(
                 ArgumentMatcher {
                     it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
                 }
             )
         )
@@ -297,7 +298,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             argThat(
                 ArgumentMatcher {
                     it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
                 }
             )
         )
@@ -306,12 +307,12 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             argThat(
                 ArgumentMatcher {
                     it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED && it.scrollY == 2 &&
-                            it.maxScrollY == 5 &&
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                it.scrollDeltaY == 2
-                            } else {
-                                true
-                            }
+                        it.maxScrollY == 5 &&
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            it.scrollDeltaY == 2
+                        } else {
+                            true
+                        }
                 }
             )
         )

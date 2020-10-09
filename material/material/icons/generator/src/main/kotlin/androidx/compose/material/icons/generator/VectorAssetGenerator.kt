@@ -99,7 +99,8 @@ class VectorAssetGenerator(
                         backingProperty,
                         MemberNames.MaterialIcon,
                         iconTheme.name,
-                        iconName)
+                        iconName
+                    )
                     vector.nodes.forEach { node -> addRecursively(node) }
                     endControlFlow()
                 }

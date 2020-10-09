@@ -875,7 +875,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     private fun hasNewPositioningCallback(): Boolean {
         return modifier.foldOut(false) { mod, hasNewCallback ->
             hasNewCallback ||
-                    (mod is OnGloballyPositionedModifier && mod !in onPositionedCallbacks)
+                (mod is OnGloballyPositionedModifier && mod !in onPositionedCallbacks)
         }
     }
 

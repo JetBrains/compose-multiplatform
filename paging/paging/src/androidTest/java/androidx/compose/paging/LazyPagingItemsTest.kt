@@ -81,8 +81,10 @@ class LazyPagingItemsTest {
             val lazyPagingItems = pager.flow.collectAsLazyPagingItems()
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 items(lazyPagingItems) {
-                    Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
-                        .testTag("$it"))
+                    Spacer(
+                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                            .testTag("$it")
+                    )
                 }
             }
         }
@@ -108,8 +110,10 @@ class LazyPagingItemsTest {
             val lazyPagingItems = pager.flow.collectAsLazyPagingItems()
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 itemsIndexed(lazyPagingItems) { index, item ->
-                    Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
-                        .testTag("$index-$item"))
+                    Spacer(
+                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                            .testTag("$index-$item")
+                    )
                 }
             }
         }
@@ -135,8 +139,10 @@ class LazyPagingItemsTest {
             val lazyPagingItems = pager.flow.collectAsLazyPagingItems()
             LazyRow(Modifier.preferredWidth(200.dp)) {
                 items(lazyPagingItems) {
-                    Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight()
-                        .testTag("$it"))
+                    Spacer(
+                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                            .testTag("$it")
+                    )
                 }
             }
         }

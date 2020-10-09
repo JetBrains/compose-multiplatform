@@ -27,7 +27,10 @@ import androidx.compose.ui.onSizeChanged
 fun OnSizeChangedSample(name: String) {
     // Use onSizeChanged() for diagnostics. Use Layout or SubcomposeLayout if you want
     // to use the size of one component to affect the size of another component.
-    Text("Hello $name", Modifier.onSizeChanged { size ->
-        println("The size of the Text in pixels is $size")
-    })
+    Text(
+        "Hello $name",
+        Modifier.onSizeChanged { size ->
+            println("The size of the Text in pixels is $size")
+        }
+    )
 }

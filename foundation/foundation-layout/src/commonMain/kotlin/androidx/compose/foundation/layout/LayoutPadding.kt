@@ -231,10 +231,10 @@ private class PaddingModifier(
     override fun equals(other: Any?): Boolean {
         val otherModifier = other as? PaddingModifier ?: return false
         return start == otherModifier.start &&
-                top == otherModifier.top &&
-                end == otherModifier.end &&
-                bottom == otherModifier.bottom &&
-                rtlAware == otherModifier.rtlAware
+            top == otherModifier.top &&
+            end == otherModifier.end &&
+            bottom == otherModifier.bottom &&
+            rtlAware == otherModifier.rtlAware
     }
 }
 

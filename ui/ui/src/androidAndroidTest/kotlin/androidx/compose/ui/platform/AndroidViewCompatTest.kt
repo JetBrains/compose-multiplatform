@@ -482,8 +482,9 @@ class AndroidViewCompatTest {
                     Box(Modifier.padding(paddingDp)) {
                         AndroidView(::FrameLayout) {
                             it.setContent {
-                                Box(Modifier.padding(paddingDp)
-                                    .onGloballyPositioned { coordinates = it }
+                                Box(
+                                    Modifier.padding(paddingDp)
+                                        .onGloballyPositioned { coordinates = it }
                                 )
                             }
                         }
