@@ -199,6 +199,15 @@ package androidx.compose.runtime {
     method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
   }
 
+  public interface DisposableEffectDisposable {
+    method public void dispose();
+  }
+
+  public final class DisposableEffectScope {
+    ctor public DisposableEffectScope();
+    method public inline androidx.compose.runtime.DisposableEffectDisposable onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> onDisposeEffect);
+  }
+
   public final class EffectsKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference compositionReference();
     method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
@@ -372,6 +381,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T, V1, V2> T! remember(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.Composable public static inline <T, V1, V2, V3> T! remember(V1? v1, V2? v2, V3? v3, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.Composable public static inline <V> V! remember(Object![]? inputs, kotlin.jvm.functions.Function0<? extends V> calculation);
+    method @androidx.compose.runtime.Composable public static inline <T> androidx.compose.runtime.State<T> rememberUpdatedState(T? newValue);
   }
 
   @androidx.compose.runtime.ComposeCompilerApi public interface ScopeUpdateScope {
@@ -379,6 +389,11 @@ package androidx.compose.runtime {
   }
 
   public final class SideEffectKt {
+    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? subject, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? subject1, Object? subject2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? subject1, Object? subject2, Object? subject3, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object![]? subjects, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void SideEffect(kotlin.jvm.functions.Function0<kotlin.Unit> effect);
   }
 

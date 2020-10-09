@@ -89,3 +89,30 @@ inline fun <V> remember(
     for (input in inputs) invalid = invalid or currentComposer.changed(input)
     return currentComposer.cache(invalid, calculation)
 }
+
+/**
+ * [remember] a [mutableStateOf] [newValue] and update its value to [newValue] on each
+ * recomposition of the [rememberUpdatedState] call.
+ *
+ * [rememberUpdatedState] should be used when parameters or values computed during composition
+ * are referenced by a long-lived lambda or object expression. Recomposition will update the
+ * resulting [State] without recreating the long-lived lambda or object, allowing that object to
+ * persist without cancelling and resubscribing, or relaunching a long-lived operation that may
+ * be expensive or prohibitive to recreate and restart.
+ * This may be common when working with [DisposableEffect] or [LaunchedTask], for example:
+ *
+ * @sample androidx.compose.runtime.samples.rememberUpdatedStateSampleWithDisposableEffect
+ *
+ * [LaunchedTask]s often describe state machines that should not be reset and restarted if a
+ * parameter or event callback changes, but they should have the current value available when
+ * needed. For example:
+ *
+ * @sample androidx.compose.runtime.samples.rememberUpdatedStateSampleWithLaunchedTask
+ *
+ * By using [rememberUpdatedState] a composable function can update these operations in progress.
+ */
+@Suppress("NOTHING_TO_INLINE")
+@Composable
+inline fun <T> rememberUpdatedState(newValue: T): State<T> = remember {
+    mutableStateOf(newValue)
+}.apply { value = newValue }
