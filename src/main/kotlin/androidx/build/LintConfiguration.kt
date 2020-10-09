@@ -93,11 +93,10 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             fatal("VisibleForTests")
 
-            // Workaround for integration branch using a newer AGP with a check that we don't want.
-            // This will be removed when we update to that AGP (b/160261355).
-            if (com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.startsWith("4.2.")) {
-                disable("KtxExtensionAvailable")
-            }
+            // Disable dependency checks that suggest to change them. We want libraries to be
+            // intentional with their dependency version bumps.
+            disable("KtxExtensionAvailable")
+            disable("GradleDependency")
 
             if (extension.compilationTarget != CompilationTarget.HOST) {
                 fatal("Assert")
