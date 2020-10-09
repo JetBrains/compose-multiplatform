@@ -430,17 +430,17 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void LinearProgressIndicator-kLDug40(@FloatRange(from=0.0, to=1.0) float progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional long backgroundColor);
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface RadioButtonColors {
+    method public long radioColor-0d7_KjU(boolean enabled, boolean selected);
+  }
+
   public final class RadioButtonConstants {
-    method @androidx.compose.runtime.Composable public long animateDefaultColor-tRWe6DU(boolean selected, boolean enabled, optional long selectedColor, optional long unselectedColor, optional long disabledColor);
-    method public long getDefaultDisabledColor-0d7_KjU();
-    method public long getDefaultUnselectedColor-0d7_KjU();
-    property public final long defaultDisabledColor;
-    property public final long defaultUnselectedColor;
+    method @androidx.compose.runtime.Composable public androidx.compose.material.RadioButtonColors defaultColors-xS_xkl8(optional long selectedColor, optional long unselectedColor, optional long disabledColor);
     field public static final androidx.compose.material.RadioButtonConstants INSTANCE;
   }
 
   public final class RadioButtonKt {
-    method @androidx.compose.runtime.Composable public static void RadioButton-BNs5H-w(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional long color);
+    method @androidx.compose.runtime.Composable public static void RadioButton(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.RadioButtonColors colors);
   }
 
   @androidx.compose.runtime.Immutable public final class ResistanceConfig {
