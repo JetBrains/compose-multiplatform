@@ -391,6 +391,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
             // assign a role for auto scroll to work.
             info.className = "android.widget.HorizontalScrollView"
+            if (xScrollState.maxValue > 0f) {
+                info.isScrollable = true
+            }
             if (xScrollState.value < xScrollState.maxValue) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
@@ -426,6 +429,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
             // assign a role for auto scroll to work.
             info.className = "android.widget.ScrollView"
+            if (yScrollState.maxValue > 0f) {
+                info.isScrollable = true
+            }
             if (yScrollState.value < yScrollState.maxValue) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
