@@ -153,7 +153,7 @@ interface DrawTransform {
      *  @param pivot The coordinates for the pivot point, defaults to the center of the
      *  coordinate space
      */
-    fun rotate(degrees: Float, pivot: Offset)
+    fun rotate(degrees: Float, pivot: Offset = center)
 
     /**
      * Add an axis-aligned scale to the current transform, scaling by the first

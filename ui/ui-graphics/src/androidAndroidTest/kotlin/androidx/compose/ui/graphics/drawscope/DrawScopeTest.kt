@@ -20,9 +20,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
@@ -618,6 +620,36 @@ class DrawScopeTest {
     }
 
     @Test
+    fun testRotationCenterPivotRad() {
+        val width = 200
+        val height = 200
+        val size = Size(width.toFloat(), height.toFloat())
+        val imageAsset = ImageAsset(width, height)
+        CanvasDrawScope().draw(Canvas(imageAsset), size) {
+            drawRect(color = Color.Red)
+            rotateRad(kotlin.math.PI.toFloat()) {
+                drawRect(
+                    topLeft = Offset(100.0f, 100.0f),
+                    size = Size(100.0f, 100.0f),
+                    color = Color.Blue
+                )
+            }
+        }
+
+        val pixelMap = imageAsset.toPixelMap()
+        assertEquals(Color.Blue, pixelMap[0, 0])
+        assertEquals(Color.Blue, pixelMap[99, 0])
+        assertEquals(Color.Blue, pixelMap[0, 99])
+        assertEquals(Color.Blue, pixelMap[99, 99])
+
+        assertEquals(Color.Red, pixelMap[0, 100])
+        assertEquals(Color.Red, pixelMap[100, 0])
+        assertEquals(Color.Red, pixelMap[100, 100])
+        assertEquals(Color.Red, pixelMap[100, 99])
+        assertEquals(Color.Red, pixelMap[99, 100])
+    }
+
+    @Test
     fun testRotationTopLeftPivot() {
         val width = 200
         val height = 200
@@ -891,6 +923,64 @@ class DrawScopeTest {
         }
     }
 
+    @Test
+    fun testDefaultClipIntersectParams() {
+        testDrawTransformDefault {
+            clipPath(Path())
+            assertEquals(ClipOp.Intersect, this.clipOp)
+        }
+    }
+
+    @Test
+    fun testDefaultClipRectParams() {
+        testDrawTransformDefault {
+            clipRect()
+            assertEquals(0f, clipLeft)
+            assertEquals(0f, clipTop)
+            assertEquals(size.width, clipRight)
+            assertEquals(size.height, clipBottom)
+            assertEquals(ClipOp.Intersect, clipOp)
+        }
+    }
+
+    @Test
+    fun testDefaultTranslateParams() {
+        testDrawTransformDefault {
+            translate()
+            assertEquals(0f, left)
+            assertEquals(0f, top)
+        }
+    }
+
+    @Test
+    fun testDefaultRotationPivotParam() {
+        testDrawTransformDefault {
+            rotate(7f)
+            assertEquals(center, this.pivot)
+        }
+    }
+
+    @Test
+    fun testDefaultScalePivotParam() {
+        testDrawTransformDefault {
+            scale(0.5f, 0.5f)
+            assertEquals(center, this.pivot)
+        }
+    }
+
+    private inline fun testDrawTransformDefault(block: WrappedDrawTransform.() -> Unit) {
+        val width = 100
+        val height = 150
+        TestDrawScopeTransform().draw(
+            Canvas(ImageAsset(width, height)),
+            Size(width.toFloat(), height.toFloat())
+        ) {
+            withWrappedTransform({
+                block(this)
+            }) { /* no-op */ }
+        }
+    }
+
     /**
      * Helper method used  to confirm both DrawScope rendered content and Canvas drawn
      * content are identical
@@ -949,4 +1039,96 @@ class DrawScopeTest {
         size: Size,
         block: DrawScope.() -> Unit
     ) = this.draw(Density(1.0f, 1.0f), LayoutDirection.Ltr, canvas, size, block)
+
+    private inline fun DrawScope.withWrappedTransform(
+        transformBlock: WrappedDrawTransform.() -> Unit,
+        drawBlock: DrawScope.() -> Unit
+    ) {
+        withTransform(
+            { transformBlock((this as WrappedDrawTransform)) },
+            drawBlock
+        )
+    }
+
+    private class TestDrawScopeTransform(
+        val drawScope: CanvasDrawScope = CanvasDrawScope()
+    ) : DrawScope by drawScope {
+
+        override val drawContext = object : DrawContext {
+            override var size: Size
+                get() = drawScope.drawContext.size
+                set(value) {
+                    drawScope.drawContext.size = value
+                }
+            override val canvas: Canvas
+                get() = drawScope.drawContext.canvas
+            override val transform: DrawTransform =
+                WrappedDrawTransform(drawScope.drawContext.transform)
+        }
+
+        inline fun draw(canvas: Canvas, size: Size, block: DrawScope.() -> Unit) {
+            drawScope.draw(
+                Density(1.0f, 1.0f),
+                LayoutDirection.Ltr,
+                canvas,
+                size
+            ) {
+                this@TestDrawScopeTransform.block()
+            }
+        }
+    }
+
+    /**
+     * DrawTransform implementation that caches its parameter values to ensure proper defaults
+     * are being provided.
+     */
+    class WrappedDrawTransform(val drawTransform: DrawTransform) : DrawTransform by drawTransform {
+
+        var clipLeft: Float = -1f
+        var clipTop: Float = -1f
+        var clipRight: Float = -1f
+        var clipBottom: Float = -1f
+        var clipOp: ClipOp? = null
+
+        var left: Float = -1f
+        var top: Float = -1f
+
+        var pivot: Offset = Offset(-1f, -1f)
+
+        override fun clipRect(
+            left: Float,
+            top: Float,
+            right: Float,
+            bottom: Float,
+            clipOp: ClipOp
+        ) {
+            clipLeft = left
+            clipTop = top
+            clipRight = right
+            clipBottom = bottom
+            this.clipOp = clipOp
+            drawTransform.clipRect(left, top, right, bottom, clipOp)
+        }
+
+        override fun clipPath(path: Path, clipOp: ClipOp) {
+            this.clipOp = clipOp
+            drawTransform.clipPath(path, clipOp)
+        }
+
+        override fun translate(left: Float, top: Float) {
+            this.left = left
+            this.top = top
+            drawTransform.translate(left, top)
+        }
+
+        override fun rotate(degrees: Float, pivot: Offset) {
+            this.pivot = pivot
+            drawTransform.rotate(degrees, pivot)
+        }
+
+        override fun scale(scaleX: Float, scaleY: Float, pivot: Offset) {
+            this.pivot = pivot
+            drawTransform.scale(scaleX, scaleY, pivot)
+        }
+    }
 }
