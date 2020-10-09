@@ -72,9 +72,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
-fun main() = Window {
+fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
     var count = remember { mutableStateOf(0) }
     MaterialTheme {
         Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
@@ -93,13 +94,15 @@ fun main() = Window {
         }
     }
 }
+
 ```
 Open `build.gradle.kts` as a project in IDEA.
 
 ![New project](screen1.png)
 
+
 After downloading Compose for Desktop dependencies from Maven repositories your new project is ready
-to go. Open Gradle toolbar on the right, and select `Tasks/applications/run`.
+to go. Open Gradle toolbar on the right, and select `sample/Tasks/applications/run`.
 First run may take some time, and afterwards following dialog will show up:
 
 ![Application running](screen2.gif)
