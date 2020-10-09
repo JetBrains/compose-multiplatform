@@ -47,6 +47,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.javaGetter
 
@@ -81,7 +83,8 @@ class IconComparisonTest(
         @Parameterized.Parameters(name = "{1}")
         fun initIconSublist(): Array<Array<Any>> {
             val numberOfChunks = 4
-            val subLists = AllIcons.chunked(AllIcons.size / numberOfChunks)
+            val listSize = ceil(AllIcons.size / numberOfChunks.toFloat()).roundToInt()
+            val subLists = AllIcons.chunked(listSize)
             return subLists.mapIndexed { index, list ->
                 arrayOf(list, "${index + 1}of$numberOfChunks")
             }.toTypedArray()
@@ -110,6 +113,11 @@ class IconComparisonTest(
             rule.waitForIdle()
 
             val iconName = property.javaGetter!!.declaringClass.canonicalName!!
+
+            // The XML inflated VectorAsset doesn't have a name, and we set a name in the
+            // programmatic VectorAsset. This doesn't affect how the VectorAsset is drawn, so we
+            // make sure the names match so the comparison does not fail.
+            xmlVector = xmlVector!!.copy(name = programmaticVector.name)
 
             assertVectorAssetsAreEqual(xmlVector!!, programmaticVector, iconName)
 
