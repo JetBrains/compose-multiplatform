@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.LayoutDirection
 /**
  * The receiver scope of a layout's intrinsic measurements lambdas.
  */
-abstract class IntrinsicMeasureScope : Density {
+interface IntrinsicMeasureScope : Density {
     /**
      * The [LayoutDirection] of the `Layout` or `LayoutModifier` using the measure scope
      * to measure their children.
      */
-    abstract val layoutDirection: LayoutDirection
+    val layoutDirection: LayoutDirection
 }

@@ -218,9 +218,8 @@ package androidx.compose.ui {
     method public androidx.compose.ui.Placeable measure-BRTryo0(long constraints);
   }
 
-  public abstract class MeasureScope extends androidx.compose.ui.layout.IntrinsicMeasureScope {
-    ctor public MeasureScope();
-    method public final androidx.compose.ui.MeasureScope.MeasureResult layout(int width, int height, optional java.util.Map<androidx.compose.ui.AlignmentLine,java.lang.Integer> alignmentLines, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Placeable.PlacementScope,kotlin.Unit> placementBlock);
+  public interface MeasureScope extends androidx.compose.ui.layout.IntrinsicMeasureScope {
+    method public default androidx.compose.ui.MeasureScope.MeasureResult layout(int width, int height, optional java.util.Map<androidx.compose.ui.AlignmentLine,java.lang.Integer> alignmentLines, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Placeable.PlacementScope,kotlin.Unit> placementBlock);
   }
 
   public static interface MeasureScope.MeasureResult {
@@ -1749,9 +1748,8 @@ package androidx.compose.ui.layout {
   public final class IntrinsicMeasurableKt {
   }
 
-  public abstract class IntrinsicMeasureScope implements androidx.compose.ui.unit.Density {
-    ctor public IntrinsicMeasureScope();
-    method public abstract androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
+  public interface IntrinsicMeasureScope extends androidx.compose.ui.unit.Density {
+    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
   }
 
@@ -1807,9 +1805,8 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi public static <T> void SubcomposeLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope<T>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.MeasureScope.MeasureResult> measureBlock);
   }
 
-  @androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi public abstract class SubcomposeMeasureScope<T> extends androidx.compose.ui.MeasureScope {
-    ctor public SubcomposeMeasureScope();
-    method public abstract java.util.List<androidx.compose.ui.Measurable> subcompose(T? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  @androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi public interface SubcomposeMeasureScope<T> extends androidx.compose.ui.MeasureScope {
+    method public java.util.List<androidx.compose.ui.Measurable> subcompose(T? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
 }

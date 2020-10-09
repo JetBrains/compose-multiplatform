@@ -499,7 +499,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * The scope used to run the [MeasureBlocks.measure]
      * [MeasureBlock][androidx.compose.ui.MeasureBlock].
      */
-    val measureScope: MeasureScope = object : MeasureScope(), Density {
+    val measureScope: MeasureScope = object : MeasureScope, Density {
         override val density: Float get() = this@LayoutNode.density.density
         override val fontScale: Float get() = this@LayoutNode.density.fontScale
         override val layoutDirection: LayoutDirection get() = this@LayoutNode.layoutDirection
