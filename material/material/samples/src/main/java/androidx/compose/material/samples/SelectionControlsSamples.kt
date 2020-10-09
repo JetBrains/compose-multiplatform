@@ -64,14 +64,7 @@ fun TriStateCheckboxSample() {
         TriStateCheckbox(
             state = parentState,
             onClick = onParentClick,
-            boxColor = CheckboxConstants.animateDefaultBoxColor(
-                state = parentState,
-                enabled = true,
-                checkedColor = MaterialTheme.colors.primary
-            ),
-            borderColor = CheckboxConstants.animateDefaultBorderColor(
-                state = parentState,
-                enabled = true,
+            colors = CheckboxConstants.defaultColors(
                 checkedColor = MaterialTheme.colors.primary
             )
         )
