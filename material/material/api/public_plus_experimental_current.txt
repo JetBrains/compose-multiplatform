@@ -126,15 +126,17 @@ package androidx.compose.material {
     enum_constant public static final androidx.compose.material.BottomSheetValue Expanded;
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonColors {
+    method @androidx.compose.runtime.Composable public long backgroundColor-0d7_KjU(boolean enabled);
+    method @androidx.compose.runtime.Composable public long contentColor-0d7_KjU(boolean enabled);
+  }
+
   public final class ButtonConstants {
-    method @androidx.compose.runtime.Composable public float animateDefaultElevation-qDazgog(androidx.compose.foundation.InteractionState interactionState, boolean enabled, optional float defaultElevation, optional float pressedElevation, optional float disabledElevation);
-    method @androidx.compose.runtime.Composable public long defaultButtonBackgroundColor-Q31_wr0(boolean enabled, optional long defaultColor, optional long disabledColor);
-    method @androidx.compose.runtime.Composable public long defaultButtonContentColor-Q31_wr0(boolean enabled, long defaultColor, optional long disabledColor);
-    method @androidx.compose.runtime.Composable public long defaultOutlinedButtonContentColor-Q31_wr0(boolean enabled, optional long defaultColor, optional long disabledColor);
-    method @androidx.compose.runtime.Composable public long defaultTextButtonContentColor-Q31_wr0(boolean enabled, optional long defaultColor, optional long disabledColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonColors defaultButtonColors-nlx5xbs(optional long backgroundColor, optional long disabledBackgroundColor, optional long contentColor, optional long disabledContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonElevation defaultElevation-qYQSm_w(optional float defaultElevation, optional float pressedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonColors defaultOutlinedButtonColors-xS_xkl8(optional long backgroundColor, optional long contentColor, optional long disabledContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonColors defaultTextButtonColors-xS_xkl8(optional long backgroundColor, optional long contentColor, optional long disabledContentColor);
     method public androidx.compose.foundation.layout.PaddingValues getDefaultContentPadding();
-    method public long getDefaultDisabledBackgroundColor-0d7_KjU();
-    method public long getDefaultDisabledContentColor-0d7_KjU();
     method public float getDefaultIconSize-D9Ej5fM();
     method public float getDefaultIconSpacing-D9Ej5fM();
     method public float getDefaultMinHeight-D9Ej5fM();
@@ -149,17 +151,19 @@ package androidx.compose.material {
     property public final float DefaultMinWidth;
     property public final androidx.compose.foundation.layout.PaddingValues DefaultTextContentPadding;
     property public final float OutlinedBorderSize;
-    property public final long defaultDisabledBackgroundColor;
-    property public final long defaultDisabledContentColor;
     property public final androidx.compose.foundation.BorderStroke defaultOutlinedBorder;
     field public static final androidx.compose.material.ButtonConstants INSTANCE;
     field public static final float OutlinedBorderOpacity = 0.12f;
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonElevation {
+    method @androidx.compose.runtime.Composable public float elevation-D9Ej5fM(boolean enabled, androidx.compose.foundation.InteractionState interactionState);
+  }
+
   public final class ButtonKt {
-    method @androidx.compose.runtime.Composable public static void Button-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional float elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static inline void OutlinedButton-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional float elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static inline void TextButton-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional float elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void Button(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline void OutlinedButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline void TextButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
   public final class CardKt {

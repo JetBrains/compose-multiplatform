@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Divider
 import androidx.compose.navigation.AmbientNavController
 import androidx.compose.navigation.NavHost
@@ -93,7 +94,7 @@ fun NavigateButton(screen: Screen) {
     val navController = AmbientNavController.current
     Button(
         onClick = { navController.navigate(screen.title) },
-        backgroundColor = LightGray,
+        colors = ButtonConstants.defaultButtonColors(backgroundColor = LightGray),
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(text = "Navigate to " + screen.title)
@@ -106,7 +107,7 @@ fun NavigateBackButton() {
     if (navController.previousBackStackEntry != null) {
         Button(
             onClick = { navController.popBackStack() },
-            backgroundColor = LightGray,
+            colors = ButtonConstants.defaultButtonColors(backgroundColor = LightGray),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Go to Previous screen")
