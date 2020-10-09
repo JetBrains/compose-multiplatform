@@ -139,6 +139,78 @@ class TextFieldDelegateIntegrationTest {
 
         assertThat(height).isEqualTo(requestHeight)
     }
+
+    @Test
+    fun layout_empty_text_height_constraint_min_height() {
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(""),
+            style = TextStyle.Default,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+        val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
+        val requestHeight = layoutResult.size.height * 2
+
+        val (_, height, _) = TextFieldDelegate.layout(
+            textDelegate,
+            Constraints.fixedHeight(requestHeight),
+            layoutDirection
+        )
+
+        assertThat(height).isEqualTo(requestHeight)
+    }
+
+    @Test
+    fun layout_empty_text_height_constraint_max_height() {
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(""),
+            style = TextStyle.Default,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+        val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
+        val requestHeight = layoutResult.size.height / 2
+
+        val (_, height, _) = TextFieldDelegate.layout(
+            textDelegate,
+            Constraints.fixedHeight(requestHeight),
+            layoutDirection
+        )
+
+        assertThat(height).isEqualTo(requestHeight)
+    }
+
+    @Test
+    fun layout_maxConstraint_greaterThanTextWidth_returnsTextWidth() {
+        // choose a text that is wider than default min width
+        val text = AnnotatedString("H".repeat(DefaultWidthCharCount * 2))
+
+        val textDelegate = TextDelegate(
+            text = text,
+            style = TextStyle.Default,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+
+        val layoutResult = textDelegate.layout(Constraints(), layoutDirection)
+
+        // choose constraints to be larger than layout width and height
+        val constraints = Constraints(
+            minWidth = 0,
+            maxWidth = layoutResult.size.width * 2,
+            minHeight = 0,
+            maxHeight = layoutResult.size.height * 2
+        )
+
+        val (width, height) = TextFieldDelegate.layout(
+            textDelegate,
+            constraints,
+            layoutDirection
+        )
+
+        assertThat(width.toFloat()).isEqualTo(layoutResult.size.width)
+        assertThat(height.toFloat()).isEqualTo(layoutResult.size.height)
+    }
 }
 
 private fun TextLayoutResult.toBitmap() = Bitmap.createBitmap(
