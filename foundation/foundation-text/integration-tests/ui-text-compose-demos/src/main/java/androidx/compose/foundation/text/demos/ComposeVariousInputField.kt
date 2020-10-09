@@ -246,6 +246,7 @@ private fun VariousEditLine(
 ) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     BaseTextField(
+        modifier = demoTextFieldModifiers,
         value = state.value,
         keyboardType = keyboardType,
         imeAction = imeAction,
@@ -274,7 +275,7 @@ private fun TextRange.constrain(minimumValue: Int, maximumValue: Int): TextRange
 private fun HintEditText(hintText: @Composable () -> Unit) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
 
-    Box {
+    Box(demoTextFieldModifiers) {
         BaseTextField(
             modifier = Modifier.fillMaxWidth(),
             value = state.value,
