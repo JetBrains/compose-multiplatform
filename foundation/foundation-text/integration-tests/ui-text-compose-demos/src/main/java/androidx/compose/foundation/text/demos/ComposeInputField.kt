@@ -19,16 +19,22 @@ package androidx.compose.foundation.text.demos
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 
 private val KEYBOARD_TYPES = listOf(
     Pair(KeyboardType.Text, "Text"),
@@ -86,6 +92,7 @@ private fun EditLine(
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     BaseTextField(
+        modifier = demoTextFieldModifiers,
         value = state.value,
         keyboardType = keyboardType,
         imeAction = imeAction,
@@ -97,3 +104,8 @@ private fun EditLine(
         }
     )
 }
+
+val demoTextFieldModifiers = Modifier
+    .padding(6.dp)
+    .border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
+    .padding(6.dp)
