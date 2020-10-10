@@ -102,6 +102,7 @@ abstract class AbstractApplier<T>(val root: T) : Applier<T> {
     }
 
     override fun up() {
+        check(stack.isNotEmpty())
         current = stack.removeAt(stack.size - 1)
     }
 
@@ -125,14 +126,20 @@ abstract class AbstractApplier<T>(val root: T) : Applier<T> {
     }
 
     protected fun MutableList<T>.move(from: Int, to: Int, count: Int) {
+        val dest = if (from > to) to else to - count
         if (count == 1) {
-            val fromEl = get(from)
-            val toEl = set(to, fromEl)
-            set(from, toEl)
+            if (from == to + 1 || from == to - 1) {
+                // Adjacent elements, perform swap to avoid backing array manipulations.
+                val fromEl = get(from)
+                val toEl = set(to, fromEl)
+                set(from, toEl)
+            } else {
+                val fromEl = removeAt(from)
+                insert(dest, fromEl)
+            }
         } else {
             val subView = subList(from, from + count)
             val subCopy = subView.toMutableList()
-            val dest = if (from > to) to else (to - count)
             subView.clear()
             addAll(dest, subCopy)
         }
