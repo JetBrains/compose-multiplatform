@@ -88,8 +88,6 @@ internal inline fun <T> BuildableList<T>.mutate(
     mutator: (MutableList<T>) -> Unit
 ): BuildableList<T> = builder().apply(mutator).build()
 
-expect class UnsupportedOperationException
-
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
 @Target(

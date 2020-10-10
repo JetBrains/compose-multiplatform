@@ -105,5 +105,3 @@ private val emptyBuildableList = BuildableList<Any>(emptyPersistentList)
 
 @Suppress("UNCHECKED_CAST")
 internal actual fun <T> buildableListOf(): BuildableList<T> = emptyBuildableList as BuildableList<T>
-
-public actual typealias UnsupportedOperationException = java.lang.UnsupportedOperationException
