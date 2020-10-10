@@ -42,6 +42,7 @@ fun InputFieldTrickyUseCase() {
 private fun RejectNonDigits() {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     BaseTextField(
+        modifier = demoTextFieldModifiers,
         value = state.value,
         textStyle = TextStyle(fontSize = 32.sp),
         onValueChange = {
@@ -58,6 +59,7 @@ private fun RejectNonDigits() {
 private fun RejectComposition() {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     BaseTextField(
+        modifier = demoTextFieldModifiers,
         value = state.value,
         textStyle = TextStyle(fontSize = 32.sp),
         onValueChange = {
