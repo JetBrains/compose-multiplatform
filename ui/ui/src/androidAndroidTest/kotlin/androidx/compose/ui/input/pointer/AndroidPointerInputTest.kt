@@ -36,7 +36,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.setContent
@@ -49,7 +48,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -419,102 +417,6 @@ class AndroidPointerInputTest {
             assertThat(log[0]).isEqualTo(listOf(down(0, 0.milliseconds, 0f, 0f)))
         }
     }
-
-    /**
-     * When a modifier is added, it should work, even when it takes the position of a previous
-     * modifier.
-     */
-    @Test
-    fun recomposeWithNewModifier() {
-        var tap2Enabled by mutableStateOf(false)
-        var tapLatch = CountDownLatch(1)
-        val tapLatch2 = CountDownLatch(1)
-        var positionedLatch = CountDownLatch(1)
-
-            rule.runOnUiThread {
-                container.setContent(Recomposer.current()) {
-                    FillLayout(
-                        Modifier
-                            .tapGestureFilter {
-                                tapLatch.countDown()
-                            }.then(
-                                if (tap2Enabled) Modifier.tapGestureFilter {
-                                    tapLatch2.countDown()
-                                } else Modifier
-                            ).onGloballyPositioned { positionedLatch.countDown() }
-                    )
-                }
-            }
-
-        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
-
-        val locationInWindow = IntArray(2)
-        rule.runOnUiThread {
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
-
-            // Get the current location in window.
-            androidComposeView.getLocationInWindow(locationInWindow)
-
-            val downEvent = createPointerEventAt(0, MotionEvent.ACTION_DOWN, locationInWindow)
-            androidComposeView.dispatchTouchEvent(downEvent)
-        }
-
-        rule.runOnUiThread {
-            val upEvent = createPointerEventAt(200, MotionEvent.ACTION_UP, locationInWindow)
-            androidComposeView.dispatchTouchEvent(upEvent)
-        }
-
-        assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
-        tapLatch = CountDownLatch(1)
-
-        positionedLatch = CountDownLatch(1)
-        tap2Enabled = true
-        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
-
-        rule.runOnUiThread {
-            val downEvent = createPointerEventAt(1000, MotionEvent.ACTION_DOWN, locationInWindow)
-            androidComposeView.dispatchTouchEvent(downEvent)
-        }
-        // Need to wait for long press timeout (at least)
-        rule.runOnUiThread {
-            val upEvent = createPointerEventAt(
-                1030,
-                MotionEvent.ACTION_UP,
-                locationInWindow
-            )
-            androidComposeView.dispatchTouchEvent(upEvent)
-        }
-        assertTrue(tapLatch2.await(1, TimeUnit.SECONDS))
-
-        positionedLatch = CountDownLatch(1)
-        tap2Enabled = false
-        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
-
-        rule.runOnUiThread {
-            val downEvent = createPointerEventAt(2000, MotionEvent.ACTION_DOWN, locationInWindow)
-            androidComposeView.dispatchTouchEvent(downEvent)
-        }
-        rule.runOnUiThread {
-            val upEvent = createPointerEventAt(2200, MotionEvent.ACTION_UP, locationInWindow)
-            androidComposeView.dispatchTouchEvent(upEvent)
-        }
-        assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
-    }
-
-    private fun createPointerEventAt(eventTime: Int, action: Int, locationInWindow: IntArray) =
-        MotionEvent(
-            eventTime,
-            action,
-            1,
-            0,
-            arrayOf(PointerProperties(0)),
-            arrayOf(
-                PointerCoords(
-                    locationInWindow[0].toFloat(),
-                    locationInWindow[1].toFloat()
-                )
-            )
-        )
 }
 
 @Suppress("TestFunctionName")
