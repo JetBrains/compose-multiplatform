@@ -29,6 +29,7 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.animate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -53,6 +54,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -2879,6 +2881,48 @@ class AndroidLayoutDrawTest {
 
         // draw modifier will be redrawn if the root node is placed
         assertTrue(drawLatch.await(10000, TimeUnit.SECONDS))
+    }
+
+    // When a LayoutNode is removed, but it contains a layout that is being updated, the
+    // layout should not be remeasured.
+    @OptIn(ExperimentalSubcomposeLayoutApi::class)
+    @Test
+    fun disappearingLayoutNode() {
+        var size by mutableStateOf(10f)
+        val notShownLatch = CountDownLatch(1)
+        val measureLatch = CountDownLatch(1)
+
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Box(Modifier.background(Color.Red).drawLatchModifier()) {
+                    var animatedSize by remember { mutableStateOf(size) }
+                    animatedSize = animate(size)
+                    if (animatedSize == 10f) {
+                        Layout(
+                            modifier = Modifier.background(Color.Cyan),
+                            children = {}
+                        ) { _, _ ->
+                            if (animatedSize != 10f) {
+                                measureLatch.countDown()
+                            }
+                            val sizePx = animatedSize.roundToInt()
+                            layout(sizePx, sizePx) {}
+                        }
+                    } else {
+                        notShownLatch.countDown()
+                    }
+                }
+            }
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+        drawLatch = CountDownLatch(1)
+        activityTestRule.runOnUiThread {
+            size = 20f
+        }
+
+        assertTrue(notShownLatch.await(1, TimeUnit.SECONDS))
+        assertFalse(measureLatch.await(200, TimeUnit.MILLISECONDS))
     }
 
     private fun composeSquares(model: SquareModel) {
