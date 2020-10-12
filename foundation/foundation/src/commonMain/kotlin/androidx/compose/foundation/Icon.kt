@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.unit.dp
 
 /**
- * Icon component that draws [asset] using [tint], defaulting to [contentColor].
+ * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor].
  *
  * @param asset [VectorAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 fun Icon(
     asset: VectorAsset,
     modifier: Modifier = Modifier,
-    tint: Color = contentColor()
+    tint: Color = AmbientContentColor.current
 ) {
     Icon(
         painter = VectorPainter(asset),
@@ -53,7 +53,7 @@ fun Icon(
 }
 
 /**
- * Icon component that draws [asset] using [tint], defaulting to [contentColor].
+ * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor].
  *
  * @param asset [ImageAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
@@ -63,7 +63,7 @@ fun Icon(
 fun Icon(
     asset: ImageAsset,
     modifier: Modifier = Modifier,
-    tint: Color = contentColor()
+    tint: Color = AmbientContentColor.current
 ) {
     val painter = remember(asset) { ImagePainter(asset) }
     Icon(
@@ -74,7 +74,7 @@ fun Icon(
 }
 
 /**
- * Icon component that draws a [painter] using [tint], defaulting to [contentColor].
+ * Icon component that draws a [painter] using [tint], defaulting to [AmbientContentColor].
  *
  * @param painter Painter to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
@@ -84,7 +84,7 @@ fun Icon(
 fun Icon(
     painter: Painter,
     modifier: Modifier = Modifier,
-    tint: Color = contentColor()
+    tint: Color = AmbientContentColor.current
 ) {
     // TODO: consider allowing developers to override the intrinsic size, and specify their own
     // size that this icon will be forced to take up.
@@ -94,12 +94,14 @@ fun Icon(
 
 private fun Modifier.defaultSizeFor(painter: Painter) =
     this.then(
-        if (painter.intrinsicSize == Size.Unspecified) {
+        if (painter.intrinsicSize == Size.Unspecified || painter.intrinsicSize.isInfinite()) {
             DefaultIconSizeModifier
         } else {
             Modifier
         }
     )
+
+private fun Size.isInfinite() = width.isInfinite() && height.isInfinite()
 
 // Default icon size, for icons with no intrinsic size information
 private val DefaultIconSizeModifier = Modifier.preferredSize(24.dp)

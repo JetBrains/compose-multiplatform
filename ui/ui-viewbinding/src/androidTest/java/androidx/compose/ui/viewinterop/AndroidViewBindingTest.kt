@@ -23,7 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
@@ -93,7 +93,7 @@ class AndroidViewBindingTest {
             Providers(DensityAmbient provides density) {
                 AndroidViewBinding(
                     TestLayoutBinding::inflate,
-                    Modifier.size(size).onPositioned {
+                    Modifier.size(size).onGloballyPositioned {
                         Truth.assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
                     }
                 )

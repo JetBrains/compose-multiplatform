@@ -50,6 +50,7 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
@@ -81,37 +82,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 import android.view.KeyEvent as AndroidKeyEvent
-
-/***
- * This function creates an instance of [AndroidOwner]
- *
- * @param context Context to use to create a View
- * @param lifecycleOwner Current [LifecycleOwner]. When it is not provided we will try to get the
- * owner using [ViewTreeLifecycleOwner] when we will be attached.
- * @param viewModelStoreOwner Current [ViewModelStoreOwner]. When it is not provided we will try
- * to get the owner using [ViewTreeViewModelStoreOwner] when we will be attached.
- * @param savedStateRegistryOwner Current [SavedStateRegistryOwner]. When it is not provided we will try
- * to get the owner using [ViewTreeSavedStateRegistryOwner] when we will be attached.
- */
-fun AndroidOwner(
-    context: Context,
-    lifecycleOwner: LifecycleOwner? = null,
-    viewModelStoreOwner: ViewModelStoreOwner? = null,
-    savedStateRegistryOwner: SavedStateRegistryOwner? = null
-): AndroidOwner = AndroidComposeView(
-    context,
-    lifecycleOwner,
-    viewModelStoreOwner,
-    savedStateRegistryOwner
-)
 
 @SuppressLint("ViewConstructor")
 @OptIn(
@@ -121,12 +96,7 @@ fun AndroidOwner(
     ExperimentalLayoutNodeApi::class
 )
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-internal class AndroidComposeView constructor(
-    context: Context,
-    initialLifecycleOwner: LifecycleOwner?,
-    initialViewModelStoreOwner: ViewModelStoreOwner?,
-    initialSavedStateRegistryOwner: SavedStateRegistryOwner?
-) : ViewGroup(context), AndroidOwner {
+internal class AndroidComposeView(context: Context) : ViewGroup(context), AndroidOwner {
 
     override val view: View = this
 
@@ -139,7 +109,9 @@ internal class AndroidComposeView constructor(
         properties = {}
     )
 
-    private val focusManager: FocusManager = FocusManager()
+    private val _focusManager: FocusManagerImpl = FocusManagerImpl()
+    override val focusManager: FocusManager
+        get() = _focusManager
 
     private val keyInputModifier = KeyInputModifier(null, null)
 
@@ -150,7 +122,7 @@ internal class AndroidComposeView constructor(
         it.modifier = Modifier
             .drawLayer()
             .then(semanticsModifier)
-            .then(focusManager.modifier)
+            .then(_focusManager.modifier)
             .then(keyInputModifier)
     }
 
@@ -184,10 +156,15 @@ internal class AndroidComposeView constructor(
 
     private var observationClearRequested = false
 
+    /**
+     * Provide clipboard manager to the user. Use the Android version of clipboard manager.
+     */
+    override val clipboardManager = AndroidClipboardManager(context)
+
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         Log.d(FOCUS_TAG, "Owner FocusChanged($gainFocus)")
-        with(focusManager) {
+        with(_focusManager) {
             if (gainFocus) takeFocus() else releaseFocus()
         }
     }
@@ -198,6 +175,14 @@ internal class AndroidComposeView constructor(
 
     override fun dispatchKeyEvent(event: AndroidKeyEvent): Boolean {
         return sendKeyEvent(KeyEventAndroid(event))
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+
+        if (hasWindowFocus) {
+            accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
+        }
     }
 
     private val snapshotObserver = SnapshotStateObserver { command ->
@@ -245,6 +230,9 @@ internal class AndroidComposeView constructor(
         isFocusableInTouchMode = true
         clipChildren = false
         root.isPlaced = true
+        clipboardManager.addChangeListener {
+            accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
+        }
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
         AndroidOwner.onAndroidOwnerCreatedCallback?.invoke(this)
     }
@@ -393,7 +381,7 @@ internal class AndroidComposeView constructor(
         // we postpone onPositioned callbacks until onLayout as LayoutCoordinates
         // are currently wrong if you try to get the global(activity) coordinates -
         // View is not yet laid out.
-        dispatchOnPositioned()
+        updatePositionCacheAndDispatch()
         if (_androidViewsHandler != null && androidViewsHandler.isLayoutRequested) {
             // Even if we laid out during onMeasure, this can happen when the Views hierarchy
             // receives forceLayout(). We need to relayout to clear the isLayoutRequested info
@@ -401,6 +389,9 @@ internal class AndroidComposeView constructor(
             androidViewsHandler.layout(0, 0, r - l, b - t)
         }
     }
+
+    override val hasPendingMeasureOrLayout
+        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
     private var globalPosition: IntOffset = IntOffset.Zero
 
@@ -410,7 +401,7 @@ internal class AndroidComposeView constructor(
     // so that we don't have to continue using try/catch after fails once.
     private var isRenderNodeCompatible = true
 
-    private fun dispatchOnPositioned() {
+    private fun updatePositionCacheAndDispatch() {
         var positionChanged = false
         getLocationOnScreen(tmpPositionArray)
         if (globalPosition.x != tmpPositionArray[0] || globalPosition.y != tmpPositionArray[1]) {
@@ -511,18 +502,7 @@ internal class AndroidComposeView constructor(
         }
     }
 
-    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? =
-        if (initialLifecycleOwner != null && initialViewModelStoreOwner != null &&
-            initialSavedStateRegistryOwner != null
-        ) {
-            AndroidOwner.ViewTreeOwners(
-                initialLifecycleOwner,
-                initialViewModelStoreOwner,
-                initialSavedStateRegistryOwner
-            )
-        } else {
-            null
-        }
+    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? = null
         private set
 
     override fun setOnViewTreeOwnersAvailable(callback: (AndroidOwner.ViewTreeOwners) -> Unit) {
@@ -541,13 +521,13 @@ internal class AndroidComposeView constructor(
     // on a different position, but also in the position of each of the grandparents as all these
     // positions add up to final global position)
     private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-        dispatchOnPositioned()
+        updatePositionCacheAndDispatch()
     }
 
     // executed when a scrolling container like ScrollView of RecyclerView performed the scroll,
     // this could affect our global position
     private val scrollChangedListener = ViewTreeObserver.OnScrollChangedListener {
-        dispatchOnPositioned()
+        updatePositionCacheAndDispatch()
     }
 
     override fun onAttachedToWindow() {
@@ -607,6 +587,15 @@ internal class AndroidComposeView constructor(
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
         measureAndLayout()
+        // TODO(b/166848812): Calling updatePositionCacheAndDispatch here seems necessary because
+        //  if the soft keyboard being displayed causes the AndroidComposeView to be offset from
+        //  the screen, we don't seem to have any timely callback that updates our globalPosition
+        //  cache. ViewTreeObserver.OnGlobalLayoutListener gets called, but not when the keyboard
+        //  opens. And when it gets called as the keyboard is closing, it is called before the
+        //  keyboard actually closes causing the globalPosition to be wrong.
+        // TODO(shepshapard): There is no test to garuntee that this method is called here as doing
+        //  so proved to be very difficult. A test should be added.
+        updatePositionCacheAndDispatch()
         val processResult = trace("AndroidOwner:onTouch") {
             val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent)
             if (pointerInputEvent != null) {
@@ -644,11 +633,6 @@ internal class AndroidComposeView constructor(
      */
     override val hapticFeedBack: HapticFeedback =
         AndroidHapticFeedback(this)
-
-    /**
-     * Provide clipboard manager to the user. Use the Android version of clipboard manager.
-     */
-    override val clipboardManager: ClipboardManager = AndroidClipboardManager(context)
 
     /**
      * Provide textToolbar to the user, for text-related operation. Use the Android version of

@@ -18,13 +18,12 @@ package androidx.compose.material
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.contentColor
-import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -48,7 +47,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
@@ -237,7 +236,7 @@ class ButtonTest {
     fun containedButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             Button(onClick = {}) {
-                assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.button)
+                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -246,7 +245,7 @@ class ButtonTest {
     fun outlinedButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             OutlinedButton(onClick = {}) {
-                assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.button)
+                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -255,7 +254,7 @@ class ButtonTest {
     fun textButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             TextButton(onClick = {}) {
-                assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.button)
+                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -290,7 +289,7 @@ class ButtonTest {
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             primary = MaterialTheme.colors.primary
-            Providers(ShapesAmbient provides Shapes(small = shape)) {
+            Providers(AmbientShapes provides Shapes(small = shape)) {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = 0.dp) {
                     Box(Modifier.preferredSize(10.dp, 10.dp))
                 }
@@ -315,7 +314,7 @@ class ButtonTest {
         rule.setMaterialContent {
             onPrimary = MaterialTheme.colors.onPrimary
             Button(onClick = {}) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -329,7 +328,7 @@ class ButtonTest {
         rule.setMaterialContent {
             primary = MaterialTheme.colors.primary
             OutlinedButton(onClick = {}) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -343,7 +342,7 @@ class ButtonTest {
         rule.setMaterialContent {
             primary = MaterialTheme.colors.primary
             TextButton(onClick = {}) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -481,9 +480,9 @@ class ButtonTest {
         var emphasis: Emphasis? = null
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = EmphasisAmbient.current.disabled
+            emphasis = AmbientEmphasisLevels.current.disabled
             Button(onClick = {}, enabled = false) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -497,9 +496,9 @@ class ButtonTest {
         var emphasis: Emphasis? = null
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = EmphasisAmbient.current.disabled
+            emphasis = AmbientEmphasisLevels.current.disabled
             OutlinedButton(onClick = {}, enabled = false) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -513,9 +512,9 @@ class ButtonTest {
         var emphasis: Emphasis? = null
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = EmphasisAmbient.current.disabled
+            emphasis = AmbientEmphasisLevels.current.disabled
             TextButton(onClick = {}, enabled = false) {
-                content = contentColor()
+                content = AmbientContentColor.current
             }
         }
 
@@ -528,10 +527,10 @@ class ButtonTest {
         var contentCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
             Box {
-                Button({}, Modifier.onPositioned { buttonCoordinates = it }) {
+                Button({}, Modifier.onGloballyPositioned { buttonCoordinates = it }) {
                     Box(
                         Modifier.preferredSize(2.dp)
-                            .onPositioned { contentCoordinates = it }
+                            .onGloballyPositioned { contentCoordinates = it }
                     )
                 }
             }
@@ -611,13 +610,18 @@ class ButtonTest {
         var buttonBounds = Rect(0f, 0f, 0f, 0f)
         rule.setMaterialContent {
             Column {
-                Spacer(Modifier.size(10.dp).weight(1f).onPositioned {
-                    item1Bounds = it.boundsInRoot
-                })
+                Spacer(
+                    Modifier.size(10.dp).weight(1f).onGloballyPositioned {
+                        item1Bounds = it.boundsInRoot
+                    }
+                )
 
-                Button(onClick = {}, modifier = Modifier.weight(1f).onPositioned {
-                    buttonBounds = it.boundsInRoot
-                }) {
+                Button(
+                    onClick = {},
+                    modifier = Modifier.weight(1f).onGloballyPositioned {
+                        buttonBounds = it.boundsInRoot
+                    }
+                ) {
                     Text("Button")
                 }
 
@@ -635,15 +639,22 @@ class ButtonTest {
         var item1Bounds = Rect(0f, 0f, 0f, 0f)
         var item2Bounds = Rect(0f, 0f, 0f, 0f)
         rule.setMaterialContent {
-            Button(onClick = {}, modifier = Modifier.onPositioned {
-                buttonBounds = it.boundsInRoot
-            }) {
-                Spacer(Modifier.size(10.dp).onPositioned {
-                    item1Bounds = it.boundsInRoot
-                })
-                Spacer(Modifier.width(10.dp).height(5.dp).onPositioned {
-                    item2Bounds = it.boundsInRoot
-                })
+            Button(
+                onClick = {},
+                modifier = Modifier.onGloballyPositioned {
+                    buttonBounds = it.boundsInRoot
+                }
+            ) {
+                Spacer(
+                    Modifier.size(10.dp).onGloballyPositioned {
+                        item1Bounds = it.boundsInRoot
+                    }
+                )
+                Spacer(
+                    Modifier.width(10.dp).height(5.dp).onGloballyPositioned {
+                        item2Bounds = it.boundsInRoot
+                    }
+                )
             }
         }
 
@@ -661,9 +672,10 @@ class ButtonTest {
         var childCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
             Box {
-                button(Modifier.onPositioned { parentCoordinates = it }) {
-                    Text("Test button",
-                        Modifier.onPositioned { childCoordinates = it }
+                button(Modifier.onGloballyPositioned { parentCoordinates = it }) {
+                    Text(
+                        "Test button",
+                        Modifier.onGloballyPositioned { childCoordinates = it }
                     )
                 }
             }
@@ -671,7 +683,7 @@ class ButtonTest {
 
         rule.runOnIdle {
             val topLeft = childCoordinates!!.localToGlobal(Offset.Zero).x -
-                    parentCoordinates!!.localToGlobal(Offset.Zero).x
+                parentCoordinates!!.localToGlobal(Offset.Zero).x
             val currentPadding = with(rule.density) {
                 padding.toIntPx().toFloat()
             }

@@ -73,104 +73,104 @@ class DoubleTapGestureFilterTest {
     // Tests that verify conditions under which onDoubleTap will not be called.
 
     @Test
-    fun onPointerInput_down_onDoubleTapNotCalled() {
-        filter::onPointerInput.invokeOverAllPasses(down(0, 0.milliseconds))
+    fun onPointerEvent_down_onDoubleTapNotCalled() {
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUp_onDoubleTapNotCalled() {
         val down = down(0, 0.milliseconds)
         val up = down.up(duration = 1.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownWithinTimeout_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpDownWithinTimeout_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val up = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 100.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownOutsideTimeout_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpDownOutsideTimeout_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val up = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 101.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownOutsideTimeoutUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpDownOutsideTimeoutUp_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 101.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downMoveConsumedUpDownInsideTimeoutUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downMoveConsumedUpDownInsideTimeoutUp_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val moveConsumed = down1.moveTo(1.milliseconds, x = 1f).consume(dx = 1f)
         val up1 = moveConsumed.up(duration = 2.milliseconds)
         val down2 = down(2, 101.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(moveConsumed)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(moveConsumed))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownInsideTimeoutMoveConsumedUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpDownInsideTimeoutMoveConsumedUp_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 100.milliseconds)
         val moveConsumed = down2.moveTo(101.milliseconds, x = 1f).consume(dx = 1f)
         val up2 = moveConsumed.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(moveConsumed)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(moveConsumed))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_2Down1MoveConsumedUpDownInsideTimeoutUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_2Down1MoveConsumedUpDownInsideTimeoutUp_onDoubleTapNotCalled() {
         val down1A = down(0, 0.milliseconds)
         val down1B = down(1, 0.milliseconds)
         val moveConsumed1A = down1A.moveTo(1.milliseconds, x = 1f).consume(dx = 1f)
@@ -180,18 +180,18 @@ class DoubleTapGestureFilterTest {
         val down2 = down(2, 101.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1A, down1B)
-        filter::onPointerInput.invokeOverAllPasses(moveConsumed1A, move1B)
-        filter::onPointerInput.invokeOverAllPasses(up1A, up1B)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1A, down1B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(moveConsumed1A, move1B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1A, up1B))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUp2DownInsideTimeout1MoveConsumedUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUp2DownInsideTimeout1MoveConsumedUp_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val up2 = down1.up(duration = 1.milliseconds)
         val down2A = down(0, 100.milliseconds)
@@ -201,82 +201,82 @@ class DoubleTapGestureFilterTest {
         val up2A = moveConsumed2A.up(duration = 102.milliseconds)
         val up2B = move2B.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2A, down2B)
-        filter::onPointerInput.invokeOverAllPasses(moveConsumed2A, move2B)
-        filter::onPointerInput.invokeOverAllPasses(up2A, up2B)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2A, down2B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(moveConsumed2A, move2B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2A, up2B))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downConsumedUpDownWithinTimeoutUp_onDoubleTapNotCalled() {
-        val down1 = down(1, 0.milliseconds).consumeDownChange()
+    fun onPointerEvent_downConsumedUpDownWithinTimeoutUp_onDoubleTapNotCalled() {
+        val down1 = down(1, 0.milliseconds).apply { consumeDownChange() }
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(0, 100.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpConsumedDownWithinTimeoutUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpConsumedDownWithinTimeoutUp_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
-        val up1 = down1.up(duration = 1.milliseconds).consumeDownChange()
+        val up1 = down1.up(duration = 1.milliseconds).apply { consumeDownChange() }
         val down2 = down(0, 100.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownConsumedWithinTimeoutUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpDownConsumedWithinTimeoutUp_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
-        val down2 = down(0, 100.milliseconds).consumeDownChange()
+        val down2 = down(0, 100.milliseconds).apply { consumeDownChange() }
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownWithinTimeoutUpConsumed_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpDownWithinTimeoutUpConsumed_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(0, 100.milliseconds)
-        val up2 = down2.up(duration = 102.milliseconds).consumeDownChange()
+        val up2 = down2.up(duration = 102.milliseconds).apply { consumeDownChange() }
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_2down1Up1DownWithinTimeout1Up_onDoubleTapNotCalled() {
+    fun onPointerEvent_2down1Up1DownWithinTimeout1Up_onDoubleTapNotCalled() {
         val down1A = down(0, 0.milliseconds)
         val down1B = down(1, 0.milliseconds)
         val move1A1 = down1A.moveTo(2.milliseconds)
@@ -286,17 +286,17 @@ class DoubleTapGestureFilterTest {
         val move1A3 = move1A2.moveTo(102.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1A, down1B)
-        filter::onPointerInput.invokeOverAllPasses(move1A1, up2B)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1A, down1B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1A1, up2B))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(move1A2, down2)
-        filter::onPointerInput.invokeOverAllPasses(move1A3, up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1A2, down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1A3, up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_1down1Up2DownWithinTimeout1Up_onDoubleTapNotCalled() {
+    fun onPointerEvent_1down1Up2DownWithinTimeout1Up_onDoubleTapNotCalled() {
         val down1 = down(0, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2A = down(0, 100.milliseconds)
@@ -304,45 +304,45 @@ class DoubleTapGestureFilterTest {
         val move2A = down2A.moveTo(101.milliseconds)
         val up2B = down2B.up(duration = 101.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2A, down2B)
-        filter::onPointerInput.invokeOverAllPasses(move2A, up2B)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2A, down2B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2A, up2B))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downMoveOutOfBoundsUpDownUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downMoveOutOfBoundsUpDownUp_onDoubleTapNotCalled() {
         val down = down(0, 0.milliseconds, 0f, 0f)
         val move = down.moveTo(1.milliseconds, 1f, 1f)
         val up = move.up(duration = 12.milliseconds)
         val down2 = down(0, 13.milliseconds, 0f, 0f)
         val up2 = down2.up(duration = 14.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(move, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(down2, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up2, IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2), IntSize(1, 1))
 
         verify(onDoubleTap, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownMoveOutOfBoundsUp_onDoubleTapNotCalled() {
+    fun onPointerEvent_downUpDownMoveOutOfBoundsUp_onDoubleTapNotCalled() {
         val down = down(0, 0.milliseconds, 0f, 0f)
         val up = down.up(duration = 1.milliseconds)
         val down2 = down(0, 2.milliseconds, 0f, 0f)
         val move2 = down2.moveTo(3.milliseconds, 1f, 1f)
         val up2 = down2.up(duration = 4.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(down2, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(move2, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up2, IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2), IntSize(1, 1))
 
         verify(onDoubleTap, never()).invoke(any())
     }
@@ -350,59 +350,59 @@ class DoubleTapGestureFilterTest {
     // Tests that verify conditions under which onDoubleTap will be called.
 
     @Test
-    fun onPointerInput_downUpDownInsideTimeoutUp_onDoubleTapCalled() {
+    fun onPointerEvent_downUpDownInsideTimeoutUp_onDoubleTapCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 100.milliseconds)
         val up2 = down2.up(duration = 101.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downMoveUpDownInsideTimeoutUp_onDoubleTapCalled() {
+    fun onPointerEvent_downMoveUpDownInsideTimeoutUp_onDoubleTapCalled() {
         val down1 = down(1, 0.milliseconds)
         val move = down1.moveTo(1.milliseconds, x = 1f)
         val up1 = move.up(duration = 2.milliseconds)
         val down2 = down(2, 101.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(move)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownInsideTimeoutMoveUp_onDoubleTapCalled() {
+    fun onPointerEvent_downUpDownInsideTimeoutMoveUp_onDoubleTapCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 10.milliseconds)
         val move = down2.moveTo(101.milliseconds, x = 1f)
         val up2 = move.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(move)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
 
     @Test
-    fun onPointerInput_2Down1MoveUpDownInsideTimeoutUp_onDoubleTapCalled() {
+    fun onPointerEvent_2Down1MoveUpDownInsideTimeoutUp_onDoubleTapCalled() {
         val down1A = down(0, 0.milliseconds)
         val down1B = down(1, 0.milliseconds)
         val move1A = down1A.moveTo(1.milliseconds, x = 1f)
@@ -412,18 +412,18 @@ class DoubleTapGestureFilterTest {
         val down2 = down(2, 101.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1A, down1B)
-        filter::onPointerInput.invokeOverAllPasses(move1A, move1B)
-        filter::onPointerInput.invokeOverAllPasses(up1A, up1B)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1A, down1B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1A, move1B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1A, up1B))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUp2DownInsideTimeout1MoveUp_onDoubleTapCalled() {
+    fun onPointerEvent_downUp2DownInsideTimeout1MoveUp_onDoubleTapCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2A = down(0, 100.milliseconds)
@@ -433,18 +433,18 @@ class DoubleTapGestureFilterTest {
         val up2A = move2A.up(duration = 102.milliseconds)
         val up2B = move2B.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2A, down2B)
-        filter::onPointerInput.invokeOverAllPasses(move2A, move2B)
-        filter::onPointerInput.invokeOverAllPasses(up2A, up2B)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2A, down2B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2A, move2B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2A, up2B))
 
         verify(onDoubleTap).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downMoveOutOfBoundsUpDownUpDownUp_onDoubleTapCalledOnce() {
+    fun onPointerEvent_downMoveOutOfBoundsUpDownUpDownUp_onDoubleTapCalledOnce() {
         val down = down(0, 0.milliseconds, 0f, 0f)
         val move = down.moveTo(1.milliseconds, 1f, 1f)
         val up = move.up(duration = 2.milliseconds)
@@ -453,20 +453,20 @@ class DoubleTapGestureFilterTest {
         val down3 = down(0, 5.milliseconds, 0f, 0f)
         val up3 = down3.up(6.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(move, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up, IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up), IntSize(1, 1))
 
-        filter::onPointerInput.invokeOverAllPasses(down2, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up2, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(down3, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up3, IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down3), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up3), IntSize(1, 1))
 
         verify(onDoubleTap).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downUpDownMoveOutOfBoundsUpDownUpDownUp_onDoubleTapCalledOnce() {
+    fun onPointerEvent_downUpDownMoveOutOfBoundsUpDownUpDownUp_onDoubleTapCalledOnce() {
         val down = down(0, 0.milliseconds, 0f, 0f)
         val up = down.up(duration = 2.milliseconds)
         val down2 = down(0, 3.milliseconds, 0f, 0f)
@@ -477,16 +477,16 @@ class DoubleTapGestureFilterTest {
         val down4 = down(0, 7.milliseconds, 0f, 0f)
         val up4 = down4.up(8.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(down2, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(move2, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up2, IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2), IntSize(1, 1))
 
-        filter::onPointerInput.invokeOverAllPasses(down3, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up3, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(down4, IntSize(1, 1))
-        filter::onPointerInput.invokeOverAllPasses(up4, IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down3), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up3), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down4), IntSize(1, 1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up4), IntSize(1, 1))
 
         verify(onDoubleTap).invoke(any())
     }
@@ -494,7 +494,7 @@ class DoubleTapGestureFilterTest {
     // This test verifies that the 2nd down causes the double tap time out timer to stop such that
     // the second wait doesn't cause the gesture detector to reset to an idle state.
     @Test
-    fun onPointerInput_downUpWaitHalfDownWaitHalfUp_onDoubleTapCalled() {
+    fun onPointerEvent_downUpWaitHalfDownWaitHalfUp_onDoubleTapCalled() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val wait1 = 50L
@@ -502,12 +502,12 @@ class DoubleTapGestureFilterTest {
         val wait2 = 50L
         val up2 = down2.up(duration = 101.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(wait1, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
         testContext.advanceTimeBy(wait2, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
@@ -515,41 +515,41 @@ class DoubleTapGestureFilterTest {
     // Tests that verify correctness of PxPosition value passed to onDoubleTap
 
     @Test
-    fun onPointerInput_downUpDownUpAllAtOrigin_onDoubleTapCalledWithOrigin() {
+    fun onPointerEvent_downUpDownUpAllAtOrigin_onDoubleTapCalledWithOrigin() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 100.milliseconds)
         val up2 = down2.up(duration = 101.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(Offset.Zero)
     }
 
     @Test
-    fun onPointerInput_downUpDownMoveUp_onDoubleTapCalledWithFinalMovePosition() {
+    fun onPointerEvent_downUpDownMoveUp_onDoubleTapCalledWithFinalMovePosition() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 100.milliseconds)
         val move2 = down2.moveTo(101.milliseconds, 3f, 5f)
         val up2 = move2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(move2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(Offset(3f, 5f))
     }
 
     @Test
-    fun onPointerInput_downUp2Down2Move1UpThen1Up_onDoubleTapCalledWithFinalFingerPosition() {
+    fun onPointerEvent_downUp2Down2Move1UpThen1Up_onDoubleTapCalledWithFinalFingerPosition() {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2A = down(0, 100.milliseconds)
@@ -560,13 +560,13 @@ class DoubleTapGestureFilterTest {
         val move2B2 = move2B1.moveTo(102.milliseconds, x = 7f, y = 11f)
         val up2B = move2B2.up(duration = 103.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2A, down2B)
-        filter::onPointerInput.invokeOverAllPasses(move2A, move2B1)
-        filter::onPointerInput.invokeOverAllPasses(up2A, move2B2)
-        filter::onPointerInput.invokeOverAllPasses(up2B)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2A, down2B))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2A, move2B1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2A, move2B2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2B))
 
         verify(onDoubleTap).invoke(Offset(7f, 11f))
     }
@@ -574,65 +574,65 @@ class DoubleTapGestureFilterTest {
     // Tests that verify correct consumption behavior
 
     @Test
-    fun onPointerInput_down_downNotConsumed() {
+    fun onPointerEvent_down_downNotConsumed() {
         val down = down(0, 0.milliseconds)
-        val result = filter::onPointerInput.invokeOverAllPasses(down)
-        assertThat(result.consumed.downChange).isFalse()
+        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        assertThat(result.changes[0].consumed.downChange).isFalse()
     }
 
     @Test
-    fun onPointerInput_downUp_upNotConsumed() {
+    fun onPointerEvent_downUp_upNotConsumed() {
         val down = down(0, 0.milliseconds)
         val up = down.up(1.milliseconds)
-        filter::onPointerInput.invokeOverAllPasses(down)
-        val result = filter::onPointerInput.invokeOverAllPasses(up)
-        assertThat(result.consumed.downChange).isFalse()
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
+        assertThat(result.changes[0].consumed.downChange).isFalse()
     }
 
     @Test
-    fun onPointerInput_downUpDownInsideTimeout_lastDownNotConsumed() {
+    fun onPointerEvent_downUpDownInsideTimeout_lastDownNotConsumed() {
         val down = down(0, 0.milliseconds)
         val up = down.up(1.milliseconds)
         val down2 = down(2, 100.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        val result = filter::onPointerInput.invokeOverAllPasses(down2)
+        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
-        assertThat(result.consumed.downChange).isFalse()
+        assertThat(result.changes[0].consumed.downChange).isFalse()
     }
 
     @Test
-    fun onPointerInput_downUpDownOutsideTimeoutUp_lastUpNotConsumed() {
+    fun onPointerEvent_downUpDownOutsideTimeoutUp_lastUpNotConsumed() {
         val down = down(0, 0.milliseconds)
         val up = down.up(1.milliseconds)
         val down2 = down(2, 101.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        val result = filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
-        assertThat(result.consumed.downChange).isFalse()
+        assertThat(result.changes[0].consumed.downChange).isFalse()
     }
 
     @Test
-    fun onPointerInput_downUpDownInsideTimeoutUp_lastUpConsumed() {
+    fun onPointerEvent_downUpDownInsideTimeoutUp_lastUpConsumed() {
         val down = down(0, 0.milliseconds)
         val up = down.up(1.milliseconds)
         val down2 = down(2, 100.milliseconds)
         val up2 = down2.up(duration = 101.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        val result = filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
-        assertThat(result.consumed.downChange).isTrue()
+        assertThat(result.changes[0].consumed.downChange).isTrue()
     }
 
     // Tests that verify correct cancellation behavior
@@ -644,12 +644,12 @@ class DoubleTapGestureFilterTest {
         val down2 = down(1, duration = 200.milliseconds)
         val up2 = down2.up(duration = 201.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         filter.onCancel()
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
@@ -661,12 +661,12 @@ class DoubleTapGestureFilterTest {
         val down2 = down(2, 200.milliseconds)
         val up2 = down2.up(duration = 201.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap, never()).invoke(any())
     }
@@ -679,11 +679,11 @@ class DoubleTapGestureFilterTest {
         val up2 = down2.up(duration = 201.milliseconds)
 
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
@@ -696,13 +696,13 @@ class DoubleTapGestureFilterTest {
         val down2 = down(2, duration = 200.milliseconds)
         val up2 = down2.up(duration = 201.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
@@ -716,14 +716,14 @@ class DoubleTapGestureFilterTest {
         val down2 = down(2, duration = 200.milliseconds)
         val up2 = down2.up(duration = 201.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down0)
-        filter::onPointerInput.invokeOverAllPasses(up0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up0))
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
@@ -738,15 +738,15 @@ class DoubleTapGestureFilterTest {
         val down3 = down(3, 200.milliseconds)
         val up3 = down3.up(duration = 201.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down0)
-        filter::onPointerInput.invokeOverAllPasses(up0)
-        filter::onPointerInput.invokeOverAllPasses(down1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up0))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down3)
-        filter::onPointerInput.invokeOverAllPasses(up3)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down3))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up3))
 
         verify(onDoubleTap).invoke(any())
     }
@@ -763,17 +763,17 @@ class DoubleTapGestureFilterTest {
         val down3 = down(3, 300.milliseconds)
         val up3 = down3.up(duration = 301.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down0)
-        filter::onPointerInput.invokeOverAllPasses(up0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up0))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down3)
-        filter::onPointerInput.invokeOverAllPasses(up3)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down3))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up3))
 
         verify(onDoubleTap, times(2)).invoke(any())
     }
@@ -794,15 +794,15 @@ class DoubleTapGestureFilterTest {
         val down2 = down(2, 102.milliseconds)
         val up2 = down2.up(duration = 103.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down0)
-        filter::onPointerInput.invokeOverAllPasses(up0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up0))
         testContext.advanceTimeBy(delay0, TimeUnit.MILLISECONDS)
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(up1)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(onDoubleTap).invoke(any())
     }
@@ -810,12 +810,12 @@ class DoubleTapGestureFilterTest {
     // Verifies correct behavior around dispatching custom messages with simple cases
 
     @Test
-    fun onPointerInput_downUp_delayUpToCorrectPointersAndRetained() {
+    fun onPointerEvent_downUp_delayUpToCorrectPointersAndRetained() {
         val down1 = down(123, 0.milliseconds)
         val up = down1.up(duration = 1.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         verify(customEventDispatcher)
             .dispatchCustomEvent(DelayUpEvent(DelayUpMessage.DelayUp, setOf(PointerId(123))))
@@ -825,17 +825,17 @@ class DoubleTapGestureFilterTest {
     }
 
     @Test
-    fun onPointerInput_downUpDownBeforeTimeOut_delayUpConsumedToCorrectPointersAndReleased() {
+    fun onPointerEvent_downUpDownBeforeTimeOut_delayUpConsumedToCorrectPointersAndReleased() {
         val down1 = down(123, 0.milliseconds)
         val up = down1.up(duration = 1.milliseconds)
         val delay1 = 1L
         val down2 = down(456, 2.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         reset(customEventDispatcher)
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
         verify(customEventDispatcher).dispatchCustomEvent(
             DelayUpEvent(DelayUpMessage.DelayedUpConsumed, setOf(PointerId(123)))
@@ -847,13 +847,13 @@ class DoubleTapGestureFilterTest {
     }
 
     @Test
-    fun onPointerInput_downUpTimeOut_delayUpNotConsumedToCorrectPointersAndReleased() {
+    fun onPointerEvent_downUpTimeOut_delayUpNotConsumedToCorrectPointersAndReleased() {
         val down1 = down(123, 0.milliseconds)
         val up = down1.up(duration = 1.milliseconds)
         val delay1 = 1000L
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         reset(customEventDispatcher)
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
 
@@ -869,39 +869,39 @@ class DoubleTapGestureFilterTest {
     // Verifies correct behavior around dispatching custom messages in relation to other factors
 
     @Test
-    fun onPointerInput_downUpConsumed_noCustomMessageDispatched() {
+    fun onPointerEvent_downUpConsumed_noCustomMessageDispatched() {
         val down1 = down(123, 0.milliseconds)
-        val upConsumed = down1.up(duration = 1.milliseconds).consumeDownChange()
+        val upConsumed = down1.up(duration = 1.milliseconds).apply { consumeDownChange() }
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(upConsumed)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(upConsumed))
 
         verifyNoMoreInteractions(customEventDispatcher)
     }
 
     @Test
-    fun onPointerInput_downUpConsumedDownBeforeTimeout_noCustomMessageDispatched() {
+    fun onPointerEvent_downUpConsumedDownBeforeTimeout_noCustomMessageDispatched() {
         val down1 = down(123, 0.milliseconds)
-        val upConsumed = down1.up(duration = 1.milliseconds).consumeDownChange()
+        val upConsumed = down1.up(duration = 1.milliseconds).apply { consumeDownChange() }
         val delay1 = 1L
         val down2 = down(456, 2.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(upConsumed)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(upConsumed))
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
-        filter::onPointerInput.invokeOverAllPasses(down2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
         verifyNoMoreInteractions(customEventDispatcher)
     }
 
     @Test
-    fun onPointerInput_downUpConsumedTimeout_noCustomMessageDispatched() {
+    fun onPointerEvent_downUpConsumedTimeout_noCustomMessageDispatched() {
         val down1 = down(123, 0.milliseconds)
-        val upConsumed = down1.up(duration = 1.milliseconds).consumeDownChange()
+        val upConsumed = down1.up(duration = 1.milliseconds).apply { consumeDownChange() }
         val delay1 = 1000L
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(upConsumed)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(upConsumed))
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
 
         verifyNoMoreInteractions(customEventDispatcher)
@@ -913,8 +913,8 @@ class DoubleTapGestureFilterTest {
         val up = down1.up(duration = 1.milliseconds)
         val delay1 = 1000L
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         reset(customEventDispatcher)
         filter.onCancel()
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
@@ -929,37 +929,37 @@ class DoubleTapGestureFilterTest {
     }
 
     @Test
-    fun onPointerInput_downUpCancelDownBeforeTimeOut_noMessageDispatched() {
+    fun onPointerEvent_downUpCancelDownBeforeTimeOut_noMessageDispatched() {
         val down1 = down(123, 0.milliseconds)
         val up = down1.up(duration = 1.milliseconds)
         val delay1 = 1L
         val down2 = down(456, 2.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
         filter.onCancel()
         reset(customEventDispatcher)
-        filter::onPointerInput.invokeOverAllPasses(down2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
         verifyNoMoreInteractions(customEventDispatcher)
     }
 
     @Test
-    fun onPointerInput_downUpCancelDownUp_delayUpToCorrectPointersAndRetained() {
+    fun onPointerEvent_downUpCancelDownUp_delayUpToCorrectPointersAndRetained() {
         val down1 = down(123, 0.milliseconds)
         val up = down1.up(duration = 1.milliseconds)
         val delay1 = 1L
         val down2 = down(456, 2.milliseconds)
         val up2 = down2.up(3.milliseconds)
 
-        filter::onPointerInput.invokeOverAllPasses(down1)
-        filter::onPointerInput.invokeOverAllPasses(up)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(delay1, TimeUnit.MILLISECONDS)
         filter.onCancel()
         reset(customEventDispatcher)
-        filter::onPointerInput.invokeOverAllPasses(down2)
-        filter::onPointerInput.invokeOverAllPasses(up2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
         verify(customEventDispatcher)
             .dispatchCustomEvent(DelayUpEvent(DelayUpMessage.DelayUp, setOf(PointerId(456))))

@@ -28,6 +28,7 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
@@ -81,14 +82,17 @@ class DesktopOwner(
         properties = {}
     )
 
-    private val focusManager: FocusManager = FocusManager()
+    private val _focusManager: FocusManagerImpl = FocusManagerImpl()
+    override val focusManager: FocusManager
+        get() = _focusManager
+
     private val keyInputModifier = KeyInputModifier(null, null)
 
     override val root = LayoutNode().also {
         it.measureBlocks = RootMeasureBlocks
         it.modifier = Modifier.drawLayer()
             .then(semanticsModifier)
-            .then(focusManager.modifier)
+            .then(_focusManager.modifier)
             .then(keyInputModifier)
         it.isPlaced = true
     }
@@ -103,6 +107,7 @@ class DesktopOwner(
         container.register(this)
         snapshotObserver.enableStateUpdatesObserving(true)
         root.attach(this)
+        _focusManager.takeFocus()
     }
 
     fun dispose() {
@@ -119,6 +124,8 @@ class DesktopOwner(
 
     override val clipboardManager = DesktopClipboardManager()
 
+    internal val selectionManager = SelectionManagerTracker()
+
     override val textToolbar = DesktopTextToolbar()
 
     override val semanticsOwner: SemanticsOwner = SemanticsOwner(root)
@@ -127,12 +134,12 @@ class DesktopOwner(
 
     override val autofill: Autofill? get() = null
 
-    // TODO(demin): implement sending key events from OS
-    // (see Ralston Da Silva comment in
-    //  [https://android-review.googlesource.com/c/platform/frameworks/support/+/1372126/6])
-    // implement also key codes in androidx.compose.ui.input.key.Key
+    val keyboard: Keyboard?
+        get() = container.keyboard
+
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
-        return keyInputModifier.processKeyInput(keyEvent)
+        return keyboard?.processKeyInput(keyEvent) ?: false ||
+            keyInputModifier.processKeyInput(keyEvent)
     }
 
     override var showLayoutBounds = false
@@ -166,6 +173,9 @@ class DesktopOwner(
         measureAndLayoutDelegate.requestRelayout(layoutNode)
         container.invalidate()
     }
+
+    override val hasPendingMeasureOrLayout
+        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
     // Don't inline these variables into snapshotObserver.observeReads,
     // because observeReads requires that onChanged should always be the same instance.
@@ -274,7 +284,7 @@ class DesktopOwner(
                 .filterIsInstance<PointerMoveEventFilter>()
         ) {
             if (!onMoveConsumed) {
-                val relative = position - filter.layoutCoordinates.globalBounds.topLeft
+                val relative = position - filter.layoutCoordinates!!.globalBounds.topLeft
                 onMoveConsumed = filter.onMoveHandler(relative)
             }
             if (!onEnterConsumed && !oldMoveFilters.contains(filter))

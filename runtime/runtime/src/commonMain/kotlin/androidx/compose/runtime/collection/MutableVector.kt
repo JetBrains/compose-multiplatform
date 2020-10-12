@@ -18,7 +18,6 @@
 
 package androidx.compose.runtime.collection
 
-import androidx.compose.runtime.sortArrayWith
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.math.max
@@ -204,6 +203,18 @@ class MutableVector<T> @PublishedApi internal constructor(
     inline fun any(predicate: (T) -> Boolean): Boolean {
         contract { callsInPlace(predicate) }
         for (i in 0..lastIndex) {
+            if (predicate(get(i))) return true
+        }
+        return false
+    }
+
+    /**
+     * Returns `true` if any of the elements give a `true` return value for [predicate] while
+     * iterating in the reverse order.
+     */
+    inline fun reversedAny(predicate: (T) -> Boolean): Boolean {
+        contract { callsInPlace(predicate) }
+        for (i in lastIndex downTo 0) {
             if (predicate(get(i))) return true
         }
         return false
@@ -611,6 +622,13 @@ class MutableVector<T> @PublishedApi internal constructor(
     }
 
     /**
+     * [remove] [element] from the [MutableVector]
+     */
+    inline operator fun minusAssign(element: T) {
+        remove(element)
+    }
+
+    /**
      * Removes [element] from the [MutableVector]. If [element] was in the [MutableVector]
      * and was removed, `true` will be returned, or `false` will be returned if the element
      * was not found.
@@ -728,7 +746,7 @@ class MutableVector<T> @PublishedApi internal constructor(
      * Sorts the [MutableVector] using [comparator] to order the items.
      */
     fun sortWith(comparator: Comparator<T>) {
-        sortArrayWith(content as Array<T>, comparator = comparator, fromIndex = 0, toIndex = size)
+        (content as Array<T>).sortWith(comparator = comparator, fromIndex = 0, toIndex = size)
     }
 
     /**

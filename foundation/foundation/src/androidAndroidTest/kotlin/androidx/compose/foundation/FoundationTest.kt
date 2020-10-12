@@ -42,7 +42,8 @@ fun ComposeTestRuleJUnit.setContentForSizeAssertions(
         Box {
             Box(
                 Modifier.preferredSizeIn(maxWidth = parentMaxWidth, maxHeight = parentMaxHeight)
-                    .testTag("containerForSizeAssertion")) {
+                    .testTag("containerForSizeAssertion")
+            ) {
                 children()
             }
         }

@@ -26,7 +26,6 @@ import androidx.compose.ui.util.unpackFloat2
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.truncate
 
 /**
  * Constructs a [Size] from the given width and height
@@ -45,11 +44,23 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
 
     @Stable
     val width: Float
-        get() = unpackFloat1(packedValue)
+        get() {
+            // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
+            check(this.packedValue != Unspecified.packedValue) {
+                "Size is unspecified"
+            }
+            return unpackFloat1(packedValue)
+        }
 
     @Stable
     val height: Float
-        get() = unpackFloat2(packedValue)
+        get() {
+            // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
+            check(this.packedValue != Unspecified.packedValue) {
+                "Size is unspecified"
+            }
+            return unpackFloat2(packedValue)
+        }
 
     @Suppress("NOTHING_TO_INLINE")
     @Stable
@@ -74,15 +85,12 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
         val Zero = Size(0.0f, 0.0f)
 
         /**
-         * A size whose [width] and [height] are infinite.
-         *
-         * See also:
-         *
-         *  * [isInfinite], which checks whether either dimension is infinite.
-         *  * [isFinite], which checks whether both dimensions are finite.
+         * A size whose [width] and [height] are unspecified. This is a sentinel
+         * value used to initialize a non-null parameter.
+         * Access to width or height on an unspecified size is not allowed
          */
         @Stable
-        val Unspecified = Size(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+        val Unspecified = Size(Float.NaN, Float.NaN)
     }
 
     /**
@@ -114,27 +122,6 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
     operator fun div(operand: Float) = Size(width / operand, height / operand)
 
     /**
-     * Integer (truncating) division operator.
-     *
-     * Returns a [Size] whose dimensions are the dimensions of the left-hand-side
-     * operand (a [Size]) divided by the scalar right-hand-side operand (a
-     * [Float]), rounded towards zero.
-     */
-    @Stable
-    fun truncDiv(operand: Float) =
-        Size(truncate(width / operand), truncate(height / operand))
-
-    /**
-     * Modulo (remainder) operator.
-     *
-     * Returns a [Size] whose dimensions are the remainder of dividing the
-     * left-hand-side operand (a [Size]) by the scalar right-hand-side operand (a
-     * [Float]).
-     */
-    @Stable
-    operator fun rem(operand: Float) = Size(width % operand, height % operand)
-
-    /**
      * The lesser of the magnitudes of the [width] and the [height].
      */
     @Stable
@@ -147,12 +134,6 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
     @Stable
     val maxDimension: Float
         get() = max(width.absoluteValue, height.absoluteValue)
-
-    /**
-     * A [Size] with the [width] and [height] swapped.
-     */
-    @Stable
-    fun getFlipped() = Size(height, width)
 
     override fun toString() = "Size(${width.toStringAsFixed(1)}, ${height.toStringAsFixed(1)})"
 }

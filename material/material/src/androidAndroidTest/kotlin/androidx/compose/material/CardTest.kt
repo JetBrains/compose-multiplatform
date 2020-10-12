@@ -18,7 +18,6 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.Providers
@@ -55,10 +54,11 @@ class CardTest {
             Surface(color = background) {
                 Box {
                     cardColor = MaterialTheme.colors.surface
-                    Providers(ShapesAmbient provides Shapes(medium = shape)) {
-                        Card(modifier = Modifier
-                            .semantics(mergeAllDescendants = true) {}
-                            .testTag("card"),
+                    Providers(AmbientShapes provides Shapes(medium = shape)) {
+                        Card(
+                            modifier = Modifier
+                                .semantics(mergeAllDescendants = true) {}
+                                .testTag("card"),
                             elevation = 0.dp
                         ) {
                             Box(Modifier.preferredSize(50.dp, 50.dp))

@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ContentColorAmbient
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
@@ -32,13 +32,11 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import kotlin.math.ln
 
 /**
  * Material surface is the central metaphor in material design. Each surface exists at a given
@@ -54,7 +52,9 @@ import kotlin.math.ln
  *
  * 3) Borders: If [shape] has a border, then it will also be drawn.
  *
- * 4) Background: Surface fills the shape specified by [shape] with the [color].
+ * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
+ * [Colors.surface], the [ElevationOverlay] from [AmbientElevationOverlay] will be used to apply
+ * an overlay - by default this will only occur in dark theme.
  *
  * 5) Content color: Surface uses [contentColor] to specify a preferred color for the content of
  * this surface - this is used by the [Text] and [Icon] components as a default color.
@@ -94,17 +94,23 @@ fun Surface(
     content: @Composable () -> Unit
 ) {
     val elevationPx = with(DensityAmbient.current) { elevation.toPx() }
+    val elevationOverlay = AmbientElevationOverlay.current
+    val backgroundColor = if (color == MaterialTheme.colors.surface && elevationOverlay != null) {
+        elevationOverlay.apply(color, elevation)
+    } else {
+        color
+    }
     SurfaceLayout(
         modifier.drawLayer(shadowElevation = elevationPx, shape = shape)
             .zIndex(elevation.value)
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .background(
-                color = getBackgroundColorForElevation(color, elevation),
+                color = backgroundColor,
                 shape = shape
             )
             .clip(shape)
     ) {
-        Providers(ContentColorAmbient provides contentColor, children = content)
+        Providers(AmbientContentColor provides contentColor, children = content)
     }
 }
 
@@ -140,37 +146,4 @@ private fun SurfaceLayout(modifier: Modifier = Modifier, children: @Composable (
             }
         }
     }
-}
-
-/**
- * If in a light theme, returns [color]. If in dark theme, applies an elevation overlay if [color]
- * is equal to [Colors.surface], else returns [color]
- */
-@Composable
-private fun getBackgroundColorForElevation(color: Color, elevation: Dp): Color {
-    val colors = MaterialTheme.colors
-    return if (elevation > 0.dp && color == colors.surface && !colors.isLight) {
-        color.withElevation(elevation)
-    } else {
-        color
-    }
-}
-
-/**
- * Applies a [Color.White] overlay to this color based on the [elevation]. This increases visibility
- * of elevation for surfaces in a dark theme.
- */
-private fun Color.withElevation(elevation: Dp): Color {
-    val foreground = calculateForeground(elevation)
-    return foreground.compositeOver(this)
-}
-
-// TODO: b/145802792 - clarify this algorithm
-/**
- * @return the alpha-modified [Color.White] to overlay on top of the surface color to produce
- * the resultant color.
- */
-private fun calculateForeground(elevation: Dp): Color {
-    val alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 100f
-    return Color.White.copy(alpha = alpha)
 }

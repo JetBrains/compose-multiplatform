@@ -118,6 +118,7 @@ kotlin {
         }
 
         desktopTest.dependencies {
+            implementation project(':ui:ui-test')
             implementation(TRUTH)
             implementation(JUNIT)
             implementation(MOCKITO_CORE)
@@ -161,6 +162,9 @@ android {
         }
     }
     testOptions.unitTests.includeAndroidResources = true
+    buildTypes.all {
+        consumerProguardFiles("proguard-rules.pro")
+    }
 }
 
 // An ugly hack to workaround b/159426957 causing MPP+AGP to conflict.

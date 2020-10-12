@@ -50,20 +50,24 @@ fun AlertDialogSample() {
             text = {
                 Text(
                     "This area typically contains the supportive text " +
-                            "which presents the details regarding the Dialog's purpose."
+                        "which presents the details regarding the Dialog's purpose."
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
-                    openDialog.value = false
-                }) {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                    }
+                ) {
                     Text("Confirm")
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    openDialog.value = false
-                }) {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                    }
+                ) {
                     Text("Dismiss")
                 }
             }
@@ -87,7 +91,7 @@ fun CustomAlertDialogSample() {
             text = {
                 Text(
                     "This area typically contains the supportive text " +
-                            "which presents the details regarding the Dialog's purpose."
+                        "which presents the details regarding the Dialog's purpose."
                 )
             },
             buttons = {

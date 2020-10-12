@@ -17,7 +17,7 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.IndicationAmbient
+import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
@@ -49,7 +49,7 @@ fun IndicationSample() {
             modifier = Modifier
                 // this element doesn't have a click, but will indicate as it accepts same
                 // interaction state
-                .indication(interactionState, IndicationAmbient.current())
+                .indication(interactionState, AmbientIndication.current())
                 .padding(10.dp)
         )
     }

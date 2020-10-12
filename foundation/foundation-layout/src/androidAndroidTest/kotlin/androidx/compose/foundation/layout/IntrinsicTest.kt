@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -51,7 +51,7 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicWidthSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -80,7 +80,7 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
                     }.preferredHeight(IntrinsicSize.Min).saveLayoutInfo(
@@ -108,7 +108,7 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicWidthSize.value = coordinates.size
                         positionedLatch.countDown()
                     }.preferredWidth(IntrinsicSize.Max).saveLayoutInfo(
@@ -136,7 +136,7 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
                     }.preferredHeight(IntrinsicSize.Max).saveLayoutInfo(
@@ -165,7 +165,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(DpConstraints(maxWidth = 5.dp)) {
                     FixedIntrinsicsBox(
-                        Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                        Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                             minIntrinsicWidthSize.value = coordinates.size
                             positionedLatch.countDown()
                         }.preferredWidth(IntrinsicSize.Min).saveLayoutInfo(
@@ -195,7 +195,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(DpConstraints(minWidth = 15.dp)) {
                     FixedIntrinsicsBox(
-                        Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                        Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                             minIntrinsicWidthSize.value = coordinates.size
                             positionedLatch.countDown()
                         }.preferredWidth(IntrinsicSize.Min).saveLayoutInfo(
@@ -225,7 +225,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     DpConstraints(maxHeight = 35.dp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -258,7 +258,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     DpConstraints(minHeight = 45.dp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -291,7 +291,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     DpConstraints(maxWidth = 25.dp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicWidthSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -324,7 +324,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     DpConstraints(minWidth = 35.dp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicWidthSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -357,7 +357,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     DpConstraints(maxHeight = 55.dp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
@@ -390,7 +390,7 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(
                     DpConstraints(minHeight = 65.dp),
-                    modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
+                    modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
                     }

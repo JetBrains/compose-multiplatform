@@ -392,8 +392,8 @@ class PointerInputTest {
         val pointerInputChange2 =
             createPointerInputChange(0f, 0f, true, 0f, 0f, false, 0f, 0f, false)
 
-        val (_, _, _, consumed) = pointerInputChange1.consumeDownChange()
-        val (_, _, _, consumed1) = pointerInputChange2.consumeDownChange()
+        val (_, _, _, consumed) = pointerInputChange1.apply { consumeDownChange() }
+        val (_, _, _, consumed1) = pointerInputChange2.apply { consumeDownChange() }
 
         assertThat(consumed.downChange, `is`(true))
         assertThat(consumed1.downChange, `is`(true))
@@ -406,8 +406,8 @@ class PointerInputTest {
         val pointerInputChange2 =
             createPointerInputChange(0f, 0f, false, 0f, 0f, false, 0f, 0f, false)
 
-        val (_, _, _, consumed) = pointerInputChange1.consumeDownChange()
-        val (_, _, _, consumed1) = pointerInputChange2.consumeDownChange()
+        val (_, _, _, consumed) = pointerInputChange1.apply { consumeDownChange() }
+        val (_, _, _, consumed1) = pointerInputChange2.apply { consumeDownChange() }
 
         assertThat(consumed.downChange, `is`(false))
         assertThat(consumed1.downChange, `is`(false))
@@ -418,7 +418,7 @@ class PointerInputTest {
         val pointerInputChange1 =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 0f, 0f, false)
 
-        val pointerInputChangeResult1 = pointerInputChange1.consumePositionChange(0f, 0f)
+        val pointerInputChangeResult1 = pointerInputChange1.apply { consumePositionChange(0f, 0f) }
 
         assertThat(pointerInputChangeResult1, `is`(equalTo(pointerInputChange1)))
     }
@@ -428,9 +428,12 @@ class PointerInputTest {
         val pointerInputChange1 =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 0f, 0f, false)
 
-        val pointerInputChangeResult1 = pointerInputChange1.consumePositionChange(5f, 0f)
-        val pointerInputChangeResult2 = pointerInputChange1.consumePositionChange(0f, 3f)
-        val pointerInputChangeResult3 = pointerInputChange1.consumePositionChange(5f, 3f)
+        val pointerInputChangeResult1 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(5f, 0f) }
+        val pointerInputChangeResult2 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(0f, 3f) }
+        val pointerInputChangeResult3 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(5f, 3f) }
 
         assertThat(
             pointerInputChangeResult1,
@@ -451,9 +454,12 @@ class PointerInputTest {
         val pointerInputChange1 =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 0f, 0f, false)
 
-        val pointerInputChangeResult1 = pointerInputChange1.consumePositionChange(6f, 0f)
-        val pointerInputChangeResult2 = pointerInputChange1.consumePositionChange(0f, 12f)
-        val pointerInputChangeResult3 = pointerInputChange1.consumePositionChange(6f, 12f)
+        val pointerInputChangeResult1 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(6f, 0f) }
+        val pointerInputChangeResult2 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(0f, 12f) }
+        val pointerInputChangeResult3 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(6f, 12f) }
 
         assertThat(
             pointerInputChangeResult1,
@@ -474,9 +480,12 @@ class PointerInputTest {
         val pointerInputChange1 =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 1f, 5f, false)
 
-        val pointerInputChangeResult1 = pointerInputChange1.consumePositionChange(2f, 0f)
-        val pointerInputChangeResult2 = pointerInputChange1.consumePositionChange(0f, 3f)
-        val pointerInputChangeResult3 = pointerInputChange1.consumePositionChange(2f, 3f)
+        val pointerInputChangeResult1 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(2f, 0f) }
+        val pointerInputChangeResult2 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(0f, 3f) }
+        val pointerInputChangeResult3 =
+            pointerInputChange1.deepCopy().apply { consumePositionChange(2f, 3f) }
 
         assertThat(
             pointerInputChangeResult1,
@@ -499,8 +508,8 @@ class PointerInputTest {
         val pointerInputChange2 =
             createPointerInputChange(2f, 1f, true, 2f, 1f, true, 0f, 0f, false)
 
-        val actual1 = pointerInputChange1.consumeAllChanges()
-        val actual2 = pointerInputChange2.consumeAllChanges()
+        val actual1 = pointerInputChange1.apply { consumeAllChanges() }
+        val actual2 = pointerInputChange2.apply { consumeAllChanges() }
 
         assertThat(actual1).isEqualTo(pointerInputChange1)
         assertThat(actual2).isEqualTo(pointerInputChange2)
@@ -513,8 +522,8 @@ class PointerInputTest {
         val pointerInputChange2 =
             createPointerInputChange(2f, 1f, false, 2f, 1f, true, 0f, 0f, false)
 
-        val actual1 = pointerInputChange1.consumeAllChanges()
-        val actual2 = pointerInputChange2.consumeAllChanges()
+        val actual1 = pointerInputChange1.apply { consumeAllChanges() }
+        val actual2 = pointerInputChange2.apply { consumeAllChanges() }
 
         assertThat(actual1).isEqualTo(
             createPointerInputChange(1f, 2f, true, 1f, 2f, false, 0f, 0f, true)
@@ -529,7 +538,7 @@ class PointerInputTest {
         val pointerInputChange =
             createPointerInputChange(1f, 2f, true, 11f, 21f, true, 0f, 0f, false)
 
-        val actual = pointerInputChange.consumeAllChanges()
+        val actual = pointerInputChange.apply { consumeAllChanges() }
 
         assertThat(actual).isEqualTo(
             createPointerInputChange(1f, 2f, true, 11f, 21f, true, -10f, -19f, false)
@@ -541,7 +550,7 @@ class PointerInputTest {
         val pointerInputChange =
             createPointerInputChange(1f, 2f, true, 11f, 21f, true, -3f, -5f, false)
 
-        val actual = pointerInputChange.consumeAllChanges()
+        val actual = pointerInputChange.apply { consumeAllChanges() }
 
         assertThat(actual).isEqualTo(
             createPointerInputChange(1f, 2f, true, 11f, 21f, true, -10f, -19f, false)
@@ -555,8 +564,8 @@ class PointerInputTest {
         val pointerInputChange2 =
             createPointerInputChange(1f, 2f, false, 11f, 21f, true, -7f, -11f, false)
 
-        val actual1 = pointerInputChange1.consumeAllChanges()
-        val actual2 = pointerInputChange2.consumeAllChanges()
+        val actual1 = pointerInputChange1.apply { consumeAllChanges() }
+        val actual2 = pointerInputChange2.apply { consumeAllChanges() }
 
         assertThat(actual1).isEqualTo(
             createPointerInputChange(1f, 2f, true, 11f, 21f, false, -10f, -19f, true)
@@ -601,3 +610,11 @@ class PointerInputTest {
         )
     }
 }
+
+private fun PointerInputChange.deepCopy() =
+    PointerInputChange(
+        id,
+        current.copy(),
+        previous.copy(),
+        consumed.copy()
+    )

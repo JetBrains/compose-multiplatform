@@ -18,9 +18,9 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
@@ -113,7 +113,7 @@ class MenuTest {
         rule.onNodeWithTag("MenuContent2").assertExists()
         val node = rule.onNode(
             isPopup() and hasAnyDescendant(hasTestTag("MenuContent1")) and
-                    hasAnyDescendant(hasTestTag("MenuContent2"))
+                hasAnyDescendant(hasTestTag("MenuContent2"))
         ).assertExists().fetchSemanticsNode()
         with(rule.density) {
             assertThat(node.size.width).isEqualTo(130)
@@ -256,26 +256,26 @@ class MenuTest {
 
     @Test
     fun dropdownMenuItem_emphasis() {
-        var onSurface = Color.Unset
-        var enabledContentColor = Color.Unset
-        var disabledContentColor = Color.Unset
+        var onSurface = Color.Unspecified
+        var enabledContentColor = Color.Unspecified
+        var disabledContentColor = Color.Unspecified
         lateinit var enabledEmphasis: Emphasis
         lateinit var disabledEmphasis: Emphasis
 
         rule.setContent {
             onSurface = MaterialTheme.colors.onSurface
-            enabledEmphasis = EmphasisAmbient.current.high
-            disabledEmphasis = EmphasisAmbient.current.disabled
+            enabledEmphasis = AmbientEmphasisLevels.current.high
+            disabledEmphasis = AmbientEmphasisLevels.current.disabled
             DropdownMenu(
                 toggle = { Box(Modifier.size(20.dp)) },
                 onDismissRequest = {},
                 expanded = true
             ) {
                 DropdownMenuItem(onClick = {}) {
-                    enabledContentColor = contentColor()
+                    enabledContentColor = AmbientContentColor.current
                 }
                 DropdownMenuItem(enabled = false, onClick = {}) {
-                    disabledContentColor = contentColor()
+                    disabledContentColor = AmbientContentColor.current
                 }
             }
         }

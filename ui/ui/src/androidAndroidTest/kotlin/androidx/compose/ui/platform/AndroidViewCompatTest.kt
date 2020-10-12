@@ -63,7 +63,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.isAttached
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -437,14 +437,14 @@ class AndroidViewCompatTest {
         var inner: Offset = Offset.Zero
 
         rule.setContent {
-            Box(Modifier.onPositioned { outer = it.globalPosition }) {
+            Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
                 val paddingDp = with(DensityAmbient.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
                     AndroidView(::FrameLayout) {
                         it.setContent {
                             Box(
                                 Modifier.padding(paddingDp)
-                                    .onPositioned { inner = it.globalPosition }
+                                    .onGloballyPositioned { inner = it.globalPosition }
                             )
                         }
                     }
@@ -482,7 +482,9 @@ class AndroidViewCompatTest {
                     Box(Modifier.padding(paddingDp)) {
                         AndroidView(::FrameLayout) {
                             it.setContent {
-                                Box(Modifier.padding(paddingDp).onPositioned { coordinates = it })
+                                Box(Modifier.padding(paddingDp)
+                                    .onGloballyPositioned { coordinates = it }
+                                )
                             }
                         }
                     }
@@ -510,16 +512,16 @@ class AndroidViewCompatTest {
         var inner1: Offset = Offset.Zero
         var inner2: Offset = Offset.Zero
         rule.setContent {
-            Box(Modifier.onPositioned { outer = it.globalPosition }) {
+            Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
                 Box(Modifier.padding(start = paddingDp, top = paddingDp)) {
                     emitView(::LinearLayout, {}) {
                         Box(
-                            Modifier.size(sizeDp).background(Color.Blue).onPositioned {
+                            Modifier.size(sizeDp).background(Color.Blue).onGloballyPositioned {
                                 inner1 = it.globalPosition
                             }
                         )
                         Box(
-                            Modifier.size(sizeDp).background(Color.Gray).onPositioned {
+                            Modifier.size(sizeDp).background(Color.Gray).onGloballyPositioned {
                                 inner2 = it.globalPosition
                             }
                         )

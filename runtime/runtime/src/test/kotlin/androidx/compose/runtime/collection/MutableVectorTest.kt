@@ -16,16 +16,13 @@
 
 package androidx.compose.runtime.collection
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCollectionApi::class)
-@RunWith(JUnit4::class)
 class MutableVectorTest {
     val list: MutableVector<Int> = mutableVectorOf(1, 2, 3, 4, 5)
 
@@ -92,6 +89,23 @@ class MutableVectorTest {
         assertTrue(list.any { it == 5 })
         assertTrue(list.any { it == 1 })
         assertFalse(list.any { it == 0 })
+    }
+
+    @Test
+    fun reversedAny() {
+        val reversedList = mutableListOf<Int>()
+        assertFalse(list.reversedAny {
+            reversedList.add(it)
+            false
+        })
+        assertEquals(reversedList, list.asMutableList().reversed())
+
+        val reversedSublist = mutableListOf<Int>()
+        assertTrue(list.reversedAny {
+            reversedSublist.add(it)
+            reversedSublist.size == 2
+        })
+        assertEquals(reversedSublist, listOf(5, 4))
     }
 
     @Test

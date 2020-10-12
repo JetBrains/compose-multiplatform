@@ -17,6 +17,8 @@
 package androidx.compose.ui.selection
 
 import androidx.compose.runtime.ambientOf
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.LayoutCoordinates
 
 /**
  *  An interface allowing a composable to subscribe and unsubscribe to selection changes.
@@ -37,6 +39,19 @@ interface SelectionRegistrar {
      * is called.
      */
     fun onPositionChange()
+
+    /**
+     * When selection changes, this method is called.
+     *
+     * @param layoutCoordinates [LayoutCoordinates] of the [Selectable].
+     * @param startPosition coordinates of where the selection starts.
+     * @param endPosition coordinates of where the selection ends.
+     */
+    fun onUpdateSelection(
+        layoutCoordinates: LayoutCoordinates,
+        startPosition: Offset,
+        endPosition: Offset
+    )
 }
 
 /**

@@ -18,7 +18,6 @@ package androidx.compose.integration.demos.test
 
 import androidx.compose.androidview.demos.ComposeInAndroidDialogDismissDialogDuringDispatch
 import androidx.test.espresso.Espresso
-import androidx.test.filters.MediumTest
 import androidx.test.filters.LargeTest
 import androidx.compose.integration.demos.AllDemosCategory
 import androidx.compose.integration.demos.DemoActivity
@@ -29,6 +28,7 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allDemos
 import androidx.compose.integration.demos.common.allLaunchableDemos
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.ui.test.SemanticsNodeInteractionCollection
 import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertTextEquals
@@ -40,29 +40,58 @@ import androidx.ui.test.hasClickAction
 import androidx.ui.test.hasText
 import androidx.ui.test.isDialog
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class DemoTest {
     @get:Rule
-    val rule = createAndroidComposeRule<DemoActivity>(disableTransitions = true).also {
-        it.clockTestRule.pauseClock()
+    val rule = createAndroidComposeRule<DemoActivity>(disableTransitions = true)
+
+    private val SplitDemoCategories = mutableListOf<List<Demo>>().apply {
+        val numberOfCategoriesPerSplit = AllDemosCategory.demos.size / 4
+
+        add(
+            AllDemosCategory.demos.subList(
+                fromIndex = 0,
+                toIndex = numberOfCategoriesPerSplit
+            )
+        )
+
+        add(
+            AllDemosCategory.demos.subList(
+                fromIndex = numberOfCategoriesPerSplit,
+                toIndex = numberOfCategoriesPerSplit * 2
+            )
+        )
+
+        add(
+            AllDemosCategory.demos.subList(
+                fromIndex = numberOfCategoriesPerSplit * 2,
+                toIndex = numberOfCategoriesPerSplit * 3
+            )
+        )
+
+        add(
+            AllDemosCategory.demos.subList(
+                fromIndex = numberOfCategoriesPerSplit * 3,
+                toIndex = AllDemosCategory.demos.size
+            )
+        )
+
+        require(AllDemosCategory.demos.size == sumBy { it.size }) {
+            "Not all demo categories are being tested!"
+        }
     }
 
-    @Ignore("Flaky test: 'Animation clock still has observer(s) after it is disposed.'")
-    @MediumTest
+    @LargeTest
     @Test
     fun testFiltering() {
         assertIsOnRootScreen()
         // Enter filtering mode
         rule.onNodeWithTag(Tags.FilterButton).performClick()
-        rule.waitForIdle()
 
-        rule.clockTestRule.advanceClock(5000)
         // TODO: use keyboard input APIs when available to actually filter the list
         val testDemo = AllDemosCategory.allLaunchableDemos()
             // ActivityDemos don't set the title in the AppBar, so we can't verify if we've
@@ -73,48 +102,53 @@ class DemoTest {
         // Click on the first demo
         val demoTitle = testDemo.title
         rule.onNodeWithText(demoTitle).performScrollTo().performClick()
-        rule.waitForIdle()
 
         assertAppBarHasTitle(demoTitle)
         Espresso.pressBack()
-        assertIsOnRootScreen()
-        rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(5000)
-        rule.waitForIdle()
-    }
-
-    @MediumTest
-    @Test
-    fun navigateThroughOneDemo() {
-        // Keep track of each demo we visit
-        val visitedDemos = mutableListOf<Demo>()
-
-        // Visit all demos, ensuring we start and end up on the root screen
-        assertIsOnRootScreen()
-        AllDemosCategory.visitFirstDemo(
-            visitedDemos = visitedDemos,
-            path = listOf(AllDemosCategory)
-        )
         assertIsOnRootScreen()
     }
 
     @LargeTest
     @Test
-    fun navigateThroughAllDemos() {
+    fun navigateThroughAllDemos_1() {
+        navigateThroughAllDemos(SplitDemoCategories[0])
+    }
+
+    @LargeTest
+    @Test
+    fun navigateThroughAllDemos_2() {
+        navigateThroughAllDemos(SplitDemoCategories[1])
+    }
+
+    @LargeTest
+    @Test
+    fun navigateThroughAllDemos_3() {
+        navigateThroughAllDemos(SplitDemoCategories[2])
+    }
+
+    @LargeTest
+    @Test
+    fun navigateThroughAllDemos_4() {
+        navigateThroughAllDemos(SplitDemoCategories[3])
+    }
+
+    private fun navigateThroughAllDemos(demoCategories: List<Demo>) {
         // Keep track of each demo we visit
         val visitedDemos = mutableListOf<Demo>()
 
         // Visit all demos, ensuring we start and end up on the root screen
         assertIsOnRootScreen()
-        AllDemosCategory.visitDemos(
+        val root = DemoCategory(AllDemosCategory.title, demoCategories)
+        root.visitDemos(
             visitedDemos = visitedDemos,
-            path = listOf(AllDemosCategory)
+            path = listOf(root)
         )
         assertIsOnRootScreen()
 
+        val expectedDemos = root.allDemos()
+
         // Ensure that we visited all the demos we expected to, in the order we expected to.
-        assertThat(visitedDemos).isEqualTo(AllDemosCategory.allDemos())
+        assertThat(visitedDemos).isEqualTo(expectedDemos)
     }
 
     /**
@@ -128,30 +162,21 @@ class DemoTest {
     ) {
         demos.forEach { demo ->
             visitedDemos.add(demo)
-            demo.visit(visitedDemos, path, true)
+            demo.visit(visitedDemos, path)
         }
-    }
-
-    private fun DemoCategory.visitFirstDemo(
-        visitedDemos: MutableList<Demo>,
-        path: List<DemoCategory>
-    ) {
-        visitedDemos.add(demos[0])
-        demos[0].visit(visitedDemos, path, false)
     }
 
     /**
      * Visits a [Demo], and then navigates back up to the [DemoCategory] it was inside.
      *
-     * If this [Demo] is a [DemoCategory], this will visit all sub-[Demo]s first before continuing
+     * If this [Demo] is a [DemoCategory], this will visit sub-[Demo]s first before continuing
      * in the current category.
      *
      * @param path The path of categories that leads to this demo
      */
     private fun Demo.visit(
         visitedDemos: MutableList<Demo>,
-        path: List<DemoCategory>,
-        visitAll: Boolean
+        path: List<DemoCategory>
     ) {
         val navigationTitle = if (path.size == 1) {
             path.first().title
@@ -164,15 +189,8 @@ class DemoTest {
             .performScrollTo()
             .performClick()
 
-        rule.waitForIdle()
-        rule.clockTestRule.advanceClock(5000)
-
         if (this is DemoCategory) {
-            if (visitAll) {
-                visitDemos(visitedDemos, path + this)
-            } else {
-                visitFirstDemo(visitedDemos, path + this)
-            }
+            visitDemos(visitedDemos, path + this)
         }
 
         // TODO: b/165693257 demos without a compose view crash as onAllNodes will fail to
@@ -189,9 +207,6 @@ class DemoTest {
 
         rule.waitForIdle()
         Espresso.pressBack()
-        rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(5000)
 
         assertAppBarHasTitle(navigationTitle)
     }

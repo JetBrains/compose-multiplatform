@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.contentColor
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -137,20 +137,20 @@ class Colors (
 
     override fun toString(): String {
         return "Colors(" +
-                "primary=$primary, " +
-                "primaryVariant=$primaryVariant, " +
-                "secondary=$secondary, " +
-                "secondaryVariant=$secondaryVariant, " +
-                "background=$background, " +
-                "surface=$surface, " +
-                "error=$error, " +
-                "onPrimary=$onPrimary, " +
-                "onSecondary=$onSecondary, " +
-                "onBackground=$onBackground, " +
-                "onSurface=$onSurface, " +
-                "onError=$onError, " +
-                "isLight=$isLight" +
-                ")"
+            "primary=$primary, " +
+            "primaryVariant=$primaryVariant, " +
+            "secondary=$secondary, " +
+            "secondaryVariant=$secondaryVariant, " +
+            "background=$background, " +
+            "surface=$surface, " +
+            "error=$error, " +
+            "onPrimary=$onPrimary, " +
+            "onSecondary=$onSecondary, " +
+            "onBackground=$onBackground, " +
+            "onSurface=$onSurface, " +
+            "onError=$onError, " +
+            "isLight=$isLight" +
+            ")"
     }
 }
 
@@ -235,7 +235,7 @@ fun darkColors(
  * [Colors.onPrimary]. If [color] is not present in the theme, this will return `null`.
  *
  * @return the matching `on` color for [color]. If [color] is not part of the theme's
- * [Colors], then returns [Color.Unset].
+ * [Colors], then returns [Color.Unspecified].
  *
  * @see contentColorFor
  */
@@ -248,29 +248,29 @@ fun Colors.contentColorFor(color: Color): Color {
         background -> onBackground
         surface -> onSurface
         error -> onError
-        else -> Color.Unset
+        else -> Color.Unspecified
     }
 }
 
 /**
  * Tries to match [color] to a color in the current [Colors], and then returns the
  * corresponding `on` color. If [color] can not be matched to the palette, then this will return
- * the existing value for [contentColor] at this point in the tree.
+ * the existing value for [AmbientContentColor] at this point in the tree.
  *
  * @see Colors.contentColorFor
  */
 @Composable
 fun contentColorFor(color: Color) =
-    MaterialTheme.colors.contentColorFor(color).useOrElse { contentColor() }
+    MaterialTheme.colors.contentColorFor(color).useOrElse { AmbientContentColor.current }
 
 /**
  * Updates the internal values of the given [Colors] with values from the [other] [Colors]. This
  * allows efficiently updating a subset of [Colors], without recomposing every composable that
- * consumes values from [ColorAmbient].
+ * consumes values from [AmbientColors].
  *
  * Because [Colors] is very wide-reaching, and used by many expensive composables in the
- * hierarchy, providing a new value to [ColorAmbient] causes every composable consuming
- * [ColorAmbient] to recompose, which is prohibitively expensive in cases such as animating one
+ * hierarchy, providing a new value to [AmbientColors] causes every composable consuming
+ * [AmbientColors] to recompose, which is prohibitively expensive in cases such as animating one
  * color in the theme. Instead, [Colors] is internally backed by [mutableStateOf], and this
  * function mutates the internal state of [this] to match values in [other]. This means that any
  * changes will mutate the internal state of [this], and only cause composables that are reading
@@ -300,4 +300,4 @@ internal fun Colors.updateColorsFrom(other: Colors) {
  * recompositions, using [Colors.updateColorsFrom].
  * To retrieve the current value of this ambient, use [MaterialTheme.colors].
  */
-internal val ColorAmbient = staticAmbientOf { lightColors() }
+internal val AmbientColors = staticAmbientOf { lightColors() }

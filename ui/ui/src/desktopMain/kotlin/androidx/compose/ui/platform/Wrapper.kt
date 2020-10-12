@@ -23,10 +23,11 @@ import androidx.compose.runtime.FrameManager
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
+import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 
-@OptIn(ExperimentalComposeApi::class)
+@OptIn(ExperimentalComposeApi::class, ExperimentalKeyInput::class)
 fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
     FrameManager.ensureStarted()
 
@@ -37,13 +38,23 @@ fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
         }
     }
 
+    keyboard?.shortcut(copyToClipboardKeySet) {
+        selectionManager.recentManager?.let { selector ->
+            selector.getSelectedText()?.let {
+                clipboardManager.setText(it)
+            }
+        }
+    }
+
     return composition
 }
 
+@OptIn(ExperimentalKeyInput::class)
 @Composable
 private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () -> Unit) {
     Providers(
-        DesktopOwnersAmbient provides owner.container
+        DesktopOwnersAmbient provides owner.container,
+        SelectionManagerTrackerAmbient provides owner.selectionManager
     ) {
         ProvideCommonAmbients(
             owner = owner,

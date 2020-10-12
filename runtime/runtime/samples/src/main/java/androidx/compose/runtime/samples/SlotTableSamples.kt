@@ -55,7 +55,7 @@ private fun Contact(contact: Contact) {}
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
-private fun Column(children: @Composable () -> Unit) {}
+internal fun Column(children: @Composable () -> Unit) {}
 
 @Suppress("UNUSED_PARAMETER")
 @Composable

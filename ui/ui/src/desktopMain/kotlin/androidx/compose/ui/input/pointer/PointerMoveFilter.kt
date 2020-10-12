@@ -40,11 +40,11 @@ internal class PointerMoveEventFilter : PointerInputFilter() {
     lateinit var onExitHandler: () -> Boolean
     lateinit var onMoveHandler: (position: Offset) -> Boolean
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = changes
+    ) = pointerEvent.changes
 
     override fun onCancel() = Unit
 }

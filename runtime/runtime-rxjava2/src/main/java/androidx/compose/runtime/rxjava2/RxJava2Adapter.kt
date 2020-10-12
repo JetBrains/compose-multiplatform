@@ -42,7 +42,7 @@ import io.reactivex.plugins.RxJavaPlugins
  */
 @Deprecated(
     "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-            "best default, for example when you have a List it is better to start with emptyList()",
+        "best default, for example when you have a List it is better to start with emptyList()",
     ReplaceWith("subscribeAsState(null)")
 )
 @Suppress("NOTHING_TO_INLINE")
@@ -82,7 +82,7 @@ fun <R, T : R> Observable<T>.subscribeAsState(initial: R): State<R> =
  */
 @Deprecated(
     "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-            "best default, for example when you have a List it is better to start with emptyList()",
+        "best default, for example when you have a List it is better to start with emptyList()",
     ReplaceWith("subscribeAsState(null)")
 )
 @Suppress("NOTHING_TO_INLINE")
@@ -122,7 +122,7 @@ fun <R, T : R> Flowable<T>.subscribeAsState(initial: R): State<R> =
  */
 @Deprecated(
     "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-            "best default, for example when you have a List it is better to start with emptyList()",
+        "best default, for example when you have a List it is better to start with emptyList()",
     ReplaceWith("subscribeAsState(null)")
 )
 @Suppress("NOTHING_TO_INLINE")
@@ -162,7 +162,7 @@ fun <R, T : R> Single<T>.subscribeAsState(initial: R): State<R> =
  */
 @Deprecated(
     "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-            "best default, for example when you have a List it is better to start with emptyList()",
+        "best default, for example when you have a List it is better to start with emptyList()",
     ReplaceWith("subscribeAsState(null)")
 )
 @Suppress("NOTHING_TO_INLINE")

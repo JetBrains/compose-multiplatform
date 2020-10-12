@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.Placeable
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -29,8 +30,6 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.util.fastAny
-import androidx.compose.ui.util.fastForEach
 
 @OptIn(ExperimentalLayoutNodeApi::class)
 internal class InnerPlaceable(
@@ -123,10 +122,11 @@ internal class InnerPlaceable(
         return layoutNode.calculateAlignmentLines()[line] ?: AlignmentLine.Unspecified
     }
 
+    @OptIn(ExperimentalCollectionApi::class)
     override fun draw(canvas: Canvas) {
         withPositionTranslation(canvas) {
             val owner = layoutNode.requireOwner()
-            layoutNode.zIndexSortedChildren.fastForEach { child ->
+            layoutNode.zSortedChildren.forEach { child ->
                 if (child.isPlaced) {
                     require(child.layoutState == LayoutNode.LayoutState.Ready) {
                         "$child is not ready. layoutState is ${child.layoutState}"
@@ -140,6 +140,7 @@ internal class InnerPlaceable(
         }
     }
 
+    @OptIn(ExperimentalCollectionApi::class)
     override fun hitTest(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
@@ -147,7 +148,7 @@ internal class InnerPlaceable(
         // Any because as soon as true is returned, we know we have found a hit path and we must
         // not add PointerInputFilters on different paths so we should not even go looking.
         val originalSize = hitPointerInputFilters.size
-        layoutNode.zIndexSortedChildren.reversed().fastAny { child ->
+        layoutNode.zSortedChildren.reversedAny { child ->
             callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
             hitPointerInputFilters.size > originalSize
         }

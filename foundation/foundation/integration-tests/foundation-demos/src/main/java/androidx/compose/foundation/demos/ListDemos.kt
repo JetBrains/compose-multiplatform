@@ -16,11 +16,11 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.foundation.ContentColorAmbient
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
+import androidx.compose.paging.demos.PagingDemos
 
 val LazyListDemos = listOf(
     ComposableDemo("Simple column") { LazyColumnDemo() },
@@ -66,7 +67,8 @@ val LazyListDemos = listOf(
     ComposableDemo("Pager-like list") { PagerLikeDemo() },
     ComposableDemo("Rtl list") { RtlListDemo() },
     ComposableDemo("LazyColumn DSL") { LazyColumnScope() },
-    ComposableDemo("LazyRow DSL") { LazyRowScope() }
+    ComposableDemo("LazyRow DSL") { LazyRowScope() },
+    PagingDemos
 )
 
 @Composable
@@ -101,7 +103,7 @@ private fun ListAddRemoveItemsDemo() {
             (1..numItems).map { it + offset }.toList(),
             Modifier.fillMaxWidth()
         ) {
-            Text("$it", style = currentTextStyle().copy(fontSize = 40.sp))
+            Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
         }
     }
 }
@@ -114,7 +116,7 @@ private fun ListHoistedStateDemo() {
         FlowRow {
             Text(
                 "First item: ${state.firstVisibleItemIndex}",
-                style = currentTextStyle().copy(fontSize = 30.sp)
+                style = AmbientTextStyle.current.copy(fontSize = 30.sp)
             )
         }
         LazyColumnFor(
@@ -122,7 +124,7 @@ private fun ListHoistedStateDemo() {
             Modifier.fillMaxWidth(),
             state = state
         ) {
-            Text("$it", style = currentTextStyle().copy(fontSize = 40.sp))
+            Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
         }
     }
 }
@@ -135,7 +137,7 @@ fun Button(modifier: Modifier, onClick: () -> Unit, children: @Composable () -> 
             .background(Color(0xFF6200EE), RoundedCornerShape(4.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Providers(ContentColorAmbient provides Color.White) {
+        Providers(AmbientContentColor provides Color.White) {
             children()
         }
     }
@@ -177,7 +179,8 @@ private fun RtlListDemo() {
     Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
         LazyRowForIndexed((0..100).toList(), Modifier.fillMaxWidth()) { index, item ->
             Text(
-                "$item", Modifier
+                "$item",
+                Modifier
                     .size(100.dp)
                     .background(if (index % 2 == 0) Color.LightGray else Color.Transparent)
                     .padding(16.dp)

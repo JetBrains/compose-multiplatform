@@ -33,24 +33,24 @@ import androidx.compose.ui.unit.dp
 
 @Deprecated(
     "All Box parameters have been removed (and gravity has been renamed to alignment). Use " +
-            "Modifier.background, Modifier.border and Modifier.padding instead. Also Box has been" +
-            " moved to androidx.compose.foundation.layout and that should be used instead.",
+        "Modifier.background, Modifier.border and Modifier.padding instead. Also Box has been" +
+        " moved to androidx.compose.foundation.layout and that should be used instead.",
     replaceWith = ReplaceWith(
         "Box(\n" +
-                "        modifier" +
-                "           .background(backgroundColor, shape)" +
-                "           .border(border, shape)" +
-                "           .padding(" +
-                "               start = if (paddingStart != Dp.Unspecified) paddingStart else " +
-                "padding," +
-                "               top = if (paddingTop != Dp.Unspecified) paddingTop else padding," +
-                "               end = if (paddingEnd != Dp.Unspecified) paddingEnd else padding," +
-                "               bottom = if (paddingBottom != Dp.Unspecified) paddingBottom else " +
-                "padding" +
-                "           ),\n" +
-                "        gravity,\n" +
-                "        children\n" +
-                "    )",
+            "        modifier" +
+            "           .background(backgroundColor, shape)" +
+            "           .border(border, shape)" +
+            "           .padding(" +
+            "               start = if (paddingStart != Dp.Unspecified) paddingStart else " +
+            "padding," +
+            "               top = if (paddingTop != Dp.Unspecified) paddingTop else padding," +
+            "               end = if (paddingEnd != Dp.Unspecified) paddingEnd else padding," +
+            "               bottom = if (paddingBottom != Dp.Unspecified) paddingBottom else " +
+            "padding" +
+            "           ),\n" +
+            "        gravity,\n" +
+            "        children\n" +
+            "    )",
         "androidx.compose.foundation.layout.Box",
         "androidx.compose.foundation.background",
         "androidx.compose.foundation.border",
@@ -115,10 +115,10 @@ private fun needsPadding(
     paddingEnd: Dp,
     paddingBottom: Dp
 ) = (padding != Dp.Unspecified && padding != 0.dp) ||
-        (paddingStart != Dp.Unspecified && paddingStart != 0.dp) ||
-        (paddingTop != Dp.Unspecified && paddingTop != 0.dp) ||
-        (paddingEnd != Dp.Unspecified && paddingEnd != 0.dp) ||
-        (paddingBottom != Dp.Unspecified && paddingBottom != 0.dp)
+    (paddingStart != Dp.Unspecified && paddingStart != 0.dp) ||
+    (paddingTop != Dp.Unspecified && paddingTop != 0.dp) ||
+    (paddingEnd != Dp.Unspecified && paddingEnd != 0.dp) ||
+    (paddingBottom != Dp.Unspecified && paddingBottom != 0.dp)
 
 private fun Alignment.toColumnArrangement() = Arrangement.aligned(object : Alignment.Vertical {
     override fun align(size: Int): Int = align(IntSize(0, size)).y

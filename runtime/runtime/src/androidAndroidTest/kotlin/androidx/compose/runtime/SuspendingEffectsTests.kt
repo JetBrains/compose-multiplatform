@@ -49,13 +49,13 @@ class SuspendingEffectsTests : BaseComposeTest() {
     override val activityRule = makeTestActivityRule()
 
     @Test
-    fun testLaunchInComposition() {
+    fun testLaunchedTask() {
         var counter by mutableStateOf(0)
 
-        // Used as a signal that launchInComposition will await
+        // Used as a signal that LaunchedTask will await
         val ch = Channel<Unit>(Channel.CONFLATED)
         compose {
-            launchInComposition {
+            LaunchedTask {
                 counter++
                 ch.receive()
                 counter++
@@ -74,11 +74,11 @@ class SuspendingEffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAwaitFrameFromLaunchInComposition() {
+    fun testAwaitFrameFromLaunchedTask() {
         var choreographerTime by mutableStateOf(Long.MIN_VALUE)
         var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
         compose {
-            launchInComposition {
+            LaunchedTask {
                 withFrameNanos {
                     awaitFrameTime = it
                 }
@@ -166,13 +166,13 @@ class SuspendingEffectsTests : BaseComposeTest() {
     @Test
     fun testCoroutineScopesHaveCorrectFrameClock() {
         var recomposerClock: MonotonicFrameClock? = null
-        var launchInCompositionClock: MonotonicFrameClock? = null
+        var launchedTaskClock: MonotonicFrameClock? = null
         var rememberCoroutineScopeFrameClock: MonotonicFrameClock? = null
 
         compose {
             recomposerClock = currentComposer.recomposer.frameClock
-            launchInComposition {
-                launchInCompositionClock = coroutineContext[MonotonicFrameClock]
+            LaunchedTask {
+                launchedTaskClock = coroutineContext[MonotonicFrameClock]
             }
             val rememberedScope = rememberCoroutineScope()
             onCommit {
@@ -181,7 +181,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
             }
         }.then {
             assertNotNull(recomposerClock, "Recomposer frameClock")
-            assertSame(recomposerClock, launchInCompositionClock, "launchInComposition clock")
+            assertSame(recomposerClock, launchedTaskClock, "LaunchedTask clock")
             assertSame(
                 recomposerClock, rememberCoroutineScopeFrameClock,
                 "rememberCoroutineScope clock"
@@ -190,20 +190,20 @@ class SuspendingEffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testLaunchInCompositionRunsAfter() {
+    fun testLaunchedTaskRunsAfter() {
         var onCommitRan = false
         var launchRanAfter = false
         compose {
             // Confirms that these run "out of order" with respect to one another because
             // the launch runs dispatched.
-            launchInComposition {
+            LaunchedTask {
                 launchRanAfter = onCommitRan
             }
             onCommit {
                 onCommitRan = true
             }
         }.then {
-            assertTrue(launchRanAfter, "expected launchInComposition to run after later onCommit")
+            assertTrue(launchRanAfter, "expected LaunchedTask to run after later onCommit")
         }
     }
 

@@ -54,23 +54,23 @@ class ScaleSlopExceededGestureFilterTest {
     // Verifies the circumstances under which onScaleSlopExceeded should not be called.
 
     @Test
-    fun onPointerInputChanges_1PointerMoves10TimesScaleSlopInXAndY_onTouchSlopExceededNotCalled() {
+    fun onPointerEvent_1PointerMoves10TimesScaleSlopInXAndY_onTouchSlopExceededNotCalled() {
         var pointer = down(0)
-        filter::onPointerInput.invokeOverAllPasses(pointer)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         pointer = pointer.moveBy(
             Duration(milliseconds = 10),
             TestTouchSlop.toFloat() * 10,
             TestTouchSlop.toFloat() * 10
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         assertThat(onScaleSlopExceededCount).isEqualTo(0)
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             1f, 0f,
             0f, 0f,
@@ -80,8 +80,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             1f, 0f,
             0f, 0f,
@@ -91,8 +91,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             0f, 1f,
             0f, 0f,
@@ -102,8 +102,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             0f, 1f,
             0f, 0f,
@@ -113,8 +113,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             11f, 0f,
             0f, 0f,
@@ -124,8 +124,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             11 + TinyNum, 0f,
             0f, 0f,
@@ -135,8 +135,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             0f, 11f,
             0f, 0f,
@@ -146,8 +146,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers1MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers1MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             0f, 11 + TinyNum,
             0f, 0f,
@@ -157,8 +157,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             1f, 0f,
             -5f, 0f,
@@ -168,8 +168,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             1f, 0f,
             -5f, 0f,
@@ -179,8 +179,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             0f, 1f,
             0f, -5f,
@@ -190,8 +190,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             0f, 0f,
             0f, 1f,
             0f, -5f,
@@ -201,8 +201,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             -5f, 0f,
             6f, 0f,
             0f, 0f,
@@ -212,8 +212,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             -5f, 0f,
             6 + TinyNum, 0f,
             0f, 0f,
@@ -223,8 +223,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_2Pointers(
             0f, -5f,
             0f, 6f,
             0f, 0f,
@@ -234,8 +234,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2Pointers2MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_2Pointers(
+    fun onPointerEvent_2Pointers2MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_2Pointers(
             0f, -5f,
             0f, 6 + TinyNum,
             0f, 0f,
@@ -245,8 +245,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             1f, 0f,
             2f, 0f,
@@ -258,8 +258,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             1f, 0f,
             2f, 0f,
@@ -271,8 +271,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             0f, 1f,
             0f, 2f,
@@ -284,8 +284,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             0f, 1f,
             0f, 2f,
@@ -297,8 +297,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             1f, 0f,
             13.25f, 0f,
@@ -310,8 +310,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             1f, 0f,
             13.26f, 0f,
@@ -323,8 +323,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             0f, 1f,
             0f, 13.25f,
@@ -336,8 +336,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers1MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers1MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             0f, 0f,
             0f, 1f,
             0f, 13.26f,
@@ -349,8 +349,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveAwayToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             -1f, 0f,
             0f, 0f,
             1f, 0f,
@@ -362,8 +362,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveAwayOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             -1f, 0f,
             0f, 0f,
             1f, 0f,
@@ -375,8 +375,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveAwayToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             0f, -1f,
             0f, 0f,
             0f, 1f,
@@ -388,8 +388,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveAwayOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             0f, -1f,
             0f, 0f,
             0f, 1f,
@@ -401,8 +401,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveTowardToSlopX_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             -8.5f, 0f,
             0f, 0f,
             8.5f, 0f,
@@ -414,8 +414,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveTowardOverSlopX_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             -8.6f, 0f,
             0f, 0f,
             8.5f, 0f,
@@ -427,8 +427,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveTowardToSlopY_onTouchSlopExceededNotCalled() {
+        onPointerEvent_3Pointers(
             0f, -8.5f,
             0f, 0f,
             0f, 8.5f,
@@ -440,8 +440,8 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_3Pointers2MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
-        onPointerInputChanges_3Pointers(
+    fun onPointerEvent_3Pointers2MoveTowardOverSlopY_onTouchSlopExceededCalledOnce() {
+        onPointerEvent_3Pointers(
             0f, -8.6f,
             0f, 0f,
             0f, 8.5f,
@@ -453,11 +453,11 @@ class ScaleSlopExceededGestureFilterTest {
     }
 
     @Test
-    fun onPointerInputChanges_2PointersMoveAroundUnderSlop_onTouchSlopExceededNotCalled() {
+    fun onPointerEvent_2PointersMoveAroundUnderSlop_onTouchSlopExceededNotCalled() {
         // Arrange
         var pointer1 = down(0, 0.milliseconds, 0f, 0f)
         var pointer2 = down(1, 0.milliseconds, 0f, 50f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
@@ -472,7 +472,7 @@ class ScaleSlopExceededGestureFilterTest {
             10f,
             100f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Translate, rotate and scale down.
         pointer1 = pointer1.moveTo(
@@ -485,7 +485,7 @@ class ScaleSlopExceededGestureFilterTest {
             -40f,
             75f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Translate, rotate and scale up.
         pointer1 = pointer1.moveTo(
@@ -498,7 +498,7 @@ class ScaleSlopExceededGestureFilterTest {
             40f,
             -20f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Translate, rotate and scale down.
         pointer1 = pointer1.moveTo(
@@ -511,17 +511,17 @@ class ScaleSlopExceededGestureFilterTest {
             20f,
             -80f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         assertThat(onScaleSlopExceededCount).isEqualTo(0)
     }
 
     @Test
-    fun onPointerInputChanges_2PointersMoveOverIntoAndOverSlop_onTouchSlopExceededCalledOnce() {
+    fun onPointerEvent_2PointersMoveOverIntoAndOverSlop_onTouchSlopExceededCalledOnce() {
         // Arrange
         var pointer1 = down(0, 0.milliseconds, 0f, 0f)
         var pointer2 = down(1, 0.milliseconds, 0f, 20f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
@@ -536,7 +536,7 @@ class ScaleSlopExceededGestureFilterTest {
             0f,
             30 + TinyNum
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Under
         pointer1 = pointer1.moveTo(
@@ -549,7 +549,7 @@ class ScaleSlopExceededGestureFilterTest {
             0f,
             30 - TinyNum
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Over
         pointer1 = pointer1.moveTo(
@@ -562,18 +562,18 @@ class ScaleSlopExceededGestureFilterTest {
             0f,
             30 + TinyNum
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         assertThat(onScaleSlopExceededCount).isEqualTo(1)
     }
 
     @Test
-    fun onPointerInputChanges_2PointersStepToSlopThenOverX_onTouchSlopExceededCalledOnceOver() {
+    fun onPointerEvent_2PointersStepToSlopThenOverX_onTouchSlopExceededCalledOnceOver() {
 
         // Arrange
         var pointer1 = down(0, 0.milliseconds, 0f, 0f)
         var pointer2 = down(1, 0.milliseconds, 1f, 0f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
@@ -589,7 +589,7 @@ class ScaleSlopExceededGestureFilterTest {
                 1f,
                 0f
             )
-            filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+            filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
         }
 
         // Verify that we have not gone over.
@@ -606,18 +606,18 @@ class ScaleSlopExceededGestureFilterTest {
             TinyNum,
             0f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Verify we have gone over.
         assertThat(onScaleSlopExceededCount).isEqualTo(1)
     }
 
     @Test
-    fun onPointerInputChanges_2PointersStepToSlopThenOverY_onTouchSlopExceededCalledOnceOver() {
+    fun onPointerEvent_2PointersStepToSlopThenOverY_onTouchSlopExceededCalledOnceOver() {
         // Arrange
         var pointer1 = down(0, 0.milliseconds, 0f, 0f)
         var pointer2 = down(1, 0.milliseconds, 0f, 1f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
@@ -633,7 +633,7 @@ class ScaleSlopExceededGestureFilterTest {
                 0f,
                 1f
             )
-            filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+            filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
         }
 
         // Verify that we have not gone over.
@@ -650,7 +650,7 @@ class ScaleSlopExceededGestureFilterTest {
             0f,
             TinyNum
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Verify we have gone over.
         assertThat(onScaleSlopExceededCount).isEqualTo(1)
@@ -665,7 +665,7 @@ class ScaleSlopExceededGestureFilterTest {
 
         var pointer1 = down(0, 0.milliseconds, 0f, 0f)
         var pointer2 = down(1, 0L.milliseconds, 1f, 0f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
             10.milliseconds,
@@ -677,7 +677,7 @@ class ScaleSlopExceededGestureFilterTest {
             11f,
             0f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
@@ -685,7 +685,7 @@ class ScaleSlopExceededGestureFilterTest {
 
         pointer1 = down(0, 0.milliseconds, 0f, 0f)
         pointer2 = down(1, 0L.milliseconds, 1f, 0f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
             10.milliseconds,
@@ -697,7 +697,7 @@ class ScaleSlopExceededGestureFilterTest {
             11f,
             0f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Assert
 
@@ -711,7 +711,7 @@ class ScaleSlopExceededGestureFilterTest {
 
         var pointer1 = down(0, 0.milliseconds, 0f, 0f)
         var pointer2 = down(1, 0L.milliseconds, 1f, 0f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
             10.milliseconds,
@@ -723,7 +723,7 @@ class ScaleSlopExceededGestureFilterTest {
             11 + TinyNum,
             0f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
@@ -731,7 +731,7 @@ class ScaleSlopExceededGestureFilterTest {
 
         pointer1 = down(0, 0.milliseconds, 0f, 0f)
         pointer2 = down(1, 0L.milliseconds, 1f, 0f)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
             10.milliseconds,
@@ -743,14 +743,14 @@ class ScaleSlopExceededGestureFilterTest {
             11 + TinyNum,
             0f
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Assert
 
         assertThat(onScaleSlopExceededCount).isEqualTo(2)
     }
 
-    private fun onPointerInputChanges_2Pointers(
+    private fun onPointerEvent_2Pointers(
         x1s: Float,
         y1s: Float,
         x2s: Float,
@@ -764,7 +764,7 @@ class ScaleSlopExceededGestureFilterTest {
         // Arrange
         var pointer1 = down(0, 0.milliseconds, x1s, y1s)
         var pointer2 = down(1, 0L.milliseconds, x2s, y2s)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
         pointer1 = pointer1.moveTo(
@@ -777,12 +777,12 @@ class ScaleSlopExceededGestureFilterTest {
             x2e,
             y2e
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         assertThat(onScaleSlopExceededCount).isEqualTo(expectedCound)
     }
 
-    private fun onPointerInputChanges_3Pointers(
+    private fun onPointerEvent_3Pointers(
         x1s: Float,
         y1s: Float,
         x2s: Float,
@@ -801,7 +801,7 @@ class ScaleSlopExceededGestureFilterTest {
         var pointer1 = down(0, 0.milliseconds, x1s, y1s)
         var pointer2 = down(1, 0.milliseconds, x2s, y2s)
         var pointer3 = down(2, 0.milliseconds, x3s, y3s)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2, pointer3)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2, pointer3))
 
         // Act
         pointer1 = pointer1.moveTo(
@@ -819,7 +819,7 @@ class ScaleSlopExceededGestureFilterTest {
             x3e,
             y3e
         )
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2, pointer3)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2, pointer3))
 
         assertThat(onScaleSlopExceededCount).isEqualTo(expectedCound)
     }

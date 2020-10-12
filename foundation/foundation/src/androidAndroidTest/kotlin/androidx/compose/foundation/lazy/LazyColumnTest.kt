@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -89,8 +90,10 @@ class LazyColumnTest {
         rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 itemsIndexed(items) { index, item ->
-                    Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
-                            .testTag("$index-$item"))
+                    Spacer(
+                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                            .testTag("$index-$item")
+                    )
                 }
             }
         }
@@ -203,5 +206,50 @@ class LazyColumnTest {
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun lazyColumnAllowEmptyListItems() {
+        val itemTag = "itemTag"
+
+        rule.setContent {
+            LazyColumn {
+                items(emptyList<Any>()) { }
+                item {
+                    Spacer(Modifier.preferredSize(10.dp).testTag(itemTag))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(itemTag)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun lazyColumnAllowsNullableItems() {
+        val items = listOf("1", null, "3")
+        val nullTestTag = "nullTestTag"
+
+        rule.setContent {
+            LazyColumn(Modifier.preferredHeight(200.dp)) {
+                items(items) {
+                    if (it != null) {
+                        Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
+                    } else {
+                        Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                            .testTag(nullTestTag))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag(nullTestTag)
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("3")
+            .assertDoesNotExist()
     }
 }

@@ -18,7 +18,6 @@ package androidx.compose.desktop.examples.example1
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
@@ -59,6 +58,11 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.input.key.ExperimentalKeyInput
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.ShortcutHandler
+import androidx.compose.ui.input.key.keyInputFilter
+import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.Placeholder
@@ -106,6 +110,7 @@ fun main() {
     }
 }
 
+@OptIn(ExperimentalKeyInput::class)
 @Composable
 private fun LeftColumn(modifier: Modifier) = Column(modifier) {
     val amount = remember { mutableStateOf(0) }
@@ -209,6 +214,9 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             overflow = TextOverflow.Ellipsis
         )
 
+        var overText by remember { mutableStateOf("Move mouse over text:") }
+        Text(overText)
+
         Text(
             text = "fun <T : Comparable<T>> List<T>.quickSort(): List<T> = when {\n" +
                 "  size < 2 -> this\n" +
@@ -219,18 +227,16 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                 "   }\n" +
                 "}",
             modifier = Modifier.padding(10.dp).pointerMoveFilter(
-                onMove = { position ->
-                    println("MOVE: $position")
+                onMove = {
+                    overText = "Move position: $it"
                     false
                 },
                 onEnter = {
-                    println("HOVER!")
-                    text.value = "HOVER ${amount.value}"
+                    overText = "Over enter"
                     false
                 },
                 onExit = {
-                    println("UNHOVER!")
-                    text.value = "UNHOVER ${amount.value}"
+                    overText = "Over exit"
                     false
                 }
             )
@@ -262,7 +268,11 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                 Button(
                     modifier = Modifier.padding(4.dp),
                     onClick = {
-                        Window(size = IntSize(400, 200)) {
+                        AppWindow(size = IntSize(400, 200)).also {
+                            it.keyboard.shortcut(Key.Escape) {
+                                it.close()
+                            }
+                        }.show {
                             Animations(isCircularEnabled = animation.value)
                         }
                     }
@@ -283,10 +293,14 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             onValueChange = { amount.value = it.toIntOrNull() ?: 42 },
             label = { Text(text = "Input1") }
         )
+
         TextField(
             value = text.value,
             onValueChange = { text.value = it },
-            label = { Text(text = "Input2") }
+            label = { Text(text = "Input2") },
+            modifier = Modifier.keyInputFilter(ShortcutHandler(Key.MetaLeft + Key.Enter) {
+                text.value = "Cleared!"
+            })
         )
 
         Image(imageResource("androidx/compose/desktop/example/circus.jpg"))

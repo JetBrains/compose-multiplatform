@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DesktopPath
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.isSet
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toComposeRect
@@ -308,7 +308,7 @@ internal class DesktopParagraph(
         var currentColor = paragraphIntrinsics.builder.textStyle.color
         var currentShadow = paragraphIntrinsics.builder.textStyle.shadow
         var currentTextDecoration = paragraphIntrinsics.builder.textStyle.textDecoration
-        if (color.isSet && color != currentColor) {
+        if (color.isSpecified && color != currentColor) {
             toRebuild = true
             currentColor = color
         }
@@ -501,7 +501,7 @@ internal class ParagraphBuilder(
     }
 
     private fun applyStyles(from: SpanStyle, to: SkTextStyle) {
-        if (from.color != Color.Unset) {
+        if (from.color != Color.Unspecified) {
             to.setColor(from.color.toArgb())
         }
         from.fontFamily?.let {
@@ -514,7 +514,7 @@ internal class ParagraphBuilder(
         from.textDecoration?.let {
             to.decorationStyle = it.toSkDecorationStyle(from.color)
         }
-        if (from.background != Color.Unset) {
+        if (from.background != Color.Unspecified) {
             to.background = Paint().apply {
                 color = from.background.toArgb()
             }

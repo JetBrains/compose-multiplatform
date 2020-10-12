@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 
 @RequiresOptIn(
     "This is an experimental API for demonstrating how LazyColumn / LazyRow should work" +
-            "using a DSL implementation. This is a prototype and its implementation is not suited" +
-            " for PagedList or large lists."
+        "using a DSL implementation. This is a prototype and its implementation is not suited" +
+        " for PagedList or large lists."
 )
 annotation class ExperimentalLazyDsl
 
@@ -39,7 +39,7 @@ interface LazyListScope {
      * @param items the data list
      * @param itemContent the content displayed by a single item
      */
-    fun <T : Any> items(
+    fun <T> items(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(item: T) -> Unit
     )
@@ -57,7 +57,7 @@ interface LazyListScope {
      * @param items the data list
      * @param itemContent the content displayed by a single item
      */
-    fun <T : Any> itemsIndexed(
+    fun <T> itemsIndexed(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     )
@@ -81,10 +81,13 @@ internal class LazyListScopeImpl : LazyListScope {
         return interval.content(scope, localIntervalIndex)
     }
 
-    override fun <T : Any> items(
+    override fun <T> items(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(item: T) -> Unit
     ) {
+        // There aren't any items to display
+        if (items.isEmpty()) { return }
+
         val interval = IntervalHolder(
             startIndex = totalSize,
             content = { index ->
@@ -110,10 +113,13 @@ internal class LazyListScopeImpl : LazyListScope {
         intervals.add(interval)
     }
 
-    override fun <T : Any> itemsIndexed(
+    override fun <T> itemsIndexed(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     ) {
+        // There aren't any items to display
+        if (items.isEmpty()) { return }
+
         val interval = IntervalHolder(
             startIndex = totalSize,
             content = { index ->
@@ -165,6 +171,8 @@ internal class LazyListScopeImpl : LazyListScope {
  * currently visible items.
  * This API is not stable yet, please consider using [LazyRowFor] instead.
  *
+ * @sample androidx.compose.foundation.samples.LazyRowSample
+ *
  * @param modifier the modifier to apply to this layout
  * @param contentPadding specify a padding around the whole content
  * @param verticalAlignment the vertical alignment applied to the items
@@ -190,13 +198,17 @@ fun LazyRow(
         verticalAlignment = verticalAlignment,
         isVertical = false
     ) {
-            index -> scope.contentFor(index, this) }
+        index ->
+        scope.contentFor(index, this)
+    }
 }
 
 /**
  * The DSL implementation of a vertically scrolling list that only composes and lays out the
  * currently visible items.
  * This API is not stable yet, please consider using [LazyColumnFor] instead.
+ *
+ * @sample androidx.compose.foundation.samples.LazyColumnSample
  *
  * @param modifier the modifier to apply to this layout
  * @param contentPadding specify a padding around the whole content

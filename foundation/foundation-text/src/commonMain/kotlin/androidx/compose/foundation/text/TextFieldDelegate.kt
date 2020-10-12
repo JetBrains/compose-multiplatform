@@ -45,7 +45,9 @@ import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -103,16 +105,26 @@ class TextFieldDelegate {
             layoutDirection: LayoutDirection,
             prevResultText: TextLayoutResult? = null
         ): Triple<Int, Int, TextLayoutResult> {
-            val layoutResult = textDelegate.layout(constraints, layoutDirection, prevResultText)
+            val layoutResult = textDelegate.layout(
+                constraints = constraints,
+                layoutDirection = layoutDirection,
+                prevResult = prevResultText,
+                respectMinConstraints = true
+            )
 
             val isEmptyText = textDelegate.text.text.isEmpty()
             val height = if (isEmptyText) {
                 val singleLineHeight = computeLineHeightForEmptyText(
-                    style = textDelegate.style,
+                    style = resolveDefaults(textDelegate.style, layoutDirection),
                     density = textDelegate.density,
                     resourceLoader = textDelegate.resourceLoader
                 )
-                constraints.constrainHeight(singleLineHeight)
+                when (textDelegate.overflow) {
+                    TextOverflow.None ->
+                        singleLineHeight.coerceAtLeast(constraints.minHeight)
+                    TextOverflow.Clip, TextOverflow.Ellipsis ->
+                        constraints.constrainHeight(singleLineHeight)
+                }
             } else {
                 layoutResult.size.height
             }
@@ -216,39 +228,30 @@ class TextFieldDelegate {
         }
 
         /**
-         * Called when onRelease event is fired.
+         * Sets the cursor position. Should be called when TextField has focus.
          *
          * @param position The event position in composable coordinate.
          * @param textLayoutResult The text layout result
          * @param editProcessor The edit processor
          * @param offsetMap The offset map
          * @param onValueChange The callback called when the new editor state arrives.
-         * @param textInputService The text input service
-         * @param token The current input session token.
-         * @param hasFocus True if the composable has input focus, otherwise false.
          */
         @JvmStatic
-        internal fun onRelease(
+        internal fun setCursorOffset(
             position: Offset,
             textLayoutResult: TextLayoutResult,
             editProcessor: EditProcessor,
             offsetMap: OffsetMap,
-            onValueChange: (TextFieldValue) -> Unit,
-            textInputService: TextInputService?,
-            token: InputSessionToken,
-            hasFocus: Boolean
+            onValueChange: (TextFieldValue) -> Unit
         ) {
-            textInputService?.showSoftwareKeyboard(token)
-            if (hasFocus) {
-                val offset = offsetMap.transformedToOriginal(
-                    textLayoutResult.getOffsetForPosition(position)
-                )
-                onEditCommand(
-                    listOf(SetSelectionEditOp(offset, offset)),
-                    editProcessor,
-                    onValueChange
-                )
-            }
+            val offset = offsetMap.transformedToOriginal(
+                textLayoutResult.getOffsetForPosition(position)
+            )
+            onEditCommand(
+                listOf(SetSelectionEditOp(offset, offset)),
+                editProcessor,
+                onValueChange
+            )
         }
 
         /**
@@ -271,13 +274,17 @@ class TextFieldDelegate {
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): InputSessionToken {
-            return textInputService?.startInput(
+            val inputSessionToken = textInputService?.startInput(
                 value = TextFieldValue(value.text, value.selection, value.composition),
                 keyboardType = keyboardType,
                 imeAction = imeAction,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
             ) ?: INVALID_SESSION
+
+            textInputService?.showSoftwareKeyboard(inputSessionToken)
+
+            return inputSessionToken
         }
 
         /**
@@ -321,8 +328,8 @@ class TextFieldDelegate {
                 AnnotatedString.Builder(transformed.transformedText).apply {
                     addStyle(
                         SpanStyle(textDecoration = TextDecoration.Underline),
-                        compositionRange.start,
-                        compositionRange.end
+                        transformed.offsetMap.originalToTransformed(compositionRange.start),
+                        transformed.offsetMap.originalToTransformed(compositionRange.end)
                     )
                 }.toAnnotatedString(),
                 transformed.offsetMap

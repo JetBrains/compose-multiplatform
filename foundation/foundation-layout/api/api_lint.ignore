@@ -19,5 +19,3 @@ ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#create
 
 MutableBareField: androidx.compose.foundation.layout.State#layoutDirection:
     Bare field layoutDirection must be marked final, or moved behind accessors if mutable
-MutableBareField: androidx.compose.foundation.layout.State#rootIncomingConstraints:
-    Bare field rootIncomingConstraints must be marked final, or moved behind accessors if mutable

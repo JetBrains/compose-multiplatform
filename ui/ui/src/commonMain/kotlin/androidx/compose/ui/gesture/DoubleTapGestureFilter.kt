@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.DelayUpEvent
 import androidx.compose.ui.gesture.customevents.DelayUpMessage
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -86,11 +87,13 @@ internal class DoubleTapGestureFilter(
         delayUpDispatcher = DelayUpDispatcher(customEventDispatcher)
     }
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
+
+        val changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Main) {
             if (state == State.Idle && changes.all { it.changedToDown() }) {
@@ -121,7 +124,10 @@ internal class DoubleTapGestureFilter(
             if (state == State.SecondDown && changes.all { it.changedToUp() }) {
                 state = State.Idle
                 onDoubleTap.invoke(changes[0].previous.position!!)
-                return changes.map { it.consumeDownChange() }
+                return changes.map {
+                    it.consumeDownChange()
+                    it
+                }
             }
         }
 

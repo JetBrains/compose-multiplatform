@@ -17,6 +17,7 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Interaction
@@ -24,7 +25,6 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -75,7 +75,7 @@ fun PriorityInteractionStateSample() {
                 .padding(3.dp)
         ) {
             Text(
-                text, style = currentTextStyle().copy(textAlign = TextAlign.Center),
+                text, style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
                 modifier = Modifier.fillMaxSize().wrapContentSize()
             )
         }
@@ -129,7 +129,7 @@ fun MultipleInteractionStateSample() {
                 val pressed = Interaction.Pressed in interactionState
                 Text(
                     text = if (pressed) "Pressed" else "Not pressed",
-                    style = currentTextStyle().copy(textAlign = TextAlign.Center),
+                    style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
                     modifier = Modifier.fillMaxSize().wrapContentSize()
                 )
             }
@@ -143,14 +143,14 @@ fun MultipleInteractionStateSample() {
                 val dragged = Interaction.Dragged in interactionState
                 Text(
                     text = if (dragged) "Dragged" else "Not dragged",
-                    style = currentTextStyle().copy(textAlign = TextAlign.Center),
+                    style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
                     modifier = Modifier.fillMaxSize().wrapContentSize()
                 )
             }
         }
         Text(
             text = text,
-            style = currentTextStyle().copy(textAlign = TextAlign.Center),
+            style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxSize().wrapContentSize()
         )
     }

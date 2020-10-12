@@ -311,10 +311,11 @@ fun FancyTab(title: String, onClick: () -> Unit, selected: Boolean) {
 fun FancyIndicator(color: Color, modifier: Modifier = Modifier) {
     // Draws a rounded rectangular with border around the Tab, with a 5.dp padding from the edges
     // Color is passed in as a parameter [color]
-    Box(modifier
-        .padding(5.dp)
-        .fillMaxSize()
-        .border(BorderStroke(2.dp, color), RoundedCornerShape(5.dp))
+    Box(
+        modifier
+            .padding(5.dp)
+            .fillMaxSize()
+            .border(BorderStroke(2.dp, color), RoundedCornerShape(5.dp))
     )
 }
 

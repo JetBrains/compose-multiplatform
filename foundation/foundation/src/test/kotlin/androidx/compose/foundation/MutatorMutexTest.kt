@@ -107,7 +107,7 @@ class MutatorMutexTest {
                 }
                 assertEquals(
                     "first mutator of priority $firstPriority cancelled by second " +
-                            "mutator of priority $secondPriority",
+                        "mutator of priority $secondPriority",
                     secondPriority >= firstPriority,
                     firstMutatorJob.isCancelled
                 )

@@ -18,7 +18,7 @@ package androidx.compose.ui.draw
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
-import androidx.compose.ui.platform.InspectableParameter
+import androidx.compose.ui.platform.InspectableValue
 import com.google.common.truth.Truth
 import org.junit.Test
 
@@ -26,7 +26,7 @@ class DrawLayerModifierTest {
 
     @Test
     fun testInspectable() {
-        val modifier = Modifier.drawLayer(rotationX = 2.0f) as InspectableParameter
+        val modifier = Modifier.drawLayer(rotationX = 2.0f) as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("drawLayer")
         Truth.assertThat(modifier.valueOverride).isNull()
         Truth.assertThat(modifier.inspectableElements.map { it.name }.toList())

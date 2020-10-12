@@ -20,8 +20,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
@@ -80,10 +80,18 @@ inline class TransformOrigin(@PublishedApi internal val packedValue: Long) {
 }
 
 /**
- * A [Modifier.Element] that makes content draw into a layer, allowing easily changing
- * properties of the drawn contents.
+ * A [Modifier.Element] that makes content draw into a draw layer. The draw
+ * layer can be invalidated separately from parents. A [drawLayer] should be used when the content
+ * updates independently from anything above it to minimize the invalidated content.
+ *
+ * A [DrawLayerModifier] can also be used to apply effects to content, such as
+ * scaling ([scaleX], [scaleY]), rotation ([rotationX], [rotationY], [rotationZ]),
+ * opacity ([alpha]), shadow ([shadowElevation], [shape]), and clipping ([clip], [shape]).
+ * Changes to most properties will not invalidate the contents. If set up correctly,
+ * animating these properties can avoid composition, layout, and drawing.
  *
  * @sample androidx.compose.ui.samples.AnimateFadeIn
+ * @see drawLayer
  */
 interface DrawLayerModifier : Modifier.Element {
     /**
@@ -154,6 +162,7 @@ interface DrawLayerModifier : Modifier.Element {
     /**
      * The [Shape] of the layer. When [shadowElevation] is non-zero a shadow is produced using
      * this [shape]. When [clip] is `true` contents will be clipped to this [shape].
+     * When clipping, the content will be redrawn when the [shape] changes.
      */
     val shape: Shape get() = RectangleShape
 
@@ -176,27 +185,33 @@ private data class SimpleDrawLayerModifier(
     override val transformOrigin: TransformOrigin,
     override val shape: Shape,
     override val clip: Boolean
-) : DrawLayerModifier, InspectableParameter {
+) : DrawLayerModifier, InspectableValue {
     override val nameFallback: String = "drawLayer"
-    override val inspectableElements: Sequence<ParameterElement>
+    override val inspectableElements: Sequence<ValueElement>
         get() = sequenceOf(
-            ParameterElement("scaleX", scaleX),
-            ParameterElement("scaleY", scaleY),
-            ParameterElement("alpha", alpha),
-            ParameterElement("translationX", translationX),
-            ParameterElement("translationY", translationY),
-            ParameterElement("shadowElevation", shadowElevation),
-            ParameterElement("rotationX", rotationX),
-            ParameterElement("rotationY", rotationY),
-            ParameterElement("rotationZ", rotationZ),
-            ParameterElement("transformOrigin", transformOrigin),
-            ParameterElement("shape", shape),
-            ParameterElement("clip", clip)
+            ValueElement("scaleX", scaleX),
+            ValueElement("scaleY", scaleY),
+            ValueElement("alpha", alpha),
+            ValueElement("translationX", translationX),
+            ValueElement("translationY", translationY),
+            ValueElement("shadowElevation", shadowElevation),
+            ValueElement("rotationX", rotationX),
+            ValueElement("rotationY", rotationY),
+            ValueElement("rotationZ", rotationZ),
+            ValueElement("transformOrigin", transformOrigin),
+            ValueElement("shape", shape),
+            ValueElement("clip", clip)
         )
 }
 
 /**
- * Draw the content into a layer. This permits applying special effects and transformations:
+ * Creates a [DrawLayerModifier] to have all content will be drawn into a new draw layer. The draw
+ * layer can be invalidated separately from parents. A [drawLayer] should be used when the content
+ * updates independently from anything above it to minimize the invalidated content.
+ *
+ * [drawLayer] can also be used to apply effects to content, such as scaling ([scaleX], [scaleY]),
+ * rotation ([rotationX], [rotationY], [rotationZ]), opacity ([alpha]), shadow
+ * ([shadowElevation], [shape]), and clipping ([clip], [shape]).
  *
  * @sample androidx.compose.ui.samples.ChangeOpacity
  *

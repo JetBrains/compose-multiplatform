@@ -17,6 +17,7 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 
 /**
  * Opens a dialog with the given content.
@@ -30,7 +31,26 @@ import androidx.compose.runtime.Composable
  * @sample androidx.compose.ui.samples.DialogSample
  *
  * @param onDismissRequest Executes when the user tries to dismiss the Dialog.
- * @param children The content to be displayed inside the dialog.
+ * @param properties Typically platform specific properties to further configure the dialog.
+ * @param content The content to be displayed inside the dialog.
  */
 @Composable
-expect fun Dialog(onDismissRequest: () -> Unit, children: @Composable () -> Unit)
+fun Dialog(
+    onDismissRequest: () -> Unit,
+    properties: DialogProperties? = null,
+    content: @Composable () -> Unit
+) = ActualDialog(onDismissRequest, properties, content)
+
+/**
+ * Common interface for dialog properties. These are typically platform specific options to further
+ * configure a dialog. For android ones use AndroidDialogProperties.
+ */
+@Immutable
+interface DialogProperties
+
+@Composable
+internal expect fun ActualDialog(
+    onDismissRequest: () -> Unit,
+    properties: DialogProperties? = null,
+    content: @Composable () -> Unit
+)

@@ -241,6 +241,27 @@ object SemanticsActions {
         AccessibilityAction<(AnnotatedString) -> Boolean>>("SetText")
 
     /**
+     * Action to copy the text to the clipboard.
+     *
+     * @see SemanticsPropertyReceiver.copyText
+     */
+    val CopyText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CopyText")
+
+    /**
+     * Action to cut the text and copy it to the clipboard.
+     *
+     * @see SemanticsPropertyReceiver.cutText
+     */
+    val CutText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CutText")
+
+    /**
+     * Action to paste the text from the clipboard.
+     *
+     * @see SemanticsPropertyReceiver.pasteText
+     */
+    val PasteText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("PasteText")
+
+    /**
      * Custom actions which are defined by app developers.
      *
      * @see SemanticsPropertyReceiver.customActions
@@ -541,7 +562,50 @@ fun SemanticsPropertyReceiver.setText(label: String? = null, action: (AnnotatedS
  */
 fun SemanticsPropertyReceiver.setSelection(
     label: String? = null,
-    action: (Int, Int, Boolean) -> Boolean
+    action: (
+        startIndex: Int,
+        endIndex: Int,
+        traversalMode: Boolean
+    ) -> Boolean
 ) {
     this[SemanticsActions.SetSelection] = AccessibilityAction(label, action)
+}
+
+/**
+ * This function adds the [SemanticsActions.CopyText] to the [SemanticsPropertyReceiver].
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.CopyText] is called.
+ */
+fun SemanticsPropertyReceiver.copyText(
+    label: String? = null,
+    action: () -> Boolean
+) {
+    this[SemanticsActions.CopyText] = AccessibilityAction(label, action)
+}
+
+/**
+ * This function adds the [SemanticsActions.CutText] to the [SemanticsPropertyReceiver].
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.CutText] is called.
+ */
+fun SemanticsPropertyReceiver.cutText(
+    label: String? = null,
+    action: () -> Boolean
+) {
+    this[SemanticsActions.CutText] = AccessibilityAction(label, action)
+}
+
+/**
+ * This function adds the [SemanticsActions.PasteText] to the [SemanticsPropertyReceiver].
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PasteText] is called.
+ */
+fun SemanticsPropertyReceiver.pasteText(
+    label: String? = null,
+    action: () -> Boolean
+) {
+    this[SemanticsActions.PasteText] = AccessibilityAction(label, action)
 }

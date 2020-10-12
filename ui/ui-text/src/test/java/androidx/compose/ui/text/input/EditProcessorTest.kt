@@ -42,13 +42,13 @@ class EditProcessorTest {
     fun test_new_state_and_edit_commands() {
         val proc = EditProcessor()
         val tis: TextInputService = mock()
-        val dummyInputSessionToken = 10 // We are not using this value in this test. Just dummy.
+        val inputSessionToken = 10 // We are not using this value in this test.
 
         val model = TextFieldValue("ABCDE", TextRange.Zero)
-        proc.onNewState(model, tis, dummyInputSessionToken)
+        proc.onNewState(model, tis, inputSessionToken)
         assertEquals(model, proc.mPreviousState)
         val captor = argumentCaptor<TextFieldValue>()
-        verify(tis, times(1)).onStateUpdated(eq(dummyInputSessionToken), captor.capture())
+        verify(tis, times(1)).onStateUpdated(eq(inputSessionToken), captor.capture())
         assertEquals(1, captor.allValues.size)
         assertEquals("ABCDE", captor.firstValue.text)
         assertEquals(0, captor.firstValue.selection.min)

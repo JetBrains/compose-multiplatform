@@ -47,9 +47,11 @@ fun LinearProgressIndicatorSample() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         LinearProgressIndicator(progress = animatedProgress)
         Spacer(Modifier.height(30.dp))
-        OutlinedButton(onClick = {
-            if (progress < 1f) progress += 0.1f
-        }) {
+        OutlinedButton(
+            onClick = {
+                if (progress < 1f) progress += 0.1f
+            }
+        ) {
             Text("Increase")
         }
     }
@@ -67,9 +69,11 @@ fun CircularProgressIndicatorSample() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         CircularProgressIndicator(progress = animatedProgress)
         Spacer(Modifier.height(30.dp))
-        OutlinedButton(onClick = {
-            if (progress < 1f) progress += 0.1f
-        }) {
+        OutlinedButton(
+            onClick = {
+                if (progress < 1f) progress += 0.1f
+            }
+        ) {
             Text("Increase")
         }
     }

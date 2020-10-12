@@ -29,7 +29,7 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -57,7 +57,7 @@ class DrawLayerTest {
     private lateinit var positionLatch: CountDownLatch
     private lateinit var layoutCoordinates: LayoutCoordinates
 
-    private val positioner = Modifier.onPositioned {
+    private val positioner = Modifier.onGloballyPositioned {
         layoutCoordinates = it
         positionLatch.countDown()
     }

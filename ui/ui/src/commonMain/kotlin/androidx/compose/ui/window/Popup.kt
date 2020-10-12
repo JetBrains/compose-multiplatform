@@ -42,9 +42,9 @@ import androidx.compose.ui.unit.width
  * Ltr/Rtl context, thus in Ltr it will be added to the original aligned position and in Rtl it
  * will be subtracted from it.
  * @param isFocusable Indicates if the popup can grab the focus.
- * @param onDismissRequest Executes when the popup tries to dismiss itself. This happens when
- * the popup is focusable and the user clicks outside.
- * @param children The content to be displayed inside the popup.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param properties Typically platform specific properties to further configure the popup.
+ * @param content The content to be displayed inside the popup.
  */
 @Composable
 fun Popup(
@@ -52,7 +52,8 @@ fun Popup(
     offset: IntOffset = IntOffset(0, 0),
     isFocusable: Boolean = false,
     onDismissRequest: (() -> Unit)? = null,
-    children: @Composable () -> Unit
+    properties: PopupProperties? = null,
+    content: @Composable () -> Unit
 ) {
     val popupPositioner = remember(alignment, offset) {
         AlignmentOffsetPositionProvider(
@@ -65,9 +66,17 @@ fun Popup(
         popupPositionProvider = popupPositioner,
         isFocusable = isFocusable,
         onDismissRequest = onDismissRequest,
-        children = children
+        properties = properties,
+        content = content
     )
 }
+
+/**
+ * Common interface for popup properties. These are typically platform specific options to further
+ * configure a popup. For android ones use AndroidPopupProperties.
+ */
+@Immutable
+interface PopupProperties
 
 /**
  * Opens a popup with the given content.
@@ -78,9 +87,8 @@ fun Popup(
  * @param dropDownAlignment The start or end alignment below the parent.
  * @param offset An offset from the original aligned position of the popup.
  * @param isFocusable Indicates if the popup can grab the focus.
- * @param onDismissRequest Executes when the popup tries to dismiss itself. This happens when
- * the popup is focusable and the user clicks outside.
- * @param children The content to be displayed inside the popup.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param content The content to be displayed inside the popup.
  */
 @Composable
 internal fun DropdownPopup(
@@ -88,7 +96,7 @@ internal fun DropdownPopup(
     offset: IntOffset = IntOffset(0, 0),
     isFocusable: Boolean = false,
     onDismissRequest: (() -> Unit)? = null,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val popupPositioner = remember(dropDownAlignment, offset) {
         DropdownPositionProvider(
@@ -101,7 +109,7 @@ internal fun DropdownPopup(
         popupPositionProvider = popupPositioner,
         isFocusable = isFocusable,
         onDismissRequest = onDismissRequest,
-        children = children
+        content = content
     )
 }
 
@@ -115,17 +123,30 @@ internal fun PopupTestTag(tag: String, children: @Composable () -> Unit) {
     Providers(PopupTestTagAmbient provides tag, children = children)
 }
 
+/**
+ * Opens a popup with the given content.
+ *
+ * The popup is positioned based on the coordinates return from [popupPositionProvider].
+ *
+ * @param popupPositionProvider The position provider to be used to determine popup's position.
+ * @param isFocusable Indicates if the popup can grab the focus.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param properties Typically platform specific properties to further configure the popup.
+ * @param content The content to be displayed inside the popup.
+ */
 @Composable
 fun Popup(
     popupPositionProvider: PopupPositionProvider,
     isFocusable: Boolean = false,
     onDismissRequest: (() -> Unit)? = null,
-    children: @Composable () -> Unit
+    properties: PopupProperties? = null,
+    content: @Composable () -> Unit
 ) = ActualPopup(
     popupPositionProvider,
     isFocusable,
     onDismissRequest,
-    children
+    properties,
+    content
 )
 
 @Composable
@@ -133,7 +154,8 @@ internal expect fun ActualPopup(
     popupPositionProvider: PopupPositionProvider,
     isFocusable: Boolean,
     onDismissRequest: (() -> Unit)?,
-    children: @Composable () -> Unit
+    properties: PopupProperties?,
+    content: @Composable () -> Unit
 )
 
 /**

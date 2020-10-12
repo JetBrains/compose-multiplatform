@@ -1,11 +1,3 @@
 // Baseline format: 1.0
-AcronymName: androidx.compose.ui.geometry.Rect.Companion#fromLTRB(float, float, float, float):
-    Acronyms should not be capitalized in method names: was `fromLTRB`, should this be `fromLtrb`?
-AcronymName: androidx.compose.ui.geometry.Rect.Companion#fromLTWH(float, float, float, float):
-    Acronyms should not be capitalized in method names: was `fromLTWH`, should this be `fromLtwh`?
-
-
-KotlinOperator: androidx.compose.ui.geometry.RRect#contains(androidx.compose.ui.geometry.Offset):
-    Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.ui.geometry.Rect#contains(androidx.compose.ui.geometry.Offset):
+KotlinOperator: androidx.compose.ui.geometry.MutableRect#set(float, float, float, float):
     Note that adding the `operator` keyword would allow calling this method using operator syntax

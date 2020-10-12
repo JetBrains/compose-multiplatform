@@ -23,6 +23,15 @@ import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.gesture.TapGestureFilter
 
+@ExperimentalFocus
+interface FocusManager {
+    /**
+     * Call this function to clear focus from the currently focused component, and set the focus to
+     * the root focus modifier.
+     */
+    fun clearFocus()
+}
+
 /**
  * The focus manager is used by different [Owner][androidx.compose.ui.node.Owner] implementations
  * to control focus.
@@ -30,8 +39,9 @@ import androidx.compose.ui.gesture.TapGestureFilter
  * @param focusModifier The modifier that will be used as the root focus modifier.
  */
 @ExperimentalFocus
-internal class FocusManager(private val focusModifier: FocusModifier = FocusModifier(Inactive)) {
-
+internal class FocusManagerImpl(
+    private val focusModifier: FocusModifier = FocusModifier(Inactive)
+) : FocusManager {
     private val passThroughClickModifier = PointerInputModifierImpl(
         TapGestureFilter().apply {
             onTap = { clearFocus() }
@@ -41,7 +51,7 @@ internal class FocusManager(private val focusModifier: FocusModifier = FocusModi
 
     /**
      * A [Modifier] that can be added to the [Owners][androidx.compose.ui.node.Owner] modifier
-     * list that contains the modifiers required by the foucus system. (Eg, a root focus modifier).
+     * list that contains the modifiers required by the focus system. (Eg, a root focus modifier).
      */
     val modifier: Modifier
         // TODO(b/168831247): return an empty Modifier when there are no focusable children.
@@ -50,9 +60,9 @@ internal class FocusManager(private val focusModifier: FocusModifier = FocusModi
 
     /**
      * The [Owner][androidx.compose.ui.node.Owner] calls this function when it gains focus. This
-     * informs the [focus manager][FocusManager] that the [Owner][androidx.compose.ui.node.Owner]
-     * gained focus, and that it should propagate this focus to one of the focus modifiers in the
-     * component hierarchy.
+     * informs the [focus manager][FocusManagerImpl] that the
+     * [Owner][androidx.compose.ui.node.Owner] gained focus, and that it should propagate this
+     * focus to one of the focus modifiers in the component hierarchy.
      */
     fun takeFocus() {
         // If the focus state is not Inactive, it indicates that the focus state is already
@@ -65,9 +75,9 @@ internal class FocusManager(private val focusModifier: FocusModifier = FocusModi
 
     /**
      * The [Owner][androidx.compose.ui.node.Owner] calls this function when it loses focus. This
-     * informs the [focus manager][FocusManager] that the [Owner][androidx.compose.ui.node.Owner]
-     * lost focus, and that it should clear focus from all the focus modifiers in the component
-     * hierarchy.
+     * informs the [focus manager][FocusManagerImpl] that the
+     * [Owner][androidx.compose.ui.node.Owner] lost focus, and that it should clear focus from
+     * all the focus modifiers in the component hierarchy.
      */
     fun releaseFocus() {
         focusModifier.focusNode.clearFocus(forcedClear = true)
@@ -79,7 +89,7 @@ internal class FocusManager(private val focusModifier: FocusModifier = FocusModi
      * This could be used to clear focus when a user clicks on empty space outside a focusable
      * component.
      */
-    fun clearFocus() {
+    override fun clearFocus() {
         if (focusModifier.focusNode.clearFocus(forcedClear = false)) {
             focusModifier.focusState = Active
         }

@@ -211,10 +211,12 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         }
     }
 
+    @Suppress("DEPRECATION")
     private class CompositionCoroutineScopeImpl(
         override val coroutineContext: CoroutineContext
     ) : CompositionCoroutineScope
 
+    @Suppress("DEPRECATION")
     @OptIn(ExperimentalCoroutinesApi::class)
     internal fun launchEffect(
         block: suspend CompositionCoroutineScope.() -> Unit
@@ -254,7 +256,7 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
     }
 
     private fun performRecompose(composer: Composer<*>): Boolean {
-        if (composer.isComposing) return false
+        if (composer.isComposing || composer.isDisposed) return false
         return composing(composer) {
             composer.recompose().also {
                 Snapshot.notifyObjectsInitialized()
@@ -305,7 +307,10 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         }
     }
 
-    fun hasPendingChanges(): Boolean =
+    /**
+     * Returns true if any pending invalidations have been scheduled.
+     */
+    fun hasInvalidations(): Boolean =
         !idlingLatch.isOpen || synchronized(invalidComposers) { invalidComposers.isNotEmpty() }
 
     internal fun scheduleRecompose(composer: Composer<*>) {

@@ -21,7 +21,7 @@ import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextField
@@ -45,7 +45,8 @@ import androidx.compose.ui.unit.dp
 fun SimpleTextFieldSample() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Label") }
     )
@@ -68,7 +69,8 @@ fun SimpleOutlinedTextFieldSample() {
 fun TextFieldWithIcons() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         placeholder = { Text("placeholder") },
         leadingIcon = { Icon(Icons.Filled.Favorite) },
@@ -81,7 +83,8 @@ fun TextFieldWithIcons() {
 fun TextFieldWithPlaceholder() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Email") },
         placeholder = { Text("example@gmail.com") }
@@ -124,7 +127,7 @@ fun TextFieldWithHelperMessage() {
         val textColor = if (invalidInput) {
             MaterialTheme.colors.error
         } else {
-            EmphasisAmbient.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
+            AmbientEmphasisLevels.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
         }
         Text(
             text = if (invalidInput) "Requires '@' and at least 5 symbols" else "Helper message",
@@ -154,7 +157,8 @@ fun TextFieldSample() {
         TextFieldValue("example", TextRange(0, 7))
     }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Label") }
     )
@@ -179,7 +183,8 @@ fun OutlinedTextFieldSample() {
 fun TextFieldWithHideKeyboardOnImeAction() {
     var text by savedInstanceState { "" }
 
-    TextField(value = text,
+    TextField(
+        value = text,
         onValueChange = { text = it },
         label = { Text("Label") },
         imeAction = ImeAction.Done,

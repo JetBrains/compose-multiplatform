@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.InspectableParameter
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.test.filters.MediumTest
@@ -149,13 +149,15 @@ class BackgroundTest {
     @Test
     fun testInspectableParameter() {
         val exclusions = listOf("nameFallback", "lastSize", "lastOutline")
-        val modifier = Modifier.background(Color.Magenta) as InspectableParameter
+        val modifier = Modifier.background(Color.Magenta) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("background")
         assertThat(modifier.valueOverride).isEqualTo(Color.Magenta)
         assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(modifier.javaClass.declaredFields
-                .filter { !it.isSynthetic && !exclusions.contains(it.name) }
-                .map { it.name })
+            .containsExactlyElementsIn(
+                modifier.javaClass.declaredFields
+                    .filter { !it.isSynthetic && !exclusions.contains(it.name) }
+                    .map { it.name }
+            )
     }
 
     @Composable

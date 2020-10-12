@@ -44,7 +44,7 @@ import androidx.compose.ui.semantics.semantics
  * pressed, using [Interaction.Pressed]. Only initial (first) press will be recorded and added to
  * [InteractionState]
  * @param indication indication to be shown when modified element is pressed. Be default,
- * indication from [IndicationAmbient] will be used. Pass `null` to show no indication
+ * indication from [AmbientIndication] will be used. Pass `null` to show no indication
  * @param onLongClick will be called when user long presses on the element
  * @param onDoubleClick will be called when user double clicks on the element
  * @param onClick will be called when user clicks on the element
@@ -54,7 +54,7 @@ fun Modifier.clickable(
     enabled: Boolean = true,
     onClickLabel: String? = null,
     interactionState: InteractionState = remember { InteractionState() },
-    indication: Indication? = IndicationAmbient.current(),
+    indication: Indication? = AmbientIndication.current(),
     onLongClickLabel: String? = null,
     onLongClick: (() -> Unit)? = null,
     onDoubleClick: (() -> Unit)? = null,

@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -132,18 +133,19 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
         }
     }
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
 
-        var internalChanges = changes
+        var changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Initial && state == State.Started) {
-            internalChanges = internalChanges.map {
+            changes = changes.map {
                 if (it.changedToDown()) {
                     it.consumeDownChange()
+                    it
                 } else {
                     it
                 }
@@ -152,17 +154,17 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
 
         if (pass == PointerEventPass.Main) {
 
-            if (state == State.Idle && internalChanges.all { it.changedToDown() }) {
+            if (state == State.Idle && changes.all { it.changedToDown() }) {
                 // If we have not yet started and all of the changes changed to down, we are
                 // starting.
                 state = State.Started
-                onStart?.invoke(internalChanges.first().current.position!!)
+                onStart?.invoke(changes.first().current.position!!)
             } else if (state == State.Started) {
-                if (internalChanges.all { it.changedToUpIgnoreConsumed() }) {
+                if (changes.all { it.changedToUpIgnoreConsumed() }) {
                     // If we have started and all of the changes changed to up, we are stopping.
                     state = State.Idle
                     onStop?.invoke()
-                } else if (!internalChanges.anyPointersInBounds(bounds)) {
+                } else if (!changes.anyPointersInBounds(bounds)) {
                     // If all of the down pointers are currently out of bounds, we should cancel
                     // as this indicates that the user does not which to trigger a press based
                     // event.
@@ -172,14 +174,17 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
             }
 
             if (state == State.Started) {
-                internalChanges = internalChanges.map { it.consumeDownChange() }
+                changes = changes.map {
+                    it.consumeDownChange()
+                    it
+                }
             }
         }
 
         if (
             pass == PointerEventPass.Final &&
             state == State.Started &&
-            internalChanges.fastAny { it.anyPositionChangeConsumed() }
+            changes.fastAny { it.anyPositionChangeConsumed() }
         ) {
             // On the final pass, if we have started and any of the changes had consumed
             // position changes, we cancel.
@@ -187,7 +192,7 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
             onCancel?.invoke()
         }
 
-        return internalChanges
+        return changes
     }
 
     override fun onCancel() {

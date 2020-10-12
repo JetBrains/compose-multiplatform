@@ -57,8 +57,10 @@ class IconTest {
     fun vector_customIconSize_dimensions() {
         val width = 35.dp
         val height = 83.dp
-        val vector = VectorAssetBuilder(defaultWidth = width, defaultHeight = height,
-            viewportWidth = width.value, viewportHeight = height.value).build()
+        val vector = VectorAssetBuilder(
+            defaultWidth = width, defaultHeight = height,
+            viewportWidth = width.value, viewportHeight = height.value
+        ).build()
         rule
             .setMaterialContentForSizeAssertions {
                 Icon(vector)
@@ -73,11 +75,11 @@ class IconTest {
         val height = 24.dp
         rule
             .setMaterialContentForSizeAssertions {
-                val dummyImage = with(DensityAmbient.current) {
+                val image = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
                 }
 
-                Icon(dummyImage)
+                Icon(image)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -90,11 +92,11 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val dummyImage = with(DensityAmbient.current) {
+                val image = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
                 }
 
-                Icon(dummyImage)
+                Icon(image)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -120,11 +122,11 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val dummyImage = with(DensityAmbient.current) {
+                val image = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
                 }
 
-                val imagePainter = ImagePainter(dummyImage)
+                val imagePainter = ImagePainter(image)
                 Icon(imagePainter)
             }
             .assertWidthIsEqualTo(width)

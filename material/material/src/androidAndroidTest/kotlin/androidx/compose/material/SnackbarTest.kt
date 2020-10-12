@@ -61,18 +61,21 @@ class SnackbarTest {
     val rule = createComposeRule(disableTransitions = true)
 
     private val longText = "Message is very long and long and long and long and long " +
-            "and long and long and long and long and long and long"
+        "and long and long and long and long and long and long"
 
     @Test
     fun defaultSnackbar_semantics() {
         var clicked = false
         rule.setMaterialContent {
             Box {
-                Snackbar(text = { Text("Message") }, action = {
-                    TextButton(onClick = { clicked = true }) {
-                        Text("UNDO")
+                Snackbar(
+                    text = { Text("Message") },
+                    action = {
+                        TextButton(onClick = { clicked = true }) {
+                            Text("UNDO")
+                        }
                     }
-                })
+                )
             }
         }
 
@@ -338,10 +341,11 @@ class SnackbarTest {
                 // on top of surface
                 snackBarColor = MaterialTheme.colors.onSurface.copy(alpha = 0.8f)
                     .compositeOver(background)
-                Providers(ShapesAmbient provides Shapes(medium = shape)) {
-                    Snackbar(modifier = Modifier
-                        .semantics(mergeAllDescendants = true) {}
-                        .testTag("snackbar"),
+                Providers(AmbientShapes provides Shapes(medium = shape)) {
+                    Snackbar(
+                        modifier = Modifier
+                            .semantics(mergeAllDescendants = true) {}
+                            .testTag("snackbar"),
                         text = { Text("") }
                     )
                 }

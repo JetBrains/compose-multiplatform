@@ -21,8 +21,6 @@ import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentListOf
 
-internal actual typealias BitSet = java.util.BitSet
-
 actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
 
 internal actual open class ThreadLocal<T> actual constructor(
@@ -109,13 +107,3 @@ private val emptyBuildableList = BuildableList<Any>(emptyPersistentList)
 internal actual fun <T> buildableListOf(): BuildableList<T> = emptyBuildableList as BuildableList<T>
 
 public actual typealias UnsupportedOperationException = java.lang.UnsupportedOperationException
-
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun <T> sortArrayWith(
-    array: Array<T>,
-    comparator: Comparator<T>,
-    fromIndex: Int,
-    toIndex: Int
-) {
-    array.sortWith(comparator, fromIndex, toIndex)
-}

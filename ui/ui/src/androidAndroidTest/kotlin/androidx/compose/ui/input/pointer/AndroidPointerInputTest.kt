@@ -36,7 +36,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntSize
@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit
 class AndroidPointerInputTest {
     @Suppress("DEPRECATION")
     @get:Rule
-    val rule = androidx.test.rule.ActivityTestRule<AndroidPointerInputTestActivity>(
+    val rule = androidx.test.rule.ActivityTestRule(
         AndroidPointerInputTestActivity::class.java
     )
 
@@ -94,7 +94,7 @@ class AndroidPointerInputTest {
                 container.setContent(Recomposer.current()) {
                     FillLayout(
                         Modifier
-                            .onPositioned { latch.countDown() }
+                            .onGloballyPositioned { latch.countDown() }
                     )
                 }
             }
@@ -131,7 +131,7 @@ class AndroidPointerInputTest {
                     FillLayout(
                         Modifier
                             .consumeMovementGestureFilter()
-                            .onPositioned { latch.countDown() }
+                            .onGloballyPositioned { latch.countDown() }
                     )
                 }
             }
@@ -191,7 +191,7 @@ class AndroidPointerInputTest {
                         .consumeDownGestureFilter {
                             consumedDownPosition = it
                         }
-                        .onPositioned {
+                        .onGloballyPositioned {
                             latch.countDown()
                         }
                 ) { _, _ ->
@@ -254,7 +254,7 @@ class AndroidPointerInputTest {
                                     {},
                                     Modifier
                                         .logEventsGestureFilter(log)
-                                        .onPositioned {
+                                        .onGloballyPositioned {
                                             latch.countDown()
                                         }
                                 ) { _, _ ->
@@ -311,7 +311,7 @@ class AndroidPointerInputTest {
                     FillLayout(
                         Modifier
                             .consumeMovementGestureFilter(consumeMovement)
-                            .onPositioned { latch.countDown() }
+                            .onGloballyPositioned { latch.countDown() }
                     )
                 }
             }
@@ -356,6 +356,67 @@ class AndroidPointerInputTest {
             }
         }
     }
+
+    /**
+     * This test verifies that if the AndroidComposeView is offset directly by a call to
+     * "offsetTopAndBottom(int)", that pointer locations are correct when dispatched down to a child
+     * PointerInputModifier.
+     */
+    @Test
+    fun dispatchTouchEvent_androidComposeViewOffset_positionIsCorrect() {
+
+        // Arrange
+
+        val offset = 50
+        val log = mutableListOf<List<PointerInputChange>>()
+
+        countDown { latch ->
+            rule.runOnUiThread {
+                container.setContent(Recomposer.current()) {
+                    FillLayout(
+                        Modifier
+                            .logEventsGestureFilter(log)
+                            .onGloballyPositioned { latch.countDown() }
+                    )
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+
+            androidComposeView = container.getChildAt(0) as AndroidComposeView
+
+            // Get the current location in window.
+            val locationInWindow = IntArray(2).also {
+                androidComposeView.getLocationInWindow(it)
+            }
+
+            // Offset the androidComposeView.
+            androidComposeView.offsetTopAndBottom(offset)
+
+            // Create a motion event that is also offset.
+            val motionEvent = MotionEvent(
+                0,
+                MotionEvent.ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(
+                    PointerCoords(
+                        locationInWindow[0].toFloat(),
+                        locationInWindow[1].toFloat() + offset
+                    )
+                )
+            )
+
+            // Act
+            androidComposeView.dispatchTouchEvent(motionEvent)
+
+            // Assert
+            assertThat(log).hasSize(1)
+            assertThat(log[0]).isEqualTo(listOf(down(0, 0.milliseconds, 0f, 0f)))
+        }
+    }
 }
 
 @Suppress("TestFunctionName")
@@ -391,20 +452,21 @@ private class PointerInputModifierImpl(override val pointerInputFilter: PointerI
     PointerInputModifier
 
 private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : PointerInputFilter() {
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ) =
         if (consumeMovement) {
-            changes.map {
+            pointerEvent.changes.map {
                 it.consumePositionChange(
                     it.positionChange().x,
                     it.positionChange().y
                 )
             }
+            pointerEvent.changes
         } else {
-            changes
+            pointerEvent.changes
         }
 
     override fun onCancel() {}
@@ -412,14 +474,15 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
 
 private class ConsumeDownChangeFilter : PointerInputFilter() {
     var onDown by mutableStateOf<(Offset) -> Unit>({})
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = changes.map {
+    ) = pointerEvent.changes.map {
         if (it.changedToDown()) {
             onDown(it.current.position!!)
             it.consumeDownChange()
+            it
         } else {
             it
         }
@@ -431,11 +494,12 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
 private class LogEventsGestureFilter(val log: MutableList<List<PointerInputChange>>) :
     PointerInputFilter() {
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
+        val changes = pointerEvent.changes
         if (pass == PointerEventPass.Initial) {
             log.add(changes.map { it.copy() })
         }

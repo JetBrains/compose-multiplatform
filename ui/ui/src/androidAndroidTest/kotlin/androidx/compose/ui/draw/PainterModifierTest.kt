@@ -57,7 +57,7 @@ import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.InspectableParameter
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Constraints
@@ -607,7 +607,7 @@ class PainterModifierTest {
 
     @Test
     fun testInspectable() {
-        val modifier = Modifier.paint(TestPainter(10f, 20f)) as InspectableParameter
+        val modifier = Modifier.paint(TestPainter(10f, 20f)) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("paint")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.toList())

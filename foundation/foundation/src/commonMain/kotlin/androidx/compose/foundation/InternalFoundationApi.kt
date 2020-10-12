@@ -17,6 +17,8 @@
 package androidx.compose.foundation
 
 @RequiresOptIn(message = "This API is internal to library.")
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY,
-        AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
+@Target(
+    AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY,
+    AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER
+)
 annotation class InternalFoundationApi

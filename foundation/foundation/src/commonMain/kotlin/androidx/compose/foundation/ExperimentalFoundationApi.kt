@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation
 
-@RequiresOptIn("This foundation API is experimental and is likely to change or be removed in the " +
-        "future.")
+@RequiresOptIn(
+    "This foundation API is experimental and is likely to change or be removed in the " +
+        "future."
+)
 annotation class ExperimentalFoundationApi

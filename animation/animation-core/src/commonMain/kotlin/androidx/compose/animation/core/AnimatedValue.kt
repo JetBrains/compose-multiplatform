@@ -140,8 +140,7 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
 
         this.targetValue = targetValue
         val animationWrapper = TargetBasedAnimation(
-            anim.vectorize(typeConverter),
-            value, targetValue, velocityVector, typeConverter
+            anim, value, targetValue, typeConverter, velocityVector
         )
 
         this.onEnd = onEnd
@@ -406,8 +405,8 @@ fun AnimatedFloat.fling(
             targetAnimation.animation,
             value,
             targetAnimation.target,
-            AnimationVector1D(startVelocity),
-            typeConverter
+            typeConverter,
+            AnimationVector1D(startVelocity)
         )
         startAnimation(animWrapper)
     }

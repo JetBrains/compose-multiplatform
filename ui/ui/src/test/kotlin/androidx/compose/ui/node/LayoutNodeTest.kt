@@ -25,6 +25,8 @@ import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
@@ -1662,7 +1664,11 @@ class LayoutNodeTest {
         PointerInputModifier
 }
 
-@OptIn(InternalCoreApi::class, ExperimentalLayoutNodeApi::class)
+@OptIn(
+    ExperimentalFocus::class,
+    ExperimentalLayoutNodeApi::class,
+    InternalCoreApi::class
+)
 private class MockOwner(
     val position: IntOffset = IntOffset.Zero,
     override val root: LayoutNode = LayoutNode()
@@ -1687,6 +1693,8 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
+    override val focusManager: FocusManager
+        get() = TODO("Not yet implemented")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")
     override val layoutDirection: LayoutDirection
@@ -1699,6 +1707,8 @@ private class MockOwner(
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
     }
+
+    override val hasPendingMeasureOrLayout = false
 
     override fun onAttach(node: LayoutNode) {
         onAttachParams += node

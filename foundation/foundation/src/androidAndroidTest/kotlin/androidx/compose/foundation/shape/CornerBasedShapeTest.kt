@@ -38,10 +38,10 @@ class CornerBasedShapeTest {
         val passedSize = Size(100.0f, 50.0f)
         var assertionExecuted = false
         val assertSizes = { size: Size,
-                            topLeft: Float,
-                            topRight: Float,
-                            bottomRight: Float,
-                            bottomLeft: Float ->
+            topLeft: Float,
+            topRight: Float,
+            bottomRight: Float,
+            bottomLeft: Float ->
             assertThat(size).isEqualTo(passedSize)
             assertThat(topLeft).isEqualTo(4.0f)
             assertThat(topRight).isEqualTo(3.0f)
@@ -71,10 +71,10 @@ class CornerBasedShapeTest {
 
         val sizesList = mutableListOf<Size>()
         val assertSizes = { size: Size,
-                            topLeft: Float,
-                            topRight: Float,
-                            bottomRight: Float,
-                            bottomLeft: Float ->
+            topLeft: Float,
+            topRight: Float,
+            bottomRight: Float,
+            bottomLeft: Float ->
             sizesList.add(size)
             assertThat(topLeft).isEqualTo(4.0f)
             assertThat(topRight).isEqualTo(4.0f)
@@ -104,10 +104,10 @@ class CornerBasedShapeTest {
 
         val sizesList = mutableListOf<Size>()
         val assertSizes = { size: Size,
-                            topLeft: Float,
-                            topRight: Float,
-                            bottomRight: Float,
-                            bottomLeft: Float ->
+            topLeft: Float,
+            topRight: Float,
+            bottomRight: Float,
+            bottomLeft: Float ->
             sizesList.add(size)
             assertThat(topLeft).isEqualTo(1.0f)
             assertThat(topRight).isEqualTo(1.0f)
@@ -137,10 +137,10 @@ class CornerBasedShapeTest {
 
         val sizesList = mutableListOf<Size>()
         val assertSizes = { size: Size,
-                            topLeft: Float,
-                            topRight: Float,
-                            bottomRight: Float,
-                            bottomLeft: Float ->
+            topLeft: Float,
+            topRight: Float,
+            bottomRight: Float,
+            bottomLeft: Float ->
             sizesList.add(size)
             assertThat(topLeft).isEqualTo(4.0f)
             assertThat(topRight).isEqualTo(4.0f)
@@ -211,10 +211,13 @@ class CornerBasedShapeTest {
             bottomLeft = CornerSize(50)
         )
         assertThat(impl)
-            .isEqualTo(impl.copy(bottomRight = CornerSize(
-                3.dp
+            .isEqualTo(
+                impl.copy(
+                    bottomRight = CornerSize(
+                        3.dp
+                    )
+                )
             )
-            ))
     }
 }
 

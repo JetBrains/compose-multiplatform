@@ -20,7 +20,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.CoreText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -29,13 +28,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
@@ -88,6 +92,10 @@ class SelectionContainerTest {
 
     private val hapticFeedback = mock<HapticFeedback>()
 
+    // Variables used to store position and size of the CoreText.
+    private val textPosition = Ref<Offset>()
+    private val textSize = Ref<IntSize>()
+
     @Before
     fun setup() {
         rule.setContent {
@@ -104,7 +112,7 @@ class SelectionContainerTest {
                     ) {
                         CoreText(
                             AnnotatedString(textContent),
-                            Modifier.fillMaxSize(),
+                            modifier = saveLayout(textPosition, textSize),
                             style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
                             softWrap = true,
                             overflow = TextOverflow.Clip,
@@ -125,15 +133,18 @@ class SelectionContainerTest {
     @SdkSuppress(minSdkVersion = 27)
     fun press_to_cancel() {
         // Setup. Long press to create a selection.
-        // A reasonable number.
-        val position = 50f
-        longPress(x = position, y = position)
+        // The long press position.
+        // positionX is 50 pixels to the right of the CoreText's left edge.
+        // positionY is the middle of the CoreText.
+        val positionX = textPosition.value!!.x + 50f
+        val positionY = textPosition.value!!.y + textSize.value!!.height / 2
+        longPress(x = positionX, y = positionY)
         rule.runOnIdle {
             assertThat(selection.value).isNotNull()
         }
 
         // Act.
-        press(x = position, y = position)
+        press(x = positionX, y = positionY)
 
         // Assert.
         rule.runOnIdle {
@@ -149,14 +160,17 @@ class SelectionContainerTest {
     @SdkSuppress(minSdkVersion = 27)
     fun tapToCancelDoesNotBlockUp() {
         // Setup. Long press to create a selection.
-        // A reasonable number.
-        val position = 50f
-        longPress(x = position, y = position)
+        // The long press position.
+        // positionX is 50 pixels to the right of the CoreText's left edge.
+        // positionY is the middle of the CoreText.
+        val positionX = textPosition.value!!.x + 50f
+        val positionY = textPosition.value!!.y + textSize.value!!.height / 2
+        longPress(x = positionX, y = positionY)
 
         log.entries.clear()
 
         // Act.
-        press(x = position, y = position)
+        press(x = positionX, y = positionY)
 
         // Assert.
         rule.runOnIdle {
@@ -184,33 +198,6 @@ class SelectionContainerTest {
         rule.runOnIdle {
             assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
             assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
-            verify(
-                hapticFeedback,
-                times(1)
-            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-        }
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = 27)
-    fun long_press_and_drag_select_text_range() {
-        // Setup. Want to selection "Dem".
-        val startOffset = textContent.indexOf('D')
-        val endOffset = textContent.indexOf('m') + 1
-        val characterSize = with(rule.density) { fontSize.toPx() }
-
-        // Act.
-        longPressAndDrag(
-            startX = startOffset * characterSize,
-            startY = 0.5f * characterSize,
-            endX = endOffset * characterSize,
-            endY = 0.5f * characterSize
-        )
-
-        // Assert.
-        rule.runOnIdle {
-            assertThat(selection.value!!.start.offset).isEqualTo(startOffset)
-            assertThat(selection.value!!.end.offset).isEqualTo("Text Demo".length)
             verify(
                 hapticFeedback,
                 times(1)
@@ -289,12 +276,12 @@ class SelectionContainerTest {
     }
 }
 
-private class PointerInputChangeLog : (List<PointerInputChange>, PointerEventPass) -> Unit {
+private class PointerInputChangeLog : (PointerEvent, PointerEventPass) -> Unit {
 
     val entries = mutableListOf<PointerInputChangeLogEntry>()
 
-    override fun invoke(p1: List<PointerInputChange>, p2: PointerEventPass) {
-        entries.add(PointerInputChangeLogEntry(p1.map { it }, p2))
+    override fun invoke(p1: PointerEvent, p2: PointerEventPass) {
+        entries.add(PointerInputChangeLogEntry(p1.changes.map { it }, p2))
     }
 }
 
@@ -303,8 +290,16 @@ private data class PointerInputChangeLogEntry(
     val pass: PointerEventPass
 )
 
+private fun saveLayout(
+    coords: Ref<Offset>,
+    size: Ref<IntSize>
+): Modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
+    coords.value = coordinates.localToRoot(Offset.Zero)
+    size.value = coordinates.size
+}
+
 private fun Modifier.gestureSpy(
-    onPointerInput: (List<PointerInputChange>, PointerEventPass) -> Unit
+    onPointerInput: (PointerEvent, PointerEventPass) -> Unit
 ): Modifier = composed {
     val spy = remember { GestureSpy() }
     spy.onPointerInput = onPointerInput
@@ -313,16 +308,16 @@ private fun Modifier.gestureSpy(
 
 private class GestureSpy : PointerInputModifier {
 
-    lateinit var onPointerInput: (List<PointerInputChange>, PointerEventPass) -> Unit
+    lateinit var onPointerInput: (PointerEvent, PointerEventPass) -> Unit
 
     override val pointerInputFilter = object : PointerInputFilter() {
-        override fun onPointerInput(
-            changes: List<PointerInputChange>,
+        override fun onPointerEvent(
+            pointerEvent: PointerEvent,
             pass: PointerEventPass,
             bounds: IntSize
         ): List<PointerInputChange> {
-            onPointerInput(changes, pass)
-            return changes
+            onPointerInput(pointerEvent, pass)
+            return pointerEvent.changes
         }
 
         override fun onCancel() {

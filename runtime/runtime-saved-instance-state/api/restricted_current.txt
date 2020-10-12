@@ -1,4 +1,4 @@
-// Signature format: 3.0
+// Signature format: 4.0
 package androidx.compose.runtime.savedinstancestate {
 
   public final class ListSaverKt {
@@ -10,11 +10,11 @@ package androidx.compose.runtime.savedinstancestate {
   }
 
   public final class RememberSavedInstanceStateKt {
-    method @androidx.compose.runtime.Composable public static <T> T rememberSavedInstanceState(Object![]? inputs, androidx.compose.runtime.savedinstancestate.Saver<T,?> saver = autoSaver(), String? key = null, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.runtime.Composable public static <T> T rememberSavedInstanceState(Object![]? inputs, optional androidx.compose.runtime.savedinstancestate.Saver<T,?> saver, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
   public final class SavedInstanceStateKt {
-    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.MutableState<T> savedInstanceState(Object![]? inputs, androidx.compose.runtime.savedinstancestate.Saver<T,?> saver = autoSaver(), String? key = null, androidx.compose.runtime.SnapshotMutationPolicy<T> policy = structuralEqualityPolicy(), kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.MutableState<T> savedInstanceState(Object![]? inputs, optional androidx.compose.runtime.savedinstancestate.Saver<T,?> saver, optional String? key, optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
   public interface Saver<Original, Saveable> {

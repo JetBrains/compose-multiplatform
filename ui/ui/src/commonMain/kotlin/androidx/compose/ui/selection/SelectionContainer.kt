@@ -20,10 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.platform.TextToolbarAmbient
@@ -55,20 +55,27 @@ fun SelectionContainer(
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
 
-    val gestureModifiers = remember {
-        // Get the layout coordinates of the selection container. This is for hit test of
-        // cross-composable selection.
-        Modifier
-            .noConsumptionTapGestureFilter { manager.onRelease() }
-            .longPressDragGestureFilter(manager.longPressDragObserver)
-            .onPositioned { manager.containerLayoutCoordinates = it }
+    val selectionContainerModifier = Modifier.composed {
+        val gestureModifiers = Modifier.noConsumptionTapGestureFilter { manager.onRelease() }
+
+        val positionedModifier = remember {
+            // Get the layout coordinates of the selection container. This is for hit test of
+            // cross-composable selection.
+            Modifier.onGloballyPositioned { manager.containerLayoutCoordinates = it }
+        }
+
+        if (selection != null) {
+            this.then(gestureModifiers).then(positionedModifier)
+        } else {
+            this.then(positionedModifier)
+        }
     }
 
     Providers(SelectionRegistrarAmbient provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
         SelectionLayout(
-            modifier = modifier.then(gestureModifiers)
+            modifier = modifier.then(selectionContainerModifier)
         ) {
             children()
             manager.selection?.let {
@@ -95,6 +102,19 @@ fun SelectionContainer(
             }
         }
     }
+}
+
+/**
+ * This is for disabling selection for text when the text is inside a SelectionContainer.
+ *
+ * To use this, simply add this to wrap one or more text composables.
+ */
+@Composable
+fun DisableSelection(content: @Composable () -> Unit) {
+    Providers(
+        SelectionRegistrarAmbient provides null,
+        children = content
+    )
 }
 
 @Composable

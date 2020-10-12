@@ -172,201 +172,219 @@ internal fun Char.toPathNodes(args: FloatArray): List<PathNode> = when (this) {
     RelativeCloseKey, CloseKey -> listOf(
         PathNode.Close
     )
-    RelativeMoveToKey -> pathNodesFromArgs(
-        args,
-        NUM_MOVE_TO_ARGS
-    ) { array ->
-        PathNode.RelativeMoveTo(
-            x = array[0],
-            y = array[1]
-        )
-    }
+    RelativeMoveToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_MOVE_TO_ARGS
+        ) { array ->
+            PathNode.RelativeMoveTo(
+                x = array[0],
+                y = array[1]
+            )
+        }
 
-    MoveToKey -> pathNodesFromArgs(
-        args,
-        NUM_MOVE_TO_ARGS
-    ) { array ->
-        PathNode.MoveTo(
-            x = array[0],
-            y = array[1]
-        )
-    }
+    MoveToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_MOVE_TO_ARGS
+        ) { array ->
+            PathNode.MoveTo(
+                x = array[0],
+                y = array[1]
+            )
+        }
 
-    RelativeLineToKey -> pathNodesFromArgs(
-        args,
-        NUM_LINE_TO_ARGS
-    ) { array ->
-        PathNode.RelativeLineTo(
-            x = array[0],
-            y = array[1]
-        )
-    }
+    RelativeLineToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_LINE_TO_ARGS
+        ) { array ->
+            PathNode.RelativeLineTo(
+                x = array[0],
+                y = array[1]
+            )
+        }
 
-    LineToKey -> pathNodesFromArgs(
-        args,
-        NUM_LINE_TO_ARGS
-    ) { array ->
-        PathNode.LineTo(
-            x = array[0],
-            y = array[1]
-        )
-    }
+    LineToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_LINE_TO_ARGS
+        ) { array ->
+            PathNode.LineTo(
+                x = array[0],
+                y = array[1]
+            )
+        }
 
-    RelativeHorizontalToKey -> pathNodesFromArgs(
-        args,
-        NUM_HORIZONTAL_TO_ARGS
-    ) { array ->
-        PathNode.RelativeHorizontalTo(
-            x = array[0]
-        )
-    }
+    RelativeHorizontalToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_HORIZONTAL_TO_ARGS
+        ) { array ->
+            PathNode.RelativeHorizontalTo(
+                x = array[0]
+            )
+        }
 
-    HorizontalToKey -> pathNodesFromArgs(
-        args,
-        NUM_HORIZONTAL_TO_ARGS
-    ) { array ->
-        PathNode.HorizontalTo(x = array[0])
-    }
+    HorizontalToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_HORIZONTAL_TO_ARGS
+        ) { array ->
+            PathNode.HorizontalTo(x = array[0])
+        }
 
-    RelativeVerticalToKey -> pathNodesFromArgs(
-        args,
-        NUM_VERTICAL_TO_ARGS
-    ) { array ->
-        PathNode.RelativeVerticalTo(y = array[0])
-    }
+    RelativeVerticalToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_VERTICAL_TO_ARGS
+        ) { array ->
+            PathNode.RelativeVerticalTo(y = array[0])
+        }
 
-    VerticalToKey -> pathNodesFromArgs(
-        args,
-        NUM_VERTICAL_TO_ARGS
-    ) { array ->
-        PathNode.VerticalTo(y = array[0])
-    }
+    VerticalToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_VERTICAL_TO_ARGS
+        ) { array ->
+            PathNode.VerticalTo(y = array[0])
+        }
 
-    RelativeCurveToKey -> pathNodesFromArgs(
-        args,
-        NUM_CURVE_TO_ARGS
-    ) { array ->
-        PathNode.RelativeCurveTo(
-            dx1 = array[0],
-            dy1 = array[1],
-            dx2 = array[2],
-            dy2 = array[3],
-            dx3 = array[4],
-            dy3 = array[5]
-        )
-    }
+    RelativeCurveToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_CURVE_TO_ARGS
+        ) { array ->
+            PathNode.RelativeCurveTo(
+                dx1 = array[0],
+                dy1 = array[1],
+                dx2 = array[2],
+                dy2 = array[3],
+                dx3 = array[4],
+                dy3 = array[5]
+            )
+        }
 
-    CurveToKey -> pathNodesFromArgs(
-        args,
-        NUM_CURVE_TO_ARGS
-    ) { array ->
-        PathNode.CurveTo(
-            x1 = array[0],
-            y1 = array[1],
-            x2 = array[2],
-            y2 = array[3],
-            x3 = array[4],
-            y3 = array[5]
-        )
-    }
+    CurveToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_CURVE_TO_ARGS
+        ) { array ->
+            PathNode.CurveTo(
+                x1 = array[0],
+                y1 = array[1],
+                x2 = array[2],
+                y2 = array[3],
+                x3 = array[4],
+                y3 = array[5]
+            )
+        }
 
-    RelativeReflectiveCurveToKey -> pathNodesFromArgs(
-        args,
-        NUM_REFLECTIVE_CURVE_TO_ARGS
-    ) { array ->
-        PathNode.RelativeReflectiveCurveTo(
-            x1 = array[0],
-            y1 = array[1],
-            x2 = array[2],
-            y2 = array[3]
-        )
-    }
+    RelativeReflectiveCurveToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_REFLECTIVE_CURVE_TO_ARGS
+        ) { array ->
+            PathNode.RelativeReflectiveCurveTo(
+                x1 = array[0],
+                y1 = array[1],
+                x2 = array[2],
+                y2 = array[3]
+            )
+        }
 
-    ReflectiveCurveToKey -> pathNodesFromArgs(
-        args,
-        NUM_REFLECTIVE_CURVE_TO_ARGS
-    ) { array ->
-        PathNode.ReflectiveCurveTo(
-            x1 = array[0],
-            y1 = array[1],
-            x2 = array[2],
-            y2 = array[3]
-        )
-    }
+    ReflectiveCurveToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_REFLECTIVE_CURVE_TO_ARGS
+        ) { array ->
+            PathNode.ReflectiveCurveTo(
+                x1 = array[0],
+                y1 = array[1],
+                x2 = array[2],
+                y2 = array[3]
+            )
+        }
 
-    RelativeQuadToKey -> pathNodesFromArgs(
-        args,
-        NUM_QUAD_TO_ARGS
-    ) { array ->
-        PathNode.RelativeQuadTo(
-            x1 = array[0],
-            y1 = array[1],
-            x2 = array[2],
-            y2 = array[3]
-        )
-    }
+    RelativeQuadToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_QUAD_TO_ARGS
+        ) { array ->
+            PathNode.RelativeQuadTo(
+                x1 = array[0],
+                y1 = array[1],
+                x2 = array[2],
+                y2 = array[3]
+            )
+        }
 
-    QuadToKey -> pathNodesFromArgs(
-        args,
-        NUM_QUAD_TO_ARGS
-    ) { array ->
-        PathNode.QuadTo(
-            x1 = array[0],
-            y1 = array[1],
-            x2 = array[2],
-            y2 = array[3]
-        )
-    }
+    QuadToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_QUAD_TO_ARGS
+        ) { array ->
+            PathNode.QuadTo(
+                x1 = array[0],
+                y1 = array[1],
+                x2 = array[2],
+                y2 = array[3]
+            )
+        }
 
-    RelativeReflectiveQuadToKey -> pathNodesFromArgs(
-        args,
-        NUM_REFLECTIVE_QUAD_TO_ARGS
-    ) { array ->
-        PathNode.RelativeReflectiveQuadTo(
-            x = array[0],
-            y = array[1]
-        )
-    }
+    RelativeReflectiveQuadToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_REFLECTIVE_QUAD_TO_ARGS
+        ) { array ->
+            PathNode.RelativeReflectiveQuadTo(
+                x = array[0],
+                y = array[1]
+            )
+        }
 
-    ReflectiveQuadToKey -> pathNodesFromArgs(
-        args,
-        NUM_REFLECTIVE_QUAD_TO_ARGS
-    ) { array ->
-        PathNode.ReflectiveQuadTo(
-            x = array[0],
-            y = array[1]
-        )
-    }
+    ReflectiveQuadToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_REFLECTIVE_QUAD_TO_ARGS
+        ) { array ->
+            PathNode.ReflectiveQuadTo(
+                x = array[0],
+                y = array[1]
+            )
+        }
 
-    RelativeArcToKey -> pathNodesFromArgs(
-        args,
-        NUM_ARC_TO_ARGS
-    ) { array ->
-        PathNode.RelativeArcTo(
-            horizontalEllipseRadius = array[0],
-            verticalEllipseRadius = array[1],
-            theta = array[2],
-            isMoreThanHalf = array[3].compareTo(0.0f) != 0,
-            isPositiveArc = array[4].compareTo(0.0f) != 0,
-            arcStartDx = array[5],
-            arcStartDy = array[6]
-        )
-    }
+    RelativeArcToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_ARC_TO_ARGS
+        ) { array ->
+            PathNode.RelativeArcTo(
+                horizontalEllipseRadius = array[0],
+                verticalEllipseRadius = array[1],
+                theta = array[2],
+                isMoreThanHalf = array[3].compareTo(0.0f) != 0,
+                isPositiveArc = array[4].compareTo(0.0f) != 0,
+                arcStartDx = array[5],
+                arcStartDy = array[6]
+            )
+        }
 
-    ArcToKey -> pathNodesFromArgs(
-        args,
-        NUM_ARC_TO_ARGS
-    ) { array ->
-        PathNode.ArcTo(
-            horizontalEllipseRadius = array[0],
-            verticalEllipseRadius = array[1],
-            theta = array[2],
-            isMoreThanHalf = array[3].compareTo(0.0f) != 0,
-            isPositiveArc = array[4].compareTo(0.0f) != 0,
-            arcStartX = array[5],
-            arcStartY = array[6]
-        )
-    }
+    ArcToKey ->
+        pathNodesFromArgs(
+            args,
+            NUM_ARC_TO_ARGS
+        ) { array ->
+            PathNode.ArcTo(
+                horizontalEllipseRadius = array[0],
+                verticalEllipseRadius = array[1],
+                theta = array[2],
+                isMoreThanHalf = array[3].compareTo(0.0f) != 0,
+                isPositiveArc = array[4].compareTo(0.0f) != 0,
+                arcStartX = array[5],
+                arcStartY = array[6]
+            )
+        }
 
     else -> throw IllegalArgumentException("Unknown command for: $this")
 }

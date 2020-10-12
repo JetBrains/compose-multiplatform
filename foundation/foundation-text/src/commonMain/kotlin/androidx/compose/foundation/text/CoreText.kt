@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 @file:Suppress("DEPRECATION_ERROR")
+
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
+import androidx.compose.runtime.CommitScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
@@ -26,19 +29,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.HorizontalAlignmentLine
 import androidx.compose.ui.Layout
+import androidx.compose.ui.MeasureBlock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.LongPressDragObserver
+import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.layout.IntrinsicMeasureBlock
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.FontLoaderAmbient
 import androidx.compose.ui.selection.Selectable
+import androidx.compose.ui.selection.SelectionRegistrar
 import androidx.compose.ui.selection.SelectionRegistrarAmbient
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
@@ -56,6 +64,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.subSequence
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
 import kotlin.math.max
@@ -65,12 +74,20 @@ import kotlin.math.roundToInt
 /** The default selection color if none is specified. */
 internal val DefaultSelectionColor = Color(0x6633B5E5)
 internal typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
-internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (String)->Unit>
+internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (String) -> Unit>
+
 /**
  * CoreText is a low level element that displays text with multiple different styles. The text to
  * display is described using a [AnnotatedString]. Typically you will instead want to use
  * [androidx.compose.foundation.Text], which is a higher level Text element that contains semantics and
  * consumes style information from a theme.
+ *
+ * During the measurement, CoreText tends to shrink its size and reports the minimal needed size
+ * to its parent. It will ignore the minWidth and minHeight except when [TextAlign] is
+ * [TextAlign.Justify]. When [TextAlign.Justify] is specified and [text] is short enough that
+ * doesn't exceed minWidth, CoreText will justify the [text] to fill the given minWidth.
+ * When input [text] is too long and exceeds the maxWidth/maxHeight constrains, it will determine
+ * its size based on the [overflow] option.
  *
  * @param text AnnotatedString encoding a styled text.
  * @param modifier Modifier to apply to this layout node.
@@ -100,7 +117,6 @@ fun CoreText(
 ) {
     require(maxLines > 0) { "maxLines should be greater than 0" }
 
-    // Ambients
     // selection registrar, if no SelectionContainer is added ambient value will be null
     val selectionRegistrar = SelectionRegistrarAmbient.current
     val density = DensityAmbient.current
@@ -133,87 +149,136 @@ fun CoreText(
         maxLines = maxLines,
         placeholders = placeholders
     )
+    state.onTextLayout = onTextLayout
+
+    val controller = remember { TextController(state) }
+    controller.update(selectionRegistrar)
 
     Layout(
-        children = { InlineChildren(text, inlineComposables) },
-        modifier = modifier.drawLayer().drawBehind {
-            state.layoutResult?.let { layoutResult ->
-                drawIntoCanvas { canvas ->
-                    state.selectionRange?.let {
-                        TextDelegate.paintBackground(
-                            it.min,
-                            it.max,
-                            state.selectionPaint,
-                            canvas,
-                            layoutResult
+        children = if (inlineComposables.isEmpty()) {
+            emptyContent()
+        } else {
+            { InlineChildren(text, inlineComposables) }
+        },
+        modifier = modifier
+            .then(controller.modifiers)
+            .then(
+                if (selectionRegistrar != null) {
+                    Modifier.longPressDragGestureFilter(
+                        longPressDragObserver(
+                            state = state,
+                            selectionRegistrar = selectionRegistrar
                         )
-                    }
-                    TextDelegate.paint(canvas, layoutResult)
+                    )
+                } else {
+                    Modifier
                 }
-            }
-        }.onPositioned {
-            // Get the layout coordinates of the text composable. This is for hit test of
-            // cross-composable selection.
-            state.layoutCoordinates = it
+            ),
+        minIntrinsicWidthMeasureBlock = controller.minIntrinsicWidth,
+        minIntrinsicHeightMeasureBlock = controller.minIntrinsicHeight,
+        maxIntrinsicWidthMeasureBlock = controller.maxIntrinsicWidth,
+        maxIntrinsicHeightMeasureBlock = controller.maxIntrinsicHeight,
+        measureBlock = controller.measure
+    )
 
-            if (selectionRegistrar != null && state.selectionRange != null) {
+    onCommit(selectionRegistrar, callback = controller.commit)
+}
+
+@Composable
+internal fun InlineChildren(
+    text: AnnotatedString,
+    inlineContents: List<InlineContentRange>
+) {
+    inlineContents.fastForEach { (content, start, end) ->
+        Layout(
+            children = { content(text.subSequence(start, end).text) }
+        ) { children, constrains ->
+            val placeables = children.map { it.measure(constrains) }
+            layout(width = constrains.maxWidth, height = constrains.maxHeight) {
+                placeables.fastForEach { it.placeRelative(0, 0) }
+            }
+        }
+    }
+}
+
+@OptIn(InternalTextApi::class)
+private class TextController(val state: TextState) {
+    var selectionRegistrar: SelectionRegistrar? = null
+
+    fun update(selectionRegistrar: SelectionRegistrar?) {
+        this.selectionRegistrar = selectionRegistrar
+    }
+
+    val modifiers = Modifier.drawLayer().drawBehind {
+        state.layoutResult?.let { layoutResult ->
+            drawIntoCanvas { canvas ->
+                state.selectionRange?.let {
+                    TextDelegate.paintBackground(
+                        it.min,
+                        it.max,
+                        state.selectionPaint,
+                        canvas,
+                        layoutResult
+                    )
+                }
+                TextDelegate.paint(canvas, layoutResult)
+            }
+        }
+    }.onGloballyPositioned {
+        // Get the layout coordinates of the text composable. This is for hit test of
+        // cross-composable selection.
+        state.layoutCoordinates = it
+        selectionRegistrar?.let { selectionRegistrar ->
+            if (state.selectionRange != null) {
                 val newGlobalPosition = it.globalPosition
                 if (newGlobalPosition != state.previousGlobalPosition) {
                     selectionRegistrar.onPositionChange()
                 }
                 state.previousGlobalPosition = newGlobalPosition
             }
-        }.semantics {
-            getTextLayoutResult {
-                if (state.layoutResult != null) {
-                    it.add(state.layoutResult!!)
-                    true
-                } else {
-                    false
-                }
-            }
-        },
-        minIntrinsicWidthMeasureBlock = { _, _ ->
-            state.textDelegate.layoutIntrinsics(layoutDirection)
-            state.textDelegate.minIntrinsicWidth
-        },
-        minIntrinsicHeightMeasureBlock = { _, width ->
-            // given the width constraint, determine the min height
-            state.textDelegate
-                .layout(
-                    Constraints(
-                        0,
-                        width,
-                        0,
-                        Constraints.Infinity
-                    ),
-                    layoutDirection
-                ).size.height
-        },
-        maxIntrinsicWidthMeasureBlock = { _, _ ->
-            state.textDelegate.layoutIntrinsics(layoutDirection)
-            state.textDelegate.maxIntrinsicWidth
-        },
-        maxIntrinsicHeightMeasureBlock = { _, width ->
-            state.textDelegate
-                .layout(
-                    Constraints(
-                        0,
-                        width,
-                        0,
-                        Constraints.Infinity
-                    ),
-                    layoutDirection
-                ).size.height
         }
-    ) { measurables, constraints ->
+    }.semantics {
+        getTextLayoutResult {
+            if (state.layoutResult != null) {
+                it.add(state.layoutResult!!)
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    val minIntrinsicWidth: IntrinsicMeasureBlock = { _, _ ->
+        state.textDelegate.layoutIntrinsics(layoutDirection)
+        state.textDelegate.minIntrinsicWidth
+    }
+
+    val minIntrinsicHeight: IntrinsicMeasureBlock = { _, width ->
+        // given the width constraint, determine the min height
+        state.textDelegate
+            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
+            .size.height
+    }
+
+    val maxIntrinsicWidth: IntrinsicMeasureBlock = { _, _ ->
+        state.textDelegate.layoutIntrinsics(layoutDirection)
+        state.textDelegate.maxIntrinsicWidth
+    }
+
+    val maxIntrinsicHeight: IntrinsicMeasureBlock = { _, width ->
+        state.textDelegate
+            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
+            .size.height
+    }
+
+    val measure: MeasureBlock = { measurables, constraints ->
         val layoutResult = state.textDelegate.layout(
             constraints,
             layoutDirection,
             state.layoutResult
         )
         if (state.layoutResult != layoutResult) {
-            onTextLayout(layoutResult)
+            state.onTextLayout(layoutResult)
         }
         state.layoutResult = layoutResult
 
@@ -258,10 +323,10 @@ fun CoreText(
         }
     }
 
-    onCommit(selectionRegistrar) {
+    val commit: CommitScope.() -> Unit = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
         val id: Selectable? =
-            selectionRegistrar?.let {
+            selectionRegistrar?.let { selectionRegistrar ->
                 selectionRegistrar.subscribe(
                     MultiWidgetSelectionDelegate(
                         selectionRangeUpdate = { state.selectionRange = it },
@@ -273,24 +338,7 @@ fun CoreText(
 
         onDispose {
             // unregister only if any id was provided by SelectionRegistrar
-            id?.let { selectionRegistrar.unsubscribe(id) }
-        }
-    }
-}
-
-@Composable
-internal fun InlineChildren(
-    text: AnnotatedString,
-    inlineContents: List<InlineContentRange>
-) {
-    inlineContents.fastForEach { (content, start, end) ->
-        Layout(
-            children = { content(text.subSequence(start, end).text) }
-        ) { children, constrains ->
-            val placeables = children.map { it.measure(constrains) }
-            layout(width = constrains.maxWidth, height = constrains.maxHeight) {
-                placeables.fastForEach { it.placeRelative(0, 0) }
-            }
+            id?.let { selectionRegistrar?.unsubscribe(id) }
         }
     }
 }
@@ -306,9 +354,12 @@ val FirstBaseline = HorizontalAlignmentLine(::min)
 val LastBaseline = HorizontalAlignmentLine(::max)
 
 @OptIn(InternalTextApi::class)
-private class TextState(
+@VisibleForTesting
+internal class TextState(
     var textDelegate: TextDelegate
 ) {
+    var onTextLayout: (TextLayoutResult) -> Unit = {}
+
     /**
      * The current selection range, used by selection.
      * This should be a state as every time we update the value during the selection we
@@ -377,9 +428,9 @@ internal fun resolveInlineContent(
     val inlineContentAnnotations = text.getStringAnnotations(INLINE_CONTENT_TAG, 0, text.length)
 
     val placeholders = mutableListOf<AnnotatedString.Range<Placeholder>>()
-    val inlineComposables = mutableListOf<AnnotatedString.Range<@Composable (String) ->Unit>>()
+    val inlineComposables = mutableListOf<AnnotatedString.Range<@Composable (String) -> Unit>>()
     inlineContentAnnotations.fastForEach { annotation ->
-        inlineContent[annotation.item]?. let { inlineTextContent ->
+        inlineContent[annotation.item]?.let { inlineTextContent ->
             placeholders.add(
                 AnnotatedString.Range(
                     inlineTextContent.placeholder,
@@ -397,4 +448,63 @@ internal fun resolveInlineContent(
         }
     }
     return Pair(placeholders, inlineComposables)
+}
+
+@OptIn(InternalTextApi::class)
+@VisibleForTesting
+internal fun longPressDragObserver(
+    state: TextState,
+    selectionRegistrar: SelectionRegistrar?
+): LongPressDragObserver {
+    /**
+     * The beginning position of the drag gesture. Every time a new drag gesture starts, it wil be
+     * recalculated.
+     */
+    var dragBeginPosition = Offset.Zero
+
+    /**
+     * The total distance being dragged of the drag gesture. Every time a new drag gesture starts,
+     * it will be zeroed out.
+     */
+    var dragTotalDistance = Offset.Zero
+    return object : LongPressDragObserver {
+        override fun onLongPress(pxPosition: Offset) {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return
+
+                selectionRegistrar?.onUpdateSelection(
+                    layoutCoordinates = it,
+                    startPosition = pxPosition,
+                    endPosition = pxPosition
+                )
+
+                dragBeginPosition = pxPosition
+            }
+        }
+
+        override fun onDragStart() {
+            super.onDragStart()
+            // selection never started
+            if (state.selectionRange == null) return
+            // Zero out the total distance that being dragged.
+            dragTotalDistance = Offset.Zero
+        }
+
+        override fun onDrag(dragDistance: Offset): Offset {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return Offset.Zero
+                // selection never started, did not consume any drag
+                if (state.selectionRange == null) return Offset.Zero
+
+                dragTotalDistance += dragDistance
+
+                selectionRegistrar?.onUpdateSelection(
+                    layoutCoordinates = it,
+                    startPosition = dragBeginPosition,
+                    endPosition = dragBeginPosition + dragTotalDistance
+                )
+            }
+            return dragDistance
+        }
+    }
 }

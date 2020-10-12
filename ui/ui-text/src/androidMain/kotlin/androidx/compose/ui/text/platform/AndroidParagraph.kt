@@ -329,7 +329,7 @@ internal class AndroidParagraph constructor(
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
-        if (color != Color.Unset || shadow != null || textDecoration != null) {
+        if (color != Color.Unspecified || shadow != null || textDecoration != null) {
             textPaint.applySpanStyle(
                 style = SpanStyle(
                     color = color,

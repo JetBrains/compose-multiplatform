@@ -76,7 +76,7 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
     override fun listIterator(): MutableListIterator<T> = StateListIterator(this, 0)
     override fun listIterator(index: Int): MutableListIterator<T> = StateListIterator(this, index)
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
-        require(fromIndex in 0..toIndex && toIndex < size)
+        require(fromIndex in 0..toIndex && toIndex <= size)
         return SubList(this, fromIndex, toIndex)
     }
     override fun add(element: T) = conditionalUpdate { it.add(element) }
@@ -141,8 +141,8 @@ private fun modificationError(): Nothing =
     error("Cannot modify a state list through an iterator")
 
 private fun validateRange(index: Int, size: Int) {
-    if (index !in 0..size) {
-        throw IndexOutOfBoundsException("index ($index) is out of bound of 0..$size")
+    if (index !in 0 until size) {
+        throw IndexOutOfBoundsException("index ($index) is out of bound of [0, $size)")
     }
 }
 
@@ -356,7 +356,7 @@ private class SubList<T>(
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
-        require(fromIndex in 0..toIndex && toIndex < size)
+        require(fromIndex in 0..toIndex && toIndex <= size)
         validateModification()
         return SubList(parentList, fromIndex + offset, toIndex + offset)
     }

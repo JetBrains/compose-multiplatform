@@ -163,7 +163,7 @@ fun ComponentActivity.setContent(
     val composeView: AndroidOwner = window.decorView
         .findViewById<ViewGroup>(android.R.id.content)
         .getChildAt(0) as? AndroidOwner
-        ?: AndroidOwner(this, this, this).also {
+        ?: AndroidComposeView(this).also {
             setContentView(it.view, DefaultLayoutParams)
         }
     return doSetContent(composeView, recomposer, null, content)
@@ -194,7 +194,7 @@ fun ViewGroup.setContent(
             getChildAt(0) as? AndroidOwner
         } else {
             removeAllViews(); null
-        } ?: AndroidOwner(context).also { addView(it.view, DefaultLayoutParams) }
+        } ?: AndroidComposeView(context).also { addView(it.view, DefaultLayoutParams) }
     return doSetContent(composeView, recomposer, parentComposition, content)
 }
 
@@ -284,6 +284,8 @@ private class WrappedComposition(
         }
         original.dispose()
     }
+
+    override fun hasInvalidations() = original.hasInvalidations()
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         if (event == Lifecycle.Event.ON_DESTROY) {

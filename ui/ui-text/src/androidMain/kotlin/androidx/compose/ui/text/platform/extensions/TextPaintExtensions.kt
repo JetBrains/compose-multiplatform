@@ -21,7 +21,7 @@ import android.os.Build
 import android.text.TextPaint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.isSet
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -70,7 +70,7 @@ internal fun TextPaint.applySpanStyle(
         }
     }
 
-    if (style.color.isSet) {
+    if (style.color.isSpecified) {
         color = style.color.toArgb()
     }
 
@@ -129,7 +129,7 @@ internal fun TextPaint.applySpanStyle(
             TextUnit.Inherit
         },
         background = if (style.background == Color.Transparent) {
-            Color.Unset // No need to add transparent background for default text style.
+            Color.Unspecified // No need to add transparent background for default text style.
         } else {
             style.background
         },

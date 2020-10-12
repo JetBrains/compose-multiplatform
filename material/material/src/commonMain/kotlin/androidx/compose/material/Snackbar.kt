@@ -93,7 +93,7 @@ fun Snackbar(
         color = backgroundColor,
         contentColor = contentColor
     ) {
-        ProvideEmphasis(EmphasisAmbient.current.high) {
+        ProvideEmphasis(AmbientEmphasisLevels.current.high) {
             val textStyle = MaterialTheme.typography.body2
             ProvideTextStyle(value = textStyle) {
                 when {

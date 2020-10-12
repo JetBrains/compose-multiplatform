@@ -33,7 +33,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
@@ -143,13 +143,19 @@ class FloatingActionButtonTest {
         var buttonBounds = Rect(0f, 0f, 0f, 0f)
         rule.setMaterialContent {
             Column {
-                Spacer(Modifier.size(10.dp).weight(1f).onPositioned {
-                    item1Bounds = it.boundsInRoot
-                })
+                Spacer(
+                    Modifier.size(10.dp).weight(1f).onGloballyPositioned {
+                        item1Bounds = it.boundsInRoot
+                    }
+                )
 
-                FloatingActionButton(onClick = {}, modifier = Modifier.weight(1f).onPositioned {
-                    buttonBounds = it.boundsInRoot
-                }) {
+                FloatingActionButton(
+                    onClick = {},
+                    modifier = Modifier.weight(1f)
+                        .onGloballyPositioned {
+                            buttonBounds = it.boundsInRoot
+                        }
+                ) {
                     Text("Button")
                 }
 
@@ -172,7 +178,7 @@ class FloatingActionButtonTest {
             Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
-                Providers(ShapesAmbient provides Shapes(small = themeShape)) {
+                Providers(AmbientShapes provides Shapes(small = themeShape)) {
                     FloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},
@@ -206,7 +212,7 @@ class FloatingActionButtonTest {
             Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
-                Providers(ShapesAmbient provides Shapes(small = themeShape)) {
+                Providers(AmbientShapes provides Shapes(small = themeShape)) {
                     ExtendedFloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},
@@ -234,9 +240,15 @@ class FloatingActionButtonTest {
         var contentCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent {
             Box {
-                FloatingActionButton({}, Modifier.onPositioned { buttonCoordinates = it }) {
-                    Box(Modifier.preferredSize(2.dp)
-                        .onPositioned { contentCoordinates = it }
+                FloatingActionButton(
+                    {},
+                    Modifier.onGloballyPositioned {
+                        buttonCoordinates = it
+                    }
+                ) {
+                    Box(
+                        Modifier.preferredSize(2.dp)
+                            .onGloballyPositioned { contentCoordinates = it }
                     )
                 }
             }
@@ -263,12 +275,13 @@ class FloatingActionButtonTest {
             Box {
                 ExtendedFloatingActionButton(
                     text = {
-                        Box(Modifier.preferredSize(2.dp)
-                            .onPositioned { contentCoordinates = it }
+                        Box(
+                            Modifier.preferredSize(2.dp)
+                                .onGloballyPositioned { contentCoordinates = it }
                         )
                     },
                     onClick = {},
-                    modifier = Modifier.onPositioned { buttonCoordinates = it }
+                    modifier = Modifier.onGloballyPositioned { buttonCoordinates = it }
                 )
             }
         }
@@ -295,17 +308,19 @@ class FloatingActionButtonTest {
             Box {
                 ExtendedFloatingActionButton(
                     text = {
-                        Box(Modifier.preferredSize(2.dp)
-                            .onPositioned { textCoordinates = it }
+                        Box(
+                            Modifier.preferredSize(2.dp)
+                                .onGloballyPositioned { textCoordinates = it }
                         )
                     },
                     icon = {
-                        Box(Modifier.preferredSize(10.dp)
-                            .onPositioned { iconCoordinates = it }
+                        Box(
+                            Modifier.preferredSize(10.dp)
+                                .onGloballyPositioned { iconCoordinates = it }
                         )
                     },
                     onClick = {},
-                    modifier = Modifier.onPositioned { buttonCoordinates = it }
+                    modifier = Modifier.onGloballyPositioned { buttonCoordinates = it }
                 )
             }
         }

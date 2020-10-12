@@ -17,15 +17,18 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.text.AnnotatedString
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 
 // TODO(demin): implement ClipboardManager
 class DesktopClipboardManager : ClipboardManager {
+    val systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
     override fun getText(): AnnotatedString? {
         println("ClipboardManager.getText not implemented yet")
         return null
     }
 
     override fun setText(annotatedString: AnnotatedString) {
-        println("ClipboardManager.setText not implemented yet")
+        systemClipboard.setContents(StringSelection(annotatedString.text), null)
     }
 }

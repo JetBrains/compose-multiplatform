@@ -27,6 +27,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.ScrollOrientationLoc
 import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -173,24 +174,25 @@ internal class RawDragGestureFilter : PointerInputFilter() {
         scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
     }
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
 
-        scrollOrientationLocker.onPointerInputSetup(changes, pass)
+        val originalChanges = pointerEvent.changes
+        var changesToReturn = originalChanges
 
-        var changesToReturn = changes
+        scrollOrientationLocker.onPointerInputSetup(originalChanges, pass)
 
         if (pass == PointerEventPass.Initial) {
-
             if (started) {
                 // If we are have started we want to prevent any descendants from reacting to
                 // any down change.
                 changesToReturn = changesToReturn.map {
                     if (it.changedToDown()) {
                         it.consumeDownChange()
+                        it
                     } else {
                         it
                     }
@@ -204,9 +206,9 @@ internal class RawDragGestureFilter : PointerInputFilter() {
             val applicableChanges =
                 with(orientation) {
                     if (this != null) {
-                        scrollOrientationLocker.getPointersFor(changes, this)
+                        scrollOrientationLocker.getPointersFor(originalChanges, this)
                     } else {
-                        changes
+                        originalChanges
                     }
                 }
 
@@ -243,6 +245,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                             if (velocityTracker != null) {
                                 changesToReturn = changesToReturn.map {
                                     it.consumeDownChange()
+                                    it
                                 }
                                 velocityTracker!!.calculateVelocity().pixelsPerSecond
                             } else {
@@ -354,6 +357,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
 
                     movedChanges = movedChanges.map {
                         it.consumePositionChange(consumed.x, consumed.y)
+                        it
                     }
                 }
             }
@@ -361,7 +365,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
             changesToReturn = movedChanges + otherChanges
         }
 
-        scrollOrientationLocker.onPointerInputTearDown(changes, pass)
+        scrollOrientationLocker.onPointerInputTearDown(originalChanges, pass)
 
         return changesToReturn
     }

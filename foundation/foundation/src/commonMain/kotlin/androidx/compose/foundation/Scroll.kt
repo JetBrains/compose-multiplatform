@@ -141,7 +141,8 @@ class ScrollState(
                 val consumed = newValue - value
                 value += consumed
                 consumed
-            })
+            }
+        )
 
     /**
      * Stop any ongoing animation, smooth scrolling or fling occurring on this [ScrollState]
@@ -378,14 +379,16 @@ private fun Modifier.scroll(
                 this.horizontalAccessibilityScrollState = accessibilityScrollState
             }
             // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
-            scrollBy(action = { x: Float, y: Float ->
-                if (isVertical) {
-                    state.scrollBy(y)
-                } else {
-                    state.scrollBy(x)
+            scrollBy(
+                action = { x: Float, y: Float ->
+                    if (isVertical) {
+                        state.scrollBy(y)
+                    } else {
+                        state.scrollBy(x)
+                    }
+                    return@scrollBy true
                 }
-                return@scrollBy true
-            })
+            )
         }
     }
     val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
@@ -436,18 +439,18 @@ internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolea
     if (isVertical) {
         check(maxHeight != Constraints.Infinity) {
             "Nesting scrollable in the same direction layouts like ScrollableContainer and " +
-                    "LazyColumnFor is not allowed. If you want to add a header before the list of" +
-                    " items please take a look on LazyColumn component which has a DSL api which" +
-                    " allows to first add a header via item() function and then the list of " +
-                    "items via items()."
+                "LazyColumnFor is not allowed. If you want to add a header before the list of" +
+                " items please take a look on LazyColumn component which has a DSL api which" +
+                " allows to first add a header via item() function and then the list of " +
+                "items via items()."
         }
     } else {
         check(maxWidth != Constraints.Infinity) {
             "Nesting scrollable in the same direction layouts like ScrollableRow and " +
-                    "LazyRowFor is not allowed. If you want to add a header before the list of " +
-                    "items please take a look on LazyRow component which has a DSL api which " +
-                    "allows to first add a fixed element via item() function and then the " +
-                    "list of items via items()."
+                "LazyRowFor is not allowed. If you want to add a header before the list of " +
+                "items please take a look on LazyRow component which has a DSL api which " +
+                "allows to first add a fixed element via item() function and then the " +
+                "list of items via items()."
         }
     }
 }

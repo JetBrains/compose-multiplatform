@@ -1,12 +1,4 @@
 // Baseline format: 1.0
-ArrayReturn: androidx.compose.ui.input.pointer.PointerInputTestUtilKt#invokeOverAllPasses-he86P5Q(kotlin.jvm.functions.Function3<? super java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>,? super androidx.compose.ui.input.pointer.PointerEventPass,? super androidx.compose.ui.unit.IntSize,? extends java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>>, androidx.compose.ui.input.pointer.PointerInputChange[], long) parameter #1:
-    Method parameter should be Collection<PointerInputChange> (or subclass) instead of raw array; was `androidx.compose.ui.input.pointer.PointerInputChange[]`
-ArrayReturn: androidx.compose.ui.input.pointer.PointerInputTestUtilKt#invokeOverPasses-34fyLIo(kotlin.jvm.functions.Function3<? super java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>,? super androidx.compose.ui.input.pointer.PointerEventPass,? super androidx.compose.ui.unit.IntSize,? extends java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>>, androidx.compose.ui.input.pointer.PointerInputChange, androidx.compose.ui.input.pointer.PointerEventPass[], long) parameter #2:
-    Method parameter should be Collection<PointerEventPass> (or subclass) instead of raw array; was `androidx.compose.ui.input.pointer.PointerEventPass[]`
-ArrayReturn: androidx.compose.ui.input.pointer.PointerInputTestUtilKt#invokeOverPasses-kxbhPDs(kotlin.jvm.functions.Function3<? super java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>,? super androidx.compose.ui.input.pointer.PointerEventPass,? super androidx.compose.ui.unit.IntSize,? extends java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>>, androidx.compose.ui.input.pointer.PointerInputChange[], androidx.compose.ui.input.pointer.PointerEventPass, long) parameter #1:
-    Method parameter should be Collection<PointerInputChange> (or subclass) instead of raw array; was `androidx.compose.ui.input.pointer.PointerInputChange[]`
-
-
 AutoBoxing: androidx.compose.ui.node.LayoutNode#getAlignmentLine(androidx.compose.ui.AlignmentLine):
     Must avoid boxed primitives (`java.lang.Integer`)
 
@@ -35,10 +27,10 @@ ExecutorRegistration: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGe
     Registration methods should have overload that accepts delivery Executor: `scrollGestureFilter`
 
 
-GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultHeight():
-    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultHeight()
-GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultWidth():
-    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultWidth()
+GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultHeight-D9Ej5fM():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultHeight-D9Ej5fM()
+GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultWidth-D9Ej5fM():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultWidth-D9Ej5fM()
 GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getName():
     Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getName()
 GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getViewportHeight():

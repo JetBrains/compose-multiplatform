@@ -40,8 +40,11 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarAmbient
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -344,7 +347,7 @@ class TextFieldTest {
                 BaseTextField(
                     value = TextFieldValue(),
                     onValueChange = {},
-                    modifier = Modifier.onPositioned {
+                    modifier = Modifier.onGloballyPositioned {
                         size = it.size.width
                     }
                 )
@@ -367,7 +370,7 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier
                         .preferredWidth(textFieldWidth)
-                        .onPositioned {
+                        .onGloballyPositioned {
                             size = it.size.width
                         }
                 )
@@ -392,7 +395,7 @@ class TextFieldTest {
                         onValueChange = {},
                         modifier = Modifier
                             .weight(1f)
-                            .onPositioned {
+                            .onGloballyPositioned {
                                 size = it.size.width
                             }
                     )
@@ -473,8 +476,12 @@ class TextFieldTest {
             .assert(hasInputMethodsSupport())
             .assert(hasImeAction(ImeAction.Unspecified))
             .assert(isNotFocused())
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
-                TextRange.Zero))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange.Zero
+                )
+            )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetText))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetSelection))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult))
@@ -520,14 +527,22 @@ class TextFieldTest {
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
         rule.onNodeWithTag("textField")
             .assertTextEquals(hello.text)
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
-                TextRange(hello.length)))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange(hello.length)
+                )
+            )
 
         rule.onNodeWithTag("textField")
             .performSemanticsAction(SemanticsActions.SetSelection) { it(1, 3, true) }
         rule.onNodeWithTag("textField")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
-                TextRange(1, 3)))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.TextSelectionRange,
+                    TextRange(1, 3)
+                )
+            )
     }
 
     @Test
@@ -542,6 +557,99 @@ class TextFieldTest {
 
         rule.onNode(hasInputMethodsSupport())
             .assert(hasImeAction(ImeAction.Search))
+    }
+
+    @Test
+    fun semantics_copyTextAction() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
+
+        rule.setContent {
+            CoreTextField(
+                modifier = Modifier.testTag("textField"),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.CopyText) { it() }
+
+        rule.runOnIdle {
+            assertThat(value.selection).isEqualTo(TextRange(5, 5))
+        }
+    }
+
+    @Test
+    fun semantics_pasteTextAction() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
+
+        rule.setContent {
+            CoreTextField(
+                modifier = Modifier.testTag("textField"),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.CopyText) { it() }
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.PasteText) { it() }
+
+        rule.runOnIdle {
+            assertThat(value.text).isEqualTo("HelloHello World")
+        }
+    }
+
+    @Test
+    fun semantics_cutTextAction() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 6)))
+
+        rule.setContent {
+            CoreTextField(
+                modifier = Modifier.testTag("textField"),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.CutText) { it() }
+
+        rule.runOnIdle {
+            assertThat(value.text).isEqualTo("World")
+            assertThat(value.selection).isEqualTo(TextRange(0, 0))
+        }
+    }
+
+    @Test
+    fun semantics_longClick() {
+        val text = "Hello World"
+        var value by mutableStateOf(TextFieldValue(text, TextRange(text.length)))
+        var toolbar: TextToolbar? = null
+
+        rule.setContent {
+            toolbar = TextToolbarAmbient.current
+            CoreTextField(
+                modifier = Modifier.testTag(Tag),
+                value = value,
+                onValueChange = { value = it }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(toolbar?.status).isEqualTo(TextToolbarStatus.Hidden)
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performSemanticsAction(SemanticsActions.OnLongClick) { it() }
+
+        rule.runOnIdle {
+            assertThat(toolbar?.status).isEqualTo(TextToolbarStatus.Shown)
+        }
     }
 
     @Test

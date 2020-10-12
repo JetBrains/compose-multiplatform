@@ -45,7 +45,7 @@ class PhysicsAnimationTest {
         val end = 500
         val playTime = 150L
         val animation = TargetBasedAnimation(
-            VectorizedSpringSpec(), start, end, 0,
+            spring(), start, end, 0,
             Int.VectorConverter
         )
 
@@ -65,7 +65,7 @@ class PhysicsAnimationTest {
         val interruptionTime = 150L
 
         val animation = TargetBasedAnimation(
-            VectorizedSpringSpec(), start1, end1, 0f,
+            spring(), start1, end1, 0f,
             Float.VectorConverter
         )
 
@@ -79,7 +79,7 @@ class PhysicsAnimationTest {
         val startVelocity2 = interruptionVelocity
 
         val animation2 = TargetBasedAnimation(
-            VectorizedSpringSpec(), start2, end2, startVelocity2,
+            spring(), start2, end2, startVelocity2,
             Float.VectorConverter
         )
         // let's verify values after 15 ms of the second animation
@@ -113,7 +113,7 @@ class PhysicsAnimationTest {
             visibilityThreshold = 1f
         )
         val criticalWrapper = TargetBasedAnimation(
-            criticalSpec.vectorize(Float.VectorConverter),
+            criticalSpec,
             startValue = startValue,
             endValue = endValue,
             startVelocity = startVelocity,
@@ -146,7 +146,7 @@ class PhysicsAnimationTest {
             visibilityThreshold = 1f
         )
         val overWrapper = TargetBasedAnimation(
-            overSpec.vectorize(Float.VectorConverter),
+            overSpec,
             startValue = startValue,
             endValue = endValue,
             startVelocity = startVelocity,
@@ -179,7 +179,7 @@ class PhysicsAnimationTest {
             visibilityThreshold = 1f
         )
         val underWrapper = TargetBasedAnimation(
-            underSpec.vectorize(Float.VectorConverter),
+            underSpec,
             startValue = startValue,
             endValue = endValue,
             startVelocity = startVelocity,
@@ -201,7 +201,7 @@ class PhysicsAnimationTest {
     @Test
     fun testEndSnapping() {
         TargetBasedAnimation(
-            VectorizedSpringSpec(),
+            spring(),
             0f,
             100f,
             0f,

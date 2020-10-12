@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.BackdropValue.Concealed
 import androidx.compose.material.BackdropValue.Revealed
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -82,6 +83,7 @@ enum class BackdropValue {
  * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
  */
 @ExperimentalMaterialApi
+@Stable
 class BackdropScaffoldState(
     initialValue: BackdropValue,
     clock: AnimationClockObservable,
@@ -112,11 +114,14 @@ class BackdropScaffoldState(
      * @param onRevealed Optional callback invoked when the back layer has been revealed.
      */
     fun reveal(onRevealed: (() -> Unit)? = null) {
-        animateTo(targetValue = Revealed, onEnd = { endReason, endValue ->
-            if (endReason != Interrupted && endValue == Revealed) {
-                onRevealed?.invoke()
+        animateTo(
+            targetValue = Revealed,
+            onEnd = { endReason, endValue ->
+                if (endReason != Interrupted && endValue == Revealed) {
+                    onRevealed?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -125,11 +130,14 @@ class BackdropScaffoldState(
      * @param onConcealed Optional callback invoked when the back layer has been concealed.
      */
     fun conceal(onConcealed: (() -> Unit)? = null) {
-        animateTo(targetValue = Concealed, onEnd = { endReason, endValue ->
-            if (endReason != Interrupted && endValue == Concealed) {
-                onConcealed?.invoke()
+        animateTo(
+            targetValue = Concealed,
+            onEnd = { endReason, endValue ->
+                if (endReason != Interrupted && endValue == Concealed) {
+                    onConcealed?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -172,11 +180,14 @@ fun rememberBackdropScaffoldState(
     clock: AnimationClockObservable = AnimationClockAmbient.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
-    snackbarHostState: SnackbarHostState = SnackbarHostState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BackdropScaffoldState {
     val disposableClock = clock.asDisposableClock()
     return rememberSavedInstanceState(
         disposableClock,
+        animationSpec,
+        confirmStateChange,
+        snackbarHostState,
         saver = BackdropScaffoldState.Saver(
             clock = disposableClock,
             animationSpec = animationSpec,
@@ -313,7 +324,6 @@ fun BackdropScaffold(
                     peekHeightPx to Concealed,
                     revealedHeight to Revealed
                 ),
-                thresholds = { _, _ -> FixedThreshold(56.dp) },
                 orientation = Orientation.Vertical,
                 enabled = gesturesEnabled
             )
@@ -341,8 +351,11 @@ fun BackdropScaffold(
             Box(
                 Modifier
                     .zIndex(Float.POSITIVE_INFINITY)
-                    .padding(bottom = if (scaffoldState.isRevealed &&
-                        revealedHeight == fullHeight - headerHeightPx) headerHeight else 0.dp),
+                    .padding(
+                        bottom = if (scaffoldState.isRevealed &&
+                            revealedHeight == fullHeight - headerHeightPx
+                        ) headerHeight else 0.dp
+                    ),
                 alignment = Alignment.BottomCenter
             ) {
                 snackbarHost(scaffoldState.snackbarHostState)

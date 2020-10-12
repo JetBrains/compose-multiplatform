@@ -30,6 +30,7 @@ import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
@@ -39,7 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.setContent
@@ -57,6 +58,17 @@ import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import org.jetbrains.annotations.TestOnly
 
 /**
+ * Android specific properties to configure a popup.
+ *
+ * @param securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the popup's
+ * window.
+ */
+@Immutable
+data class AndroidPopupProperties(
+    val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
+) : PopupProperties
+
+/**
  * Opens a popup with the given content.
  *
  * The popup is positioned using a custom [popupPositionProvider].
@@ -65,16 +77,17 @@ import org.jetbrains.annotations.TestOnly
  *
  * @param popupPositionProvider Provides the screen position of the popup.
  * @param isFocusable Indicates if the popup can grab the focus.
- * @param onDismissRequest Executes when the popup tries to dismiss itself. This happens when
- * the popup is focusable and the user clicks outside.
- * @param children The content to be displayed inside the popup.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param properties Typically a platform specific properties to further configure the popup.
+ * @param content The content to be displayed inside the popup.
  */
 @Composable
 internal actual fun ActualPopup(
     popupPositionProvider: PopupPositionProvider,
     isFocusable: Boolean,
     onDismissRequest: (() -> Unit)?,
-    children: @Composable () -> Unit
+    properties: PopupProperties?,
+    content: @Composable () -> Unit
 ) {
     val view = ViewAmbient.current
     val density = DensityAmbient.current
@@ -86,6 +99,7 @@ internal actual fun ActualPopup(
     popupLayout.testTag = PopupTestTagAmbient.current
     remember(popupPositionProvider) { popupLayout.setPositionProvider(popupPositionProvider) }
     remember(isFocusable) { popupLayout.setIsFocusable(isFocusable) }
+    remember(properties) { popupLayout.setProperties(properties) }
 
     var composition: Composition? = null
 
@@ -94,7 +108,7 @@ internal actual fun ActualPopup(
     // Get the parent's global position, size and layout direction
     Layout(
         children = emptyContent(),
-        modifier = Modifier.onPositioned { childCoordinates ->
+        modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
             // Get the global position of the parent
             val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
@@ -116,14 +130,14 @@ internal actual fun ActualPopup(
     onCommit {
         composition = popupLayout.setContent(recomposer, parentComposition) {
             SimpleStack(
-                Modifier.semantics { this.popup() }.onPositioned {
+                Modifier.semantics { this.popup() }.onGloballyPositioned {
                     // Get the size of the content
                     popupLayout.popupContentSize = it.size
 
                     // Update the popup's position
                     popupLayout.updatePosition()
                 },
-                children = children
+                children = content
             )
         }
     }
@@ -236,12 +250,33 @@ private class PopupLayout(
     /**
      * Set whether the popup can grab a focus and support dismissal.
      */
-    fun setIsFocusable(isFocusable: Boolean) {
-        params.flags = if (!isFocusable) {
+    fun setIsFocusable(isFocusable: Boolean) = applyNewFlags(
+        if (!isFocusable) {
             params.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         } else {
             params.flags and (WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv())
         }
+    )
+
+    fun setSecureFlagEnabled(secureFlagEnabled: Boolean) = applyNewFlags(
+        if (secureFlagEnabled) {
+            params.flags or WindowManager.LayoutParams.FLAG_SECURE
+        } else {
+            params.flags and (WindowManager.LayoutParams.FLAG_SECURE.inv())
+        }
+    )
+
+    fun setProperties(properties: PopupProperties?) {
+        if (properties != null && properties is AndroidPopupProperties) {
+            setSecureFlagEnabled(properties.securePolicy
+                .shouldApplySecureFlag(composeView.isFlagSecureEnabled()))
+        } else {
+            setSecureFlagEnabled(composeView.isFlagSecureEnabled())
+        }
+    }
+
+    private fun applyNewFlags(flags: Int) {
+        params.flags = flags
 
         if (viewAdded) {
             windowManager.updateViewLayout(this, params)
@@ -252,10 +287,7 @@ private class PopupLayout(
      * Updates the position of the popup based on current position properties.
      */
     fun updatePosition() {
-        val provider = positionProvider
-        if (provider == null) {
-            return
-        }
+        val provider = positionProvider ?: return
 
         val windowGlobalBounds = Rect().let {
             composeView.rootView.getWindowVisibleDisplayFrame(it)
@@ -299,6 +331,10 @@ private class PopupLayout(
      * users clicks outside the popup.
      */
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        // Note that this implementation is taken from PopupWindow. It actually does not seem to
+        // matter whether we return true or false as some upper layer decides on whether the
+        // event is propagated to other windows or not. So for focusable the event is consumed but
+        // for not focusable it is propagated to other windows.
         if ((event?.action == MotionEvent.ACTION_DOWN) &&
             ((event.x < 0) || (event.x >= width) || (event.y < 0) || (event.y >= height))
         ) {
@@ -325,11 +361,13 @@ private class PopupLayout(
                 WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH or
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
                     WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
                     WindowManager.LayoutParams.FLAG_SPLIT_TOUCH
                 ).inv()
+
+            // Enables us to intercept outside clicks even when popup is not focusable
+            flags = flags or WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
 
             type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL
 
@@ -350,6 +388,14 @@ private class PopupLayout(
         right = right,
         bottom = bottom
     )
+}
+
+internal fun View.isFlagSecureEnabled(): Boolean {
+    val windowParams = rootView.layoutParams as? WindowManager.LayoutParams
+    if (windowParams != null) {
+        return (windowParams.flags and WindowManager.LayoutParams.FLAG_SECURE) != 0
+    }
+    return false
 }
 
 /**

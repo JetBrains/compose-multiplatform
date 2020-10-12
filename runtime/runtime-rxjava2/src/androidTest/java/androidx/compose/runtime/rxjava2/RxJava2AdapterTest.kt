@@ -164,9 +164,11 @@ class RxJava2AdapterTest(private val factory: () -> Stream) {
             }
         }
 
-        Thread(Runnable {
-            stream.onNext("value")
-        }).start()
+        Thread(
+            Runnable {
+                stream.onNext("value")
+            }
+        ).start()
 
         assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue()
 

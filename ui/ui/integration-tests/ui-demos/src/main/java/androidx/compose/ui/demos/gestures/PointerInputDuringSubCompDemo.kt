@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -102,11 +103,14 @@ internal class PointerCounterGestureFilter : PointerInputFilter() {
 
     lateinit var onPointerCountChanged: (resultingPointerCount: Int) -> Unit
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
+
+        val changes = pointerEvent.changes
+
         if (pass == PointerEventPass.Main) {
             if (changes.any {
                 it.changedToDownIgnoreConsumed() || it.changedToUpIgnoreConsumed()

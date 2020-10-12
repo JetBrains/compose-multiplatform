@@ -22,6 +22,8 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.text.font.Font
@@ -62,6 +64,12 @@ val ClipboardManagerAmbient = staticAmbientOf<ClipboardManager>()
 val DensityAmbient = staticAmbientOf<Density>()
 
 /**
+ * The ambient that can be used to control focus within Compose.
+ */
+@ExperimentalFocus
+val FocusManagerAmbient = staticAmbientOf<FocusManager>()
+
+/**
  * The ambient to provide platform font loading methods.
  *
  * Use [androidx.compose.ui.res.fontResource] instead.
@@ -73,6 +81,11 @@ val FontLoaderAmbient = staticAmbientOf<Font.ResourceLoader>()
  * The ambient to provide haptic feedback to the user.
  */
 val HapticFeedBackAmbient = staticAmbientOf<HapticFeedback>()
+
+/**
+ * The ambient to provide the layout direction.
+ */
+val LayoutDirectionAmbient = staticAmbientOf<LayoutDirection>()
 
 /**
  * The ambient to provide communication with platform text input service.
@@ -89,11 +102,7 @@ val TextToolbarAmbient = staticAmbientOf<TextToolbar>()
  */
 val UriHandlerAmbient = staticAmbientOf<UriHandler>()
 
-/**
- * The ambient to provide the layout direction.
- */
-val LayoutDirectionAmbient = staticAmbientOf<LayoutDirection>()
-
+@OptIn(ExperimentalFocus::class)
 @Composable
 internal fun ProvideCommonAmbients(
     owner: Owner,
@@ -107,12 +116,13 @@ internal fun ProvideCommonAmbients(
         AutofillTreeAmbient provides owner.autofillTree,
         ClipboardManagerAmbient provides owner.clipboardManager,
         DensityAmbient provides owner.density,
+        FocusManagerAmbient provides owner.focusManager,
         FontLoaderAmbient provides owner.fontLoader,
         HapticFeedBackAmbient provides owner.hapticFeedBack,
+        LayoutDirectionAmbient provides owner.layoutDirection,
         TextInputServiceAmbient provides owner.textInputService,
         TextToolbarAmbient provides owner.textToolbar,
         UriHandlerAmbient provides uriHandler,
-        LayoutDirectionAmbient provides owner.layoutDirection,
         children = content
     )
 }

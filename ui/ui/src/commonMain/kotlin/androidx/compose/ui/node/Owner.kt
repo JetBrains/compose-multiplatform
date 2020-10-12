@@ -18,6 +18,8 @@ package androidx.compose.ui.node
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
@@ -78,6 +80,12 @@ interface Owner {
 
     val textInputService: TextInputService
 
+    /**
+     * Provide a focus manager that controls focus within Compose.
+     */
+    @ExperimentalFocus
+    val focusManager: FocusManager
+
     val fontLoader: Font.ResourceLoader
 
     val layoutDirection: LayoutDirection
@@ -96,9 +104,14 @@ interface Owner {
     fun onRequestMeasure(layoutNode: LayoutNode)
 
     /**
-     * Called by [LayoutNode] to request the Owner a new measurement+layout.
+     * Called by [LayoutNode] to request the Owner a new layout.
      */
     fun onRequestRelayout(layoutNode: LayoutNode)
+
+    /**
+     * Whether the Owner has pending layout work.
+     */
+    val hasPendingMeasureOrLayout: Boolean
 
     /**
      * Called by [LayoutNode] when it is attached to the view system and now has an owner.

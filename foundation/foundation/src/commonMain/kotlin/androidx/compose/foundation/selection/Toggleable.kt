@@ -17,7 +17,7 @@
 package androidx.compose.foundation.selection
 
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.IndicationAmbient
+import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Strings
@@ -53,14 +53,14 @@ import androidx.compose.ui.semantics.semantics
  * @param interactionState [InteractionState] that will be updated when this toggleable is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when modified element is pressed. Be default,
- * indication from [IndicationAmbient] will be used. Pass `null` to show no indication
+ * indication from [AmbientIndication] will be used. Pass `null` to show no indication
  */
 @Composable
 fun Modifier.toggleable(
     value: Boolean,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    indication: Indication? = IndicationAmbient.current(),
+    indication: Indication? = AmbientIndication.current(),
     onValueChange: (Boolean) -> Unit
 ) = triStateToggleable(
     state = ToggleableState(value),
@@ -88,14 +88,14 @@ fun Modifier.toggleable(
  * @param interactionState [InteractionState] that will be updated when this toggleable is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when modified element is pressed. Be default,
- * indication from [IndicationAmbient] will be used. Pass `null` to show no indication
+ * indication from [AmbientIndication] will be used. Pass `null` to show no indication
  */
 @Composable
 fun Modifier.triStateToggleable(
     state: ToggleableState,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    indication: Indication? = IndicationAmbient.current(),
+    indication: Indication? = AmbientIndication.current(),
     onClick: () -> Unit
 ) = composed {
     // TODO(pavlis): Handle multiple states for Semantics

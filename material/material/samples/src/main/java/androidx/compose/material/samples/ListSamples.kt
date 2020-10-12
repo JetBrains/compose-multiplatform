@@ -17,11 +17,11 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
@@ -49,22 +49,25 @@ fun OneLineListItems(
         Divider()
         ListItem(
             text = { Text("One line list item with 24x24 icon") },
-            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
             text = { Text("One line list item with 40x40 icon") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
             text = { Text("One line list item with 56x56 icon") },
-            icon = { Image(icon56x56, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon56x56, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
             text = { Text("One line clickable list item") },
-            icon = { Image(icon56x56, colorFilter = ColorFilter.tint(contentColor())) },
+            icon = { Image(
+                icon56x56,
+                colorFilter = ColorFilter.tint(AmbientContentColor.current)
+            ) },
             modifier = Modifier.clickable { }
         )
         Divider()
@@ -75,7 +78,10 @@ fun OneLineListItems(
         Divider()
         ListItem(
             text = { Text("One line list item") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) },
+            icon = { Image(
+                icon40x40,
+                colorFilter = ColorFilter.tint(AmbientContentColor.current)
+            ) },
             trailing = { Icon(vectorIcon) }
         )
         Divider()
@@ -100,27 +106,33 @@ fun TwoLineListItems(icon24x24: ImageAsset, icon40x40: ImageAsset) {
         ListItem(
             text = { Text("Two line list item with 24x24 icon") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
             text = { Text("Two line list item with 40x40 icon") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
             text = { Text("Two line list item with 40x40 icon") },
             secondaryText = { Text("Secondary text") },
             trailing = { Text("meta") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(
+                icon40x40,
+                colorFilter = ColorFilter.tint(AmbientContentColor.current)
+            ) }
         )
         Divider()
         var checked by remember { mutableStateOf(false) }
         ListItem(
             text = { Text("Two line list item") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) },
+            icon = { Image(
+                icon40x40,
+                colorFilter = ColorFilter.tint(AmbientContentColor.current)
+            ) },
             trailing = {
                 Checkbox(checked, onCheckedChange = { checked = !checked })
             }
@@ -138,7 +150,7 @@ fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
             secondaryText = {
                 Text(
                     "This is a long secondary text for the current list item, " +
-                            "displayed on two lines"
+                        "displayed on two lines"
                 )
             },
             singleLineSecondaryText = false,
@@ -156,11 +168,11 @@ fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
             secondaryText = {
                 Text(
                     "This is a long secondary text for the current list item " +
-                            "displayed on two lines"
+                        "displayed on two lines"
                 )
             },
             singleLineSecondaryText = false,
-            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
@@ -168,7 +180,7 @@ fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
             secondaryText = {
                 Text(
                     "This is a long secondary text for the current list" +
-                            " item, displayed on two lines"
+                        " item, displayed on two lines"
                 )
             },
             singleLineSecondaryText = false,
@@ -194,17 +206,22 @@ fun OneLineRtlLtrListItems(icon24x24: ImageAsset, icon40x40: ImageAsset) {
         Divider()
         ListItem(
             text = { Text("פריט ברשימה אחת עם תמונה.") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
             text = { Text("One line list item with 24x24 icon") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
         ListItem(
             text = { Text("عنصر قائمة واحد مع رمز زائدة") },
-            trailing = { Image(icon24x24, colorFilter = ColorFilter.tint(contentColor())) }
+            trailing = {
+                Image(
+                    icon24x24,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
     }
@@ -220,7 +237,8 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
         Divider()
         ListItem(
             text = { Text("بند قائمة من سطرين") },
-            secondaryText = { Text("نص ثانوي") })
+            secondaryText = { Text("نص ثانوي") }
+        )
         Divider()
         ListItem(
             modifier = Modifier.clickable { },
@@ -231,13 +249,19 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
         ListItem(
             text = { Text("عنصر قائمة مكون من سطرين مع رمز") },
             overlineText = { Text("فوق الخط") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(
+                icon40x40,
+                colorFilter = ColorFilter.tint(AmbientContentColor.current)
+            ) }
         )
         Divider()
         ListItem(
             text = { Text("Clickable two line item") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) },
+            icon = { Image(
+                icon40x40,
+                colorFilter = ColorFilter.tint(AmbientContentColor.current)
+            ) },
             trailing = {
                 var checked by remember { mutableStateOf(false) }
                 Checkbox(checked, onCheckedChange = { checked = !checked })
@@ -248,7 +272,10 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
         ListItem(
             text = { Text("بندان قابلان للنقر") },
             secondaryText = { Text("نص ثانوي") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) },
+            icon = { Image(
+                icon40x40,
+                colorFilter = ColorFilter.tint(AmbientContentColor.current)
+            ) },
             modifier = Modifier.clickable { }
         )
         Divider()
@@ -270,7 +297,7 @@ fun ThreeLineRtlLtrListItems(icon40x40: ImageAsset) {
             secondaryText = {
                 Text(
                     "هذا نص ثانوي طويل لعنصر القائمة الحالي ، معروض على سطرين. " +
-                            "في لغات أخرى قد نحتاج إلى المزيد من النص"
+                        "في لغات أخرى قد نحتاج إلى المزيد من النص"
                 )
             },
             singleLineSecondaryText = false
@@ -280,7 +307,7 @@ fun ThreeLineRtlLtrListItems(icon40x40: ImageAsset) {
             text = { Text("ثلاثة عناصر قائمة مع رمز") },
             overlineText = { Text("فوق الخط") },
             secondaryText = { Text("نص ثانوي") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(contentColor())) }
+            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
         )
         Divider()
     }

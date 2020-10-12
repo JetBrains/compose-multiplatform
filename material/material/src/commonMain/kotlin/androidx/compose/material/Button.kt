@@ -21,7 +21,7 @@ package androidx.compose.material
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animatedValue
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.IndicationAmbient
+import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
@@ -116,7 +116,8 @@ fun Button(
             onClick = onClick,
             enabled = enabled,
             interactionState = interactionState,
-            indication = null)
+            indication = null
+        )
     ) {
         ProvideTextStyle(
             value = MaterialTheme.typography.button
@@ -127,7 +128,7 @@ fun Button(
                         minWidth = ButtonConstants.DefaultMinWidth,
                         minHeight = ButtonConstants.DefaultMinHeight
                     )
-                    .indication(interactionState, IndicationAmbient.current())
+                    .indication(interactionState, AmbientIndication.current())
                     .padding(contentPadding),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -444,7 +445,7 @@ object ButtonConstants {
     @Composable
     val defaultDisabledContentColor
         get(): Color = with(MaterialTheme.colors) {
-            EmphasisAmbient.current.disabled.applyEmphasis(onSurface)
+            AmbientEmphasisLevels.current.disabled.applyEmphasis(onSurface)
         }
 
     /**

@@ -97,10 +97,11 @@ class RoundedCornerShapeTest {
     fun roundedCornerUpdateAllCornerSize() {
         assertThat(
             RoundedCornerShape(10.0f).copy(
-            CornerSize(
-                5.dp
+                CornerSize(
+                    5.dp
+                )
             )
-        ))
+        )
             .isEqualTo(RoundedCornerShape(5.dp))
     }
 
@@ -108,9 +109,9 @@ class RoundedCornerShapeTest {
     fun roundedCornerUpdateTwoCornerSizes() {
         val original = RoundedCornerShape(10.0f)
             .copy(
-            topLeft = CornerSize(3.dp),
-            bottomLeft = CornerSize(50)
-        )
+                topLeft = CornerSize(3.dp),
+                bottomLeft = CornerSize(50)
+            )
 
         assertEquals(CornerSize(3.dp), original.topLeft)
         assertEquals(CornerSize(10.0f), original.topRight)
@@ -118,9 +119,10 @@ class RoundedCornerShapeTest {
         assertEquals(CornerSize(50), original.bottomLeft)
         assertThat(
             RoundedCornerShape(10.0f).copy(
-            topLeft = CornerSize(3.dp),
-            bottomLeft = CornerSize(50)
-        )).isEqualTo(
+                topLeft = CornerSize(3.dp),
+                bottomLeft = CornerSize(50)
+            )
+        ).isEqualTo(
             RoundedCornerShape(
                 topLeft = CornerSize(3.dp),
                 topRight = CornerSize(10.0f),

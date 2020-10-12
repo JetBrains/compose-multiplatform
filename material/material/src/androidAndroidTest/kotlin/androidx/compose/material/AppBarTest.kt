@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -100,7 +100,8 @@ class AppBarTest {
             .assertLeftPositionInRootIsEqualTo(AppBarStartAndEndPadding)
             // Navigation icon should be 4.dp from the bottom
             .assertTopPositionInRootIsEqualTo(
-                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize)
+                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
+            )
 
         rule.onNodeWithTag("title")
             // Title should be 72.dp from the start
@@ -114,7 +115,8 @@ class AppBarTest {
             .assertLeftPositionInRootIsEqualTo(expectedActionPosition(appBarBounds.width))
             // Action should be 4.dp from the bottom
             .assertTopPositionInRootIsEqualTo(
-                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize)
+                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
+            )
     }
 
     @Test
@@ -153,7 +155,7 @@ class AppBarTest {
                 TopAppBar(
                     title = {
                         Text("App Bar Title")
-                        textStyle = currentTextStyle()
+                        textStyle = AmbientTextStyle.current
                         h6Style = MaterialTheme.typography.h6
                     }
                 )
@@ -189,7 +191,8 @@ class AppBarTest {
             .assertLeftPositionInRootIsEqualTo(AppBarStartAndEndPadding)
             // Child icon should be 4.dp from the bottom
             .assertTopPositionInRootIsEqualTo(
-                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize)
+                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
+            )
     }
 
     /**

@@ -1,8 +1,4 @@
 // Baseline format: 1.0
-MethodNameUnits: androidx.compose.ui.unit.Durations#inSeconds(androidx.compose.ui.unit.Duration):
-    Returned time values must be in milliseconds, was `inSeconds`
-
-
 MissingNullability: androidx.compose.ui.unit.Uptime#toString-impl(long):
     Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.unit.Velocity#toString-impl(long):

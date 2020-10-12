@@ -21,9 +21,9 @@ import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.background
-import androidx.compose.foundation.contentColor
-import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -50,7 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.testTag
@@ -266,7 +266,7 @@ class TextFieldTest {
                             text = "label",
                             fontSize = 10.sp,
                             modifier = Modifier
-                                .onPositioned {
+                                .onGloballyPositioned {
                                     labelPosition.value = it.positionInRoot
                                     labelSize.value = it.size
                                 }
@@ -305,10 +305,13 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier.preferredHeight(height),
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
-                            labelPosition.value = it.positionInRoot
-                            labelSize.value = it.size
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                                labelSize.value = it.size
+                            }
+                        )
                     }
                 )
             }
@@ -341,11 +344,15 @@ class TextFieldTest {
                     value = "",
                     onValueChange = {},
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
-                            labelPosition.value = it.positionInRoot
-                            labelSize.value = it.size
-                            baseline.value = it[FirstBaseline].toFloat() + labelPosition.value!!.y
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                                labelSize.value = it.size
+                                baseline.value = it[FirstBaseline].toFloat() +
+                                    labelPosition.value!!.y
+                            }
+                        )
                     }
                 )
             }
@@ -380,12 +387,15 @@ class TextFieldTest {
                     value = "input",
                     onValueChange = {},
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
-                            labelPosition.value = it.positionInRoot
-                            labelSize.value = it.size
-                            baseline.value =
-                                it[FirstBaseline].toFloat() + labelPosition.value!!.y
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                                labelSize.value = it.size
+                                baseline.value =
+                                    it[FirstBaseline].toFloat() + labelPosition.value!!.y
+                            }
+                        )
                     }
                 )
             }
@@ -420,10 +430,13 @@ class TextFieldTest {
                     onValueChange = {},
                     label = { Text("label") },
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.onPositioned {
-                            placeholderPosition.value = it.positionInRoot
-                            placeholderSize.value = it.size
-                        })
+                        Text(
+                            text = "placeholder",
+                            modifier = Modifier.onGloballyPositioned {
+                                placeholderPosition.value = it.positionInRoot
+                                placeholderSize.value = it.size
+                            }
+                        )
                     }
                 )
             }
@@ -461,10 +474,14 @@ class TextFieldTest {
                     onValueChange = {},
                     label = {},
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.height(20.dp).onPositioned {
-                            placeholderPosition.value = it.positionInRoot
-                            placeholderSize.value = it.size
-                        })
+                        Text(
+                            text = "placeholder",
+                            modifier = Modifier.height(20.dp)
+                                .onGloballyPositioned {
+                                    placeholderPosition.value = it.positionInRoot
+                                    placeholderSize.value = it.size
+                                }
+                        )
                     }
                 )
             }
@@ -501,10 +518,13 @@ class TextFieldTest {
                     onValueChange = {},
                     label = {},
                     placeholder = {
-                        Text(text = "placeholder", modifier = Modifier.onPositioned {
-                            placeholderPosition.value = it.positionInRoot
-                            placeholderSize.value = it.size
-                        })
+                        Text(
+                            text = "placeholder",
+                            modifier = Modifier.onGloballyPositioned {
+                                placeholderPosition.value = it.positionInRoot
+                                placeholderSize.value = it.size
+                            }
+                        )
                     }
                 )
             }
@@ -529,13 +549,14 @@ class TextFieldTest {
                 label = {},
                 placeholder = {
                     Text("placeholder")
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 0.6f
                             )
                         )
-                    assertThat(currentTextStyle()).isEqualTo(MaterialTheme.typography.subtitle1)
+                    assertThat(AmbientTextStyle.current)
+                        .isEqualTo(MaterialTheme.typography.subtitle1)
                 }
             )
         }
@@ -561,16 +582,20 @@ class TextFieldTest {
                 modifier = Modifier.preferredSize(textFieldWidth, textFieldHeight),
                 label = {},
                 leadingIcon = {
-                    Box(Modifier.preferredSize(size).onPositioned {
-                        leadingPosition.value = it.positionInRoot
-                        leadingSize.value = it.size
-                    })
+                    Box(
+                        Modifier.preferredSize(size).onGloballyPositioned {
+                            leadingPosition.value = it.positionInRoot
+                            leadingSize.value = it.size
+                        }
+                    )
                 },
                 trailingIcon = {
-                    Box(Modifier.preferredSize(size).onPositioned {
-                        trailingPosition.value = it.positionInRoot
-                        trailingSize.value = it.size
-                    })
+                    Box(
+                        Modifier.preferredSize(size).onGloballyPositioned {
+                            trailingPosition.value = it.positionInRoot
+                            trailingSize.value = it.size
+                        }
+                    )
                 }
             )
         }
@@ -609,9 +634,12 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier.preferredHeight(height),
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
-                            labelPosition.value = it.positionInRoot
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                            }
+                        )
                     },
                     trailingIcon = { Box(Modifier.preferredSize(iconSize)) },
                     leadingIcon = { Box(Modifier.preferredSize(iconSize)) }
@@ -638,9 +666,12 @@ class TextFieldTest {
                     onValueChange = {},
                     modifier = Modifier.preferredHeight(height),
                     label = {
-                        Text(text = "label", modifier = Modifier.onPositioned {
-                            labelPosition.value = it.positionInRoot
-                        })
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                            }
+                        )
                     },
                     trailingIcon = {},
                     leadingIcon = {}
@@ -664,7 +695,7 @@ class TextFieldTest {
                 label = {},
                 isErrorValue = false,
                 leadingIcon = {
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -672,7 +703,7 @@ class TextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -692,7 +723,7 @@ class TextFieldTest {
                 label = {},
                 isErrorValue = true,
                 leadingIcon = {
-                    assertThat(contentColor())
+                    assertThat(AmbientContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -700,7 +731,7 @@ class TextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(contentColor()).isEqualTo(MaterialTheme.colors.error)
+                    assertThat(AmbientContentColor.current).isEqualTo(MaterialTheme.colors.error)
                 }
             )
         }

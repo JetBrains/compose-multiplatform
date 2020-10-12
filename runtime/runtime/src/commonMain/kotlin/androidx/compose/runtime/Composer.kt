@@ -354,6 +354,8 @@ class Composer<N>(
     internal var parentReference: CompositionReference? = null
     internal var isComposing = false
         private set
+    internal var isDisposed = false
+        private set
     internal var disposeHook: (() -> Unit)? = null
 
     private var reader: SlotReader = slotTable.openReader().also { it.close() }
@@ -745,8 +747,12 @@ class Composer<N>(
                     writer.removeCurrentGroup(manager)
                 }
                 providerUpdates.clear()
+                applier.clear()
                 manager.dispatchLifecycleObservers()
+            } else {
+                applier.clear()
             }
+            isDisposed = true
             disposeHook?.invoke()
         }
     }

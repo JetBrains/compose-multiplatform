@@ -30,12 +30,23 @@ import androidx.compose.ui.graphics.Color
  * @return the preferred content color specified by a parent, defaulting to [Color.Black] if
  * unspecified.
  */
+@Deprecated(
+    message = "Use AmbientContentColor.current directly",
+    replaceWith = ReplaceWith(
+        "AmbientContentColor.current",
+        "androidx.compose.foundation.AmbientContentColor"
+    )
+)
 @Composable
-fun contentColor() = ContentColorAmbient.current
+fun contentColor() = AmbientContentColor.current
 
 /**
  * Ambient containing the preferred content color for a given position in the hierarchy.
  *
- * See [contentColor] for a more descriptive alias to consume the value from this ambient.
+ * This color should be used for any typography / iconography, to ensure that the color of these
+ * adjusts when the background color changes. For example, on a dark background, text should be
+ * light, and on a light background, text should be dark.
+ *
+ * Defaults to [Color.Black] if no color has been explicitly set.
  */
-val ContentColorAmbient = ambientOf { Color.Black }
+val AmbientContentColor = ambientOf { Color.Black }

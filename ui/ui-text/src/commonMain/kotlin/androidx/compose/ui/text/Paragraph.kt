@@ -243,7 +243,7 @@ interface Paragraph {
      */
     fun paint(
         canvas: Canvas,
-        color: Color = Color.Unset,
+        color: Color = Color.Unspecified,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null
     )

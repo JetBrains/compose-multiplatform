@@ -27,6 +27,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
+import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.Measurable
@@ -37,6 +38,7 @@ import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
+import androidx.compose.ui.node.isAttached
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.subcomposeInto
@@ -166,16 +168,19 @@ private class SubcomposeLayoutState<T> :
         currentIndex++
 
         val nodeState = nodeToNodeState.getOrPut(node) {
-            NodeState(slotId, content)
+            NodeState(slotId, emptyContent())
         }
-        nodeState.content = content
-        subcompose(node, nodeState)
+        val hasPendingChanges = nodeState.composition?.hasInvalidations() ?: true
+        if (nodeState.content !== content || hasPendingChanges) {
+            nodeState.content = content
+            subcompose(node, nodeState)
+        }
         return node.children
     }
 
     fun subcomposeIfRemeasureNotScheduled() {
         val root = root!!
-        if (root.layoutState != LayoutState.NeedsRemeasure) {
+        if (root.layoutState != LayoutState.NeedsRemeasure && root.isAttached()) {
             root.foldedChildren.fastForEach {
                 subcompose(it, nodeToNodeState.getValue(it))
             }

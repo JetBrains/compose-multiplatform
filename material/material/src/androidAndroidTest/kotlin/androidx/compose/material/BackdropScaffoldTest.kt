@@ -260,9 +260,11 @@ class BackdropScaffoldTest {
                 appBar = { Box(Modifier.preferredHeight(peekHeight)) },
                 backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
                 frontLayerContent = {
-                    Box(Modifier.fillMaxSize().testTag(frontLayer).clickable {
-                        frontLayerClicks += 1
-                    })
+                    Box(
+                        Modifier.fillMaxSize().testTag(frontLayer).clickable {
+                            frontLayerClicks += 1
+                        }
+                    )
                 }
             )
         }

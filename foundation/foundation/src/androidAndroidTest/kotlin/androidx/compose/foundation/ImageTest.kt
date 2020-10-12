@@ -116,10 +116,20 @@ class ImageTest {
             val imageStartY = height / 2 - imageHeight / 2
             Assert.assertEquals(bgColorArgb, getPixel(imageStartX + 2, imageStartY))
             Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY + 1))
-            Assert.assertEquals(pathArgb, getPixel(imageStartX + (imageWidth / 2) - 1,
-                imageStartY + (imageHeight / 2) + 1))
-            Assert.assertEquals(bgColorArgb, getPixel(imageStartX + (imageWidth / 2) - 2,
-                imageStartY + (imageHeight / 2) - 5))
+            Assert.assertEquals(
+                pathArgb,
+                getPixel(
+                    imageStartX + (imageWidth / 2) - 1,
+                    imageStartY + (imageHeight / 2) + 1
+                )
+            )
+            Assert.assertEquals(
+                bgColorArgb,
+                getPixel(
+                    imageStartX + (imageWidth / 2) - 2,
+                    imageStartY + (imageHeight / 2) - 5
+                )
+            )
             Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY + imageHeight - 1))
         }
     }
@@ -136,7 +146,8 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 Image(
-                    ImagePainter(createImageAsset(),
+                    ImagePainter(
+                        createImageAsset(),
                         IntOffset(
                             imageWidth / 2 - subsectionWidth / 2,
                             imageHeight / 2 - subsectionHeight / 2
@@ -156,10 +167,20 @@ class ImageTest {
             val imageStartY = height / 2 - subsectionHeight / 2
             Assert.assertEquals(bgColorArgb, getPixel(imageStartX + 2, imageStartY))
             Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY + 1))
-            Assert.assertEquals(pathArgb, getPixel(imageStartX + (subsectionWidth / 2) - 1,
-                imageStartY + (subsectionHeight / 2) + 1))
-            Assert.assertEquals(bgColorArgb, getPixel(imageStartX + (subsectionWidth / 2) - 2,
-                imageStartY + (subsectionHeight / 2) - 5))
+            Assert.assertEquals(
+                pathArgb,
+                getPixel(
+                    imageStartX + (subsectionWidth / 2) - 1,
+                    imageStartY + (subsectionHeight / 2) + 1
+                )
+            )
+            Assert.assertEquals(
+                bgColorArgb,
+                getPixel(
+                    imageStartX + (subsectionWidth / 2) - 2,
+                    imageStartY + (subsectionHeight / 2) - 5
+                )
+            )
             Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY + subsectionHeight - 1))
 
             // Verify top left region outside the subsection has a white background
@@ -168,28 +189,46 @@ class ImageTest {
             Assert.assertEquals(boxBgArgb, getPixel(imageStartX, imageStartY - 1))
 
             // Verify top right region outside the subsection has a white background
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX + subsectionWidth - 1, imageStartY - 1))
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX + subsectionWidth, imageStartY - 1))
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX + subsectionWidth, imageStartY))
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX + subsectionWidth - 1, imageStartY - 1)
+            )
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX + subsectionWidth, imageStartY - 1)
+            )
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX + subsectionWidth, imageStartY)
+            )
 
             // Verify bottom left region outside the subsection has a white background
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX - 1, imageStartY + subsectionHeight - 1))
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX - 1, imageStartY + subsectionHeight))
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX, imageStartY + subsectionHeight))
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX - 1, imageStartY + subsectionHeight - 1)
+            )
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX - 1, imageStartY + subsectionHeight)
+            )
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX, imageStartY + subsectionHeight)
+            )
 
             // Verify bottom right region outside the subsection has a white background
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX + subsectionWidth - 1, imageStartY + subsectionHeight))
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX + subsectionWidth, imageStartY + subsectionHeight))
-            Assert.assertEquals(boxBgArgb,
-                getPixel(imageStartX + subsectionWidth, imageStartY + subsectionHeight - 1))
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX + subsectionWidth - 1, imageStartY + subsectionHeight)
+            )
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX + subsectionWidth, imageStartY + subsectionHeight)
+            )
+            Assert.assertEquals(
+                boxBgArgb,
+                getPixel(imageStartX + subsectionWidth, imageStartY + subsectionHeight - 1)
+            )
         }
     }
 
@@ -208,7 +247,8 @@ class ImageTest {
                 // The resultant Image composable should be twice the size of the underlying
                 // ImageAsset that is to be drawn and will stretch the content to fit
                 // the bounds
-                Image(asset = createImageAsset(),
+                Image(
+                    asset = createImageAsset(),
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -226,12 +266,28 @@ class ImageTest {
             val imageStartY = height / 2 - imageComposableHeight / 2
             Assert.assertEquals(bgColorArgb, getPixel(imageStartX + 5, imageStartY))
             Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY + 5))
-            Assert.assertEquals(pathArgb, getPixel(imageStartX + (imageComposableWidth / 2) - 5,
-                imageStartY + (imageComposableHeight / 2) + 5))
-            Assert.assertEquals(bgColorArgb, getPixel(imageStartX + (imageComposableWidth / 2),
-                imageStartY + (imageComposableHeight / 2) - 10))
-            Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY +
-                    imageComposableHeight - 1))
+            Assert.assertEquals(
+                pathArgb,
+                getPixel(
+                    imageStartX + (imageComposableWidth / 2) - 5,
+                    imageStartY + (imageComposableHeight / 2) + 5
+                )
+            )
+            Assert.assertEquals(
+                bgColorArgb,
+                getPixel(
+                    imageStartX + (imageComposableWidth / 2),
+                    imageStartY + (imageComposableHeight / 2) - 10
+                )
+            )
+            Assert.assertEquals(
+                pathArgb,
+                getPixel(
+                    imageStartX,
+                    imageStartY +
+                        imageComposableHeight - 1
+                )
+            )
         }
     }
 
@@ -249,7 +305,8 @@ class ImageTest {
             ) {
                 // The resultant Image composable should be twice the size of the underlying
                 // ImageAsset that is to be drawn in the bottom end section of the composable
-                Image(asset = createImageAsset(),
+                Image(
+                    asset = createImageAsset(),
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -272,10 +329,20 @@ class ImageTest {
             val imageStartY = composableEndY - imageHeight
             Assert.assertEquals(bgColorArgb, getPixel(imageStartX + 2, imageStartY))
             Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY + 1))
-            Assert.assertEquals(pathArgb, getPixel(imageStartX + (imageWidth / 2) - 1,
-                imageStartY + (imageHeight / 2) + 1))
-            Assert.assertEquals(bgColorArgb, getPixel(imageStartX + (imageWidth / 2) - 2,
-                imageStartY + (imageHeight / 2) - 5))
+            Assert.assertEquals(
+                pathArgb,
+                getPixel(
+                    imageStartX + (imageWidth / 2) - 1,
+                    imageStartY + (imageHeight / 2) + 1
+                )
+            )
+            Assert.assertEquals(
+                bgColorArgb,
+                getPixel(
+                    imageStartX + (imageWidth / 2) - 2,
+                    imageStartY + (imageHeight / 2) - 5
+                )
+            )
             Assert.assertEquals(pathArgb, getPixel(imageStartX, imageStartY + imageHeight - 1))
         }
     }
@@ -307,7 +374,7 @@ class ImageTest {
                             minWidth = minWidth,
                             minHeight = minHeight
                         )
-                        .drawBehind { vectorLatch.countDown() }
+                            .drawBehind { vectorLatch.countDown() }
                     )
                 }
             }
@@ -321,20 +388,52 @@ class ImageTest {
             val imageStartX = width / 2 - boxWidth / 2
             val imageStartY = height / 2 - boxHeight / 2
             Assert.assertEquals(containerBgColor, getPixel(imageStartX - 1, imageStartY - 1))
-            Assert.assertEquals(containerBgColor, getPixel(imageStartX + boxWidth + 1,
-                imageStartY - 1))
-            Assert.assertEquals(containerBgColor, getPixel(imageStartX + boxWidth + 1,
-                imageStartY + boxHeight + 1))
-            Assert.assertEquals(containerBgColor, getPixel(imageStartX - 1, imageStartY +
-                    boxHeight + 1))
+            Assert.assertEquals(
+                containerBgColor,
+                getPixel(
+                    imageStartX + boxWidth + 1,
+                    imageStartY - 1
+                )
+            )
+            Assert.assertEquals(
+                containerBgColor,
+                getPixel(
+                    imageStartX + boxWidth + 1,
+                    imageStartY + boxHeight + 1
+                )
+            )
+            Assert.assertEquals(
+                containerBgColor,
+                getPixel(
+                    imageStartX - 1,
+                    imageStartY +
+                        boxHeight + 1
+                )
+            )
 
             Assert.assertEquals(imageColor, getPixel(imageStartX, imageStartY + 15))
-            Assert.assertEquals(containerBgColor, getPixel(imageStartX + boxWidth - 2,
-                imageStartY - 1))
-            Assert.assertEquals(imageColor, getPixel(imageStartX + boxWidth - 10,
-                imageStartY + boxHeight - 2))
-            Assert.assertEquals(imageColor, getPixel(imageStartX, imageStartY +
-                    boxHeight - 2))
+            Assert.assertEquals(
+                containerBgColor,
+                getPixel(
+                    imageStartX + boxWidth - 2,
+                    imageStartY - 1
+                )
+            )
+            Assert.assertEquals(
+                imageColor,
+                getPixel(
+                    imageStartX + boxWidth - 10,
+                    imageStartY + boxHeight - 2
+                )
+            )
+            Assert.assertEquals(
+                imageColor,
+                getPixel(
+                    imageStartX,
+                    imageStartY +
+                        boxHeight - 2
+                )
+            )
         }
     }
 
@@ -346,13 +445,16 @@ class ImageTest {
                 with(Canvas(this)) {
                     val paint = Paint().apply { this.color = Color.Blue }
                     drawRect(0f, 0f, 100f, 100f, paint)
-                    drawRect(25f, 25f, 75f, 75f,
-                        paint.apply { this.color = Color.Red })
+                    drawRect(
+                        25f, 25f, 75f, 75f,
+                        paint.apply { this.color = Color.Red }
+                    )
                 }
                 this
             }
             val heightDp = asset.height / DensityAmbient.current.density
-            Image(asset,
+            Image(
+                asset,
                 modifier = Modifier
                     .testTag(testTag)
                     .background(Color.Green)

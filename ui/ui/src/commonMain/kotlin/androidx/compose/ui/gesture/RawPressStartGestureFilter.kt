@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -69,32 +70,35 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
 
     private var active = false
 
-    override fun onPointerInput(
-        changes: List<PointerInputChange>,
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
     ): List<PointerInputChange> {
 
-        var internalChanges = changes
+        var changes = pointerEvent.changes
 
         if (pass == executionPass) {
-            if (enabled && internalChanges.all { it.changedToDown() }) {
+            if (enabled && changes.all { it.changedToDown() }) {
                 // If we have not yet started and all of the changes changed to down, we are
                 // starting.
                 active = true
-                onPressStart(internalChanges.first().current.position!!)
-            } else if (internalChanges.all { it.changedToUp() }) {
+                onPressStart(changes.first().current.position!!)
+            } else if (changes.all { it.changedToUp() }) {
                 // If we have started and all of the changes changed to up, we are stopping.
                 active = false
             }
 
             if (active) {
                 // If we have started, we should consume the down change on all changes.
-                internalChanges = internalChanges.map { it.consumeDownChange() }
+                changes = changes.map {
+                    it.consumeDownChange()
+                    it
+                }
             }
         }
 
-        return internalChanges
+        return changes
     }
 
     override fun onCancel() {

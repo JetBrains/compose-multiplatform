@@ -31,7 +31,6 @@ class SnapAnimationTest {
             animation,
             0f,
             0f,
-            AnimationVector(0f),
             Float.VectorConverter
         )
 

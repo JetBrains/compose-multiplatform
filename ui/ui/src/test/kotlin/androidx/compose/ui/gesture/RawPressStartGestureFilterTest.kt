@@ -54,85 +54,86 @@ class RawPressStartGestureFilterTest {
     // Verification of scenarios where onPressStart should not be called.
 
     @Test
-    fun onPointerInput_downConsumed_onPressStartNotCalled() {
-        filter::onPointerInput.invokeOverAllPasses(down(0).consumeDownChange())
+    fun onPointerEvent_downConsumed_onPressStartNotCalled() {
+        filter::onPointerEvent
+            .invokeOverAllPasses(pointerEventOf(down(0).apply { consumeDownChange() }))
         verify(filter.onPressStart, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downConsumedDown_onPressStartNotCalled() {
-        var pointer1 = down(1, duration = 0.milliseconds).consumeDownChange()
-        filter::onPointerInput.invokeOverAllPasses(pointer1)
+    fun onPointerEvent_downConsumedDown_onPressStartNotCalled() {
+        var pointer1 = down(1, duration = 0.milliseconds).apply { consumeDownChange() }
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
         pointer1 = pointer1.moveBy(10.milliseconds)
         val pointer2 = down(2, duration = 10.milliseconds)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
         verify(filter.onPressStart, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_disabledDown_onPressStartNotCalled() {
+    fun onPointerEvent_disabledDown_onPressStartNotCalled() {
         filter.setEnabled(false)
-        filter::onPointerInput.invokeOverAllPasses(down(0))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0)))
         verify(filter.onPressStart, never()).invoke(any())
     }
 
     @Test
-    fun onPointerInput_disabledDownEnabledDown_onPressStartNotCalled() {
+    fun onPointerEvent_disabledDownEnabledDown_onPressStartNotCalled() {
 
         filter.setEnabled(false)
-        var pointer1 = down(1, duration = 0.milliseconds).consumeDownChange()
-        filter::onPointerInput.invokeOverAllPasses(pointer1)
+        var pointer1 = down(1, duration = 0.milliseconds).apply { consumeDownChange() }
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
         filter.setEnabled(true)
         pointer1 = pointer1.moveBy(10.milliseconds)
         val pointer2 = down(2, duration = 10.milliseconds)
-        filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
         verify(filter.onPressStart, never()).invoke(any())
     }
 
     // Verification of scenarios where onPressStart should be called once.
 
     @Test
-    fun onPointerInput_down_onPressStartCalledOnce() {
-        filter::onPointerInput.invokeOverAllPasses(down(0))
+    fun onPointerEvent_down_onPressStartCalledOnce() {
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0)))
         verify(filter.onPressStart).invoke(any())
     }
 
     @Test
-    fun onPointerInput_downDown_onPressStartCalledOnce() {
+    fun onPointerEvent_downDown_onPressStartCalledOnce() {
         var pointer0 = down(0)
-        filter::onPointerInput.invokeOverAllPasses(pointer0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0))
         pointer0 = pointer0.moveTo(1.milliseconds)
         val pointer1 = down(1, 1.milliseconds)
-        filter::onPointerInput.invokeOverAllPasses(pointer0, pointer1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
 
         verify(filter.onPressStart).invoke(any())
     }
 
     @Test
-    fun onPointerInput_2Down1Up1Down_onPressStartCalledOnce() {
+    fun onPointerEvent_2Down1Up1Down_onPressStartCalledOnce() {
         var pointer0 = down(0)
         var pointer1 = down(1)
-        filter::onPointerInput.invokeOverAllPasses(pointer0, pointer1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
         pointer0 = pointer0.up(100.milliseconds)
         pointer1 = pointer1.moveTo(100.milliseconds)
-        filter::onPointerInput.invokeOverAllPasses(pointer0, pointer1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
         pointer0 = down(0, duration = 200.milliseconds)
         pointer1 = pointer1.moveTo(200.milliseconds)
-        filter::onPointerInput.invokeOverAllPasses(pointer0, pointer1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
 
         verify(filter.onPressStart).invoke(any())
     }
 
     @Test
-    fun onPointerInput_1DownMoveOutside2ndDown_onPressStartOnlyCalledOnce() {
+    fun onPointerEvent_1DownMoveOutside2ndDown_onPressStartOnlyCalledOnce() {
         var pointer0 = down(0, x = 0f, y = 0f)
-        filter::onPointerInput.invokeOverAllPasses(pointer0, IntSize(5, 5))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0), IntSize(5, 5))
         pointer0 = pointer0.moveTo(100.milliseconds, 10f, 0f)
-        filter::onPointerInput.invokeOverAllPasses(pointer0, IntSize(5, 5))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0), IntSize(5, 5))
         pointer0 = pointer0.moveTo(200.milliseconds)
         val pointer1 = down(1, x = 0f, y = 0f)
 
-        filter::onPointerInput.invokeOverAllPasses(pointer0, pointer1)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
 
         verify(filter.onPressStart).invoke(any())
     }
@@ -140,18 +141,19 @@ class RawPressStartGestureFilterTest {
     // Verification of correct position returned by onPressStart.
 
     @Test
-    fun onPointerInput_down_downPositionIsCorrect() {
-        filter::onPointerInput.invokeOverAllPasses(down(0, x = 13f, y = 17f))
+    fun onPointerEvent_down_downPositionIsCorrect() {
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, x = 13f, y = 17f)))
         verify(filter.onPressStart).invoke(Offset(13f, 17f))
     }
 
     // Verification of correct consumption behavior.
 
     @Test
-    fun onPointerInput_disabledDown_noDownChangeConsumed() {
+    fun onPointerEvent_disabledDown_noDownChangeConsumed() {
         filter.setEnabled(false)
         var pointer = down(0)
-        pointer = filter::onPointerInput.invokeOverAllPasses(pointer)
+        pointer =
+            filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer)).changes.first()
         assertThat(pointer.consumed.downChange, `is`(false))
     }
 
@@ -166,9 +168,11 @@ class RawPressStartGestureFilterTest {
 
     @Test
     fun onCancel_downCancelDown_onPressStartCalledTwice() {
-        filter::onPointerInput.invokeOverAllPasses(down(id = 0, duration = 0.milliseconds))
+        filter::onPointerEvent
+            .invokeOverAllPasses(pointerEventOf(down(id = 0, duration = 0.milliseconds)))
         filter.onCancel()
-        filter::onPointerInput.invokeOverAllPasses(down(id = 0, duration = 1.milliseconds))
+        filter::onPointerEvent
+            .invokeOverAllPasses(pointerEventOf(down(id = 0, duration = 1.milliseconds)))
 
         verify(filter.onPressStart, times(2)).invoke(any())
     }
@@ -176,59 +180,59 @@ class RawPressStartGestureFilterTest {
     // Verification of correct execution pass behavior
 
     @Test
-    fun onPointerInput_initial_behaviorOccursAtCorrectTime() {
+    fun onPointerEvent_initial_behaviorOccursAtCorrectTime() {
         filter.setExecutionPass(PointerEventPass.Initial)
 
-        val pointer = filter::onPointerInput.invokeOverPasses(
-            down(0),
+        val pointer = filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down(0)),
             PointerEventPass.Initial
         )
 
         verify(filter.onPressStart).invoke(any())
-        assertThat(pointer.consumed.downChange, `is`(true))
+        assertThat(pointer.changes.first().consumed.downChange, `is`(true))
     }
 
     @Test
-    fun onPointerInput_Main_behaviorOccursAtCorrectTime() {
+    fun onPointerEvent_Main_behaviorOccursAtCorrectTime() {
         filter.setExecutionPass(PointerEventPass.Main)
 
-        var pointer = filter::onPointerInput.invokeOverPasses(
-            down(0),
+        var pointer = filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down(0)),
             PointerEventPass.Initial
         )
 
         verify(filter.onPressStart, never()).invoke(any())
-        assertThat(pointer.consumed.downChange, `is`(false))
+        assertThat(pointer.changes.first().consumed.downChange, `is`(false))
 
-        pointer = filter::onPointerInput.invokeOverPasses(
-            down(1),
+        pointer = filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down(1)),
             PointerEventPass.Main
         )
 
         verify(filter.onPressStart).invoke(any())
-        assertThat(pointer.consumed.downChange, `is`(true))
+        assertThat(pointer.changes.first().consumed.downChange, `is`(true))
     }
 
     @Test
-    fun onPointerInput_final_behaviorOccursAtCorrectTime() {
+    fun onPointerEvent_final_behaviorOccursAtCorrectTime() {
         filter.setExecutionPass(PointerEventPass.Final)
 
-        var pointer = filter::onPointerInput.invokeOverPasses(
-            down(0),
+        var pointer = filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down(0)),
             PointerEventPass.Initial,
             PointerEventPass.Main
         )
 
         verify(filter.onPressStart, never()).invoke(any())
-        assertThat(pointer.consumed.downChange, `is`(false))
+        assertThat(pointer.changes.first().consumed.downChange, `is`(false))
 
-        pointer = filter::onPointerInput.invokeOverPasses(
-            down(1),
+        pointer = filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down(1)),
             PointerEventPass.Final
         )
 
         verify(filter.onPressStart).invoke(any())
-        assertThat(pointer.consumed.downChange, `is`(true))
+        assertThat(pointer.changes.first().consumed.downChange, `is`(true))
     }
 
     // Verification of correct cancellation behavior.
@@ -238,16 +242,16 @@ class RawPressStartGestureFilterTest {
     // and the 1st down is already consumed, the gesture detector won't consume the 2nd down.
     @Test
     fun onCancel_downCancelDownConsumedDown_thirdDownNotConsumed() {
-        filter::onPointerInput
-            .invokeOverAllPasses(down(id = 0, duration = 0.milliseconds))
+        filter::onPointerEvent
+            .invokeOverAllPasses(pointerEventOf(down(id = 0, duration = 0.milliseconds)))
         filter.onCancel()
-        var pointer1 = down(id = 1, duration = 10.milliseconds).consumeDownChange()
-        filter::onPointerInput.invokeOverAllPasses(pointer1)
+        var pointer1 = down(id = 1, duration = 10.milliseconds).apply { consumeDownChange() }
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
         pointer1 = pointer1.moveTo(20.milliseconds, 0f, 0f)
         val pointer2 = down(id = 2, duration = 20.milliseconds)
-        val results = filter::onPointerInput.invokeOverAllPasses(pointer1, pointer2)
+        val results = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
-        assertThat(results[0].consumed.downChange, `is`(false))
-        assertThat(results[1].consumed.downChange, `is`(false))
+        assertThat(results.changes[0].consumed.downChange, `is`(false))
+        assertThat(results.changes[1].consumed.downChange, `is`(false))
     }
 }

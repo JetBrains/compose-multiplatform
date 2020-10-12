@@ -172,16 +172,6 @@ internal class PointerInteropFilter : PointerInputModifier {
 
             private var state = DispatchToViewState.Unknown
 
-            override fun onPointerInput(
-                changes: List<PointerInputChange>,
-                pass: PointerEventPass,
-                bounds: IntSize
-            ): List<PointerInputChange> {
-                // No implementation as onPointerEvent is overridden.
-                // The super method will eventually be removed so this is just temporary.
-                throw NotImplementedError("This method is temporary and should never be called")
-            }
-
             override fun onPointerEvent(
                 pointerEvent: PointerEvent,
                 pass: PointerEventPass,
@@ -259,7 +249,8 @@ internal class PointerInteropFilter : PointerInputModifier {
                         if (state === DispatchToViewState.Dispatching) {
                             // If we were dispatching, send ACTION_CANCEL.
                             pointerEvent.toCancelMotionEventScope(
-                                this.layoutCoordinates.localToRoot(Offset.Zero)
+                                this.layoutCoordinates?.localToRoot(Offset.Zero)
+                                    ?: error("layoutCoordinates not set")
                             ) { motionEvent ->
                                 onTouchEvent(motionEvent)
                             }
@@ -268,7 +259,8 @@ internal class PointerInteropFilter : PointerInputModifier {
                     } else {
                         // Dispatch and update our state with the result.
                         pointerEvent.toMotionEventScope(
-                            this.layoutCoordinates.localToRoot(Offset.Zero)
+                            this.layoutCoordinates?.localToRoot(Offset.Zero)
+                                ?: error("layoutCoordinates not set")
                         ) { motionEvent ->
                             state = if (onTouchEvent(motionEvent)) {
                                 DispatchToViewState.Dispatching
@@ -278,7 +270,10 @@ internal class PointerInteropFilter : PointerInputModifier {
                         }
                         if (state === DispatchToViewState.Dispatching) {
                             // If the Android View claimed the event, consume all changes.
-                            changes = changes.map { it.consumeAllChanges() }
+                            changes = changes.map {
+                                it.consumeAllChanges()
+                                it
+                            }
                         }
                     }
                     return changes

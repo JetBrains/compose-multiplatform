@@ -19,8 +19,8 @@ package androidx.compose.material
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.background
-import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
@@ -100,7 +100,7 @@ import kotlin.math.roundToInt
  * updated text comes as a parameter of the callback
  * @param modifier a [Modifier] for this text field
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [currentTextStyle] defined by the theme
+ * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
  * text style for internal [Text] is [Typography.caption] when the text field is in focus and
  * [Typography.subtitle1] when the text field is not in focus
@@ -148,7 +148,7 @@ fun TextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = currentTextStyle(),
+    textStyle: TextStyle = AmbientTextStyle.current,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -225,7 +225,7 @@ fun TextField(
  * [TextFieldValue]. An updated [TextFieldValue] comes as a parameter of the callback
  * @param modifier a [Modifier] for this text field
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [currentTextStyle] defined by the theme
+ * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
  * text style for internal [Text] is [Typography.caption] when the text field is in focus and
  * [Typography.subtitle1] when the text field is not in focus
@@ -273,7 +273,7 @@ fun TextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = currentTextStyle(),
+    textStyle: TextStyle = AmbientTextStyle.current,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,

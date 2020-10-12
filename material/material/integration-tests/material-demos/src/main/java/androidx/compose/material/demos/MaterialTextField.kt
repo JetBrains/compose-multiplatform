@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
-import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.RadioButton
@@ -135,15 +135,16 @@ fun MaterialTextFieldDemo() {
             Title("Text field type")
             Column {
                 TextFieldType.values().map { it.name }.forEach { textType ->
-                    Row(Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = (textType == selectedTextField.name),
-                            onClick = {
-                                selectedTextField = TextFieldType.valueOf(textType)
-                            }
-                        )
-                        .padding(horizontal = 16.dp)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (textType == selectedTextField.name),
+                                onClick = {
+                                    selectedTextField = TextFieldType.valueOf(textType)
+                                }
+                            )
+                            .padding(horizontal = 16.dp)
                     ) {
                         RadioButton(
                             selected = (textType == selectedTextField.name),
@@ -181,13 +182,14 @@ fun MaterialTextFieldDemo() {
             Title("Assistive text")
             Column {
                 Option.values().map { it.name }.forEach { text ->
-                    Row(Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = (text == selectedOption.name),
-                            onClick = { selectedOption = Option.valueOf(text) }
-                        )
-                        .padding(horizontal = 16.dp)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (text == selectedOption.name),
+                                onClick = { selectedOption = Option.valueOf(text) }
+                            )
+                            .padding(horizontal = 16.dp)
                     ) {
                         RadioButton(
                             selected = (text == selectedOption.name),
@@ -216,10 +218,10 @@ private fun TextFieldWithMessage(
     val typography = MaterialTheme.typography.caption
     val color = when (helperMessageOption) {
         Option.Helper -> {
-            EmphasisAmbient.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
+            AmbientEmphasisLevels.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
         }
         Option.Error -> MaterialTheme.colors.error
-        else -> Color.Unset
+        else -> Color.Unspecified
     }
 
     Column {

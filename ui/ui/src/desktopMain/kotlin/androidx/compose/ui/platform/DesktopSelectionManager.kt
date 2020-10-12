@@ -21,8 +21,12 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.selection.Selectable
 import androidx.compose.ui.selection.Selection
+import androidx.compose.ui.selection.SelectionRegistrarImpl
+import androidx.compose.ui.selection.getCurrentSelectedText
+import androidx.compose.ui.selection.merge
+import androidx.compose.ui.text.AnnotatedString
 
-internal class DesktopSelectionManager(private val selectionRegistrar: DesktopSelectionRegistrar) {
+internal class DesktopSelectionManager(private val selectionRegistrar: SelectionRegistrarImpl) {
     private var dragBeginPosition = Offset.Zero
 
     private var dragTotalDistance = Offset.Zero
@@ -91,8 +95,30 @@ internal class DesktopSelectionManager(private val selectionRegistrar: DesktopSe
         require(coordinates.isAttached)
         return coordinates
     }
-}
 
-private fun merge(lhs: Selection?, rhs: Selection?): Selection? {
-    return lhs?.merge(rhs) ?: rhs
+    internal fun getSelectedText(): AnnotatedString? {
+        val selectables = selectionRegistrar.sort(requireContainerCoordinates())
+        var selectedText: AnnotatedString? = null
+
+        selection?.let {
+            for (handler in selectables) {
+                // Continue if the current selectable is before the selection starts.
+                if (handler != it.start.selectable && handler != it.end.selectable &&
+                    selectedText == null
+                ) continue
+
+                val currentSelectedText = getCurrentSelectedText(
+                    selectable = handler,
+                    selection = it
+                )
+                selectedText = selectedText?.plus(currentSelectedText) ?: currentSelectedText
+
+                // Break if the current selectable is the last selected selectable.
+                if (handler == it.end.selectable && !it.handlesCrossed ||
+                    handler == it.start.selectable && it.handlesCrossed
+                ) break
+            }
+        }
+        return selectedText
+    }
 }

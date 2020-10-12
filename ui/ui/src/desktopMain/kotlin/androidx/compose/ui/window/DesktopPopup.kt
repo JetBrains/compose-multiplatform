@@ -23,7 +23,8 @@ internal actual fun ActualPopup(
     popupPositionProvider: PopupPositionProvider,
     isFocusable: Boolean,
     onDismissRequest: (() -> Unit)?,
-    children: @Composable () -> Unit
+    properties: PopupProperties?,
+    content: @Composable () -> Unit
 ) {
     TODO("not implemented")
 }

@@ -246,10 +246,12 @@ class RememberSavedInstanceStateTest {
 
     @Test
     fun theLatestPassedSaverIsUsed() {
-        var saver by mutableStateOf(Saver<Int, Int>(
-            save = { 1 },
-            restore = { 1 }
-        ))
+        var saver by mutableStateOf(
+            Saver<Int, Int>(
+                save = { 1 },
+                restore = { 1 }
+            )
+        )
 
         restorationTester.setContent {
             rememberSavedInstanceState(saver = saver) { 1 }

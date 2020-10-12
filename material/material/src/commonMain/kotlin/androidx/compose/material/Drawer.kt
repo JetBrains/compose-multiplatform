@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -90,6 +91,7 @@ enum class BottomDrawerValue {
  */
 @Suppress("NotCloseable")
 @OptIn(ExperimentalMaterialApi::class)
+@Stable
 class DrawerState(
     initialValue: DrawerValue,
     clock: AnimationClockObservable,
@@ -118,11 +120,14 @@ class DrawerState(
      * @param onOpened Optional callback invoked when the drawer has finished opening.
      */
     fun open(onOpened: (() -> Unit)? = null) {
-        animateTo(DrawerValue.Open, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Open) {
-                onOpened?.invoke()
+        animateTo(
+            DrawerValue.Open,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Open) {
+                    onOpened?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -131,11 +136,14 @@ class DrawerState(
      * @param onClosed Optional callback invoked when the drawer has finished closing.
      */
     fun close(onClosed: (() -> Unit)? = null) {
-        animateTo(DrawerValue.Closed, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Closed) {
-                onClosed?.invoke()
+        animateTo(
+            DrawerValue.Closed,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Closed) {
+                    onClosed?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -195,13 +203,16 @@ class BottomDrawerState(
      * @param onOpened Optional callback invoked when the drawer has finished opening.
      */
     fun open(onOpened: (() -> Unit)? = null) {
-        animateTo(BottomDrawerValue.Open, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted &&
-                endValue == BottomDrawerValue.Open
-            ) {
-                onOpened?.invoke()
+        animateTo(
+            BottomDrawerValue.Open,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted &&
+                    endValue == BottomDrawerValue.Open
+                ) {
+                    onOpened?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -210,13 +221,16 @@ class BottomDrawerState(
      * @param onClosed Optional callback invoked when the drawer has finished closing.
      */
     fun close(onClosed: (() -> Unit)? = null) {
-        animateTo(BottomDrawerValue.Closed, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted &&
-                endValue == BottomDrawerValue.Closed
-            ) {
-                onClosed?.invoke()
+        animateTo(
+            BottomDrawerValue.Closed,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted &&
+                    endValue == BottomDrawerValue.Closed
+                ) {
+                    onClosed?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -225,13 +239,16 @@ class BottomDrawerState(
      * @param onExpanded Optional callback invoked when the drawer has finished expanding.
      */
     fun expand(onExpanded: (() -> Unit)? = null) {
-        animateTo(BottomDrawerValue.Expanded, onEnd = { endReason, endValue ->
-            if (endReason != AnimationEndReason.Interrupted &&
-                endValue == BottomDrawerValue.Expanded
-            ) {
-                onExpanded?.invoke()
+        animateTo(
+            BottomDrawerValue.Expanded,
+            onEnd = { endReason, endValue ->
+                if (endReason != AnimationEndReason.Interrupted &&
+                    endValue == BottomDrawerValue.Expanded
+                ) {
+                    onExpanded?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -350,7 +367,8 @@ fun ModalDrawerLayout(
                 reverseDirection = isRtl,
                 velocityThreshold = DrawerVelocityThreshold,
                 resistance = null
-        )) {
+            )
+        ) {
             Box {
                 bodyContent()
             }
@@ -457,7 +475,6 @@ fun BottomDrawerLayout(
             Modifier.swipeable(
                 state = drawerState,
                 anchors = anchors,
-                thresholds = { _, _ -> FixedThreshold(BottomDrawerThreshold) },
                 orientation = Orientation.Vertical,
                 enabled = gesturesEnabled,
                 resistance = null
@@ -548,4 +565,3 @@ private const val DrawerStiffness = 1000f
 private val AnimationSpec = SpringSpec<Float>(stiffness = DrawerStiffness)
 
 internal const val BottomDrawerOpenFraction = 0.5f
-internal val BottomDrawerThreshold = 56.dp

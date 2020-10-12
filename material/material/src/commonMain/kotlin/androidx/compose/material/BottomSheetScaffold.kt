@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +43,7 @@ import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
@@ -75,6 +76,7 @@ enum class BottomSheetValue {
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @ExperimentalMaterialApi
+@Stable
 class BottomSheetState(
     initialValue: BottomSheetValue,
     clock: AnimationClockObservable,
@@ -104,11 +106,14 @@ class BottomSheetState(
      * @param onExpanded Optional callback invoked when the bottom sheet has been expanded.
      */
     fun expand(onExpanded: (() -> Unit)? = null) {
-        animateTo(BottomSheetValue.Expanded, onEnd = { endReason, _ ->
-            if (endReason == AnimationEndReason.TargetReached) {
-                onExpanded?.invoke()
+        animateTo(
+            BottomSheetValue.Expanded,
+            onEnd = { endReason, _ ->
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onExpanded?.invoke()
+                }
             }
-        })
+        )
     }
 
     /**
@@ -117,11 +122,14 @@ class BottomSheetState(
      * @param onCollapsed Optional callback invoked when the bottom sheet has been collapsed.
      */
     fun collapse(onCollapsed: (() -> Unit)? = null) {
-        animateTo(BottomSheetValue.Collapsed, onEnd = { endReason, _ ->
-            if (endReason == AnimationEndReason.TargetReached) {
-                onCollapsed?.invoke()
+        animateTo(
+            BottomSheetValue.Collapsed,
+            onEnd = { endReason, _ ->
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onCollapsed?.invoke()
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -147,11 +155,9 @@ class BottomSheetState(
 }
 
 /**
- * Create a [BottomSheetState] and [remember] it against the [clock]. If a clock is not
- * specified, the default animation clock will be used, as provided by [AnimationClockAmbient].
+ * Create a [BottomSheetState] and [remember] it.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
@@ -159,11 +165,10 @@ class BottomSheetState(
 @ExperimentalMaterialApi
 fun rememberBottomSheetState(
     initialValue: BottomSheetValue,
-    clock: AnimationClockObservable = AnimationClockAmbient.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
-    val disposableClock = clock.asDisposableClock()
+    val disposableClock = AnimationClockAmbient.current.asDisposableClock()
     return rememberSavedInstanceState(
         disposableClock,
         saver = BottomSheetState.Saver(
@@ -189,6 +194,7 @@ fun rememberBottomSheetState(
  * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
  */
 @ExperimentalMaterialApi
+@Stable
 class BottomSheetScaffoldState(
     val drawerState: DrawerState,
     val bottomSheetState: BottomSheetState,
@@ -207,7 +213,7 @@ class BottomSheetScaffoldState(
 fun rememberBottomSheetScaffoldState(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     bottomSheetState: BottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed),
-    snackbarHostState: SnackbarHostState = SnackbarHostState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BottomSheetScaffoldState {
     return remember(drawerState, bottomSheetState, snackbarHostState) {
         BottomSheetScaffoldState(
@@ -300,7 +306,6 @@ fun BottomSheetScaffold(
                 fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
                 fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
             ),
-            thresholds = { _, _ -> FixedThreshold(56.dp) },
             orientation = Orientation.Vertical,
             enabled = sheetGesturesEnabled,
             resistance = null
@@ -324,7 +329,9 @@ fun BottomSheetScaffold(
                         swipeable
                             .fillMaxWidth()
                             .heightIn(min = sheetPeekHeight)
-                            .onPositioned { bottomSheetHeight = it.size.height.toFloat() },
+                            .onGloballyPositioned {
+                                bottomSheetHeight = it.size.height.toFloat()
+                            },
                         shape = sheetShape,
                         elevation = sheetElevation,
                         color = sheetBackgroundColor,
@@ -373,12 +380,14 @@ private fun BottomSheetScaffoldStack(
     bottomSheetOffset: State<Float>,
     floatingActionButtonPosition: FabPosition
 ) {
-    Layout(children = {
-        body()
-        bottomSheet()
-        floatingActionButton()
-        snackbarHost()
-    }) { measurables, constraints ->
+    Layout(
+        children = {
+            body()
+            bottomSheet()
+            floatingActionButton()
+            snackbarHost()
+        }
+    ) { measurables, constraints ->
         val placeable = measurables.first().measure(constraints)
 
         layout(placeable.width, placeable.height) {

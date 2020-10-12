@@ -38,16 +38,6 @@ dependencies {
 
     androidTestImplementation project(":ui:ui-test")
 
-    // TODO: presumably shouldn't need to specify these again? figure out why this is needed.
-    androidTestImplementation project(":compose:androidview:androidview:integration-tests:androidview-demos")
-    androidTestImplementation project(":compose:animation:animation:integration-tests:animation-demos")
-    androidTestImplementation project(":compose:foundation:foundation-layout:integration-tests:foundation-layout-demos")
-    androidTestImplementation project(":compose:foundation:foundation-text:integration-tests:foundation-text-demos")
-    androidTestImplementation project(":compose:foundation:foundation:integration-tests:foundation-demos")
-    androidTestImplementation project(":compose:material:material:integration-tests:material-demos")
-    androidTestImplementation project(":compose:material:material:integration-tests:material-studies")
-    androidTestImplementation project(":compose:ui:ui:integration-tests:ui-demos")
-
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(ESPRESSO_CORE)
@@ -61,20 +51,6 @@ android {
         // Change the APK name to match the *testapp regex we use to pick up APKs for testing as
         // part of CI.
         archivesBaseName = "compose-demos-testapp"
-    }
-    /*
-    Kotlin generates kotlin_module files based off the gradle *sub*module name, ignoring the
-    parent project - this means that we generate multiple of these files for any project with a
-    :samples subproject.
-
-    Ideally each sample module should set:
-    compileOptions {
-        kotlinOptions.freeCompilerArgs += ['-module-name', "$PUBLISH_GROUP_ID.$PUBLISH_ARTIFACT_ID"]
-    }
-    However, given that we aren't shipping these demos, we can just exclude all of these.
-    */
-    packagingOptions {
-        exclude 'META-INF/samples_debug.kotlin_module'
     }
 }
 

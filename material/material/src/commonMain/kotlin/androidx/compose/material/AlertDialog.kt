@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 /**
  * Alert dialog is a [Dialog] which interrupts the user with urgent information, details or actions.
@@ -62,6 +63,7 @@ import androidx.compose.ui.window.Dialog
  * @param shape Defines the Dialog's shape
  * @param backgroundColor The background color of the dialog.
  * @param contentColor The preferred content color provided by this dialog to its children.
+ * @param properties Typically platform specific properties to further configure the dialog.
  */
 @Composable
 fun AlertDialog(
@@ -73,32 +75,36 @@ fun AlertDialog(
     text: @Composable (() -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = MaterialTheme.colors.surface,
-    contentColor: Color = contentColorFor(backgroundColor)
+    contentColor: Color = contentColorFor(backgroundColor),
+    properties: DialogProperties? = null
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         buttons = {
             @OptIn(ExperimentalLayout::class)
-            (Box(Modifier.fillMaxWidth().padding(all = 8.dp)) {
-        FlowRow(
-            mainAxisSize = SizeMode.Expand,
-            mainAxisAlignment = MainAxisAlignment.End,
-            mainAxisSpacing = 8.dp,
-            crossAxisSpacing = 12.dp
-        ) {
-            if (dismissButton != null) {
-                dismissButton()
-            }
-            confirmButton()
-        }
-    })
+            (
+                Box(Modifier.fillMaxWidth().padding(all = 8.dp)) {
+                    FlowRow(
+                        mainAxisSize = SizeMode.Expand,
+                        mainAxisAlignment = MainAxisAlignment.End,
+                        mainAxisSpacing = 8.dp,
+                        crossAxisSpacing = 12.dp
+                    ) {
+                        if (dismissButton != null) {
+                            dismissButton()
+                        }
+                        confirmButton()
+                    }
+                }
+                )
         },
         modifier = modifier,
         title = title,
         text = text,
         shape = shape,
         backgroundColor = backgroundColor,
-        contentColor = contentColor
+        contentColor = contentColor,
+        properties = properties
     )
 }
 
@@ -121,6 +127,7 @@ fun AlertDialog(
  * @param shape Defines the Dialog's shape.
  * @param backgroundColor The background color of the dialog.
  * @param contentColor The preferred content color provided by this dialog to its children.
+ * @param properties Typically platform specific properties to further configure the dialog.
  */
 @Composable
 fun AlertDialog(
@@ -131,16 +138,20 @@ fun AlertDialog(
     text: @Composable (() -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = MaterialTheme.colors.surface,
-    contentColor: Color = contentColorFor(backgroundColor)
+    contentColor: Color = contentColorFor(backgroundColor),
+    properties: DialogProperties? = null
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = properties
+    ) {
         Surface(
             modifier = modifier,
             shape = shape,
             color = backgroundColor,
             contentColor = contentColor
         ) {
-            val emphasisLevels = EmphasisAmbient.current
+            val emphasisLevels = AmbientEmphasisLevels.current
             Column {
                 if (title != null) {
                     Box(TitlePadding.align(Alignment.Start)) {

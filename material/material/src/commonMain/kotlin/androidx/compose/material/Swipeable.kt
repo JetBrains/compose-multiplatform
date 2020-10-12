@@ -150,13 +150,16 @@ open class SwipeableState<T>(
                 maxBound = Float.POSITIVE_INFINITY
                 val targetOffset = anchors.getOffset(value)
                     ?: anchors.keys.minByOrNull { abs(it - offset.value) }!!
-                holder.animateTo(targetOffset, animationSpec, onEnd = { endReason, _ ->
-                    value = anchors.getValue(targetOffset)
-                    minBound = anchors.keys.minOrNull()!!
-                    maxBound = anchors.keys.maxOrNull()!!
-                    // If the animation was interrupted for any reason, snap as a last resort.
-                    if (endReason == AnimationEndReason.Interrupted) holder.snapTo(targetOffset)
-                })
+                holder.animateTo(
+                    targetOffset, animationSpec,
+                    onEnd = { endReason, _ ->
+                        value = anchors.getValue(targetOffset)
+                        minBound = anchors.keys.minOrNull()!!
+                        maxBound = anchors.keys.maxOrNull()!!
+                        // If the animation was interrupted for any reason, snap as a last resort.
+                        if (endReason == AnimationEndReason.Interrupted) holder.snapTo(targetOffset)
+                    }
+                )
             }
             anchorsState.value = anchors
         }
@@ -424,11 +427,11 @@ internal fun <T : Any> rememberSwipeableStateFor(
 fun <T> Modifier.swipeable(
     state: SwipeableState<T>,
     anchors: Map<Float, T>,
-    thresholds: (from: T, to: T) -> ThresholdConfig,
     orientation: Orientation,
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
     interactionState: InteractionState? = null,
+    thresholds: (from: T, to: T) -> ThresholdConfig = { _, _ -> FixedThreshold(56.dp) },
     resistance: ResistanceConfig? = defaultResistanceConfig(anchors.keys),
     velocityThreshold: Dp = DefaultVelocityThreshold
 ) = composed {
