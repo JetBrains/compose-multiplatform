@@ -93,7 +93,11 @@ class SwitchScreenshotTest {
     fun switchTest_checked_customColor() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Switch(checked = true, onCheckedChange = { }, color = Color.Red)
+                Switch(
+                    checked = true,
+                    onCheckedChange = { },
+                    colors = SwitchConstants.defaultColors(checkedThumbColor = Color.Red)
+                )
             }
         }
         assertToggeableAgainstGolden("switch_checked_customColor")
