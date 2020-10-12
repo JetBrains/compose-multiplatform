@@ -2,7 +2,7 @@
 
 ## What is covered
 
-In this tutorial we will see how to create and deploy simple desktop UI application
+In this tutorial we will see how to create simple desktop UI application
 using Compose UI framework.
 
 ## Prerequisites
@@ -96,6 +96,8 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
 }
 
 ```
+## Running the project
+
 Open `build.gradle.kts` as a project in IDEA.
 
 ![New project](screen1.png)
