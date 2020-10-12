@@ -92,17 +92,17 @@ fun SimpleRelativeToSiblings() {
         // left edge of the third one.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .alignWithSiblings { it.width / 2 }
+                .alignBy { it.width / 2 }
                 .background(Color.Blue)
         )
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .alignWithSiblings { it.width }
+                .alignBy { it.width }
                 .background(Color.Magenta)
         )
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .alignWithSiblings { 0 }
+                .alignBy { 0 }
                 .background(Color.Red)
         )
     }
@@ -118,7 +118,7 @@ fun SimpleRelativeToSiblingsInColumn() {
     // of Row because the baselines are horizontal. Therefore, we create these vertical alignment
     // lines, that refer to the start and end of the RectangleWithStartEnd layout which knows
     // how to provide them. Then Column will know how to align horizontally children such
-    // that the positions of the alignment lines coincide, as asked by alignWithSiblings.
+    // that the positions of the alignment lines coincide, as asked by alignBy.
     val start = VerticalAlignmentLine(::min)
     val end = VerticalAlignmentLine(::min)
 
@@ -139,17 +139,17 @@ fun SimpleRelativeToSiblingsInColumn() {
         // left edge of the third one.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .alignWithSiblings { it.width / 2 }
+                .alignBy { it.width / 2 }
                 .background(Color.Blue)
         )
         RectangleWithStartEnd(
-            Modifier.alignWithSiblings(end),
+            Modifier.alignBy(end),
             color = Color.Magenta,
             width = 80.dp,
             height = 40.dp
         )
         RectangleWithStartEnd(
-            Modifier.alignWithSiblings(start),
+            Modifier.alignBy(start),
             color = Color.Red,
             width = 80.dp,
             height = 40.dp

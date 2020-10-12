@@ -24,12 +24,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Sampled
 @Composable
@@ -82,17 +82,28 @@ fun SimpleAlignInRow() {
 
 @Sampled
 @Composable
-fun SimpleRelativeToSiblingsInRow() {
+fun SimpleAlignByInRow() {
     Row(Modifier.fillMaxHeight()) {
-        // Center of the colored rectangle is aligned to first baseline of the text.
+        // The center of the magenta Box and the baselines of the two texts will be
+        // vertically aligned. Note that alignBy() or alignByBaseline() has to be specified
+        // for all children we want to take part in the alignment. For example, alignByBaseline()
+        // means that the baseline of the text should be aligned with the alignment line
+        // (possibly another baseline) specified for siblings using alignBy or alignByBaseline.
+        // If no other sibling had alignBy() or alignByBaseline(), the modifier would have no
+        // effect.
         Box(
             modifier = Modifier.preferredSize(80.dp, 40.dp)
-                .alignWithSiblings { it.height / 2 }
-                .background(Color.Red)
+                .alignBy { it.height / 2 }
+                .background(Color.Magenta)
         )
         Text(
-            text = "Text.",
-            modifier = Modifier.alignWithSiblings(FirstBaseline).background(color = Color.Cyan)
+            text = "Text 1",
+            fontSize = 40.sp,
+            modifier = Modifier.alignByBaseline().background(color = Color.Red)
+        )
+        Text(
+            text = "Text 2",
+            modifier = Modifier.alignByBaseline().background(color = Color.Cyan)
         )
     }
 }
