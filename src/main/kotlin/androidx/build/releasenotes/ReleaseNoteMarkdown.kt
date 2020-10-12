@@ -70,8 +70,9 @@ class CommitMarkdownList(
     }
 
     private fun makeReleaseNotesSection(sectionCommitType: CommitType): String {
-        var sectionHeader: MarkdownBoldText = MarkdownBoldText(CommitType
-            .getTitle(sectionCommitType))
+        var sectionHeader: MarkdownBoldText = MarkdownBoldText(
+            CommitType.getTitle(sectionCommitType)
+        )
         var markdownStringSection: String = ""
         commits.filter { commit ->
             commit.type == sectionCommitType
@@ -126,8 +127,10 @@ fun getGitilesDiffLogLink(startSHA: String, endSHA: String, projectDir: String):
      * should be relative to frameworks/support/.
      */
     if (projectDir.contains("frameworks/support")) {
-        throw RuntimeException("Gitiles directory should only contain the directory structure" +
-                "within frameworks/support/*, but received incorrect directory: $projectDir")
+        throw RuntimeException(
+            "Gitiles directory should only contain the directory structure" +
+                "within frameworks/support/*, but received incorrect directory: $projectDir"
+        )
     }
     // Remove extra preceeding directory slashes, if they exist
     var verifiedProjectDir = projectDir
@@ -224,17 +227,19 @@ class LibraryReleaseNotes(
 
     init {
         if (version == "" || groupId == "") {
-            throw RuntimeException("Tried to create Library Release Notes Header without setting" +
-                    "the groupId or version!")
+            throw RuntimeException(
+                "Tried to create Library Release Notes Header without setting" +
+                    "the groupId or version!"
+            )
         }
         if (fromSHA == "" || untilSHA == "") {
             throw RuntimeException("Tried to create Library Release Notes with an empty SHA!")
         }
         header = if (requiresSameVersion) {
-                LibraryHeader(groupId, version)
-            } else {
-                LibraryHeader(artifactIds.joinToString(), version)
-            }
+            LibraryHeader(groupId, version)
+        } else {
+            LibraryHeader(artifactIds.joinToString(), version)
+        }
         diffLogLink = getGitilesDiffLogLink(fromSHA, untilSHA, projectDir)
         if (commitList.isNotEmpty()) {
             commitList.forEach { commit ->
@@ -288,8 +293,8 @@ class LibraryReleaseNotes(
 
     override fun toString(): String {
         return "$header\n" +
-                "${getFormattedDate()}\n\n" +
-                getFormattedReleaseSummary() +
-                "$commitMarkdownList"
+            "${getFormattedDate()}\n\n" +
+            getFormattedReleaseSummary() +
+            "$commitMarkdownList"
     }
 }

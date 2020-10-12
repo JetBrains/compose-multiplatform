@@ -59,7 +59,8 @@ abstract class UpdateResourceApiTask : DefaultTask() {
             val version = outputApi.version()
             if (version != null && version.isFinalApi() &&
                 outputApi.publicApiFile.exists() &&
-                !project.hasProperty("force")) {
+                !project.hasProperty("force")
+            ) {
                 permitOverwriting = false
             }
         }

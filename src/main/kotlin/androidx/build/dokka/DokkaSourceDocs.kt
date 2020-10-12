@@ -54,24 +54,24 @@ object DokkaSourceDocs {
     }
 
     @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project):
-            TaskCollection<DokkaTask> {
-        val tasks = this
-        var dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
-            .matching { it.name.contains(DOCS_TYPE) }
-
-        if (dokkaTasks.isEmpty()) {
-            Dokka.createDocsTask(DOCS_TYPE, runnerProject, hiddenPackages)
-            dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
+        TaskCollection<DokkaTask> {
+            val tasks = this
+            var dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
                 .matching { it.name.contains(DOCS_TYPE) }
 
-            if (tasks.findByName(ALTERNATE_ARCHIVE_TASK_NAME) == null) {
-                tasks.register(ALTERNATE_ARCHIVE_TASK_NAME) {
-                    it.dependsOn(tasks.named(ARCHIVE_TASK_NAME))
+            if (dokkaTasks.isEmpty()) {
+                Dokka.createDocsTask(DOCS_TYPE, runnerProject, hiddenPackages)
+                dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
+                    .matching { it.name.contains(DOCS_TYPE) }
+
+                if (tasks.findByName(ALTERNATE_ARCHIVE_TASK_NAME) == null) {
+                    tasks.register(ALTERNATE_ARCHIVE_TASK_NAME) {
+                        it.dependsOn(tasks.named(ARCHIVE_TASK_NAME))
+                    }
                 }
             }
+            return dokkaTasks
         }
-        return dokkaTasks
-    }
 
     fun registerAndroidProject(
         project: Project,

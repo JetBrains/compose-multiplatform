@@ -72,7 +72,7 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
 
     private fun getJarFiles(): List<File> {
         return jarFiles.files.filter { file ->
-                file.name.endsWith(JAR_FILE_EXTENSION)
+            file.name.endsWith(JAR_FILE_EXTENSION)
         }
     }
 

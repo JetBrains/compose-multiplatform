@@ -94,8 +94,7 @@ abstract class AffectedModuleDetector {
             val enabled = rootProject.hasProperty(ENABLE_ARG)
             val subset = when {
                 rootProject.hasProperty(DEPENDENT_PROJECTS_ARG) -> ProjectSubset.DEPENDENT_PROJECTS
-                rootProject.hasProperty(CHANGED_PROJECTS_ARG)
-                    -> ProjectSubset.CHANGED_PROJECTS
+                rootProject.hasProperty(CHANGED_PROJECTS_ARG) -> ProjectSubset.CHANGED_PROJECTS
                 else -> ProjectSubset.ALL_AFFECTED_PROJECTS
             }
             if (!enabled) {
@@ -115,10 +114,10 @@ abstract class AffectedModuleDetector {
                 override fun projectsEvaluated(gradle: Gradle?) {
                     logger.lifecycle("projects evaluated")
                     AffectedModuleDetectorImpl(
-                            rootProject = rootProject,
-                            logger = logger,
-                            ignoreUnknownProjects = false,
-                            projectSubset = subset
+                        rootProject = rootProject,
+                        logger = logger,
+                        ignoreUnknownProjects = false,
+                        projectSubset = subset
                     ).also {
                         if (!enabled) {
                             logger.info("swapping with accept all")
@@ -150,10 +149,11 @@ abstract class AffectedModuleDetector {
 
         private fun getOrThrow(project: Project): AffectedModuleDetector {
             return getInstance(project) ?: throw GradleException(
-                    """
+                """
                         Tried to get affected module detector too early.
                         You cannot access it until all projects are evaluated.
-                    """.trimIndent())
+                """.trimIndent()
+            )
         }
 
         /**
@@ -205,7 +205,7 @@ private class AcceptAll(
 class AffectedModuleDetectorImpl constructor(
     private val rootProject: Project,
     private val logger: Logger?,
-        // used for debugging purposes when we want to ignore non module files
+    // used for debugging purposes when we want to ignore non module files
     private val ignoreUnknownProjects: Boolean = false,
     private val projectSubset: ProjectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
@@ -292,17 +292,21 @@ class AffectedModuleDetectorImpl constructor(
             val containingProject = findContainingProject(filePath)
             if (containingProject == null) {
                 unknownFiles.add(filePath)
-                logger?.info("Couldn't find containing project for file$filePath. " +
-                        "Adding to unknownFiles.")
+                logger?.info(
+                    "Couldn't find containing project for file$filePath. Adding to unknownFiles."
+                )
             } else {
                 changedProjects.add(containingProject)
-                logger?.info("For file $filePath containing project is $containingProject. " +
-                        "Adding to changedProjects.")
+                logger?.info(
+                    "For file $filePath containing project is $containingProject. " +
+                        "Adding to changedProjects."
+                )
             }
         }
 
         return changedProjects + getAffectedCobuiltProjects(
-            changedProjects, cobuiltTestProjects)
+            changedProjects, cobuiltTestProjects
+        )
     }
 
     /**
@@ -313,8 +317,8 @@ class AffectedModuleDetectorImpl constructor(
         val dependentProjects = changedProjects.flatMap {
             dependencyTracker.findAllDependents(it)
         }.toSet()
-        return dependentProjects + getAffectedCobuiltProjects(dependentProjects,
-            cobuiltTestProjects) + alwaysBuild
+        return dependentProjects + alwaysBuild +
+            getAffectedCobuiltProjects(dependentProjects, cobuiltTestProjects)
     }
 
     /**
@@ -345,7 +349,7 @@ class AffectedModuleDetectorImpl constructor(
 
         // Should only trigger if there are no changedFiles
         if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) buildAll =
-        true
+            true
         unknownFiles.forEach {
             if (affectsAllOfThisBuild(it) || affectsAllOfBothBuilds(it)) {
                 buildAll = true
@@ -368,7 +372,7 @@ class AffectedModuleDetectorImpl constructor(
                     """
                     The modules detected as affected by changed files are
                     ${changedProjects + dependentProjects}
-                """.trimIndent()
+                    """.trimIndent()
                 )
             }
             when (projectSubset) {
@@ -394,11 +398,12 @@ class AffectedModuleDetectorImpl constructor(
     )
     private fun affectsAllOfThisBuild(file: String): Boolean {
         return !file.contains(File.separatorChar) ||
-                NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD.any { file.startsWith(it) }
+            NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD.any { file.startsWith(it) }
     } // objects in root are assumed to affect all projects in the build
     private fun affectsAllOfBothBuilds(file: String): Boolean {
         return ROOT_FILES_OR_FOLDERS_AFFECTING_ALL_OF_BOTH_BUILDS.any {
-            file.startsWith("../$it") || file.startsWith(it) }
+            file.startsWith("../$it") || file.startsWith(it)
+        }
     } // if you are in the ui build, the path is e.g. ../busytown
 
     private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<Project>> {
@@ -409,9 +414,10 @@ class AffectedModuleDetectorImpl constructor(
                 val project = rootProject.findProject(path)
                 if (project == null) {
                     if (setExists) {
-                        throw IllegalStateException("One of the projects in the group of " +
-                                "projects that are required to be built together is missing. " +
-                                "Looked for " + setPaths)
+                        throw IllegalStateException(
+                            "One of the projects in the group of projects that are required to " +
+                                "be built together is missing. Looked for " + setPaths
+                        )
                     }
                 } else {
                     setExists = true
@@ -429,9 +435,7 @@ class AffectedModuleDetectorImpl constructor(
         val cobuilts = mutableSetOf<Project>()
         affectedProjects.forEach { project ->
             allCobuiltSets.forEach { cobuiltSet ->
-                if (cobuiltSet.any {
-                        project == it
-                    }) {
+                if (cobuiltSet.any { project == it }) {
                     cobuilts.addAll(cobuiltSet)
                 }
             }

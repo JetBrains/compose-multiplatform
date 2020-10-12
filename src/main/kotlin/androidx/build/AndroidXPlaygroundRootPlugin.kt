@@ -165,7 +165,7 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         val snapshots =
             "https://androidx.dev/snapshots/builds/${props.snapshotBuildId}/artifacts/repository"
         val metalava = "https://androidx.dev/metalava/builds/${props.metalavaBuildId}/artifacts" +
-                "/repo/m2repository"
+            "/repo/m2repository"
         val doclava = "https://androidx.dev/dokka/builds/${props.dokkaBuildId}/artifacts/repository"
         val all = listOf(snapshots, metalava, doclava)
     }

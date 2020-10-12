@@ -44,7 +44,7 @@ fun runMetalavaWithArgs(
         "HiddenSuperclass" // We allow having a hidden parent class
     ) + args
 
-    val workQueue = workerExecutor.noIsolation()
+    val workQueue = workerExecutor.processIsolation()
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
         parameters.getArgs().set(allArgs)
         parameters.getMetalavaClasspath().set(metalavaConfiguration.files)
@@ -79,7 +79,7 @@ abstract class MetalavaWorkAction @Inject constructor (
 
 fun Project.getMetalavaConfiguration(): Configuration {
     return configurations.findByName("metalava") ?: configurations.create("metalava") {
-        val dependency = dependencies.create("com.android:metalava:1.3.0")
+        val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha02")
         it.dependencies.add(dependency)
     }
 }
@@ -181,21 +181,24 @@ fun Project.generateApi(
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
-    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor,
-        pathToManifest)
-    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode,
-        workerExecutor, pathToManifest)
+    generateApi(
+        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor, pathToManifest
+    )
+    generateApi(
+        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode, workerExecutor, pathToManifest
+    )
 
     val restrictedAPIMode = if (includeRestrictToLibraryGroupApis) {
         GenerateApiMode.AllRestrictedApis
     } else {
         GenerateApiMode.RestrictToLibraryGroupPrefixApis
     }
-    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, restrictedAPIMode, ApiLintMode.Skip,
-        workerExecutor)
+    generateApi(
+        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        apiLocation, restrictedAPIMode, ApiLintMode.Skip, workerExecutor
+    )
     workerExecutor.await()
     val removedApiFile = apiLocation.removedApiFile
     if (removedApiFile.exists()) {
@@ -217,8 +220,10 @@ fun Project.generateApi(
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
-    val args = getGenerateApiArgs(bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
-        generateApiMode, apiLintMode, pathToManifest)
+    val args = getGenerateApiArgs(
+        bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
+        generateApiMode, apiLintMode, pathToManifest
+    )
     runMetalavaWithArgs(getMetalavaConfiguration(), args, workerExecutor)
 }
 
@@ -240,7 +245,7 @@ fun Project.getGenerateApiArgs(
         "--source-path",
         sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
-        "--format=v3",
+        "--format=v4",
         "--output-kotlin-nulls=yes"
     )
 
@@ -255,7 +260,7 @@ fun Project.getGenerateApiArgs(
                 args += listOf("--removed-api", outputLocation.removedApiFile.toString())
             }
             is GenerateApiMode.AllRestrictedApis,
-                GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
+            GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
                 args += listOf("--api", outputLocation.restrictedApiFile.toString())
             }
             is GenerateApiMode.ExperimentalApi -> {
@@ -283,13 +288,17 @@ fun Project.getGenerateApiArgs(
                 "--show-unannotated"
             )
             if (generateApiMode is GenerateApiMode.AllRestrictedApis) {
-                args += listOf("--show-annotation",
-                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
-                    "LIBRARY_GROUP)")
+                args += listOf(
+                    "--show-annotation",
+                    "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
+                        "LIBRARY_GROUP)"
+                )
             } else {
-                args += listOf("--hide-annotation",
-                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
-                    "LIBRARY_GROUP)")
+                args += listOf(
+                    "--hide-annotation",
+                    "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
+                        "LIBRARY_GROUP)"
+                )
             }
             args += HIDE_EXPERIMENTAL_ARGS
         }
@@ -304,24 +313,28 @@ fun Project.getGenerateApiArgs(
             if (apiLintMode.apiLintBaseline.exists()) {
                 args += listOf("--baseline", apiLintMode.apiLintBaseline.toString())
             }
-            args.addAll(listOf(
-                "--error",
-                "DeprecationMismatch", // Enforce deprecation mismatch
-                "--error",
-                "ReferencesDeprecated"
-            ))
+            args.addAll(
+                listOf(
+                    "--error",
+                    "DeprecationMismatch", // Enforce deprecation mismatch
+                    "--error",
+                    "ReferencesDeprecated"
+                )
+            )
         }
         is ApiLintMode.Skip -> {
-            args.addAll(listOf(
-                "--hide",
-                "DeprecationMismatch",
-                "--hide",
-                "UnhiddenSystemApi",
-                "--hide",
-                "ReferencesHidden",
-                "--hide",
-                "ReferencesDeprecated"
-            ))
+            args.addAll(
+                listOf(
+                    "--hide",
+                    "DeprecationMismatch",
+                    "--hide",
+                    "UnhiddenSystemApi",
+                    "--hide",
+                    "ReferencesHidden",
+                    "--hide",
+                    "ReferencesDeprecated"
+                )
+            )
         }
     }
 

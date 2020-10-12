@@ -16,6 +16,7 @@
 
 package androidx.build
 
+/* ktlint-disable max-line-length */
 /**
  * The list of maven group names of all the libraries in this project.
  */
@@ -26,8 +27,7 @@ object LibraryGroups {
     val APPCOMPAT = LibraryGroup("androidx.appcompat", null)
     val APPSEARCH = LibraryGroup("androidx.appsearch", LibraryVersions.APPSEARCH)
     val ARCH_CORE = LibraryGroup("androidx.arch.core", LibraryVersions.ARCH_CORE)
-    val ASYNCLAYOUTINFLATER = LibraryGroup("androidx.asynclayoutinflater",
-        LibraryVersions.ASYNCLAYOUTINFLATER)
+    val ASYNCLAYOUTINFLATER = LibraryGroup("androidx.asynclayoutinflater", LibraryVersions.ASYNCLAYOUTINFLATER)
     val AUTOFILL = LibraryGroup("androidx.autofill", LibraryVersions.AUTOFILL)
     val BIOMETRIC = LibraryGroup("androidx.biometric", LibraryVersions.BIOMETRIC)
     val BROWSER = LibraryGroup("androidx.browser", LibraryVersions.BROWSER)
@@ -39,8 +39,7 @@ object LibraryGroups {
     val CONCURRENT = LibraryGroup("androidx.concurrent", LibraryVersions.FUTURES)
     val CONTENTACCESS = LibraryGroup("androidx.contentaccess", LibraryVersions.CONTENTACCESS)
     val CONTENTPAGER = LibraryGroup("androidx.contentpager", LibraryVersions.CONTENTPAGER)
-    val COORDINATORLAYOUT = LibraryGroup("androidx.coordinatorlayout",
-        LibraryVersions.COORDINATORLAYOUT)
+    val COORDINATORLAYOUT = LibraryGroup("androidx.coordinatorlayout", LibraryVersions.COORDINATORLAYOUT)
     val CORE = LibraryGroup("androidx.core", null)
     val CURSORADAPTER = LibraryGroup("androidx.cursoradapter", LibraryVersions.CURSORADAPTER)
     val CUSTOMVIEW = LibraryGroup("androidx.customview", LibraryVersions.CUSTOMVIEW)
@@ -56,8 +55,7 @@ object LibraryGroups {
     val HEIFWRITER = LibraryGroup("androidx.heifwriter", LibraryVersions.HEIFWRITER)
     val HILT = LibraryGroup("androidx.hilt", null)
     val INSPECTION = LibraryGroup("androidx.inspection", LibraryVersions.INSPECTION)
-    val INSPECTION_EXTENSIONS = LibraryGroup("androidx.inspection.extensions",
-        LibraryVersions.SQLITE_INSPECTOR)
+    val INSPECTION_EXTENSIONS = LibraryGroup("androidx.inspection.extensions", LibraryVersions.SQLITE_INSPECTOR)
     val IPC = LibraryGroup("androidx.ipc", LibraryVersions.IPC)
     val INTERPOLATOR = LibraryGroup("androidx.interpolator", LibraryVersions.INTERPOLATOR)
     val JETIFIER = LibraryGroup("com.android.tools.build.jetifier", null)
@@ -65,8 +63,7 @@ object LibraryGroups {
     val LEGACY = LibraryGroup("androidx.legacy", null)
     val LIFECYCLE = LibraryGroup("androidx.lifecycle", null)
     val LOADER = LibraryGroup("androidx.loader", LibraryVersions.LOADER)
-    val LOCALBROADCASTMANAGER = LibraryGroup("androidx.localbroadcastmanager",
-        LibraryVersions.LOCALBROADCASTMANAGER)
+    val LOCALBROADCASTMANAGER = LibraryGroup("androidx.localbroadcastmanager", LibraryVersions.LOCALBROADCASTMANAGER)
     val MEDIA = LibraryGroup("androidx.media", null)
     val MEDIA2 = LibraryGroup("androidx.media2", LibraryVersions.MEDIA2)
     val MEDIAROUTER = LibraryGroup("androidx.mediarouter", LibraryVersions.MEDIAROUTER)
@@ -86,11 +83,9 @@ object LibraryGroups {
     val SERIALIZATION = LibraryGroup("androidx.serialization", LibraryVersions.SERIALIZATION)
     val SHARETARGET = LibraryGroup("androidx.sharetarget", LibraryVersions.SHARETARGET)
     val SLICE = LibraryGroup("androidx.slice", null)
-    val SLIDINGPANELAYOUT = LibraryGroup("androidx.slidingpanelayout",
-        LibraryVersions.SLIDINGPANELAYOUT)
+    val SLIDINGPANELAYOUT = LibraryGroup("androidx.slidingpanelayout", LibraryVersions.SLIDINGPANELAYOUT)
     val SQLITE = LibraryGroup("androidx.sqlite", LibraryVersions.SQLITE)
-    val SWIPEREFRESHLAYOUT = LibraryGroup("androidx.swiperefreshlayout",
-        LibraryVersions.SWIPEREFRESHLAYOUT)
+    val SWIPEREFRESHLAYOUT = LibraryGroup("androidx.swiperefreshlayout", LibraryVersions.SWIPEREFRESHLAYOUT)
     val TESTSCREENSHOT = LibraryGroup("androidx.test.screenshot", LibraryVersions.TESTSCREENSHOT)
     val TEXTCLASSIFIER = LibraryGroup("androidx.textclassifier", LibraryVersions.TEXTCLASSIFIER)
     val TRACING = LibraryGroup("androidx.tracing", LibraryVersions.TRACING)
@@ -112,6 +107,7 @@ object LibraryGroups {
         val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
         val MATERIAL = LibraryGroup("androidx.compose.material", null)
         val NAVIGATION = LibraryGroup("androidx.compose.navigation", null)
+        val PAGING = LibraryGroup("androidx.compose.paging", null)
         val RUNTIME = LibraryGroup("androidx.compose.runtime", null)
         val UI = LibraryGroup("androidx.compose.ui", null)
     }

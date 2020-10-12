@@ -58,7 +58,7 @@ fun Project.getRootOutDirectory(): File {
  * Directory to put build info files for release service dependency files.
  */
 fun Project.getBuildInfoDirectory(): File =
-        File(getDistributionDirectory(), "build-info")
+    File(getDistributionDirectory(), "build-info")
 
 /**
  * Directory for android test configuration files that get consumed by Tradefed in CI.
@@ -76,7 +76,7 @@ fun Project.getReleaseNotesDirectory(): File =
  * Directory to put host test results so they can be consumed by the testing dashboard.
  */
 fun Project.getHostTestResultDirectory(): File =
-        File(getDistributionDirectory(), "host-test-reports")
+    File(getDistributionDirectory(), "host-test-reports")
 
 /**
  * Directory to put host test coverage results so they can be consumed by the testing dashboard.

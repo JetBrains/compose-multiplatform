@@ -61,8 +61,8 @@ class GitClientImpl(
     private val workingDir: File,
     private val logger: Logger?,
     private val commandRunner: GitClient.CommandRunner = RealCommandRunner(
-            workingDir = workingDir,
-            logger = logger
+        workingDir = workingDir,
+        logger = logger
     )
 ) : GitClient {
 
@@ -77,11 +77,13 @@ class GitClientImpl(
         includeUncommitted: Boolean
     ): List<String> {
         // use this if we don't want local changes
-        return commandRunner.executeAndParse(if (includeUncommitted) {
-            "$CHANGED_FILES_CMD_PREFIX HEAD..$sha"
-        } else {
-            "$CHANGED_FILES_CMD_PREFIX $top $sha"
-        })
+        return commandRunner.executeAndParse(
+            if (includeUncommitted) {
+                "$CHANGED_FILES_CMD_PREFIX HEAD..$sha"
+            } else {
+                "$CHANGED_FILES_CMD_PREFIX $top $sha"
+            }
+        )
     }
 
     /**
@@ -89,9 +91,9 @@ class GitClientImpl(
      */
     override fun findPreviousMergeCL(): String? {
         return commandRunner.executeAndParse(PREV_MERGE_CMD)
-                .firstOrNull()
-                ?.split(" ")
-                ?.firstOrNull()
+            .firstOrNull()
+            ?.split(" ")
+            ?.firstOrNull()
     }
 
     private fun findGitDirInParentFilepath(filepath: File): File? {
@@ -126,7 +128,8 @@ class GitClientImpl(
                     commitSHADelimiter = commitSHADelimiter,
                     subjectDelimiter = subjectDelimiter,
                     authorEmailDelimiter = authorEmailDelimiter
-                ))
+                )
+            )
         }
         return commitLog.toList()
     }
@@ -154,24 +157,24 @@ class GitClientImpl(
 
         var gitLogOptions: String =
             "--pretty=format:$commitStartDelimiter%n" +
-                    "$commitSHADelimiter%H%n" +
-                    "$authorEmailDelimiter%ae%n" +
-                    "$dateDelimiter%ad%n" +
-                    "$subjectDelimiter%s%n" +
-                    "$bodyDelimiter%b" +
-                    if (!keepMerges) {
-                        " --no-merges"
-                    } else {
-                        ""
-                    }
+                "$commitSHADelimiter%H%n" +
+                "$authorEmailDelimiter%ae%n" +
+                "$dateDelimiter%ad%n" +
+                "$subjectDelimiter%s%n" +
+                "$bodyDelimiter%b" +
+                if (!keepMerges) {
+                    " --no-merges"
+                } else {
+                    ""
+                }
         var gitLogCmd: String
         if (gitCommitRange.fromExclusive != "") {
             gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions " +
-                    "${gitCommitRange.fromExclusive}..${gitCommitRange.untilInclusive}" +
-                    " -- ./$relativeProjectDir"
+                "${gitCommitRange.fromExclusive}..${gitCommitRange.untilInclusive}" +
+                " -- ./$relativeProjectDir"
         } else {
             gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions ${gitCommitRange.untilInclusive} -n " +
-                    "${gitCommitRange.n} -- ./$relativeProjectDir"
+                "${gitCommitRange.n} -- ./$relativeProjectDir"
         }
         val gitLogString: String = commandRunner.execute(gitLogCmd)
         val commits = parseCommitLogString(
@@ -184,8 +187,10 @@ class GitClientImpl(
         )
         if (commits.isEmpty()) {
             // Probably an error; log this
-            logger?.warn("No git commits found! Ran this command: '" +
-                    gitLogCmd + "' and received this output: '" + gitLogString + "'")
+            logger?.warn(
+                "No git commits found! Ran this command: '" +
+                    gitLogCmd + "' and received this output: '" + gitLogString + "'"
+            )
         }
         return commits
     }
@@ -437,8 +442,7 @@ data class Commit(
             releaseNoteDelimiters.forEach { delimiter ->
                 if (delimiter in line) {
                     // Find the starting quote of the release notes quote block
-                    var releaseNoteStartIndex: Int = gitCommit.lastIndexOf(delimiter)
-                        + delimiter.length
+                    var releaseNoteStartIndex = gitCommit.lastIndexOf(delimiter) + delimiter.length
                     releaseNoteStartIndex = gitCommit.indexOf('"', releaseNoteStartIndex)
                     // Move to the character after the first quote
                     if (gitCommit[releaseNoteStartIndex] == '"') {

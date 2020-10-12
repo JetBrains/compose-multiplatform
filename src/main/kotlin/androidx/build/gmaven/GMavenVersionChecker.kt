@@ -16,6 +16,7 @@
 
 package androidx.build.gmaven
 
+import androidx.build.AndroidXPlaygroundRootPlugin
 import androidx.build.Version
 import groovy.util.XmlSlurper
 import groovy.util.slurpersupport.Node
@@ -43,6 +44,11 @@ class GMavenVersionChecker(private val logger: Logger) {
      * @return true if the artifact is already on maven.google.com
      */
     fun isReleased(group: String, artifactName: String, version: String): Boolean {
+        // Playground projects insert SNAPSHOT_MARKER as a placeholder for unreleased ToT project
+        // dependency, so we can immediately return false here.
+        // Note: SNAPSHOT_MARKER requires a special path here because it fails Version validation
+        if (version == AndroidXPlaygroundRootPlugin.SNAPSHOT_MARKER) return false
+
         return getVersions(group, artifactName)?.contains(Version(version)) ?: false
     }
 
@@ -91,8 +97,10 @@ class GMavenVersionChecker(private val logger: Logger) {
                 logger.info("could not find version data for $group, seems like a new file")
                 return null
             } catch (ioException: IOException) {
-                logger.warn("failed to fetch the maven info, retrying in 2 seconds. " +
-                        "Run $run of $retryCount")
+                logger.warn(
+                    "failed to fetch the maven info, retrying in 2 seconds. " +
+                        "Run $run of $retryCount"
+                )
                 Thread.sleep(RETRY_DELAY)
             }
         }
@@ -108,7 +116,7 @@ class GMavenVersionChecker(private val logger: Logger) {
          * @return The URL of the XML file
          */
         private fun buildGroupUrl(group: String) =
-                "$BASE${group.replace(".","/")}/$GROUP_FILE"
+            "$BASE${group.replace(".","/")}/$GROUP_FILE"
     }
 }
 
