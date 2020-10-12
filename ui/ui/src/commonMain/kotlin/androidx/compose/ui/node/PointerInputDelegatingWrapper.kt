@@ -29,13 +29,6 @@ internal class PointerInputDelegatingWrapper(
         pointerInputModifier.pointerInputFilter.layoutCoordinates = this
     }
 
-    override var modifier: PointerInputModifier
-        get() = super.modifier
-        set(value) {
-            super.modifier = value
-            value.pointerInputFilter.layoutCoordinates = this
-        }
-
     override fun hitTest(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
