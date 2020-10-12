@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.platform.DensityAmbient
@@ -74,7 +73,7 @@ internal class ScaleSlopExceededGestureFilter(private val scaleSlop: Float) : Po
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
+    ) {
 
         val changes = pointerEvent.changes
 
@@ -107,8 +106,6 @@ internal class ScaleSlopExceededGestureFilter(private val scaleSlop: Float) : Po
             passedSlop = false
             scaleDiffTotal = 0f
         }
-
-        return changes
     }
 
     override fun onCancel() {

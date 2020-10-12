@@ -1544,22 +1544,13 @@ package androidx.compose.ui.input.pointer {
 
   @androidx.compose.ui.gesture.ExperimentalPointerInput @kotlin.coroutines.RestrictsSuspension public interface HandlePointerInputScope {
     method public suspend Object? awaitCustomEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.CustomEvent> p);
-    method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.MutablePointerEvent> p);
+    method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent> p);
   }
 
   public final class HitPathTrackerKt {
   }
 
   public final class MotionEventAdapterKt {
-  }
-
-  @androidx.compose.ui.gesture.ExperimentalPointerInput public final class MutablePointerEvent {
-    ctor public MutablePointerEvent(androidx.compose.ui.input.pointer.PointerEvent originalEvent);
-    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> getChanges();
-    method public androidx.compose.ui.unit.Uptime? getInputTime-T5nwvdw();
-    method public void setChanges(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> p);
-    property public final java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes;
-    property public final androidx.compose.ui.unit.Uptime? inputTime;
   }
 
   public final class PointerEvent {
@@ -1660,7 +1651,7 @@ package androidx.compose.ui.input.pointer {
     method public abstract void onCancel();
     method public void onCustomEvent(androidx.compose.ui.input.pointer.CustomEvent customEvent, androidx.compose.ui.input.pointer.PointerEventPass pass);
     method public void onInit(androidx.compose.ui.input.pointer.CustomEventDispatcher customEventDispatcher);
-    method public abstract java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> onPointerEvent-d1fqKvQ(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
+    method public abstract void onPointerEvent-d1fqKvQ(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
     property public final long size;
   }
 

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.inMilliseconds
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -91,14 +92,14 @@ internal class DoubleTapGestureFilter(
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
+    ) {
 
         val changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Main) {
             if (state == State.Idle && changes.all { it.changedToDown() }) {
                 state = State.Down
-                return changes
+                return
             }
 
             if (state == State.Down && changes.all { it.changedToUp() }) {
@@ -111,22 +112,21 @@ internal class DoubleTapGestureFilter(
                     delayUpDispatcher.allowUp()
                 }
 
-                return changes
+                return
             }
 
             if (state == State.Up && changes.all { it.changedToDown() }) {
                 state = State.SecondDown
                 job?.cancel()
                 delayUpDispatcher.disallowUp()
-                return changes
+                return
             }
 
             if (state == State.SecondDown && changes.all { it.changedToUp() }) {
                 state = State.Idle
                 onDoubleTap.invoke(changes[0].previous.position!!)
-                return changes.map {
+                changes.fastForEach {
                     it.consumeDownChange()
-                    it
                 }
             }
         }
@@ -144,8 +144,6 @@ internal class DoubleTapGestureFilter(
                 fullReset()
             }
         }
-
-        return changes
     }
 
     override fun onCancel() {

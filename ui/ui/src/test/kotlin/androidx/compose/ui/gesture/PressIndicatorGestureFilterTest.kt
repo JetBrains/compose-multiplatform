@@ -456,27 +456,26 @@ class PressIndicatorGestureFilterTest {
 
     @Test
     fun onPointerInput_down_downChangeConsumedDuringMain() {
-        var pointer = down(0, 0.milliseconds)
-        pointer = filter::onPointerEvent.invokeOverPasses(
+        val pointer = down(0, 0.milliseconds)
+        filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(pointer),
             PointerEventPass.Initial
-        ).changes.first()
+        )
         assertThat(pointer.consumed.downChange, `is`(false))
 
-        pointer = filter::onPointerEvent.invoke(
+        filter::onPointerEvent.invoke(
             pointerEventOf(pointer),
             PointerEventPass.Main,
             IntSize(0, 0)
-        ).first()
+        )
         assertThat(pointer.consumed.downChange, `is`(true))
     }
 
     @Test
     fun onPointerInput_disabledDown_noDownChangeConsumed() {
         filter.setEnabled(false)
-        var pointer = down(0, 0.milliseconds)
-        pointer =
-            filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer)).changes.first()
+        val pointer = down(0, 0.milliseconds)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         assertThat(pointer.consumed.downChange, `is`(false))
     }
 

@@ -21,13 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.changedToUp
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Observes various events sent by [rawScaleGestureFilter].  Implement and pass into
@@ -138,26 +136,20 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-
-        var changes = pointerEvent.changes
+    ) {
+        val changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Initial && active) {
             // If we are currently scaling, we want to prevent any children from reacting to any
             // down change.
-            changes = changes.map {
-                if (it.changedToDown() || it.changedToUp()) {
-                    it.consumeDownChange()
-                    it
-                } else {
-                    it
-                }
+            changes.fastForEach {
+                it.consumeDownChange()
             }
         }
 
         if (pass == PointerEventPass.Main) {
 
-            var (currentlyDownChanges, otherChanges) = changes.partition {
+            val currentlyDownChanges = changes.filter {
                 it.current.down && it.previous.down
             }
 
@@ -192,7 +184,6 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
                             (scalePercentageUsed - 1) / (scalePercentage - 1)
 
                         if (percentageOfChangeUsed > 0f) {
-                            val newCurrentlyDownChanges = mutableListOf<PointerInputChange>()
                             for (i in currentlyDownChanges.indices) {
 
                                 val xVectorToAverageChange =
@@ -209,24 +200,16 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
                                         i
                                     ) * percentageOfChangeUsed
 
-                                newCurrentlyDownChanges
-                                    .add(
-                                        currentlyDownChanges[i].consume(
-                                            xVectorToAverageChange,
-                                            yVectorToAverageChange
-                                        )
-                                    )
+                                currentlyDownChanges[i].consumePositionChange(
+                                    xVectorToAverageChange,
+                                    yVectorToAverageChange
+                                )
                             }
-                            currentlyDownChanges = newCurrentlyDownChanges
                         }
                     }
                 }
             }
-
-            changes = currentlyDownChanges + otherChanges
         }
-
-        return changes
     }
 
     override fun onCancel() {

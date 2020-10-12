@@ -110,7 +110,7 @@ internal class DragSlopExceededGestureFilter(
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
+    ) {
 
         val changes = pointerEvent.changes
 
@@ -194,8 +194,6 @@ internal class DragSlopExceededGestureFilter(
         }
 
         scrollOrientationLocker.onPointerInputTearDown(changes, pass)
-
-        return changes
     }
 
     override fun onCancel() {

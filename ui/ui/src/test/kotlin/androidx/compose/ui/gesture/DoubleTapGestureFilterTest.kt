@@ -576,8 +576,8 @@ class DoubleTapGestureFilterTest {
     @Test
     fun onPointerEvent_down_downNotConsumed() {
         val down = down(0, 0.milliseconds)
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        assertThat(result.changes[0].consumed.downChange).isFalse()
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
+        assertThat(down.consumed.downChange).isFalse()
     }
 
     @Test
@@ -585,8 +585,8 @@ class DoubleTapGestureFilterTest {
         val down = down(0, 0.milliseconds)
         val up = down.up(1.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
-        assertThat(result.changes[0].consumed.downChange).isFalse()
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
+        assertThat(up.consumed.downChange).isFalse()
     }
 
     @Test
@@ -598,9 +598,9 @@ class DoubleTapGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
-        assertThat(result.changes[0].consumed.downChange).isFalse()
+        assertThat(down2.consumed.downChange).isFalse()
     }
 
     @Test
@@ -614,9 +614,9 @@ class DoubleTapGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
-        assertThat(result.changes[0].consumed.downChange).isFalse()
+        assertThat(up2.consumed.downChange).isFalse()
     }
 
     @Test
@@ -630,9 +630,9 @@ class DoubleTapGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
-        val result = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up2))
 
-        assertThat(result.changes[0].consumed.downChange).isTrue()
+        assertThat(up2.consumed.downChange).isTrue()
     }
 
     // Tests that verify correct cancellation behavior

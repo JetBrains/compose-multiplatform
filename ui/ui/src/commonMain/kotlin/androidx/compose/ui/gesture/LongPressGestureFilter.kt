@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
@@ -38,6 +37,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.inMilliseconds
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -88,25 +88,20 @@ internal class LongPressGestureFilter(
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-
+    ) {
         val changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Initial) {
-            return if (state == State.Fired) {
+            if (state == State.Fired) {
                 // If we fired and have not reset, we should prevent other pointer input nodes from
                 // responding to up, so consume it early on.
-                changes.map {
+                changes.fastForEach {
                     if (it.changedToUp()) {
                         it.consumeDownChange()
-                        it
-                    } else {
-                        it
                     }
                 }
-            } else {
-                changes
             }
+            return
         }
 
         if (pass == PointerEventPass.Main) {
@@ -143,8 +138,6 @@ internal class LongPressGestureFilter(
             // If we are anything but Idle and something consumed movement, reset.
             resetToIdle()
         }
-
-        return changes
     }
 
     override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {

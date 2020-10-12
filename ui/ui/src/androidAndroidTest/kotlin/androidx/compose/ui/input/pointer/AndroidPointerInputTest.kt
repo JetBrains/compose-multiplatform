@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -554,18 +555,16 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) =
+    ) {
         if (consumeMovement) {
-            pointerEvent.changes.map {
+            pointerEvent.changes.fastForEach {
                 it.consumePositionChange(
                     it.positionChange().x,
                     it.positionChange().y
                 )
             }
-            pointerEvent.changes
-        } else {
-            pointerEvent.changes
         }
+    }
 
     override fun onCancel() {}
 }
@@ -576,13 +575,12 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = pointerEvent.changes.map {
-        if (it.changedToDown()) {
-            onDown(it.current.position!!)
-            it.consumeDownChange()
-            it
-        } else {
-            it
+    ) {
+        pointerEvent.changes.fastForEach {
+            if (it.changedToDown()) {
+                onDown(it.current.position!!)
+                it.consumeDownChange()
+            }
         }
     }
 
@@ -596,12 +594,10 @@ private class LogEventsGestureFilter(val log: MutableList<List<PointerInputChang
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-        val changes = pointerEvent.changes
+    ) {
         if (pass == PointerEventPass.Initial) {
-            log.add(changes.map { it.copy() })
+            log.add(pointerEvent.changes.map { it.copy() })
         }
-        return changes
     }
 
     override fun onCancel() {}

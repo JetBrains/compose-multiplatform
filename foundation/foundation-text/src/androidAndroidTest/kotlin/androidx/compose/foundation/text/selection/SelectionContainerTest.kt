@@ -315,9 +315,8 @@ private class GestureSpy : PointerInputModifier {
             pointerEvent: PointerEvent,
             pass: PointerEventPass,
             bounds: IntSize
-        ): List<PointerInputChange> {
+        ) {
             onPointerInput(pointerEvent, pass)
-            return pointerEvent.changes
         }
 
         override fun onCancel() {

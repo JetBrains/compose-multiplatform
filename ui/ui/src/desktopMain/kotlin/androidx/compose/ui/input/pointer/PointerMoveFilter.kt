@@ -44,7 +44,7 @@ internal class PointerMoveEventFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = pointerEvent.changes
+    ) = Unit
 
     override fun onCancel() = Unit
 }

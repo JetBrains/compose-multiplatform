@@ -62,7 +62,7 @@ abstract class PointerInputFilter {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange>
+    )
 
     /**
      * Invoked to notify the handler that no more calls to [PointerInputFilter] will be made, until
@@ -220,12 +220,6 @@ data class ConsumedData(
 enum class PointerEventPass {
     Initial, Main, Final
 }
-
-/**
- * A function used to react to and modify [PointerInputChange]s.
- */
-typealias PointerInputHandler =
-    (PointerEvent, PointerEventPass, IntSize) -> List<PointerInputChange>
 
 /**
  * The base type for all custom events.

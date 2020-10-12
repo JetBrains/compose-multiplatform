@@ -30,7 +30,6 @@ import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
@@ -178,23 +177,18 @@ internal class RawDragGestureFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
+    ) {
+        val changes = pointerEvent.changes
 
-        val originalChanges = pointerEvent.changes
-        var changesToReturn = originalChanges
-
-        scrollOrientationLocker.onPointerInputSetup(originalChanges, pass)
+        scrollOrientationLocker.onPointerInputSetup(changes, pass)
 
         if (pass == PointerEventPass.Initial) {
             if (started) {
                 // If we are have started we want to prevent any descendants from reacting to
                 // any down change.
-                changesToReturn = changesToReturn.map {
+                changes.fastForEach {
                     if (it.changedToDown()) {
                         it.consumeDownChange()
-                        it
-                    } else {
-                        it
                     }
                 }
             }
@@ -206,22 +200,22 @@ internal class RawDragGestureFilter : PointerInputFilter() {
             val applicableChanges =
                 with(orientation) {
                     if (this != null) {
-                        scrollOrientationLocker.getPointersFor(originalChanges, this)
+                        scrollOrientationLocker.getPointersFor(changes, this)
                     } else {
-                        originalChanges
+                        changes
                     }
                 }
 
             // Handle up changes, which includes removing individual pointer VelocityTrackers
             // and potentially calling onStop().
-            if (changesToReturn.fastAny { it.changedToUpIgnoreConsumed() }) {
+            if (changes.fastAny { it.changedToUpIgnoreConsumed() }) {
 
                 // TODO(b/162269614): Should be update to only have one velocity tracker that
                 //  tracks the average change overtime, instead of one for each finger.
 
                 var velocityTracker: VelocityTracker? = null
 
-                changesToReturn.fastForEach {
+                changes.fastForEach {
                     // This pointer is up (consumed or not), so we should stop tracking
                     // information about it.  If the pointer is not locked out of our
                     // orientation, get the velocity tracker because this might be a fling.
@@ -236,16 +230,15 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                     }
                 }
 
-                if (changesToReturn.all { it.changedToUpIgnoreConsumed() }) {
+                if (changes.all { it.changedToUpIgnoreConsumed() }) {
                     // All of the pointers are up, so reset and call onStop.  If we have a
                     // velocityTracker at this point, that means at least one of the up events
                     // was not consumed so we should send velocity for flinging.
                     if (started) {
                         val velocity: Offset? =
                             if (velocityTracker != null) {
-                                changesToReturn = changesToReturn.map {
+                                changes.fastForEach {
                                     it.consumeDownChange()
-                                    it
                                 }
                                 velocityTracker!!.calculateVelocity().pixelsPerSecond
                             } else {
@@ -260,8 +253,8 @@ internal class RawDragGestureFilter : PointerInputFilter() {
 
             // Handle down changes: for each new pointer that has been added, start tracking
             // information about it.
-            if (changesToReturn.fastAny { it.changedToDownIgnoreConsumed() }) {
-                changesToReturn.fastForEach {
+            if (changes.fastAny { it.changedToDownIgnoreConsumed() }) {
+                changes.fastForEach {
                     // If a pointer has changed to down, we should start tracking information
                     // about it.
                     if (it.changedToDownIgnoreConsumed()) {
@@ -279,7 +272,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
 
             // Handle moved changes.
 
-            var (movedChanges, otherChanges) = changesToReturn.partition {
+            val movedChanges = changes.filter {
                 it.current.down && !it.changedToDownIgnoreConsumed()
             }
 
@@ -350,24 +343,19 @@ internal class RawDragGestureFilter : PointerInputFilter() {
 
                     val consumed = dragObserver.onDrag(
                         Offset(
-                            totalDx / changesToReturn.size,
-                            totalDy / changesToReturn.size
+                            totalDx / changes.size,
+                            totalDy / changes.size
                         )
                     )
 
-                    movedChanges = movedChanges.map {
+                    movedChanges.fastForEach {
                         it.consumePositionChange(consumed.x, consumed.y)
-                        it
                     }
                 }
             }
-
-            changesToReturn = movedChanges + otherChanges
         }
 
-        scrollOrientationLocker.onPointerInputTearDown(originalChanges, pass)
-
-        return changesToReturn
+        scrollOrientationLocker.onPointerInputTearDown(changes, pass)
     }
 
     override fun onCancel() {
