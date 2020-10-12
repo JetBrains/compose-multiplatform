@@ -103,7 +103,7 @@ fun <T> SubcomposeLayout(
  * subcompose a content during the measuring on top of the features provided by [MeasureScope].
  */
 @ExperimentalSubcomposeLayoutApi
-abstract class SubcomposeMeasureScope<T> : MeasureScope() {
+interface SubcomposeMeasureScope<T> : MeasureScope {
     /**
      * Performs subcomposition of the provided [content] with given [slotId].
      *
@@ -115,12 +115,12 @@ abstract class SubcomposeMeasureScope<T> : MeasureScope() {
      * @param content the composable content which defines the slot. It could emit multiple
      * layouts, in this case the returned list of [Measurable]s will have multiple elements.
      */
-    abstract fun subcompose(slotId: T, content: @Composable () -> Unit): List<Measurable>
+    fun subcompose(slotId: T, content: @Composable () -> Unit): List<Measurable>
 }
 
 @OptIn(ExperimentalLayoutNodeApi::class, ExperimentalSubcomposeLayoutApi::class)
 private class SubcomposeLayoutState<T> :
-    SubcomposeMeasureScope<T>(),
+    SubcomposeMeasureScope<T>,
     CompositionLifecycleObserver {
     // Values set during the composition
     var recomposer: Recomposer? = null
@@ -134,7 +134,7 @@ private class SubcomposeLayoutState<T> :
     // Pre-allocated lambdas to update LayoutNode
     val setRoot: LayoutNode.(Unit) -> Unit = { root = this }
     val setMeasureBlock:
-        LayoutNode.(SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult) -> Unit =
+        LayoutNode.(SubcomposeMeasureScope<T>.(Constraints) -> MeasureScope.MeasureResult) -> Unit =
             { measureBlocks = createMeasureBlocks(it) }
 
     // inner state
@@ -208,7 +208,7 @@ private class SubcomposeLayoutState<T> :
     }
 
     private fun createMeasureBlocks(
-        block: SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult
+        block: SubcomposeMeasureScope<T>.(Constraints) -> MeasureScope.MeasureResult
     ): LayoutNode.MeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
         error = "Intrinsic measurements are not currently supported by SubcomposeLayout"
     ) {
@@ -216,14 +216,14 @@ private class SubcomposeLayoutState<T> :
             measureScope: MeasureScope,
             measurables: List<Measurable>,
             constraints: Constraints
-        ): MeasureResult {
+        ): MeasureScope.MeasureResult {
             this@SubcomposeLayoutState.layoutDirection = measureScope.layoutDirection
             this@SubcomposeLayoutState.density = measureScope.density
             this@SubcomposeLayoutState.fontScale = measureScope.fontScale
             currentIndex = 0
             val result = block(constraints)
             val indexAfterMeasure = currentIndex
-            return object : MeasureResult {
+            return object : MeasureScope.MeasureResult {
                 override val width: Int
                     get() = result.width
                 override val height: Int

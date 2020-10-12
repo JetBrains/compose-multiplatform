@@ -370,7 +370,8 @@ internal class DefaultIntrinsicMeasurable(
 internal class IntrinsicsMeasureScope(
     density: Density,
     override val layoutDirection: LayoutDirection
-) : MeasureScope(), Density by density
+) : MeasureScope, Density by density
+
 /**
  * Default [LayoutNode.MeasureBlocks] object implementation, providing intrinsic measurements
  * that use the measure block replacing the measure calls with intrinsic measurement calls.
