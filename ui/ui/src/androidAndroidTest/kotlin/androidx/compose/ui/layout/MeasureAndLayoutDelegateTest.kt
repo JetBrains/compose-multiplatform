@@ -87,6 +87,23 @@ class MeasureAndLayoutDelegateTest {
         }
     }
 
+    @Test
+    fun rootNodeIsPlacedWhenAttached() {
+        val root = root {}
+        createDelegate(root, firstMeasureCompleted = false)
+        val owner = root.owner!!
+
+        assertThat(root.isPlaced).isTrue()
+
+        root.detach()
+
+        assertThat(root.isPlaced).isFalse()
+
+        root.attach(owner)
+
+        assertThat(root.isPlaced).isTrue()
+    }
+
     // remeasure request:
 
     @Test

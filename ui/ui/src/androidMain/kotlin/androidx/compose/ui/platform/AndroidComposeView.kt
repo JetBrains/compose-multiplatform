@@ -229,7 +229,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
         isFocusableInTouchMode = true
         clipChildren = false
-        root.isPlaced = true
         clipboardManager.addChangeListener {
             accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
         }
@@ -301,7 +300,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
 
     private fun scheduleMeasureAndLayout(nodeToRemeasure: LayoutNode? = null) {
-        if (!isLayoutRequested) {
+        if (!isLayoutRequested && isAttachedToWindow) {
             if (wasMeasuredWithMultipleConstraints && nodeToRemeasure != null) {
                 // if nodeToRemeasure can potentially resize the root and the view was measured
                 // twice with different constraints last time it means the constraints we have could
@@ -360,8 +359,12 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
                 wasMeasuredWithMultipleConstraints = true
             }
             measureAndLayoutDelegate.updateRootConstraints(constraints)
-            measureAndLayoutDelegate.measureAndLayout()
-            setMeasuredDimension(root.width, root.height)
+            if (isAttachedToWindow) {
+                measureAndLayoutDelegate.measureAndLayout()
+                setMeasuredDimension(root.width, root.height)
+            } else {
+                setMeasuredDimension(minWidth, minHeight)
+            }
         }
     }
 
