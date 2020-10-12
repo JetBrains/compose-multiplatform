@@ -36,7 +36,7 @@ sealed class ApiTaskConfig
 data class LibraryApiTaskConfig(val library: LibraryExtension) : ApiTaskConfig()
 object JavaApiTaskConfig : ApiTaskConfig()
 
-private fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
+fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
     if (!project.state.executed) {
         throw GradleException(
             "Project ${project.name} has not been evaluated. Extension" +
