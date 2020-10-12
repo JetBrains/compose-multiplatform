@@ -305,6 +305,12 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         check(parent == null || parent.owner == owner) {
             "Attaching to a different owner($owner) than the parent's owner(${parent?.owner})"
         }
+        if (parent == null) {
+            // it is a root node and attached root nodes are always placed (as there is no parent
+            // to place them explicitly)
+            isPlaced = true
+        }
+
         this.owner = owner
         this.depth = (parent?.depth ?: -1) + 1
         if (outerSemantics != null) {
@@ -542,7 +548,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * Whether or not this LayoutNode and all of its parents have been placed in the hierarchy.
      */
     var isPlaced = false
-        internal set
+        private set
 
     /**
      * The order in which this node was placed by its parent during the previous [layoutChildren].

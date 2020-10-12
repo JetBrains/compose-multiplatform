@@ -191,6 +191,8 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out
      */
     fun measureAndLayout(): Boolean {
+        require(root.isAttached())
+        require(root.isPlaced)
         require(!duringMeasureLayout)
         // we don't need to measure any children unless we have the correct root constraints
         if (rootConstraints.isZero) {
