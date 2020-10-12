@@ -155,10 +155,7 @@ internal fun assertRelaidOut(
 
 @ExperimentalLayoutNodeApi
 internal fun root(block: LayoutNode.() -> Unit = {}): LayoutNode {
-    return node(block).apply {
-        @OptIn(ExperimentalLayoutNodeApi::class)
-        isPlaced = true
-    }
+    return node(block)
 }
 
 @ExperimentalLayoutNodeApi

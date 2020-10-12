@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
@@ -2845,6 +2846,39 @@ class AndroidLayoutDrawTest {
             measuredLatch = CountDownLatch(1)
         }
         assertTrue(measuredLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun reattachingViewKeepsRootNodePlaced() {
+        lateinit var container1: FrameLayout
+        lateinit var container2: FrameLayout
+
+        activityTestRule.runOnUiThread {
+            val activity = activityTestRule.activity
+            container1 = FrameLayout(activity)
+            container2 = FrameLayout(activity)
+            activity.setContentView(container1)
+            container1.addView(container2)
+            container2.setContent(Recomposer.current()) {
+                FixedSize(10, Modifier.drawLatchModifier())
+            }
+        }
+
+        assertTrue(drawLatch.await(10000, TimeUnit.SECONDS))
+
+        drawLatch = CountDownLatch(1)
+        activityTestRule.runOnUiThread {
+            container1.removeView(container2)
+        }
+
+        assertFalse(drawLatch.await(200, TimeUnit.MILLISECONDS))
+
+        activityTestRule.runOnUiThread {
+            container1.addView(container2)
+        }
+
+        // draw modifier will be redrawn if the root node is placed
+        assertTrue(drawLatch.await(10000, TimeUnit.SECONDS))
     }
 
     private fun composeSquares(model: SquareModel) {

@@ -94,7 +94,6 @@ class DesktopOwner(
             .then(semanticsModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
-        it.isPlaced = true
     }
 
     private val snapshotObserver = SnapshotStateObserver { command ->
