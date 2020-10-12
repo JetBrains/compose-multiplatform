@@ -20,6 +20,11 @@ import androidx.compose.runtime.Immutable
 
 /**
  * Defines an offset line that can be used by parent layouts to align and position their children.
+ * Text baselines are representative examples of [AlignmentLine]s. For example, they can be used
+ * by `Row`, to align its children by baseline, or by `relativePaddingFrom` to achieve a layout
+ * with a specific distance from the top to the baseline of the text content. [AlignmentLine]s
+ * can be understood as an abstraction over text baselines.
+ *
  * When a layout provides a value for a particular [AlignmentLine], this can be read by the
  * parents of the layout after measuring, using the [Placeable.get] operator on the corresponding
  * [Placeable] instance. Based on the position of the [AlignmentLine], the parents can then decide
@@ -60,17 +65,29 @@ sealed class AlignmentLine(
 /**
  * Merges two values of the current [alignment line][AlignmentLine].
  */
-fun AlignmentLine.merge(position1: Int, position2: Int) = merger(position1, position2)
+internal fun AlignmentLine.merge(position1: Int, position2: Int) = merger(position1, position2)
 
 /**
- * A vertical [AlignmentLine].
+ * A vertical [AlignmentLine]. Defines a vertical offset line that can be used by parent layouts
+ * usually to align or position their children horizontally. The positions of the alignment lines
+ * will be automatically inherited by parent layouts from their content, and the [merger] will
+ * be used to merge multiple line positions when more than one child provides a specific
+ * [AlignmentLine]. See [AlignmentLine] for more details.
  *
  * @param merger How to merge two alignment line values defined by different children
  */
 class VerticalAlignmentLine(merger: (Int, Int) -> Int) : AlignmentLine(merger)
 
 /**
- * A horizontal [AlignmentLine].
+ * A horizontal [AlignmentLine]. Defines an horizontal offset line that can be used by parent
+ * layouts usually to align or position their children vertically. Text baselines (`FirstBaseline`
+ * and `LastBaseline`) are representative examples of [HorizontalAlignmentLine]s. For example,
+ * they can be used by `Row`, to align its children by baseline, or by `relativePaddingFrom` to
+ * achieve a layout with a specific from the top to the baseline of the text content.
+ * The positions of the alignment lines will be automatically inherited by parent layouts from
+ * their content, and the [merger] will be used to merge multiple line positions when more
+ * than one child provides a specific [HorizontalAlignmentLine]. See [AlignmentLine]
+ * for more details.
  *
  * @param merger How to merge two alignment line values defined by different children
  */
