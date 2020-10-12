@@ -86,7 +86,6 @@ package androidx.compose.ui {
   }
 
   public final class AlignmentLineKt {
-    method public static int merge(androidx.compose.ui.AlignmentLine, int position1, int position2);
   }
 
   public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
