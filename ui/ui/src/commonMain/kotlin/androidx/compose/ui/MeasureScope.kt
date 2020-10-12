@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.Constraints
  * The receiver scope of a layout's measure lambda. The return value of the
  * measure lambda is [MeasureResult], which should be returned by [layout]
  */
-abstract class MeasureScope : IntrinsicMeasureScope() {
+interface MeasureScope : IntrinsicMeasureScope {
     /**
      * Interface holding the size and alignment lines of the measured layout, as well as the
      * children positioning logic.
@@ -55,11 +55,10 @@ abstract class MeasureScope : IntrinsicMeasureScope() {
      * @param alignmentLines the alignment lines defined by the layout
      * @param placementBlock block defining the children positioning of the current layout
      */
-    /*inline*/ fun layout(
+    fun layout(
         width: Int,
         height: Int,
         alignmentLines: Map<AlignmentLine, Int> = emptyMap(),
-        /*crossinline*/
         placementBlock: Placeable.PlacementScope.() -> Unit
     ) = object : MeasureResult {
         override val width = width
