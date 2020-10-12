@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.checkapi.shouldConfigureApiTasks
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -178,6 +179,13 @@ open class AndroidXExtension(val project: Project) {
             if (!publish.shouldRelease()) return false
             return field
         }
+
+    var legacyDisableKotlinStrictApiMode = false
+
+    fun shouldEnforceKotlinStrictApiMode(): Boolean {
+        return !legacyDisableKotlinStrictApiMode &&
+            shouldConfigureApiTasks()
+    }
 
     fun license(closure: Closure<*>): License {
         val license = project.configure(License(), closure) as License
