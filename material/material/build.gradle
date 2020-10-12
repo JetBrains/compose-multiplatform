@@ -93,6 +93,7 @@ androidx {
     mavenGroup = LibraryGroups.Compose.MATERIAL
     inceptionYear = "2018"
     description = "Compose Material Design Components library"
+    legacyDisableKotlinStrictApiMode = true
 }
 
 tasks.withType(KotlinCompile).configureEach {

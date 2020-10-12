@@ -49,13 +49,13 @@ import kotlinx.coroutines.flow.collect
  * @param flow the [Flow] object which contains a stream of [PagingData] elements.
  * @param T the type of value used by [PagingData].
  */
-class LazyPagingItems<T : Any> internal constructor(
+public class LazyPagingItems<T : Any> internal constructor(
     private val flow: Flow<PagingData<T>>
 ) {
     /**
      * The number of items which can be accessed.
      */
-    val itemCount: Int
+    public val itemCount: Int
         get() = pagingDataDiffer.size
 
     private val mainDispatcher = Dispatchers.Main
@@ -104,14 +104,16 @@ class LazyPagingItems<T : Any> internal constructor(
      * @return the item specified at [index] or null if the [index] is not between correct
      * bounds or the item is a placeholder.
      */
-    operator fun get(index: Int): T? {
+    public operator fun get(index: Int): T? {
         return pagingDataDiffer[index]
     }
 
     /**
      * A [CombinedLoadStates] object which represents the current loading state.
      */
-    var loadState by mutableStateOf(CombinedLoadStates(InitialLoadStates))
+    public var loadState: CombinedLoadStates by mutableStateOf(
+        CombinedLoadStates(InitialLoadStates)
+    )
         private set
 
     internal suspend fun collectLoadState() {
@@ -142,7 +144,7 @@ private val InitialLoadStates = LoadStates(
  * @sample androidx.compose.paging.samples.PagingBackendSample
  */
 @Composable
-fun <T : Any> Flow<PagingData<T>>.collectAsLazyPagingItems(): LazyPagingItems<T> {
+public fun <T : Any> Flow<PagingData<T>>.collectAsLazyPagingItems(): LazyPagingItems<T> {
     val lazyPagingItems = remember(this) { LazyPagingItems(this) }
 
     LaunchedTask(lazyPagingItems) {
@@ -168,7 +170,7 @@ fun <T : Any> Flow<PagingData<T>>.collectAsLazyPagingItems(): LazyPagingItems<T>
  * [itemContent] method should handle the logic of displaying a placeholder instead of the main
  * content displayed by an item which is not `null`.
  */
-fun <T : Any> LazyListScope.items(
+public fun <T : Any> LazyListScope.items(
     lazyPagingItems: LazyPagingItems<T>,
     itemContent: @Composable LazyItemScope.(value: T?) -> Unit
 ) {
@@ -196,7 +198,7 @@ fun <T : Any> LazyListScope.items(
  * [itemContent] method should handle the logic of displaying a placeholder instead of the main
  * content displayed by an item which is not `null`.
  */
-fun <T : Any> LazyListScope.itemsIndexed(
+public fun <T : Any> LazyListScope.itemsIndexed(
     lazyPagingItems: LazyPagingItems<T>,
     itemContent: @Composable LazyItemScope.(index: Int, value: T?) -> Unit
 ) {

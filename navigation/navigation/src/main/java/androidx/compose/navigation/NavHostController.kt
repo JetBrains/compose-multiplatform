@@ -42,7 +42,7 @@ import androidx.navigation.navigation
  * @return a mutable state of the current back stack entry
  */
 @Composable
-fun NavController.currentBackStackEntryAsState(): State<NavBackStackEntry?> {
+public fun NavController.currentBackStackEntryAsState(): State<NavBackStackEntry?> {
     val currentNavBackStackEntry = remember { mutableStateOf(currentBackStackEntry) }
     // setup the onDestinationChangedListener responsible for detecting when the
     // current back stack entry changes
@@ -65,7 +65,7 @@ fun NavController.currentBackStackEntryAsState(): State<NavBackStackEntry?> {
  * @see NavHost
  */
 @Composable
-fun rememberNavController(): NavHostController {
+public fun rememberNavController(): NavHostController {
     val context = ContextAmbient.current
     return rememberSavedInstanceState(saver = NavControllerSaver(context)) {
         createNavController(context)
@@ -92,7 +92,7 @@ private fun NavControllerSaver(
  *
  * @param destinationId a id to navigate to
  */
-fun NavHostController.navigate(destinationId: Any) {
+public fun NavHostController.navigate(destinationId: Any) {
     navigate(generateId(destinationId))
 }
 

@@ -29,7 +29,7 @@ import androidx.navigation.Navigator
  * [composable].
  */
 @Navigator.Name("composable")
-class ComposeNavigator : Navigator<ComposeNavigator.Destination>() {
+public class ComposeNavigator : Navigator<ComposeNavigator.Destination>() {
 
     override fun navigate(
         destination: Destination,
@@ -56,7 +56,7 @@ class ComposeNavigator : Navigator<ComposeNavigator.Destination>() {
      * NavDestination specific to [ComposeNavigator]
      */
     @NavDestination.ClassType(Composable::class)
-    class Destination(
+    public class Destination(
         navigator: ComposeNavigator,
         internal val content: @Composable () -> Unit
     ) : NavDestination(navigator)

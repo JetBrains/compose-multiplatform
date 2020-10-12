@@ -51,6 +51,7 @@ androidx {
     inceptionYear = "2020"
     description = "Compose integration with Paging"
     runApiTasks = new RunApiTasks.Yes()
+    legacyDisableKotlinStrictApiMode = true
 }
 
 tasks.withType(KotlinCompile).configureEach {
