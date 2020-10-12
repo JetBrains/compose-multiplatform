@@ -66,6 +66,7 @@ androidx {
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Internal Compose utilities used by other modules"
+    legacyDisableKotlinStrictApiMode = true
 }
 
 tasks.withType(KotlinCompile).configureEach {

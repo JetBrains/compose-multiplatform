@@ -26,7 +26,7 @@ import androidx.navigation.get
  * @param id id for the destination
  * @param content composable for the destination
  */
-fun NavGraphBuilder.composable(id: Any, content: @Composable () -> Unit) {
+public fun NavGraphBuilder.composable(id: Any, content: @Composable () -> Unit) {
     addDestination(
         ComposeNavigator.Destination(provider[ComposeNavigator::class], content).apply {
             setId(generateId(id))

@@ -80,6 +80,7 @@ androidx {
     mavenGroup = LibraryGroups.Compose.FOUNDATION
     inceptionYear = "2019"
     description = "Compose layout implementations"
+    legacyDisableKotlinStrictApiMode = true
 }
 
 tasks.withType(KotlinCompile).configureEach {

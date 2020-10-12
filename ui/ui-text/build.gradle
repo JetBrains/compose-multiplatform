@@ -98,6 +98,7 @@ androidx {
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2019"
     description = "Compose Text primitives and utilities"
+    legacyDisableKotlinStrictApiMode = true
 }
 
 tasks.withType(KotlinCompile).configureEach {

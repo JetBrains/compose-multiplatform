@@ -92,6 +92,7 @@ androidx {
     mavenGroup = LibraryGroups.Compose.FOUNDATION
     inceptionYear = "2020"
     description = "Compose Text higher level APIs"
+    legacyDisableKotlinStrictApiMode = true
 }
 
 tasks.withType(KotlinCompile).configureEach {
