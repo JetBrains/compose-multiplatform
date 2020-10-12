@@ -22,7 +22,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.relativePaddingFrom
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.foundation.text.LastBaseline
 import androidx.compose.runtime.Composable
@@ -275,9 +275,7 @@ private fun NewLineButtonSnackbar(
             )
     ) {
         Box(
-            Modifier
-                .relativePaddingFrom(LastBaseline, after = LongButtonVerticalOffset)
-                .relativePaddingFrom(FirstBaseline, before = HeightToFirstLine)
+            Modifier.paddingFromBaseline(HeightToFirstLine, LongButtonVerticalOffset)
                 .padding(end = HorizontalSpacingButtonSide)
         ) { text() }
         Box(Modifier.align(Alignment.End)) { action() }
