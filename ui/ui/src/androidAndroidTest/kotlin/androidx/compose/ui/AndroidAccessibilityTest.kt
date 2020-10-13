@@ -56,7 +56,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.os.BuildCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.ui.test.SemanticsMatcher
@@ -91,7 +91,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@MediumTest
+@LargeTest
 @RunWith(JUnit4::class)
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -275,7 +275,7 @@ class AndroidAccessibilityTest {
             textFieldSelectionOneLatch = CountDownLatch(1)
             provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument)
         }
-        if (!textFieldSelectionOneLatch.await(1, TimeUnit.SECONDS)) {
+        if (!textFieldSelectionOneLatch.await(5, TimeUnit.SECONDS)) {
             throw AssertionError("Failed to wait for text selection change.")
         }
         rule.onNodeWithTag(TextFieldTag)
@@ -302,7 +302,7 @@ class AndroidAccessibilityTest {
                 argument
             )
         }
-        if (!textFieldSelectionZeroLatch.await(1, TimeUnit.SECONDS)) {
+        if (!textFieldSelectionZeroLatch.await(5, TimeUnit.SECONDS)) {
             throw AssertionError("Failed to wait for text selection change.")
         }
         rule.onNodeWithTag(TextFieldTag)
