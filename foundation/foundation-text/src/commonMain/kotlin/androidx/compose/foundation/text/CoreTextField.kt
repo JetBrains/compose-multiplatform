@@ -37,7 +37,6 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
@@ -96,9 +95,9 @@ import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.annotation.VisibleForTesting
-import androidx.compose.ui.unit.Density
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -145,6 +144,8 @@ import kotlin.math.roundToInt
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
+ * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
+ * text will be positioned as if there was unlimited horizontal space.
  */
 @Composable
 @OptIn(
@@ -162,7 +163,8 @@ fun CoreTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    cursorColor: Color = Color.Unspecified
+    cursorColor: Color = Color.Unspecified,
+    softWrap: Boolean = true
 ) {
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
@@ -186,6 +188,7 @@ fun CoreTextField(
             TextDelegate(
                 text = visualText,
                 style = textStyle,
+                softWrap = softWrap,
                 density = density,
                 resourceLoader = resourceLoader
             )
@@ -194,6 +197,7 @@ fun CoreTextField(
     state.update(
         visualText,
         textStyle,
+        softWrap,
         density,
         resourceLoader,
         onValueChange,
@@ -537,6 +541,7 @@ internal class TextFieldState(
     fun update(
         visualText: AnnotatedString,
         textStyle: TextStyle,
+        softWrap: Boolean,
         density: Density,
         resourceLoader: Font.ResourceLoader,
         onValueChange: (TextFieldValue) -> Unit,
@@ -549,6 +554,7 @@ internal class TextFieldState(
             current = textDelegate,
             text = visualText,
             style = textStyle,
+            softWrap = softWrap,
             density = density,
             resourceLoader = resourceLoader,
             placeholders = emptyList()
