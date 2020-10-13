@@ -36,6 +36,7 @@ import androidx.build.checkapi.LibraryApiTaskConfig
 import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.studio.StudioTask
 import com.android.build.api.artifact.ArtifactType
+import com.android.build.api.artifact.Artifacts
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.AppExtension
@@ -269,13 +270,67 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
-        libraryExtension.onVariants.withBuildType("release") {
-            // Disable unit test for release build type
-            unitTest {
-                @Suppress("UnstableApiUsage")
-                enabled = false
-            }
+
+        try {
+            val libraryAndroidComponentsExtensionType =
+                Class.forName("com.android.build.api.extension.LibraryAndroidComponentsExtension")
+            val androidComponentsExtension =
+                project.extensions.getByType(libraryAndroidComponentsExtensionType)
+            val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
+            val selector = libraryAndroidComponentsExtensionType.getMethod("selector")
+                .invoke(androidComponentsExtension)
+            libraryAndroidComponentsExtensionType
+                .getMethod("beforeUnitTest", selectorType, Function1::class.java)
+                .invoke(
+                    androidComponentsExtension,
+                    selectorType.getMethod("withBuildType", String::class.java)
+                        .invoke(selector, "release"),
+                    { unitTest: Any ->
+                        unitTest.javaClass.getMethod("setEnabled", Boolean::class.java)
+                            .invoke(unitTest, false)
+                    }
+                )
+        } catch (cnfe: ClassNotFoundException) {
+            // old iteration of the new API.
+            val allVariants = libraryExtension.javaClass.getMethod("getOnVariants")
+                .invoke(libraryExtension)
+
+            allVariants.javaClass.getMethod(
+                "withBuildType",
+                String::class.java,
+                Function1::class.java
+            ).invoke(
+                allVariants,
+                "release",
+                { variant: Any ->
+                    variant.javaClass.getMethod(
+                        "unitTest",
+                        Function1::class.java
+                    ).invoke(
+                        variant,
+                        { unitTest: Any ->
+                            unitTest.javaClass.getMethod(
+                                "setEnabled",
+                                Boolean::class.java
+                            ).invoke(
+                                unitTest,
+                                false
+                            )
+                        }
+                    )
+                }
+            )
         }
+
+        // switch to this code once 4.2.0-beta1 can be used.
+
+        // project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
+        //   beforeUnitTest(selector().withBuildType("release")) {
+        //     // Disable unit test for release build type
+        //     @Suppress("UnstableApiUsage")
+        //     enabled = false
+        //   }
+        // }
         libraryExtension.packagingOptions {
             // TODO: Replace this with a per-variant packagingOption for androidTest specifically
             //  once b/69953968 is resolved.
@@ -486,7 +541,40 @@ class AndroidXPlugin : Plugin<Project> {
 
         val commonExtension = project.extensions.getByType(CommonExtension::class.java)
         if (hasAndroidTestSourceCode(project, this)) {
-            commonExtension.configureTestConfigGeneration(project)
+            try {
+                val androidComponentsExtensionType =
+                    Class.forName("com.android.build.api.extension.AndroidComponentsExtension")
+                val androidComponentsExtension =
+                    project.extensions.getByType(androidComponentsExtensionType)
+                val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
+                val selector = androidComponentsExtensionType.getMethod("selector")
+                    .invoke(androidComponentsExtension)
+                androidComponentsExtension.javaClass.getMethod(
+                    "androidTest",
+                    selectorType,
+                    Function1::class.java
+                ).invoke(
+                    androidComponentsExtension,
+                    selector.javaClass.getMethod("all").invoke(selector),
+                    { androidTest: Any ->
+                        createTestConfigurationGenerationTask(
+                            project,
+                            androidTest.javaClass.getMethod(
+                                "getName"
+                            ).invoke(
+                                androidTest
+                            ) as String,
+                            androidTest.javaClass.getMethod(
+                                "getArtifacts"
+                            ).invoke(
+                                androidTest
+                            ) as Artifacts
+                        )
+                    }
+                )
+            } catch (cnfe: ClassNotFoundException) {
+                commonExtension.configureTestConfigGeneration(project)
+            }
         }
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
@@ -500,36 +588,72 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun CommonExtension<*, *, *, *, *, *, *, *>
     .configureTestConfigGeneration(project: Project) {
-        onVariants {
-            val variant = this
-            androidTestProperties {
-                val generateTestConfigurationTask = project.tasks.register(
-                    "${project.name}${GENERATE_TEST_CONFIGURATION_TASK}${variant.name}",
-                    GenerateTestConfigurationTask::class.java
-                ) {
-                    it.testFolder.set(artifacts.get(ArtifactType.APK))
-                    it.testLoader.set(artifacts.getBuiltArtifactsLoader())
-                    it.outputXml.fileValue(
-                        File(
-                            project.getTestConfigDirectory(),
-                            "${project.asFilenamePrefix()}${variant.name}AndroidTest.xml"
-                        )
+        // old iteration of the new API.
+        javaClass.getMethod("onVariants", Function1::class.java)
+            .invoke(
+                this,
+                { variant: Any ->
+                    variant.javaClass.getMethod(
+                        "androidTestProperties",
+                        Function1::class.java
+                    ).invoke(
+                        variant,
+                        { androidTest: Any ->
+                            createTestConfigurationGenerationTask(
+                                project,
+                                androidTest.javaClass.getMethod(
+                                    "getName"
+                                ).invoke(androidTest) as String,
+                                androidTest.javaClass.getMethod(
+                                    "getArtifacts"
+                                ).invoke(androidTest) as Artifacts
+                            )
+                        }
                     )
-                }
-                project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
-                    .dependsOn(generateTestConfigurationTask)
-            }
+                } as Function1<Any, Any>
+            )
+    }
+
+    private fun createTestConfigurationGenerationTask(
+        project: Project,
+        variantName: String,
+        artifacts: Artifacts
+    ) {
+        val generateTestConfigurationTask = project.tasks.register(
+            "${project.name}${GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+            GenerateTestConfigurationTask::class.java
+        ) {
+            it.testFolder.set(artifacts.get(ArtifactType.APK))
+            it.testLoader.set(artifacts.getBuiltArtifactsLoader())
+            it.outputXml.fileValue(
+                File(
+                    project.getTestConfigDirectory(),
+                    "${project.asFilenamePrefix()}${variantName}AndroidTest.xml"
+                )
+            )
         }
+        project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+            .dependsOn(generateTestConfigurationTask)
     }
 
     private fun ApplicationExtension<*, *, *, *, *>
     .addAppApkToTestConfigGeneration(project: Project) {
-        onVariantProperties.withBuildType("debug") {
-            project.tasks.withType(GenerateTestConfigurationTask::class.java) {
-                it.appFolder.set(artifacts.get(ArtifactType.APK))
-                it.appLoader.set(artifacts.getBuiltArtifactsLoader())
-            }
-        }
+        val allVariants = javaClass.getMethod("getOnVariantProperties")
+            .invoke(this)
+
+        allVariants.javaClass.getMethod("withBuildType", String::class.java, Function1::class.java)
+            .invoke(
+                allVariants,
+                "debug",
+                { debugVariant: Any ->
+                    val artifacts = debugVariant.javaClass.getMethod("getArtifacts")
+                        .invoke(debugVariant) as Artifacts
+                    project.tasks.withType(GenerateTestConfigurationTask::class.java) {
+                        it.appFolder.set(artifacts.get(ArtifactType.APK))
+                        it.appLoader.set(artifacts.getBuiltArtifactsLoader())
+                    }
+                }
+            )
     }
 
     private fun hasAndroidTestSourceCode(project: Project, extension: TestedExtension): Boolean {
@@ -664,8 +788,38 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        val applicationExtension = project.extensions.getByType(ApplicationExtension::class.java)
-        applicationExtension.addAppApkToTestConfigGeneration(project)
+        try {
+            val androidComponentsExtensionType = Class.forName(
+                "com.android.build.api.extension.ApplicationAndroidComponentsExtension"
+            )
+            val androidComponentsExtension =
+                project.extensions.getByType(androidComponentsExtensionType)
+            val selectorType = Class.forName(
+                "com.android.build.api.extension.VariantSelector"
+            )
+            val selector = androidComponentsExtensionType.getMethod("selector")
+                .invoke(androidComponentsExtension)
+            androidComponentsExtensionType
+                .getMethod("onVariants", selectorType, Function1::class.java)
+                .invoke(
+                    androidComponentsExtension,
+                    selectorType.getMethod("withBuildType", String::class.java)
+                        .invoke(selector, "debug"),
+                    { debugVariant: Any ->
+                        val artifacts = debugVariant.javaClass.getMethod("getArtifacts")
+                            .invoke(debugVariant) as Artifacts
+                        project.tasks.withType(GenerateTestConfigurationTask::class.java) {
+                            it.appFolder.set(artifacts.get(ArtifactType.APK))
+                            it.appLoader.set(artifacts.getBuiltArtifactsLoader())
+                        }
+                    }
+                )
+        } catch (cnfe: ClassNotFoundException) {
+            val applicationExtension = project.extensions.getByType(
+                ApplicationExtension::class.java
+            )
+            applicationExtension.addAppApkToTestConfigGeneration(project)
+        }
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
