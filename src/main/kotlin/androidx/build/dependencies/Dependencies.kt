@@ -94,11 +94,11 @@ const val PLAY_CORE = "com.google.android.play:core:1.8.0"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.2.9"
 const val RX_JAVA3 = "io.reactivex.rxjava3:rxjava:3.0.0"
-const val SKIKO_VERSION = "0.1.7"
-const val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
-const val SKIKO_LINUX = "org.jetbrains.skiko:skiko-jvm-runtime-linux:$SKIKO_VERSION"
-const val SKIKO_MACOS = "org.jetbrains.skiko:skiko-jvm-runtime-macos:$SKIKO_VERSION"
-const val SKIKO_WINDOWS = "org.jetbrains.skiko:skiko-jvm-runtime-windows:$SKIKO_VERSION"
+val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.1.9"
+val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
+val SKIKO_LINUX = "org.jetbrains.skiko:skiko-jvm-runtime-linux:$SKIKO_VERSION"
+val SKIKO_MACOS = "org.jetbrains.skiko:skiko-jvm-runtime-macos:$SKIKO_VERSION"
+val SKIKO_WINDOWS = "org.jetbrains.skiko:skiko-jvm-runtime-windows:$SKIKO_VERSION"
 val SKIKO_CURRENT_OS by lazy {
     val os = System.getProperty("os.name")
     when {
