@@ -174,15 +174,10 @@ object Release {
         }
         val version = project.version
 
-        var zipTasks: MutableList<TaskProvider<GMavenZipTask>> = mutableListOf()
-        if (!extension.mavenGroup!!.requireSameVersion) {
-            zipTasks.add(getProjectZipTask(project))
-        }
-        zipTasks.addAll(
-            listOf(
-                getGroupReleaseZipTask(project, mavenGroup),
-                getGlobalFullZipTask(project)
-            )
+        var zipTasks = listOf(
+            getProjectZipTask(project),
+            getGroupReleaseZipTask(project, mavenGroup),
+            getGlobalFullZipTask(project)
         )
         val artifact = Artifact(
             mavenGroup = mavenGroup,
