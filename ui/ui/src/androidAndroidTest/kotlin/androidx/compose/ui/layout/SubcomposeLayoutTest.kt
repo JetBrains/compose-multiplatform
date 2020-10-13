@@ -528,7 +528,7 @@ class SubcomposeLayoutTest {
             }
         }
 
-        assertTrue(stateUsedLatch.await(1, TimeUnit.SECONDS))
+        assertTrue("state was used in setup", stateUsedLatch.await(1, TimeUnit.SECONDS))
 
         stateUsedLatch = CountDownLatch(1)
         scenario.onActivity {
@@ -544,7 +544,10 @@ class SubcomposeLayoutTest {
             container1.addView(container2)
         }
 
-        assertTrue(stateUsedLatch.await(1, TimeUnit.SECONDS))
+        assertTrue(
+            "state was used after reattaching view",
+            stateUsedLatch.await(1, TimeUnit.SECONDS)
+        )
     }
 }
 

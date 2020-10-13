@@ -104,7 +104,7 @@ package androidx.compose.runtime {
   }
 
   public final class Composer<N> {
-    ctor public Composer(androidx.compose.runtime.SlotTable slotTable, @androidx.compose.runtime.ComposeCompilerApi androidx.compose.runtime.Applier<N> applier, @androidx.compose.runtime.ExperimentalComposeApi androidx.compose.runtime.Recomposer recomposer);
+    ctor public Composer(androidx.compose.runtime.SlotTable slotTable, @androidx.compose.runtime.ComposeCompilerApi androidx.compose.runtime.Applier<N> applier, internal androidx.compose.runtime.CompositionReference parentReference);
     method @androidx.compose.runtime.InternalComposeApi public void applyChanges();
     method @androidx.compose.runtime.ComposeCompilerApi public inline <T> T! cache(boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(Object? value);
@@ -129,7 +129,6 @@ package androidx.compose.runtime {
     method public int getCurrentCompoundKeyHash();
     method public boolean getDefaultsInvalid();
     method public boolean getInserting();
-    method public androidx.compose.runtime.Recomposer getRecomposer();
     method public boolean getSkipping();
     method public androidx.compose.runtime.SlotTable getSlotTable();
     method @androidx.compose.runtime.ComposeCompilerApi public Object joinKey(Object? left, Object? right);
@@ -153,7 +152,6 @@ package androidx.compose.runtime {
     property public final int currentCompoundKeyHash;
     property public final boolean defaultsInvalid;
     property public final boolean inserting;
-    property public final androidx.compose.runtime.Recomposer recomposer;
     property public final boolean skipping;
     property public final androidx.compose.runtime.SlotTable slotTable;
   }
@@ -168,10 +166,6 @@ package androidx.compose.runtime {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  @Deprecated public interface CompositionCoroutineScope extends kotlinx.coroutines.CoroutineScope {
-    method @Deprecated public default suspend Object? awaitFrame(kotlin.coroutines.Continuation<? super java.lang.Long> p);
-  }
-
   @Deprecated public interface CompositionFrameClock extends androidx.compose.runtime.dispatch.MonotonicFrameClock {
     method @Deprecated public default suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
   }
@@ -184,7 +178,7 @@ package androidx.compose.runtime {
   }
 
   public final class CompositionKt {
-    method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition compositionFor(Object key, androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.Recomposer recomposer, optional androidx.compose.runtime.CompositionReference? parent, optional kotlin.jvm.functions.Function0<kotlin.Unit> onCreated);
+    method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition compositionFor(Object key, androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent, optional kotlin.jvm.functions.Function0<kotlin.Unit> onCreated);
   }
 
   public interface CompositionLifecycleObserver {
@@ -193,6 +187,9 @@ package androidx.compose.runtime {
   }
 
   public abstract class CompositionReference {
+  }
+
+  public final class CompositionReferenceKt {
   }
 
   public final class DerivedStateKt {
@@ -352,18 +349,24 @@ package androidx.compose.runtime {
     property public final T! value;
   }
 
-  public final class Recomposer {
+  public final class Recomposer extends androidx.compose.runtime.CompositionReference {
     ctor public Recomposer(androidx.compose.runtime.EmbeddingContext embeddingContext);
     ctor public Recomposer();
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public void composeInitial$metalava_module(androidx.compose.runtime.Composer<?> composer, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public kotlin.coroutines.CoroutineContext? getApplyingCoroutineContext$metalava_module();
+    method public boolean getCollectingKeySources$metalava_module();
+    method public int getCompoundHashKey$metalava_module();
     method public androidx.compose.runtime.EmbeddingContext getEmbeddingContext();
-    method public androidx.compose.runtime.dispatch.MonotonicFrameClock getFrameClock();
     method public boolean hasInvalidations();
+    method public void invalidate$metalava_module(androidx.compose.runtime.Composer<?> composer);
     method public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public void recordInspectionTable$metalava_module(java.util.Set<androidx.compose.runtime.SlotTable> table);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
-    method public void setEmbeddingContext(androidx.compose.runtime.EmbeddingContext p);
+    property public kotlin.coroutines.CoroutineContext? applyingCoroutineContext;
+    property public boolean collectingKeySources;
+    property public int compoundHashKey;
     property public final androidx.compose.runtime.EmbeddingContext embeddingContext;
-    property public final androidx.compose.runtime.dispatch.MonotonicFrameClock frameClock;
     field public static final androidx.compose.runtime.Recomposer.Companion Companion;
   }
 
@@ -565,12 +568,6 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @androidx.compose.runtime.Composable public static void LaunchedTask(Object![]? keys, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated public static suspend Object? awaitDispose(androidx.compose.runtime.CompositionCoroutineScope, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDispose, optional kotlin.coroutines.Continuation<?> p);
-    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object? key, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void launchInComposition(Object![]? keys, kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @androidx.compose.runtime.Composable public static inline kotlinx.coroutines.CoroutineScope rememberCoroutineScope(optional kotlin.jvm.functions.Function0<? extends kotlin.coroutines.CoroutineContext> getContext);
   }
 

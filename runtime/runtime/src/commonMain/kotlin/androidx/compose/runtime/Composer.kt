@@ -23,6 +23,7 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.SlotTable.Companion.EMPTY
 import androidx.compose.runtime.tooling.InspectionTables
+import kotlin.coroutines.CoroutineContext
 
 internal typealias Change<N> = (
     applier: Applier<N>,
@@ -316,10 +317,9 @@ class Composer<N>(
     val applier: Applier<N>,
 
     /**
-     * Manager for scheduling recompositions.
+     * Parent of this composition; a [Recomposer] for root-level compositions.
      */
-    @ExperimentalComposeApi
-    val recomposer: Recomposer
+    internal val parentReference: CompositionReference
 ) {
     init {
         FrameManager.ensureStarted()
@@ -352,7 +352,6 @@ class Composer<N>(
 
     private val invalidateStack = Stack<RecomposeScope>()
 
-    internal var parentReference: CompositionReference? = null
     internal var isComposing = false
         private set
     internal var isDisposed = false
@@ -499,18 +498,18 @@ class Composer<N>(
     private fun startRoot() {
         reader = slotTable.openReader()
         startGroup(rootKey)
-        parentReference?.let { parentRef ->
-            parentRef.startComposing()
-            parentProvider = parentRef.getAmbientScope()
-            providersInvalidStack.push(providersInvalid.asInt())
-            providersInvalid = changed(parentProvider)
-            collectKeySources = parentRef.collectingKeySources
-            resolveAmbient(InspectionTables, parentProvider)?.let {
-                it.add(slotTable)
-                parentRef.recordInspectionTable(it)
-            }
-            startGroup(parentRef.compoundHashKey)
+
+        // parent reference management
+        parentReference.startComposing()
+        parentProvider = parentReference.getAmbientScope()
+        providersInvalidStack.push(providersInvalid.asInt())
+        providersInvalid = changed(parentProvider)
+        collectKeySources = parentReference.collectingKeySources
+        resolveAmbient(InspectionTables, parentProvider)?.let {
+            it.add(slotTable)
+            parentReference.recordInspectionTable(it)
         }
+        startGroup(parentReference.compoundHashKey)
     }
 
     /**
@@ -518,10 +517,9 @@ class Composer<N>(
      * the composition.
      */
     private fun endRoot() {
-        parentReference?.let { parentRef ->
-            endGroup()
-            parentRef.doneComposing()
-        }
+        endGroup()
+        parentReference.doneComposing()
+
         endGroup()
         recordEndRoot()
         finalizeCompose()
@@ -757,7 +755,7 @@ class Composer<N>(
 
     internal fun dispose() {
         trace("Compose:Composer.dispose") {
-            parentReference?.unregisterComposer(this)
+            parentReference.unregisterComposer(this)
             invalidateStack.clear()
             invalidations.clear()
             changes.clear()
@@ -1219,17 +1217,8 @@ class Composer<N>(
         return ref.ref
     }
 
-    private fun <T> resolveAmbient(key: Ambient<T>, scope: AmbientMap): T {
-        if (scope.contains(key)) return scope.getValueOf(key)
-
-        val ref = parentReference
-
-        if (ref != null) {
-            return ref.getAmbient(key)
-        }
-
-        return key.defaultValueHolder.value
-    }
+    private fun <T> resolveAmbient(key: Ambient<T>, scope: AmbientMap): T =
+        if (scope.contains(key)) scope.getValueOf(key) else parentReference.getAmbient(key)
 
     internal fun <T> parentAmbient(key: Ambient<T>): T = resolveAmbient(key, currentAmbientScope())
 
@@ -1772,11 +1761,7 @@ class Composer<N>(
             // composition.
             return InvalidationResult.IMMINENT
         }
-        if (parentReference != null) {
-            parentReference?.invalidate()
-        } else {
-            recomposer.scheduleRecompose(this)
-        }
+        parentReference.invalidate(this)
         return if (isComposing) InvalidationResult.DEFERRED else InvalidationResult.SCHEDULED
     }
 
@@ -2313,7 +2298,7 @@ class Composer<N>(
             }
         }
 
-        override fun <N> registerComposer(composer: Composer<N>) {
+        override fun registerComposer(composer: Composer<*>) {
             composers.add(composer)
         }
 
@@ -2322,10 +2307,14 @@ class Composer<N>(
             composers.remove(composer)
         }
 
-        override fun invalidate() {
-            // continue invalidating up the spine of AmbientReferences
-            parentReference?.invalidate()
+        override val applyingCoroutineContext: CoroutineContext?
+            get() = parentReference.applyingCoroutineContext
 
+        override fun composeInitial(composer: Composer<*>, composable: @Composable () -> Unit) {
+            parentReference.composeInitial(composer, composable)
+        }
+
+        override fun invalidate(composer: Composer<*>) {
             invalidate(scope)
         }
 

@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.util.annotation.MainThread
@@ -27,8 +26,7 @@ import androidx.compose.ui.util.annotation.MainThread
 @OptIn(ExperimentalLayoutNodeApi::class)
 internal expect fun actualSubcomposeInto(
     container: LayoutNode,
-    recomposer: Recomposer,
-    parent: CompositionReference?,
+    parent: CompositionReference,
     composable: @Composable () -> Unit
 ): Composition
 
@@ -36,7 +34,6 @@ internal expect fun actualSubcomposeInto(
 @MainThread
 fun subcomposeInto(
     container: LayoutNode,
-    recomposer: Recomposer,
-    parent: CompositionReference? = null,
+    parent: CompositionReference,
     composable: @Composable () -> Unit
-): Composition = actualSubcomposeInto(container, recomposer, parent, composable)
+): Composition = actualSubcomposeInto(container, parent, composable)
