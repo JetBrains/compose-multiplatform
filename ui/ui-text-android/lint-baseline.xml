@@ -8,7 +8,7 @@
         errorLine2="                        ~~~~~~">
         <location
             file="src/main/java/androidx/compose/ui/text/android/style/FontSpan.kt"
-            line="52"
+            line="46"
             column="25"/>
     </issue>
 
