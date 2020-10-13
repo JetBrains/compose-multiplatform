@@ -260,10 +260,18 @@ internal class PointerInteropFilter : PointerInputModifier {
                         this.layoutCoordinates?.localToRoot(Offset.Zero)
                             ?: error("layoutCoordinates not set")
                     ) { motionEvent ->
-                        state = if (onTouchEvent(motionEvent)) {
-                            DispatchToViewState.Dispatching
+                        if (motionEvent.actionMasked == MotionEvent.ACTION_DOWN) {
+                            // If the action is ACTION_DOWN, we care about the return value of
+                            // onTouchEvent and use it to set our initial dispatching state.
+                            state = if (onTouchEvent(motionEvent)) {
+                                DispatchToViewState.Dispatching
+                            } else {
+                                DispatchToViewState.NotDispatching
+                            }
                         } else {
-                            DispatchToViewState.NotDispatching
+                            // Otherwise, we don't care about the return value. This is intended
+                            // to be in accordance with how the Android View system works.
+                            onTouchEvent(motionEvent)
                         }
                     }
                     if (state === DispatchToViewState.Dispatching) {
