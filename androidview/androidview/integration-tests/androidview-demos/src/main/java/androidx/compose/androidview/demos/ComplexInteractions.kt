@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.material.ButtonConstants
 
 // TODO(b/158099918): Add this demo to AndroidViewDemos.kt once b/158099918 has been resolved.
 @Suppress("unused")
@@ -118,7 +119,10 @@ fun colorButton() {
         } else {
             Color.Blue
         }
-    Button(onClick = { state.value = !state.value }, backgroundColor = color) {
+    Button(
+        onClick = { state.value = !state.value },
+        colors = ButtonConstants.defaultButtonColors(backgroundColor = color)
+    ) {
         Text("Click me")
     }
 }

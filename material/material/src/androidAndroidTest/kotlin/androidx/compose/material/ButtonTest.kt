@@ -290,7 +290,7 @@ class ButtonTest {
             surface = MaterialTheme.colors.surface
             primary = MaterialTheme.colors.primary
             Providers(AmbientShapes provides Shapes(small = shape)) {
-                Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = 0.dp) {
+                Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = null) {
                     Box(Modifier.preferredSize(10.dp, 10.dp))
                 }
             }
@@ -396,9 +396,8 @@ class ButtonTest {
                     Button(
                         onClick = {},
                         enabled = false,
-                        backgroundColor = ButtonConstants.defaultButtonBackgroundColor(
-                            enabled = false,
-                            defaultColor = Color.Red
+                        colors = ButtonConstants.defaultButtonColors(
+                            backgroundColor = Color.Red
                         ),
                         shape = RectangleShape
                     ) {}
@@ -559,16 +558,16 @@ class ButtonTest {
                     .preferredSize(10.dp, 10.dp)
             ) {
                 Button(
-                    backgroundColor = Color.Yellow,
-                    elevation = 2.dp,
+                    colors = ButtonConstants.defaultButtonColors(backgroundColor = Color.Yellow),
+                    elevation = ButtonConstants.defaultElevation(defaultElevation = 2.dp),
                     onClick = {},
                     shape = RectangleShape
                 ) {
                     Box(Modifier.fillMaxSize())
                 }
                 Button(
-                    backgroundColor = Color.Green,
-                    elevation = 0.dp,
+                    colors = ButtonConstants.defaultButtonColors(backgroundColor = Color.Green),
+                    elevation = null,
                     onClick = {},
                     shape = RectangleShape
                 ) {

@@ -158,7 +158,7 @@ fun Snackbar(
     val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
         {
             TextButton(
-                contentColor = actionColor,
+                colors = ButtonConstants.defaultTextButtonColors(contentColor = actionColor),
                 onClick = { snackbarData.performAction() },
                 content = { Text(actionLabel) }
             )
