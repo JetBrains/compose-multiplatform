@@ -29,7 +29,7 @@ import androidx.compose.ui.assertRect
 import androidx.compose.ui.background
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
@@ -169,7 +169,7 @@ class ClipDrawTest {
     fun roundedUniformRectClip() {
         val shape = object : Shape {
             override fun createOutline(size: Size, density: Density): Outline =
-                Outline.Rounded(RoundRect(size.toRect(), Radius(12f)))
+                Outline.Rounded(RoundRect(size.toRect(), CornerRadius(12f)))
         }
         rule.runOnUiThreadIR {
             activity.setContent {
@@ -207,10 +207,10 @@ class ClipDrawTest {
                 Outline.Rounded(
                     RoundRect(
                         size.toRect(),
-                        Radius.Zero,
-                        Radius(12f),
-                        Radius(12f),
-                        Radius(12f)
+                        CornerRadius.Zero,
+                        CornerRadius(12f),
+                        CornerRadius(12f),
+                        CornerRadius(12f)
                     )
                 )
         }
@@ -314,7 +314,7 @@ class ClipDrawTest {
         rule.runOnUiThreadIR {
             model.value = object : Shape {
                 override fun createOutline(size: Size, density: Density): Outline =
-                    Outline.Rounded(RoundRect(size.toRect(), Radius(12f)))
+                    Outline.Rounded(RoundRect(size.toRect(), CornerRadius(12f)))
             }
         }
 

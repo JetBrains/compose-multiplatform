@@ -53,8 +53,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
@@ -296,7 +296,7 @@ private val MagnifierPopupShape = GenericShape { size ->
     val arrowY = height * 0.8f
     val arrowXOffset = width * 0.4f
 
-    addRoundRect(RoundRect(0f, 0f, width, arrowY, radius = Radius(20f, 20f)))
+    addRoundRect(RoundRect(0f, 0f, width, arrowY, cornerRadius = CornerRadius(20f, 20f)))
 
     moveTo(arrowXOffset, arrowY)
     lineTo(width / 2f, height)
