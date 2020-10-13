@@ -47,7 +47,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/main/java/androidx/compose/integration/demos/DemoActivity.kt"
-            line="76"
+            line="78"
             column="13"/>
     </issue>
 
@@ -58,7 +58,7 @@
         errorLine2="            ~~~~~~~~~~~~">
         <location
             file="src/main/java/androidx/compose/integration/demos/DemoActivity.kt"
-            line="151"
+            line="153"
             column="13"/>
     </issue>
 

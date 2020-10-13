@@ -8,7 +8,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="122"
+            line="98"
             column="1"/>
     </issue>
 
@@ -103,7 +103,7 @@
     <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
-        errorLine1="                setDimens(left, top, 0, 0, width(), height()) }"
+        errorLine1="                setDimens(left, top, 0, 0, width(), height())"
         errorLine2="                ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
@@ -118,7 +118,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="104"
+            line="105"
             column="19"/>
     </issue>
 
@@ -129,7 +129,7 @@
         errorLine2="                                                                       ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="104"
+            line="105"
             column="72"/>
     </issue>
 
@@ -140,7 +140,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="105"
+            line="106"
             column="19"/>
     </issue>
 
@@ -151,7 +151,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="106"
+            line="107"
             column="19"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="                  ~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="107"
+            line="108"
             column="19"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="238"
+            line="226"
             column="13"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="240"
+            line="228"
             column="13"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.kt"
-            line="278"
+            line="351"
             column="27"/>
     </issue>
 
@@ -228,7 +228,7 @@
         errorLine2="                              ~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.kt"
-            line="52"
+            line="53"
             column="31"/>
     </issue>
 
@@ -261,19 +261,19 @@
         errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
-            line="160"
+            line="164"
             column="31"/>
     </issue>
 
     <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.WrapperKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
-        errorLine1="            owner.view.attributeSourceResourceMap.isNotEmpty()"
-        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        owner.view.attributeSourceResourceMap.isNotEmpty()"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.kt"
-            line="355"
-            column="24"/>
+            line="319"
+            column="20"/>
     </issue>
 
 </issues>

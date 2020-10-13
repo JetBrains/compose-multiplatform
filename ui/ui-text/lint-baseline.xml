@@ -8,7 +8,7 @@
         errorLine2="                     ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidDefaultTypeface.kt"
-            line="43"
+            line="44"
             column="22"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                     ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidGenericFontFamilyTypeface.kt"
-            line="73"
+            line="75"
             column="22"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="            ~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/TextPaintExtensions.kt"
-            line="62"
+            line="58"
             column="13"/>
     </issue>
 
