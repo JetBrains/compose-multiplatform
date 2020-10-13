@@ -18,6 +18,8 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.assertNotNestingScrollableContainers
@@ -67,24 +69,29 @@ internal inline class DataIndex(val value: Int) {
  * @param initialFirstVisibleItemIndex the initial value for [LazyListState.firstVisibleItemIndex]
  * @param initialFirstVisibleItemScrollOffset the initial value for
  * [LazyListState.firstVisibleItemScrollOffset]
+ * @param interactionState [InteractionState] that will be updated when the element with this
+ * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
+ * the fling (or smooth scroll) is in progress, use [LazyListState.isAnimationRunning].
  */
 @Composable
 fun rememberLazyListState(
     initialFirstVisibleItemIndex: Int = 0,
-    initialFirstVisibleItemScrollOffset: Int = 0
+    initialFirstVisibleItemScrollOffset: Int = 0,
+    interactionState: InteractionState? = null
 ): LazyListState {
     val clock = AnimationClockAmbient.current.asDisposableClock()
     val config = defaultFlingConfig()
 
     // Avoid creating a new instance every invocation
-    val saver = remember(config, clock) {
-        LazyListState.Saver(config, clock)
+    val saver = remember(config, clock, interactionState) {
+        LazyListState.Saver(config, clock, interactionState)
     }
 
-    return rememberSavedInstanceState(config, clock, saver = saver) {
+    return rememberSavedInstanceState(config, clock, interactionState, saver = saver) {
         LazyListState(
             initialFirstVisibleItemIndex,
             initialFirstVisibleItemScrollOffset,
+            interactionState,
             config,
             clock
         )
@@ -96,11 +103,20 @@ fun rememberLazyListState(
  * A state object that can be hoisted to control and observe scrolling
  *
  * In most cases, this will be created via [rememberLazyListState].
+ *
+ * @param firstVisibleItemIndex the initial value for [LazyListState.firstVisibleItemIndex]
+ * @param firstVisibleItemScrollOffset the initial value for
+ * @param interactionState [InteractionState] that will be updated when the element with this
+ * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
+ * the fling (or smooth scroll) is in progress, use [LazyListState.isAnimationRunning].
+ * @param flingConfig fling configuration to use for flinging
+ * @param animationClock animation clock to run flinging and smooth scrolling on
  */
 @Stable
 class LazyListState constructor(
     firstVisibleItemIndex: Int = 0,
     firstVisibleItemScrollOffset: Int = 0,
+    interactionState: InteractionState? = null,
     flingConfig: FlingConfig,
     animationClock: AnimationClockObservable
 ) {
@@ -122,6 +138,12 @@ class LazyListState constructor(
     val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
 
     /**
+     * whether the Lazy list with this state is currently animating/flinging
+     */
+    val isAnimationRunning
+        get() = scrollableController.isAnimationRunning
+
+    /**
      * The amount of scroll to be consumed in the next layout pass.  Scrolling forward is negative
      * - that is, it is the amount that the items are offset in y
      */
@@ -135,7 +157,8 @@ class LazyListState constructor(
         ScrollableController(
             flingConfig = flingConfig,
             animationClock = animationClock,
-            consumeScrollDelta = { onScroll(it) }
+            consumeScrollDelta = { onScroll(it) },
+            interactionState = interactionState
         )
 
     /**
@@ -389,7 +412,8 @@ class LazyListState constructor(
          */
         fun Saver(
             flingConfig: FlingConfig,
-            animationClock: AnimationClockObservable
+            animationClock: AnimationClockObservable,
+            interactionState: InteractionState?
         ): Saver<LazyListState, *> = listSaver(
             save = { listOf(it.firstVisibleItemIndex, it.firstVisibleItemScrollOffset) },
             restore = {
@@ -397,7 +421,8 @@ class LazyListState constructor(
                     firstVisibleItemIndex = it[0],
                     firstVisibleItemScrollOffset = it[1],
                     flingConfig = flingConfig,
-                    animationClock = animationClock
+                    animationClock = animationClock,
+                    interactionState = interactionState
                 )
             }
         )
