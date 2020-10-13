@@ -23,6 +23,7 @@ import org.jetbrains.skija.Matrix33
 import org.jetbrains.skija.PathDirection
 import org.jetbrains.skija.PathEffect
 import org.jetbrains.skija.PathFillMode
+import org.jetbrains.skija.PathOp
 
 actual fun Path(): Path = DesktopPath()
 
@@ -40,8 +41,11 @@ inline fun Path.asDesktopPath(): org.jetbrains.skija.Path =
     }
 
 class DesktopPath(
-    val internalPath: org.jetbrains.skija.Path = org.jetbrains.skija.Path()
+    internalPath: org.jetbrains.skija.Path = org.jetbrains.skija.Path()
 ) : Path {
+    var internalPath = internalPath
+        private set
+
     override var fillType: PathFillType
         get() {
             if (internalPath.fillMode == PathFillMode.EVEN_ODD) {
@@ -172,9 +176,22 @@ class DesktopPath(
         path2: Path,
         operation: PathOperation
     ): Boolean {
-        // TODO(demin): implement Path.op
-        println("Path.op not implemented yet")
-        return false
+        val path = org.jetbrains.skija.Path.makeCombining(
+            path1.asDesktopPath(),
+            path2.asDesktopPath(),
+            operation.toSkijaOperation()
+        )
+
+        internalPath = path ?: internalPath
+        return path != null
+    }
+
+    private fun PathOperation.toSkijaOperation() = when (this) {
+        PathOperation.difference -> PathOp.DIFFERENCE
+        PathOperation.intersect -> PathOp.INTERSECT
+        PathOperation.union -> PathOp.UNION
+        PathOperation.xor -> PathOp.XOR
+        PathOperation.reverseDifference -> PathOp.REVERSE_DIFFERENCE
     }
 
     override val isConvex: Boolean get() = internalPath.isConvex

@@ -26,6 +26,8 @@ import androidx.compose.ui.graphics.DesktopGraphicsTest
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.VertexMode
+import androidx.compose.ui.graphics.Vertices
 import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.graphics.withSave
 import androidx.compose.ui.graphics.withSaveLayer
@@ -293,6 +295,30 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
 
         canvas.clipRect(left = 2f, top = 2f, right = 14f, bottom = 14f, clipOp = ClipOp.Difference)
         canvas.drawRect(left = -4f, top = -4f, right = 20f, bottom = 20f, paint = greenPaint)
+
+        screenshotRule.snap(surface)
+    }
+
+    @Test
+    fun drawVertices() {
+        val positions = listOf(
+            Offset(0f, 0f),
+            Offset(16f, 0f),
+            Offset(8f, 8f),
+            Offset(16f, 8f),
+            Offset(0f, 16f),
+            Offset(16f, 16f),
+        )
+        val colors = listOf(
+            Color.Red, Color.Green, Color.Blue, Color.Cyan, Color.Magenta, Color.Yellow
+        )
+        val indices = listOf(0, 1, 2, 3, 4, 5)
+
+        canvas.drawVertices(
+            Vertices(VertexMode.Triangles, positions, positions, colors, indices),
+            BlendMode.SrcOver,
+            Paint()
+        )
 
         screenshotRule.snap(surface)
     }
