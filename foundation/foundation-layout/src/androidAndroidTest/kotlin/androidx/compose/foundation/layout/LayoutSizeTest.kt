@@ -1118,29 +1118,20 @@ class LayoutSizeTest : LayoutTest() {
 
     @Test
     fun testInspectableParameter() {
-        checkModifier(
-            Modifier.width(200.0.dp), "width", 200.0.dp,
-            listOf(ValueElement("width", 200.0.dp))
-        )
-        checkModifier(
-            Modifier.height(300.0.dp), "height", 300.0.dp,
-            listOf(ValueElement("height", 300.0.dp))
-        )
-        checkModifier(
-            Modifier.size(400.0.dp), "size", 400.0.dp,
-            listOf(ValueElement("size", 400.0.dp))
-        )
+        checkModifier(Modifier.width(200.0.dp), "width", 200.0.dp, listOf())
+        checkModifier(Modifier.height(300.0.dp), "height", 300.0.dp, listOf())
+        checkModifier(Modifier.size(400.0.dp), "size", 400.0.dp, listOf())
         checkModifier(
             Modifier.size(100.0.dp, 200.0.dp), "size", null,
             listOf(ValueElement("width", 100.0.dp), ValueElement("height", 200.0.dp))
         )
         checkModifier(
             Modifier.widthIn(100.0.dp, 200.0.dp), "widthIn", null,
-            listOf(ValueElement("minWidth", 100.0.dp), ValueElement("maxWidth", 200.0.dp))
+            listOf(ValueElement("min", 100.0.dp), ValueElement("max", 200.0.dp))
         )
         checkModifier(
             Modifier.heightIn(10.0.dp, 200.0.dp), "heightIn", null,
-            listOf(ValueElement("minHeight", 10.0.dp), ValueElement("maxHeight", 200.0.dp))
+            listOf(ValueElement("min", 10.0.dp), ValueElement("max", 200.0.dp))
         )
         checkModifier(
             Modifier.sizeIn(10.dp, 20.dp, 30.dp, 40.dp), "sizeIn", null,
@@ -1149,29 +1140,20 @@ class LayoutSizeTest : LayoutTest() {
                 ValueElement("maxWidth", 30.dp), ValueElement("maxHeight", 40.dp)
             )
         )
-        checkModifier(
-            Modifier.preferredWidth(200.0.dp), "preferredWidth", 200.0.dp,
-            listOf(ValueElement("width", 200.0.dp))
-        )
-        checkModifier(
-            Modifier.preferredHeight(300.0.dp), "preferredHeight", 300.0.dp,
-            listOf(ValueElement("height", 300.0.dp))
-        )
-        checkModifier(
-            Modifier.preferredSize(400.0.dp), "preferredSize", 400.0.dp,
-            listOf(ValueElement("size", 400.0.dp))
-        )
+        checkModifier(Modifier.preferredWidth(200.0.dp), "preferredWidth", 200.0.dp, listOf())
+        checkModifier(Modifier.preferredHeight(300.0.dp), "preferredHeight", 300.0.dp, listOf())
+        checkModifier(Modifier.preferredSize(400.0.dp), "preferredSize", 400.0.dp, listOf())
         checkModifier(
             Modifier.preferredSize(100.0.dp, 200.0.dp), "preferredSize", null,
             listOf(ValueElement("width", 100.0.dp), ValueElement("height", 200.0.dp))
         )
         checkModifier(
             Modifier.preferredWidthIn(100.0.dp, 200.0.dp), "preferredWidthIn", null,
-            listOf(ValueElement("minWidth", 100.0.dp), ValueElement("maxWidth", 200.0.dp))
+            listOf(ValueElement("min", 100.0.dp), ValueElement("max", 200.0.dp))
         )
         checkModifier(
             Modifier.preferredHeightIn(10.0.dp, 200.0.dp), "preferredHeightIn", null,
-            listOf(ValueElement("minHeight", 10.0.dp), ValueElement("maxHeight", 200.0.dp))
+            listOf(ValueElement("min", 10.0.dp), ValueElement("max", 200.0.dp))
         )
         checkModifier(
             Modifier.preferredSizeIn(10.dp, 20.dp, 30.dp, 40.dp), "preferredSizeIn", null,
@@ -1181,21 +1163,72 @@ class LayoutSizeTest : LayoutTest() {
             )
         )
 
-        checkModifier(Modifier.fillMaxWidth(), "fillMaxWidth", null, listOf())
-        checkModifier(Modifier.fillMaxHeight(), "fillMaxHeight", null, listOf())
-        checkModifier(Modifier.fillMaxSize(), "fillMaxSize", null, listOf())
+        checkModifier(
+            Modifier.fillMaxWidth(), "fillMaxWidth", null,
+            listOf(ValueElement("fraction", 1.0f))
+        )
+        checkModifier(
+            Modifier.fillMaxWidth(0.7f), "fillMaxWidth", null,
+            listOf(ValueElement("fraction", 0.7f))
+        )
+        checkModifier(
+            Modifier.fillMaxHeight(), "fillMaxHeight", null,
+            listOf(ValueElement("fraction", 1.0f))
+        )
+        checkModifier(
+            Modifier.fillMaxHeight(0.15f), "fillMaxHeight", null,
+            listOf(ValueElement("fraction", 0.15f))
+        )
+        checkModifier(
+            Modifier.fillMaxSize(), "fillMaxSize", null,
+            listOf(ValueElement("fraction", 1.0f))
+        )
+        checkModifier(
+            Modifier.fillMaxSize(0.25f), "fillMaxSize", null,
+            listOf(ValueElement("fraction", 0.25f))
+        )
 
         checkModifier(
             Modifier.wrapContentWidth(), "wrapContentWidth", null,
-            listOf(ValueElement("alignment", Alignment.CenterHorizontally))
+            listOf(
+                ValueElement("align", Alignment.CenterHorizontally),
+                ValueElement("unbounded", false)
+            )
+        )
+        checkModifier(
+            Modifier.wrapContentWidth(Alignment.End, true), "wrapContentWidth", null,
+            listOf(
+                ValueElement("align", Alignment.End),
+                ValueElement("unbounded", true)
+            )
         )
         checkModifier(
             Modifier.wrapContentHeight(), "wrapContentHeight", null,
-            listOf(ValueElement("alignment", Alignment.CenterVertically))
+            listOf(
+                ValueElement("align", Alignment.CenterVertically),
+                ValueElement("unbounded", false)
+            )
+        )
+        checkModifier(
+            Modifier.wrapContentHeight(Alignment.Bottom, true), "wrapContentHeight", null,
+            listOf(
+                ValueElement("align", Alignment.Bottom),
+                ValueElement("unbounded", true)
+            )
         )
         checkModifier(
             Modifier.wrapContentSize(), "wrapContentSize", null,
-            listOf(ValueElement("alignment", Alignment.Center))
+            listOf(
+                ValueElement("align", Alignment.Center),
+                ValueElement("unbounded", false)
+            )
+        )
+        checkModifier(
+            Modifier.wrapContentSize(Alignment.BottomCenter, true), "wrapContentSize", null,
+            listOf(
+                ValueElement("align", Alignment.BottomCenter),
+                ValueElement("unbounded", true)
+            )
         )
 
         checkModifier(
