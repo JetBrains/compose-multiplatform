@@ -72,13 +72,6 @@ internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (Str
  * [androidx.compose.foundation.Text], which is a higher level Text element that contains semantics and
  * consumes style information from a theme.
  *
- * During the measurement, CoreText tends to shrink its size and reports the minimal needed size
- * to its parent. It will ignore the minWidth and minHeight except when [TextAlign] is
- * [TextAlign.Justify]. When [TextAlign.Justify] is specified and [text] is short enough that
- * doesn't exceed minWidth, CoreText will justify the [text] to fill the given minWidth.
- * When input [text] is too long and exceeds the maxWidth/maxHeight constrains, it will determine
- * its size based on the [overflow] option.
- *
  * @param text AnnotatedString encoding a styled text.
  * @param modifier Modifier to apply to this layout node.
  * @param style Style configuration for the text such as color, font, line height etc.

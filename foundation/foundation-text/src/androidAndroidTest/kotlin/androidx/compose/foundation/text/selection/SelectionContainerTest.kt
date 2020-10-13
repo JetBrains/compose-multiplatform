@@ -20,6 +20,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.CoreText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -28,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -37,9 +37,6 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
@@ -92,10 +89,6 @@ class SelectionContainerTest {
 
     private val hapticFeedback = mock<HapticFeedback>()
 
-    // Variables used to store position and size of the CoreText.
-    private val textPosition = Ref<Offset>()
-    private val textSize = Ref<IntSize>()
-
     @Before
     fun setup() {
         rule.setContent {
@@ -112,7 +105,7 @@ class SelectionContainerTest {
                     ) {
                         CoreText(
                             AnnotatedString(textContent),
-                            modifier = saveLayout(textPosition, textSize),
+                            Modifier.fillMaxSize(),
                             style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
                             softWrap = true,
                             overflow = TextOverflow.Clip,
@@ -133,18 +126,15 @@ class SelectionContainerTest {
     @SdkSuppress(minSdkVersion = 27)
     fun press_to_cancel() {
         // Setup. Long press to create a selection.
-        // The long press position.
-        // positionX is 50 pixels to the right of the CoreText's left edge.
-        // positionY is the middle of the CoreText.
-        val positionX = textPosition.value!!.x + 50f
-        val positionY = textPosition.value!!.y + textSize.value!!.height / 2
-        longPress(x = positionX, y = positionY)
+        // A reasonable number.
+        val position = 50f
+        longPress(x = position, y = position)
         rule.runOnIdle {
             assertThat(selection.value).isNotNull()
         }
 
         // Act.
-        press(x = positionX, y = positionY)
+        press(x = position, y = position)
 
         // Assert.
         rule.runOnIdle {
@@ -160,17 +150,14 @@ class SelectionContainerTest {
     @SdkSuppress(minSdkVersion = 27)
     fun tapToCancelDoesNotBlockUp() {
         // Setup. Long press to create a selection.
-        // The long press position.
-        // positionX is 50 pixels to the right of the CoreText's left edge.
-        // positionY is the middle of the CoreText.
-        val positionX = textPosition.value!!.x + 50f
-        val positionY = textPosition.value!!.y + textSize.value!!.height / 2
-        longPress(x = positionX, y = positionY)
+        // A reasonable number.
+        val position = 50f
+        longPress(x = position, y = position)
 
         log.entries.clear()
 
         // Act.
-        press(x = positionX, y = positionY)
+        press(x = position, y = position)
 
         // Assert.
         rule.runOnIdle {
@@ -316,14 +303,6 @@ private data class PointerInputChangeLogEntry(
     val changes: List<PointerInputChange>,
     val pass: PointerEventPass
 )
-
-private fun saveLayout(
-    coords: Ref<Offset>,
-    size: Ref<IntSize>
-): Modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-    coords.value = coordinates.localToRoot(Offset.Zero)
-    size.value = coordinates.size
-}
 
 private fun Modifier.gestureSpy(
     onPointerInput: (PointerEvent, PointerEventPass) -> Unit

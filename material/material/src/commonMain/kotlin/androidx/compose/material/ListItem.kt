@@ -345,14 +345,10 @@ private fun BaselinesOffsetColumn(
     content: @Composable () -> Unit
 ) {
     Layout(content, modifier) { measurables, constraints ->
-        val childConstraints = constraints.copy(
-            minWidth = 0,
-            minHeight = 0,
-            maxHeight = Constraints.Infinity
-        )
+        val childConstraints = constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity)
         val placeables = measurables.map { it.measure(childConstraints) }
 
-        val containerWidth = placeables.fold(constraints.minWidth) { maxWidth, placeable ->
+        val containerWidth = placeables.fold(0) { maxWidth, placeable ->
             max(maxWidth, placeable.width)
         }
         val y = Array(placeables.size) { 0 }
