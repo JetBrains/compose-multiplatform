@@ -41,6 +41,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.AUTOFILL, "1.1.0-beta01")
     ignore(LibraryGroups.BENCHMARK.group, "benchmark-gradle-plugin")
     ignore(LibraryGroups.BENCHMARK.group, "benchmark-macro")
+    ignore(LibraryGroups.BENCHMARK.group, "benchmark-macro-runtime")
     ignore(LibraryGroups.BENCHMARK.group, "benchmark-perfetto")
     prebuilts(LibraryGroups.BENCHMARK, "1.1.0-alpha01")
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.1.0-beta01")
