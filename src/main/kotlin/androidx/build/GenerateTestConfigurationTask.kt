@@ -45,6 +45,7 @@ private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         <option name="test-suite-tag" value="androidx_unit_tests" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
         <option name="wifi:disable" value="true" />
+        <option name="check-min-sdk" value="true" />
         <include name="google/unbundled/common/setup" />
         <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
         <option name="cleanup-apks" value="true" />
@@ -74,6 +75,7 @@ private const val SELF_INSTRUMENTING_TEMPLATE = """<?xml version="1.0" encoding=
         <option name="test-suite-tag" value="androidx_unit_tests" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
         <option name="wifi:disable" value="true" />
+        <option name="check-min-sdk" value="true" />
         <include name="google/unbundled/common/setup" />
         <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
         <option name="cleanup-apks" value="true" />
