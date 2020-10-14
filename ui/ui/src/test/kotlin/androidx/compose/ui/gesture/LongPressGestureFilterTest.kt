@@ -20,8 +20,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.LongPressFiredEvent
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveBy
@@ -82,7 +82,8 @@ class LongPressGestureFilterTest {
     @Test
     fun onPointerEvent_DownMoveConsumed_eventNotFired() {
         val down = down(0)
-        val move = down.moveBy(50.milliseconds, 1f, 1f).consume(1f, 0f)
+        val move =
+            down.moveBy(50.milliseconds, 1f, 1f).apply { consumePositionChange(1f, 0f) }
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -97,7 +98,8 @@ class LongPressGestureFilterTest {
     fun onPointerEvent_2Down1MoveConsumed_eventNotFired() {
         val down0 = down(0)
         val down1 = down(1)
-        val move0 = down0.moveBy(50.milliseconds, 1f, 1f).consume(1f, 0f)
+        val move0 =
+            down0.moveBy(50.milliseconds, 1f, 1f).apply { consumePositionChange(1f, 0f) }
         val move1 = down0.moveBy(50.milliseconds, 0f, 0f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0, down1))
@@ -450,7 +452,7 @@ class LongPressGestureFilterTest {
         var pointer = down(0, 0.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
-        pointer = pointer.moveTo(50.milliseconds, 5f).consume(1f)
+        pointer = pointer.moveTo(50.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         // Act

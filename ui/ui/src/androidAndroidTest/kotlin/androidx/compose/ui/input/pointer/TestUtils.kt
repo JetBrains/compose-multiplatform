@@ -26,6 +26,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime
+import com.google.common.truth.FailureMetadata
+import com.google.common.truth.Subject
+import com.google.common.truth.Truth
 
 internal fun PointerInputEventData(
     id: Int,
@@ -193,14 +196,6 @@ internal fun PointerEvent.deepCopy() =
         motionEvent = motionEvent
     )
 
-internal fun PointerInputChange.deepCopy() =
-    PointerInputChange(
-        id,
-        current.copy(),
-        previous.copy(),
-        consumed.copy()
-    )
-
 internal fun pointerEventOf(
     vararg changes: PointerInputChange,
     motionEvent: MotionEvent = MotionEventDouble
@@ -287,3 +282,97 @@ internal data class OnCustomEventEntry (
 
 internal fun internalPointerEventOf(vararg changes: PointerInputChange) =
     InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), MotionEventDouble)
+
+internal class PointerEventSubject(
+    metaData: FailureMetadata,
+    val actual: PointerEvent
+) : Subject(metaData, actual) {
+    companion object {
+        private val Factory =
+            Factory<PointerEventSubject, PointerEvent> { metadata, actual ->
+                PointerEventSubject(metadata, actual)
+            }
+
+        fun assertThat(actual: PointerEvent): PointerEventSubject {
+            return Truth.assertAbout(Factory).that(actual)
+        }
+    }
+
+    fun isStructurallyEqualTo(expected: PointerEvent) {
+        check("motionEvent").that(actual.motionEvent).isEqualTo(expected.motionEvent)
+        val actualChanges = actual.changes
+        val expectedChanges = expected.changes
+        check("changes.size").that(actualChanges.size).isEqualTo(expectedChanges.size)
+        actualChanges.forEachIndexed { i, _ ->
+            check("id").that(actualChanges[i].id).isEqualTo(expectedChanges[i].id)
+            check("current").that(actualChanges[i].current).isEqualTo(expectedChanges[i].current)
+            check("previous").that(actualChanges[i].previous).isEqualTo(expectedChanges[i].previous)
+            check("consumed.downChange")
+                .that(actualChanges[i].consumed.downChange)
+                .isEqualTo(expectedChanges[i].consumed.downChange)
+            check("consumed.positionChange")
+                .that(actualChanges[i].consumed.positionChange)
+                .isEqualTo(expectedChanges[i].consumed.positionChange)
+        }
+    }
+}
+
+internal class PointerInputChangeSubject(
+    metaData: FailureMetadata,
+    val actual: PointerInputChange
+) : Subject(metaData, actual) {
+
+    companion object {
+
+        private val Factory =
+            Factory<PointerInputChangeSubject, PointerInputChange> { metadata, actual ->
+                PointerInputChangeSubject(metadata, actual)
+            }
+
+        fun assertThat(actual: PointerInputChange?): PointerInputChangeSubject {
+            return Truth.assertAbout(Factory).that(actual)
+        }
+    }
+
+    fun nothingConsumed() {
+        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
+        check("consumed.positionChange").that(actual.consumed.positionChange).isEqualTo(Offset.Zero)
+    }
+
+    fun downConsumed() {
+        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(true)
+    }
+
+    fun downNotConsumed() {
+        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
+    }
+
+    fun positionChangeConsumed(expected: Offset) {
+        check("consumed.positionChangeConsumed")
+            .that(actual.consumed.positionChange).isEqualTo(expected)
+    }
+
+    fun positionChangeNotConsumed() {
+        positionChangeConsumed(Offset.Zero)
+    }
+
+    fun isStructurallyEqualTo(expected: PointerInputChange) {
+        check("id").that(actual.id).isEqualTo(expected.id)
+        check("current").that(actual.current).isEqualTo(expected.current)
+        check("previous").that(actual.previous).isEqualTo(expected.previous)
+        check("consumed.downChange")
+            .that(actual.consumed.downChange)
+            .isEqualTo(expected.consumed.downChange)
+        check("consumed.positionChange")
+            .that(actual.consumed.positionChange)
+            .isEqualTo(expected.consumed.positionChange)
+    }
+}
+
+internal fun PointerInputChange.deepCopy() =
+    PointerInputChange(
+        id,
+        current.copy(),
+        previous.copy(),
+        ConsumedData(consumed.positionChange, consumed.downChange)
+    )

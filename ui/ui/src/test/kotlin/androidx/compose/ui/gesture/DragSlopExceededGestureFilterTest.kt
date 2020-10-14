@@ -24,8 +24,8 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.scrollorientationlocking.ScrollOrientationLocker
 import androidx.compose.ui.gesture.scrollorientationlocking.ShareScrollOrientationLockerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPass
@@ -101,7 +101,9 @@ class DragSlopExceededGestureFilterTest {
     fun onPointerEvent_downMoveFullyConsumed_canDragNotCalled() {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(Duration(milliseconds = 10), 3f, 5f).consume(3f, 5f)
+        val move =
+            down.moveBy(Duration(milliseconds = 10), 3f, 5f)
+                .apply { consumePositionChange(3f, 5f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(canDragDirections).isEmpty()
@@ -136,7 +138,9 @@ class DragSlopExceededGestureFilterTest {
     fun onPointerEvent_downMoveOneDimensionPartiallyConsumed_canDragCalledOnce() {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(Duration(milliseconds = 10), 0f, 5f).consume(0f, 4f)
+        val move =
+            down.moveBy(Duration(milliseconds = 10), 0f, 5f)
+                .apply { consumePositionChange(0f, 4f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Twice because while under touch slop, DragGestureDetector checks during Main and
@@ -148,7 +152,9 @@ class DragSlopExceededGestureFilterTest {
     fun onPointerEvent_downMoveTwoDimensionPartiallyConsumed_canDragCalledTwice() {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(Duration(milliseconds = 10), 3f, 5f).consume(2f, 4f)
+        val move =
+            down.moveBy(Duration(milliseconds = 10), 3f, 5f)
+                .apply { consumePositionChange(2f, 4f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // 4 times because while under touch slop, DragGestureDetector checks during Main and
@@ -303,7 +309,9 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, TestTouchSlop + TinyNum, 0f).consume(dx = 1f)
+        val move =
+            down.moveBy(10.milliseconds, TestTouchSlop + TinyNum, 0f)
+                .apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Assert
@@ -325,7 +333,8 @@ class DragSlopExceededGestureFilterTest {
                 PointerEventPass.Main
             )
         )
-        val move2 = move.consume(dx = (TestTouchSlop * 2f + TinyNum))
+        val move2 =
+            move.apply { consumePositionChange(TestTouchSlop * 2f + TinyNum, 0f) }
         filter::onPointerEvent.invokeOverPass(
             pointerEventOf(move2),
             PointerEventPass.Final
@@ -684,7 +693,8 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, 0f, 0f).consume(dx = beyondSlop)
+        val move =
+            down.moveBy(10.milliseconds, 0f, 0f).apply { consumePositionChange(beyondSlop, 0f) }
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(move),
             listOf(
@@ -714,7 +724,7 @@ class DragSlopExceededGestureFilterTest {
             )
         )
 
-        val moveConsumed = move.consume(dx = beyondSlop)
+        val moveConsumed = move.apply { consumePositionChange(beyondSlop, 0f) }
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(moveConsumed),
             PointerEventPass.Final
@@ -742,7 +752,7 @@ class DragSlopExceededGestureFilterTest {
             )
         )
 
-        val moveConsumed = move.consume(dx = -restOfSlopAndBeyond)
+        val moveConsumed = move.apply { consumePositionChange(-restOfSlopAndBeyond, 0f) }
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(moveConsumed),
             PointerEventPass.Final

@@ -18,8 +18,8 @@ package androidx.compose.ui.gesture
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPasses
@@ -128,7 +128,7 @@ class PressIndicatorGestureFilterTest {
     fun onPointerInput_downMoveConsumedUp_onStopNotCalled() {
         var pointer = down(0, 0.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.moveTo(100.milliseconds, 5f).consume(1f)
+        pointer = pointer.moveTo(100.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         pointer = pointer.up(200.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
@@ -233,7 +233,7 @@ class PressIndicatorGestureFilterTest {
     fun onPointerInput_downConsumedMoveConsumed_onCancelNotCalled() {
         var pointer = down(0, 0.milliseconds).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.moveBy(100.milliseconds, 5f).consume(1f)
+        pointer = pointer.moveBy(100.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         verify(filter.onCancel!!, never()).invoke()
@@ -290,7 +290,7 @@ class PressIndicatorGestureFilterTest {
     fun onPointerInput_downMoveConsumed_onCancelCalledOnce() {
         var pointer = down(0, 0.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.moveBy(100.milliseconds, 5f).consume(1f)
+        pointer = pointer.moveBy(100.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         verify(filter.onCancel!!).invoke()
@@ -300,9 +300,9 @@ class PressIndicatorGestureFilterTest {
     fun onPointerInput_downMoveConsumedMoveConsumed_onCancelCalledOnce() {
         var pointer = down(0, 0.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.moveBy(100.milliseconds, 5f).consume(1f)
+        pointer = pointer.moveBy(100.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.moveBy(100.milliseconds, 5f).consume(1f)
+        pointer = pointer.moveBy(100.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         verify(filter.onCancel!!).invoke()
@@ -313,8 +313,8 @@ class PressIndicatorGestureFilterTest {
         var pointer0 = down(0)
         var pointer1 = down(1)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
-        pointer0 = pointer0.moveBy(100.milliseconds, 5f).consume(1f)
-        pointer1 = pointer1.moveBy(100.milliseconds, 5f).consume(1f)
+        pointer0 = pointer0.moveBy(100.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
+        pointer1 = pointer1.moveBy(100.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
 
         verify(filter.onCancel!!).invoke()
@@ -327,11 +327,11 @@ class PressIndicatorGestureFilterTest {
         pointer0 = pointer0.moveTo(100.milliseconds)
         var pointer1 = down(1, duration = 100.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
-        pointer0 = pointer0.moveBy(100L.milliseconds, 5f).consume(5f)
+        pointer0 = pointer0.moveBy(100L.milliseconds, 5f).apply { consumePositionChange(5f, 0f) }
         pointer1 = pointer1.moveBy(100L.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
         pointer0 = pointer0.moveBy(100L.milliseconds)
-        pointer1 = pointer1.moveBy(100L.milliseconds, 5f).consume(5f)
+        pointer1 = pointer1.moveBy(100L.milliseconds, 5f).apply { consumePositionChange(5f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer0, pointer1))
 
         verify(filter.onCancel!!).invoke()
@@ -544,7 +544,7 @@ class PressIndicatorGestureFilterTest {
     fun onCancel_downMoveConsumedCancel_justStartAndCancelCalledInOrderOnce() {
         var pointer = down(0, 0.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.moveTo(50.milliseconds, 1f).consume(1f)
+        pointer = pointer.moveTo(50.milliseconds, 1f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         filter.onCancel()
 

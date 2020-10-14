@@ -23,8 +23,8 @@ import androidx.compose.ui.gesture.customevents.DelayUpEvent
 import androidx.compose.ui.gesture.customevents.DelayUpMessage
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPass
@@ -79,7 +79,7 @@ class TapGestureFilterTest {
     fun onPointerEvent_downMoveConsumedUp_onReleaseNotCalled() {
         var pointer = down(0, 0.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
-        pointer = pointer.moveTo(100.milliseconds, 5f).consume(5f)
+        pointer = pointer.moveTo(100.milliseconds, 5f).apply { consumePositionChange(5f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         pointer = pointer.up(200.milliseconds)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
