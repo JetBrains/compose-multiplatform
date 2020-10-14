@@ -303,7 +303,7 @@ class TextFieldDelegateTest {
         whenever(mDelegate.style).thenReturn(TextStyle())
         whenever(mDelegate.density).thenReturn(Density(1.0f))
         whenever(mDelegate.resourceLoader).thenReturn(mock())
-        whenever(mDelegate.layout(Constraints(anyLong()), any(), eq(null), eq(true)))
+        whenever(mDelegate.layout(Constraints(anyLong()), any(), eq(null)))
             .thenReturn(textLayoutResult)
 
         val (width, height, layoutResult) = TextFieldDelegate.layout(

@@ -60,13 +60,6 @@ import androidx.compose.ui.unit.TextUnit
  * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
  * adapt to different background colors and still maintain contrast and accessibility.
  *
- * During the measurement, CoreText tends to shrink its size and reports the minimal needed size
- * to its parent. It will ignore the minWidth and minHeight except when [TextAlign] is
- * [TextAlign.Justify]. When [TextAlign.Justify] is specified and [text] is short enough that
- * doesn't exceed minWidth, CoreText will justify the [text] to fill the given minWidth.
- * When input [text] is too long and exceeds the maxWidth/maxHeight constrains, it will determine
- * its size based on the [overflow] option.
- *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param color [Color] to apply to the text. If [Color.Unspecified], and [style] has no color set,
@@ -152,13 +145,6 @@ fun Text(
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
  * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
  * adapt to different background colors and still maintain contrast and accessibility.
- *
- * During the measurement, CoreText tends to shrink its size and reports the minimal needed size
- * to its parent. It will ignore the minWidth and minHeight except when [TextAlign] is
- * [TextAlign.Justify]. When [TextAlign.Justify] is specified and [text] is short enough that
- * doesn't exceed minWidth, CoreText will justify the [text] to fill the given minWidth.
- * When input [text] is too long and exceeds the maxWidth/maxHeight constrains, it will determine
- * its size based on the [overflow] option.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
