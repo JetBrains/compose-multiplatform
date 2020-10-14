@@ -23,6 +23,8 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.tooling.InspectionTables
 import kotlin.coroutines.CoroutineContext
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.persistentHashMapOf
 
 internal typealias Change<N> = (
     applier: Applier<N>,
@@ -299,7 +301,11 @@ class ProvidedValue<T> internal constructor(val ambient: Ambient<T>, val value: 
  * value. It is used both to represent the values provided by a [Providers] call and the combined
  * scope of all provided ambients.
  */
-internal typealias AmbientMap = BuildableMap<Ambient<Any?>, State<Any?>>
+internal typealias AmbientMap = PersistentMap<Ambient<Any?>, State<Any?>>
+
+internal inline fun AmbientMap.mutate(
+    mutator: (MutableMap<Ambient<Any?>, State<Any?>>) -> Unit
+): AmbientMap = builder().apply(mutator).build()
 
 @Suppress("UNCHECKED_CAST")
 internal fun <T> AmbientMap.contains(key: Ambient<T>) = this.containsKey(key as Ambient<Any?>)
@@ -309,7 +315,7 @@ internal fun <T> AmbientMap.getValueOf(key: Ambient<T>) = this[key as Ambient<An
 
 @Composable
 private fun ambientMapOf(values: Array<out ProvidedValue<*>>): AmbientMap {
-    val result: AmbientMap = buildableMapOf()
+    val result: AmbientMap = persistentHashMapOf()
     return result.mutate {
         for (provided in values) {
             @Suppress("UNCHECKED_CAST")
@@ -362,7 +368,7 @@ class Composer<N>(
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     internal var pendingInvalidScopes = false
     private val entersStack = IntStack()
-    private var parentProvider: AmbientMap = buildableMapOf()
+    private var parentProvider: AmbientMap = persistentHashMapOf()
     private val providerUpdates = HashMap<Int, AmbientMap>()
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()

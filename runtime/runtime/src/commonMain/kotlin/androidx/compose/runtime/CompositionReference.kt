@@ -17,8 +17,9 @@
 package androidx.compose.runtime
 
 import kotlin.coroutines.CoroutineContext
+import kotlinx.collections.immutable.persistentHashMapOf
 
-private val EmptyAmbientMap: AmbientMap = buildableMapOf()
+private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
 
 /**
  * A [CompositionReference] is an opaque type that is used to logically "link" two compositions
