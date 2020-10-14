@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation.samples
+package androidx.navigation.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.ScrollableColumn
@@ -27,10 +27,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Divider
-import androidx.compose.navigation.AmbientNavController
-import androidx.compose.navigation.NavHost
-import androidx.compose.navigation.composable
-import androidx.compose.navigation.navigate
+import androidx.navigation.compose.AmbientNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigate
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color

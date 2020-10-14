@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation
+package androidx.navigation.compose
 
 import android.content.ContextWrapper
 import androidx.activity.OnBackPressedDispatcherOwner
@@ -36,7 +36,7 @@ import androidx.navigation.NavHostController
  * Once this is called, any Composable with in given [NavGraphBuilder] can be navigated to from the
  * [AmbientNavController].
  *
- * @sample androidx.compose.navigation.samples.BasicNav
+ * @sample androidx.navigation.compose.samples.BasicNav
  *
  * @param id the id to set on the graph
  * @param startDestination an object to identify a destination

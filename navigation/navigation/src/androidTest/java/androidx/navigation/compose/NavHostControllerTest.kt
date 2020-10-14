@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation
+package androidx.navigation.compose
 
 import androidx.annotation.IdRes
 import androidx.compose.runtime.State

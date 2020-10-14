@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.demos.LayoutDemos
 import androidx.compose.material.demos.MaterialDemos
 import androidx.compose.material.studies.MaterialStudies
 import androidx.compose.foundation.text.demos.TextDemos
-import androidx.compose.navigation.demos.NavigationDemos
+import androidx.navigation.compose.demos.NavigationDemos
 
 /**
  * [DemoCategory] containing all the top level demo categories.
