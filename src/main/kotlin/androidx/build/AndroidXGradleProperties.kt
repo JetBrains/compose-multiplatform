@@ -38,6 +38,11 @@ const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
 const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
 
 /**
+ * Setting this property enables multiplatform builds of Compose
+ */
+const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
+
+/**
  * Setting this property enables calculating the fraction of code covered by tests
  */
 const val COVERAGE_ENABLED = "androidx.coverageEnabled"
@@ -87,6 +92,7 @@ const val EXPERIMENTAL_KOTLIN_BACKEND_ENABLED = "androidx.experimentalKotlinBack
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
+    COMPOSE_MPP_ENABLED,
     COVERAGE_ENABLED,
     DISPLAY_TEST_OUTPUT,
     ENABLE_DOCUMENTATION,
