@@ -128,6 +128,8 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         project.configurations.filter {
             /* Ignore test configuration dependencies */
             !it.name.contains("test", ignoreCase = true) &&
+                /* Ignore annotation processors */
+                !it.name.contains("annotationProcessor", ignoreCase = true) &&
                 /* Ignore compile configuration dependencies */
                 !it.name.contains("compileClasspath", ignoreCase = true) &&
                 !it.name.contains("compileOnly", ignoreCase = true)
