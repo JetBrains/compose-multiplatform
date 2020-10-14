@@ -19,6 +19,7 @@ import com.arkivanov.decompose.ComponentContext
 import example.todo.common.list.TodoList
 import example.todo.common.list.TodoList.Dependencies
 import example.todo.common.list.TodoList.Output
+import example.todo.common.list.store.TodoListStore
 import example.todo.common.list.store.TodoListStore.Intent
 import example.todo.common.list.store.TodoListStoreProvider
 import example.todo.common.utils.composeState
@@ -36,6 +37,8 @@ internal class TodoListImpl(
                 database = TodoListStoreDatabase(queries = database.todoDatabaseQueries)
             ).provide()
         }
+
+    internal val state: TodoListStore.State get() = store.state
 
     @Composable
     override fun invoke() {
@@ -62,11 +65,11 @@ internal class TodoListImpl(
         }
     }
 
-    private fun onItemClicked(id: Long) {
+    internal fun onItemClicked(id: Long) {
         listOutput.onNext(Output.ItemSelected(id = id))
     }
 
-    private fun onDoneChanged(id: Long, isDone: Boolean) {
+    internal fun onDoneChanged(id: Long, isDone: Boolean) {
         store.accept(Intent.SetDone(id = id, isDone = isDone))
     }
 }
