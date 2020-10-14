@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -25,54 +26,91 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("kotlin-multiplatform")
 }
 
-kotlin {
-    android()
-    jvm("desktop")
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
+if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    dependencies {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
 
-            api project(":compose:ui:ui-unit")
-            implementation project(":compose:runtime:runtime")
-            implementation project(":compose:ui:ui-util")
-        }
+        api "androidx.annotation:annotation:1.1.0"
+        api project(":compose:ui:ui-unit")
 
-        androidMain.dependencies {
-            api "androidx.annotation:annotation:1.1.0"
-        }
+        implementation project(":compose:runtime:runtime")
+        implementation project(":compose:ui:ui-util")
+        implementation(KOTLIN_STDLIB_COMMON)
 
-        desktopMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-            implementation(SKIKO)
-        }
+        testImplementation(ANDROIDX_TEST_RULES)
+        testImplementation(ANDROIDX_TEST_RUNNER)
+        testImplementation(JUNIT)
+        testImplementation(TRUTH)
 
-        androidTest.dependencies {
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(JUNIT)
-            implementation(TRUTH)
-        }
+        androidTestImplementation project(":compose:ui:ui-graphics:ui-graphics-samples")
+        androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ESPRESSO_CORE)
+        androidTestImplementation(JUNIT)
+        androidTestImplementation(TRUTH)
+    }
+}
 
-        androidAndroidTest.dependencies {
-            implementation project(":compose:ui:ui-graphics:ui-graphics-samples")
-            implementation project(":ui:ui-test")
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(ESPRESSO_CORE)
-            implementation(JUNIT)
-        }
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
 
-        desktopTest {
-            resources.srcDirs += "src/desktopTest/res"
-            dependencies {
-                implementation project(":ui:ui-test")
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
+
+                api project(":compose:ui:ui-unit")
+                implementation project(":compose:runtime:runtime")
+                implementation project(":compose:ui:ui-util")
+            }
+
+            androidMain.dependencies {
+                api "androidx.annotation:annotation:1.1.0"
+            }
+
+            desktopMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+                implementation(SKIKO)
+            }
+
+            androidTest.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
                 implementation(JUNIT)
                 implementation(TRUTH)
-                implementation(SKIKO_CURRENT_OS)
+            }
+
+            androidAndroidTest.dependencies {
+                implementation project(":compose:ui:ui-graphics:ui-graphics-samples")
+                implementation project(":ui:ui-test")
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ESPRESSO_CORE)
+                implementation(JUNIT)
+            }
+
+            desktopTest {
+                resources.srcDirs += "src/desktopTest/res"
+                dependencies {
+                    implementation project(":ui:ui-test")
+                    implementation(JUNIT)
+                    implementation(TRUTH)
+                    implementation(SKIKO_CURRENT_OS)
+                }
             }
         }
     }
@@ -88,8 +126,10 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
 }
 
-tasks.findByName("desktopTest").configure {
-    systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../../golden"
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    tasks.findByName("desktopTest").configure {
+        systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../../golden"
+    }
 }
 
 tasks.withType(KotlinCompile).configureEach {

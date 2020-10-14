@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -26,43 +28,79 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("kotlin-multiplatform")
 }
+
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
+
+    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+
+        api project(":compose:material:material-icons-core")
+
+        implementation(KOTLIN_STDLIB_COMMON)
+        implementation project(":compose:runtime:runtime")
+
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(JUNIT)
+        androidTestImplementation(KOTLIN_REFLECT)
+        androidTestImplementation(TRUTH)
+
+        androidTestImplementation project(":compose:foundation:foundation")
+        androidTestImplementation project(":compose:foundation:foundation-layout")
+        androidTestImplementation project(":compose:ui:ui")
+        androidTestImplementation project(":test-screenshot")
+        androidTestImplementation project(":ui:ui-test")
+    }
 }
 
-kotlin {
-    android()
-    sourceSets {
-        commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
-            api project(":compose:material:material-icons-core")
-            implementation project(":compose:runtime:runtime")
-        }
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
+                api project(":compose:material:material-icons-core")
+                implementation project(":compose:runtime:runtime")
+            }
 
-        androidTest.dependencies {
-            implementation project(":compose:foundation:foundation")
-            implementation project(":compose:foundation:foundation-layout")
-            implementation project(":compose:ui:ui")
-            implementation project(":test-screenshot")
-            implementation project(":ui:ui-test")
+            androidTest.dependencies {
+                implementation project(":compose:foundation:foundation")
+                implementation project(":compose:foundation:foundation-layout")
+                implementation project(":compose:ui:ui")
+                implementation project(":test-screenshot")
+                implementation project(":ui:ui-test")
 
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(JUNIT)
-            implementation(KOTLIN_REFLECT)
-            implementation(TRUTH)
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(JUNIT)
+                implementation(KOTLIN_REFLECT)
+                implementation(TRUTH)
+            }
         }
     }
 }
+
 android.buildTypes.all {
     // Jacoco hangs intermittently due to the large number of files
     testCoverageEnabled = false
 }
 
-IconGenerationTask.registerExtendedIconProject(project, android)
+IconGenerationTask.registerExtendedIconProject(
+        project,
+        android,
+        AndroidXUiPlugin.isMultiplatformEnabled(project)
+)
 
 androidx {
     name = "Compose Material Icons Extended"
