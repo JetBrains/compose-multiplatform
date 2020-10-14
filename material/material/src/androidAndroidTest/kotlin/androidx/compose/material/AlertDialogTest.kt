@@ -23,6 +23,7 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.ui.test.assertContainsColor
@@ -43,6 +44,7 @@ class AlertDialogTest {
     @get:Rule
     val rule = createComposeRule(disableTransitions = true)
 
+    @FlakyTest(bugId = 170333139)
     @Test
     fun customStyleProperties_shouldApply() {
         var contentColor = Color.Unspecified

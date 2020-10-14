@@ -41,6 +41,7 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.key.KeyInputModifier
@@ -1410,7 +1411,9 @@ fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutN
  * from the given LayoutNodeWrapper
  */
 @OptIn(ExperimentalLayoutNodeApi::class)
-internal class LayoutNodeDrawScope : ContentDrawScope() {
+internal class LayoutNodeDrawScope(
+    private val canvasDrawScope: CanvasDrawScope = CanvasDrawScope()
+) : DrawScope by canvasDrawScope, ContentDrawScope {
 
     // NOTE, currently a single ComponentDrawScope is shared across composables
     // which done to allocate a single set of Paint objects and re-use them across
@@ -1423,7 +1426,7 @@ internal class LayoutNodeDrawScope : ContentDrawScope() {
         drawIntoCanvas { canvas -> wrapped?.draw(canvas) }
     }
 
-    internal fun draw(
+    internal inline fun draw(
         canvas: Canvas,
         size: Size,
         layoutNodeWrapper: LayoutNodeWrapper,
@@ -1431,18 +1434,15 @@ internal class LayoutNodeDrawScope : ContentDrawScope() {
     ) {
         val previousWrapper = wrapped
         wrapped = layoutNodeWrapper
-        draw(canvas, size, block)
+        canvasDrawScope.draw(
+            layoutNodeWrapper.measureScope,
+            layoutNodeWrapper.measureScope.layoutDirection,
+            canvas,
+            size,
+            block
+        )
         wrapped = previousWrapper
     }
-
-    override val density: Float
-        get() = wrapped!!.measureScope.density
-
-    override val fontScale: Float
-        get() = wrapped!!.measureScope.fontScale
-
-    override val layoutDirection: LayoutDirection
-        get() = wrapped!!.measureScope.layoutDirection
 }
 
 /**
