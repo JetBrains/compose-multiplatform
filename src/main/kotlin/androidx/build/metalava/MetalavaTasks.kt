@@ -22,6 +22,7 @@ import androidx.build.addToCheckTask
 import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
+import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.java.JavaCompileInputs
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.api.LibraryVariant
@@ -67,6 +68,7 @@ object MetalavaTasks {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
             applyInputs(javaCompileInputs, task)
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         // Policy: If the artifact has previously been released, e.g. has a beta or later API file
@@ -88,6 +90,7 @@ object MetalavaTasks {
                 task.bootClasspath = javaCompileInputs.bootClasspath
                 task.cacheEvenIfNoOutputs()
                 task.dependsOn(generateApi)
+                AffectedModuleDetector.configureTaskGuard(task)
             }
 
             ignoreApiChanges = project.tasks.register(
@@ -134,6 +137,7 @@ object MetalavaTasks {
                 checkApiRelease?.let {
                     task.dependsOn(checkApiRelease)
                 }
+                AffectedModuleDetector.configureTaskGuard(task)
             }
 
         val regenerateOldApis = project.tasks.register(
@@ -166,6 +170,7 @@ object MetalavaTasks {
             // developer updates an API, if backwards compatibility checks are enabled in the
             // library, then we want to check that the changes are backwards compatible.
             checkApiRelease?.let { task.dependsOn(it) }
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         // ignoreApiChanges depends on the output of this task for the "current" API surface.
