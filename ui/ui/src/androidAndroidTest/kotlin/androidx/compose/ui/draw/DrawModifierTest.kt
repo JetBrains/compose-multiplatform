@@ -17,6 +17,7 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawWithCache
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.toArgb
@@ -242,6 +245,99 @@ class DrawModifierTest {
                 assertEquals(endSize, this.height)
                 assertEquals(Color.Red.toArgb(), getPixel(1, 1))
                 assertEquals(Color.Red.toArgb(), getPixel(width - 2, height - 2))
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testDrawWithCacheContentDrawnImplicitly() {
+        // Verify that drawContent is invoked even if it is not explicitly called within
+        // the implementation of the callback provided in the onDraw method
+        // in Modifier.drawWithCache
+        val testTag = "testTag"
+        val testSize = 200
+        rule.setContent {
+            AtLeastSize(
+                size = testSize,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    onDraw {
+                        drawRect(Color.Red, size = Size(size.width / 2, size.height))
+                    }
+                }.background(Color.Blue)
+            )
+        }
+
+        rule.onNodeWithTag(testTag).apply {
+            captureToBitmap().apply {
+                assertEquals(Color.Blue.toArgb(), getPixel(0, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, height - 1))
+                assertEquals(Color.Blue.toArgb(), getPixel(0, height - 1))
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testDrawWithCacheOverContent() {
+        // Verify that drawContent is not invoked implicitly if it is explicitly called within
+        // the implementation of the callback provided in the onDraw method
+        // in Modifier.drawWithCache. That is the red rectangle is drawn above the contents
+        val testTag = "testTag"
+        val testSize = 200
+        rule.setContent {
+            AtLeastSize(
+                size = testSize,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(Color.Red, size = Size(size.width / 2, size.height))
+                    }
+                }.background(Color.Blue)
+            )
+        }
+
+        rule.onNodeWithTag(testTag).apply {
+            captureToBitmap().apply {
+                assertEquals(Color.Blue.toArgb(), getPixel(width / 2 + 1, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, height - 1))
+                assertEquals(Color.Blue.toArgb(), getPixel(width / 2 + 1, height - 1))
+
+                assertEquals(Color.Red.toArgb(), getPixel(0, 0))
+                assertEquals(Color.Red.toArgb(), getPixel(width / 2 - 1, 0))
+                assertEquals(Color.Red.toArgb(), getPixel(width / 2 - 1, height - 1))
+                assertEquals(Color.Red.toArgb(), getPixel(0, height - 1))
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testDrawWithCacheBlendsContent() {
+        // Verify that the drawing commands of drawContent are blended against the green
+        // rectangle with the specified BlendMode
+        val testTag = "testTag"
+        val testSize = 200
+        rule.setContent {
+            AtLeastSize(
+                size = testSize,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(Color.Green, blendMode = BlendMode.Plus)
+                    }
+                }.background(Color.Blue)
+            )
+        }
+
+        rule.onNodeWithTag(testTag).apply {
+            captureToBitmap().apply {
+                assertEquals(Color.Cyan.toArgb(), getPixel(0, 0))
+                assertEquals(Color.Cyan.toArgb(), getPixel(width - 1, 0))
+                assertEquals(Color.Cyan.toArgb(), getPixel(width - 1, height - 1))
+                assertEquals(Color.Cyan.toArgb(), getPixel(0, height - 1))
             }
         }
     }
