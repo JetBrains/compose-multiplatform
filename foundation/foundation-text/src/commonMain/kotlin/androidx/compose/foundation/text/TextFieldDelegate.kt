@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.SpanStyle
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.SetSelectionEditOp
@@ -86,7 +88,10 @@ private fun computeLineHeightForEmptyText(
 private fun Float.toIntPx(): Int = ceil(this).roundToInt()
 
 /** @suppress **/
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 @InternalTextApi
 class TextFieldDelegate {
     companion object {
@@ -276,6 +281,7 @@ class TextFieldDelegate {
             editProcessor: EditProcessor,
             keyboardType: KeyboardType,
             imeAction: ImeAction,
+            keyboardOptions: KeyboardOptions,
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): InputSessionToken {
@@ -283,6 +289,7 @@ class TextFieldDelegate {
                 value = TextFieldValue(value.text, value.selection, value.composition),
                 keyboardType = keyboardType,
                 imeAction = imeAction,
+                keyboardOptions = keyboardOptions,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
             ) ?: INVALID_SESSION

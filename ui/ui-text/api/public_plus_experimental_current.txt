@@ -72,6 +72,9 @@ package androidx.compose.ui.text {
     method public static inline <R> R withStyle(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.ParagraphStyle style, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
   }
 
+  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental text API that may change without warning.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalTextApi {
+  }
+
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is internal API that may change frequently and without warning.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalTextApi {
   }
 
@@ -780,6 +783,20 @@ package androidx.compose.ui.text.input {
     method public void onImeAction(androidx.compose.ui.text.input.ImeAction imeAction);
   }
 
+  @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public final class KeyboardOptions {
+    ctor public KeyboardOptions(boolean singleLine);
+    method public boolean component1();
+    method @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.input.KeyboardOptions copy(boolean singleLine);
+    method public boolean getSingleLine();
+    property public final boolean singleLine;
+    field public static final androidx.compose.ui.text.input.KeyboardOptions.Companion Companion;
+  }
+
+  public static final class KeyboardOptions.Companion {
+    method public androidx.compose.ui.text.input.KeyboardOptions getDefault();
+    property public final androidx.compose.ui.text.input.KeyboardOptions Default;
+  }
+
   public enum KeyboardType {
     enum_constant public static final androidx.compose.ui.text.input.KeyboardType Ascii;
     enum_constant public static final androidx.compose.ui.text.input.KeyboardType Email;
@@ -826,7 +843,7 @@ package androidx.compose.ui.text.input {
     method public void notifyFocusedRect(androidx.compose.ui.geometry.Rect rect);
     method public void onStateUpdated(androidx.compose.ui.text.input.TextFieldValue value);
     method public void showSoftwareKeyboard();
-    method public void startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public void startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction, androidx.compose.ui.text.input.KeyboardOptions keyboardOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
     method public void stopInput();
   }
 
@@ -897,7 +914,7 @@ package androidx.compose.ui.text.input {
     method public void notifyFocusedRect(int token, androidx.compose.ui.geometry.Rect rect);
     method public void onStateUpdated(int token, androidx.compose.ui.text.input.TextFieldValue value);
     method public void showSoftwareKeyboard(int token);
-    method public int startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public int startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction, androidx.compose.ui.text.input.KeyboardOptions keyboardOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
     method public void stopInput(int token);
   }
 

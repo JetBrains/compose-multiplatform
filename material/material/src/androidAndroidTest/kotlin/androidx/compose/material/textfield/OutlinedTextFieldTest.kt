@@ -610,6 +610,7 @@ class OutlinedTextFieldTest {
                 value = any(),
                 keyboardType = eq(KeyboardType.Email),
                 imeAction = eq(ImeAction.Go),
+                keyboardOptions = any(),
                 onEditCommand = any(),
                 onImeActionPerformed = any()
             )

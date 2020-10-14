@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextDelegate
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
@@ -65,7 +67,10 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.ArgumentMatchers.anyLong
 
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 @RunWith(JUnit4::class)
 class TextFieldDelegateTest {
 
@@ -157,10 +162,19 @@ class TextFieldDelegateTest {
     @Test
     fun on_focus() {
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
+        val keyboardOptions = KeyboardOptions(singleLine = true)
+        val keyboardType = KeyboardType.Phone
+        val imeAction = ImeAction.Search
 
         TextFieldDelegate.onFocus(
-            textInputService, editorState, processor,
-            KeyboardType.Text, ImeAction.Unspecified, onValueChange, onEditorActionPerformed
+            textInputService = textInputService,
+            value = editorState,
+            editProcessor = processor,
+            keyboardType = keyboardType,
+            imeAction = imeAction,
+            keyboardOptions = keyboardOptions,
+            onValueChange = onValueChange,
+            onImeActionPerformed = onEditorActionPerformed
         )
         verify(textInputService).startInput(
             eq(
@@ -169,8 +183,9 @@ class TextFieldDelegateTest {
                     selection = editorState.selection
                 )
             ),
-            eq(KeyboardType.Text),
-            eq(ImeAction.Unspecified),
+            eq(keyboardType),
+            eq(imeAction),
+            eq(keyboardOptions),
             any(),
             eq(onEditorActionPerformed)
         )

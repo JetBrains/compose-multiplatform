@@ -16,11 +16,13 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.input.BackspaceKeyEditOp
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.MoveCursorEditOp
 import androidx.compose.ui.text.input.PlatformTextInputService
@@ -47,6 +49,7 @@ interface DesktopInputComponent {
     fun locationOnScreen(): Point
 }
 
+@OptIn(ExperimentalTextApi::class)
 internal class DesktopPlatformInput(val component: DesktopComponent) :
     PlatformTextInputService {
     data class CurrentInput(
@@ -66,6 +69,7 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
         value: TextFieldValue,
         keyboardType: KeyboardType,
         imeAction: ImeAction,
+        keyboardOptions: KeyboardOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
