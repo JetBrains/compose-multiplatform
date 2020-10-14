@@ -14,28 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.graphics.drawscope
+package androidx.compose.ui.graphics.painter
 
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-
-/**
- * TestDrawScope implementation with default values for density and layout direction
- */
-class TestDrawScope() : DrawScope() {
-    override var layoutDirection: LayoutDirection = LayoutDirection.Ltr
-
-    override var density: Float = 1.0f
-
-    override var fontScale: Float = 1.0f
-
-    fun drawInto(canvas: Canvas, size: Size, block: DrawScope.() -> Unit) {
-        draw(canvas, size, block)
-    }
-}
 
 /**
  * Helper method that draws a Painter into the given canvas, automatically creating a DrawScope
@@ -49,7 +35,7 @@ fun drawPainter(
     colorFilter: ColorFilter? = null,
     layoutDirection: LayoutDirection = LayoutDirection.Ltr
 ) {
-    TestDrawScope().apply { this.layoutDirection = layoutDirection }.drawInto(canvas, size) {
+    CanvasDrawScope().draw(Density(1.0f, 1.0f), layoutDirection, canvas, size) {
         with (painter) {
             draw(size, alpha = alpha, colorFilter = colorFilter)
         }

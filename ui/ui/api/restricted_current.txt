@@ -111,9 +111,8 @@ package androidx.compose.ui {
     method public static androidx.compose.ui.Modifier materialize(androidx.compose.runtime.Composer<?>, androidx.compose.ui.Modifier modifier);
   }
 
-  public abstract class ContentDrawScope extends androidx.compose.ui.graphics.drawscope.DrawScope {
-    ctor public ContentDrawScope();
-    method public abstract void drawContent();
+  public interface ContentDrawScope extends androidx.compose.ui.graphics.drawscope.DrawScope {
+    method public void drawContent();
   }
 
   @kotlin.PublishedApi internal final class DefaultIntrinsicMeasurable implements androidx.compose.ui.Measurable {
