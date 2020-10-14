@@ -142,13 +142,38 @@ inline fun DrawScope.rotate(
  * The pivot coordinate remains unchanged by the rotation transformation
  *
  * @param radians to rotate clockwise
- *  @param pivotX The x-coordinate for the pivot point, defaults to the center of the
+ * @param pivot The coordinate for the pivot point, defaults to the center of the
+ *  coordinate space
+ * @param block lambda that is called to issue drawing commands within the rotated
+ * coordinate space
+ */
+inline fun DrawScope.rotateRad(
+    radians: Float,
+    pivot: Offset = center,
+    block: DrawScope.() -> Unit
+) {
+    withTransform({ rotate(degrees(radians), pivot) }, block)
+}
+
+/**
+ * Add a rotation (in radians clockwise) to the current transform at the given pivot point.
+ * The pivot coordinate remains unchanged by the rotation transformation
+ *
+ * @param radians to rotate clockwise
+ * @param pivotX The x-coordinate for the pivot point, defaults to the center of the
  *  coordinate space horizontally
- *  @param pivotY The y-coordinate for the pivot point, defaults to the center of the
+ * @param pivotY The y-coordinate for the pivot point, defaults to the center of the
  *  coordinate space vertically
  * @param block lambda that is called to issue drawing commands within the rotated
  * coordinate space
  */
+@Deprecated(
+    "Use rotateRad(radians, Offset(pivotX, pivotY)) instead",
+    ReplaceWith(
+        "rotateRad(radians, Offset(pivotX, pivotY), block)",
+        "androidx.compose.ui.graphics.drawscope"
+    )
+)
 inline fun DrawScope.rotateRad(
     radians: Float,
     pivotX: Float = center.x,
