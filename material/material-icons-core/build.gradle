@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -26,26 +28,50 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("kotlin-multiplatform")
 }
 
-kotlin {
-    android()
-    jvm("desktop")
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
-            api project(":compose:ui:ui")
-        }
+if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    dependencies {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+        kotlinPlugin project(":compose:compiler:compiler")
 
-        androidMain.dependencies {
-            implementation(KOTLIN_STDLIB)
+        api project(":compose:ui:ui")
+        implementation(KOTLIN_STDLIB)
+    }
+}
+
+if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
+                api project(":compose:ui:ui")
+            }
+
+            androidMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+            }
         }
     }
 }
 
-IconGenerationTask.registerCoreIconProject(project)
+IconGenerationTask.registerCoreIconProject(
+        project,
+        android,
+        AndroidXUiPlugin.isMultiplatformEnabled(project)
+)
 
 androidx {
     name = "Compose Material Icons Core"
@@ -59,8 +85,6 @@ androidx {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        freeCompilerArgs += [
-                "-Xallow-jvm-ir-dependencies"
-        ]
+        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies"]
     }
 }

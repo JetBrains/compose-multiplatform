@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -25,47 +27,77 @@ plugins {
     id("AndroidXPlugin")
     id("AndroidXUiPlugin")
     id("com.android.library")
-    id("kotlin-multiplatform")
 }
 
-kotlin {
-    android()
-    jvm("desktop")
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
-            api(KOTLIN_COROUTINES_CORE)
-        }
-        jvmMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-            api(KOTLIN_COROUTINES_CORE)
-        }
-        androidMain {
-            dependencies {
-                api "androidx.annotation:annotation:1.1.0"
-                implementation("androidx.core:core-ktx:1.1.0")
-                implementation(KOTLIN_COROUTINES_ANDROID)
+if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    dependencies {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+
+        api(KOTLIN_COROUTINES_CORE)
+        api "androidx.annotation:annotation:1.1.0"
+
+        implementation(KOTLIN_STDLIB_COMMON)
+        implementation(KOTLIN_STDLIB)
+        implementation("androidx.core:core-ktx:1.1.0")
+        implementation(KOTLIN_COROUTINES_ANDROID)
+
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ANDROIDX_TEST_EXT_KTX)
+        androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
+        androidTestImplementation(JUNIT)
+    }
+}
+
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
+                api(KOTLIN_COROUTINES_CORE)
             }
-            dependsOn jvmMain
-        }
+            jvmMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+                api(KOTLIN_COROUTINES_CORE)
+            }
+            androidMain {
+                dependencies {
+                    api "androidx.annotation:annotation:1.1.0"
+                    implementation("androidx.core:core-ktx:1.1.0")
+                    implementation(KOTLIN_COROUTINES_ANDROID)
+                }
+                dependsOn jvmMain
+            }
 
-        androidTest.dependencies {
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(JUNIT)
-        }
+            androidTest.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(JUNIT)
+            }
 
-        androidAndroidTest.dependencies {
-            implementation(ANDROIDX_TEST_RULES)
-            implementation(ANDROIDX_TEST_RUNNER)
-            implementation(ANDROIDX_TEST_EXT_KTX)
-            implementation(ANDROIDX_TEST_UIAUTOMATOR)
-            implementation(JUNIT)
-        }
+            androidAndroidTest.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ANDROIDX_TEST_EXT_KTX)
+                implementation(ANDROIDX_TEST_UIAUTOMATOR)
+                implementation(JUNIT)
+            }
 
-        desktopMain {
-            dependsOn jvmMain
+            desktopMain {
+                dependsOn jvmMain
+            }
         }
     }
 }
@@ -94,7 +126,7 @@ androidx {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
-            "-Xuse-experimental=kotlin.Experimental"
+                "-Xuse-experimental=kotlin.Experimental"
         ]
         useIR = true
     }
