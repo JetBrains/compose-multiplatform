@@ -20,6 +20,7 @@ import androidx.build.StudioType
 import androidx.build.getSupportRootFolder
 import androidx.build.studioType
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
 import org.gradle.api.tasks.Internal
@@ -29,8 +30,8 @@ import java.io.File
 
 /**
  * Base task with common logic for updating and launching studio in both the frameworks/support
- * project and the frameworks/support/ui project. Project-specific configuration is provided by
- * [RootStudioTask] and [ComposeStudioTask].
+ * project and playground projects. Project-specific configuration is provided by
+ * [RootStudioTask] and [PlaygroundStudioTask].
  */
 abstract class StudioTask : DefaultTask() {
 
@@ -51,15 +52,13 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected open val installParentDir: File = project.rootDir
 
-    private val studioVersions by lazy { StudioVersions.get() }
-
     /**
      * Directory name (not path) that Studio will be unzipped into.
      */
     private val studioDirectoryName: String
         get() {
             val osName = StudioPlatformUtilities.osName
-            with(studioVersions) {
+            with(StudioVersions) {
                 return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
             }
         }
@@ -127,13 +126,18 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(project, studioVersions, studioArchiveName, studioArchivePath)
+            studioArchiveCreator(project, StudioVersions, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
-            studioPatcher(this, project, studioInstallationDir)
             with(platformUtilities) { updateJvmHeapSize() }
             // Finish install process
             successfulInstallFile.createNewFile()
+        }
+        val successfulStudioPatch = File("$studioInstallationDir/PATCH_SUCCESSFUL")
+        if (!successfulStudioPatch.exists()) {
+            studioPatcher(this, project, studioInstallationDir)
+            // Finish patch process
+            successfulStudioPatch.createNewFile()
         }
     }
 
@@ -142,6 +146,16 @@ abstract class StudioTask : DefaultTask() {
      */
     private fun launch() {
         if (checkLicenseAgreement(services)) {
+            if (!System.getenv().containsKey("ANDROIDX_PROJECTS")) {
+                throw GradleException(
+                    """
+                    Please specify which set of projects you'd like to open in studio
+                    with ANDROIDX_PROJECTS=MAIN ./gradlew studio
+
+                    For possible options see settings.gradle
+                    """.trimIndent()
+                )
+            }
             println("Launching studio...")
             launchStudio()
         } else {
@@ -156,7 +170,6 @@ abstract class StudioTask : DefaultTask() {
 
             // Some environment properties are already set in gradlew, and these by default carry
             // through here
-            // TODO: idea.properties should be different for main and ui, fix
             val additionalStudioEnvironmentProperties = mapOf(
                 "STUDIO_PROPERTIES" to ideaProperties.absolutePath,
                 "STUDIO_VM_OPTIONS" to vmOptions.absolutePath,
@@ -203,7 +216,6 @@ abstract class StudioTask : DefaultTask() {
         fun Project.registerStudioTask() {
             val studioTask = when (studioType()) {
                 StudioType.ANDROIDX -> RootStudioTask::class.java
-                StudioType.COMPOSE -> ComposeStudioTask::class.java
                 StudioType.PLAYGROUND -> PlaygroundStudioTask::class.java
             }
             tasks.register(STUDIO_TASK, studioTask)
@@ -216,16 +228,8 @@ abstract class StudioTask : DefaultTask() {
  */
 open class RootStudioTask : StudioTask() {
     override val studioArchiveCreator = UrlArchiveCreator
+    override val studioPatcher: StudioPatcher = KotlinStudioPatcher
     override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
-}
-
-/**
- * Task for launching studio in the frameworks/support/ui (Compose) project
- */
-open class ComposeStudioTask : StudioTask() {
-    override val studioArchiveCreator = UrlArchiveCreator
-    override val studioPatcher = ComposeStudioPatcher
-    override val ideaProperties get() = projectRoot.resolve("idea.properties")
 }
 
 /**
