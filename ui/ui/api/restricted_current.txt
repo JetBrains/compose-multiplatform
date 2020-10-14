@@ -2188,7 +2188,8 @@ package androidx.compose.ui.platform {
   public final class InspectableValueKt {
     method public static inline kotlin.jvm.functions.Function1<androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> debugInspectorInfo(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> definitions);
     method public static kotlin.jvm.functions.Function1<androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> getNoInspectorInfo();
-    field public static final boolean DebugInspectorInfo = true;
+    method public static boolean isDebugInspectorInfoEnabled();
+    method public static void setDebugInspectorInfoEnabled(boolean p);
   }
 
   public final class InspectionModeKt {
