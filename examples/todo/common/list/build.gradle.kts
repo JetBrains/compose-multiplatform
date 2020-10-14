@@ -15,5 +15,13 @@ kotlin {
                 implementation(Deps.Badoo.Reaktive.reaktive)
             }
         }
+
+        named("commonTest") {
+            dependencies {
+                implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
+                implementation(Deps.Badoo.Reaktive.reaktiveTesting)
+                implementation(Deps.Badoo.Reaktive.utils)
+            }
+        }
     }
 }

@@ -4,6 +4,9 @@ object Deps {
         object Kotlin {
             private const val VERSION = "1.4.0"
             const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
+            const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
+            const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
+            const val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common:$VERSION"
         }
 
         object Compose {
@@ -40,6 +43,8 @@ object Deps {
         object Reaktive {
             private const val VERSION = "1.1.18"
             const val reaktive = "com.badoo.reaktive:reaktive:$VERSION"
+            const val reaktiveTesting = "com.badoo.reaktive:reaktive-testing:$VERSION"
+            const val utils = "com.badoo.reaktive:utils:$VERSION"
             const val coroutinesInterop = "com.badoo.reaktive:coroutines-interop:$VERSION"
         }
     }
