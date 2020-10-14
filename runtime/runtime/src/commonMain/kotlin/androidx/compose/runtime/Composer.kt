@@ -319,7 +319,7 @@ class Composer<N>(
     /**
      * Parent of this composition; a [Recomposer] for root-level compositions.
      */
-    internal val parentReference: CompositionReference
+    private val parentReference: CompositionReference
 ) {
     init {
         FrameManager.ensureStarted()
@@ -365,6 +365,9 @@ class Composer<N>(
     private var hasProvider = false
     private var insertAnchor: Anchor = insertTable.anchor(0)
     private val insertFixups = mutableListOf<Change<N>>()
+
+    internal val applyCoroutineContext: CoroutineContext
+        get() = parentReference.effectCoroutineContext
 
     /**
      * Inserts a "Replaceable Group" starting marker in the slot table at the current execution
@@ -2307,8 +2310,8 @@ class Composer<N>(
             composers.remove(composer)
         }
 
-        override val applyingCoroutineContext: CoroutineContext?
-            get() = parentReference.applyingCoroutineContext
+        override val effectCoroutineContext: CoroutineContext
+            get() = parentReference.effectCoroutineContext
 
         override fun composeInitial(composer: Composer<*>, composable: @Composable () -> Unit) {
             parentReference.composeInitial(composer, composable)

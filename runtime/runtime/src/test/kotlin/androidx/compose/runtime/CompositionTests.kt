@@ -2474,7 +2474,7 @@ private fun compose(
                 return onFrame(0)
             }
         }
-        val recomposer = Recomposer().apply {
+        val recomposer = Recomposer(scope.coroutineContext).apply {
             scope.launch(clock) { runRecomposeAndApplyChanges() }
         }
         Composer(
