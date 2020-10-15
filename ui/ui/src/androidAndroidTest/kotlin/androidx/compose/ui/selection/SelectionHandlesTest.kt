@@ -89,7 +89,7 @@ class SelectionHandlesTest {
     fun StartSelectionHandle_left_pointing() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                SelectionHandle(
+                DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = true,
                     directions = Pair(
@@ -113,7 +113,7 @@ class SelectionHandlesTest {
     fun StartSelectionHandle_right_pointing() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                SelectionHandle(
+                DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = true,
                     directions = Pair(
@@ -137,7 +137,7 @@ class SelectionHandlesTest {
     fun EndSelectionHandle_right_pointing() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                SelectionHandle(
+                DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = false,
                     directions = Pair(
@@ -161,7 +161,7 @@ class SelectionHandlesTest {
     fun EndSelectionHandle_left_pointing() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                SelectionHandle(
+                DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = false,
                     directions = Pair(

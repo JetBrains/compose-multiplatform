@@ -19,28 +19,108 @@ package androidx.compose.ui.selection
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
+import androidx.compose.ui.AbsoluteAlignment
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
+import androidx.compose.ui.LayoutModifier
+import androidx.compose.ui.Measurable
+import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
+import androidx.compose.ui.util.annotation.VisibleForTesting
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 internal val HANDLE_WIDTH = 25.dp
 internal val HANDLE_HEIGHT = 25.dp
 private val HANDLE_COLOR = Color(0xFF2B28F5.toInt())
 
+/**
+ * @suppress
+ */
+@InternalTextApi
 @Composable
-internal fun SelectionHandleLayout(modifier: Modifier, left: Boolean) {
+fun SelectionHandle(
+    startHandlePosition: Offset?,
+    endHandlePosition: Offset?,
+    isStartHandle: Boolean,
+    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    handlesCrossed: Boolean,
+    modifier: Modifier,
+    handle: (@Composable () -> Unit)?
+) {
+    SelectionHandlePopup(
+        startHandlePosition = startHandlePosition,
+        endHandlePosition = endHandlePosition,
+        isStartHandle = isStartHandle,
+        directions = directions,
+        handlesCrossed = handlesCrossed
+    ) {
+        if (handle == null) {
+            DefaultSelectionHandle(
+                modifier = modifier,
+                isStartHandle = isStartHandle,
+                directions = directions,
+                handlesCrossed = handlesCrossed
+            )
+        } else handle()
+    }
+}
+
+/**
+ * Adjust coordinates for given text offset.
+ *
+ * Currently [android.text.Layout.getLineBottom] returns y coordinates of the next
+ * line's top offset, which is not included in current line's hit area. To be able to
+ * hit current line, move up this y coordinates by 1 pixel.
+ *
+ * @suppress
+ */
+@InternalTextApi
+fun getAdjustedCoordinates(position: Offset): Offset {
+    return Offset(position.x, position.y - 1f)
+}
+
+/**
+ * @suppress
+ */
+@InternalTextApi
+@Composable
+@VisibleForTesting
+internal fun DefaultSelectionHandle(
+    modifier: Modifier,
+    isStartHandle: Boolean,
+    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    handlesCrossed: Boolean
+) {
     val selectionHandleCache = remember { SelectionHandleCache() }
     HandleDrawLayout(modifier = modifier, width = HANDLE_WIDTH, height = HANDLE_HEIGHT) {
-        drawPath(selectionHandleCache.createPath(this, left), HANDLE_COLOR)
+        drawPath(
+            selectionHandleCache.createPath(
+                this,
+                isLeft(isStartHandle, directions, handlesCrossed)
+            ),
+            HANDLE_COLOR
+        )
     }
 }
 
@@ -121,30 +201,119 @@ private fun HandleDrawLayout(
  */
 @InternalTextApi
 @Composable
-fun SelectionHandle(
-    modifier: Modifier,
+private fun SelectionHandlePopup(
+    startHandlePosition: Offset?,
+    endHandlePosition: Offset?,
     isStartHandle: Boolean,
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
-    handlesCrossed: Boolean
+    handlesCrossed: Boolean,
+    handle: @Composable () -> Unit
 ) {
-    SelectionHandleLayout(
-        modifier,
-        isLeft(isStartHandle, directions, handlesCrossed)
-    )
+    val offset = (if (isStartHandle) startHandlePosition else endHandlePosition) ?: return
+
+    SimpleLayout(AllowZeroSize) {
+        val left = isLeft(
+            isStartHandle = isStartHandle,
+            directions = directions,
+            handlesCrossed = handlesCrossed
+        )
+        val alignment = if (left) AbsoluteAlignment.TopRight else AbsoluteAlignment.TopLeft
+
+        val intOffset = IntOffset(offset.x.roundToInt(), offset.y.roundToInt())
+
+        val popupPositioner = remember(alignment, intOffset) {
+            SelectionHandlePositionProvider(alignment, intOffset)
+        }
+
+        Popup(
+            popupPositionProvider = popupPositioner,
+            content = handle
+        )
+    }
+}
+
+/**
+ * This modifier allows the content to measure at its desired size without regard for the incoming
+ * measurement [minimum width][Constraints.minWidth] or [minimum height][Constraints.minHeight]
+ * constraints.
+ *
+ * The same as "wrapContentSize" in foundation-layout, which we cannot use in this module.
+ */
+private object AllowZeroSize : LayoutModifier {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureScope.MeasureResult {
+        val placeable = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
+        return layout(
+            max(constraints.minWidth, placeable.width),
+            max(constraints.minHeight, placeable.height)
+        ) {
+            placeable.place(0, 0)
+        }
+    }
+}
+
+/**
+ * This is a copy of "AlignmentOffsetPositionProvider" class in Popup, with some
+ * change at "resolvedOffset" value.
+ *
+ * This is for [SelectionHandlePopup] only.
+ */
+@VisibleForTesting
+internal class SelectionHandlePositionProvider(
+    val alignment: Alignment,
+    val offset: IntOffset
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        parentGlobalBounds: IntBounds,
+        windowGlobalBounds: IntBounds,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize
+    ): IntOffset {
+        // TODO: Decide which is the best way to round to result without reimplementing Alignment.align
+        var popupGlobalPosition = IntOffset(0, 0)
+
+        // Get the aligned point inside the parent
+        val parentAlignmentPoint = alignment.align(
+            IntSize(parentGlobalBounds.width, parentGlobalBounds.height),
+            layoutDirection
+        )
+        // Get the aligned point inside the child
+        val relativePopupPos = alignment.align(
+            IntSize(popupContentSize.width, popupContentSize.height),
+            layoutDirection
+        )
+
+        // Add the global position of the parent
+        popupGlobalPosition += IntOffset(parentGlobalBounds.left, parentGlobalBounds.top)
+
+        // Add the distance between the parent's top left corner and the alignment point
+        popupGlobalPosition += parentAlignmentPoint
+
+        // Subtract the distance between the children's top left corner and the alignment point
+        popupGlobalPosition -= IntOffset(relativePopupPos.x, relativePopupPos.y)
+
+        // Add the user offset
+        val resolvedOffset = IntOffset(offset.x, offset.y)
+        popupGlobalPosition += resolvedOffset
+
+        return popupGlobalPosition
+    }
 }
 
 /**
  * Computes whether the handle's appearance should be left-pointing or right-pointing.
  */
-internal fun isLeft(
+private fun isLeft(
     isStartHandle: Boolean,
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
     handlesCrossed: Boolean
 ): Boolean {
-    if (isStartHandle) {
-        return isHandleLtrDirection(directions.first, handlesCrossed)
+    return if (isStartHandle) {
+        isHandleLtrDirection(directions.first, handlesCrossed)
     } else {
-        return !isHandleLtrDirection(directions.second, handlesCrossed)
+        !isHandleLtrDirection(directions.second, handlesCrossed)
     }
 }
 
@@ -158,6 +327,7 @@ internal fun isLeft(
  * the right. However, in Rtl context or when handles are crossed, the start handle should point to
  * the right, and the end handle should point to left.
  */
+@VisibleForTesting
 internal fun isHandleLtrDirection(
     direction: ResolvedTextDirection,
     areHandlesCrossed: Boolean
