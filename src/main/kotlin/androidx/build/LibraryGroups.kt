@@ -106,7 +106,6 @@ object LibraryGroups {
         val COMPILER = LibraryGroup("androidx.compose.compiler", null)
         val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
         val MATERIAL = LibraryGroup("androidx.compose.material", null)
-        val NAVIGATION = LibraryGroup("androidx.compose.navigation", null)
         val PAGING = LibraryGroup("androidx.compose.paging", null)
         val RUNTIME = LibraryGroup("androidx.compose.runtime", null)
         val UI = LibraryGroup("androidx.compose.ui", null)
