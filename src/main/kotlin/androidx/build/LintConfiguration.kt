@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.getByType
 import com.android.build.gradle.internal.dsl.LintOptions
 import org.gradle.api.Project
@@ -38,9 +37,6 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 
     // Create fake variant tasks since that is what is invoked by developers.
     val lintTask = tasks.named("lint")
-    lintTask.configure { task ->
-        AffectedModuleDetector.configureTaskGuard(task)
-    }
     tasks.register("lintDebug") {
         it.dependsOn(lintTask)
         it.enabled = false
@@ -57,17 +53,10 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 
 fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: AndroidXExtension) {
     configureLint(lintOptions, extension)
-    tasks.named("lint").configure { task ->
+    tasks.named("lint").configure({ task ->
         // We already run lintDebug, we don't need to run lint which lints the release variant
         task.enabled = false
-    }
-    if (name != "docs-fake") {
-        afterEvaluate {
-            tasks.named("lintDebug").configure { task ->
-                AffectedModuleDetector.configureTaskGuard(task)
-            }
-        }
-    }
+    })
 }
 
 fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
