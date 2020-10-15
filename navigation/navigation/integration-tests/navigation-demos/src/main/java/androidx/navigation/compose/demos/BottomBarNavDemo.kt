@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation.demos
+package androidx.navigation.compose.demos
 
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
@@ -23,13 +23,13 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.navigation.NavHost
-import androidx.compose.navigation.composable
-import androidx.compose.navigation.navigate
-import androidx.compose.navigation.rememberNavController
-import androidx.compose.navigation.samples.Dashboard
-import androidx.compose.navigation.samples.Profile
-import androidx.compose.navigation.samples.Scrollable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigate
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.samples.Dashboard
+import androidx.navigation.compose.samples.Profile
+import androidx.navigation.compose.samples.Scrollable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

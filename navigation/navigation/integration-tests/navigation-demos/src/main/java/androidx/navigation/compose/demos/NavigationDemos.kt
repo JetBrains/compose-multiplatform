@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation.demos
+package androidx.navigation.compose.demos
 
-import androidx.compose.navigation.samples.BasicNav
-import androidx.compose.runtime.Composable
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.DemoCategory
 
-@Composable
-fun BasicNavDemo() {
-    BasicNav()
-}
+val NavigationDemos = DemoCategory(
+    "Navigation",
+    listOf(
+        ComposableDemo("Basic Nav Demo") { BasicNavDemo() },
+        ComposableDemo("Bottom Bar Nav Demo") { BottomBarNavDemo() }
+    )
+)

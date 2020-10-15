@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation
+package androidx.navigation.compose
 
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.get
+import androidx.compose.runtime.ProvidableAmbient
+import androidx.compose.runtime.ambientOf
+import androidx.navigation.NavHostController
 
 /**
- * Add the [Composable] to the [NavGraphBuilder]
+ * Ambient for access to the navController
  *
- * @param id id for the destination
- * @param content composable for the destination
+ * @sample androidx.navigation.compose.samples.NavigateButton
  */
-public fun NavGraphBuilder.composable(id: Any, content: @Composable () -> Unit) {
-    addDestination(
-        ComposeNavigator.Destination(provider[ComposeNavigator::class], content).apply {
-            setId(generateId(id))
-        }
-    )
-}
+public val AmbientNavController: ProvidableAmbient<NavHostController> = ambientOf()

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation
+package androidx.navigation.compose
 
 import android.content.Context
 import android.os.Bundle
