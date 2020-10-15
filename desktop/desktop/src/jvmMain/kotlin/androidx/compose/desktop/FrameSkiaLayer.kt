@@ -18,6 +18,7 @@ package androidx.compose.desktop
 
 import androidx.compose.ui.platform.DesktopComponent
 import androidx.compose.ui.platform.FrameDispatcher
+import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
@@ -47,6 +48,14 @@ internal class FrameSkiaLayer {
         wrapped.redrawLayer()
     }
 
+    var onDensityChanged: ((Density) -> Unit)? = null
+
+    private var _density: Density? = null
+    val density
+        get() = _density ?: detectCurrentDensity().also {
+            _density = it
+        }
+
     inner class Wrapped : SkiaLayer(), DesktopComponent {
         var currentInputMethodRequests: InputMethodRequests? = null
 
@@ -64,6 +73,8 @@ internal class FrameSkiaLayer {
         }
 
         override fun locationOnScreen() = locationOnScreen
+
+        override fun scaleCanvas(dpi: Float) {}
     }
 
     val wrapped = Wrapped()
@@ -93,15 +104,34 @@ internal class FrameSkiaLayer {
     // but onRender should be called in AWT thread. Picture doesn't add any visible overhead on
     // CPU/RAM.
     private suspend fun preparePicture(frameTimeNanos: Long) {
-        val bounds = Rect.makeWH(wrapped.width.toFloat(), wrapped.height.toFloat())
+        val bounds = Rect.makeWH(wrapped.width * density.density, wrapped.height * density.density)
         val pictureCanvas = pictureRecorder.beginRecording(bounds)
-        renderer?.onFrame(pictureCanvas, wrapped.width, wrapped.height, frameTimeNanos)
+        renderer?.onFrame(
+            pictureCanvas,
+            (wrapped.width * density.density).toInt(),
+            (wrapped.height * density.density).toInt(),
+            frameTimeNanos
+        )
         picture.set(pictureRecorder.finishRecordingAsPicture())
     }
 
     fun reinit() {
+        val currentDensity = detectCurrentDensity()
+        if (_density != currentDensity) {
+            _density = currentDensity
+            onDensityChanged?.invoke(density)
+        }
         check(!isDisposed)
         wrapped.reinit()
+    }
+
+    // TODO(demin): detect OS fontScale
+    //  font size can be changed on Windows 10 in Settings - Ease of Access,
+    //  on Ubuntu in Settings - Universal Access
+    //  on macOS there is no such setting
+    private fun detectCurrentDensity(): Density {
+        val density = wrapped.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+        return Density(density, density)
     }
 
     private fun getFramesPerSecond(): Float {

@@ -20,6 +20,9 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.RootMeasureBlocks
@@ -68,10 +71,11 @@ import androidx.compose.ui.unit.LayoutDirection
 )
 class DesktopOwner(
     val container: DesktopOwners,
-    // TODO(demin): pass density here instead of scale canvas (SkiaWindow.kt#initSkija)
-    override val density: Density = Density(1f, 1f)
+    density: Density = Density(1f, 1f)
 ) : Owner {
     private var size: IntSize = IntSize(0, 0)
+
+    override var density by mutableStateOf(density)
 
     // TODO(demin): support RTL
     override val layoutDirection: LayoutDirection = LayoutDirection.Ltr
@@ -211,7 +215,7 @@ class DesktopOwner(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ) = SkijaLayer(
-        density,
+        this,
         drawLayerModifier,
         invalidateParentLayer = {
             invalidateParentLayer()

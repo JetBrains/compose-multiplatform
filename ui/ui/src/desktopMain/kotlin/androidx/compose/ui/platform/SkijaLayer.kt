@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.asDesktopPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.node.OwnedLayer
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -39,14 +38,14 @@ import org.jetbrains.skija.Rect
 import org.jetbrains.skija.ShadowUtils
 
 class SkijaLayer(
-    private val density: Density,
+    private val owner: DesktopOwner,
     modifier: DrawLayerModifier,
     private val invalidateParentLayer: () -> Unit,
     private val drawBlock: SkijaLayer.(Canvas) -> Unit
 ) : OwnedLayer {
     private var size = IntSize.Zero
     private var position = IntOffset.Zero
-    private var outlineCache = OutlineCache(density, size, modifier.shape)
+    private var outlineCache = OutlineCache(owner.density, size, modifier.shape)
     private val pictureRecorder = PictureRecorder()
     private var picture: Picture? = null
     private var isDestroyed = false
@@ -98,6 +97,7 @@ class SkijaLayer(
     }
 
     override fun drawLayer(canvas: Canvas) {
+        outlineCache.density = owner.density
         if (picture == null) {
             val pictureCanvas = pictureRecorder.beginRecording(
                 Rect.makeWH(
@@ -160,7 +160,7 @@ class SkijaLayer(
     override fun updateLayerProperties() = Unit
 
     @ExperimentalUnsignedTypes
-    fun drawShadow(canvas: DesktopCanvas) = with (density) {
+    fun drawShadow(canvas: DesktopCanvas) = with (owner.density) {
         val path = when (val outline = outlineCache.outline) {
             is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
             is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
