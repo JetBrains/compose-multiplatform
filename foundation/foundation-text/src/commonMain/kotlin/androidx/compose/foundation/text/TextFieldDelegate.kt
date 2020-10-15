@@ -102,12 +102,13 @@ class TextFieldDelegate {
             textDelegate: TextDelegate,
             constraints: Constraints,
             layoutDirection: LayoutDirection,
+            maxLines: Int = Int.MAX_VALUE,
             prevResultText: TextLayoutResult? = null
         ): Triple<Int, Int, TextLayoutResult> {
             val layoutResult = textDelegate.layout(constraints, layoutDirection, prevResultText)
 
             val isEmptyText = textDelegate.text.text.isEmpty()
-            val height = if (isEmptyText) {
+            var height = if (isEmptyText) {
                 val singleLineHeight = computeLineHeightForEmptyText(
                     style = resolveDefaults(textDelegate.style, layoutDirection),
                     density = textDelegate.density,
@@ -117,8 +118,23 @@ class TextFieldDelegate {
             } else {
                 layoutResult.size.height
             }
+
+            height = constrainWithMaxLines(maxLines, height, layoutResult)
+
             val width = layoutResult.size.width
             return Triple(width, height, layoutResult)
+        }
+
+        private fun constrainWithMaxLines(
+            maxLines: Int,
+            height: Int,
+            layoutResult: TextLayoutResult
+        ): Int {
+            return if (maxLines == Int.MAX_VALUE || layoutResult.lineCount <= maxLines) {
+                height
+            } else {
+                ceil(layoutResult.getLineBottom(maxLines - 1)).toInt()
+            }
         }
 
         /**
