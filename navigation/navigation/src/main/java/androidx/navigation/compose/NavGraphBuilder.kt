@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package androidx.compose.navigation.demos
+package androidx.navigation.compose
 
-import androidx.compose.integration.demos.common.ComposableDemo
-import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.get
 
-val NavigationDemos = DemoCategory(
-    "Navigation",
-    listOf(
-        ComposableDemo("Basic Nav Demo") { BasicNavDemo() },
-        ComposableDemo("Bottom Bar Nav Demo") { BottomBarNavDemo() }
+/**
+ * Add the [Composable] to the [NavGraphBuilder]
+ *
+ * @param id id for the destination
+ * @param content composable for the destination
+ */
+public fun NavGraphBuilder.composable(id: Any, content: @Composable () -> Unit) {
+    addDestination(
+        ComposeNavigator.Destination(provider[ComposeNavigator::class], content).apply {
+            setId(generateId(id))
+        }
     )
-)
+}

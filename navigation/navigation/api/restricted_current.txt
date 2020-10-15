@@ -1,19 +1,19 @@
 // Signature format: 4.0
-package androidx.compose.navigation {
+package androidx.navigation.compose {
 
   public final class AmbientsKt {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.navigation.NavHostController> getAmbientNavController();
   }
 
-  @androidx.navigation.Navigator.Name("composable") public final class ComposeNavigator extends androidx.navigation.Navigator<androidx.compose.navigation.ComposeNavigator.Destination> {
+  @androidx.navigation.Navigator.Name("composable") public final class ComposeNavigator extends androidx.navigation.Navigator<androidx.navigation.compose.ComposeNavigator.Destination> {
     ctor public ComposeNavigator();
-    method public androidx.compose.navigation.ComposeNavigator.Destination createDestination();
-    method public androidx.navigation.NavDestination? navigate(androidx.compose.navigation.ComposeNavigator.Destination destination, android.os.Bundle? args, androidx.navigation.NavOptions? navOptions, androidx.navigation.Navigator.Extras? navigatorExtras);
+    method public androidx.navigation.compose.ComposeNavigator.Destination createDestination();
+    method public androidx.navigation.NavDestination? navigate(androidx.navigation.compose.ComposeNavigator.Destination destination, android.os.Bundle? args, androidx.navigation.NavOptions? navOptions, androidx.navigation.Navigator.Extras? navigatorExtras);
     method public boolean popBackStack();
   }
 
   @androidx.navigation.NavDestination.ClassType(Composable::class) public static final class ComposeNavigator.Destination extends androidx.navigation.NavDestination {
-    ctor public ComposeNavigator.Destination(androidx.compose.navigation.ComposeNavigator navigator, internal kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    ctor public ComposeNavigator.Destination(androidx.navigation.compose.ComposeNavigator navigator, internal kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class NavGraphBuilderKt {
