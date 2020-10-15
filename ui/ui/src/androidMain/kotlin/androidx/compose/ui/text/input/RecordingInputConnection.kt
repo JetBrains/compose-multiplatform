@@ -35,16 +35,17 @@ import androidx.annotation.VisibleForTesting
 private val DEBUG = false
 private val TAG = "RecordingIC"
 
+/**
+ * [InputConnection] implementation that binds Android IME to Compose.
+ *
+ * @param initState The initial input state.
+ * @param eventListener An input event listener.
+ * @param autoCorrect Whether autoCorrect is enabled.
+ */
 internal class RecordingInputConnection(
-    /**
-     * The initial input state
-     */
     initState: TextFieldValue,
-
-    /**
-     * An input event listener.
-     */
-    val eventListener: InputEventListener
+    val eventListener: InputEventListener,
+    val autoCorrect: Boolean
 ) : InputConnection {
 
     // The depth of the batch session. 0 means no session.
@@ -290,13 +291,10 @@ internal class RecordingInputConnection(
     }
 
     override fun commitCorrection(correctionInfo: CorrectionInfo?): Boolean {
-        if (DEBUG) { Log.d(TAG, "commitCorrection($correctionInfo)") }
-        // We don't support this callback.
-        // The API documents says this should return if the input connection is no longer valid, but
-        // The Chromium implementation already returning false, so assuming it is safe to return
-        // false if not supported.
-        // see https://cs.chromium.org/chromium/src/content/public/android/java/src/org/chromium/content/browser/input/ThreadedInputConnection.java
-        return false
+        if (DEBUG) { Log.d(TAG, "commitCorrection($correctionInfo) autoCorrect:$autoCorrect") }
+        // Should add an event here so that we can implement the autocorrect highlight
+        // Bug: 170647219
+        return autoCorrect
     }
 
     override fun getHandler(): Handler? {

@@ -84,6 +84,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
 
         return RecordingInputConnection(
             initState = state,
+            autoCorrect = keyboardOptions.autoCorrect,
             eventListener = object : InputEventListener {
                 override fun onEditOperations(editOps: List<EditOperation>) {
                     onEditCommand(editOps)
@@ -242,6 +243,10 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 KeyboardCapitalization.Sentences -> {
                     outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                 }
+            }
+
+            if (keyboardOptions.autoCorrect) {
+                outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
             }
         }
 

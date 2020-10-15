@@ -550,4 +550,55 @@ class TextInputServiceAndroidTest {
             assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
         }
     }
+
+    @Test
+    fun test_fill_editor_info_auto_correct_on() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Ascii,
+            ImeAction.Done,
+            KeyboardOptions(autoCorrect = true),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertFalse((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_auto_correct_off() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Ascii,
+            ImeAction.Done,
+            KeyboardOptions(autoCorrect = false),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun autocorrect_not_added_when_input_type_is_not_text() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Number,
+            ImeAction.Done,
+            KeyboardOptions(autoCorrect = true),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+        }
+    }
 }

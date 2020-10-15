@@ -85,6 +85,16 @@ private val KeyboardOptionsList = listOf(
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         keyboardType = KeyboardType.Text,
         name = "Capitalize Sentences"
+    ),
+    KeyboardOptionsData(
+        keyboardOptions = KeyboardOptions(autoCorrect = true),
+        keyboardType = KeyboardType.Text,
+        name = "AutoCorrect On"
+    ),
+    KeyboardOptionsData(
+        keyboardOptions = KeyboardOptions(autoCorrect = false),
+        keyboardType = KeyboardType.Text,
+        name = "AutoCorrect Off"
     )
 )
 

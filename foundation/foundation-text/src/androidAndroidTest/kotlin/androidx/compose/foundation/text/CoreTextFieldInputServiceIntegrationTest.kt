@@ -68,7 +68,8 @@ class CoreTextFieldInputServiceIntegrationTest {
         val value = TextFieldValue("abc")
         val keyboardOptions = KeyboardOptions(
             singleLine = true,
-            capitalization = KeyboardCapitalization.Words
+            capitalization = KeyboardCapitalization.Words,
+            autoCorrect = false
         )
         val keyboardType = KeyboardType.Phone
         val imeAction = ImeAction.Search
