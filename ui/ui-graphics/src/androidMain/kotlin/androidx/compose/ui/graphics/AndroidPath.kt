@@ -158,17 +158,17 @@ inline fun Path.asAndroidPath(): android.graphics.Path =
 
     override fun addRoundRect(roundRect: RoundRect) {
         rectF.set(roundRect.left, roundRect.top, roundRect.right, roundRect.bottom)
-        radii[0] = roundRect.topLeftRadius.x
-        radii[1] = roundRect.topLeftRadius.y
+        radii[0] = roundRect.topLeftCornerRadius.x
+        radii[1] = roundRect.topLeftCornerRadius.y
 
-        radii[2] = roundRect.topRightRadius.x
-        radii[3] = roundRect.topRightRadius.y
+        radii[2] = roundRect.topRightCornerRadius.x
+        radii[3] = roundRect.topRightCornerRadius.y
 
-        radii[4] = roundRect.bottomRightRadius.x
-        radii[5] = roundRect.bottomRightRadius.y
+        radii[4] = roundRect.bottomRightCornerRadius.x
+        radii[5] = roundRect.bottomRightCornerRadius.y
 
-        radii[6] = roundRect.bottomLeftRadius.x
-        radii[7] = roundRect.bottomLeftRadius.y
+        radii[6] = roundRect.bottomLeftCornerRadius.x
+        radii[7] = roundRect.bottomLeftCornerRadius.y
         internalPath.addRoundRect(rectF, radii, android.graphics.Path.Direction.CCW)
     }
 

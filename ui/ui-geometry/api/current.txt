@@ -1,6 +1,37 @@
 // Signature format: 4.0
 package androidx.compose.ui.geometry {
 
+  @androidx.compose.runtime.Immutable public final inline class CornerRadius {
+    ctor public CornerRadius();
+    method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
+    method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
+    method public static long constructor-impl(internal long packedValue);
+    method public static long copy-kKHJgLs(long $this, optional float x, optional float y);
+    method @androidx.compose.runtime.Stable public static operator long div-kKHJgLs(long $this, float operand);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static float getX-impl(long $this);
+    method public static float getY-impl(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Stable public static operator long minus-wNNjKcU(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long plus-wNNjKcU(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long times-kKHJgLs(long $this, float operand);
+    method public static String toString-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator long unaryMinus-kKHJgLs(long $this);
+    field public static final androidx.compose.ui.geometry.CornerRadius.Companion Companion;
+  }
+
+  public static final class CornerRadius.Companion {
+    method public long getZero-kKHJgLs();
+    property public final long Zero;
+  }
+
+  public final class CornerRadiusKt {
+    method @androidx.compose.runtime.Stable public static inline long CornerRadius(float x, optional float y);
+    method @Deprecated @androidx.compose.runtime.Stable public static inline long Radius(float x, optional float y);
+    method @androidx.compose.runtime.Stable public static long lerp-LCIZJP8(long start, long stop, float fraction);
+  }
+
   public final class MutableRect {
     ctor public MutableRect(float left, float top, float right, float bottom);
     method public boolean contains-k-4lQ0M(long offset);
@@ -68,38 +99,6 @@ package androidx.compose.ui.geometry {
   public final class OffsetKt {
     method @androidx.compose.runtime.Stable public static inline long Offset(float x, float y);
     method @androidx.compose.runtime.Stable public static long lerp-tX6QBWo(long start, long stop, float fraction);
-  }
-
-  @androidx.compose.runtime.Immutable public final inline class Radius {
-    ctor public Radius();
-    method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
-    method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
-    method public static long copy-QM5bGvM(long $this, optional float x, optional float y);
-    method @androidx.compose.runtime.Stable public static operator long div-QM5bGvM(long $this, float operand);
-    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
-    method public static boolean equals-impl0(long p1, long p2);
-    method public static float getX-impl(long $this);
-    method public static float getY-impl(long $this);
-    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
-    method @androidx.compose.runtime.Stable public static operator long minus-OoK_8eo(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long plus-OoK_8eo(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long rem-QM5bGvM(long $this, float operand);
-    method @androidx.compose.runtime.Stable public static operator long times-QM5bGvM(long $this, float operand);
-    method public static String toString-impl(long $this);
-    method public static long truncDiv-QM5bGvM(long $this, float operand);
-    method @androidx.compose.runtime.Stable public static operator long unaryMinus-QM5bGvM(long $this);
-    field public static final androidx.compose.ui.geometry.Radius.Companion Companion;
-  }
-
-  public static final class Radius.Companion {
-    method public long getZero-QM5bGvM();
-    property public final long Zero;
-  }
-
-  public final class RadiusKt {
-    method @androidx.compose.runtime.Stable public static inline long Radius(float x, optional float y);
-    method @androidx.compose.runtime.Stable public static long lerp-dD-ENU0(long start, long stop, float fraction);
   }
 
   @androidx.compose.runtime.Immutable public final class Rect {
@@ -179,32 +178,32 @@ package androidx.compose.ui.geometry {
     method public float component2();
     method public float component3();
     method public float component4();
-    method public long component5-QM5bGvM();
-    method public long component6-QM5bGvM();
-    method public long component7-QM5bGvM();
-    method public long component8-QM5bGvM();
+    method public long component5-kKHJgLs();
+    method public long component6-kKHJgLs();
+    method public long component7-kKHJgLs();
+    method public long component8-kKHJgLs();
     method public boolean contains-k-4lQ0M(long point);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.geometry.RoundRect copy-HepwI24(float left, float top, float right, float bottom, long topLeftRadius, long topRightRadius, long bottomRightRadius, long bottomLeftRadius);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.geometry.RoundRect copy-snQPIwc(float left, float top, float right, float bottom, long topLeftCornerRadius, long topRightCornerRadius, long bottomRightCornerRadius, long bottomLeftCornerRadius);
     method public float getBottom();
-    method public long getBottomLeftRadius-QM5bGvM();
-    method public long getBottomRightRadius-QM5bGvM();
+    method public long getBottomLeftCornerRadius-kKHJgLs();
+    method public long getBottomRightCornerRadius-kKHJgLs();
     method public float getHeight();
     method public float getLeft();
     method public float getRight();
     method public float getTop();
-    method public long getTopLeftRadius-QM5bGvM();
-    method public long getTopRightRadius-QM5bGvM();
+    method public long getTopLeftCornerRadius-kKHJgLs();
+    method public long getTopRightCornerRadius-kKHJgLs();
     method public float getWidth();
     method public static androidx.compose.ui.geometry.RoundRect getZero();
     property public final float bottom;
-    property public final long bottomLeftRadius;
-    property public final long bottomRightRadius;
+    property public final long bottomLeftCornerRadius;
+    property public final long bottomRightCornerRadius;
     property public final float height;
     property public final float left;
     property public final float right;
     property public final float top;
-    property public final long topLeftRadius;
-    property public final long topRightRadius;
+    property public final long topLeftCornerRadius;
+    property public final long topRightCornerRadius;
     property public final float width;
     field public static final androidx.compose.ui.geometry.RoundRect.Companion Companion;
   }
@@ -217,9 +216,9 @@ package androidx.compose.ui.geometry {
   public final class RoundRectKt {
     method public static androidx.compose.ui.geometry.RoundRect RoundRect(float left, float top, float right, float bottom, float radiusX, float radiusY);
     method public static androidx.compose.ui.geometry.RoundRect RoundRect(androidx.compose.ui.geometry.Rect rect, float radiusX, float radiusY);
-    method public static androidx.compose.ui.geometry.RoundRect RoundRect-9kgzNNk(androidx.compose.ui.geometry.Rect rect, optional long topLeft, optional long topRight, optional long bottomRight, optional long bottomLeft);
-    method public static androidx.compose.ui.geometry.RoundRect RoundRect-FXlJaX8(androidx.compose.ui.geometry.Rect rect, long radius);
-    method public static androidx.compose.ui.geometry.RoundRect RoundRect-TZLOQlQ(float left, float top, float right, float bottom, long radius);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect--YCCMLI(androidx.compose.ui.geometry.Rect rect, optional long topLeft, optional long topRight, optional long bottomRight, optional long bottomLeft);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect-fCQrIv8(float left, float top, float right, float bottom, long cornerRadius);
+    method public static androidx.compose.ui.geometry.RoundRect RoundRect-v2DAv8c(androidx.compose.ui.geometry.Rect rect, long cornerRadius);
     method @Deprecated public static long bottomLeftRadius(androidx.compose.ui.geometry.RoundRect);
     method @Deprecated public static long bottomRightRadius(androidx.compose.ui.geometry.RoundRect);
     method @Deprecated public static long center(androidx.compose.ui.geometry.RoundRect);

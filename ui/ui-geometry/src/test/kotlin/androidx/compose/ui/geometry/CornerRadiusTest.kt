@@ -23,17 +23,17 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class RadiusTest {
+class CornerRadiusTest {
 
     @Test
     fun testRadiusCopy() {
-        val radius = Radius(100f, 200f)
+        val radius = CornerRadius(100f, 200f)
         Assert.assertEquals(radius, radius.copy())
     }
 
     @Test
     fun testRadiusCopyOverwriteX() {
-        val radius = Radius(100f, 200f)
+        val radius = CornerRadius(100f, 200f)
         val copy = radius.copy(x = 50f)
         Assert.assertEquals(50f, copy.x)
         Assert.assertEquals(200f, copy.y)
@@ -41,7 +41,7 @@ class RadiusTest {
 
     @Test
     fun testRadiusCopyOverwriteY() {
-        val radius = Radius(100f, 200f)
+        val radius = CornerRadius(100f, 200f)
         val copy = radius.copy(y = 300f)
         Assert.assertEquals(100f, copy.x)
         Assert.assertEquals(300f, copy.y)
@@ -49,7 +49,7 @@ class RadiusTest {
 
     @Test
     fun testDestructuringAssignment() {
-        val (x, y) = Radius(17f, 42f)
+        val (x, y) = CornerRadius(17f, 42f)
         assertEquals(17f, x)
         assertEquals(42f, y)
     }

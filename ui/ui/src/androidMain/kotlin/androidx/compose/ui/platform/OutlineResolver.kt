@@ -155,7 +155,7 @@ internal class OutlineResolver(private val density: Density) {
     }
 
     private fun updateCacheWithRoundRect(roundRect: RoundRect) {
-        val radius = roundRect.topLeftRadius.x
+        val radius = roundRect.topLeftCornerRadius.x
         if (roundRect.isSimple) {
             cachedOutline.setRoundRect(
                 roundRect.left.roundToInt(),
