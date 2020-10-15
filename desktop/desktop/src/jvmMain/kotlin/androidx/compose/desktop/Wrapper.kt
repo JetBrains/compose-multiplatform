@@ -21,15 +21,18 @@ import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 
-fun ComposeWindow.setContent(content: @Composable () -> Unit):
-    Composition {
-        val owners = DesktopOwners(this.layer.wrapped, this::needRedrawLayer)
-        val owner = DesktopOwner(owners)
-
-        this.owners = owners
-        val composition = owner.setContent(content)
-
-        parent.onDismissEvents.add(owner::dispose)
-
-        return composition
+fun ComposeWindow.setContent(content: @Composable () -> Unit): Composition {
+    check(owners == null) {
+        "Cannot setContent twice."
     }
+    val owners = DesktopOwners(this.layer.wrapped, this::needRedrawLayer)
+    val owner = DesktopOwner(owners, density)
+    val composition = owner.setContent(content)
+
+    this.owners = owners
+
+    onDensityChanged(owner::density::set)
+    parent.onDismissEvents.add(owner::dispose)
+
+    return composition
+}
