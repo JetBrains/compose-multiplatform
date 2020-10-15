@@ -30,7 +30,6 @@ import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.setFrom
-import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.node.OwnedLayer
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -44,7 +43,7 @@ internal class ViewLayer(
     drawLayerModifier: DrawLayerModifier,
     val drawBlock: (Canvas) -> Unit,
     val invalidateParentLayer: () -> Unit
-) : View(ownerView.context), OwnedLayer, OwnerScope {
+) : View(ownerView.context), OwnedLayer {
     private val outlineResolver = OutlineResolver(ownerView.density)
     // Value of the layerModifier's clipToBounds property
     private var clipToBounds = false

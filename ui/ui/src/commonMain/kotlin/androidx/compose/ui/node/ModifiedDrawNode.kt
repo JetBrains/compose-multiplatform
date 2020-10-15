@@ -86,10 +86,12 @@ internal class ModifiedDrawNode(
         // invalidates the current layer.
         private val onCommitAffectingModifiedDrawNode: (ModifiedDrawNode) -> Unit =
             { modifiedDrawNode ->
-                // Note this intentionally does not invalidate the layer as Owner implementations
-                // already observe and invalidate the layer on state changes. Instead just
-                // mark the cache dirty so that it will be re-created on the next draw
-                modifiedDrawNode.invalidateCache = true
+                if (modifiedDrawNode.isValid) {
+                    // Note this intentionally does not invalidate the layer as Owner implementations
+                    // already observe and invalidate the layer on state changes. Instead just
+                    // mark the cache dirty so that it will be re-created on the next draw
+                    modifiedDrawNode.invalidateCache = true
+                }
             }
     }
 

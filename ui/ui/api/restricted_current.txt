@@ -1975,7 +1975,7 @@ package androidx.compose.ui.node {
     property public final androidx.compose.ui.Modifier modifier;
   }
 
-  public interface OwnedLayer {
+  public interface OwnedLayer extends androidx.compose.ui.node.OwnerScope {
     method public void destroy();
     method public void drawLayer(androidx.compose.ui.graphics.Canvas canvas);
     method public long getLayerId();
