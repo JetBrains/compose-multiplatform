@@ -19,7 +19,6 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.animation.animate
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +32,7 @@ import androidx.compose.material.DismissValue.DismissedToEnd
 import androidx.compose.material.DismissValue.DismissedToStart
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons

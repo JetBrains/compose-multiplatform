@@ -18,7 +18,6 @@ package androidx.compose.desktop.examples.example1
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
@@ -44,6 +43,7 @@ import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold

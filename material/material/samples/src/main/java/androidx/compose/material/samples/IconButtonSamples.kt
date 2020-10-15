@@ -18,7 +18,7 @@ package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Icon
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.icons.Icons

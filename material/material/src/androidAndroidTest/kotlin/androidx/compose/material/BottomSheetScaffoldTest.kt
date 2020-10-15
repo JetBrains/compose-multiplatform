@@ -18,7 +18,6 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.animation.core.ManualAnimationClock
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

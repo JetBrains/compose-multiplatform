@@ -18,13 +18,13 @@ package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

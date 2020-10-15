@@ -18,7 +18,6 @@ package androidx.compose.material
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
