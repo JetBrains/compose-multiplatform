@@ -17,9 +17,9 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -191,7 +192,9 @@ fun Button(
 ) {
     Button(
         onClick = onClick,
-        backgroundColor = Color(10, 162, 232),
+        colors = ButtonConstants.defaultButtonColors(
+            backgroundColor = Color(10, 162, 232)
+        ),
         modifier = Modifier.preferredHeight(40.dp)
             .preferredWidth(200.dp)
     ) {
