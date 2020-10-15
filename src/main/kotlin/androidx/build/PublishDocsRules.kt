@@ -104,6 +104,9 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.MEDIA2, "media2-widget", "1.1.0-beta01")
     prebuilts(LibraryGroups.MEDIA2, "1.1.0-beta01")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.2.0")
+    // TODO: un-ignore this once we have a prebuilts for navigation compose
+    ignore(LibraryGroups.NAVIGATION.group, "navigation-compose")
+    ignore(LibraryGroups.NAVIGATION.group, "navigation-compose-samples")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-runtime-truth")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
