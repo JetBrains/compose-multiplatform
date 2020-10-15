@@ -933,7 +933,6 @@ package androidx.compose.runtime.snapshots {
     method public abstract boolean hasPendingChanges();
     method @kotlin.PublishedApi internal androidx.compose.runtime.snapshots.Snapshot? makeCurrent();
     method @kotlin.PublishedApi internal void restoreCurrent(androidx.compose.runtime.snapshots.Snapshot? snapshot);
-    method public void setId$metalava_module(int p);
     method public abstract androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     property public int id;
     property public abstract boolean readonly;
