@@ -900,7 +900,6 @@ package androidx.compose.runtime.snapshots {
     method public abstract boolean getReadonly();
     method public abstract androidx.compose.runtime.snapshots.Snapshot getRoot();
     method public abstract boolean hasPendingChanges();
-    method public void setId$metalava_module(int p);
     method public abstract androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     property public int id;
     property public abstract boolean readonly;
