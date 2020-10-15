@@ -27,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.selection.SimpleContainer
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createAndroidComposeRule
