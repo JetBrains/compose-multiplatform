@@ -194,22 +194,28 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     }
 
     private val onCommitAffectingMeasure: (LayoutNode) -> Unit = { layoutNode ->
-        onRequestMeasure(layoutNode)
+        if (layoutNode.isValid) {
+            onRequestMeasure(layoutNode)
+        }
     }
 
     private val onCommitAffectingLayout: (LayoutNode) -> Unit = { layoutNode ->
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode)) {
+        if (layoutNode.isValid && measureAndLayoutDelegate.requestRelayout(layoutNode)) {
             scheduleMeasureAndLayout()
         }
     }
 
     private val onCommitAffectingLayer: (OwnedLayer) -> Unit = { layer ->
-        layer.invalidate()
+        if (layer.isValid) {
+            layer.invalidate()
+        }
     }
 
     private val onCommitAffectingLayerParams: (OwnedLayer) -> Unit = { layer ->
-        handler.postAtFrontOfQueue {
-            updateLayerProperties(layer)
+        if (layer.isValid) {
+            handler.postAtFrontOfQueue {
+                updateLayerProperties(layer)
+            }
         }
     }
 
@@ -218,6 +224,13 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
 
     override fun pauseModelReadObserveration(block: () -> Unit) =
         snapshotObserver.pauseObservingReads(block)
+
+    private val clearInvalidObservations: Runnable = Runnable {
+        if (observationClearRequested) {
+            observationClearRequested = false
+            snapshotObserver.removeObservationsFor { !(it as OwnerScope).isValid }
+        }
+    }
 
     init {
         setWillNotDraw(false)
@@ -247,10 +260,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     fun requestClearInvalidObservations() {
         if (!observationClearRequested) {
             observationClearRequested = true
-            post {
-                observationClearRequested = false
-                snapshotObserver.removeObservationsFor { !(it as OwnerScope).isValid }
-            }
+            handler.postAtFrontOfQueue(clearInvalidObservations)
         }
     }
 

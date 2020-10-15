@@ -86,6 +86,9 @@ class SkijaLayer(
         matrix.reset()
     }
 
+    override val isValid: Boolean
+        get() = !isDestroyed
+
     override fun invalidate() {
         if (!isDestroyed && picture != null) {
             picture?.close()

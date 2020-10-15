@@ -1785,6 +1785,9 @@ private class MockOwner(
 
             override fun getMatrix(matrix: Matrix) {
             }
+
+            override val isValid: Boolean
+                get() = true
         }
     }
 
