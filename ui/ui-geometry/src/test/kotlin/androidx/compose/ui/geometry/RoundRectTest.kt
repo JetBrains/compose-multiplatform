@@ -30,10 +30,10 @@ class RoundRectTest {
     fun testRoundRectContains() {
         val roundRect = RoundRect(
             Rect(1.0f, 1.0f, 2.0f, 2.0f),
-            topLeft = Radius(0.5f),
-            topRight = Radius(0.25f),
-            bottomRight = Radius(0.25f, 0.75f),
-            bottomLeft = Radius.Zero
+            topLeft = CornerRadius(0.5f),
+            topRight = CornerRadius(0.25f),
+            bottomRight = CornerRadius(0.25f, 0.75f),
+            bottomLeft = CornerRadius.Zero
         )
 
         assertFalse(roundRect.contains(Offset(1.0f, 1.0f)))
@@ -50,10 +50,10 @@ class RoundRectTest {
     fun testRoundRectContainsLargeRadii() {
         val roundRect = RoundRect(
             Rect(1.0f, 1.0f, 2.0f, 2.0f),
-            topLeft = Radius(5000.0f),
-            topRight = Radius(2500.0f),
-            bottomRight = Radius(2500.0f, 7500.0f),
-            bottomLeft = Radius.Zero
+            topLeft = CornerRadius(5000.0f),
+            topRight = CornerRadius(2500.0f),
+            bottomRight = CornerRadius(2500.0f, 7500.0f),
+            bottomLeft = CornerRadius.Zero
         )
 
         assertFalse(roundRect.contains(Offset(1.0f, 1.0f)))
@@ -75,10 +75,10 @@ class RoundRectTest {
             20f,
             30f,
             40f,
-            Radius(5f, 10f),
-            Radius(15f, 20f),
-            Radius(25f, 30f),
-            Radius(35f, 40f)
+            CornerRadius(5f, 10f),
+            CornerRadius(15f, 20f),
+            CornerRadius(25f, 30f),
+            CornerRadius(35f, 40f)
         )
         assertEquals(right - left, roundRect.width)
     }
@@ -92,10 +92,10 @@ class RoundRectTest {
             top,
             30f,
             bottom,
-            Radius(5f, 10f),
-            Radius(15f, 20f),
-            Radius(25f, 30f),
-            Radius(35f, 40f)
+            CornerRadius(5f, 10f),
+            CornerRadius(15f, 20f),
+            CornerRadius(25f, 30f),
+            CornerRadius(35f, 40f)
         )
         assertEquals(bottom - top, roundRect.height)
     }
@@ -108,42 +108,42 @@ class RoundRectTest {
             15f,
             20f,
             25f,
-            Radius(30f, 30f),
-            Radius(30f, 30f),
-            Radius(30f, 30f),
-            Radius(30f, 30f)
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f)
         )
         assertEquals(roundRect1, roundRect2)
     }
 
     @Test
     fun testRoundRectRadiusConstructor() {
-        val roundRect1 = RoundRect(10f, 15f, 20f, 25f, Radius(30f))
+        val roundRect1 = RoundRect(10f, 15f, 20f, 25f, CornerRadius(30f))
         val roundRect2 = RoundRect(
             10f,
             15f,
             20f,
             25f,
-            Radius(30f, 30f),
-            Radius(30f, 30f),
-            Radius(30f, 30f),
-            Radius(30f, 30f)
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f)
         )
         assertEquals(roundRect1, roundRect2)
     }
 
     @Test
     fun testRoundRectWithRectAndRadiusConstructor() {
-        val roundRect1 = RoundRect(Rect(10f, 15f, 20f, 25f), Radius(30f))
+        val roundRect1 = RoundRect(Rect(10f, 15f, 20f, 25f), CornerRadius(30f))
         val roundRect2 = RoundRect(
             10f,
             15f,
             20f,
             25f,
-            Radius(30f, 30f),
-            Radius(30f, 30f),
-            Radius(30f, 30f),
-            Radius(30f, 30f)
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f),
+            CornerRadius(30f, 30f)
         )
         assertEquals(roundRect1, roundRect2)
     }
@@ -152,20 +152,20 @@ class RoundRectTest {
     fun testRoundRectWithRectAndSeparateRadii() {
         val roundRect1 = RoundRect(
             Rect(10f, 15f, 20f, 25f),
-            Radius(1f, 2f),
-            Radius(3f, 4f),
-            Radius(5f, 6f),
-            Radius(7f, 8f)
+            CornerRadius(1f, 2f),
+            CornerRadius(3f, 4f),
+            CornerRadius(5f, 6f),
+            CornerRadius(7f, 8f)
         )
         val roundRect2 = RoundRect(
             10f,
             15f,
             20f,
             25f,
-            Radius(1f, 2f),
-            Radius(3f, 4f),
-            Radius(5f, 6f),
-            Radius(7f, 8f)
+            CornerRadius(1f, 2f),
+            CornerRadius(3f, 4f),
+            CornerRadius(5f, 6f),
+            CornerRadius(7f, 8f)
         )
         assertEquals(roundRect1, roundRect2)
     }
@@ -177,32 +177,32 @@ class RoundRectTest {
             0f,
             10f,
             10f,
-            Radius(10f, 15f),
-            Radius(17f, 20f),
-            Radius (25f, 30f),
-            Radius(35f, 40f)
+            CornerRadius(10f, 15f),
+            CornerRadius(17f, 20f),
+            CornerRadius(25f, 30f),
+            CornerRadius(35f, 40f)
         )
-        assertEquals(Radius(10f, 15f), rr.topLeftRadius)
-        assertEquals(Radius(17f, 20f), rr.topRightRadius)
-        assertEquals(Radius(25f, 30f), rr.bottomRightRadius)
-        assertEquals(Radius(35f, 40f), rr.bottomLeftRadius)
+        assertEquals(CornerRadius(10f, 15f), rr.topLeftCornerRadius)
+        assertEquals(CornerRadius(17f, 20f), rr.topRightCornerRadius)
+        assertEquals(CornerRadius(25f, 30f), rr.bottomRightCornerRadius)
+        assertEquals(CornerRadius(35f, 40f), rr.bottomLeftCornerRadius)
     }
 
     @Test
     fun testMinDimension() {
-        val rr = RoundRect(0f, 0f, 100f, 50f, Radius(7f, 8f))
+        val rr = RoundRect(0f, 0f, 100f, 50f, CornerRadius(7f, 8f))
         assertEquals(50f, rr.minDimension)
     }
 
     @Test
     fun testMaxDimension() {
-        val rr = RoundRect(0f, 0f, 300f, 100f, Radius(5f, 10f))
+        val rr = RoundRect(0f, 0f, 300f, 100f, CornerRadius(5f, 10f))
         assertEquals(300f, rr.maxDimension)
     }
 
     @Test
     fun testCenter() {
-        val rr = RoundRect(0f, 0f, 200f, 100f, Radius.Zero)
+        val rr = RoundRect(0f, 0f, 200f, 100f, CornerRadius.Zero)
         assertEquals(Offset(100f, 50f), rr.center)
     }
 
@@ -210,11 +210,14 @@ class RoundRectTest {
     fun testSafeInnerRect() {
         val insetFactor = 0.29289321881f // 1-cos(pi/4)
         val rr = RoundRect(
-            left = 0f, top = 0f, right = 100f, bottom = 100f,
-            topLeftRadius = Radius(0f, 5f),
-            topRightRadius = Radius(5f, 10f),
-            bottomRightRadius = Radius(10f, 15f),
-            bottomLeftRadius = Radius(15f, 20f)
+            left = 0f,
+            top = 0f,
+            right = 100f,
+            bottom = 100f,
+            topLeftCornerRadius = CornerRadius(0f, 5f),
+            topRightCornerRadius = CornerRadius(5f, 10f),
+            bottomRightCornerRadius = CornerRadius(10f, 15f),
+            bottomLeftCornerRadius = CornerRadius(15f, 20f)
         )
         assertEquals(
             Rect(
@@ -229,7 +232,7 @@ class RoundRectTest {
 
     @Test
     fun testBoundingRect() {
-        val rr = RoundRect(1f, 2f, 3f, 4f, Radius(15f, 10f))
+        val rr = RoundRect(1f, 2f, 3f, 4f, CornerRadius(15f, 10f))
         assertEquals(Rect(1f, 2f, 3f, 4f), rr.boundingRect)
     }
 }

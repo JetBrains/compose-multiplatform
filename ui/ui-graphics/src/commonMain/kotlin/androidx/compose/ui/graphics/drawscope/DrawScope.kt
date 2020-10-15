@@ -17,7 +17,7 @@
 package androidx.compose.ui.graphics.drawscope
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -499,7 +499,7 @@ interface DrawScope : Density {
      * @param brush The color or fill to be applied to the rounded rectangle
      * @param topLeft Offset from the local origin of 0, 0 relative to the current translation
      * @param size Dimensions of the rectangle to draw
-     * @param radius Corner radius of the rounded rectangle
+     * @param cornerRadius Corner radius of the rounded rectangle, negative radii values are clamped to 0
      * @param alpha Opacity to be applied to rounded rectangle from 0.0f to 1.0f representing
      * fully transparent to fully opaque respectively
      * @param style Specifies whether the rounded rectangle is stroked or filled in
@@ -510,7 +510,7 @@ interface DrawScope : Density {
         brush: Brush,
         topLeft: Offset = Offset.Zero,
         size: Size = this.size.offsetSize(topLeft),
-        radius: Radius = Radius.Zero,
+        cornerRadius: CornerRadius = CornerRadius.Zero,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
         style: DrawStyle = Fill,
         colorFilter: ColorFilter? = null,
@@ -524,7 +524,7 @@ interface DrawScope : Density {
      * @param color The color to be applied to the rounded rectangle
      * @param topLeft Offset from the local origin of 0, 0 relative to the current translation
      * @param size Dimensions of the rectangle to draw
-     * @param radius Corner radius of the rounded rectangle
+     * @param cornerRadius Corner radius of the rounded rectangle, negative radii values are clamped to 0
      * @param alpha Opacity to be applied to rounded rectangle from 0.0f to 1.0f representing
      * fully transparent to fully opaque respectively
      * @param style Specifies whether the rounded rectangle is stroked or filled in
@@ -535,7 +535,7 @@ interface DrawScope : Density {
         color: Color,
         topLeft: Offset = Offset.Zero,
         size: Size = this.size.offsetSize(topLeft),
-        radius: Radius = Radius.Zero,
+        cornerRadius: CornerRadius = CornerRadius.Zero,
         style: DrawStyle = Fill,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
         colorFilter: ColorFilter? = null,

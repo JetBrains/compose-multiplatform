@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.graphics.drawscope
 
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -234,7 +234,7 @@ class CanvasDrawScope : DrawScope {
         brush: Brush,
         topLeft: Offset,
         size: Size,
-        radius: Radius,
+        cornerRadius: CornerRadius,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         style: DrawStyle,
         colorFilter: ColorFilter?,
@@ -244,8 +244,8 @@ class CanvasDrawScope : DrawScope {
         topLeft.y,
         topLeft.x + size.width,
         topLeft.y + size.height,
-        radius.x,
-        radius.y,
+        cornerRadius.x,
+        cornerRadius.y,
         configurePaint(brush, style, alpha, colorFilter, blendMode)
     )
 
@@ -256,7 +256,7 @@ class CanvasDrawScope : DrawScope {
         color: Color,
         topLeft: Offset,
         size: Size,
-        radius: Radius,
+        cornerRadius: CornerRadius,
         style: DrawStyle,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         colorFilter: ColorFilter?,
@@ -266,8 +266,8 @@ class CanvasDrawScope : DrawScope {
         topLeft.y,
         topLeft.x + size.width,
         topLeft.y + size.height,
-        radius.x,
-        radius.y,
+        cornerRadius.x,
+        cornerRadius.y,
         configurePaint(color, style, alpha, colorFilter, blendMode)
     )
 

@@ -23,7 +23,16 @@ import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.toStringAsFixed
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
-import kotlin.math.truncate
+
+/**
+ * Constructs a Radius with the given [x] and [y] parameters for the
+ * size of the radius along the x and y axis respectively. By default
+ * the radius along the Y axis matches that of the given x-axis
+ * unless otherwise specified. Negative radii values are clamped to 0.
+ */
+@Suppress("NOTHING_TO_INLINE")
+@Stable
+inline fun CornerRadius(x: Float, y: Float = x) = CornerRadius(packFloats(x, y))
 
 /**
  * Constructs a Radius with the given [x] and [y] parameters for the
@@ -33,7 +42,14 @@ import kotlin.math.truncate
  */
 @Suppress("NOTHING_TO_INLINE")
 @Stable
-inline fun Radius(x: Float, y: Float = x) = Radius(packFloats(x, y))
+@Deprecated(
+    "Use CornerRadius(x, y) instead",
+    ReplaceWith(
+        "CornerRadius(x, y)",
+        "androidx.compose.ui.geometry"
+    )
+)
+inline fun Radius(x: Float, y: Float = x) = CornerRadius(packFloats(x, y))
 
 /**
  * A radius for either circular or elliptical (oval) shapes.
@@ -42,8 +58,9 @@ inline fun Radius(x: Float, y: Float = x) = Radius(packFloats(x, y))
  * function constructor as it is represented as an inline class with 2 float
  * parameters packed into a single long to reduce allocation overhead
  **/
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Radius(@PublishedApi internal val packedValue: Long) {
+inline class CornerRadius(@PublishedApi internal val packedValue: Long) {
 
     /** The radius value on the horizontal axis. */
     @Stable
@@ -66,17 +83,17 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
      * Returns a copy of this Radius instance optionally overriding the
      * radius parameter for the x or y axis
      */
-    fun copy(x: Float = this.x, y: Float = this.y) = Radius(x, y)
+    fun copy(x: Float = this.x, y: Float = this.y) = CornerRadius(x, y)
 
     companion object {
 
         /**
          * A radius with [x] and [y] values set to zero.
          *
-         * You can use [Radius.Zero] with [RoundRect] to have right-angle corners.
+         * You can use [CornerRadius.Zero] with [RoundRect] to have right-angle corners.
          */
         @Stable
-        val Zero: Radius = Radius(0.0f)
+        val Zero: CornerRadius = CornerRadius(0.0f)
     }
 
     /**
@@ -90,7 +107,7 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
      * a radius of one pixel from the other.
      */
     @Stable
-    operator fun unaryMinus() = Radius(-x, -y)
+    operator fun unaryMinus() = CornerRadius(-x, -y)
 
     /**
      * Binary subtraction operator.
@@ -100,7 +117,7 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
      * left-hand-side operand's [y] minus the right-hand-side operand's [y].
      */
     @Stable
-    operator fun minus(other: Radius) = Radius(x - other.x, y - other.y)
+    operator fun minus(other: CornerRadius) = CornerRadius(x - other.x, y - other.y)
 
     /**
      * Binary addition operator.
@@ -110,7 +127,7 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
      * two operands.
      */
     @Stable
-    operator fun plus(other: Radius) = Radius(x + other.x, y + other.y)
+    operator fun plus(other: CornerRadius) = CornerRadius(x + other.x, y + other.y)
 
     /**
      * Multiplication operator.
@@ -120,7 +137,7 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
      * right-hand-side operand (a Float).
      */
     @Stable
-    operator fun times(operand: Float) = Radius(x * operand, y * operand)
+    operator fun times(operand: Float) = CornerRadius(x * operand, y * operand)
 
     /**
      * Division operator.
@@ -130,33 +147,13 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
      * operand (a Float).
      */
     @Stable
-    operator fun div(operand: Float) = Radius(x / operand, y / operand)
-
-    /**
-     * Integer (truncating) division operator.
-     *
-     * Returns a radius whose coordinates are the coordinates of the
-     * left-hand-side operand (a radius) divided by the scalar right-hand-side
-     * operand (a Float), rounded towards zero.
-     */
-    fun truncDiv(operand: Float): Radius =
-        Radius(truncate(x / operand), truncate(y / operand))
-
-    /**
-     * Modulo (remainder) operator.
-     *
-     * Returns a radius whose coordinates are the remainder of dividing the
-     * coordinates of the left-hand-side operand (a radius) by the scalar
-     * right-hand-side operand (a Float).
-     */
-    @Stable
-    operator fun rem(operand: Float) = Radius(x % operand, y % operand)
+    operator fun div(operand: Float) = CornerRadius(x / operand, y / operand)
 
     override fun toString(): String {
         return if (x == y) {
-            "Radius.circular(${x.toStringAsFixed(1)})"
+            "CornerRadius.circular(${x.toStringAsFixed(1)})"
         } else {
-            "Radius.elliptical(${x.toStringAsFixed(1)}, ${y.toStringAsFixed(1)})"
+            "CornerRadius.elliptical(${x.toStringAsFixed(1)}, ${y.toStringAsFixed(1)})"
         }
     }
 }
@@ -177,8 +174,8 @@ inline class Radius(@PublishedApi internal val packedValue: Long) {
  * an `AnimationController`.
  */
 @Stable
-fun lerp(start: Radius, stop: Radius, fraction: Float): Radius {
-    return Radius(
+fun lerp(start: CornerRadius, stop: CornerRadius, fraction: Float): CornerRadius {
+    return CornerRadius(
         lerp(start.x, stop.x, fraction),
         lerp(start.y, stop.y, fraction)
     )

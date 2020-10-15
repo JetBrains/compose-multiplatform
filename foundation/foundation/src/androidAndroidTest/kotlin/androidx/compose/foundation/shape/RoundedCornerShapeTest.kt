@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.shape
 
-import androidx.compose.ui.geometry.Radius
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
@@ -42,7 +42,7 @@ class RoundedCornerShapeTest {
     fun roundedUniformCorners() {
         val rounded = RoundedCornerShape(25)
 
-        val expectedRadius = Radius(25f)
+        val expectedRadius = CornerRadius(25f)
         val outline = rounded.toOutline() as Outline.Rounded
         assertThat(outline.roundRect).isEqualTo(
             RoundRect(size.toRect(), expectedRadius)
@@ -66,10 +66,10 @@ class RoundedCornerShapeTest {
         assertThat(outline.roundRect).isEqualTo(
             RoundRect(
                 size.toRect(),
-                Radius(radius1),
-                Radius(radius2),
-                Radius(radius3),
-                Radius(radius4)
+                CornerRadius(radius1),
+                CornerRadius(radius2),
+                CornerRadius(radius3),
+                CornerRadius(radius4)
             )
         )
     }

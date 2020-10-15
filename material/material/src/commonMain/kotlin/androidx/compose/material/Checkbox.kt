@@ -44,8 +44,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -285,14 +285,14 @@ private fun DrawScope.drawBox(
         boxColor,
         topLeft = Offset(strokeWidth, strokeWidth),
         size = Size(checkboxSize - strokeWidth * 2, checkboxSize - strokeWidth * 2),
-        radius = Radius(radius / 2),
+        cornerRadius = CornerRadius(radius / 2),
         style = Fill
     )
     drawRoundRect(
         borderColor,
         topLeft = Offset(halfStrokeWidth, halfStrokeWidth),
         size = Size(checkboxSize - strokeWidth, checkboxSize - strokeWidth),
-        radius = Radius(radius),
+        cornerRadius = CornerRadius(radius),
         style = stroke
     )
 }
