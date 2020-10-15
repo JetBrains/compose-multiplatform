@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
@@ -162,7 +163,10 @@ class TextFieldDelegateTest {
     @Test
     fun on_focus() {
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        val keyboardOptions = KeyboardOptions(singleLine = true)
+        val keyboardOptions = KeyboardOptions(
+            singleLine = true,
+            capitalization = KeyboardCapitalization.Sentences
+        )
         val keyboardType = KeyboardType.Phone
         val imeAction = ImeAction.Search
 

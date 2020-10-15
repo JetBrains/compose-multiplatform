@@ -25,13 +25,16 @@ import androidx.compose.ui.text.ExperimentalTextApi
  *
  * @param singleLine signals the keyboard that the text field is single line and keyboard should
  * not show enter action.
+ * @param capitalization signals the keyboard whether to automatically capitalize characters,
+ * words or sentences.
  */
 @ExperimentalTextApi
 @Immutable
-data class KeyboardOptions(val singleLine: Boolean) {
+data class KeyboardOptions(
+    val singleLine: Boolean = false,
+    val capitalization: KeyboardCapitalization = KeyboardCapitalization.None
+) {
     companion object {
-        val Default = KeyboardOptions(
-            singleLine = false
-        )
+        val Default = KeyboardOptions()
     }
 }

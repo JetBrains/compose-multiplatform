@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PlatformTextInputService
@@ -65,7 +66,10 @@ class CoreTextFieldInputServiceIntegrationTest {
 
         val testTag = "KeyboardOption"
         val value = TextFieldValue("abc")
-        val keyboardOptions = KeyboardOptions(singleLine = true)
+        val keyboardOptions = KeyboardOptions(
+            singleLine = true,
+            capitalization = KeyboardCapitalization.Words
+        )
         val keyboardType = KeyboardType.Phone
         val imeAction = ImeAction.Search
         var focused = false

@@ -29,13 +29,14 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalTextApi::class)
-private class Data(
+private class KeyboardOptionsData(
     val keyboardOptions: KeyboardOptions,
     val keyboardType: KeyboardType,
     val name: String,
@@ -44,32 +45,47 @@ private class Data(
 
 @OptIn(ExperimentalTextApi::class)
 private val KeyboardOptionsList = listOf(
-    Data(
+    KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(singleLine = true),
         keyboardType = KeyboardType.Text,
         name = "singleLine/Text"
     ),
-    Data(
+    KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(singleLine = false),
         keyboardType = KeyboardType.Text,
         name = "multiLine/Text"
     ),
-    Data(
+    KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(singleLine = true),
         keyboardType = KeyboardType.Text,
         imeAction = ImeAction.Search,
         name = "singleLine/Text/Search"
     ),
-    Data(
+    KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(singleLine = true),
         keyboardType = KeyboardType.Number,
         name = "singleLine/Number"
     ),
-    Data(
+    KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(singleLine = false),
         keyboardType = KeyboardType.Number,
         name = "multiLine/Number"
     ),
+    KeyboardOptionsData(
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
+        keyboardType = KeyboardType.Text,
+        name = "Capitalize Characters"
+    ),
+    KeyboardOptionsData(
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+        keyboardType = KeyboardType.Text,
+        name = "Capitalize Words"
+    ),
+    KeyboardOptionsData(
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+        keyboardType = KeyboardType.Text,
+        name = "Capitalize Sentences"
+    )
 )
 
 @OptIn(ExperimentalTextApi::class)
@@ -88,7 +104,7 @@ fun KeyboardOptionsDemo() {
     ExperimentalFoundationApi::class,
     ExperimentalTextApi::class
 )
-private fun MyTextField(data: Data) {
+private fun MyTextField(data: KeyboardOptionsData) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     CoreTextField(

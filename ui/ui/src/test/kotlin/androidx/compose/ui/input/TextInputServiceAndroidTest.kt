@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -434,6 +435,119 @@ class TextInputServiceAndroidTest {
             textInputService.createInputConnection(info)
             assertFalse((EditorInfo.IME_ACTION_DONE and info.imeOptions) == 0)
             assertTrue((EditorInfo.IME_ACTION_UNSPECIFIED and info.imeOptions) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_multi_line_not_set_when_input_type_is_not_text() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Number,
+            ImeAction.Done,
+            KeyboardOptions(singleLine = false),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
+            assertFalse((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_none() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Ascii,
+            ImeAction.Done,
+            KeyboardOptions(capitalization = KeyboardCapitalization.None),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_characters() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Ascii,
+            ImeAction.Done,
+            KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_words() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Ascii,
+            ImeAction.Done,
+            KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_sentences() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Ascii,
+            ImeAction.Done,
+            KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_not_added_when_input_type_is_not_text() {
+        textInputService.startInput(
+            TextFieldValue(""),
+            KeyboardType.Number,
+            ImeAction.Done,
+            KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
         }
     }
 }

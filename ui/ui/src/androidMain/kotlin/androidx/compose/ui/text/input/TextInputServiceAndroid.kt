@@ -220,12 +220,33 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         }
 
         if (!keyboardOptions.singleLine) {
-            // TextView.java#setInputTypeSingleLine
-            outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {
+                // TextView.java#setInputTypeSingleLine
+                outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            }
             // TextView.java#onCreateInputConnection
             outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_ENTER_ACTION
         }
 
+        if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {
+            when (keyboardOptions.capitalization) {
+                KeyboardCapitalization.None -> {
+                    /* do nothing */
+                }
+                KeyboardCapitalization.Characters -> {
+                    outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+                }
+                KeyboardCapitalization.Words -> {
+                    outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_CAP_WORDS
+                }
+                KeyboardCapitalization.Sentences -> {
+                    outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+                }
+            }
+        }
+
         outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_FULLSCREEN
     }
+
+    private fun hasFlag(bits: Int, flag: Int): Boolean = (bits and flag) == flag
 }

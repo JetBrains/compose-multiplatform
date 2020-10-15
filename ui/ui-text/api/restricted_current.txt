@@ -783,11 +783,22 @@ package androidx.compose.ui.text.input {
     method public void onImeAction(androidx.compose.ui.text.input.ImeAction imeAction);
   }
 
+  public enum KeyboardCapitalization {
+    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Characters;
+    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization None;
+    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Sentences;
+    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Words;
+  }
+
   @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public final class KeyboardOptions {
-    ctor public KeyboardOptions(boolean singleLine);
+    ctor public KeyboardOptions(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization);
+    ctor public KeyboardOptions();
     method public boolean component1();
-    method @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.input.KeyboardOptions copy(boolean singleLine);
+    method public androidx.compose.ui.text.input.KeyboardCapitalization component2();
+    method @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.input.KeyboardOptions copy(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization);
+    method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
     method public boolean getSingleLine();
+    property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
     property public final boolean singleLine;
     field public static final androidx.compose.ui.text.input.KeyboardOptions.Companion Companion;
   }
