@@ -242,9 +242,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
         isFocusableInTouchMode = true
         clipChildren = false
-        clipboardManager.addChangeListener {
-            accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
-        }
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
         AndroidOwner.onAndroidOwnerCreatedCallback?.invoke(this)
     }
@@ -587,6 +584,14 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         root.detach()
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
+
+        // In case of benchmarks, the handler callbacks will never get executed as benchmarks block
+        // the main thread. However this callback holds references that point to this view which
+        // effectively prevents it from being garbage collected in benchmarks.
+        if (observationClearRequested) {
+            observationClearRequested = false
+            handler.removeCallbacks(clearInvalidObservations)
+        }
     }
 
     override fun onProvideAutofillVirtualStructure(structure: ViewStructure?, flags: Int) {
