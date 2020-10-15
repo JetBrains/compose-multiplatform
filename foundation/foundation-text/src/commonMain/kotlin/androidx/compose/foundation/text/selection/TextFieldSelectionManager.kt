@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.selection.SelectionHandle
-import androidx.compose.ui.selection.SelectionHandleLayout
 import androidx.compose.ui.selection.getAdjustedCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
@@ -519,24 +518,18 @@ internal class TextFieldSelectionManager() {
 
 @Composable
 @OptIn(InternalTextApi::class)
-internal fun SelectionHandle(
+internal fun TextFieldSelectionHandle(
     isStartHandle: Boolean,
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
     manager: TextFieldSelectionManager
 ) {
-    SelectionHandleLayout(
+    SelectionHandle(
         startHandlePosition = manager.getHandlePosition(true),
         endHandlePosition = manager.getHandlePosition(false),
         isStartHandle = isStartHandle,
         directions = directions,
-        handlesCrossed = manager.value.selection.reversed
-    ) {
-        SelectionHandle(
-            modifier =
-                Modifier.dragGestureFilter(manager.handleDragObserver(isStartHandle)),
-            isStartHandle = isStartHandle,
-            directions = directions,
-            handlesCrossed = manager.value.selection.reversed
-        )
-    }
+        handlesCrossed = manager.value.selection.reversed,
+        modifier = Modifier.dragGestureFilter(manager.handleDragObserver(isStartHandle)),
+        handle = null
+    )
 }

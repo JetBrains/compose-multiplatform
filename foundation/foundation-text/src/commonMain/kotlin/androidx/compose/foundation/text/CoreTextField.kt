@@ -25,7 +25,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.repeatable
-import androidx.compose.foundation.text.selection.SelectionHandle
+import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -67,7 +67,7 @@ import androidx.compose.ui.platform.FontLoaderAmbient
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.TextToolbarAmbient
-import androidx.compose.ui.selection.SelectionLayout
+import androidx.compose.ui.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.focused
@@ -438,7 +438,7 @@ fun CoreTextField(
         .then(semanticsModifier)
         .focus()
 
-    SelectionLayout(modifiers) {
+    SimpleLayout(modifiers) {
         Layout(emptyContent()) { _, constraints ->
             TextFieldDelegate.layout(
                 state.textDelegate,
@@ -469,12 +469,12 @@ fun CoreTextField(
                     val endDirection =
                         it.getBidiRunDirection(max(value.selection.end - 1, 0))
                     val directions = Pair(startDirection, endDirection)
-                    SelectionHandle(
+                    TextFieldSelectionHandle(
                         isStartHandle = true,
                         directions = directions,
                         manager = manager
                     )
-                    SelectionHandle(
+                    TextFieldSelectionHandle(
                         isStartHandle = false,
                         directions = directions,
                         manager = manager

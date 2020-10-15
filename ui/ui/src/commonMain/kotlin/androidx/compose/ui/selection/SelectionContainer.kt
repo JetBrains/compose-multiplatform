@@ -74,29 +74,25 @@ fun SelectionContainer(
     Providers(SelectionRegistrarAmbient provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
-        SelectionLayout(
+        SimpleLayout(
             modifier = modifier.then(selectionContainerModifier)
         ) {
             children()
             manager.selection?.let {
                 for (isStartHandle in listOf(true, false)) {
-                    SelectionHandleLayout(
+                    SelectionHandle(
                         startHandlePosition = manager.startHandlePosition,
                         endHandlePosition = manager.endHandlePosition,
                         isStartHandle = isStartHandle,
                         directions = Pair(it.start.direction, it.end.direction),
-                        handlesCrossed = it.handlesCrossed
-                    ) {
-                        SelectionHandle(
-                            modifier =
-                                Modifier.dragGestureFilter(
-                                    manager.handleDragObserver(isStartHandle)
-                                ),
-                            isStartHandle = isStartHandle,
-                            directions = Pair(it.start.direction, it.end.direction),
-                            handlesCrossed = it.handlesCrossed
-                        )
-                    }
+                        handlesCrossed = it.handlesCrossed,
+                        modifier = Modifier.dragGestureFilter(
+                            manager.handleDragObserver(
+                                isStartHandle
+                            )
+                        ),
+                        handle = null
+                    )
                 }
                 SelectionFloatingToolBar(manager = manager)
             }
