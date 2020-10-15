@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.graphics.Color
@@ -105,7 +106,7 @@ fun SingleColumnLayout(currentIssue: MutableState<IssuesQuery.Node?>) {
 @Composable
 fun TwoColumnsLayout(currentIssue: MutableState<IssuesQuery.Node?>) {
     Row(Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxWidth(0.4f)) {
+        Box(modifier = Modifier.fillMaxWidth(0.4f), alignment = Alignment.Center) {
             IssuesList(currentIssue)
         }
         CurrentIssue(currentIssue.value)
@@ -253,7 +254,7 @@ fun ListBody(
                     for (iss in it.data.nodes) {
                         Box(modifier = Modifier.clickable {
                             currentIssue.value = iss
-                        }) {
+                        }, alignment = Alignment.CenterStart) {
                             ListItem(iss)
                         }
                     }
