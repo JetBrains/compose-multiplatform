@@ -154,7 +154,7 @@ android {
         testInstrumentationRunnerArgument("thisisignored", "thisisignored --no-isolated-storage")
     }
     sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../../golden/compose/material/material"
+            project.rootDir.absolutePath + "/../../golden/compose/material/material"
 }
 
 tasks.withType(KotlinCompile).configureEach {
