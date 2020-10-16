@@ -46,6 +46,13 @@ abstract class StudioTask : DefaultTask() {
         StudioPlatformUtilities.get(projectRoot, studioInstallationDir)
     }
 
+    /**
+     * If `true`, checks for `ANDROIDX_PROJECTS` environment variable to decide which
+     * projects need to be loaded.
+     */
+    @get:Internal
+    protected open val requiresProjectList: Boolean = true
+
     @get:Internal
     protected val projectRoot: File = project.rootDir
 
@@ -146,7 +153,7 @@ abstract class StudioTask : DefaultTask() {
      */
     private fun launch() {
         if (checkLicenseAgreement(services)) {
-            if (!System.getenv().containsKey("ANDROIDX_PROJECTS")) {
+            if (requiresProjectList && !System.getenv().containsKey("ANDROIDX_PROJECTS")) {
                 throw GradleException(
                     """
                     Please specify which set of projects you'd like to open in studio
@@ -236,6 +243,10 @@ open class RootStudioTask : StudioTask() {
  * Task for launching studio in a playground project
  */
 open class PlaygroundStudioTask : RootStudioTask() {
+    /**
+     * Playground projects have only 1 setup so there is no need to specify the project list.
+     */
+    override val requiresProjectList get() = false
     override val installParentDir get() = projectRoot.resolve("..")
     override val ideaProperties get() = projectRoot.resolve("../playground-common/idea.properties")
     override val vmOptions get() = projectRoot.resolve("../playground-common/studio.vmoptions")
