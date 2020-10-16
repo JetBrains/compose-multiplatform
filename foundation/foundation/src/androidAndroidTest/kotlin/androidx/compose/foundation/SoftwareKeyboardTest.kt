@@ -51,7 +51,7 @@ class SoftwareKeyboardTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         val onTextInputStarted: (SoftwareKeyboardController) -> Unit = mock()
