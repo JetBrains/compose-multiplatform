@@ -23,6 +23,7 @@ import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.MenuBar
 import java.awt.Dimension
 import java.awt.Frame
 import java.awt.image.BufferedImage
@@ -31,6 +32,7 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import javax.swing.JMenuBar
 import javax.swing.WindowConstants
 
 val AppWindowAmbient = ambientOf<AppWindow?>()
@@ -41,6 +43,7 @@ fun Window(
     location: IntOffset = IntOffset.Zero,
     centered: Boolean = true,
     icon: BufferedImage? = null,
+    menuBar: MenuBar? = null,
     undecorated: Boolean = false,
     events: WindowEvents = WindowEvents(),
     onDismissEvent: (() -> Unit)? = null,
@@ -52,6 +55,7 @@ fun Window(
         location = location,
         centered = centered,
         icon = icon,
+        menuBar = menuBar,
         undecorated = undecorated,
         events = events,
         onDismissEvent = onDismissEvent
@@ -86,6 +90,7 @@ class AppWindow : AppFrame {
             })
             addWindowFocusListener(object : WindowAdapter() {
                 override fun windowGainedFocus(event: WindowEvent) {
+                    window.setJMenuBar(parent.menuBar?.menuBar)
                     events.invokeOnFocusGet()
                 }
                 override fun windowLostFocus(event: WindowEvent) {
@@ -120,10 +125,11 @@ class AppWindow : AppFrame {
         location: IntOffset = IntOffset.Zero,
         centered: Boolean = true,
         icon: BufferedImage? = null,
+        menuBar: MenuBar? = null,
         undecorated: Boolean = false,
         events: WindowEvents = WindowEvents(),
         onDismissEvent: (() -> Unit)? = null
-    ) : this(title, size, location, centered, icon, undecorated, events, onDismissEvent) {
+    ) : this(title, size, location, centered, icon, menuBar, undecorated, events, onDismissEvent) {
         this.invoker = attached
     }
 
@@ -133,24 +139,34 @@ class AppWindow : AppFrame {
         location: IntOffset = IntOffset.Zero,
         centered: Boolean = true,
         icon: BufferedImage? = null,
+        menuBar: MenuBar? = null,
         undecorated: Boolean = false,
         events: WindowEvents = WindowEvents(),
         onDismissEvent: (() -> Unit)? = null
     ) {
+        AppManager.addWindow(this)
+
         setTitle(title)
         setIcon(icon)
-        setLocation(location.x, location.y)
         setSize(size.width, size.height)
+        if (centered) {
+            setWindowCentered()
+        } else {
+            setLocation(location.x, location.y)
+        }
 
-        this.isCentered = centered
+        this.menuBar = menuBar
+
+        if (this.menuBar == null && AppManager.sharedMenuBar != null) {
+            this.menuBar = AppManager.sharedMenuBar!!
+        }
+
         this.events = events
 
         window.setUndecorated(undecorated)
         if (onDismissEvent != null) {
             onDismissEvents.add(onDismissEvent)
         }
-
-        AppManager.addWindow(this)
     }
 
     internal var pair: AppFrame? = null
@@ -176,6 +192,16 @@ class AppWindow : AppFrame {
             }
             window.setIconImage(icon)
         }
+    }
+
+    override fun setMenuBar(menuBar: MenuBar) {
+        this.menuBar = menuBar
+        window.setJMenuBar(menuBar.menuBar)
+    }
+
+    override fun removeMenuBar() {
+        this.menuBar = null
+        window.setJMenuBar(JMenuBar())
     }
 
     override fun setSize(width: Int, height: Int) {
@@ -224,9 +250,6 @@ class AppWindow : AppFrame {
             content()
         }
 
-        if (isCentered) {
-            setWindowCentered()
-        }
         window.setVisible(true)
         events.invokeOnOpen()
     }
