@@ -18,8 +18,11 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.AnimatedValueModel
 import androidx.compose.animation.VectorConverter
-import androidx.compose.animation.animatedValue
+import androidx.compose.animation.asDisposableClock
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Interaction
@@ -37,13 +40,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -274,7 +277,6 @@ interface ButtonElevation {
      * @param enabled whether the button is enabled
      * @param interactionState the [InteractionState] for this button
      */
-    @Composable
     fun elevation(enabled: Boolean, interactionState: InteractionState): Dp
 }
 
@@ -294,7 +296,6 @@ interface ButtonColors {
      *
      * @param enabled whether the button is enabled
      */
-    @Composable
     fun backgroundColor(enabled: Boolean): Color
 
     /**
@@ -302,7 +303,6 @@ interface ButtonColors {
      *
      * @param enabled whether the button is enabled
      */
-    @Composable
     fun contentColor(enabled: Boolean): Color
 }
 
@@ -368,11 +368,17 @@ object ButtonConstants {
         // focused: Dp = 4.dp,
         // hovered: Dp = 4.dp,
         disabledElevation: Dp = 0.dp
-    ): ButtonElevation = DefaultButtonElevation(
-        defaultElevation = defaultElevation,
-        pressedElevation = pressedElevation,
-        disabledElevation = disabledElevation
-    )
+    ): ButtonElevation {
+        val clock = AnimationClockAmbient.current.asDisposableClock()
+        return remember(defaultElevation, pressedElevation, disabledElevation, clock) {
+            DefaultButtonElevation(
+                defaultElevation = defaultElevation,
+                pressedElevation = pressedElevation,
+                disabledElevation = disabledElevation,
+                clock = clock
+            )
+        }
+    }
 
     /**
      * Creates a [ButtonColors] that represents the default background and content colors used in
@@ -477,13 +483,17 @@ object ButtonConstants {
  * Default [ButtonElevation] implementation.
  */
 @OptIn(ExperimentalMaterialApi::class)
-@Immutable
+@Stable
 private class DefaultButtonElevation(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
-    private val disabledElevation: Dp
+    private val disabledElevation: Dp,
+    private val clock: AnimationClockObservable
 ) : ButtonElevation {
-    @Composable
+    private val lazyAnimatedElevation = LazyAnimatedValue<Dp, AnimationVector1D> { target ->
+        AnimatedValueModel(initialValue = target, typeConverter = Dp.VectorConverter, clock = clock)
+    }
+
     override fun elevation(enabled: Boolean, interactionState: InteractionState): Dp {
         val interaction = interactionState.value.lastOrNull {
             it is Interaction.Pressed
@@ -498,9 +508,9 @@ private class DefaultButtonElevation(
             }
         }
 
-        val animatedElevation = animatedValue(target, Dp.VectorConverter)
+        val animatedElevation = lazyAnimatedElevation.animatedValueForTarget(target)
 
-        onCommit(target) {
+        if (animatedElevation.targetValue != target) {
             if (!enabled) {
                 // No transition when moving to a disabled state
                 animatedElevation.snapTo(target)
@@ -532,12 +542,10 @@ private class DefaultButtonColors(
     private val contentColor: Color,
     private val disabledContentColor: Color
 ) : ButtonColors {
-    @Composable
     override fun backgroundColor(enabled: Boolean): Color {
         return if (enabled) backgroundColor else disabledBackgroundColor
     }
 
-    @Composable
     override fun contentColor(enabled: Boolean): Color {
         return if (enabled) contentColor else disabledContentColor
     }
