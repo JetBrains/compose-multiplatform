@@ -31,7 +31,7 @@ import kotlin.math.max
 class MutableVector<T> @PublishedApi internal constructor(
     @PublishedApi internal var content: Array<T?>,
     size: Int
-) {
+) : RandomAccess {
     /**
      * Stores allocated [MutableList] representation of this vector.
      */

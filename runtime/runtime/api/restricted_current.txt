@@ -615,7 +615,7 @@ package androidx.compose.runtime.collection {
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental API for fast access collections and is likely to change " + "before becoming stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalCollectionApi {
   }
 
-  @androidx.compose.runtime.collection.ExperimentalCollectionApi public final class MutableVector<T> {
+  @androidx.compose.runtime.collection.ExperimentalCollectionApi public final class MutableVector<T> implements java.util.RandomAccess {
     ctor @kotlin.PublishedApi internal MutableVector(@kotlin.PublishedApi internal T![] content, int size);
     method public boolean add(T? element);
     method public void add(int index, T? element);
