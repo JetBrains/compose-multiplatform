@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.paging
+package androidx.paging.compose
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.lazy.LazyItemScope
@@ -31,13 +31,13 @@ import androidx.paging.DifferCallback
 import androidx.paging.LoadState
 import androidx.paging.LoadStates
 import androidx.paging.NullPaddedList
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingDataDiffer
-import androidx.paging.PagingConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * The class responsible for accessing the data from a [Flow] of [PagingData].
@@ -141,7 +141,7 @@ private val InitialLoadStates = LoadStates(
  * instance. The [LazyPagingItems] instance can be used by the [items] and [itemsIndexed] methods
  * from [LazyListScope] in order to display the data obtained from a [Flow] of [PagingData].
  *
- * @sample androidx.compose.paging.samples.PagingBackendSample
+ * @sample androidx.paging.compose.samples.PagingBackendSample
  */
 @Composable
 public fun <T : Any> Flow<PagingData<T>>.collectAsLazyPagingItems(): LazyPagingItems<T> {
@@ -163,7 +163,7 @@ public fun <T : Any> Flow<PagingData<T>>.collectAsLazyPagingItems(): LazyPagingI
  * [LazyPagingItems.itemCount] (inclusive) always represents the full range of presentable items,
  * because every event from [PagingDataDiffer] will trigger a recomposition.
  *
- * @sample androidx.compose.paging.samples.ItemsDemo
+ * @sample androidx.paging.compose.samples.ItemsDemo
  *
  * @param lazyPagingItems the items received from a [Flow] of [PagingData].
  * @param itemContent the content displayed by a single item. In case the item is `null`, the
@@ -191,7 +191,7 @@ public fun <T : Any> LazyListScope.items(
  * always represents the full range of presentable items, because every event from
  * [PagingDataDiffer] will trigger a recomposition.
  *
- * @sample androidx.compose.paging.samples.ItemsIndexedDemo
+ * @sample androidx.paging.compose.samples.ItemsIndexedDemo
  *
  * @param lazyPagingItems the items received from a [Flow] of [PagingData].
  * @param itemContent the content displayed by a single item. In case the item is `null`, the

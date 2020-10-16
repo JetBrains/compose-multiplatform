@@ -14,4 +14,4 @@
   limitations under the License.
   -->
 
-<manifest package="androidx.compose.paging.samples" />
+<manifest package="androidx.paging.compose.samples" />

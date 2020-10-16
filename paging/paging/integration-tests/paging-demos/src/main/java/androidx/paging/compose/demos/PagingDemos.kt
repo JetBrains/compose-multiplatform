@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.paging.demos.room
+package androidx.paging.compose.demos
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.DemoCategory
+import androidx.paging.compose.demos.room.PagingRoomDemo
+import androidx.paging.compose.samples.PagingBackendSample
 
-@Entity(tableName = "users")
-data class User(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
-    val name: String
+val PagingDemos = DemoCategory(
+    "Paging",
+    listOf(
+        ComposableDemo("Paging Backend Demo") { PagingBackendSample() },
+        ComposableDemo("Paging Room Demo") { PagingRoomDemo() }
+    )
 )

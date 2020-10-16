@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.paging.samples
+package androidx.paging.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Text
@@ -23,9 +23,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.paging.collectAsLazyPagingItems
-import androidx.compose.paging.items
-import androidx.compose.paging.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,6 +33,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
+import androidx.paging.compose.itemsIndexed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlin.math.ceil

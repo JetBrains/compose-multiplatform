@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.paging
+package androidx.paging.compose
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight

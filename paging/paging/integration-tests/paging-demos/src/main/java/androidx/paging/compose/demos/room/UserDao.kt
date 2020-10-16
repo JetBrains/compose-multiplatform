@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.paging.demos.room
+package androidx.paging.compose.demos.room
 
 import androidx.paging.PagingSource
 import androidx.room.Dao

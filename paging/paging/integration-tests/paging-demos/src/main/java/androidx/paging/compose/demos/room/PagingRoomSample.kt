@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.paging.demos.room
+package androidx.paging.compose.demos.room
 
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
-import androidx.compose.paging.collectAsLazyPagingItems
-import androidx.compose.paging.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,6 +28,8 @@ import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.sp
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.random.Random
