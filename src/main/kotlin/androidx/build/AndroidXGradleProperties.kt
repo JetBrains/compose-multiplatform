@@ -169,13 +169,11 @@ fun Project.studioType() = StudioType.findType(
 
 enum class StudioType {
     ANDROIDX,
-    PLAYGROUND,
-    COMPOSE;
+    PLAYGROUND;
 
     companion object {
         fun findType(value: String?) = when (value) {
             "playground" -> PLAYGROUND
-            "compose" -> COMPOSE
             null, "androidx" -> ANDROIDX
             else -> error("Invalid project type $value")
         }

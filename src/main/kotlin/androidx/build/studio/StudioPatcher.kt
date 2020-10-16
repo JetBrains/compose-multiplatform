@@ -31,14 +31,14 @@ typealias StudioPatcher = (
 val NoopStudioPatcher: StudioPatcher = fun (_: StudioTask, _: Project, _: File) {}
 
 /**
- * Patch studio with the pre-release Kotlin 1.4-RC plugin, downloaded from Jetbrians
+ * Patch studio with the Kotlin 1.4.10 plugin, downloaded from Jetbrains
  */
-val ComposeStudioPatcher: StudioPatcher = fun (
+val KotlinStudioPatcher: StudioPatcher = fun (
     studioTask: StudioTask,
     project: Project,
     studioInstallationDir: File
 ) {
-    val url = "https://plugins.jetbrains.com/plugin/download?rel=true&updateId=92782"
+    val url = "https://plugins.jetbrains.com/plugin/download?rel=true&updateId=96650"
     val tmpZip = File("${studioInstallationDir.absolutePath}/kotlinPlugin.zip")
         .absolutePath
 

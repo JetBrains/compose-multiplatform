@@ -47,9 +47,6 @@ object SupportConfig {
     const val TARGET_SDK_VERSION = 30
 
     @JvmStatic
-    fun isUiProject() = System.getenv("DIST_SUBDIR") == "/ui"
-
-    @JvmStatic
     fun getJavaToolsJarPath() = System.getenv("JAVA_TOOLS_JAR")
 }
 

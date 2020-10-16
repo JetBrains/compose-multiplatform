@@ -16,8 +16,6 @@
 
 package androidx.build.studio
 
-import androidx.build.SupportConfig
-
 /**
  * Studio version information used for setting up the correct version of Android Studio.
  *
@@ -33,31 +31,8 @@ import androidx.build.SupportConfig
  * From this, the first number (3.6.0.5) is [studioVersion], the first number in the filename (192)
  * is the [ideaMajorVersion] and the last number (5721125) is the [studioBuildNumber].
  */
-sealed class StudioVersions {
-    abstract val studioVersion: String
-    abstract val ideaMajorVersion: String
-    abstract val studioBuildNumber: String
-
-    companion object {
-        /**
-         * Gets the relevant [StudioVersions] for the current root project.
-         */
-        fun get() = if (SupportConfig.isUiProject()) {
-            UiStudioVersions
-        } else {
-            RootStudioVersions
-        }
-    }
-}
-
-private object RootStudioVersions : StudioVersions() {
-    override val studioVersion = "4.2.0.6"
-    override val ideaMajorVersion = "201"
-    override val studioBuildNumber = "6712195"
-}
-
-private object UiStudioVersions : StudioVersions() {
-    override val studioVersion = "4.2.0.6"
-    override val ideaMajorVersion = "201"
-    override val studioBuildNumber = "6712195"
+object StudioVersions {
+    val studioVersion = "4.2.0.6"
+    val ideaMajorVersion = "201"
+    val studioBuildNumber = "6712195"
 }
