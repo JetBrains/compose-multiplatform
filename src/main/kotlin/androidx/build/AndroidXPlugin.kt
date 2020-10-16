@@ -631,6 +631,7 @@ class AndroidXPlugin : Plugin<Project> {
                     "${project.asFilenamePrefix()}${variantName}AndroidTest.xml"
                 )
             )
+            AffectedModuleDetector.configureTaskGuard(it)
         }
         project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
             .dependsOn(generateTestConfigurationTask)
