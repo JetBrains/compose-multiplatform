@@ -111,6 +111,9 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
     prebuilts(LibraryGroups.NAVIGATION, "2.3.1")
+    // TODO: un-ignore these two once we have a prebuilt for paging compose
+    ignore(LibraryGroups.PAGING.group, "paging-compose")
+    ignore(LibraryGroups.PAGING.group, "paging-compose-samples")
     // TODO: un-ignore this once we have a prebuilt for paging samples
     ignore(LibraryGroups.PAGING.group, "paging-samples")
     prebuilts(LibraryGroups.PAGING, "3.0.0-alpha07")
