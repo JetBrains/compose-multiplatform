@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
@@ -35,6 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@OptIn(ExperimentalTextApi::class)
 @RunWith(JUnit4::class)
 class TextInputServiceTest {
 
@@ -48,6 +50,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -55,6 +58,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -72,6 +76,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -90,6 +95,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -99,6 +105,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -117,6 +124,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -135,6 +143,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -144,6 +153,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -162,6 +172,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -181,6 +192,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -190,6 +202,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -209,6 +222,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -228,6 +242,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
@@ -237,6 +252,7 @@ class TextInputServiceTest {
             TextFieldValue(),
             KeyboardType.Text,
             ImeAction.NoAction,
+            KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )

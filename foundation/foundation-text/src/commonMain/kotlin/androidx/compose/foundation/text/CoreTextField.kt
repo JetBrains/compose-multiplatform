@@ -81,6 +81,7 @@ import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextDelegate
@@ -90,6 +91,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMap
@@ -152,7 +154,8 @@ import kotlin.math.roundToInt
 @Composable
 @OptIn(
     ExperimentalFocus::class,
-    InternalTextApi::class
+    InternalTextApi::class,
+    ExperimentalTextApi::class
 )
 fun CoreTextField(
     value: TextFieldValue,
@@ -167,7 +170,8 @@ fun CoreTextField(
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = Color.Unspecified,
     softWrap: Boolean = true,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     require(maxLines > 0) {
         "maxLines should be greater than 0"
@@ -244,6 +248,7 @@ fun CoreTextField(
                 state.processor,
                 keyboardType,
                 imeAction,
+                keyboardOptions,
                 onValueChangeWrapper,
                 onImeActionPerformedWrapper
             )

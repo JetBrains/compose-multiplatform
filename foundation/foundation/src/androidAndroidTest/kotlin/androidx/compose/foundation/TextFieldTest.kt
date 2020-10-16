@@ -149,7 +149,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         rule.setContent {
@@ -170,6 +170,7 @@ class TextFieldTest {
                 value = any(),
                 keyboardType = any(),
                 imeAction = any(),
+                keyboardOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
@@ -221,7 +222,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         rule.setContent {
@@ -242,6 +243,7 @@ class TextFieldTest {
                 value = any(),
                 keyboardType = any(),
                 imeAction = any(),
+                keyboardOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
@@ -280,7 +282,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
@@ -310,6 +312,7 @@ class TextFieldTest {
                 value = any(),
                 keyboardType = any(),
                 imeAction = any(),
+                keyboardOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
