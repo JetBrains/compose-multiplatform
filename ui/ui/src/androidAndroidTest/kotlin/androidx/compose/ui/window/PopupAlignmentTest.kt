@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.selection.SimpleContainer
 import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
