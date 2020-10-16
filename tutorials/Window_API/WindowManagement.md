@@ -12,9 +12,9 @@ The main class for creating windows is AppWindow. The easiest way to create and 
 import androidx.compose.desktop.AppWindow
 
 fun main() {
-	AppWindow().show {
-		// content
-	}
+    AppWindow().show {
+        // content
+    }
 }
 ```
 
@@ -33,19 +33,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Dialog
 
 fun main() {
-	Window {
-		val dialogState = remember { mutableStateOf(false) }
+    Window {
+        val dialogState = remember { mutableStateOf(false) }
 
-		Button(onClick = { dialogState.value = true })
+        Button(onClick = { dialogState.value = true })
 
-		if (dialogState.value) {
-			Dialog(
-				onDismissEvent = { dialogState.value = false }
-			) {
-				// dialog's content
-			}
-		}
-	}
+        if (dialogState.value) {
+            Dialog(
+                onDismissEvent = { dialogState.value = false }
+            ) {
+                // dialog's content
+            }
+        }
+    }
 }
 ```
 
@@ -72,24 +72,24 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 fun main() {
-	Window(
-		title = "MyApp",
-		size = IntSize(800, 600),
-		location = IntOffset(200, 200),
-		centered = false, // true - by default
-		icon = getMyAppIcon(), // custom function that returns BufferedImage
-		menuBar = getMyAppMenuBar(), // custom function that returns MenuBar
-		undecorated = true, // false - by default
-		events = WindowEvents(
-			onOpen = { println("OnOpen") },
-			... // here may be other events
-			onResize = { size ->
-				println("Size: $size")
-			}
-		)
-	) {
-		// content
-	}
+    Window(
+        title = "MyApp",
+        size = IntSize(800, 600),
+        location = IntOffset(200, 200),
+        centered = false, // true - by default
+        icon = getMyAppIcon(), // custom function that returns BufferedImage
+        menuBar = getMyAppMenuBar(), // custom function that returns MenuBar
+        undecorated = true, // false - by default
+        events = WindowEvents(
+            onOpen = { println("OnOpen") },
+            ... // here may be other events
+            onResize = { size ->
+                println("Size: $size")
+            }
+        )
+    ) {
+        // content
+    }
 }
 ```
 
@@ -114,16 +114,16 @@ import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.Window
 
 fun main() {
-	Window {
-		val current = AppWindowAmbient.current
-		Button(
-			onClick = {
-				if (current != null) {
-					println("Title: ${current.title} ${current.x} ${current.y}")
-				}
-			}
-		)
-	}
+    Window {
+        val current = AppWindowAmbient.current
+        Button(
+            onClick = {
+                if (current != null) {
+                    println("Title: ${current.title} ${current.x} ${current.y}")
+                }
+            }
+        )
+    }
 }
 ```
 
@@ -134,16 +134,16 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
 
 fun main() {
-	Window {
-		Button(
-			onClick = {
-				val current = AppManager.getCurrentFocusedWindow()
-				if (current != null) {
-					println("Title: ${current.title} ${current.x} ${current.y}")
-				}
-			}
-		)
-	}
+    Window {
+        Button(
+            onClick = {
+                val current = AppManager.getCurrentFocusedWindow()
+                if (current != null) {
+                    println("Title: ${current.title} ${current.x} ${current.y}")
+                }
+            }
+        )
+    }
 }
 ```
 
@@ -160,16 +160,16 @@ import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.Window
 
 fun main() {
-	Window {
-		val current = AppWindowAmbient.current
-		Button(
-			onClick = {
-				if (current != null) {
-					current.setWindowCentered()
-				}
-			}
-		)
-	}
+    Window {
+        val current = AppWindowAmbient.current
+        Button(
+            onClick = {
+                if (current != null) {
+                    current.setWindowCentered()
+                }
+            }
+        )
+    }
 }
 ```
 
@@ -193,17 +193,17 @@ import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
 
 fun main() {
-	Window(
-		events = WindowEvents(
-			onOpen = { println("OnOpen") },
-			... // here may be other events
-			onResize = { size ->
-				println("Size: $size")
-			}
-		)
-	) {
-		// content
-	}
+    Window(
+        events = WindowEvents(
+            onOpen = { println("OnOpen") },
+            ... // here may be other events
+            onResize = { size ->
+                println("Size: $size")
+            }
+        )
+    ) {
+        // content
+    }
 }
 ```
 
@@ -214,14 +214,14 @@ The AppManager class is used to customize the behavior of the entire application
 1. Description of common application events
 ```kotlin
 AppManager.onEvent(
-	onAppStart = { println("OnAppStart") },
-	onAppExit = { println("OnAppExit") }
+    onAppStart = { println("OnAppStart") },
+    onAppExit = { println("OnAppExit") }
 )
 ```
 2. Customization of common application context menu
 ```kotlin
 AppManager.menu(
-	getCommonAppMenuBar() // custom function that returns MenuBar
+    getCommonAppMenuBar() // custom function that returns MenuBar
 )
 ```
 3. Access to the application windows list
@@ -246,17 +246,16 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
 
 fun main() {
-	Window {
-		Button(
-			onClick = {
-				val current = AppManager.getCurrentFocusedWindow()
-				if (current != null) {
-					val jFrame = current.window
-					// do whatever you want with it, for example add some new listeners
-				}
-			}
-		)
-	}
+    Window {
+        Button(
+            onClick = {
+                val current = AppManager.getCurrentFocusedWindow()
+                if (current != null) {
+                    val jFrame = current.window
+                    // do whatever you want with it, for example add some new listeners
+                }
+            }
+        )
+    }
 }
 ```
-

@@ -21,36 +21,36 @@ import androidx.compose.ui.window.Item
 import androidx.compose.ui.window.Tray
 
 fun main() {
-	Window {
-		onActive {
-			val tray = Tray().apply {
-				icon(getImageIcon()) // custom function that returns BufferedImage
-				menu(
-					Item(
-						name = "About",
-						onClick = {
-							println("This is MyApp")
-						}
-					),
-					Item(
-						name = "Send notification",
-						onClick = {
-							tray.notify("Notification", "Message from MyApp!")
-						}
-					),
-					Item(
-						name = "Exit",
-						onClick = {
-							AppManager.exit()
-						}
-					)
-				)
-			}
-			onDispose {
-				tray.remove()
-			}
-		}
-	}
+    Window {
+        onActive {
+            val tray = Tray().apply {
+                icon(getImageIcon()) // custom function that returns BufferedImage
+                menu(
+                    Item(
+                        name = "About",
+                        onClick = {
+                            println("This is MyApp")
+                        }
+                    ),
+                    Item(
+                        name = "Send notification",
+                        onClick = {
+                            tray.notify("Notification", "Message from MyApp!")
+                        }
+                    ),
+                    Item(
+                        name = "Exit",
+                        onClick = {
+                            AppManager.exit()
+                        }
+                    )
+                )
+            }
+            onDispose {
+                tray.remove()
+            }
+        }
+    }
 }
 ```
 
@@ -70,20 +70,20 @@ import androidx.compose.material.Button
 import androidx.compose.ui.window.Notifier
 
 fun main() {
-	val message = "Some message!"
-	Window {
-		Column {
-			Button(onClick = { Notifier().notify("Notification.", message) }) {
-				Text(text = "Notify")
-			}
-			Button(onClick = { Notifier().warn("Warning.", message) }) {
-				Text(text = "Warning")
-			}
-			Button(onClick = { Notifier().error("Error.", message) }) {
-				Text(text = "Error")
-			}
-		}
-	}
+    val message = "Some message!"
+    Window {
+        Column {
+            Button(onClick = { Notifier().notify("Notification.", message) }) {
+                Text(text = "Notify")
+            }
+            Button(onClick = { Notifier().warn("Warning.", message) }) {
+                Text(text = "Warning")
+            }
+            Button(onClick = { Notifier().error("Error.", message) }) {
+                Text(text = "Error")
+            }
+        }
+    }
 }
 ```
 
@@ -102,40 +102,40 @@ import androidx.compose.ui.window.MenuBar
 import java.awt.event.KeyEvent
 
 fun main() {
-	AppManager.menu(
-		MenuBar(
-			Menu(
-				name = "Actions",
-				Item(
-					name = "About",
-					onClick = { println("This is MyApp") },
-					shortcut = keyStroke(KeyEvent.VK_I)
-				),
-				Item(
-					name = "Exit",
-					onClick = { AppManager.exit() },
-					shortcut = keyStroke(KeyEvent.VK_X)
-				)
-			),
-			Menu(
-				name = "File",
-				Item(
-					name = "Copy",
-					onClick = { println("Copy operation.") },
-					shortcut = keyStroke(KeyEvent.VK_C)
-				),
-				Item(
-					name = "Paste",
-					onClick = { println("Paste operation.") },
-					shortcut = keyStroke(KeyEvent.VK_V)
-				)
-			)
-		)
-	)
+    AppManager.menu(
+        MenuBar(
+            Menu(
+                name = "Actions",
+                Item(
+                    name = "About",
+                    onClick = { println("This is MyApp") },
+                    shortcut = keyStroke(KeyEvent.VK_I)
+                ),
+                Item(
+                    name = "Exit",
+                    onClick = { AppManager.exit() },
+                    shortcut = keyStroke(KeyEvent.VK_X)
+                )
+            ),
+            Menu(
+                name = "File",
+                Item(
+                    name = "Copy",
+                    onClick = { println("Copy operation.") },
+                    shortcut = keyStroke(KeyEvent.VK_C)
+                ),
+                Item(
+                    name = "Paste",
+                    onClick = { println("Paste operation.") },
+                    shortcut = keyStroke(KeyEvent.VK_V)
+                )
+            )
+        )
+    )
 
-	Window {
-		// content
-	}
+    Window {
+        // content
+    }
 }
 ```
 
@@ -151,38 +151,38 @@ import androidx.compose.ui.window.MenuBar
 import java.awt.event.KeyEvent
 
 fun main() {
-	Window(
-		menuBar = MenuBar(
-			Menu(
-				name = "Actions",
-				Item(
-					name = "About",
-					onClick = { println("This is MyApp") },
-					shortcut = keyStroke(KeyEvent.VK_I)
-				),
-				Item(
-					name = "Exit",
-					onClick = { AppManager.exit() },
-					shortcut = keyStroke(KeyEvent.VK_X)
-				)
-			),
-			Menu(
-				name = "File",
-				Item(
-					name = "Copy",
-					onClick = { println("Copy operation.") },
-					shortcut = keyStroke(KeyEvent.VK_C)
-				),
-				Item(
-					name = "Paste",
-					onClick = { println("Paste operation.") },
-					shortcut = keyStroke(KeyEvent.VK_V)
-				)
-			)
-		)
-	) {
-		// content
-	}
+    Window(
+        menuBar = MenuBar(
+            Menu(
+                name = "Actions",
+                Item(
+                    name = "About",
+                    onClick = { println("This is MyApp") },
+                    shortcut = keyStroke(KeyEvent.VK_I)
+                ),
+                Item(
+                    name = "Exit",
+                    onClick = { AppManager.exit() },
+                    shortcut = keyStroke(KeyEvent.VK_X)
+                )
+            ),
+            Menu(
+                name = "File",
+                Item(
+                    name = "Copy",
+                    onClick = { println("Copy operation.") },
+                    shortcut = keyStroke(KeyEvent.VK_C)
+                ),
+                Item(
+                    name = "Paste",
+                    onClick = { println("Paste operation.") },
+                    shortcut = keyStroke(KeyEvent.VK_V)
+                )
+            )
+        )
+    ) {
+        // content
+    }
 }
 ```
 
