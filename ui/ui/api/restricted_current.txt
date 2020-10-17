@@ -548,9 +548,6 @@ package androidx.compose.ui.focus {
     enum_constant public static final androidx.compose.ui.focus.FocusState Inactive;
   }
 
-  @Deprecated public enum FocusState2 {
-  }
-
   public final class FocusStateKt {
     method public static boolean isFocused(androidx.compose.ui.focus.FocusState);
   }
