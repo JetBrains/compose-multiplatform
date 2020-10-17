@@ -342,15 +342,4 @@
             column="15"/>
     </issue>
 
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    PainterModifier("
-        errorLine2="    ~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/draw/PainterModifier.kt"
-            line="65"
-            column="5"/>
-    </issue>
-
 </issues>
