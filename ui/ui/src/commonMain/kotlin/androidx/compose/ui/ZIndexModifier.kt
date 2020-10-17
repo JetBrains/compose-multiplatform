@@ -17,8 +17,9 @@
 package androidx.compose.ui
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [Modifier.Element] that controls the drawing order for the children of the same layout
@@ -47,12 +48,29 @@ interface ZIndexModifier : Modifier.Element {
  * @sample androidx.compose.ui.samples.ZIndexModifierSample
  */
 @Stable
-fun Modifier.zIndex(zIndex: Float): Modifier = this.then(SimpleZIndexModifier(zIndex))
+fun Modifier.zIndex(zIndex: Float): Modifier = this.then(
+    SimpleZIndexModifier(
+        zIndex = zIndex,
+        inspectorInfo = debugInspectorInfo {
+            name = "zIndex"
+            value = zIndex
+        }
+    )
+)
 
-private data class SimpleZIndexModifier(
-    override val zIndex: Float
-) : ZIndexModifier, InspectableValue {
-    override val nameFallback = "zIndex"
-    override val valueOverride = zIndex
-    override val inspectableElements = emptySequence<ValueElement>()
+private class SimpleZIndexModifier(
+    override val zIndex: Float,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ZIndexModifier, InspectorValueInfo(inspectorInfo) {
+
+    override fun hashCode(): Int =
+        zIndex.hashCode()
+
+    override fun equals(other: Any?): Boolean {
+        val otherModifier = other as? SimpleZIndexModifier ?: return false
+        return zIndex == otherModifier.zIndex
+    }
+
+    override fun toString(): String =
+        "SimpleZIndexModifier(zIndex=$zIndex)"
 }

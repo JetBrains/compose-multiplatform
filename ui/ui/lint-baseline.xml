@@ -353,15 +353,4 @@
             column="5"/>
     </issue>
 
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.zIndex(zIndex: Float): Modifier = this.then(SimpleZIndexModifier(zIndex))"
-        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/ZIndexModifier.kt"
-            line="50"
-            column="58"/>
-    </issue>
-
 </issues>
