@@ -17,23 +17,83 @@
 package androidx.compose.ui.draw
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.InspectableValue
-import com.google.common.truth.Truth
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class DrawLayerModifierTest {
 
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testInspectable() {
         val modifier = Modifier.drawLayer(rotationX = 2.0f) as InspectableValue
-        Truth.assertThat(modifier.nameFallback).isEqualTo("drawLayer")
-        Truth.assertThat(modifier.valueOverride).isNull()
-        Truth.assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(
-                modifier.javaClass.declaredFields
-                    .filter { !it.isSynthetic && it.name != "nameFallback" }
-                    .map { it.name }
+        assertThat(modifier.nameFallback).isEqualTo("drawLayer")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("scaleX", 1.0f),
+            ValueElement("scaleY", 1.0f),
+            ValueElement("alpha", 1.0f),
+            ValueElement("translationX", 0.0f),
+            ValueElement("translationY", 0.0f),
+            ValueElement("shadowElevation", 0.0f),
+            ValueElement("rotationX", 2.0f),
+            ValueElement("rotationY", 0.0f),
+            ValueElement("rotationZ", 0.0f),
+            ValueElement("transformOrigin", TransformOrigin.Center),
+            ValueElement("shape", RectangleShape),
+            ValueElement("clip", false)
+        )
+    }
+
+    @Test
+    fun testEquals() {
+        assertThat(
+            Modifier.drawLayer(
+                scaleX = 1.0f,
+                scaleY = 2.0f,
+                alpha = 0.75f,
+                translationX = 3.0f,
+                translationY = 4.0f,
+                shadowElevation = 5.0f,
+                rotationX = 6.0f,
+                rotationY = 7.0f,
+                rotationZ = 8.0f,
+                transformOrigin = TransformOrigin.Center,
+                shape = RectangleShape,
+                clip = true,
+            )
+        )
+            .isEqualTo(
+                Modifier.drawLayer(
+                    scaleX = 1.0f,
+                    scaleY = 2.0f,
+                    alpha = 0.75f,
+                    translationX = 3.0f,
+                    translationY = 4.0f,
+                    shadowElevation = 5.0f,
+                    rotationX = 6.0f,
+                    rotationY = 7.0f,
+                    rotationZ = 8.0f,
+                    transformOrigin = TransformOrigin.Center,
+                    shape = RectangleShape,
+                    clip = true,
+                )
             )
     }
 }
