@@ -159,7 +159,7 @@ package androidx.compose.ui {
   }
 
   public final class FocusModifierKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.focus.ExperimentalFocus public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
+    method @androidx.compose.ui.focus.ExperimentalFocus public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
   }
 
   @androidx.compose.ui.focus.ExperimentalFocus public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
@@ -340,7 +340,7 @@ package androidx.compose.ui.focus {
   }
 
   @androidx.compose.ui.focus.ExperimentalFocus public interface FocusManager {
-    method public void clearFocus();
+    method public void clearFocus(optional boolean forcedClear);
   }
 
   public final class FocusNodeUtilsKt {

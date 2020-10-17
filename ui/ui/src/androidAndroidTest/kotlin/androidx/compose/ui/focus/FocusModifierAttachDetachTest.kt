@@ -44,82 +44,7 @@ class FocusModifierAttachDetachTest {
     val rule = createComposeRule()
 
     @Test
-    fun reorderedModifiers_focusObserverInParentLayoutNode() {
-        // Arrange.
-        var focusState = Inactive
-        val focusRequester = FocusRequester()
-        lateinit var oneBeforeTwo: MutableState<Boolean>
-        rule.setFocusableContent {
-            val focusRequesterModifier = Modifier.focusRequester(focusRequester)
-            val focusModifier1 = Modifier.focus()
-            val focusModifier2 = Modifier.focus()
-            Box(modifier = Modifier.focusObserver { focusState = it }) {
-                oneBeforeTwo = remember { mutableStateOf(true) }
-                Box(
-                    modifier = if (oneBeforeTwo.value) {
-                        focusRequesterModifier
-                            .then(focusModifier1)
-                            .then(focusModifier2)
-                    } else {
-                        focusRequesterModifier
-                            .then(focusModifier2)
-                            .then(focusModifier1)
-                    }
-                )
-            }
-        }
-        rule.runOnIdle {
-            focusRequester.requestFocus()
-            assertThat(focusState).isEqualTo(Active)
-        }
-
-        // Act.
-        rule.runOnIdle { oneBeforeTwo.value = false }
-
-        // Assert.
-        rule.runOnIdle { assertThat(focusState).isEqualTo(Inactive) }
-    }
-
-    @Test
-    fun reorderedModifiers_focusObserverInParentLayoutNode2() {
-        // Arrange.
-        var focusState = Inactive
-        val focusRequester = FocusRequester()
-        lateinit var oneBeforeTwo: MutableState<Boolean>
-        rule.setFocusableContent {
-            val focusRequesterModifier = Modifier.focusRequester(focusRequester)
-            val focusModifier1 = Modifier.focus()
-            val focusModifier2 = Modifier.focus()
-
-            Box(modifier = Modifier.focusObserver { focusState = it }) {
-                oneBeforeTwo = remember { mutableStateOf(true) }
-                Box(
-                    modifier = if (oneBeforeTwo.value) {
-                        focusModifier1
-                            .then(focusRequesterModifier)
-                            .then(focusModifier2)
-                    } else {
-                        focusModifier2
-                            .then(focusRequesterModifier)
-                            .then(focusModifier1)
-                    }
-                )
-            }
-        }
-        rule.runOnIdle {
-            focusRequester.requestFocus()
-            assertThat(focusState).isEqualTo(ActiveParent)
-        }
-
-        // Act.
-        rule.runOnIdle { oneBeforeTwo.value = false }
-
-        // Assert.
-        rule.runOnIdle { assertThat(focusState).isEqualTo(Active) }
-    }
-
-    @Test
-    fun reorderedModifiers_focusObserverInSameModifierChain() {
+    fun reorderedFocusRequesterModifiers_focusObserverInSameModifierChain() {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
@@ -159,7 +84,7 @@ class FocusModifierAttachDetachTest {
     }
 
     @Test
-    fun reorderedModifiers_focusObserverDoesNotHaveAFocusModifier() {
+    fun removedModifier_focusObserverDoesNotHaveAFocusModifier() {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
@@ -233,8 +158,9 @@ class FocusModifierAttachDetachTest {
                 modifier = Modifier.focusObserver { focusState = it }
                     .focusRequester(focusRequester)
                     .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
-                    .focus()
-            )
+            ) {
+                Box(modifier = Modifier.focus())
+            }
         }
         rule.runOnIdle {
             focusRequester.requestFocus()
@@ -260,8 +186,9 @@ class FocusModifierAttachDetachTest {
                 modifier = Modifier.focusObserver { focusState = it }
                     .focusRequester(focusRequester)
                     .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
-                    .focus()
-            )
+            ) {
+                Box(modifier = Modifier.focus())
+            }
         }
         rule.runOnIdle {
             focusRequester.requestFocus()
@@ -288,8 +215,9 @@ class FocusModifierAttachDetachTest {
                 modifier = Modifier.focusObserver { focusState = it }
                     .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
                     .focusRequester(focusRequester)
-                    .focus()
-            )
+            ) {
+                Box(modifier = Modifier.focus())
+            }
         }
         rule.runOnIdle {
             focusRequester.requestFocus()
@@ -338,6 +266,49 @@ class FocusModifierAttachDetachTest {
     }
 
     @Test
+    fun removedActiveParentFocusModifierAndFocusedChild_clearsFocusFromAllParents() {
+        // Arrange.
+        var focusState = Inactive
+        var parentFocusState = Inactive
+        val focusRequester = FocusRequester()
+        lateinit var optionalFocusModifiers: MutableState<Boolean>
+        rule.setFocusableContent {
+            optionalFocusModifiers = remember { mutableStateOf(true) }
+            Box(
+                modifier = Modifier
+                    .focusObserver { parentFocusState = it }
+                    .focus()
+            ) {
+                Box(
+                    modifier = Modifier.focusObserver { focusState = it }.then(
+                        if (optionalFocusModifiers.value) {
+                            Modifier.focus()
+                                .focusRequester(focusRequester)
+                                .focus()
+                        } else {
+                            Modifier
+                        }
+                    )
+                )
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState).isEqualTo(ActiveParent)
+            assertThat(parentFocusState).isEqualTo(ActiveParent)
+        }
+
+        // Act.
+        rule.runOnIdle { optionalFocusModifiers.value = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState).isEqualTo(Inactive)
+            assertThat(parentFocusState).isEqualTo(Inactive)
+        }
+    }
+
+    @Test
     fun removedInactiveFocusModifier_pointsToNextFocusModifier() {
         // Arrange.
         var focusState = Inactive
@@ -372,8 +343,9 @@ class FocusModifierAttachDetachTest {
                 modifier = Modifier.focusObserver { focusState = it }
                     .focusRequester(focusRequester)
                     .then(if (addFocusModifier.value) Modifier.focus() else Modifier)
-                    .focus()
-            )
+            ) {
+                Box(modifier = Modifier.focus())
+            }
         }
         rule.runOnIdle {
             focusRequester.requestFocus()

@@ -84,7 +84,6 @@ class ClearFocusTest(val forcedClear: Boolean) {
         // Assert.
         rule.runOnIdle {
             assertThat(cleared).isTrue()
-            assertThat(parent.focusedChild).isNull()
             assertThat(modifier.focusState).isEqualTo(Inactive)
         }
     }
@@ -220,12 +219,10 @@ class ClearFocusTest(val forcedClear: Boolean) {
             when (forcedClear) {
                 true -> {
                     assertThat(cleared).isTrue()
-                    assertThat(parent.focusedChild).isNull()
                     assertThat(modifier.focusState).isEqualTo(Inactive)
                 }
                 false -> {
                     assertThat(cleared).isFalse()
-                    assertThat(parent.focusedChild).isEqualTo(modifier.focusNode)
                     assertThat(modifier.focusState).isEqualTo(Captured)
                 }
             }
