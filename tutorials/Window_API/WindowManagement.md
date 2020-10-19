@@ -6,7 +6,7 @@ In this guide, we'll show you how to work with windows using Compose for Desktop
 
 ## Windows creation
 
-The main class for creating windows is AppWindow. The easiest way to create and launch a new window is to use an instance of the AppWindow class and call its method show(). You can see an example below:
+The main class for creating windows is AppWindow. The easiest way to create and launch a new window is to use an instance of the AppWindow class and call its method `show()`. You can see an example below:
 
 ```kotlin
 import androidx.compose.desktop.AppWindow
@@ -18,15 +18,16 @@ fun main() {
 }
 ```
 
-There are two types of windows - modal and active. Below are functions for creating each type of window:
+There are two types of windows - modal and regular. Below are functions for creating each type of window:
 
-1. Window - active window type.
+1. Window - regular window type.
 2. Dialog - modal window type. Such a window locks its parent window until the user completes working with it and closes the modal window.
 
 You can see an example for both types of windows below.
 
 ```kotlin
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.Text
 import androidx.compose.material.Button
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,9 @@ fun main() {
     Window {
         val dialogState = remember { mutableStateOf(false) }
 
-        Button(onClick = { dialogState.value = true })
+        Button(onClick = { dialogState.value = true }) {
+            Text(text = "Open dialog")
+        }
 
         if (dialogState.value) {
             Dialog(
@@ -51,7 +54,7 @@ fun main() {
 
 ## Window attributes
 
-Each window has 9 parameters listed below:
+Each window has 9 parameters listed below, all of them could be omitted and have default values:
 
 1. title - window title
 2. size - initial window size
@@ -66,32 +69,93 @@ Each window has 9 parameters listed below:
 An example of using window parameters at the creation step:
 
 ```kotlin
+import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.MenuItem
+import androidx.compose.ui.window.KeyStroke
+import androidx.compose.ui.window.Menu
+import androidx.compose.ui.window.MenuBar
+import java.awt.Color
+import java.awt.Graphics2D
+import java.awt.image.BufferedImage
 
 fun main() {
+    val count = mutableStateOf(0)
+    val windowPos = mutableStateOf(IntOffset.Zero)
+
     Window(
         title = "MyApp",
-        size = IntSize(800, 600),
-        location = IntOffset(200, 200),
+        size = IntSize(400, 250),
+        location = IntOffset(100, 100),
         centered = false, // true - by default
-        icon = getMyAppIcon(), // custom function that returns BufferedImage
-        menuBar = getMyAppMenuBar(), // custom function that returns MenuBar
+        icon = getMyAppIcon(),
+        menuBar = MenuBar(
+            Menu(
+                name = "Actions",
+                MenuItem(
+                    name = "Increment value",
+                    onClick = {
+                        count.value++
+                    },
+                    shortcut = KeyStroke(Key.I)
+                ),
+                MenuItem(
+                    name = "Exit",
+                    onClick = { AppManager.exit() },
+                    shortcut = KeyStroke(Key.X)
+                )
+            )
+        ),
         undecorated = true, // false - by default
         events = WindowEvents(
-            onOpen = { println("OnOpen") },
-            ... // here may be other events
-            onResize = { size ->
-                println("Size: $size")
+            onRelocate = { location ->
+                windowPos.value = location
             }
         )
     ) {
         // content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Column {
+                Text(text = "Location: ${windowPos.value} Value: ${count.value}")
+                Button(
+                    onClick = {
+                        AppManager.exit()
+                    }
+                ) {
+                    Text(text = "Close app")
+                }
+            }
+        }
     }
 }
+
+fun getMyAppIcon() : BufferedImage {
+    val size = 256
+    val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
+    val graphics = image.createGraphics()
+    graphics.setColor(Color.orange)
+    graphics.fillOval(0, 0, size, size)
+    graphics.dispose()
+    return image
+}
 ```
+
+![Window attributes](window_attr.gif)
 
 ## Window properties
 
@@ -112,17 +176,40 @@ To get the properties of a window, it is enough to have a link to the current or
 ```kotlin
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 
 fun main() {
+    val windowPos = mutableStateOf(IntOffset.Zero)
+    
     Window {
         val current = AppWindowAmbient.current
-        Button(
-            onClick = {
-                if (current != null) {
-                    println("Title: ${current.title} ${current.x} ${current.y}")
+        
+        // content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Column {
+                Text(text = "Location: ${windowPos.value}")
+                Button(
+                    onClick = {
+                        if (current != null) {
+                            windowPos.value = IntOffset(current.x, current.y)
+                        }
+                    }
+                ) {
+                    Text(text = "Print window location")
                 }
             }
-        )
+        }
     }
 }
 ```
@@ -132,20 +219,44 @@ fun main() {
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 
 fun main() {
+    val windowPos = mutableStateOf(IntOffset.Zero)
+
     Window {
-        Button(
-            onClick = {
-                val current = AppManager.getCurrentFocusedWindow()
-                if (current != null) {
-                    println("Title: ${current.title} ${current.x} ${current.y}")
+        // content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Column {
+                Text(text = "Location: ${windowPos.value}")
+                Button(
+                    onClick = {
+                        val current = AppManager.focusedWindow
+                        if (current != null) {
+                            windowPos.value = IntOffset(current.x, current.y)
+                        }
+                    }
+                ) {
+                    Text(text = "Print window location")
                 }
             }
-        )
+        }
     }
 }
 ```
+
+![Window properties](current_window.gif)
 
 Using the following methods, one can change the properties of AppWindow:
 
@@ -158,20 +269,28 @@ Using the following methods, one can change the properties of AppWindow:
 ```kotlin
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.Text
+import androidx.compose.material.Button
 
 fun main() {
     Window {
         val current = AppWindowAmbient.current
+
+        // content
         Button(
             onClick = {
                 if (current != null) {
                     current.setWindowCentered()
                 }
             }
-        )
+        ) {
+            Text(text = "Center the window")
+        }
     }
 }
 ```
+
+![Window properties](center_the_window.gif)
 
 ## Window events
 
@@ -191,71 +310,113 @@ Actions can be assigned to the following window events:
 ```kotlin
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntSize
 
 fun main() {
+    val windowSize = mutableStateOf(IntSize.Zero)
+    val focused = mutableStateOf(false)
+    
     Window(
         events = WindowEvents(
-            onOpen = { println("OnOpen") },
-            ... // here may be other events
+            onFocusGet = { focused.value = true },
+            onFocusLost = { focused.value = false },
             onResize = { size ->
-                println("Size: $size")
+                windowSize.value = size
             }
         )
     ) {
         // content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Text(text = "Size: ${windowSize.value} Focused: ${focused.value}")
+        }
     }
 }
 ```
 
+![Window events](focus_the_window.gif)
+
 ## AppManager
 
-The AppManager class is used to customize the behavior of the entire application. Its main features:
+The AppManager singleton is used to customize the behavior of the entire application. Its main features:
 
 1. Description of common application events
 ```kotlin
-AppManager.onEvent(
-    onAppStart = { println("OnAppStart") },
-    onAppExit = { println("OnAppExit") }
+AppManager.setEvents(
+    onAppStart = { println("onAppStart") }, // invoked before the first window is created
+    onAppExit = { println("onAppExit") } // invoked after all windows are closed
 )
 ```
 2. Customization of common application context menu
 ```kotlin
-AppManager.menu(
+AppManager.setMenu(
     getCommonAppMenuBar() // custom function that returns MenuBar
 )
 ```
 3. Access to the application windows list
 ```kotlin
-val windows = AppManager.getWindows()
+val windows = AppManager.windows
 ```
 4. Getting the current focused window
 ```kotlin
-val current = AppManager.getCurrentFocusedWindow()
+val current = AppManager.focusedWindow
 ```
 5. Application exit
 ```kotlin
 AppManager.exit() // closes all windows
 ```
 
-## Access to javax.swing components
+## Access to Swing components
 
-Compose for Desktop uses Swing components as the window system. For more detailed customization, you can access the JFrame (Swing window representation):
+Compose for Desktop is tightly integrated with Swing on the level of top level windows. For more detailed customization, you can access the JFrame (Swing window representation):
 
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 
 fun main() {
+    val scaleFactor = mutableStateOf(0.0)
     Window {
-        Button(
-            onClick = {
-                val current = AppManager.getCurrentFocusedWindow()
-                if (current != null) {
-                    val jFrame = current.window
-                    // do whatever you want with it, for example add some new listeners
+        // content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Column {
+                Button(
+                    onClick = {
+                        val current = AppManager.focusedWindow
+                        if (current != null) {
+                            val jFrame = current.window
+                            // do whatever you want with it
+                            scaleFactor.value = jFrame.graphicsConfiguration.defaultTransform.scaleX
+                        }
+                    }
+                ) {
+                    Text(text = "Check display scaling factor")
                 }
+                Text(text = "Scaling factor: ${scaleFactor.value}}")
             }
-        )
+        }
     }
 }
 ```
+
+![Access to Swing components](scaling_factor.jpg)

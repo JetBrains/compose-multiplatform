@@ -15,30 +15,40 @@ You can add an application icon into the system tray. Using Tray, you can also s
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
-import androidx.compose.ui.window.Item
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.window.MenuItem
 import androidx.compose.ui.window.Tray
+import androidx.compose.ui.Modifier
+import java.awt.Color
+import java.awt.Graphics2D
+import java.awt.image.BufferedImage
 
 fun main() {
+    val count = mutableStateOf(0)
     Window {
         onActive {
             val tray = Tray().apply {
-                icon(getImageIcon()) // custom function that returns BufferedImage
+                icon(getMyAppIcon())
                 menu(
-                    Item(
-                        name = "About",
+                    MenuItem(
+                        name = "Increment value",
                         onClick = {
-                            println("This is MyApp")
+                            count.value++
                         }
                     ),
-                    Item(
+                    MenuItem(
                         name = "Send notification",
                         onClick = {
-                            tray.notify("Notification", "Message from MyApp!")
+                            notify("Notification", "Message from MyApp!")
                         }
                     ),
-                    Item(
+                    MenuItem(
                         name = "Exit",
                         onClick = {
                             AppManager.exit()
@@ -50,9 +60,29 @@ fun main() {
                 tray.remove()
             }
         }
+
+        // content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Text(text = "Value: ${count.value}")
+        }
     }
 }
+
+fun getMyAppIcon() : BufferedImage {
+    val size = 256
+    val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
+    val graphics = image.createGraphics()
+    graphics.setColor(Color.orange)
+    graphics.fillOval(0, 0, size, size)
+    graphics.dispose()
+    return image
+}
 ```
+
+![Tray](tray.gif)
 
 ## Notifier
 You can send system notifications with Notifier without using the system tray.
@@ -71,21 +101,24 @@ import androidx.compose.ui.window.Notifier
 
 fun main() {
     val message = "Some message!"
+    val notifier = Notifier()
     Window {
         Column {
-            Button(onClick = { Notifier().notify("Notification.", message) }) {
+            Button(onClick = { notifier.notify("Notification.", message) }) {
                 Text(text = "Notify")
             }
-            Button(onClick = { Notifier().warn("Warning.", message) }) {
+            Button(onClick = { notifier.warn("Warning.", message) }) {
                 Text(text = "Warning")
             }
-            Button(onClick = { Notifier().error("Error.", message) }) {
+            Button(onClick = { notifier.error("Error.", message) }) {
                 Text(text = "Error")
             }
         }
     }
 }
 ```
+
+![Notifier](notifier.gif)
 
 ## MenuBar
 
@@ -95,39 +128,47 @@ To create a common context menu for all application windows, you need to configu
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.ui.window.Item
-import androidx.compose.ui.window.keyStroke
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.KeyStroke
+import androidx.compose.ui.window.MenuItem
 import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuBar
-import java.awt.event.KeyEvent
 
 fun main() {
-    AppManager.menu(
+    val action = mutableStateOf("Last action: None")
+
+    AppManager.setMenu(
         MenuBar(
             Menu(
                 name = "Actions",
-                Item(
+                MenuItem(
                     name = "About",
-                    onClick = { println("This is MyApp") },
-                    shortcut = keyStroke(KeyEvent.VK_I)
+                    onClick = { action.value = "Last action: About (Command + I)" },
+                    shortcut = KeyStroke(Key.I)
                 ),
-                Item(
+                MenuItem(
                     name = "Exit",
                     onClick = { AppManager.exit() },
-                    shortcut = keyStroke(KeyEvent.VK_X)
+                    shortcut = KeyStroke(Key.X)
                 )
             ),
             Menu(
                 name = "File",
-                Item(
+                MenuItem(
                     name = "Copy",
-                    onClick = { println("Copy operation.") },
-                    shortcut = keyStroke(KeyEvent.VK_C)
+                    onClick = { action.value = "Last action: Copy (Command + C)" },
+                    shortcut = KeyStroke(Key.C)
                 ),
-                Item(
+                MenuItem(
                     name = "Paste",
-                    onClick = { println("Paste operation.") },
-                    shortcut = keyStroke(KeyEvent.VK_V)
+                    onClick = { action.value = "Last action: Paste (Command + V)" },
+                    shortcut = KeyStroke(Key.V)
                 )
             )
         )
@@ -135,54 +176,94 @@ fun main() {
 
     Window {
         // content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Text(text = action.value)
+        }
     }
 }
 ```
 
-You can to create a MenuBar for a specific window (the rest of the windows will use the common MenuBar, if defined).
+![Application MenuBar](app_menubar.gif)
+
+You can to create a MenuBar for a specific window (while others will use the common MenuBar, if defined).
 
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.ui.window.Item
-import androidx.compose.ui.window.keyStroke
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.KeyStroke
+import androidx.compose.ui.window.MenuItem
 import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuBar
-import java.awt.event.KeyEvent
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 
 fun main() {
+    val action = mutableStateOf("Last action: None")
+
     Window(
         menuBar = MenuBar(
             Menu(
                 name = "Actions",
-                Item(
+                MenuItem(
                     name = "About",
-                    onClick = { println("This is MyApp") },
-                    shortcut = keyStroke(KeyEvent.VK_I)
+                    onClick = { action.value = "Last action: About (Command + I)" },
+                    shortcut = KeyStroke(Key.I)
                 ),
-                Item(
+                MenuItem(
                     name = "Exit",
                     onClick = { AppManager.exit() },
-                    shortcut = keyStroke(KeyEvent.VK_X)
+                    shortcut = KeyStroke(Key.X)
                 )
             ),
             Menu(
                 name = "File",
-                Item(
+                MenuItem(
                     name = "Copy",
-                    onClick = { println("Copy operation.") },
-                    shortcut = keyStroke(KeyEvent.VK_C)
+                    onClick = { action.value = "Last action: Copy (Command + C)" },
+                    shortcut = KeyStroke(Key.C)
                 ),
-                Item(
+                MenuItem(
                     name = "Paste",
-                    onClick = { println("Paste operation.") },
-                    shortcut = keyStroke(KeyEvent.VK_V)
+                    onClick = { action.value = "Last action: Paste (Command + V)" },
+                    shortcut = KeyStroke(Key.V)
                 )
             )
         )
     ) {
         // content
+        Button(
+            onClick = {
+                Window(
+                    title = "Another window",
+                    size = IntSize(350, 200),
+                    location = IntOffset(100, 100),
+                    centered = false
+                ) {
+                    
+                }
+            }
+        ) {
+            Text(text = "New window")
+        }
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center
+        ) {
+            Text(text = action.value)
+        }
     }
 }
 ```
 
+![Window MenuBar](window_menubar.gif)
