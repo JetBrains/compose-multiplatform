@@ -127,8 +127,8 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonColors {
-    method @androidx.compose.runtime.Composable public long backgroundColor-0d7_KjU(boolean enabled);
-    method @androidx.compose.runtime.Composable public long contentColor-0d7_KjU(boolean enabled);
+    method public long backgroundColor-0d7_KjU(boolean enabled);
+    method public long contentColor-0d7_KjU(boolean enabled);
   }
 
   public final class ButtonConstants {
@@ -157,7 +157,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonElevation {
-    method @androidx.compose.runtime.Composable public float elevation-D9Ej5fM(boolean enabled, androidx.compose.foundation.InteractionState interactionState);
+    method public float elevation-D9Ej5fM(boolean enabled, androidx.compose.foundation.InteractionState interactionState);
   }
 
   public final class ButtonKt {
