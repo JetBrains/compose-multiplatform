@@ -20,10 +20,10 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,17 +35,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonConstants
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -100,8 +106,18 @@ fun main() {
                     }
                 )
             },
+            isFloatingActionButtonDocked = true,
+            bottomBar = {
+                BottomAppBar(cutoutShape = CircleShape) {
+                    IconButton(
+                        onClick = {}
+                    ) {
+                        Icon(Icons.Filled.Menu, Modifier.size(ButtonConstants.DefaultIconSize))
+                    }
+                }
+            },
             bodyContent = {
-                Row {
+                Row(Modifier.padding(bottom = 56.dp)) {
                     LeftColumn(Modifier.weight(1f))
                     RightColumn(Modifier.width(200.dp))
                 }
@@ -118,7 +134,7 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
     val text = remember {
         mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0\nПривет")
     }
-    Column(Modifier.fillMaxSize(), Arrangement.SpaceEvenly) {
+    ScrollableColumn(Modifier.fillMaxSize()) {
         Text(
             text = "Привет! 你好! Desktop Compose ${amount.value}",
             color = Color.Black,
@@ -256,13 +272,14 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row {
-                Button(
-                    modifier = Modifier.padding(4.dp),
-                    onClick = {
-                        animation.value = !animation.value
-                    }
-                ) {
-                    Text("Toggle")
+                Row(modifier = Modifier.padding(4.dp)) {
+                    Checkbox(
+                        animation.value,
+                        onCheckedChange = {
+                            animation.value = it
+                        }
+                    )
+                    Text("Animation")
                 }
 
                 Button(
@@ -305,7 +322,7 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             )
         )
 
-        Image(imageResource("androidx/compose/desktop/example/circus.jpg"))
+        Image(imageResource("androidx/compose/desktop/example/circus.jpg"), Modifier.size(200.dp))
     }
 }
 
