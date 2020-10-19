@@ -184,7 +184,7 @@ class MemoryLeakTest {
 
         // Check if we have a significant diff across all the data
         val diff = max - min
-        if (diff > 100 * 1024) { // 100 KiB tolerance
+        if (diff > 1024 * 1024) { // 1 MiB tolerance
             throw AssertionError(
                 "Possible memory leak detected! Min: " +
                     "${min.formatMemory()}, max: ${max.formatMemory()}\n" +
