@@ -38,7 +38,7 @@ dependencies {
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-text")
-    implementation project(":compose:paging:paging:integration-tests:paging-demos")
+    implementation project(":paging:paging-compose:integration-tests:paging-demos")
 }
 
 android {
