@@ -32,7 +32,10 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,7 +64,8 @@ import androidx.compose.ui.unit.dp
  * present on this Switch. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this Switch in different [Interaction]s.
- * @param color main color of the track and thumb when the Switch is checked
+ * @param colors [SwitchColors] that will be used to determine the color of the thumb and track
+ * in different states. See [SwitchConstants.defaultColors].
  */
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
@@ -71,7 +75,7 @@ fun Switch(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    color: Color = MaterialTheme.colors.secondaryVariant
+    colors: SwitchColors = SwitchConstants.defaultColors()
 ) {
     val minBound = 0f
     val maxBound = with(DensityAmbient.current) { ThumbPathLength.toPx() }
@@ -103,34 +107,61 @@ fun Switch(
         SwitchImpl(
             checked = checked,
             enabled = enabled,
-            checkedColor = color,
+            colors = colors,
             thumbValue = swipeableState.offset,
             interactionState = interactionState
         )
     }
 }
 
+/**
+ * Represents the colors used by a [Switch] in different states
+ *
+ * See [SwitchConstants.defaultColors] for the default implementation that follows Material
+ * specifications.
+ */
+@ExperimentalMaterialApi
+@Stable
+interface SwitchColors {
+
+    /**
+     * Represents the color used for the switch's thumb, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
+    fun thumbColor(enabled: Boolean, checked: Boolean): Color
+
+    /**
+     * Represents the color used for the switch's track, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
+    fun trackColor(enabled: Boolean, checked: Boolean): Color
+}
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BoxScope.SwitchImpl(
     checked: Boolean,
     enabled: Boolean,
-    checkedColor: Color,
+    colors: SwitchColors,
     thumbValue: State<Float>,
     interactionState: InteractionState
 ) {
     val hasInteraction =
         Interaction.Pressed in interactionState || Interaction.Dragged in interactionState
-    val elevation =
-        if (hasInteraction) {
-            SwitchDefaults.ThumbPressedElevation
-        } else {
-            SwitchDefaults.ThumbDefaultElevation
-        }
-    val trackColor = SwitchDefaults.resolveTrackColor(checked, enabled, checkedColor)
-    val thumbColor = SwitchDefaults.resolveThumbColor(checked, enabled, checkedColor)
+    val elevation = if (hasInteraction) {
+        ThumbPressedElevation
+    } else {
+        ThumbDefaultElevation
+    }
     Canvas(Modifier.align(Alignment.Center).fillMaxSize()) {
+        val trackColor = colors.trackColor(enabled, checked)
         drawTrack(trackColor, TrackWidth.toPx(), TrackStrokeWidth.toPx())
     }
+    val thumbColor = colors.thumbColor(enabled, checked)
     Surface(
         shape = CircleShape,
         color = thumbColor,
@@ -142,8 +173,9 @@ private fun BoxScope.SwitchImpl(
                 interactionState = interactionState,
                 indication = RippleIndication(radius = ThumbRippleRadius, bounded = false)
             )
-            .size(ThumbDiameter)
-    ) {}
+            .size(ThumbDiameter),
+        content = emptyContent()
+    )
 }
 
 private fun DrawScope.drawTrack(trackColor: Color, trackWidth: Float, strokeWidth: Float) {
@@ -170,61 +202,121 @@ private val ThumbPathLength = TrackWidth - ThumbDiameter
 
 private val AnimationSpec = TweenSpec<Float>(durationMillis = 100)
 
-internal object SwitchDefaults {
+private val ThumbDefaultElevation = 1.dp
+private val ThumbPressedElevation = 6.dp
 
-    const val CheckedTrackOpacity = 0.54f
-    const val UncheckedTrackOpacity = 0.38f
-
-    val ThumbDefaultElevation = 1.dp
-    val ThumbPressedElevation = 6.dp
-
+/**
+ * Contains the default values used by [Switch]
+ */
+object SwitchConstants {
+    /**
+     * Creates a [SwitchColors] that represents the different colors used in a [Switch] in
+     * different states.
+     *
+     * @param checkedThumbColor the color used for the thumb when enabled and checked
+     * @param checkedTrackColor the color used for the track when enabled and checked
+     * @param checkedTrackAlpha the alpha applied to [checkedTrackColor] and
+     * [disabledCheckedTrackColor]
+     * @param uncheckedThumbColor the color used for the thumb when enabled and unchecked
+     * @param uncheckedTrackColor the color used for the track when enabled and unchecked
+     * @param uncheckedTrackAlpha the alpha applied to [uncheckedTrackColor] and
+     * [disabledUncheckedTrackColor]
+     * @param disabledCheckedThumbColor the color used for the thumb when disabled and checked
+     * @param disabledCheckedTrackColor the color used for the track when disabled and checked
+     * @param disabledUncheckedThumbColor the color used for the thumb when disabled and unchecked
+     * @param disabledUncheckedTrackColor the color used for the track when disabled and unchecked
+     */
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    private val uncheckedTrackColor
-        get() = MaterialTheme.colors.onSurface
-
-    @Composable
-    private fun makeDisabledCheckedTrackColor(checkedColor: Color) = AmbientEmphasisLevels.current
-        .disabled
-        .applyEmphasis(checkedColor)
-        .compositeOver(MaterialTheme.colors.surface)
-
-    @Composable
-    private val disabledUncheckedTrackColor
-        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
+    fun defaultColors(
+        checkedThumbColor: Color = MaterialTheme.colors.secondaryVariant,
+        checkedTrackColor: Color = checkedThumbColor,
+        checkedTrackAlpha: Float = 0.54f,
+        uncheckedThumbColor: Color = MaterialTheme.colors.surface,
+        uncheckedTrackColor: Color = MaterialTheme.colors.onSurface,
+        uncheckedTrackAlpha: Float = 0.38f,
+        disabledCheckedThumbColor: Color = AmbientEmphasisLevels.current.disabled
+            .applyEmphasis(checkedThumbColor)
+            .compositeOver(MaterialTheme.colors.surface),
+        disabledCheckedTrackColor: Color = AmbientEmphasisLevels.current.disabled
+            .applyEmphasis(checkedTrackColor)
+            .compositeOver(MaterialTheme.colors.surface),
+        disabledUncheckedThumbColor: Color = AmbientEmphasisLevels.current.disabled
+            .applyEmphasis(uncheckedThumbColor)
+            .compositeOver(MaterialTheme.colors.surface),
+        disabledUncheckedTrackColor: Color = AmbientEmphasisLevels.current.disabled
+            .applyEmphasis(uncheckedTrackColor)
             .compositeOver(MaterialTheme.colors.surface)
+    ): SwitchColors = DefaultSwitchColors(
+        checkedThumbColor = checkedThumbColor,
+        checkedTrackColor = checkedTrackColor.copy(alpha = checkedTrackAlpha),
+        uncheckedThumbColor = uncheckedThumbColor,
+        uncheckedTrackColor = uncheckedTrackColor.copy(alpha = uncheckedTrackAlpha),
+        disabledCheckedThumbColor = disabledCheckedThumbColor,
+        disabledCheckedTrackColor = disabledCheckedTrackColor.copy(alpha = checkedTrackAlpha),
+        disabledUncheckedThumbColor = disabledUncheckedThumbColor,
+        disabledUncheckedTrackColor = disabledUncheckedTrackColor.copy(alpha = uncheckedTrackAlpha)
+    )
+}
 
-    @Composable
-    private val uncheckedThumbColor
-        get() = MaterialTheme.colors.surface
-
-    @Composable
-    private fun makeDisabledCheckedThumbColor(checkedColor: Color) = AmbientEmphasisLevels.current
-        .disabled
-        .applyEmphasis(checkedColor)
-        .compositeOver(MaterialTheme.colors.surface)
-
-    @Composable
-    private val disabledUncheckedThumbColor
-        get() = AmbientEmphasisLevels.current.disabled.applyEmphasis(MaterialTheme.colors.surface)
-            .compositeOver(MaterialTheme.colors.surface)
-
-    @Composable
-    internal fun resolveTrackColor(checked: Boolean, enabled: Boolean, checkedColor: Color): Color {
-        return if (checked) {
-            val color = if (enabled) checkedColor else makeDisabledCheckedTrackColor(checkedColor)
-            color.copy(alpha = CheckedTrackOpacity)
+/**
+ * Default [SwitchColors] implementation.
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Immutable
+private class DefaultSwitchColors(
+    private val checkedThumbColor: Color,
+    private val checkedTrackColor: Color,
+    private val uncheckedThumbColor: Color,
+    private val uncheckedTrackColor: Color,
+    private val disabledCheckedThumbColor: Color,
+    private val disabledCheckedTrackColor: Color,
+    private val disabledUncheckedThumbColor: Color,
+    private val disabledUncheckedTrackColor: Color
+) : SwitchColors {
+    override fun thumbColor(enabled: Boolean, checked: Boolean): Color {
+        return if (enabled) {
+            if (checked) checkedThumbColor else uncheckedThumbColor
         } else {
-            val color = if (enabled) uncheckedTrackColor else disabledUncheckedTrackColor
-            color.copy(alpha = UncheckedTrackOpacity)
+            if (checked) disabledCheckedThumbColor else disabledUncheckedThumbColor
         }
     }
 
-    @Composable
-    internal fun resolveThumbColor(checked: Boolean, enabled: Boolean, checkedColor: Color): Color {
-        return if (checked) {
-            if (enabled) checkedColor else makeDisabledCheckedThumbColor(checkedColor)
+    override fun trackColor(enabled: Boolean, checked: Boolean): Color {
+        return if (enabled) {
+            if (checked) checkedTrackColor else uncheckedTrackColor
         } else {
-            if (enabled) uncheckedThumbColor else disabledUncheckedThumbColor
+            if (checked) disabledCheckedTrackColor else disabledUncheckedTrackColor
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as DefaultSwitchColors
+
+        if (checkedThumbColor != other.checkedThumbColor) return false
+        if (checkedTrackColor != other.checkedTrackColor) return false
+        if (uncheckedThumbColor != other.uncheckedThumbColor) return false
+        if (uncheckedTrackColor != other.uncheckedTrackColor) return false
+        if (disabledCheckedThumbColor != other.disabledCheckedThumbColor) return false
+        if (disabledCheckedTrackColor != other.disabledCheckedTrackColor) return false
+        if (disabledUncheckedThumbColor != other.disabledUncheckedThumbColor) return false
+        if (disabledUncheckedTrackColor != other.disabledUncheckedTrackColor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = checkedThumbColor.hashCode()
+        result = 31 * result + checkedTrackColor.hashCode()
+        result = 31 * result + uncheckedThumbColor.hashCode()
+        result = 31 * result + uncheckedTrackColor.hashCode()
+        result = 31 * result + disabledCheckedThumbColor.hashCode()
+        result = 31 * result + disabledCheckedTrackColor.hashCode()
+        result = 31 * result + disabledUncheckedThumbColor.hashCode()
+        result = 31 * result + disabledUncheckedTrackColor.hashCode()
+        return result
     }
 }
