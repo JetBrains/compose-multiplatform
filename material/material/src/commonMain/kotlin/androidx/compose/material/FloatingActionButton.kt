@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 /**
  * A floating action button (FAB) is a button that represents the primary action of a screen.
  *
- * This FAB is typically used with an [androidx.compose.foundation.Icon]:
+ * This FAB is typically used with an [Icon]:
  *
  * @sample androidx.compose.material.samples.SimpleFab
  *
@@ -126,7 +126,7 @@ fun FloatingActionButton(
  * when it is null.
  * @param modifier [Modifier] to be applied to this FAB
  * @param icon Optional icon for this FAB, typically this will be a
- * [androidx.compose.foundation.Icon].
+ * [Icon].
  * @param interactionState the [InteractionState] representing the different [Interaction]s
  * present on this FAB. You can create and pass in your own remembered [InteractionState] if
  * you want to read the [InteractionState] and customize the appearance / behavior of this FAB

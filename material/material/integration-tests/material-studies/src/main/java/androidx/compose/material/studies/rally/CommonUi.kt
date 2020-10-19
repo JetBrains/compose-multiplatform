@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
@@ -99,9 +100,8 @@ private fun BaseRow(
         Spacer(Modifier.preferredWidth(16.dp))
         Icon(
             Icons.Filled.ArrowForwardIos,
-            tintColor = Color.White.copy(alpha = 0.6f),
-            modifier = Modifier.align(Alignment.CenterVertically),
-            size = 12.dp
+            tint = Color.White.copy(alpha = 0.6f),
+            modifier = Modifier.preferredSize(12.dp).align(Alignment.CenterVertically),
         )
     }
     RallyDivider()

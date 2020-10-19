@@ -121,7 +121,7 @@ fun BottomNavigation(
  * A BottomNavigationItem always shows text labels (if it exists) when selected. Showing text
  * labels if not selected is controlled by [alwaysShowLabels].
  *
- * @param icon icon for this item, typically this will be a [androidx.compose.foundation.Icon]
+ * @param icon icon for this item, typically this will be a [Icon]
  * @param selected whether this item is selected
  * @param onClick the callback to be invoked when this item is selected
  * @param modifier optional [Modifier] for this item

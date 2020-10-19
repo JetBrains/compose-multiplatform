@@ -15,7 +15,6 @@
  */
 package androidx.compose.material
 
-import androidx.compose.foundation.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.graphics.Color

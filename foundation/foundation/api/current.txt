@@ -73,9 +73,9 @@ package androidx.compose.foundation {
   }
 
   public final class IconKt {
-    method @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.ui.Modifier modifier, optional long tint);
-    method @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
-    method @androidx.compose.runtime.Composable public static void Icon-uUQrhdE(androidx.compose.ui.graphics.ImageAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-uUQrhdE(androidx.compose.ui.graphics.ImageAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
   }
 
   public final class ImageKt {

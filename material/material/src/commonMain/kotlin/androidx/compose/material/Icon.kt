@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.material
 
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
@@ -33,23 +34,19 @@ import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.unit.dp
 
 /**
- * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor].
+ * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor]. For a
+ * clickable icon, see [IconButton].
  *
  * @param asset [VectorAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
  * @param tint tint to be applied to [asset]
  */
-@Deprecated(
-    "Icon has been moved into the Material library: androidx.compose.material.Icon",
-    replaceWith = ReplaceWith("Icon(asset)", "androidx.compose.material.Icon")
-)
 @Composable
 fun Icon(
     asset: VectorAsset,
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current
 ) {
-    @Suppress("DEPRECATION")
     Icon(
         painter = VectorPainter(asset),
         modifier = modifier,
@@ -58,16 +55,13 @@ fun Icon(
 }
 
 /**
- * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor].
+ * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor]. For a
+ * clickable icon, see [IconButton].
  *
  * @param asset [ImageAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
  * @param tint tint to be applied to [asset]
  */
-@Deprecated(
-    "Icon has been moved into the Material library: androidx.compose.material.Icon",
-    replaceWith = ReplaceWith("Icon(asset)", "androidx.compose.material.Icon")
-)
 @Composable
 fun Icon(
     asset: ImageAsset,
@@ -75,7 +69,6 @@ fun Icon(
     tint: Color = AmbientContentColor.current
 ) {
     val painter = remember(asset) { ImagePainter(asset) }
-    @Suppress("DEPRECATION")
     Icon(
         painter = painter,
         modifier = modifier,
@@ -84,16 +77,13 @@ fun Icon(
 }
 
 /**
- * Icon component that draws a [painter] using [tint], defaulting to [AmbientContentColor].
+ * Icon component that draws a [painter] using [tint], defaulting to [AmbientContentColor]. For a
+ * clickable icon, see [IconButton].
  *
- * @param painter Painter to draw inside this Icon
+ * @param painter [Painter] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
  * @param tint tint to be applied to [painter]
  */
-@Deprecated(
-    "Icon has been moved into the Material library: androidx.compose.material.Icon",
-    replaceWith = ReplaceWith("Icon(asset)", "androidx.compose.material.Icon")
-)
 @Composable
 fun Icon(
     painter: Painter,
