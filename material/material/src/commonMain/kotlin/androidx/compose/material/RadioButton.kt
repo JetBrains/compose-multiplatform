@@ -20,7 +20,6 @@ import androidx.compose.animation.AnimatedValueModel
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animate
 import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimatedValue
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.tween
@@ -174,7 +173,9 @@ private class DefaultRadioButtonColors(
     private val disabledColor: Color,
     private val clock: AnimationClockObservable
 ) : RadioButtonColors {
-    private lateinit var animatedColor: AnimatedValue<Color, AnimationVector4D>
+    private val lazyAnimatedColor = LazyAnimatedValue<Color, AnimationVector4D> { target ->
+        AnimatedValueModel(target, (Color.VectorConverter)(target.colorSpace), clock)
+    }
 
     override fun radioColor(enabled: Boolean, selected: Boolean): Color {
         val target = when {
@@ -186,13 +187,7 @@ private class DefaultRadioButtonColors(
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            if (!::animatedColor.isInitialized) {
-                animatedColor = AnimatedValueModel(
-                    initialValue = target,
-                    typeConverter = (Color.VectorConverter)(target.colorSpace),
-                    clock = clock
-                )
-            }
+            val animatedColor = lazyAnimatedColor.animatedValueForTarget(target)
 
             if (animatedColor.targetValue != target) {
                 animatedColor.animateTo(target, tween(durationMillis = RadioAnimationDuration))

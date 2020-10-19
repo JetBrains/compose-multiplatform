@@ -19,7 +19,6 @@ package androidx.compose.material
 import androidx.compose.animation.AnimatedValueModel
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimatedValue
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.FloatPropKey
@@ -360,9 +359,15 @@ private class DefaultCheckboxColors(
     private val disabledIndeterminateBorderColor: Color,
     private val clock: AnimationClockObservable
 ) : CheckboxColors {
-    private lateinit var animatedCheckmarkColor: AnimatedValue<Color, AnimationVector4D>
-    private lateinit var animatedBoxColor: AnimatedValue<Color, AnimationVector4D>
-    private lateinit var animatedBorderColor: AnimatedValue<Color, AnimationVector4D>
+    private val lazyAnimatedCheckmarkColor = LazyAnimatedValue<Color, AnimationVector4D> { target ->
+        AnimatedValueModel(target, (Color.VectorConverter)(target.colorSpace), clock)
+    }
+    private val lazyAnimatedBoxColor = LazyAnimatedValue<Color, AnimationVector4D> { target ->
+        AnimatedValueModel(target, (Color.VectorConverter)(target.colorSpace), clock)
+    }
+    private val lazyAnimatedBorderColor = LazyAnimatedValue<Color, AnimationVector4D> { target ->
+        AnimatedValueModel(target, (Color.VectorConverter)(target.colorSpace), clock)
+    }
 
     override fun checkmarkColor(state: ToggleableState): Color {
         val target = if (state == ToggleableState.Off) {
@@ -371,13 +376,7 @@ private class DefaultCheckboxColors(
             checkedCheckmarkColor
         }
 
-        if (!::animatedCheckmarkColor.isInitialized) {
-            animatedCheckmarkColor = AnimatedValueModel(
-                initialValue = target,
-                typeConverter = (Color.VectorConverter)(target.colorSpace),
-                clock = clock
-            )
-        }
+        val animatedCheckmarkColor = lazyAnimatedCheckmarkColor.animatedValueForTarget(target)
 
         if (animatedCheckmarkColor.targetValue != target) {
             val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
@@ -403,13 +402,7 @@ private class DefaultCheckboxColors(
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            if (!::animatedBoxColor.isInitialized) {
-                animatedBoxColor = AnimatedValueModel(
-                    initialValue = target,
-                    typeConverter = (Color.VectorConverter)(target.colorSpace),
-                    clock = clock
-                )
-            }
+            val animatedBoxColor = lazyAnimatedBoxColor.animatedValueForTarget(target)
 
             if (animatedBoxColor.targetValue != target) {
                 val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
@@ -437,13 +430,7 @@ private class DefaultCheckboxColors(
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            if (!::animatedBorderColor.isInitialized) {
-                animatedBorderColor = AnimatedValueModel(
-                    initialValue = target,
-                    typeConverter = (Color.VectorConverter)(target.colorSpace),
-                    clock = clock
-                )
-            }
+            val animatedBorderColor = lazyAnimatedBorderColor.animatedValueForTarget(target)
 
             if (animatedBorderColor.targetValue != target) {
                 val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
