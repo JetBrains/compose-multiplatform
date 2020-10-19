@@ -106,7 +106,7 @@ fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): Ta
             val jetifierBin = "${standaloneProject.buildDir}/install/jetifier-standalone/bin/" +
                 "jetifier-standalone"
             val migrationConfig = "${standaloneProject.projectDir.getParentFile()}/migration.config"
-
+            it.onlyIf { file(archiveFile.get()).exists() }
             it.dependsOn(stripTask)
             it.inputs.file(stripTask.get().archiveFile)
             it.outputs.file(outputFileName)
@@ -127,6 +127,7 @@ fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): Ta
 fun Project.stripArchiveForPartialDejetificationTask(archiveFile: Provider<RegularFile>):
     TaskProvider<Zip> {
         return tasks.register("stripArchiveForPartialDejetification", Zip::class.java) {
+            it.onlyIf { file(archiveFile.get()).exists() }
             it.dependsOn(rootProject.tasks.named(Release.FULL_ARCHIVE_TASK_NAME))
             it.from(zipTree(archiveFile))
             it.destinationDirectory.set(rootProject.buildDir)
