@@ -110,7 +110,6 @@ class AndroidAccessibilityTest {
     private val argument = ArgumentCaptor.forClass(AccessibilityEvent::class.java)
     private var isTextFieldVisible by mutableStateOf(true)
     private var textFieldSelectionOneLatch = CountDownLatch(1)
-    private var textFieldSelectionZeroLatch = CountDownLatch(1)
 
     companion object {
         private const val ToggleableTag = "toggleable"
@@ -155,9 +154,6 @@ class AndroidAccessibilityTest {
                                     this.textSelectionRange = value.selection
                                     if (value.selection == TextRange(1)) {
                                         textFieldSelectionOneLatch.countDown()
-                                    }
-                                    if (value.selection == TextRange(0)) {
-                                        textFieldSelectionZeroLatch.countDown()
                                     }
                                 }
                                 .testTag(TextFieldTag),
@@ -268,7 +264,7 @@ class AndroidAccessibilityTest {
         }
         rule.onNodeWithTag(TextFieldTag)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
-        var argument = Bundle()
+        val argument = Bundle()
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 1)
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 1)
         rule.runOnUiThread {
@@ -283,33 +279,6 @@ class AndroidAccessibilityTest {
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.TextSelectionRange,
                     TextRange(1)
-                )
-            )
-        argument = Bundle()
-        argument.putInt(
-            AccessibilityNodeInfo.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
-            AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
-        )
-        argument.putBoolean(
-            AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN,
-            false
-        )
-        rule.runOnUiThread {
-            textFieldSelectionZeroLatch = CountDownLatch(1)
-            provider.performAction(
-                textFieldNode.id,
-                ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY,
-                argument
-            )
-        }
-        if (!textFieldSelectionZeroLatch.await(5, TimeUnit.SECONDS)) {
-            throw AssertionError("Failed to wait for text selection change.")
-        }
-        rule.onNodeWithTag(TextFieldTag)
-            .assert(
-                SemanticsMatcher.expectValue(
-                    SemanticsProperties.TextSelectionRange,
-                    TextRange(0)
                 )
             )
     }
