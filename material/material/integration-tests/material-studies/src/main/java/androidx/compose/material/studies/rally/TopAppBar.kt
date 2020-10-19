@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.ripple.RippleIndication
@@ -78,7 +79,7 @@ private fun RallyTab(
                     indication = RippleIndication(bounded = false)
                 )
         ) {
-            Icon(vectorImage = icon, tintColor = tabTintColor)
+            Icon(icon, tint = tabTintColor)
             if (selected) {
                 Spacer(Modifier.preferredWidth(12.dp))
                 Text(text, color = tabTintColor)

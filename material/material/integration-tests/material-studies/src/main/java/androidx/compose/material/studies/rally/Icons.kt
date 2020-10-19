@@ -16,41 +16,10 @@
 
 package androidx.compose.material.studies.rally
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.graphics.vector.VectorPainter
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-
-/**
- * 24x24dp icon from a resource id.
- *
- * TODO: b/150460257 remove this when androidx.compose.foundation.Icon supports minimum sizes
- */
-@Composable
-fun Icon(
-    vectorImage: VectorAsset,
-    tintColor: Color = Color.White,
-    modifier: Modifier = Modifier,
-    size: Dp = 24.dp
-) {
-    Box(
-        Modifier.preferredSize(size)
-            .then(modifier)
-            .paint(
-                VectorPainter(vectorImage), colorFilter = ColorFilter.tint(tintColor)
-            )
-    )
-}
 
 /**
  * Icons below are copied from [Icons.Filled] in material-icons-extended to avoid recompiling the

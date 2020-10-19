@@ -16,7 +16,6 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -120,10 +119,7 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(
-                                Icons.Filled.Favorite,
-                                Modifier.testTag("icon")
-                            )
+                            Icon(Icons.Filled.Favorite, Modifier.testTag("icon"))
                         },
                         label = {
                             Text("ItemText")
@@ -168,10 +164,7 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(
-                                Icons.Filled.Favorite,
-                                Modifier.testTag("icon")
-                            )
+                            Icon(Icons.Filled.Favorite, Modifier.testTag("icon"))
                         },
                         label = {
                             Text("ItemText")
@@ -205,10 +198,7 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(
-                                Icons.Filled.Favorite,
-                                Modifier.testTag("icon")
-                            )
+                            Icon(Icons.Filled.Favorite, Modifier.testTag("icon"))
                         },
                         label = {},
                         selected = false,
