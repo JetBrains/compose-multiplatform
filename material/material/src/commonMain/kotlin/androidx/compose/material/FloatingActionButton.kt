@@ -16,8 +16,11 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.AnimatedValueModel
 import androidx.compose.animation.VectorConverter
-import androidx.compose.animation.animatedValue
+import androidx.compose.animation.asDisposableClock
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
@@ -33,12 +36,13 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -62,11 +66,11 @@ import androidx.compose.ui.unit.dp
  * @param shape The [Shape] of this FAB
  * @param backgroundColor The background color. Use [Color.Transparent] to have no color
  * @param contentColor The preferred content color for content inside this FAB
- * @param elevation The z-coordinate at which to place this FAB. This controls the size
- * of the shadow below the FAB. See [FloatingActionButtonConstants.animateDefaultElevation] for
- * the default elevation that animates between [Interaction]s.
+ * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
+ * in different states. This controls the size of the shadow below the FAB.
  * @param icon the content of this FAB
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FloatingActionButton(
     onClick: () -> Unit,
@@ -75,7 +79,7 @@ fun FloatingActionButton(
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = FloatingActionButtonConstants.animateDefaultElevation(interactionState),
+    elevation: FloatingActionButtonElevation = FloatingActionButtonConstants.defaultElevation(),
     icon: @Composable () -> Unit
 ) {
     // TODO(aelias): Avoid manually managing the ripple once http://b/157687898
@@ -90,7 +94,7 @@ fun FloatingActionButton(
         shape = shape,
         color = backgroundColor,
         contentColor = contentColor,
-        elevation = elevation
+        elevation = elevation.elevation(interactionState)
     ) {
         ProvideTextStyle(MaterialTheme.typography.button) {
             Box(
@@ -131,10 +135,10 @@ fun FloatingActionButton(
  * @param shape The [Shape] of this FAB
  * @param backgroundColor The background color. Use [Color.Transparent] to have no color
  * @param contentColor The preferred content color. Will be used by text and iconography
- * @param elevation The z-coordinate at which to place this FAB. This controls the size
- * of the shadow below the button. See [FloatingActionButtonConstants.animateDefaultElevation] for
- * the default elevation that animates between [Interaction]s.
+ * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
+ * in different states. This controls the size of the shadow below the FAB.
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ExtendedFloatingActionButton(
     text: @Composable () -> Unit,
@@ -145,7 +149,7 @@ fun ExtendedFloatingActionButton(
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = FloatingActionButtonConstants.animateDefaultElevation(interactionState)
+    elevation: FloatingActionButtonElevation = FloatingActionButtonConstants.defaultElevation()
 ) {
     FloatingActionButton(
         modifier = modifier.preferredSizeIn(
@@ -180,31 +184,70 @@ fun ExtendedFloatingActionButton(
 }
 
 /**
+ * Represents the elevation for a floating action button in different states.
+ *
+ * See [FloatingActionButtonConstants.defaultElevation] for the default elevation used in a
+ * [FloatingActionButton] and [ExtendedFloatingActionButton].
+ */
+@ExperimentalMaterialApi
+@Stable
+interface FloatingActionButtonElevation {
+    /**
+     * Represents the elevation used in a floating action button, depending on [interactionState].
+     *
+     * @param interactionState the [InteractionState] for this floating action button
+     */
+    fun elevation(interactionState: InteractionState): Dp
+}
+
+/**
  * Contains the default values used by [FloatingActionButton]
  */
 object FloatingActionButtonConstants {
     // TODO: b/152525426 add support for focused and hovered states
     /**
-     * Represents the default elevation for a button in different [Interaction]s, and how the
-     * elevation animates between them.
+     * Creates a [FloatingActionButtonElevation] that will animate between the provided values
+     * according to the Material specification.
      *
-     * @param interactionState the [InteractionState] for this [FloatingActionButton], representing
-     * the current visual state, such as whether it is [Interaction.Pressed] or not.
-     * @param defaultElevation the elevation to use when the [FloatingActionButton] is has no
+     * @param defaultElevation the elevation to use when the [FloatingActionButton] has no
      * [Interaction]s
      * @param pressedElevation the elevation to use when the [FloatingActionButton] is
      * [Interaction.Pressed].
      */
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun animateDefaultElevation(
-        interactionState: InteractionState,
+    fun defaultElevation(
         defaultElevation: Dp = 6.dp,
         pressedElevation: Dp = 12.dp
         // focused: Dp = 8.dp,
         // hovered: Dp = 8.dp,
-    ): Dp {
-        class InteractionHolder(var interaction: Interaction?)
+    ): FloatingActionButtonElevation {
+        val clock = AnimationClockAmbient.current.asDisposableClock()
+        return remember(defaultElevation, pressedElevation, clock) {
+            DefaultFloatingActionButtonElevation(
+                defaultElevation = defaultElevation,
+                pressedElevation = pressedElevation,
+                clock = clock
+            )
+        }
+    }
+}
 
+/**
+ * Default [FloatingActionButtonElevation] implementation.
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Stable
+private class DefaultFloatingActionButtonElevation(
+    private val defaultElevation: Dp,
+    private val pressedElevation: Dp,
+    private val clock: AnimationClockObservable
+) : FloatingActionButtonElevation {
+    private val lazyAnimatedElevation = LazyAnimatedValue<Dp, AnimationVector1D> { target ->
+        AnimatedValueModel(initialValue = target, typeConverter = Dp.VectorConverter, clock = clock)
+    }
+
+    override fun elevation(interactionState: InteractionState): Dp {
         val interaction = interactionState.value.lastOrNull {
             it is Interaction.Pressed
         }
@@ -214,20 +257,18 @@ object FloatingActionButtonConstants {
             else -> defaultElevation
         }
 
-        val previousInteractionHolder = remember { InteractionHolder(interaction) }
+        val animatedElevation = lazyAnimatedElevation.animatedValueForTarget(target)
 
-        val animatedElevation = animatedValue(target, Dp.VectorConverter)
-
-        onCommit(target) {
+        if (animatedElevation.targetValue != target) {
+            val lastInteraction = when (animatedElevation.targetValue) {
+                pressedElevation -> Interaction.Pressed
+                else -> null
+            }
             animatedElevation.animateElevation(
-                from = previousInteractionHolder.interaction,
+                from = lastInteraction,
                 to = interaction,
                 target = target
             )
-
-            // Update the last interaction, so we know what AnimationSpec to use if we animate
-            // away from a state
-            previousInteractionHolder.interaction = interaction
         }
 
         return animatedElevation.value
