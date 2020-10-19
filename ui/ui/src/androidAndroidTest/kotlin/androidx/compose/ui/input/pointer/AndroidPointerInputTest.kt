@@ -41,7 +41,6 @@ import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.milliseconds
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.filters.SmallTest
@@ -239,7 +238,7 @@ class AndroidPointerInputTest {
     //  when run from Android Studio.  This seems to be caused by b/158099918.  Once that is
     //  fixed, @Ignore can be removed.
     @Ignore
-    fun dispatchTouchEvent_throughLayersOfAndroidAndCompose_hitsChildPointerInputFilter() {
+    fun dispatchTouchEvent_throughLayersOfAndroidAndCompose_hitsChildWithCorrectCoords() {
 
         // Arrange
 
@@ -297,7 +296,8 @@ class AndroidPointerInputTest {
 
             // Assert
             assertThat(log).hasSize(1)
-            assertThat(log[0]).isEqualTo(listOf(down(0, 0.milliseconds, 0f, 0f)))
+            assertThat(log[0]).hasSize(1)
+            assertThat(log[0][0].current.position).isEqualTo(Offset(0f, 0f))
         }
     }
 
@@ -417,7 +417,8 @@ class AndroidPointerInputTest {
 
             // Assert
             assertThat(log).hasSize(1)
-            assertThat(log[0]).isEqualTo(listOf(down(0, 0.milliseconds, 0f, 0f)))
+            assertThat(log[0]).hasSize(1)
+            assertThat(log[0][0].current.position).isEqualTo(Offset(0f, 0f))
         }
     }
 

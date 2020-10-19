@@ -73,21 +73,6 @@ internal fun PointerInputChange.up(duration: Duration) =
         consumed = ConsumedData()
     )
 
-internal fun PointerInputChange.consume(
-    dx: Float = 0f,
-    dy: Float = 0f,
-    downChange: Boolean = false
-) =
-    copy(
-        consumed = consumed.copy(
-            positionChange = Offset(
-                consumed.positionChange.x + dx,
-                consumed.positionChange.y + dy
-            ),
-            downChange = consumed.downChange || downChange
-        )
-    )
-
 /**
  * A function used to react to and modify [PointerInputChange]s.
  */
