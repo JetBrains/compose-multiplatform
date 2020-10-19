@@ -60,8 +60,8 @@ fun AnimatedValue<Dp, *>.animateElevation(
  *
  * Typically you should use [animateElevation] instead, which uses these [AnimationSpec]s
  * internally. [animateElevation] in turn is used by the defaults for [Button] and
- * [FloatingActionButton] - inside [ButtonConstants.animateDefaultElevation] and
- * [FloatingActionButtonConstants.animateDefaultElevation] respectively.
+ * [FloatingActionButton] - inside [ButtonConstants.defaultElevation] and
+ * [FloatingActionButtonConstants.defaultElevation] respectively.
  *
  * @see animateElevation
  */
