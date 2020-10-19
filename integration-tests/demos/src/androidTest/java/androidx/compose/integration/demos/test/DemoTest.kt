@@ -249,8 +249,8 @@ private val List<Demo>.navigationTitle: String
     get() = if (size == 1) first().title else drop(1).joinToString(" > ")
 
 /**
- * Trims the tree of [Demo]s represented by this [DemoCategory] by cutting all leave demos and
- * removing all empty categories as a result.
+ * Trims the tree of [Demo]s represented by this [DemoCategory] by cutting all leave demos for
+ * which the [predicate] returns `false` and recursively removing all empty categories as a result.
  */
 private fun DemoCategory.filter(
     path: List<DemoCategory> = emptyList(),
