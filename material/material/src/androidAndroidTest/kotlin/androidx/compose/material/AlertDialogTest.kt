@@ -42,7 +42,7 @@ import org.junit.runners.JUnit4
 class AlertDialogTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @FlakyTest(bugId = 170333139)
     @Test

@@ -58,7 +58,7 @@ import org.junit.runners.JUnit4
 class SnackbarTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val longText = "Message is very long and long and long and long and long " +
         "and long and long and long and long and long and long"

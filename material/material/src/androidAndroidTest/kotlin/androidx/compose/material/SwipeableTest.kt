@@ -52,7 +52,7 @@ import kotlin.math.sign
 class SwipeableTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val swipeableTag = "swipeableTag"
 

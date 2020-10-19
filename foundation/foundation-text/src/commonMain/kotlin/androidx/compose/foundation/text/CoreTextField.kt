@@ -672,7 +672,7 @@ private fun Modifier.cursor(
 
     if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unspecified) {
         onCommit(cursorColor, value.text) {
-            if (blinkingCursorEnabled) {
+            if (@Suppress("DEPRECATION_ERROR") blinkingCursorEnabled) {
                 cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
             } else {
                 cursorAlpha.snapTo(1f)
@@ -717,8 +717,9 @@ private class AnimatedFloatModel(
 }
 
 // TODO(b/151940543): Remove this variable when we have a solution for idling animations
-@InternalTextApi
 /** @suppress */
+@InternalTextApi
+@Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API and should not be used")
 var blinkingCursorEnabled: Boolean = true
     @VisibleForTesting
     set

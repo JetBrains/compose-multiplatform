@@ -66,7 +66,7 @@ import org.junit.runners.JUnit4
 class ScaffoldTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val scaffoldTag = "Scaffold"
 

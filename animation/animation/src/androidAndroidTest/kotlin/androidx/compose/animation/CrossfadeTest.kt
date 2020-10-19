@@ -37,7 +37,7 @@ import org.junit.runners.JUnit4
 class CrossfadeTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = false)
+    val rule = createComposeRule()
 
     @Test
     fun crossfadeTest_showsContent() {

@@ -34,7 +34,7 @@ class InputsTest {
     private val tag = "slider"
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun sliderPosition_valueCoercion() {

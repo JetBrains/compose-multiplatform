@@ -52,7 +52,7 @@ import org.junit.runners.JUnit4
 class SwitchTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val defaultSwitchTag = "switch"
 

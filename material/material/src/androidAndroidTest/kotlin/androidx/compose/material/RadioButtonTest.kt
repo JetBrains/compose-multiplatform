@@ -41,7 +41,7 @@ import org.junit.runners.JUnit4
 class RadioButtonTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val itemOne = "Bar"
     private val itemTwo = "Foo"

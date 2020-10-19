@@ -44,7 +44,7 @@ class CheckboxesInRowsTest(private val numberOfCheckboxes: Int) {
     }
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>(disableTransitions = true)
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun toggleRectangleColor_compose() {

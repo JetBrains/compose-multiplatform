@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
@@ -45,6 +47,7 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasInputMethodsSupport
 import androidx.ui.test.performClick
 import androidx.ui.test.performTextReplacement
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -55,8 +58,15 @@ import java.util.concurrent.TimeUnit
 class TextFieldCursorTest {
 
     @get:Rule
-    val rule = createComposeRule(disableBlinkingCursor = false).also {
+    val rule = createComposeRule().also {
         it.clockTestRule.pauseClock()
+    }
+
+    @Before
+    fun enableBlinkingCursor() {
+        @Suppress("DEPRECATION_ERROR")
+        @OptIn(InternalTextApi::class)
+        blinkingCursorEnabled = true
     }
 
     @Test

@@ -35,6 +35,7 @@ import androidx.ui.integration.test.core.text.TextFieldToggleTextTestCase
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -49,11 +50,13 @@ class TextFieldToggleTextBenchmark(
         fun initParameters(): Array<Any> = arrayOf(32, 512)
     }
 
-    @get:Rule
-    val textBenchmarkRule = TextBenchmarkTestRule()
+    private val textBenchmarkRule = TextBenchmarkTestRule()
+    private val benchmarkRule = ComposeBenchmarkRule()
 
     @get:Rule
-    val benchmarkRule = ComposeBenchmarkRule()
+    val testRule = RuleChain
+        .outerRule(textBenchmarkRule)
+        .around(benchmarkRule)
 
     private val width = textBenchmarkRule.widthDp.dp
     private val fontSize = textBenchmarkRule.fontSizeSp.sp

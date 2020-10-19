@@ -49,7 +49,7 @@ import kotlin.math.roundToInt
 @RunWith(JUnit4::class)
 class VectorAssetTest {
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun testProgrammaticAndXmlVectorAssetsAreTheSame() {

@@ -99,7 +99,7 @@ import java.util.concurrent.TimeUnit
 )
 class AndroidAccessibilityTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>(false, true)
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var androidComposeView: AndroidComposeView
     private lateinit var container: ViewGroup

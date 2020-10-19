@@ -36,9 +36,7 @@ import org.junit.runners.JUnit4
 class AndroidComposeTestCaseRunnerTest {
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>(
-        disableTransitions = true
-    )
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     internal fun <T : ComponentActivity> AndroidComposeTestRule<T>.forGivenContent(
         composable: @Composable () -> Unit
