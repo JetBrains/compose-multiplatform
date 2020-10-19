@@ -23,8 +23,8 @@ import androidx.compose.ui.gesture.customevents.DelayUpEvent
 import androidx.compose.ui.gesture.customevents.DelayUpMessage
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveTo
@@ -136,7 +136,8 @@ class DoubleTapGestureFilterTest {
     @Test
     fun onPointerEvent_downMoveConsumedUpDownInsideTimeoutUp_onDoubleTapNotCalled() {
         val down1 = down(1, 0.milliseconds)
-        val moveConsumed = down1.moveTo(1.milliseconds, x = 1f).consume(dx = 1f)
+        val moveConsumed =
+            down1.moveTo(1.milliseconds, x = 1f).apply { consumePositionChange(1f, 0f) }
         val up1 = moveConsumed.up(duration = 2.milliseconds)
         val down2 = down(2, 101.milliseconds)
         val up2 = down2.up(duration = 102.milliseconds)
@@ -156,7 +157,8 @@ class DoubleTapGestureFilterTest {
         val down1 = down(1, 0.milliseconds)
         val up1 = down1.up(duration = 1.milliseconds)
         val down2 = down(2, 100.milliseconds)
-        val moveConsumed = down2.moveTo(101.milliseconds, x = 1f).consume(dx = 1f)
+        val moveConsumed =
+            down2.moveTo(101.milliseconds, x = 1f).apply { consumePositionChange(1f, 0f) }
         val up2 = moveConsumed.up(duration = 102.milliseconds)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
@@ -173,7 +175,8 @@ class DoubleTapGestureFilterTest {
     fun onPointerEvent_2Down1MoveConsumedUpDownInsideTimeoutUp_onDoubleTapNotCalled() {
         val down1A = down(0, 0.milliseconds)
         val down1B = down(1, 0.milliseconds)
-        val moveConsumed1A = down1A.moveTo(1.milliseconds, x = 1f).consume(dx = 1f)
+        val moveConsumed1A =
+            down1A.moveTo(1.milliseconds, x = 1f).apply { consumePositionChange(1f, 0f) }
         val move1B = down1B.moveTo(1.milliseconds)
         val up1A = moveConsumed1A.up(duration = 2.milliseconds)
         val up1B = move1B.up(duration = 2.milliseconds)
@@ -196,7 +199,8 @@ class DoubleTapGestureFilterTest {
         val up2 = down1.up(duration = 1.milliseconds)
         val down2A = down(0, 100.milliseconds)
         val down2B = down(1, 100.milliseconds)
-        val moveConsumed2A = down2A.moveTo(101.milliseconds, x = 1f).consume(dx = 1f)
+        val moveConsumed2A =
+            down2A.moveTo(101.milliseconds, x = 1f).apply { consumePositionChange(1f, 0f) }
         val move2B = down2B.moveTo(101.milliseconds)
         val up2A = moveConsumed2A.up(duration = 102.milliseconds)
         val up2B = move2B.up(duration = 102.milliseconds)

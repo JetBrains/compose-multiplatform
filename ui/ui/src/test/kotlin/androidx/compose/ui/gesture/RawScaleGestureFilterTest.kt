@@ -19,7 +19,7 @@ package androidx.compose.ui.gesture
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
-import androidx.compose.ui.input.pointer.consume
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.invokeOverPasses
@@ -276,9 +276,9 @@ class RawScaleGestureFilterTest {
         scaleStartBlocked = false
 
         pointer1 =
-            pointer1.moveTo(10.milliseconds, 2f, 2f).consume(-1f, -2f)
+            pointer1.moveTo(10.milliseconds, 2f, 2f).apply { consumePositionChange(-1f, -2f) }
         pointer2 =
-            pointer2.moveTo(10.milliseconds, 5f, 1f).consume(1f, -2f)
+            pointer2.moveTo(10.milliseconds, 5f, 1f).apply { consumePositionChange(1f, -2f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         assertThat(log.filter { it.methodName == "onStart" }).isEmpty()
@@ -327,7 +327,10 @@ class RawScaleGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
         scaleStartBlocked = false
 
-        pointer1 = pointer1.moveBy(10.milliseconds, dx = 0f, dy = 0f).consume(dx = -1f)
+        pointer1 =
+            pointer1.moveBy(10.milliseconds, dx = 0f, dy = 0f).apply {
+                consumePositionChange(-1f, 0f)
+            }
         pointer2 = pointer2.moveBy(10.milliseconds, dx = 0f, dy = 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
@@ -343,7 +346,10 @@ class RawScaleGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
         scaleStartBlocked = false
 
-        pointer1 = pointer1.moveBy(10.milliseconds, dx = 0f, dy = 0f).consume(dy = -1f)
+        pointer1 =
+            pointer1
+                .moveBy(10.milliseconds, dx = 0f, dy = 0f)
+                .apply { consumePositionChange(0f, -1f) }
         pointer2 = pointer2.moveBy(10.milliseconds, dx = 0f, dy = 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 

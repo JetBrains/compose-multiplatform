@@ -23,7 +23,6 @@ import androidx.compose.ui.gesture.scrollorientationlocking.ShareScrollOrientati
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
-import androidx.compose.ui.input.pointer.consume
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
@@ -105,7 +104,8 @@ class RawDragGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1))
         dragStartBlocked = false
 
-        val move1 = down1.moveBy(10.milliseconds, 1f, 1f).consume(dx = 1f, dy = 1f)
+        val move1 =
+            down1.moveBy(10.milliseconds, 1f, 1f).apply { consumePositionChange(1f, 1f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1))
 
         assertThat(log.filter { it.methodName == "onStart" }).isEmpty()
@@ -202,7 +202,7 @@ class RawDragGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
 
-        val move = down.moveBy(10.milliseconds, 1f, 0f).consume(dx = 2f)
+        val move = down.moveBy(10.milliseconds, 1f, 0f).apply { consumePositionChange(2f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.filter { it.methodName == "onStart" }).hasSize(1)

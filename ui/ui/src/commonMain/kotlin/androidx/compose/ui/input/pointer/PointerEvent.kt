@@ -189,7 +189,7 @@ data class PointerInputData(
  * @param positionChange The amount of change to the position that has been consumed.
  * @param downChange True if a change to down or up has been consumed.
  */
-data class ConsumedData(
+class ConsumedData(
     var positionChange: Offset = Offset.Companion.Zero,
     var downChange: Boolean = false
 )

@@ -51,13 +51,7 @@ import androidx.compose.ui.unit.milliseconds
 import androidx.compose.ui.unit.minus
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.inOrder
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -106,8 +100,7 @@ class PointerInputEventProcessorTest {
     fun process_downMoveUp_convertedCorrectlyAndTraversesAllPassesInCorrectOrder() {
 
         // Arrange
-
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0,
             0,
@@ -126,53 +119,14 @@ class PointerInputEventProcessorTest {
         val events = arrayOf(
             PointerInputEvent(8712, Uptime.Boot + 3.milliseconds, offset, true),
             PointerInputEvent(8712, Uptime.Boot + 11.milliseconds, offset2, true),
-            PointerInputEvent(8712, Uptime.Boot + 13.milliseconds, offset2, false)
+            PointerInputEvent(8712, Uptime.Boot + 13.milliseconds, null, false)
         )
 
-        val expectedChanges = arrayOf(
-            PointerInputChange(
-                id = PointerId(8712),
-                current = PointerInputData(
-                    Uptime.Boot + 3.milliseconds,
-                    offset,
-                    true
-                ),
-                previous = PointerInputData(
-                    null,
-                    null,
-                    false
-                ),
-                consumed = ConsumedData()
-            ),
-            PointerInputChange(
-                id = PointerId(8712),
-                current = PointerInputData(
-                    Uptime.Boot + 11.milliseconds,
-                    offset2,
-                    true
-                ),
-                previous = PointerInputData(
-                    Uptime.Boot + 3.milliseconds,
-                    offset,
-                    true
-                ),
-                consumed = ConsumedData()
-            ),
-            PointerInputChange(
-                id = PointerId(8712),
-                current = PointerInputData(
-                    Uptime.Boot + 13.milliseconds,
-                    offset2,
-                    false
-                ),
-                previous = PointerInputData(
-                    Uptime.Boot + 11.milliseconds,
-                    offset2,
-                    true
-                ),
-                consumed = ConsumedData()
-            )
-        )
+        val down = down(8712, 3.milliseconds, offset.x, offset.y)
+        val move = down.moveTo(11.milliseconds, offset2.x, offset2.y)
+        val up = move.up(13.milliseconds)
+
+        val expectedChanges = arrayOf(down, move, up)
 
         // Act
 
@@ -180,22 +134,22 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log = pointerInputFilter.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(
-            pointerInputFilter,
-            times(PointerEventPass.values().size * expectedChanges.size)
-        ).onPointerEventMock(any(), any(), any())
+        assertThat(log)
+            .hasSize(PointerEventPass.values().size * expectedChanges.size)
 
         // Verify call values
-        inOrder(pointerInputFilter) {
-            for (expected in expectedChanges) {
-                for (pass in PointerEventPass.values()) {
-                    verify(pointerInputFilter).onPointerEventMock(
-                        eq(pointerEventOf(expected)),
-                        eq(pass),
-                        any()
-                    )
-                }
+        var count = 0
+        expectedChanges.forEach { change ->
+            PointerEventPass.values().forEach { pass ->
+                val item = log[count]
+                PointerEventSubject
+                    .assertThat(item.pointerEvent)
+                    .isStructurallyEqualTo(pointerEventOf(change))
+                assertThat(item.pass).isEqualTo(pass)
+                count++
             }
         }
     }
@@ -206,7 +160,7 @@ class PointerInputEventProcessorTest {
         // Arrange
 
         val childOffset = Offset(100f, 200f)
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             100, 200, 301, 401,
             PointerInputModifierImpl2(
@@ -252,19 +206,22 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log =
+            pointerInputFilter
+                .log
+                .getOnPointerEventLog()
+                .filter { it.pass == PointerEventPass.Initial }
+
         // Verify call count
-        verify(pointerInputFilter, times(expectedChanges.size)).onPointerEventMock(
-            any(),
-            eq(PointerEventPass.Initial),
-            any()
-        )
+        assertThat(log)
+            .hasSize(expectedChanges.size)
+
         // Verify call values
-        for (expected in expectedChanges) {
-            verify(pointerInputFilter).onPointerEventMock(
-                eq(pointerEventOf(expected)),
-                eq(PointerEventPass.Initial),
-                any()
-            )
+        expectedChanges.forEachIndexed { index, change ->
+            val item = log[index]
+            PointerEventSubject
+                .assertThat(item.pointerEvent)
+                .isStructurallyEqualTo(pointerEventOf(change))
         }
     }
 
@@ -273,7 +230,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             100, 200, 301, 401,
             PointerInputModifierImpl2(
@@ -306,7 +263,7 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
-        verify(pointerInputFilter, never()).onPointerEventMock(any(), any(), any())
+        assertThat(pointerInputFilter.log.getOnPointerEventLog()).hasSize(0)
     }
 
     @Test
@@ -327,9 +284,10 @@ class PointerInputEventProcessorTest {
     private fun process_partialTreeHits(numberOfChildrenHit: Int) {
         // Arrange
 
-        val childPointerInputFilter = spy(MockPointerInputFilter())
-        val middlePointerInputFilter = spy(MockPointerInputFilter())
-        val parentPointerInputFilter = spy(MockPointerInputFilter())
+        val log = mutableListOf<LogEntry>()
+        val childPointerInputFilter = PointerInputFilterMock(log)
+        val middlePointerInputFilter = PointerInputFilterMock(log)
+        val parentPointerInputFilter = PointerInputFilterMock(log)
 
         val childLayoutNode =
             LayoutNode(
@@ -373,57 +331,29 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val filteredLog = log.getOnPointerEventLog().filter { it.pass == PointerEventPass.Initial }
+
         when (numberOfChildrenHit) {
             3 -> {
-                verify(parentPointerInputFilter).onPointerEventMock(
-                    any(),
-                    eq(PointerEventPass.Initial),
-                    any()
-                )
-                verify(middlePointerInputFilter).onPointerEventMock(
-                    any(),
-                    eq(PointerEventPass.Initial),
-                    any()
-                )
-                verify(childPointerInputFilter).onPointerEventMock(
-                    any(),
-                    eq(PointerEventPass.Initial),
-                    any()
-                )
+                assertThat(filteredLog).hasSize(3)
+                assertThat(filteredLog[0].pointerInputFilter)
+                    .isSameInstanceAs(parentPointerInputFilter)
+                assertThat(filteredLog[1].pointerInputFilter)
+                    .isSameInstanceAs(middlePointerInputFilter)
+                assertThat(filteredLog[2].pointerInputFilter)
+                    .isSameInstanceAs(childPointerInputFilter)
             }
             2 -> {
-                verify(parentPointerInputFilter).onPointerEventMock(
-                    any(),
-                    eq(PointerEventPass.Initial),
-                    any()
-                )
-                verify(middlePointerInputFilter).onPointerEventMock(
-                    any(),
-                    eq(PointerEventPass.Initial),
-                    any()
-                )
-                verify(childPointerInputFilter, never()).onPointerEventMock(
-                    any(),
-                    any(),
-                    any()
-                )
+                assertThat(filteredLog).hasSize(2)
+                assertThat(filteredLog[0].pointerInputFilter)
+                    .isSameInstanceAs(parentPointerInputFilter)
+                assertThat(filteredLog[1].pointerInputFilter)
+                    .isSameInstanceAs(middlePointerInputFilter)
             }
             1 -> {
-                verify(parentPointerInputFilter).onPointerEventMock(
-                    any(),
-                    eq(PointerEventPass.Initial),
-                    any()
-                )
-                verify(middlePointerInputFilter, never()).onPointerEventMock(
-                    any(),
-                    any(),
-                    any()
-                )
-                verify(childPointerInputFilter, never()).onPointerEventMock(
-                    any(),
-                    any(),
-                    any()
-                )
+                assertThat(filteredLog).hasSize(1)
+                assertThat(filteredLog[0].pointerInputFilter)
+                    .isSameInstanceAs(parentPointerInputFilter)
             }
             else -> throw IllegalStateException()
         }
@@ -512,8 +442,12 @@ class PointerInputEventProcessorTest {
         val log = pointerInputFilter.log.getOnPointerEventLog()
 
         assertThat(log).hasSize(3)
-        assertThat(log[0].pointerEvent.changes.first()).isEqualTo(expectedInput)
-        assertThat(log[1].pointerEvent.changes.first()).isEqualTo(expectedOutput)
+        PointerInputChangeSubject
+            .assertThat(log[0].pointerEvent.changes.first())
+            .isStructurallyEqualTo(expectedInput)
+        PointerInputChangeSubject
+            .assertThat(log[1].pointerEvent.changes.first())
+            .isStructurallyEqualTo(expectedOutput)
     }
 
     @Test
@@ -571,9 +505,10 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val childPointerInputFilter = spy(MockPointerInputFilter())
-        val middlePointerInputFilter = spy(MockPointerInputFilter())
-        val parentPointerInputFilter = spy(MockPointerInputFilter())
+        val log = mutableListOf<LogEntry>()
+        val childPointerInputFilter = PointerInputFilterMock(log)
+        val middlePointerInputFilter = PointerInputFilterMock(log)
+        val parentPointerInputFilter = PointerInputFilterMock(log)
 
         val childOffset = Offset(cX1.toFloat(), cY1.toFloat())
         val childLayoutNode = LayoutNode(
@@ -609,12 +544,6 @@ class PointerInputEventProcessorTest {
         val offset = Offset(pointerX.toFloat(), pointerY.toFloat())
 
         val down = PointerInputEvent(0, Uptime.Boot + 7.milliseconds, offset, true)
-
-        val pointerInputHandlers = arrayOf(
-            parentPointerInputFilter,
-            middlePointerInputFilter,
-            childPointerInputFilter
-        )
 
         val expectedPointerInputChanges = arrayOf(
             PointerInputChange(
@@ -673,24 +602,75 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val filteredLog = log.getOnPointerEventLog()
+
         // Verify call count
-        pointerInputHandlers.forEach {
-            verify(it, times(PointerEventPass.values().size)).onPointerEventMock(
-                any(),
-                any(),
-                any()
-            )
-        }
+        assertThat(filteredLog).hasSize(PointerEventPass.values().size * 3)
+
         // Verify call values
-        for (pass in PointerEventPass.values()) {
-            for (i in pointerInputHandlers.indices) {
-                verify(pointerInputHandlers[i]).onPointerEventMock(
-                    pointerEventOf(expectedPointerInputChanges[i]),
-                    pass,
-                    expectedSizes[i]
-                )
-            }
-        }
+        filteredLog.verifyOnPointerEventCall(
+            0,
+            parentPointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[0]),
+            PointerEventPass.Initial,
+            expectedSizes[0]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            1,
+            middlePointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[1]),
+            PointerEventPass.Initial,
+            expectedSizes[1]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            2,
+            childPointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[2]),
+            PointerEventPass.Initial,
+            expectedSizes[2]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            3,
+            childPointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[2]),
+            PointerEventPass.Main,
+            expectedSizes[2]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            4,
+            middlePointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[1]),
+            PointerEventPass.Main,
+            expectedSizes[1]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            5,
+            parentPointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[0]),
+            PointerEventPass.Main,
+            expectedSizes[0]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            6,
+            parentPointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[0]),
+            PointerEventPass.Final,
+            expectedSizes[0]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            7,
+            middlePointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[1]),
+            PointerEventPass.Final,
+            expectedSizes[1]
+        )
+        filteredLog.verifyOnPointerEventCall(
+            8,
+            childPointerInputFilter,
+            pointerEventOf(expectedPointerInputChanges[2]),
+            PointerEventPass.Final,
+            expectedSizes[2]
+        )
     }
 
     /**
@@ -716,8 +696,9 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val childPointerInputFilter1 = spy(MockPointerInputFilter())
-        val childPointerInputFilter2 = spy(MockPointerInputFilter())
+        val log = mutableListOf<LogEntry>()
+        val childPointerInputFilter1 = PointerInputFilterMock(log)
+        val childPointerInputFilter2 = PointerInputFilterMock(log)
 
         val childLayoutNode1 =
             LayoutNode(
@@ -787,26 +768,61 @@ class PointerInputEventProcessorTest {
         // Assert
 
         // Verify call count
-        verify(childPointerInputFilter1, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(childPointerInputFilter2, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+
+        val child1Log =
+            log.getOnPointerEventLog().filter { it.pointerInputFilter === childPointerInputFilter1 }
+        val child2Log =
+            log.getOnPointerEventLog().filter { it.pointerInputFilter === childPointerInputFilter2 }
+        assertThat(child1Log).hasSize(PointerEventPass.values().size)
+        assertThat(child2Log).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        for (pointerEventPass in PointerEventPass.values()) {
-            verify(childPointerInputFilter1)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange1),
-                    pointerEventPass,
-                    IntSize(50, 50)
-                )
-            verify(childPointerInputFilter2)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange2),
-                    pointerEventPass,
-                    IntSize(50, 50)
-                )
-        }
+
+        val expectedBounds = IntSize(50, 50)
+
+        child1Log.verifyOnPointerEventCall(
+            0,
+            null,
+            pointerEventOf(expectedChange1),
+            PointerEventPass.Initial,
+            expectedBounds
+        )
+        child1Log.verifyOnPointerEventCall(
+            1,
+            null,
+            pointerEventOf(expectedChange1),
+            PointerEventPass.Main,
+            expectedBounds
+        )
+        child1Log.verifyOnPointerEventCall(
+            2,
+            null,
+            pointerEventOf(expectedChange1),
+            PointerEventPass.Final,
+            expectedBounds
+        )
+
+        child2Log.verifyOnPointerEventCall(
+            0,
+            null,
+            pointerEventOf(expectedChange2),
+            PointerEventPass.Initial,
+            expectedBounds
+        )
+        child2Log.verifyOnPointerEventCall(
+            1,
+            null,
+            pointerEventOf(expectedChange2),
+            PointerEventPass.Main,
+            expectedBounds
+        )
+        child2Log.verifyOnPointerEventCall(
+            2,
+            null,
+            pointerEventOf(expectedChange2),
+            PointerEventPass.Final,
+            expectedBounds
+        )
     }
 
     /**
@@ -834,9 +850,10 @@ class PointerInputEventProcessorTest {
     @Test
     fun process_3DownOnOverlappingPointerNodes_hitAndDispatchInfoAreCorrect() {
 
-        val childPointerInputFilter1 = spy(MockPointerInputFilter())
-        val childPointerInputFilter2 = spy(MockPointerInputFilter())
-        val childPointerInputFilter3 = spy(MockPointerInputFilter())
+        val log = mutableListOf<LogEntry>()
+        val childPointerInputFilter1 = PointerInputFilterMock(log)
+        val childPointerInputFilter2 = PointerInputFilterMock(log)
+        val childPointerInputFilter3 = PointerInputFilterMock(log)
 
         val childLayoutNode1 = LayoutNode(
             0, 0, 100, 100,
@@ -928,35 +945,85 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
-        // Verify call count
-        verify(childPointerInputFilter1, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(childPointerInputFilter2, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(childPointerInputFilter3, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        val child1Log =
+            log.getOnPointerEventLog().filter { it.pointerInputFilter === childPointerInputFilter1 }
+        val child2Log =
+            log.getOnPointerEventLog().filter { it.pointerInputFilter === childPointerInputFilter2 }
+        val child3Log =
+            log.getOnPointerEventLog().filter { it.pointerInputFilter === childPointerInputFilter3 }
+        assertThat(child1Log).hasSize(PointerEventPass.values().size)
+        assertThat(child2Log).hasSize(PointerEventPass.values().size)
+        assertThat(child3Log).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        for (pointerEventPass in PointerEventPass.values()) {
-            verify(childPointerInputFilter1)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange1),
-                    pointerEventPass,
-                    IntSize(100, 100)
-                )
-            verify(childPointerInputFilter2)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange2),
-                    pointerEventPass,
-                    IntSize(100, 100)
-                )
-            verify(childPointerInputFilter3)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange3),
-                    pointerEventPass,
-                    IntSize(100, 100)
-                )
-        }
+
+        val expectedBounds = IntSize(100, 100)
+
+        child1Log.verifyOnPointerEventCall(
+            0,
+            null,
+            pointerEventOf(expectedChange1),
+            PointerEventPass.Initial,
+            expectedBounds
+        )
+        child1Log.verifyOnPointerEventCall(
+            1,
+            null,
+            pointerEventOf(expectedChange1),
+            PointerEventPass.Main,
+            expectedBounds
+        )
+        child1Log.verifyOnPointerEventCall(
+            2,
+            null,
+            pointerEventOf(expectedChange1),
+            PointerEventPass.Final,
+            expectedBounds
+        )
+
+        child2Log.verifyOnPointerEventCall(
+            0,
+            null,
+            pointerEventOf(expectedChange2),
+            PointerEventPass.Initial,
+            expectedBounds
+        )
+        child2Log.verifyOnPointerEventCall(
+            1,
+            null,
+            pointerEventOf(expectedChange2),
+            PointerEventPass.Main,
+            expectedBounds
+        )
+        child2Log.verifyOnPointerEventCall(
+            2,
+            null,
+            pointerEventOf(expectedChange2),
+            PointerEventPass.Final,
+            expectedBounds
+        )
+
+        child3Log.verifyOnPointerEventCall(
+            0,
+            null,
+            pointerEventOf(expectedChange3),
+            PointerEventPass.Initial,
+            expectedBounds
+        )
+        child3Log.verifyOnPointerEventCall(
+            1,
+            null,
+            pointerEventOf(expectedChange3),
+            PointerEventPass.Main,
+            expectedBounds
+        )
+        child3Log.verifyOnPointerEventCall(
+            2,
+            null,
+            pointerEventOf(expectedChange3),
+            PointerEventPass.Final,
+            expectedBounds
+        )
     }
 
     /**
@@ -983,8 +1050,8 @@ class PointerInputEventProcessorTest {
     @Test
     fun process_3DownOnFloatingPointerNodeV_hitAndDispatchInfoAreCorrect() {
 
-        val childPointerInputFilter1 = spy(MockPointerInputFilter())
-        val childPointerInputFilter2 = spy(MockPointerInputFilter())
+        val childPointerInputFilter1 = PointerInputFilterMock()
+        val childPointerInputFilter2 = PointerInputFilterMock()
 
         val childLayoutNode1 = LayoutNode(
             0, 0, 100, 150,
@@ -1069,26 +1136,29 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log1 = childPointerInputFilter1.log.getOnPointerEventLog()
+        val log2 = childPointerInputFilter2.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(childPointerInputFilter1, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(childPointerInputFilter2, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log1).hasSize(PointerEventPass.values().size)
+        assertThat(log2).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        for (pointerEventPass in PointerEventPass.values()) {
-            verify(childPointerInputFilter1)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange1, expectedChange3),
-                    pointerEventPass,
-                    IntSize(100, 150)
-                )
-            verify(childPointerInputFilter2)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange2),
-                    pointerEventPass,
-                    IntSize(50, 50)
-                )
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            log1.verifyOnPointerEventCall(
+                index,
+                null,
+                pointerEventOf(expectedChange1, expectedChange3),
+                pass,
+                IntSize(100, 150)
+            )
+            log2.verifyOnPointerEventCall(
+                index,
+                null,
+                pointerEventOf(expectedChange2),
+                pass,
+                IntSize(50, 50)
+            )
         }
     }
 
@@ -1111,8 +1181,9 @@ class PointerInputEventProcessorTest {
      */
     @Test
     fun process_3DownOnFloatingPointerNodeH_hitAndDispatchInfoAreCorrect() {
-        val childPointerInputFilter1 = spy(MockPointerInputFilter())
-        val childPointerInputFilter2 = spy(MockPointerInputFilter())
+
+        val childPointerInputFilter1 = PointerInputFilterMock()
+        val childPointerInputFilter2 = PointerInputFilterMock()
 
         val childLayoutNode1 = LayoutNode(
             0, 0, 150, 100,
@@ -1197,26 +1268,29 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log1 = childPointerInputFilter1.log.getOnPointerEventLog()
+        val log2 = childPointerInputFilter2.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(childPointerInputFilter1, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(childPointerInputFilter2, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log1).hasSize(PointerEventPass.values().size)
+        assertThat(log2).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        for (pointerEventPass in PointerEventPass.values()) {
-            verify(childPointerInputFilter1)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange1, expectedChange3),
-                    pointerEventPass,
-                    IntSize(150, 100)
-                )
-            verify(childPointerInputFilter2)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange2),
-                    pointerEventPass,
-                    IntSize(50, 50)
-                )
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            log1.verifyOnPointerEventCall(
+                index,
+                null,
+                pointerEventOf(expectedChange1, expectedChange3),
+                pass,
+                IntSize(150, 100)
+            )
+            log2.verifyOnPointerEventCall(
+                index,
+                null,
+                pointerEventOf(expectedChange2),
+                pass,
+                IntSize(50, 50)
+            )
         }
     }
 
@@ -1247,10 +1321,10 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilterTopLeft = spy(MockPointerInputFilter())
-        val pointerInputFilterTopRight = spy(MockPointerInputFilter())
-        val pointerInputFilterBottomLeft = spy(MockPointerInputFilter())
-        val pointerInputFilterBottomRight = spy(MockPointerInputFilter())
+        val pointerInputFilterTopLeft = PointerInputFilterMock()
+        val pointerInputFilterTopRight = PointerInputFilterMock()
+        val pointerInputFilterBottomLeft = PointerInputFilterMock()
+        val pointerInputFilterBottomRight = PointerInputFilterMock()
 
         val layoutNodeTopLeft = LayoutNode(
             -1, -1, 1, 1,
@@ -1415,26 +1489,32 @@ class PointerInputEventProcessorTest {
             }
 
         // Verify call values
-        PointerEventPass.values().forEach { pointerEventPass ->
-            verify(pointerInputFilterTopLeft).onPointerEventMock(
-                eq(pointerEventOf(*expectedChangesTopLeft.toTypedArray())),
-                eq(pointerEventPass),
-                any()
+
+        val logTopLeft = pointerInputFilterTopLeft.log.getOnPointerEventLog()
+        val logTopRight = pointerInputFilterTopRight.log.getOnPointerEventLog()
+        val logBottomLeft = pointerInputFilterBottomLeft.log.getOnPointerEventLog()
+        val logBottomRight = pointerInputFilterBottomRight.log.getOnPointerEventLog()
+
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            logTopLeft.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(*expectedChangesTopLeft.toTypedArray()),
+                expectedPass = pass
             )
-            verify(pointerInputFilterTopRight).onPointerEventMock(
-                eq(pointerEventOf(*expectedChangesTopRight.toTypedArray())),
-                eq(pointerEventPass),
-                any()
+            logTopRight.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(*expectedChangesTopRight.toTypedArray()),
+                expectedPass = pass
             )
-            verify(pointerInputFilterBottomLeft).onPointerEventMock(
-                eq(pointerEventOf(*expectedChangesBottomLeft.toTypedArray())),
-                eq(pointerEventPass),
-                any()
+            logBottomLeft.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(*expectedChangesBottomLeft.toTypedArray()),
+                expectedPass = pass
             )
-            verify(pointerInputFilterBottomRight).onPointerEventMock(
-                eq(pointerEventOf(*expectedChangesBottomRight.toTypedArray())),
-                eq(pointerEventPass),
-                any()
+            logBottomRight.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(*expectedChangesBottomRight.toTypedArray()),
+                expectedPass = pass
             )
         }
     }
@@ -1463,7 +1543,7 @@ class PointerInputEventProcessorTest {
     fun process_rootIsOffset_onlyCorrectPointersHit() {
 
         // Arrange
-        val singlePointerInputFilter = spy(MockPointerInputFilter())
+        val singlePointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0, 0, 2, 2,
             PointerInputModifierImpl2(
@@ -1519,16 +1599,17 @@ class PointerInputEventProcessorTest {
                 )
             }
 
+        val log = singlePointerInputFilter.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(singlePointerInputFilter, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        PointerEventPass.values().forEach { pointerEventPass ->
-            verify(singlePointerInputFilter).onPointerEventMock(
-                eq(pointerEventOf(*expectedChanges.toTypedArray())),
-                eq(pointerEventPass),
-                any()
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(*expectedChanges.toTypedArray()),
+                expectedPass = pass
             )
         }
     }
@@ -1536,9 +1617,9 @@ class PointerInputEventProcessorTest {
     @Test
     fun process_downOn3NestedPointerInputModifiers_hitAndDispatchInfoAreCorrect() {
 
-        val pointerInputFilter1 = spy(MockPointerInputFilter())
-        val pointerInputFilter2 = spy(MockPointerInputFilter())
-        val pointerInputFilter3 = spy(MockPointerInputFilter())
+        val pointerInputFilter1 = PointerInputFilterMock()
+        val pointerInputFilter2 = PointerInputFilterMock()
+        val pointerInputFilter3 = PointerInputFilterMock()
 
         val modifier = PointerInputModifierImpl2(pointerInputFilter1) then
             PointerInputModifierImpl2(pointerInputFilter2) then
@@ -1584,41 +1665,42 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log1 = pointerInputFilter1.log.getOnPointerEventLog()
+        val log2 = pointerInputFilter2.log.getOnPointerEventLog()
+        val log3 = pointerInputFilter3.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(pointerInputFilter1, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(pointerInputFilter2, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(pointerInputFilter3, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log1).hasSize(PointerEventPass.values().size)
+        assertThat(log2).hasSize(PointerEventPass.values().size)
+        assertThat(log3).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        for (pointerEventPass in PointerEventPass.values()) {
-            verify(pointerInputFilter1)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange),
-                    pointerEventPass,
-                    IntSize(50, 50)
-                )
-            verify(pointerInputFilter2)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange),
-                    pointerEventPass,
-                    IntSize(50, 50)
-                )
-            verify(pointerInputFilter3)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange),
-                    pointerEventPass,
-                    IntSize(50, 50)
-                )
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            log1.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange),
+                expectedPass = pass,
+                expectedBounds = IntSize(50, 50)
+            )
+            log2.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange),
+                expectedPass = pass,
+                expectedBounds = IntSize(50, 50)
+            )
+            log3.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange),
+                expectedPass = pass,
+                expectedBounds = IntSize(50, 50)
+            )
         }
     }
 
     @Test
     fun process_downOnDeeplyNestedPointerInputModifier_hitAndDispatchInfoAreCorrect() {
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
 
         val layoutNode1 =
             LayoutNode(
@@ -1669,28 +1751,29 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log = pointerInputFilter.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(pointerInputFilter, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        for (pointerEventPass in PointerEventPass.values()) {
-            verify(pointerInputFilter)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange),
-                    pointerEventPass,
-                    IntSize(499, 495)
-                )
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange),
+                expectedPass = pass,
+                expectedBounds = IntSize(499, 495)
+            )
         }
     }
 
     @Test
     fun process_downOnComplexPointerAndLayoutNodePath_hitAndDispatchInfoAreCorrect() {
 
-        val pointerInputFilter1 = spy(MockPointerInputFilter())
-        val pointerInputFilter2 = spy(MockPointerInputFilter())
-        val pointerInputFilter3 = spy(MockPointerInputFilter())
-        val pointerInputFilter4 = spy(MockPointerInputFilter())
+        val pointerInputFilter1 = PointerInputFilterMock()
+        val pointerInputFilter2 = PointerInputFilterMock()
+        val pointerInputFilter3 = PointerInputFilterMock()
+        val pointerInputFilter4 = PointerInputFilterMock()
 
         val layoutNode1 = LayoutNode(
             1, 6, 500, 500,
@@ -1769,51 +1852,51 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log1 = pointerInputFilter1.log.getOnPointerEventLog()
+        val log2 = pointerInputFilter2.log.getOnPointerEventLog()
+        val log3 = pointerInputFilter3.log.getOnPointerEventLog()
+        val log4 = pointerInputFilter4.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(pointerInputFilter1, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(pointerInputFilter2, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(pointerInputFilter3, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(pointerInputFilter4, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        PointerEventPass.values()
+        assertThat(log1).hasSize(PointerEventPass.values().size)
+        assertThat(log2).hasSize(PointerEventPass.values().size)
+        assertThat(log3).hasSize(PointerEventPass.values().size)
+        assertThat(log4).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        for (pointerEventPass in PointerEventPass.values()) {
-            verify(pointerInputFilter1)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange1),
-                    pointerEventPass,
-                    IntSize(499, 494)
-                )
-            verify(pointerInputFilter2)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange1),
-                    pointerEventPass,
-                    IntSize(499, 494)
-                )
-            verify(pointerInputFilter3)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange2),
-                    pointerEventPass,
-                    IntSize(497, 492)
-                )
-            verify(pointerInputFilter4)
-                .onPointerEventMock(
-                    pointerEventOf(expectedChange2),
-                    pointerEventPass,
-                    IntSize(497, 492)
-                )
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            log1.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange1),
+                expectedPass = pass,
+                expectedBounds = IntSize(499, 494)
+            )
+            log2.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange1),
+                expectedPass = pass,
+                expectedBounds = IntSize(499, 494)
+            )
+            log3.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange2),
+                expectedPass = pass,
+                expectedBounds = IntSize(497, 492)
+            )
+            log4.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange2),
+                expectedPass = pass,
+                expectedBounds = IntSize(497, 492)
+            )
         }
     }
 
     @Test
     fun process_downOnFullyOverlappingPointerInputModifiers_onlyTopPointerInputModifierReceives() {
 
-        val pointerInputFilter1 = spy(MockPointerInputFilter())
-        val pointerInputFilter2 = spy(MockPointerInputFilter())
+        val pointerInputFilter1 = PointerInputFilterMock()
+        val pointerInputFilter2 = PointerInputFilterMock()
 
         val layoutNode1 = LayoutNode(
             0, 0, 100, 100,
@@ -1842,14 +1925,14 @@ class PointerInputEventProcessorTest {
         pointerInputEventProcessor.process(down)
 
         // Assert
-        verify(pointerInputFilter2, times(3)).onPointerEventMock(any(), any(), any())
-        verify(pointerInputFilter1, never()).onPointerEventMock(any(), any(), any())
+        assertThat(pointerInputFilter2.log.getOnPointerEventLog()).hasSize(3)
+        assertThat(pointerInputFilter1.log.getOnPointerEventLog()).hasSize(0)
     }
 
     @Test
     fun process_downOnPointerInputModifierInLayoutNodeWithNoSize_downNotReceived() {
 
-        val pointerInputFilter1 = spy(MockPointerInputFilter())
+        val pointerInputFilter1 = PointerInputFilterMock()
 
         val layoutNode1 = LayoutNode(
             0, 0, 0, 0,
@@ -1868,7 +1951,7 @@ class PointerInputEventProcessorTest {
         pointerInputEventProcessor.process(down)
 
         // Assert
-        verify(pointerInputFilter1, never()).onPointerEventMock(any(), any(), any())
+        assertThat(pointerInputFilter1.log.getOnPointerEventLog()).hasSize(0)
     }
 
     // Cancel Handlers
@@ -1883,7 +1966,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
 
         val layoutNode = LayoutNode(
             0, 0, 500, 500,
@@ -1923,21 +2006,20 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log = pointerInputFilter.log.filter { it is OnPointerEventEntry || it is OnCancelEntry }
+
         // Verify call count
-        verify(pointerInputFilter, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log).hasSize(PointerEventPass.values().size + 1)
 
         // Verify call values
-        inOrder(pointerInputFilter) {
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(expectedChange)),
-                    eq(pass),
-                    any()
-                )
-            }
-            verify(pointerInputFilter).onCancel()
+        PointerEventPass.values().forEachIndexed { index, pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange),
+                expectedPass = pass
+            )
         }
+        log.verifyOnCancelCall(PointerEventPass.values().size)
     }
 
     @Test
@@ -1945,7 +2027,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
 
         val layoutNode = LayoutNode(
             0, 0, 500, 500,
@@ -2041,28 +2123,30 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log = pointerInputFilter.log.filter { it is OnPointerEventEntry || it is OnCancelEntry }
+
         // Verify call count
-        verify(pointerInputFilter, times(PointerEventPass.values().size * 2))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log).hasSize(PointerEventPass.values().size * 2 + 1)
 
         // Verify call values
-        inOrder(pointerInputFilter) {
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(*expectedChanges1.toTypedArray())),
-                    eq(pass),
-                    any()
-                )
-            }
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(*expectedChanges2.toTypedArray())),
-                    eq(pass),
-                    any()
-                )
-            }
-            verify(pointerInputFilter).onCancel()
+        var index = 0
+        PointerEventPass.values().forEach { pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(*expectedChanges1.toTypedArray()),
+                expectedPass = pass
+            )
+            index++
         }
+        PointerEventPass.values().forEach { pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(*expectedChanges2.toTypedArray()),
+                expectedPass = pass
+            )
+            index++
+        }
+        log.verifyOnCancelCall(index)
     }
 
     @Test
@@ -2070,13 +2154,13 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter1 = spy(MockPointerInputFilter())
+        val pointerInputFilter1 = PointerInputFilterMock()
         val layoutNode1 = LayoutNode(
             0, 0, 199, 199,
             PointerInputModifierImpl2(pointerInputFilter1)
         )
 
-        val pointerInputFilter2 = spy(MockPointerInputFilter())
+        val pointerInputFilter2 = PointerInputFilterMock()
         val layoutNode2 = LayoutNode(
             200, 200, 399, 399,
             PointerInputModifierImpl2(pointerInputFilter2)
@@ -2145,33 +2229,32 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log1 =
+            pointerInputFilter1.log.filter { it is OnPointerEventEntry || it is OnCancelEntry }
+        val log2 =
+            pointerInputFilter2.log.filter { it is OnPointerEventEntry || it is OnCancelEntry }
+
         // Verify call count
-        verify(pointerInputFilter1, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
-        verify(pointerInputFilter2, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log1).hasSize(PointerEventPass.values().size + 1)
+        assertThat(log2).hasSize(PointerEventPass.values().size + 1)
 
         // Verify call values
-        inOrder(pointerInputFilter1) {
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter1).onPointerEventMock(
-                    eq(pointerEventOf(expectedChange1)),
-                    eq(pass),
-                    any()
-                )
-            }
-            verify(pointerInputFilter1).onCancel()
+        var index = 0
+        PointerEventPass.values().forEach { pass ->
+            log1.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange1),
+                expectedPass = pass
+            )
+            log2.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedChange2),
+                expectedPass = pass
+            )
+            index++
         }
-        inOrder(pointerInputFilter2) {
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter2).onPointerEventMock(
-                    eq(pointerEventOf(expectedChange2)),
-                    eq(pass),
-                    any()
-                )
-            }
-            verify(pointerInputFilter2).onCancel()
-        }
+        log1.verifyOnCancelCall(index)
+        log2.verifyOnCancelCall(index)
     }
 
     @Test
@@ -2179,7 +2262,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0, 0, 500, 500,
             PointerInputModifierImpl2(pointerInputFilter)
@@ -2243,28 +2326,30 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log = pointerInputFilter.log.filter { it is OnPointerEventEntry || it is OnCancelEntry }
+
         // Verify call count
-        verify(pointerInputFilter, times(PointerEventPass.values().size * 2))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log).hasSize(PointerEventPass.values().size * 2 + 1)
 
         // Verify call values
-        inOrder(pointerInputFilter) {
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(expectedDown)),
-                    eq(pass),
-                    any()
-                )
-            }
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(expectedMove)),
-                    eq(pass),
-                    any()
-                )
-            }
-            verify(pointerInputFilter).onCancel()
+        var index = 0
+        PointerEventPass.values().forEach { pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedDown),
+                expectedPass = pass
+            )
+            index++
         }
+        PointerEventPass.values().forEach { pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedMove),
+                expectedPass = pass
+            )
+            index++
+        }
+        log.verifyOnCancelCall(index)
     }
 
     @Test
@@ -2272,7 +2357,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0, 0, 500, 500,
             PointerInputModifierImpl2(pointerInputFilter)
@@ -2311,21 +2396,22 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log = pointerInputFilter.log.filter { it is OnPointerEventEntry || it is OnCancelEntry }
+
         // Verify call count
-        verify(pointerInputFilter, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log).hasSize(PointerEventPass.values().size + 1)
 
         // Verify call values
-        inOrder(pointerInputFilter) {
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(expectedDown)),
-                    eq(pass),
-                    any()
-                )
-            }
-            verify(pointerInputFilter).onCancel()
+        var index = 0
+        PointerEventPass.values().forEach { pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedDown),
+                expectedPass = pass
+            )
+            index++
         }
+        log.verifyOnCancelCall(index)
     }
 
     @Test
@@ -2333,7 +2419,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0, 0, 500, 500,
             PointerInputModifierImpl2(
@@ -2399,27 +2485,30 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val log = pointerInputFilter.log.filter { it is OnPointerEventEntry || it is OnCancelEntry }
+
         // Verify call count
-        verify(pointerInputFilter, times(PointerEventPass.values().size * 2))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(log).hasSize(PointerEventPass.values().size * 2 + 1)
 
         // Verify call values
-        inOrder(pointerInputFilter) {
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(expectedDown1)),
-                    eq(pass),
-                    any()
-                )
-            }
-            verify(pointerInputFilter).onCancel()
-            for (pass in PointerEventPass.values()) {
-                verify(pointerInputFilter).onPointerEventMock(
-                    eq(pointerEventOf(expectedDown2)),
-                    eq(pass),
-                    any()
-                )
-            }
+        var index = 0
+        PointerEventPass.values().forEach { pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedDown1),
+                expectedPass = pass
+            )
+            index++
+        }
+        log.verifyOnCancelCall(index)
+        index++
+        PointerEventPass.values().forEach { pass ->
+            log.verifyOnPointerEventCall(
+                index = index,
+                expectedEvent = pointerEventOf(expectedDown2),
+                expectedPass = pass
+            )
+            index++
         }
     }
 
@@ -2428,13 +2517,13 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val childPointerInputFilter = spy(MockPointerInputFilter())
+        val childPointerInputFilter = PointerInputFilterMock()
         val childLayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(childPointerInputFilter)
         )
 
-        val parentPointerInputFilter = spy(MockPointerInputFilter())
+        val parentPointerInputFilter = PointerInputFilterMock()
         val parentLayoutNode: LayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(parentPointerInputFilter)
@@ -2489,21 +2578,61 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val parentLog = parentPointerInputFilter.log.getOnPointerEventLog()
+        val childLog = childPointerInputFilter.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(parentPointerInputFilter, times(PointerEventPass.values().size * 2))
-            .onPointerEventMock(any(), any(), any())
-        verify(childPointerInputFilter, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(parentLog).hasSize(PointerEventPass.values().size * 2)
+        assertThat(childLog).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        PointerEventPass.values().forEach {
-            verify(parentPointerInputFilter)
-                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
-            verify(childPointerInputFilter)
-                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
-            verify(parentPointerInputFilter)
-                .onPointerEventMock(eq(pointerEventOf(expectedUpChange)), eq(it), any())
-        }
+
+        parentLog.verifyOnPointerEventCall(
+            index = 0,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Initial
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 1,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Main
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 2,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Final
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 3,
+            expectedEvent = pointerEventOf(expectedUpChange),
+            expectedPass = PointerEventPass.Initial
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 4,
+            expectedEvent = pointerEventOf(expectedUpChange),
+            expectedPass = PointerEventPass.Main
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 5,
+            expectedEvent = pointerEventOf(expectedUpChange),
+            expectedPass = PointerEventPass.Final
+        )
+
+        childLog.verifyOnPointerEventCall(
+            index = 0,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Initial
+        )
+        childLog.verifyOnPointerEventCall(
+            index = 1,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Main
+        )
+        childLog.verifyOnPointerEventCall(
+            index = 2,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Final
+        )
     }
 
     @Test
@@ -2511,13 +2640,13 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val childPointerInputFilter = spy(MockPointerInputFilter())
+        val childPointerInputFilter = PointerInputFilterMock()
         val childLayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(childPointerInputFilter)
         )
 
-        val parentPointerInputFilter = spy(MockPointerInputFilter())
+        val parentPointerInputFilter = PointerInputFilterMock()
         val parentLayoutNode: LayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(parentPointerInputFilter)
@@ -2539,8 +2668,8 @@ class PointerInputEventProcessorTest {
         pointerInputEventProcessor.process(up)
 
         // Assert
-        verify(childPointerInputFilter).onCancel()
-        verify(parentPointerInputFilter, never()).onCancel()
+        assertThat(childPointerInputFilter.log.getOnCancelLog()).hasSize(1)
+        assertThat(parentPointerInputFilter.log.getOnCancelLog()).hasSize(0)
     }
 
     @Test
@@ -2548,7 +2677,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val childPointerInputFilter = spy(MockPointerInputFilter())
+        val childPointerInputFilter = PointerInputFilterMock()
         val childLayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(
@@ -2556,7 +2685,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        val parentPointerInputFilter = spy(MockPointerInputFilter())
+        val parentPointerInputFilter = PointerInputFilterMock()
         val parentLayoutNode: LayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(
@@ -2613,21 +2742,61 @@ class PointerInputEventProcessorTest {
 
         // Assert
 
+        val parentLog = parentPointerInputFilter.log.getOnPointerEventLog()
+        val childLog = childPointerInputFilter.log.getOnPointerEventLog()
+
         // Verify call count
-        verify(parentPointerInputFilter, times(PointerEventPass.values().size * 2))
-            .onPointerEventMock(any(), any(), any())
-        verify(childPointerInputFilter, times(PointerEventPass.values().size))
-            .onPointerEventMock(any(), any(), any())
+        assertThat(parentLog).hasSize(PointerEventPass.values().size * 2)
+        assertThat(childLog).hasSize(PointerEventPass.values().size)
 
         // Verify call values
-        PointerEventPass.values().forEach {
-            verify(parentPointerInputFilter)
-                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
-            verify(childPointerInputFilter)
-                .onPointerEventMock(eq(pointerEventOf(expectedDownChange)), eq(it), any())
-            verify(parentPointerInputFilter)
-                .onPointerEventMock(eq(pointerEventOf(expectedUpChange)), eq(it), any())
-        }
+
+        parentLog.verifyOnPointerEventCall(
+            index = 0,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Initial
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 1,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Main
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 2,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Final
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 3,
+            expectedEvent = pointerEventOf(expectedUpChange),
+            expectedPass = PointerEventPass.Initial
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 4,
+            expectedEvent = pointerEventOf(expectedUpChange),
+            expectedPass = PointerEventPass.Main
+        )
+        parentLog.verifyOnPointerEventCall(
+            index = 5,
+            expectedEvent = pointerEventOf(expectedUpChange),
+            expectedPass = PointerEventPass.Final
+        )
+
+        childLog.verifyOnPointerEventCall(
+            index = 0,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Initial
+        )
+        childLog.verifyOnPointerEventCall(
+            index = 1,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Main
+        )
+        childLog.verifyOnPointerEventCall(
+            index = 2,
+            expectedEvent = pointerEventOf(expectedDownChange),
+            expectedPass = PointerEventPass.Final
+        )
     }
 
     @Test
@@ -2635,13 +2804,13 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val childPointerInputFilter = spy(MockPointerInputFilter())
+        val childPointerInputFilter = PointerInputFilterMock()
         val childLayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(childPointerInputFilter)
         )
 
-        val parentPointerInputFilter = spy(MockPointerInputFilter())
+        val parentPointerInputFilter = PointerInputFilterMock()
         val parentLayoutNode: LayoutNode = LayoutNode(
             0, 0, 100, 100,
             PointerInputModifierImpl2(parentPointerInputFilter)
@@ -2663,8 +2832,8 @@ class PointerInputEventProcessorTest {
         pointerInputEventProcessor.process(up)
 
         // Assert
-        verify(childPointerInputFilter).onCancel()
-        verify(parentPointerInputFilter, never()).onCancel()
+        assertThat(childPointerInputFilter.log.getOnCancelLog()).hasSize(1)
+        assertThat(parentPointerInputFilter.log.getOnCancelLog()).hasSize(0)
     }
 
     @Test
@@ -2687,7 +2856,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
 
         val layoutNode = LayoutNode(
             0, 0, 1, 1,
@@ -2734,7 +2903,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0, 0, 1, 1,
             PointerInputModifierImpl2(
@@ -2764,7 +2933,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0, 0, 1, 1,
             PointerInputModifierImpl2(
@@ -2796,7 +2965,7 @@ class PointerInputEventProcessorTest {
 
         // Arrange
 
-        val pointerInputFilter = spy(MockPointerInputFilter())
+        val pointerInputFilter = PointerInputFilterMock()
         val layoutNode = LayoutNode(
             0, 0, 1, 1,
             PointerInputModifierImpl2(
@@ -3044,23 +3213,31 @@ private class MockOwner(
     }
 }
 
-open class MockPointerInputFilter : PointerInputFilter() {
-
-    override fun onPointerEvent(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ) {
-        onPointerEventMock(pointerEvent, pass, bounds as Any)
+private fun List<LogEntry>.verifyOnPointerEventCall(
+    index: Int,
+    expectedPif: PointerInputFilter? = null,
+    expectedEvent: PointerEvent,
+    expectedPass: PointerEventPass,
+    expectedBounds: IntSize? = null
+) {
+    val logEntry = this[index]
+    assertThat(logEntry).isInstanceOf(OnPointerEventEntry::class.java)
+    val entry = logEntry as OnPointerEventEntry
+    if (expectedPif != null) {
+        assertThat(entry.pointerInputFilter).isSameInstanceAs(expectedPif)
     }
-
-    override fun onCancel() {}
-
-    open fun onPointerEventMock(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: Any
-    ) {
-        pointerEvent.changes
+    PointerEventSubject
+        .assertThat(entry.pointerEvent)
+        .isStructurallyEqualTo(expectedEvent)
+    assertThat(entry.pass).isEqualTo(expectedPass)
+    if (expectedBounds != null) {
+        assertThat(entry.bounds).isEqualTo(expectedBounds)
     }
+}
+
+private fun List<LogEntry>.verifyOnCancelCall(
+    index: Int
+) {
+    val logEntry = this[index]
+    assertThat(logEntry).isInstanceOf(OnCancelEntry::class.java)
 }

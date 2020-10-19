@@ -1521,9 +1521,6 @@ package androidx.compose.ui.input.key {
 package androidx.compose.ui.input.pointer {
 
   public final class ConsumedData {
-    method public long component1-F1C5BW0();
-    method public boolean component2();
-    method public androidx.compose.ui.input.pointer.ConsumedData copy-Dkz3Of0(long positionChange, boolean downChange);
     method public boolean getDownChange();
     method public long getPositionChange-F1C5BW0();
     method public void setDownChange(boolean p);
