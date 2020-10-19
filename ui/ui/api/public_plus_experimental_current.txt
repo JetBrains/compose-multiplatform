@@ -2331,9 +2331,6 @@ package androidx.compose.ui.selection {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.SelectionRegistrar> getSelectionRegistrarAmbient();
   }
 
-  public final class SimpleContainerKt {
-  }
-
   public final class SimpleLayoutKt {
   }
 
