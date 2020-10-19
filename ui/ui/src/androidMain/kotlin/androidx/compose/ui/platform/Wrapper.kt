@@ -228,6 +228,7 @@ private fun doSetContent(
             R.id.inspection_slot_table_set,
             Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>())
         )
+        enableDebugInspectorInfo()
     }
     @OptIn(ExperimentalComposeApi::class)
     val original = compositionFor(owner.root, UiApplier(owner.root), recomposer, parentComposition)
@@ -238,6 +239,18 @@ private fun doSetContent(
         }
     wrapped.setContent(content)
     return wrapped
+}
+
+private fun enableDebugInspectorInfo() {
+    // Set isDebugInspectorInfoEnabled to true via reflection such that R8 cannot see the
+    // assignment. This allows the InspectorInfo lambdas to be stripped from release builds.
+    @OptIn(InternalComposeApi::class)
+    if (!isDebugInspectorInfoEnabled) {
+        val packageClass = Class.forName("androidx.compose.ui.platform.InspectableValueKt")
+        val field = packageClass.getDeclaredField("isDebugInspectorInfoEnabled")
+        field.isAccessible = true
+        field.setBoolean(null, true)
+    }
 }
 
 private class WrappedComposition(
