@@ -9,6 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.ExperimentalKeyInput
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import example.todo.common.add.TodoAdd
@@ -17,6 +20,7 @@ import example.todo.common.add.store.TodoAddStore.Intent
 import example.todo.common.add.store.TodoAddStoreProvider
 import example.todo.common.utils.composeState
 import example.todo.common.utils.getStore
+import example.todo.common.utils.onKeyUp
 
 internal class TodoAddImpl(
     componentContext: ComponentContext,
@@ -31,6 +35,7 @@ internal class TodoAddImpl(
             ).provide()
         }
 
+    @OptIn(ExperimentalKeyInput::class)
     @Composable
     override fun invoke() {
         val state by store.composeState
@@ -38,7 +43,7 @@ internal class TodoAddImpl(
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
             OutlinedTextField(
                 value = state.text,
-                modifier = Modifier.weight(weight = 1F),
+                modifier = Modifier.weight(weight = 1F).keyInputFilter(onKeyUp(Key.Enter, ::onAddClicked)),
                 onValueChange = ::onTextChanged,
                 label = { Text(text = "Add a todo") }
             )
