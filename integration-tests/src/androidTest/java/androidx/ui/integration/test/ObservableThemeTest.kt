@@ -52,7 +52,7 @@ import org.junit.runners.JUnit4
 @OptIn(ExperimentalTesting::class)
 class ObservableThemeTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>(disableTransitions = true)
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun testObservableTheme() {

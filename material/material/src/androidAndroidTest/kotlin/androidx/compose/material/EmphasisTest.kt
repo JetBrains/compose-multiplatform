@@ -48,7 +48,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
     }
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun noEmphasisSpecified_contentColorUnmodified_surface() {

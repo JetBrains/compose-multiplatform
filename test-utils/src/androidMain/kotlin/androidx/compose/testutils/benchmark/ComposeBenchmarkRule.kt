@@ -19,11 +19,13 @@ package androidx.compose.testutils.benchmark
 import androidx.activity.ComponentActivity
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.compose.testutils.ComposeBenchmarkScope
 import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
-import androidx.ui.test.DisableTransitions
+import androidx.ui.test.DisableTransitionsTestRule
+import androidx.ui.test.InternalTestingApi
+import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -37,20 +39,17 @@ class ComposeBenchmarkRule(
 
     @Suppress("DEPRECATION")
     private val activityTestRule =
-        androidx.test.rule.ActivityTestRule<ComponentActivity>(ComponentActivity::class.java)
+        androidx.test.rule.ActivityTestRule(ComponentActivity::class.java)
 
     val benchmarkRule = BenchmarkRule()
 
-    private val disableTransitionsRule = DisableTransitions()
-
     override fun apply(base: Statement, description: Description?): Statement {
-        val statement = benchmarkRule.apply(
-            activityTestRule.apply(base, description), description!!
-        )
-        if (!enableTransitions) {
-            return disableTransitionsRule.apply(statement, description)
-        }
-        return statement
+        @OptIn(InternalTestingApi::class)
+        return RuleChain
+            .outerRule(DisableTransitionsTestRule(!enableTransitions))
+            .around(benchmarkRule)
+            .around(activityTestRule)
+            .apply(base, description)
     }
 
     /**

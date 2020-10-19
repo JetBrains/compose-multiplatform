@@ -50,7 +50,7 @@ class SemanticsTests {
     private val TestTag = "semantics-test-tag"
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private fun executeUpdateBlocking(updateFunction: () -> Unit) {
         val latch = CountDownLatch(1)

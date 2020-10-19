@@ -85,6 +85,7 @@ class TextFieldToggleTextTestCase(
         textInputServiceFactory = {
             textInputService
         }
+        @Suppress("DEPRECATION_ERROR")
         @OptIn(InternalTextApi::class)
         blinkingCursorEnabled = false
         Column(

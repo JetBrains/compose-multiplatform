@@ -74,10 +74,7 @@ import org.mockito.ArgumentMatchers
 @RunWith(JUnit4::class)
 class AndroidComposeViewAccessibilityDelegateCompatTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>(
-        disableTransitions = false,
-        disableBlinkingCursor = true
-    )
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var accessibilityDelegate: AndroidComposeViewAccessibilityDelegateCompat
     private lateinit var container: ViewGroup

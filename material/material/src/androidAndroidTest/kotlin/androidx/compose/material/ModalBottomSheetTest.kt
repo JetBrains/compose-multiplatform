@@ -45,7 +45,7 @@ import org.junit.runners.JUnit4
 class ModalBottomSheetTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val sheetHeight = 256.dp
     private val sheetTag = "sheetContentTag"

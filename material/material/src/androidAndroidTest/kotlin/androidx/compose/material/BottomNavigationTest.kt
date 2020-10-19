@@ -57,7 +57,7 @@ import org.junit.runners.JUnit4
  */
 class BottomNavigationTest {
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun bottomNavigation_size() {

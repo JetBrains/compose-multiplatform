@@ -65,7 +65,7 @@ import org.junit.runners.JUnit4
 class BottomSheetScaffoldTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val peekHeight = 75.dp
 

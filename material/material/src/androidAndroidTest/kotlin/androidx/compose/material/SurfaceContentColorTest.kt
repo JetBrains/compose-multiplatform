@@ -31,7 +31,7 @@ import org.junit.runners.JUnit4
 class SurfaceContentColorTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun surfaceSetsCorrectContentColors_primary() {

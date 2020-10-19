@@ -65,7 +65,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
     }
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun correctElevationOverlayInDarkTheme() {
