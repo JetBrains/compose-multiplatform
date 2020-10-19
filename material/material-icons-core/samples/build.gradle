@@ -33,7 +33,7 @@ dependencies {
 
     implementation(KOTLIN_STDLIB)
 
-    implementation project(":annotation:annotation-sampled")
+    compileOnly project(":annotation:annotation-sampled")
 
     implementation project(":compose:material:material")
     implementation project(":compose:material:material-icons-core")
