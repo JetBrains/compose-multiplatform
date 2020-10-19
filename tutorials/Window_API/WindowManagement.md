@@ -1,4 +1,4 @@
-# Getting Started with Compose for Desktop
+# OS windows management
 
 ## What is covered
 

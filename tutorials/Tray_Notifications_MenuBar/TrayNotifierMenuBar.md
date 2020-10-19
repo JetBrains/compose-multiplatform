@@ -1,4 +1,4 @@
-# Getting Started with Compose for Desktop
+# Tray and menu notification
 
 ## What is covered
 
