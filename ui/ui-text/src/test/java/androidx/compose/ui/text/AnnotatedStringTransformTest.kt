@@ -172,6 +172,50 @@ class AnnotatedStringTransformTest {
     }
 
     @Test
+    fun `locale dependent capitalize (Turkish)`() {
+        val input = AnnotatedString(
+            "iii hhh jjj",
+            listOf(
+                makeRange(spanStyle1, "(iii hhh jjj)"),
+                makeRange(spanStyle2, "(iii )hhh jjj"),
+                makeRange(spanStyle3, "iii (hhh jjj)")
+            ),
+            listOf(
+                makeRange(paraStyle1, "(iii hhh )jjj"),
+                makeRange(paraStyle2, "iii hhh (jjj)")
+            )
+        )
+
+        val capitalized = input.capitalize(LocaleList("tr"))
+
+        assertEquals(input.text.capitalize(Locale.forLanguageTag("tr")), capitalized.text)
+        assertEquals(input.spanStyles, capitalized.spanStyles)
+        assertEquals(input.paragraphStyles, capitalized.paragraphStyles)
+    }
+
+    @Test
+    fun `locale dependent decapitalize (Turkish)`() {
+        val input = AnnotatedString(
+            "III HHH JJJ",
+            listOf(
+                makeRange(spanStyle1, "(III HHH JJJ)"),
+                makeRange(spanStyle2, "(III )HHH JJJ"),
+                makeRange(spanStyle3, "III (HHH JJJ)")
+            ),
+            listOf(
+                makeRange(paraStyle1, "(III HHH )JJJ"),
+                makeRange(paraStyle2, "III HHH (JJJ)")
+            )
+        )
+
+        val decapitalized = input.decapitalize(LocaleList("tr"))
+
+        assertEquals(input.text.decapitalize(Locale.forLanguageTag("tr")), decapitalized.text)
+        assertEquals(input.spanStyles, decapitalized.spanStyles)
+        assertEquals(input.paragraphStyles, decapitalized.paragraphStyles)
+    }
+
+    @Test
     fun `locale dependent uppercase or lowercase (Turkish uppercase)`() {
         val input = AnnotatedString(
             "hhh iii jjj",
