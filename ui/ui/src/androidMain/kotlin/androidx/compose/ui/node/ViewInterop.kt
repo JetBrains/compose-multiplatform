@@ -19,13 +19,14 @@ package androidx.compose.ui.node
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RestrictTo
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
@@ -134,7 +135,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
             measureScope: MeasureScope,
             measurables: List<Measurable>,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
+        ): MeasureResult {
             if (constraints.minWidth != 0) {
                 getChildAt(0).minimumWidth = constraints.minWidth
             }

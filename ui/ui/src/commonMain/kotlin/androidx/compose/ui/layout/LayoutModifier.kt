@@ -45,7 +45,7 @@ interface LayoutModifier : Modifier.Element {
     fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult
+    ): MeasureResult
 
     /**
      * The function used to calculate [IntrinsicMeasurable.minIntrinsicWidth].
@@ -246,11 +246,11 @@ private object MeasuringIntrinsics {
  * @see androidx.compose.ui.layout.LayoutModifier
  */
 fun Modifier.layout(
-    measure: MeasureScope.(Measurable, Constraints) -> MeasureScope.MeasureResult
+    measure: MeasureScope.(Measurable, Constraints) -> MeasureResult
 ) = this.then(LayoutModifierImpl(measure))
 
 private data class LayoutModifierImpl(
-    val measureBlock: MeasureScope.(Measurable, Constraints) -> MeasureScope.MeasureResult
+    val measureBlock: MeasureScope.(Measurable, Constraints) -> MeasureResult
 ) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,

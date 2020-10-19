@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.satisfiedBy
@@ -54,7 +55,7 @@ private data class AspectRatioModifier(val aspectRatio: Float) : LayoutModifier 
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val size = constraints.findSizeWith(aspectRatio)
         val wrappedConstraints = if (size != null) {
             Constraints.fixed(size.width, size.height)

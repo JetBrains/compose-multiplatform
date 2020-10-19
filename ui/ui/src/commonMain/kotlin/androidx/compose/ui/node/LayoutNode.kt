@@ -49,6 +49,7 @@ import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.merge
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
@@ -421,7 +422,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             measureScope: MeasureScope,
             measurables: List<Measurable>,
             constraints: Constraints
-        ): MeasureScope.MeasureResult
+        ): MeasureResult
 
         /**
          * The function used to calculate [IntrinsicMeasurable.minIntrinsicWidth].
@@ -1096,7 +1097,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         return alignmentLines
     }
 
-    internal fun handleMeasureResult(measureResult: MeasureScope.MeasureResult) {
+    internal fun handleMeasureResult(measureResult: MeasureResult) {
         innerLayoutNodeWrapper.measureResult = measureResult
         this.providedAlignmentLines.clear()
         this.providedAlignmentLines += measureResult.alignmentLines

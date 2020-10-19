@@ -819,7 +819,7 @@ val infiniteConstraints = object : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurable.measure(Constraints())
         return layout(constraints.maxWidth, constraints.maxHeight) {
             placeable.place(0, 0)

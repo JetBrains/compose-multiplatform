@@ -64,6 +64,7 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -381,7 +382,7 @@ internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
         override fun MeasureScope.measure(
             measurable: Measurable,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
+        ): MeasureResult {
             val horizontal = start.toIntPx() + end.toIntPx()
             val placeable = measurable.measure(constraints.offset(-horizontal))
             val width = if (placeable.nonZero) {

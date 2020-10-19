@@ -56,6 +56,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
@@ -761,7 +762,7 @@ class AndroidViewCompatTest {
         override fun MeasureScope.measure(
             measurable: Measurable,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
+        ): MeasureResult {
             val placeable = measurable.measure(childConstraints)
             return layout(placeable.width, placeable.height) {
                 placeable.place(0, 0)
@@ -788,8 +789,8 @@ class AndroidViewCompatTest {
             measureScope: MeasureScope,
             measurables: List<Measurable>,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
-            return object : MeasureScope.MeasureResult {
+        ): MeasureResult {
+            return object : MeasureResult {
                 override val width = 0
                 override val height = 0
                 override val alignmentLines: Map<AlignmentLine, Int> get() = mapOf()

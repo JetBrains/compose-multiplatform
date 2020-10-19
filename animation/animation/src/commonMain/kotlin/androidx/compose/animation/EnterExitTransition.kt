@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -866,7 +867,7 @@ private class SlideTransition(
         override fun MeasureScope.measure(
             measurable: Measurable,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
+        ): MeasureResult {
             val placeable = measurable.measure(constraints)
 
             updateAnimation(IntSize(placeable.width, placeable.height))

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
@@ -3097,7 +3098,7 @@ private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Mo
                 measureScope: MeasureScope,
                 measurables: List<Measurable>,
                 constraints: Constraints
-            ): MeasureScope.MeasureResult =
+            ): MeasureResult =
                 measureScope.layout(x2 - x, y2 - y) {}
         }
         attach(mockOwner())

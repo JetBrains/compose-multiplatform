@@ -46,6 +46,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.style.TextAlign
@@ -277,7 +278,7 @@ private fun BottomNavigationItemBaselineLayout(
 private fun MeasureScope.placeIcon(
     iconPlaceable: Placeable,
     constraints: Constraints
-): MeasureScope.MeasureResult {
+): MeasureResult {
     val height = constraints.maxHeight
     val iconY = (height - iconPlaceable.height) / 2
     return layout(iconPlaceable.width, height) {
@@ -310,7 +311,7 @@ private fun MeasureScope.placeLabelAndIcon(
     iconPlaceable: Placeable,
     constraints: Constraints,
     @FloatRange(from = 0.0, to = 1.0) iconPositionAnimationProgress: Float
-): MeasureScope.MeasureResult {
+): MeasureResult {
     val height = constraints.maxHeight
 
     // TODO: consider multiple lines of text here, not really supported by spec but we should

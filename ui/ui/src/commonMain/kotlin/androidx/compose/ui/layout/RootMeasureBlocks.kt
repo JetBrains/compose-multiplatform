@@ -29,7 +29,7 @@ internal object RootMeasureBlocks : LayoutNode.NoIntrinsicsMeasureBlocks(
         measureScope: MeasureScope,
         measurables: List<Measurable>,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         return when {
             measurables.isEmpty() -> measureScope.layout(0, 0) {}
             measurables.size == 1 -> {
