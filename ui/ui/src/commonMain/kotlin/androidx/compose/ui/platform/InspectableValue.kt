@@ -16,16 +16,17 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.runtime.InternalComposeApi
+
 /**
  * An empty [InspectorInfo] DSL.
  */
 val NoInspectorInfo: InspectorInfo.() -> Unit = {}
 
 /**
- * True, if this is a debug build
+ * Turn on inspector debug information. Used internally during inspection.
  */
-// TODO(b/170125592): Replace this with an actual debug setting...
-const val DebugInspectorInfo = true
+var isDebugInspectorInfoEnabled = false
 
 /**
  * A compose value that is inspectable by tools. It gives access to private parts of a value.
@@ -123,4 +124,6 @@ abstract class InspectorValueInfo(private val info: InspectorInfo.() -> Unit) : 
  */
 inline fun debugInspectorInfo(
     crossinline definitions: InspectorInfo.() -> Unit
-): InspectorInfo.() -> Unit = if (DebugInspectorInfo) ({ definitions() }) else NoInspectorInfo
+): InspectorInfo.() -> Unit =
+    @OptIn(InternalComposeApi::class)
+    if (isDebugInspectorInfoEnabled) ({ definitions() }) else NoInspectorInfo

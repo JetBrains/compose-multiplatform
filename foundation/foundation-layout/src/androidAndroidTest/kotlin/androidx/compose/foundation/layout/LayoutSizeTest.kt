@@ -17,6 +17,7 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
@@ -27,14 +28,17 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -44,6 +48,18 @@ import java.util.concurrent.TimeUnit
 @SmallTest
 @RunWith(JUnit4::class)
 class LayoutSizeTest : LayoutTest() {
+
+    @Before
+    fun before() {
+        @OptIn(InternalComposeApi::class)
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        @OptIn(InternalComposeApi::class)
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun testPreferredSize_withWidthSizeModifiers() = with(density) {
