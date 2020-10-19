@@ -153,7 +153,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.STARTUP, "1.0.0-beta01")
     prebuilts(LibraryGroups.SWIPEREFRESHLAYOUT, "1.2.0-alpha01")
     prebuilts(LibraryGroups.TEXTCLASSIFIER, "1.0.0-alpha03")
-    prebuilts(LibraryGroups.TRACING, "1.0.0-beta01")
+    prebuilts(LibraryGroups.TRACING, "1.0.0")
     ignore(LibraryGroups.TRANSITION.group, "transition-ktx")
     prebuilts(LibraryGroups.TRANSITION, "1.4.0-beta01")
     prebuilts(LibraryGroups.TVPROVIDER, "1.1.0-alpha01")
