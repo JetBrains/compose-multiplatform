@@ -85,7 +85,7 @@ object LibraryVersions {
     val PAGING = Version("3.0.0-alpha08")
     val PAGING_COMPOSE = Version("1.0.0-alpha01")
     val PALETTE = Version("1.1.0-alpha01")
-    val PRINT = Version("1.1.0-alpha01")
+    val PRINT = Version("1.1.0-beta01")
     val PERCENTLAYOUT = Version("1.1.0-alpha01")
     val PREFERENCE = Version("1.2.0-alpha01")
     val RECOMMENDATION = Version("1.1.0-alpha01")
