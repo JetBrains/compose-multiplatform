@@ -1,8 +1,8 @@
 package example.todo.common.root.integration
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.extensions.compose.children
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
@@ -14,7 +14,6 @@ import example.todo.common.root.TodoRoot.Dependencies
 import example.todo.common.utils.Component
 import example.todo.common.utils.Consumer
 import example.todo.common.utils.Crossfade
-import example.todo.common.utils.asState
 
 internal class TodoRootImpl(
     componentContext: ComponentContext,
@@ -63,11 +62,10 @@ internal class TodoRootImpl(
 
     @Composable
     override fun invoke() {
-        val routerState by router.state.asState()
-        val activeChild = routerState.activeChild
-
-        Crossfade(currentChild = activeChild.component, currentKey = activeChild.configuration) { child ->
-            child.invoke()
+        router.state.children { child, configuration ->
+            Crossfade(currentChild = child, currentKey = configuration) { currentChild ->
+                currentChild()
+            }
         }
     }
 
