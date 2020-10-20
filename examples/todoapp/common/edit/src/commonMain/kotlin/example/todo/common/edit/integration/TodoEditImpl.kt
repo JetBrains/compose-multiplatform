@@ -1,5 +1,6 @@
 package example.todo.common.edit.integration
 
+import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,12 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
+import androidx.compose.material.IconButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import example.todo.common.edit.TodoEdit
@@ -46,8 +52,8 @@ internal class TodoEditImpl(
             TopAppBar(
                 title = { Text("Edit todo") },
                 navigationIcon = {
-                    Button(onClick = ::onFinished) {
-                        Text(text = "<")
+                    IconButton(onClick = ::onFinished) {
+                        Icon(Icons.Default.ArrowBack)
                     }
                 }
             )
