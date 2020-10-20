@@ -20,8 +20,9 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
@@ -172,7 +173,7 @@ interface DrawLayerModifier : Modifier.Element {
     val clip: Boolean get() = false
 }
 
-private data class SimpleDrawLayerModifier(
+private class SimpleDrawLayerModifier(
     override val scaleX: Float,
     override val scaleY: Float,
     override val alpha: Float,
@@ -184,24 +185,56 @@ private data class SimpleDrawLayerModifier(
     override val rotationZ: Float,
     override val transformOrigin: TransformOrigin,
     override val shape: Shape,
-    override val clip: Boolean
-) : DrawLayerModifier, InspectableValue {
-    override val nameFallback: String = "drawLayer"
-    override val inspectableElements: Sequence<ValueElement>
-        get() = sequenceOf(
-            ValueElement("scaleX", scaleX),
-            ValueElement("scaleY", scaleY),
-            ValueElement("alpha", alpha),
-            ValueElement("translationX", translationX),
-            ValueElement("translationY", translationY),
-            ValueElement("shadowElevation", shadowElevation),
-            ValueElement("rotationX", rotationX),
-            ValueElement("rotationY", rotationY),
-            ValueElement("rotationZ", rotationZ),
-            ValueElement("transformOrigin", transformOrigin),
-            ValueElement("shape", shape),
-            ValueElement("clip", clip)
-        )
+    override val clip: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : DrawLayerModifier, InspectorValueInfo(inspectorInfo) {
+
+    override fun hashCode(): Int {
+        var result = scaleX.hashCode()
+        result = 31 * result + scaleY.hashCode()
+        result = 31 * result + alpha.hashCode()
+        result = 31 * result + translationX.hashCode()
+        result = 31 * result + translationY.hashCode()
+        result = 31 * result + shadowElevation.hashCode()
+        result = 31 * result + rotationX.hashCode()
+        result = 31 * result + rotationY.hashCode()
+        result = 31 * result + rotationZ.hashCode()
+        result = 31 * result + transformOrigin.hashCode()
+        result = 31 * result + shape.hashCode()
+        result = 31 * result + clip.hashCode()
+        return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        val otherModifier = other as? SimpleDrawLayerModifier ?: return false
+        return scaleX == otherModifier.scaleX &&
+            scaleY == otherModifier.scaleY &&
+            alpha == otherModifier.alpha &&
+            translationX == otherModifier.translationX &&
+            translationY == otherModifier.translationY &&
+            shadowElevation == otherModifier.shadowElevation &&
+            rotationX == otherModifier.rotationX &&
+            rotationY == otherModifier.rotationY &&
+            rotationZ == otherModifier.rotationZ &&
+            transformOrigin == otherModifier.transformOrigin &&
+            shape == otherModifier.shape &&
+            clip == otherModifier.clip
+    }
+
+    override fun toString(): String =
+        "SimpleDrawLayerModifier(" +
+            "scaleX=$scaleX, " +
+            "scaleY=$scaleY, " +
+            "alpha = $alpha, " +
+            "translationX=$translationX, " +
+            "translationY=$translationY, " +
+            "shadowElevation=$shadowElevation, " +
+            "rotationX=$rotationX, " +
+            "rotationY=$rotationY, " +
+            "rotationZ=$rotationZ, " +
+            "transformOrigin=$transformOrigin, " +
+            "shape=$shape, " +
+            "clip=$clip)"
 }
 
 /**
@@ -252,6 +285,21 @@ fun Modifier.drawLayer(
         rotationZ = rotationZ,
         transformOrigin = transformOrigin,
         shape = shape,
-        clip = clip
+        clip = clip,
+        inspectorInfo = debugInspectorInfo {
+            name = "drawLayer"
+            properties["scaleX"] = scaleX
+            properties["scaleY"] = scaleY
+            properties["alpha"] = alpha
+            properties["translationX"] = translationX
+            properties["translationY"] = translationY
+            properties["shadowElevation"] = shadowElevation
+            properties["rotationX"] = rotationX
+            properties["rotationY"] = rotationY
+            properties["rotationZ"] = rotationZ
+            properties["transformOrigin"] = transformOrigin
+            properties["shape"] = shape
+            properties["clip"] = clip
+        }
     )
 )

@@ -279,17 +279,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    SimpleDrawLayerModifier("
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/DrawLayerModifier.kt"
-            line="243"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = this.then(DrawBackgroundModifier(onDraw))"
         errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~">
         <location
