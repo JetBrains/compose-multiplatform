@@ -2,7 +2,7 @@
 
 ## What is covered
 
-In this tutorial we will see how to install mouse events listeners on components
+In this tutorial we will see how to install mouse event listeners on components
 in Compose for Desktop.
 
 ## Mouse event listeners
@@ -10,7 +10,7 @@ in Compose for Desktop.
 ### Click listeners
 
 Click listeners are available in both Compose on Android and Compose for Desktop,
-so code like that will work on both platforms:
+so code like this will work on both platforms:
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -53,10 +53,10 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
 
 ### Mouse move listeners
 
-As typically mouse or other positional pointers are available on a desktop platforms only,
-following code will only work with Compose for Desktop.
-Let's create a text, and install pointer move filter on it, changing the background
-color per mouse pointer position:
+As typically mouse and other positional pointers are only available on desktop platforms,
+the following code will only work with Compose for Desktop.
+Let's create a window and install a pointer move filter on it that changes the background
+color according to the mouse pointer position:
 ```kotlin
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background

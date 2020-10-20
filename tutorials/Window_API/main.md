@@ -2,7 +2,7 @@
 
 ## What is covered
 
-In this guide, we'll show you how to work with windows using Compose for Desktop.
+In this tutorial we will show you how to work with windows using Compose for Desktop.
 
 ## Windows creation
 
@@ -18,12 +18,12 @@ fun main() {
 }
 ```
 
-There are two types of windows - modal and regular. Below are functions for creating each type of window:
+There are two types of window – modal and regular. Below are the functions for creating each type of window:
 
-1. Window - regular window type.
-2. Dialog - modal window type. Such a window locks its parent window until the user completes working with it and closes the modal window.
+1. Window – regular window type.
+2. Dialog – modal window type. Such a window locks its parent window until the user completes working with it and closes the modal window.
 
-You can see an example for both types of windows below.
+You can see an example of both types of window below.
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -54,19 +54,19 @@ fun main() {
 
 ## Window attributes
 
-Each window has 9 parameters listed below, all of them could be omitted and have default values:
+Each window has 9 parameters, all of them could be omitted and have default values:
 
-1. title - window title
-2. size - initial window size
-3. location - initial window position
-4. centered - set the window to the center of the display
-5. icon - window icon
-6. menuBar - window context menu
-7. undecorated - disable native border and title bar of the window
-8. events - window events
-9. onDismissEvent - event when removing the window content from a composition
+1. title – window title
+2. size – initial window size
+3. location – initial window position
+4. centered – set the window to the center of the display
+5. icon – window icon
+6. menuBar – window context menu
+7. undecorated – disable native border and title bar of the window
+8. events – window events
+9. onDismissEvent – event when removing the window content from a composition
 
-An example of using window parameters at the creation step:
+An example of using window parameters in the creation step:
 
 ```kotlin
 import androidx.compose.desktop.AppManager
@@ -161,13 +161,13 @@ fun getMyAppIcon() : BufferedImage {
 
 AppWindow parameters correspond to the following properties:
 
-1. title - window title
-2. width - window width
-3. height - window height
-4. x - position of the left top corner of the window along the X axis
-5. y - position of the left top corner of the window along the Y axis
-6. icon - window icon image
-7. events - window events
+1. title – window title
+2. width – window width
+3. height – window height
+4. x – position of the left top corner of the window along the X axis
+5. y – position of the left top corner of the window along the Y axis
+6. icon – window icon image
+7. events – window events
 
 To get the properties of a window, it is enough to have a link to the current or specific window. There are two ways to get the current focused window:
 
@@ -258,13 +258,13 @@ fun main() {
 
 ![Window properties](current_window.gif)
 
-Using the following methods, one can change the properties of AppWindow:
+Using the following methods, you can change the properties of the AppWindow:
 
-1. setTitle(title: String) - window title
-2. setSize(width: Int, height: Int) - window size
-3. setLocation(x: Int, y: Int) - window position
-4. setWindowCentered() - set the window to the center of the display
-5. setIcon(image: BufferedImage?) - window icon
+1. setTitle(title: String) – window title
+2. setSize(width: Int, height: Int) – window size
+3. setLocation(x: Int, y: Int) – window position
+4. setWindowCentered() – set the window to the center of the display
+5. setIcon(image: BufferedImage?) – window icon
 
 ```kotlin
 import androidx.compose.desktop.AppWindowAmbient
@@ -294,18 +294,18 @@ fun main() {
 
 ## Window events
 
-Events could be defined using the events parameter at the window creation step or redefine using the events property at runtime.
+Events can be defined using the events parameter in the window creation step or redefine using the events property at runtime.
 Actions can be assigned to the following window events:
 
-1. onOpen - event during window opening
-2. onClose - event during window closing
-3. onMinimize - event during window minimizing
-4. onMaximize - event during window maximizing
-5. onRestore - event during restoring window size after window minimize/maximize
-6. onFocusGet - event when window gets focus
-7. onFocusLost - event when window loses focus
-8. onResize - event on window resize (argument is window size as IntSize)
-9. onRelocate - event of the window reposition on display (argument is window position as IntOffset)
+1. onOpen – event during window opening
+2. onClose – event during window closing
+3. onMinimize – event during window minimizing
+4. onMaximize – event during window maximizing
+5. onRestore – event during restoring window size after window minimize/maximize
+6. onFocusGet – event when window gets focus
+7. onFocusLost – event when window loses focus
+8. onResize – event on window resize (argument is window size as IntSize)
+9. onRelocate – event of the window reposition on display (argument is window position as IntOffset)
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -377,7 +377,7 @@ AppManager.exit() // closes all windows
 
 ## Access to Swing components
 
-Compose for Desktop is tightly integrated with Swing on the level of top level windows. For more detailed customization, you can access the JFrame (Swing window representation):
+Compose for Desktop is tightly integrated with Swing at the top-level windows layer. For more detailed customization, you can access the JFrame class:
 
 ```kotlin
 import androidx.compose.desktop.AppManager

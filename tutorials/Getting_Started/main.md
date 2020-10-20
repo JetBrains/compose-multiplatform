@@ -2,32 +2,32 @@
 
 ## What is covered
 
-In this tutorial we will see how to create simple desktop UI application
-using Compose UI framework.
+In this tutorial we will create a simple desktop UI application
+using the Compose UI framework.
 
 ## Prerequisites
 
  Compose for Desktop can produce applications for macOS, Linux and Windows platforms,
-and all those three platforms could be used for running this tutorial.
+and so any of these platforms can be used for this tutorial.
 
-Following software have to be preinstalled:
+The following software has to be preinstalled:
    * JDK 11 or later
-   * IDEA Community or Ultimate 20.2 or later (other editors could be used, but we assume IDEA in this tutorial)
+   * IntelliJ IDEA Community Edition or Ultimate Edition 20.2 or later (other editors could be used, but we assume you are using IntelliJ IDEA in this tutorial)
 
 ## Creating a new project
 
 *TBD: new project wizard*
 
-Recommended way of building Compose for Desktop projects is using Gradle.
-JetBrains provides a convenient way of building Compose for Desktop project
-using special Gradle plugin.
+The recommended way of building Compose for Desktop projects is by using Gradle.
+JetBrains provides a simple way of building Compose for Desktop projects
+using a special Gradle plugin.
 First create a new directory, named `sample`.
 ```shell script
 mkdir sample
 cd sample
 ```
 
-Create `settings.gradle.kts` as following:
+Create `settings.gradle.kts` as follows:
 ```kotlin
 pluginManagement {
     repositories {
@@ -98,16 +98,16 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
 ```
 ## Running the project
 
-Open `build.gradle.kts` as a project in IDEA.
+Open `build.gradle.kts` as a project in IntelliJ IDEA.
 
 ![New project](screen1.png)
 
 
-After downloading Compose for Desktop dependencies from Maven repositories your new project is ready
-to go. Open Gradle toolbar on the right, and select `sample/Tasks/applications/run`.
-First run may take some time, and afterwards following dialog will show up:
+After you download the Compose for Desktop dependencies from the Maven repositories your new project is ready
+to go. Open the Gradle toolbar on the right, and select `sample/Tasks/applications/run`.
+The first run may take some time, but afterwards following dialog will be shown:
 
 ![Application running](screen2.gif)
 
-One could click on the button several times, and see that application can reactively
-update UI from state.
+You can click on the button several times and see that application reacts and
+updates the UI.

@@ -2,11 +2,11 @@
 
 ## What is covered
 
-In this guide, we'll show you how to work with system tray, create application menu bar and create window specific menu bar, and send system notifications using Compose for Desktop.
+In this tutorial we'll show you how to work with the system tray, create an application menu bar and a window-specific menu bar, and send system notifications using Compose for Desktop.
 
 ## Tray
 
-You can add an application icon into the system tray. Using Tray, you can also send notifications to the user. There are 3 types of notifications:
+You can add an application icon to the system tray. You can also send notifications to the user using the system tray. There are 3 types of notification:
 
 1. notify - simple notification
 2. warn - warning notification
@@ -102,7 +102,7 @@ fun getTrayIcon() : BufferedImage {
 
 ## Notifier
 You can send system notifications with Notifier without using the system tray.
-Notifier also has 3 types of notifications:
+Notifier also has 3 types of notification:
 
 1. notify - simple notification
 2. warn - warning notification
@@ -157,8 +157,8 @@ fun getMyAppIcon() : BufferedImage {
 
 ## MenuBar
 
-MenuBar is used to create and customize the common context menu of the application or any particular window.
-To create a common context menu for all application windows, you need to configure the AppManager.
+MenuBar is used to create and customize the common context menu of the application or a particular window.
+To create a common context menu for all the application windows, you need to configure the AppManager.
 
 ```kotlin
 import androidx.compose.desktop.AppManager
@@ -223,7 +223,7 @@ fun main() {
 
 ![Application MenuBar](app_menubar.gif)
 
-You can to create a MenuBar for a specific window (while others will use the common MenuBar, if defined).
+You can to create a MenuBar for a specific window, and have the other windows use the defined MenuBar.
 
 ```kotlin
 import androidx.compose.desktop.AppManager
