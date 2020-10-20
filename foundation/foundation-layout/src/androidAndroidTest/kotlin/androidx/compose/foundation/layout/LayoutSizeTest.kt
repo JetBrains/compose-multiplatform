@@ -17,7 +17,6 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
@@ -51,13 +50,11 @@ class LayoutSizeTest : LayoutTest() {
 
     @Before
     fun before() {
-        @OptIn(InternalComposeApi::class)
         isDebugInspectorInfoEnabled = true
     }
 
     @After
     fun after() {
-        @OptIn(InternalComposeApi::class)
         isDebugInspectorInfoEnabled = false
     }
 
