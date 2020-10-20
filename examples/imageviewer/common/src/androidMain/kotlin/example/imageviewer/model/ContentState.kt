@@ -302,6 +302,7 @@ object ContentState {
                     clearCache(context)
                     miniatures.clear()
                     isAppUIReady.value = false
+                    initData()
                 }
             } else {
                 handler.post {

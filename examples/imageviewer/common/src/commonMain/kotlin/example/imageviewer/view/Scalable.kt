@@ -21,7 +21,6 @@ import androidx.compose.ui.gesture.RawScaleObserver
 import androidx.compose.ui.gesture.doubleTapGestureFilter
 import androidx.compose.ui.gesture.rawScaleGestureFilter
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.material.Surface

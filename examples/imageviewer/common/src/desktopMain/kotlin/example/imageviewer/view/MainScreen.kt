@@ -17,7 +17,6 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollableColumn
@@ -28,6 +27,7 @@ import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -88,7 +88,7 @@ fun setMainScreen(content: ContentState) {
 @Composable
 private fun setLoadingScreen(content: ContentState) {
 
-    Stack {
+    Box {
         Column {
             setTopContent(content)
         }
@@ -148,9 +148,11 @@ fun setTitleBar(text: String, content: ContentState) {
                     })
                     .background(color = if (refreshButtonHover.value) TranslucentBlack else Transparent),
                     onClick = {
-                        if (content.isContentReady())
+                        if (content.isContentReady()) {
                             content.refresh()
-                    }) {
+                        }
+                    }
+                ) {
                     Image(
                         icRefresh(),
                         modifier = Modifier.preferredSize(35.dp)
@@ -213,9 +215,8 @@ fun setMiniatureUI(
         shape = RectangleShape,
         elevation = 20.dp
     ) {
-        Row(modifier = Modifier.padding(end = 30.dp)
-            ) {
-                Clickable(
+        Row(modifier = Modifier.padding(end = 30.dp)) {
+            Clickable(
                     onClick = {
                         content.fullscreen(picture)
                     }

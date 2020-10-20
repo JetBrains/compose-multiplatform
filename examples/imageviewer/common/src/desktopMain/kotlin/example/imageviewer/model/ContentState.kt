@@ -37,6 +37,7 @@ object ContentState {
     private lateinit var repository: ImageRepository
     private lateinit var uriRepository: String
 
+    @Composable
     fun applyContent(uriRepository: String): ContentState {
         if (this::uriRepository.isInitialized && this.uriRepository == uriRepository) {
             return this
@@ -214,8 +215,9 @@ object ContentState {
 
     fun setMainImage(picture: Picture) {
         if (mainImageWrapper.getId() == picture.id) {
-            if (!isContentReady())
+            if (!isContentReady()) {
                 isAppUIReady.value = true
+            }
             return
         }
 
@@ -272,6 +274,7 @@ object ContentState {
                     clearCache()
                     miniatures.clear()
                     isAppUIReady.value = false
+                    initData()
                 }
             } else {
                 invokeLater {

@@ -64,6 +64,7 @@ import example.imageviewer.R
 
 @Composable
 fun setMainScreen(content: ContentState) {
+
     if (content.isContentReady()) {
         Column {
             setTopContent(content)
@@ -129,9 +130,11 @@ fun setTitleBar(text: String, content: ContentState) {
             ) {
                 Clickable(
                     onClick = {
-                        if (content.isContentReady())
+                        if (content.isContentReady()) {
                             content.refresh()
-                    }) {
+                        }
+                    }
+                ) {
                     Image(
                         icRefresh(),
                         modifier = Modifier.preferredSize(35.dp)

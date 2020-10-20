@@ -15,7 +15,8 @@
  */
 package example.imageviewer
 
-import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.Window
+import androidx.compose.runtime.remember
 import example.imageviewer.utils.getPreferredWindowSize
 import example.imageviewer.view.BuildAppUI
 import example.imageviewer.model.ContentState
@@ -24,15 +25,14 @@ import example.imageviewer.style.icAppRounded
 
 fun main() {
 
-    val content = ContentState.applyContent(
-        "https://spvessel.com/iv/images/fetching.list"
-    )
-
-    AppWindow(
+    Window(
         title = "ImageViewer",
         size = getPreferredWindowSize(800, 1000),
         icon = icAppRounded()
-    ).show {
+    ) {
+        val content = ContentState.applyContent(
+            "https://spvessel.com/iv/images/fetching.list"
+        )
         BuildAppUI(content)
     }
 }
