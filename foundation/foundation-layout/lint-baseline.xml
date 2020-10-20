@@ -4,17 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="): Modifier = this.then(AlignmentLineOffset(alignmentLine, before, after))"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/AlignmentLine.kt"
-            line="60"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="    fun Modifier.align(alignment: Alignment) = this.then(BoxChildData(alignment, false))"
         errorLine2="                                                         ~~~~~~~~~~~~">
         <location

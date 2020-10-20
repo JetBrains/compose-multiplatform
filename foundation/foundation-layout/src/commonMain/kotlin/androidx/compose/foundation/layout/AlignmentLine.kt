@@ -17,13 +17,16 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import kotlin.math.max
@@ -58,13 +61,26 @@ fun Modifier.relativePaddingFrom(
     alignmentLine: AlignmentLine,
     before: Dp = Dp.Unspecified,
     after: Dp = Dp.Unspecified
-): Modifier = this.then(AlignmentLineOffset(alignmentLine, before, after))
+): Modifier = this.then(
+    AlignmentLineOffset(
+        alignmentLine = alignmentLine,
+        before = before,
+        after = after,
+        inspectorInfo = debugInspectorInfo {
+            name = "relativePaddingFrom"
+            properties["alignmentLine"] = alignmentLine
+            properties["before"] = before
+            properties["after"] = after
+        }
+    )
+)
 
-private data class AlignmentLineOffset(
+private class AlignmentLineOffset(
     val alignmentLine: AlignmentLine,
     val before: Dp,
-    val after: Dp
-) : LayoutModifier {
+    val after: Dp,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     init {
         require(
             (before.value >= 0f || before == Dp.Unspecified) &&
@@ -119,6 +135,25 @@ private data class AlignmentLineOffset(
             placeable.placeRelative(x, y)
         }
     }
+
+    override fun hashCode(): Int {
+        var result = alignmentLine.hashCode()
+        result = 31 * result + before.hashCode()
+        result = 31 * result + after.hashCode()
+        return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? AlignmentLineOffset ?: return false
+
+        return alignmentLine == otherModifier.alignmentLine &&
+            before == otherModifier.before &&
+            after == otherModifier.after
+    }
+
+    override fun toString(): String =
+        "AlignmentLineOffset(alignmentLine=$alignmentLine, before=$before, after=$after)"
 }
 
 private val AlignmentLine.horizontal: Boolean get() = this is HorizontalAlignmentLine
