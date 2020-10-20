@@ -18,11 +18,14 @@ package androidx.compose.desktop
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.MenuBar
 import java.awt.image.BufferedImage
 
 abstract class AppFrame {
 
     abstract val window: ComposeWindow
+
+    internal var menuBar: MenuBar? = null
 
     var invoker: AppFrame? = null
         protected set
@@ -42,9 +45,6 @@ abstract class AppFrame {
     val y: Int
         get() = window.y
 
-    var isCentered: Boolean = true
-        internal set
-
     var isClosed: Boolean = false
         internal set
 
@@ -59,6 +59,10 @@ abstract class AppFrame {
     abstract fun setTitle(title: String)
 
     abstract fun setIcon(image: BufferedImage?)
+
+    abstract fun setMenuBar(menuBar: MenuBar)
+
+    abstract fun removeMenuBar()
 
     abstract fun setLocation(x: Int, y: Int)
 

@@ -49,7 +49,7 @@ private class DragHandler : DragObserver {
 
     override fun onStart(downPosition: Offset) {
         if (!this::window.isInitialized) {
-            window = AppManager.getCurrentFocusedWindow()!!
+            window = AppManager.focusedWindow!!
         }
         location = Offset(
             window.x.toFloat(),
