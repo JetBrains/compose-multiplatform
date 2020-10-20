@@ -43,7 +43,7 @@ object LibraryVersions {
     val CARDVIEW = Version("1.1.0-alpha01")
     val COLLECTION = Version("1.2.0-alpha01")
     val CONTENTPAGER = Version("1.1.0-alpha01")
-    val COMPOSE = Version("1.0.0-alpha06")
+    val COMPOSE = Version("1.0.0-alpha07")
     val CONTENTACCESS = Version("1.0.0-alpha01")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
     val CORE = Version("1.5.0-alpha05")
