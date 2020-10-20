@@ -22,7 +22,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
@@ -311,7 +310,7 @@ class SkijaLayerTest {
     }
 
     private fun TestSkijaLayer() = SkijaLayer(
-        density = Density(1f, 1f),
+        owner = DesktopOwner(DesktopOwners(invalidate = {})),
         modifier = SimpleDrawLayerModifier(),
         invalidateParentLayer = {},
         drawBlock = {}
