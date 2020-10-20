@@ -21,11 +21,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Stack
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.preferredSize
@@ -78,7 +78,7 @@ fun setMainScreen(content: ContentState) {
 @Composable
 fun setLoadingScreen(content: ContentState) {
 
-    Stack {
+    Box {
         Column {
             setTopContent(content)
         }

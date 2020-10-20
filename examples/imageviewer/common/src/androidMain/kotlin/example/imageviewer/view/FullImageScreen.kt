@@ -18,8 +18,10 @@ package example.imageviewer.view
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Rect
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ScrollableRow
@@ -31,7 +33,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -85,9 +87,9 @@ fun setImageFullScreen(
 @Composable
 private fun setLoadingScreen() {
 
-    Stack {
+    Box {
         Surface(color = MiniatureColor, modifier = Modifier.preferredHeight(44.dp)) {}
-        Box() {
+        Box {
             Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
                 CircularProgressIndicator(
                     modifier = Modifier.preferredSize(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
@@ -155,12 +157,10 @@ fun setToolBar(
 fun FilterButton(
     content: ContentState,
     type: FilterType,
-    modifier: Modifier = Modifier.align(Alignment.CenterVertically).preferredSize(38.dp)
+    modifier: Modifier = Modifier.preferredSize(38.dp)
 ) {
-    Surface(
-        color = Transparent,
-        modifier = Modifier.align(Alignment.CenterVertically),
-        shape = CircleShape
+    Box(
+        modifier = Modifier.background(color = Transparent).clip(CircleShape)
     ) {
         Clickable(
             onClick = { content.toggleFilter(type) }
