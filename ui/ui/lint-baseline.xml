@@ -195,7 +195,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="226"
+            line="239"
             column="13"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="228"
+            line="241"
             column="13"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
-            line="164"
+            line="163"
             column="31"/>
     </issue>
 
@@ -272,8 +272,107 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.kt"
-            line="319"
+            line="332"
             column="20"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="    SimpleDrawLayerModifier("
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/DrawLayerModifier.kt"
+            line="243"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = this.then(DrawBackgroundModifier(onDraw))"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
+            line="58"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = this.then(object : DrawModifier {"
+        errorLine2="                        ^">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
+            line="156"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.focus(): Modifier = this.then(remember { FocusModifier(FocusState.Inactive) })"
+        errorLine2="                                           ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/FocusModifier.kt"
+            line="50"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.layoutId(id: Any) = this.then(LayoutId(id))"
+        errorLine2="                                           ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/layout/LayoutId.kt"
+            line="35"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = this.then(LayoutModifierImpl(measure))"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/LayoutModifier.kt"
+            line="251"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = this.then(object : OnGloballyPositionedModifier {"
+        errorLine2="              ^">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/OnGloballyPositionedModifier.kt"
+            line="31"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="    PainterModifier("
+        errorLine2="    ~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/draw/PainterModifier.kt"
+            line="65"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.zIndex(zIndex: Float): Modifier = this.then(SimpleZIndexModifier(zIndex))"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/ZIndexModifier.kt"
+            line="50"
+            column="58"/>
     </issue>
 
 </issues>

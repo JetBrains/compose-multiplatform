@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.test.filters.MediumTest
@@ -37,6 +39,8 @@ import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,6 +55,16 @@ class BackgroundTest {
     val rule = createComposeRule()
 
     private val contentTag = "Content"
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun background_colorRect() {
@@ -147,17 +161,32 @@ class BackgroundTest {
     }
 
     @Test
-    fun testInspectableParameter() {
-        val exclusions = listOf("nameFallback", "lastSize", "lastOutline")
+    fun testInspectableParameter1() {
         val modifier = Modifier.background(Color.Magenta) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("background")
         assertThat(modifier.valueOverride).isEqualTo(Color.Magenta)
-        assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(
-                modifier.javaClass.declaredFields
-                    .filter { !it.isSynthetic && !exclusions.contains(it.name) }
-                    .map { it.name }
-            )
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("color", Color.Magenta),
+            ValueElement("shape", RectangleShape)
+        )
+    }
+
+    @Test
+    fun testInspectableParameter2() {
+        val modifier = Modifier.background(SolidColor(Color.Red)) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("background")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("alpha", 1.0f),
+            ValueElement("brush", SolidColor(Color.Red)),
+            ValueElement("shape", RectangleShape)
+        )
+    }
+
+    @Test
+    fun testEquals() {
+        assertThat(Modifier.background(SolidColor(Color.Red)))
+            .isEqualTo(Modifier.background(SolidColor(Color.Red)))
     }
 
     @Composable

@@ -26,8 +26,9 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.annotation.FloatRange
 
 /**
@@ -44,7 +45,13 @@ fun Modifier.background(
 ) = this.then(
     Background(
         color = color,
-        shape = shape
+        shape = shape,
+        inspectorInfo = debugInspectorInfo {
+            name = "background"
+            value = color
+            properties["color"] = color
+            properties["shape"] = shape
+        }
     )
 )
 
@@ -65,16 +72,23 @@ fun Modifier.background(
     Background(
         brush = brush,
         alpha = alpha,
-        shape = shape
+        shape = shape,
+        inspectorInfo = debugInspectorInfo {
+            name = "background"
+            properties["alpha"] = alpha
+            properties["brush"] = brush
+            properties["shape"] = shape
+        }
     )
 )
 
-private data class Background internal constructor(
+private class Background constructor(
     private val color: Color? = null,
     private val brush: Brush? = null,
     private val alpha: Float = 1.0f,
-    private val shape: Shape
-) : DrawModifier, InspectableValue {
+    private val shape: Shape,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : DrawModifier, InspectorValueInfo(inspectorInfo) {
 
     // naive cache outline calculation if size is the same
     private var lastSize: Size? = null
@@ -108,16 +122,22 @@ private data class Background internal constructor(
         lastSize = size
     }
 
-    override val nameFallback = "background"
+    override fun hashCode(): Int {
+        var result = color?.hashCode() ?: 0
+        result = 31 * result + (brush?.hashCode() ?: 0)
+        result = 31 * result + alpha.hashCode()
+        result = 31 * result + shape.hashCode()
+        return result
+    }
 
-    override val valueOverride: Any?
-        get() = color ?: brush
+    override fun equals(other: Any?): Boolean {
+        val otherModifier = other as? Background ?: return false
+        return color == otherModifier.color &&
+            brush == otherModifier.brush &&
+            alpha == otherModifier.alpha &&
+            shape == otherModifier.shape
+    }
 
-    override val inspectableElements: Sequence<ValueElement>
-        get() = sequenceOf(
-            ValueElement("color", color),
-            ValueElement("brush", brush),
-            ValueElement("alpha", alpha),
-            ValueElement("shape", shape)
-        )
+    override fun toString(): String =
+        "Background(color=$color, brush=$brush, alpha = $alpha, shape=$shape)"
 }
