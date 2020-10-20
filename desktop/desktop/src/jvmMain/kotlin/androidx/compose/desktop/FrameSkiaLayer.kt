@@ -131,7 +131,7 @@ internal class FrameSkiaLayer {
     //  on macOS there is no such setting
     private fun detectCurrentDensity(): Density {
         val density = wrapped.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        return Density(density, density)
+        return Density(density, 1f)
     }
 
     private fun getFramesPerSecond(): Float {
