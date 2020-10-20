@@ -34,6 +34,11 @@ subprojects {
                         password = System.getenv("COMPOSE_REPO_KEY")
                     }
                 }
+
+                maven {
+                    name = "LocalDir"
+                    url = rootProject.buildDir.resolve("repo").toURI()
+                }
             }
         }
     }
