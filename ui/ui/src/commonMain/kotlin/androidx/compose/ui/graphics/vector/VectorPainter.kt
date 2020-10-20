@@ -84,8 +84,7 @@ fun VectorPainter(
  */
 @Composable
 fun VectorPainter(asset: VectorAsset): VectorPainter {
-    // TODO: Get rid of this temporary `vp` variable.
-    val vp = VectorPainter(
+    return VectorPainter(
         name = asset.name,
         defaultWidth = asset.defaultWidth,
         defaultHeight = asset.defaultHeight,
@@ -93,7 +92,6 @@ fun VectorPainter(asset: VectorAsset): VectorPainter {
         viewportHeight = asset.viewportHeight,
         children = { _, _ -> RenderVectorGroup(group = asset.root) }
     )
-    return vp
 }
 
 /**
