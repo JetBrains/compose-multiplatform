@@ -300,7 +300,8 @@ class ZoomableTest {
 
         rule.runOnIdle {
             assertWithMessage("Scrolling should have been smooth").that(callbackCount).isAtLeast(3)
-            assertWithMessage("Should have scaled at least 4x").that(cumulativeScale).isAtLeast(4f)
+            // Include a bit of tolerance for floating point discrepancies.
+            assertWithMessage("Should have scaled ~4x").that(cumulativeScale).isAtLeast(3.9f)
         }
     }
 
