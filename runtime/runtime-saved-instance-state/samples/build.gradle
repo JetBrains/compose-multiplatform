@@ -37,6 +37,7 @@ dependencies {
 
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:runtime:runtime-saved-instance-state")
+    implementation project(":compose:foundation:foundation")
 }
 
 android {
