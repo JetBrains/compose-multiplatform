@@ -17,7 +17,6 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
@@ -55,13 +54,11 @@ class LayoutPaddingTest : LayoutTest() {
 
     @Before
     fun before() {
-        @OptIn(InternalComposeApi::class)
         isDebugInspectorInfoEnabled = true
     }
 
     @After
     fun after() {
-        @OptIn(InternalComposeApi::class)
         isDebugInspectorInfoEnabled = false
     }
 
