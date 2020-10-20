@@ -20,6 +20,7 @@ import example.imageviewer.utils.getPreferredWindowSize
 import example.imageviewer.view.BuildAppUI
 import example.imageviewer.model.ContentState
 import example.imageviewer.model.ImageRepository
+import example.imageviewer.style.icAppRounded
 
 fun main() {
 
@@ -27,7 +28,11 @@ fun main() {
         "https://spvessel.com/iv/images/fetching.list"
     )
 
-    AppWindow("ImageViewer", getPreferredWindowSize(800, 1000)).show {
+    AppWindow(
+        title = "ImageViewer",
+        size = getPreferredWindowSize(800, 1000),
+        icon = icAppRounded()
+    ).show {
         BuildAppUI(content)
     }
 }

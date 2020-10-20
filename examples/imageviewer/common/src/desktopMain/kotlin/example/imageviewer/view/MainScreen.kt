@@ -163,18 +163,8 @@ fun setTitleBar(text: String, content: ContentState) {
 
 @Composable
 fun setPreviewImageUI(content: ContentState) {
-    val previewImageHover = remember { mutableStateOf(false) }
     Clickable(
-        modifier = Modifier.hover(
-            onEnter = {
-                previewImageHover.value = true
-                false
-            },
-            onExit = {
-                previewImageHover.value = false
-                false
-        })
-        .background(color = if (previewImageHover.value) PreviewImageAreaHoverColor else DarkGray),
+        modifier = Modifier.background(color = DarkGray),
         onClick = {
             AppState.screenState(ScreenType.FullscreenImage)
     }) {
