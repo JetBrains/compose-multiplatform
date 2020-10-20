@@ -124,7 +124,7 @@ fun applyBlurFilter(bitmap: BufferedImage): BufferedImage {
 }
 
 fun displayWidth(): Int {
-    val window = AppManager.getCurrentFocusedWindow()
+    val window = AppManager.focusedWindow
     if (window != null) {
         return window.width
     }
@@ -132,7 +132,7 @@ fun displayWidth(): Int {
 }
 
 fun displayHeight(): Int {
-    val window = AppManager.getCurrentFocusedWindow()
+    val window = AppManager.focusedWindow
     if (window != null) {
         return window.height
     }
