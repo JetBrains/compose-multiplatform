@@ -228,6 +228,7 @@ object ContentState {
                     val fullSizePicture = loadFullImage(picture.source)
                     fullSizePicture.id = picture.id
                     wrapPictureIntoMainImage(fullSizePicture)
+                    isAppUIReady.value = true
                 }
             } else {
                 invokeLater {
@@ -235,6 +236,7 @@ object ContentState {
                         "${ResString.noInternet}\n${ResString.loadImageUnavailable}"
                     )
                     wrapPictureIntoMainImage(picture)
+                    isAppUIReady.value = true
                 }
             }
         }

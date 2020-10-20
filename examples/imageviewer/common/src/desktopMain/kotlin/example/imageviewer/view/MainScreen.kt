@@ -145,7 +145,8 @@ fun setTitleBar(text: String, content: ContentState) {
                         onExit = {
                             refreshButtonHover.value = false
                             false
-                    })
+                        }
+                    )
                     .background(color = if (refreshButtonHover.value) TranslucentBlack else Transparent),
                     onClick = {
                         if (content.isContentReady()) {
@@ -169,7 +170,8 @@ fun setPreviewImageUI(content: ContentState) {
         modifier = Modifier.background(color = DarkGray),
         onClick = {
             AppState.screenState(ScreenType.FullscreenImage)
-    }) {
+        }
+    ) {
         Card(
             backgroundColor = Transparent,
             modifier = Modifier.preferredHeight(250.dp),
@@ -217,9 +219,9 @@ fun setMiniatureUI(
     ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Clickable(
-                    onClick = {
-                        content.fullscreen(picture)
-                    }
+                onClick = {
+                    content.fullscreen(picture)
+                }
             ) {
                 Image(
                     Image.makeFromEncoded(
@@ -243,17 +245,17 @@ fun setMiniatureUI(
                 
             Clickable(
                 modifier = Modifier.preferredHeight(70.dp)
-                        .preferredWidth(30.dp)
-                        .hover(
-                            onEnter = {
-                                infoButtonHover.value = true
-                                false
-                            },
-                            onExit = {
-                                infoButtonHover.value = false
-                                false
-                        })
-                        .background(color = if (infoButtonHover.value) TranslucentWhite else Transparent),
+                    .preferredWidth(30.dp)
+                    .hover(
+                        onEnter = {
+                            infoButtonHover.value = true
+                            false
+                        },
+                        onExit = {
+                            infoButtonHover.value = false
+                            false
+                    })
+                    .background(color = if (infoButtonHover.value) TranslucentWhite else Transparent),
                 onClick = {
                     showPopUpMessage(
                         "${ResString.picture} " +
