@@ -17,19 +17,19 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Text
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Checkbox
@@ -50,11 +50,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.WindowDraggableArea
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.Tray
-import androidx.compose.ui.window.Item
+import androidx.compose.ui.window.WindowDraggableArea
 import java.awt.Toolkit
 
 @Composable
@@ -63,23 +62,9 @@ fun content() {
         val tray = Tray().apply {
             icon(AppState.image())
             menu(
-                Item(
-                    name = "Send tray notification",
-                    onClick = {
-                        Notifier().notify(
-                            title = "New Notification from JB",
-                            message = "JetBrains send you a message!"
-                        )
-                    }
-                ),
-                Item(
-                    name = "Increment amount",
-                    onClick = { AppState.amount.value++ }
-                ),
-                Item(
-                    name = "Exit",
-                    onClick = { AppManager.exit() }
-                )
+                MenuItems.Notify,
+                MenuItems.Increment,
+                MenuItems.Exit
             )
         }
         onDispose {
@@ -132,7 +117,7 @@ fun content() {
                                 WindowContent(
                                     amount = AppState.amount,
                                     onClose = {
-                                        AppManager.getCurrentFocusedWindow()?.close()
+                                        AppManager.focusedWindow?.close()
                                     }
                                 )
                             }

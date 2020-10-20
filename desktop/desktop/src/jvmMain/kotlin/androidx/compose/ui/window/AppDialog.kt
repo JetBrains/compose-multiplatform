@@ -25,13 +25,16 @@ import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import java.awt.image.BufferedImage
 
 @Composable
 fun Dialog(
     title: String = "JetpackDesktopDialog",
-    size: IntSize = IntSize.Zero,
+    size: IntSize = IntSize(400, 250),
     location: IntOffset = IntOffset.Zero,
     centered: Boolean = true,
+    icon: BufferedImage? = null,
+    menuBar: MenuBar? = null,
     undecorated: Boolean = false,
     events: WindowEvents = WindowEvents(),
     onDismissEvent: (() -> Unit)? = null,
@@ -49,6 +52,8 @@ fun Dialog(
             size = size,
             location = location,
             centered = centered,
+            icon = icon,
+            menuBar = menuBar,
             undecorated = undecorated,
             events = events,
             onDismissEvent = onDismissEvent

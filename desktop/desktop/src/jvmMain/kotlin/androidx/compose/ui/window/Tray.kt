@@ -18,7 +18,6 @@ package androidx.compose.ui.window
 import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import java.awt.Image
-import java.awt.MenuItem
 import java.awt.PopupMenu
 import java.awt.SystemTray
 import java.awt.TrayIcon
@@ -52,9 +51,9 @@ class Tray {
         trayIcon.setImageAutoSize(true)
     }
 
-    fun icon(image: Image): Tray {
+    fun icon(image: Image) {
         if (!init) {
-            return this
+            return
         }
         if (this::trayIcon.isInitialized) {
             trayIcon.setImage(image)
@@ -62,16 +61,15 @@ class Tray {
             trayIcon = TrayIcon(image)
             trayIcon.setImageAutoSize(true)
         }
-        return this
     }
 
-    fun menu(vararg item: Item): Tray {
+    fun menu(vararg item: MenuItem) {
         if (!init) {
-            return this
+            return
         }
         val popup = PopupMenu()
         for (menuItem in item) {
-            val value = MenuItem(menuItem.name)
+            val value = java.awt.MenuItem(menuItem.name)
             value.addActionListener(object : ActionListener {
                 public override fun actionPerformed(e: ActionEvent) {
                     menuItem.action?.invoke()
@@ -85,7 +83,6 @@ class Tray {
         } catch (e: Exception) {
             println("TrayIcon could not be added.")
         }
-        return this
     }
 
     fun notify(title: String, message: String) {
@@ -115,17 +112,5 @@ class Tray {
         } catch (e: Exception) {
             println("TrayIcon could not be removed.")
         }
-    }
-}
-
-class Item {
-    var name: String = ""
-        private set
-    var action: (() -> Unit)?
-        private set
-
-    constructor(name: String, onClick: (() -> Unit)? = null) {
-        this.name = name
-        this.action = onClick
     }
 }
