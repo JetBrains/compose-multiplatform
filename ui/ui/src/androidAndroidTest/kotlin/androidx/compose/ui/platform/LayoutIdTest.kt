@@ -26,7 +26,8 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.test.filters.SmallTest
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -48,6 +49,12 @@ class LayoutIdTest {
     @Before
     fun setup() {
         activity = rule.activity
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun tearDown() {
+        isDebugInspectorInfoEnabled = false
     }
 
     @Test
@@ -82,15 +89,10 @@ class LayoutIdTest {
     }
 
     @Test
-    fun testInspectable() {
+    fun testInspectableValue() {
         val modifier = Modifier.layoutId("box") as InspectableValue
-        Truth.assertThat(modifier.nameFallback).isEqualTo("layoutId")
-        Truth.assertThat(modifier.valueOverride).isNull()
-        Truth.assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(
-                modifier.javaClass.declaredFields
-                    .filter { !it.isSynthetic && it.name != "nameFallback" }
-                    .map { it.name }
-            )
+        assertThat(modifier.nameFallback).isEqualTo("layoutId")
+        assertThat(modifier.valueOverride).isEqualTo("box")
+        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
 }
