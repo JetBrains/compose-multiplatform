@@ -470,7 +470,7 @@ class TextFieldTest {
         rule.setContent {
             var value by remember { mutableStateOf(TextFieldValue()) }
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
@@ -521,7 +521,7 @@ class TextFieldTest {
 
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
@@ -538,23 +538,29 @@ class TextFieldTest {
     @Test
     fun semantics_pasteTextAction() {
         val text = "Hello World"
-        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 6)))
 
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
         }
 
+        // copy text to the clipboard
         rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.CopyText) { it() }
+        rule.runOnIdle {
+            assertThat(value.selection.collapsed).isTrue()
+            assertThat(value.selection.start).isEqualTo(6)
+        }
+
+        // paste text from the clipboard
         rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.PasteText) { it() }
-
         rule.runOnIdle {
-            assertThat(value.text).isEqualTo("HelloHello World")
+            assertThat(value.text).isEqualTo("Hello Hello World")
         }
     }
 
@@ -565,7 +571,7 @@ class TextFieldTest {
 
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )

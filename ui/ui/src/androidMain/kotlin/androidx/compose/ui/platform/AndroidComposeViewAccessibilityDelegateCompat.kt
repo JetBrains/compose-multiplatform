@@ -146,8 +146,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private var semanticsRoot = SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode)
     private var checkingForSemanticsChanges = false
 
-    var clipBoardManagerText: AnnotatedString? = null
-
     init {
         // Remove callbacks that rely on view being attached to a window when we become detached.
         view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -310,7 +308,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // The config will contain the action anyway, therefore we check the clipboard text to
         // decide whether to add the action to the node or not.
         semanticsNode.config.getOrNull(SemanticsActions.PasteText)?.let {
-            if (!clipBoardManagerText?.text.isNullOrEmpty()) {
+            if (info.isFocused && view.clipboardManager.hasText()) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat(
                         AccessibilityNodeInfoCompat.ACTION_PASTE,
@@ -1310,6 +1308,24 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             }
                             sendEvent(event)
                         }
+                    }
+                    SemanticsProperties.Focused -> {
+                        if (entry.value as Boolean) {
+                            sendEvent(
+                                createEvent(
+                                    semanticsNodeIdToAccessibilityVirtualNodeId(newNode.id),
+                                    AccessibilityEvent.TYPE_VIEW_FOCUSED
+                                )
+                            )
+                        }
+                        // In View.java this window event is sent for unfocused view. But we send
+                        // it for focused too so that TalkBack invalidates its cache. Otherwise
+                        // PasteText edit option is not displayed properly on some OS versions.
+                        sendEventForVirtualView(
+                            semanticsNodeIdToAccessibilityVirtualNodeId(newNode.id),
+                            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                        )
                     }
                     else -> {
                         // TODO(b/151840490) send the correct events when property changes
