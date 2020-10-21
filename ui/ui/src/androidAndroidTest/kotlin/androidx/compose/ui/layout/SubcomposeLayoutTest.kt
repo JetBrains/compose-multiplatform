@@ -53,7 +53,6 @@ import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -537,7 +536,9 @@ class SubcomposeLayoutTest {
             container1.removeView(container2)
         }
 
-        assertFalse(stateUsedLatch.await(200, TimeUnit.MILLISECONDS))
+        // The subcomposition is allowed to be active while the View is detached,
+        // but it isn't required
+        rule.waitForIdle()
 
         scenario.onActivity {
             container1.addView(container2)

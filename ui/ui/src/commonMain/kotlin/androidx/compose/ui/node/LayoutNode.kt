@@ -1159,6 +1159,15 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     }
 
     /**
+     * Invalidates layers defined on this LayoutNode.
+     */
+    internal fun invalidateLayers() {
+        forEachDelegate { wrapper ->
+            (wrapper as? LayerWrapper)?.invalidateLayer()
+        }
+    }
+
+    /**
      * Reuses a [DelegatingLayoutNodeWrapper] from [wrapperCache] if one matches the class
      * type of [modifier]. This walks backward through the [wrapperCache] and
      * extracts all [DelegatingLayoutNodeWrapper]s that are

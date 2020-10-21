@@ -627,7 +627,8 @@ class AndroidViewCompatTest {
         // The composition has been disposed.
         rule.runOnIdle {
             assertFalse(innerAndroidComposeView!!.isAttachedToWindow)
-            assertFalse(node!!.isAttached())
+            // the node stays attached after the compose view is detached
+            assertTrue(node!!.isAttached())
         }
     }
 
