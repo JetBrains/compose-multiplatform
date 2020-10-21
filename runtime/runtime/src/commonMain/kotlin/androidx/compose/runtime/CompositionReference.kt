@@ -16,6 +16,10 @@
 
 package androidx.compose.runtime
 
+import kotlin.coroutines.CoroutineContext
+
+private val EmptyAmbientMap: AmbientMap = buildableMapOf()
+
 /**
  * A [CompositionReference] is an opaque type that is used to logically "link" two compositions
  * together. The [CompositionReference] instance represents a reference to the "parent" composition
@@ -23,17 +27,22 @@ package androidx.compose.runtime
  * "child" composition. This reference ensures that invalidations and ambients flow logically
  * through the two compositions as if they were not separate.
  *
+ * The "parent" of a root composition is a [Recomposer].
+ *
  * @see compositionReference
  */
 abstract class CompositionReference internal constructor() {
     internal abstract val compoundHashKey: Int
     internal abstract val collectingKeySources: Boolean
+    internal abstract val applyingCoroutineContext: CoroutineContext?
     internal abstract fun recordInspectionTable(table: MutableSet<SlotTable>)
-    internal abstract fun <T> getAmbient(key: Ambient<T>): T
-    internal abstract fun invalidate()
-    internal abstract fun <N> registerComposer(composer: Composer<N>)
-    internal abstract fun unregisterComposer(composer: Composer<*>)
-    internal abstract fun getAmbientScope(): AmbientMap
-    internal abstract fun startComposing()
-    internal abstract fun doneComposing()
+    internal abstract fun composeInitial(composer: Composer<*>, composable: @Composable () -> Unit)
+    internal abstract fun invalidate(composer: Composer<*>)
+
+    internal open fun <T> getAmbient(key: Ambient<T>): T = key.defaultValueHolder.value
+    internal open fun getAmbientScope(): AmbientMap = EmptyAmbientMap
+    internal open fun registerComposer(composer: Composer<*>) {}
+    internal open fun unregisterComposer(composer: Composer<*>) {}
+    internal open fun startComposing() {}
+    internal open fun doneComposing() {}
 }

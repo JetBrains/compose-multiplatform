@@ -68,13 +68,11 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
 @OptIn(ExperimentalComposeApi::class, ExperimentalLayoutNodeApi::class)
 internal actual fun actualSubcomposeInto(
     container: LayoutNode,
-    recomposer: Recomposer,
-    parent: CompositionReference?,
+    parent: CompositionReference,
     composable: @Composable () -> Unit
 ): Composition = compositionFor(
     container,
     DesktopUiApplier(container),
-    recomposer,
     parent
 ).apply {
     setContent(composable)

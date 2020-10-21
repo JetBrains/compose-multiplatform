@@ -2222,7 +2222,7 @@ package androidx.compose.ui.platform {
   }
 
   public final class SubcompositionKt {
-    method @MainThread public static androidx.compose.runtime.Composition subcomposeInto(androidx.compose.ui.node.LayoutNode container, androidx.compose.runtime.Recomposer recomposer, optional androidx.compose.runtime.CompositionReference? parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method @MainThread public static androidx.compose.runtime.Composition subcomposeInto(androidx.compose.ui.node.LayoutNode container, androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
   public final class TestTagKt {
@@ -2266,12 +2266,10 @@ package androidx.compose.ui.platform {
   }
 
   public final class WrapperKt {
-    method public static androidx.compose.runtime.Composition setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.Recomposer recomposer, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, androidx.compose.runtime.Recomposer recomposer, optional androidx.compose.runtime.CompositionReference? parentComposition, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference? parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public static androidx.compose.runtime.Composition setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
     method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
-    method @Deprecated @MainThread public static androidx.compose.runtime.Composition subcomposeInto(androidx.compose.ui.node.LayoutNode container, optional androidx.compose.runtime.CompositionReference? parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
 }

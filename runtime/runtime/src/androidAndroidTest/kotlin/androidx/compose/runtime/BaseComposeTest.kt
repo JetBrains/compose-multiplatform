@@ -124,7 +124,6 @@ abstract class BaseComposeTest {
         @OptIn(ExperimentalComposeApi::class)
         subcomposeInto(
             container,
-            Recomposer.current(),
             reference
         ) @ComposableContract(tracked = false) {
             block()

@@ -29,10 +29,8 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionReference
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
@@ -123,12 +121,9 @@ internal actual fun ActualPopup(
         layout(0, 0) {}
     }
 
-    // TODO(lmr): refactor these APIs so that recomposer isn't necessary
-    @OptIn(ExperimentalComposeApi::class)
-    val recomposer = currentComposer.recomposer
     val parentComposition = compositionReference()
     onCommit {
-        composition = popupLayout.setContent(recomposer, parentComposition) {
+        composition = popupLayout.setContent(parentComposition) {
             SimpleStack(
                 Modifier.semantics { this.popup() }.onGloballyPositioned {
                     // Get the size of the content

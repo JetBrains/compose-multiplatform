@@ -17,9 +17,7 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.compositionReference
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onDispose
@@ -191,8 +189,6 @@ class VectorPainter internal constructor() : Painter() {
         }
         val composition = composeVector(
             vector,
-            @OptIn(ExperimentalComposeApi::class)
-            currentComposer.recomposer,
             compositionReference(),
             children
         )

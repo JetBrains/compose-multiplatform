@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.emit
 import androidx.compose.ui.graphics.Brush
@@ -101,13 +100,11 @@ fun Path(
 @Suppress("NAME_SHADOWING")
 internal fun composeVector(
     container: VectorComponent,
-    recomposer: Recomposer,
-    parent: CompositionReference? = null,
+    parent: CompositionReference,
     composable: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): Composition = compositionFor(
     container,
     VectorApplier(container.root),
-    recomposer,
     parent
 ).apply {
     setContent {
