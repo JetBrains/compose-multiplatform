@@ -42,7 +42,7 @@ import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.4.0"
-    id("org.jetbrains.compose") version "0.1.0-dev68"
+    id("org.jetbrains.compose") version "0.1.0-dev97"
     application
 }
 
