@@ -115,6 +115,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     private val activityProvider: (R) -> A
 ) : ComposeTestRule {
 
+    @ExperimentalTesting
     override val clockTestRule: AnimationClockTestRule = AndroidAnimationClockTestRule()
 
     internal var disposeContentHook: (() -> Unit)? = null
@@ -144,7 +145,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
 
     override fun apply(base: Statement, description: Description?): Statement {
         @Suppress("NAME_SHADOWING")
-        @OptIn(InternalTestingApi::class)
+        @OptIn(InternalTestingApi::class, ExperimentalTesting::class)
         return RuleChain
             .outerRule(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
