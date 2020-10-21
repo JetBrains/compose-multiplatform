@@ -98,6 +98,10 @@ val EXEMPT_TASKS = setOf(
 
     ":camera:integration-tests:camera-testapp-uiwidgets:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-uiwidgets:packageDebug",
+    ":camera:integration-tests:camera-testapp-core:camera-testapp" +
+        "-coreGenerateTestConfigurationdebug",
+    ":camera:integration-tests:camera-testapp-core:camera-testapp" +
+        "-coreGenerateTestConfigurationdebugAndroidTest",
     ":camera:integration-tests:camera-testapp-view:camera-testapp" +
         "-viewGenerateTestConfigurationdebug",
     ":camera:integration-tests:camera-testapp-view:camera-testapp" +
@@ -105,6 +109,7 @@ val EXEMPT_TASKS = setOf(
     ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-view:packageDebug"
 )
+
 class TaskUpToDateValidator {
     companion object {
 
@@ -155,18 +160,22 @@ class TaskUpToDateValidator {
                 }
             }
         }
+
         fun recordTaskInputs(task: Task) {
             val text = task.inputs.files.files.joinToString("\n")
             val destFile = getTaskInputListPath(task)
             destFile.parentFile.mkdirs()
             destFile.writeText(text)
         }
+
         fun getTaskInputListPath(task: Task): File {
             return File(getTasksInputListPath(task.project), task.name)
         }
+
         fun getTasksInputListPath(project: Project): File {
             return File(project.buildDir, "TaskUpToDateValidator/inputs")
         }
+
         fun checkForChangingSetOfInputs(task: Task): String {
             val previousInputsFile = getTaskInputListPath(task)
             val previousInputs = previousInputsFile.readLines()
@@ -187,6 +196,7 @@ class TaskUpToDateValidator {
             }
             return addedMessage + removedMessage
         }
+
         fun tryToExplainTaskExecution(task: Task, taskGraph: TaskExecutionGraph): String {
             val numOutputFiles = task.outputs.files.files.size
             val outputsMessage = if (numOutputFiles > 0) {
@@ -239,6 +249,7 @@ class TaskUpToDateValidator {
             }
             return null
         }
+
         fun tryToExplainFileModification(file: File, taskGraph: TaskExecutionGraph): String {
             // Find the task declaring this file as an output,
             // or the task declaring one of its parent dirs as an output
