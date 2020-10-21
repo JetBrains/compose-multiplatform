@@ -1,4 +1,4 @@
-package example.todo.common.list.store
+package example.todo.common.main.store
 
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
@@ -10,16 +10,16 @@ import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.observeOn
 import com.badoo.reaktive.scheduler.mainScheduler
-import example.todo.common.list.store.TodoListStore.Intent
-import example.todo.common.list.store.TodoListStore.State
+import example.todo.common.main.store.TodoMainStore.Intent
+import example.todo.common.main.store.TodoMainStore.State
 
-internal class TodoListStoreProvider(
+internal class TodoMainStoreProvider(
     private val storeFactory: StoreFactory,
     private val database: Database
 ) {
 
-    fun provide(): TodoListStore =
-        object : TodoListStore, Store<Intent, State, Nothing> by storeFactory.create(
+    fun provide(): TodoMainStore =
+        object : TodoMainStore, Store<Intent, State, Nothing> by storeFactory.create(
             name = "TodoListStore",
             initialState = State(),
             bootstrapper = SimpleBootstrapper(Unit),
@@ -29,7 +29,8 @@ internal class TodoListStoreProvider(
 
     private sealed class Result {
         data class ItemsLoaded(val items: List<TodoItem>) : Result()
-        data class DoneChanged(val id: Long, val isDone: Boolean) : Result()
+        data class ItemDoneChanged(val id: Long, val isDone: Boolean) : Result()
+        data class TextChanged(val text: String) : Result()
     }
 
     private inner class ExecutorImpl : ReaktiveExecutor<Intent, Unit, State, Result, Nothing>() {
@@ -43,12 +44,19 @@ internal class TodoListStoreProvider(
 
         override fun executeIntent(intent: Intent, getState: () -> State): Unit =
             when (intent) {
-                is Intent.SetDone -> setDone(id = intent.id, isDone = intent.isDone)
+                is Intent.SetItemDone -> setItemDone(id = intent.id, isDone = intent.isDone)
+                is Intent.SetText -> dispatch(Result.TextChanged(text = intent.text))
+                is Intent.AddItem -> addItem(state = getState())
             }
 
-        private fun setDone(id: Long, isDone: Boolean) {
-            dispatch(Result.DoneChanged(id = id, isDone = isDone))
+        private fun setItemDone(id: Long, isDone: Boolean) {
+            dispatch(Result.ItemDoneChanged(id = id, isDone = isDone))
             database.setDone(id = id, isDone = isDone).subscribeScoped()
+        }
+
+        private fun addItem(state: State) {
+            dispatch(Result.TextChanged(text = ""))
+            database.add(text = state.text).subscribeScoped()
         }
     }
 
@@ -56,7 +64,8 @@ internal class TodoListStoreProvider(
         override fun State.reduce(result: Result): State =
             when (result) {
                 is Result.ItemsLoaded -> copy(items = result.items.sorted())
-                is Result.DoneChanged -> update(id = result.id) { copy(isDone = result.isDone) }
+                is Result.ItemDoneChanged -> update(id = result.id) { copy(isDone = result.isDone) }
+                is Result.TextChanged -> copy(text = result.text)
             }
 
         private inline fun State.update(id: Long, func: TodoItem.() -> TodoItem): State {
@@ -79,5 +88,7 @@ internal class TodoListStoreProvider(
         val updates: Observable<List<TodoItem>>
 
         fun setDone(id: Long, isDone: Boolean): Completable
+
+        fun add(text: String): Completable
     }
 }
