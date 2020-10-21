@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DesktopGraphicsTest
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
@@ -115,7 +116,9 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(0, 4),
             dstSize = IntSize(4, 12),
-            paint = redPaint
+            paint = redPaint.apply {
+                filterQuality = FilterQuality.None
+            }
         )
 
         screenshotRule.snap(surface)

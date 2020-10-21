@@ -29,6 +29,10 @@ actual fun Paint(): Paint = DesktopPaint()
 class DesktopPaint : Paint {
     internal val skija = org.jetbrains.skija.Paint()
 
+    constructor() {
+        filterQuality = FilterQuality.Medium
+    }
+
     override fun asFrameworkPaint(): NativePaint = skija
 
     override var alpha: Float
