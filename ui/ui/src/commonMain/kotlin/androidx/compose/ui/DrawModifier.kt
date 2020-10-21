@@ -130,9 +130,8 @@ class CacheDrawScope internal constructor(
 }
 
 /**
- * DrawCacheModifier implementation that also implements ContentDrawScope in order
- * to detect if drawContent has been invoked and automatically calls it if the specified
- * drawing callback does not do so.
+ * DrawCacheModifier implementation that is used to construct objects that are dependent on
+ * the drawing area and re-used across draw calls
  */
 private data class DrawContentCacheModifier(
     val cacheDrawScope: CacheDrawScope,
