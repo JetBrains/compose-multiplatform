@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -49,7 +48,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -546,44 +544,6 @@ class ButtonTest {
             }
             assertWithinOnePixel(buttonBounds.center, contentBounds.center)
         }
-    }
-
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    @Test
-    fun zOrderingBasedOnElevationIsApplied() {
-        rule.setMaterialContent {
-            Box(
-                Modifier.semantics(mergeAllDescendants = true) {}
-                    .testTag("stack")
-                    .preferredSize(10.dp, 10.dp)
-            ) {
-                Button(
-                    colors = ButtonConstants.defaultButtonColors(backgroundColor = Color.Yellow),
-                    elevation = ButtonConstants.defaultElevation(defaultElevation = 2.dp),
-                    onClick = {},
-                    shape = RectangleShape
-                ) {
-                    Box(Modifier.fillMaxSize())
-                }
-                Button(
-                    colors = ButtonConstants.defaultButtonColors(backgroundColor = Color.Green),
-                    elevation = null,
-                    onClick = {},
-                    shape = RectangleShape
-                ) {
-                    Box(Modifier.fillMaxSize())
-                }
-            }
-        }
-
-        rule.onNodeWithTag("stack")
-            .captureToBitmap()
-            .assertShape(
-                density = rule.density,
-                shape = RectangleShape,
-                shapeColor = Color.Yellow,
-                backgroundColor = Color.White
-            )
     }
 
     @Test
