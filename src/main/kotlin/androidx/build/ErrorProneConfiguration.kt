@@ -95,6 +95,7 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:MixedMutabilityReturnType:OFF",
 
             // Enforce the following checks.
+            "-Xep:JavaTimeDefaultTimeZone:ERROR",
             "-Xep:ParameterNotNullable:ERROR",
             "-Xep:MissingOverride:ERROR",
             "-Xep:JdkObsolete:ERROR",
