@@ -26,8 +26,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.ExperimentalRestorableStateHolder
+import androidx.compose.runtime.savedinstancestate.rememberRestorableStateHolder
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.tapGestureFilter
@@ -35,17 +37,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
+@OptIn(ExperimentalRestorableStateHolder::class)
 @Composable
 fun CrossfadeDemo() {
-    var current by remember { mutableStateOf(tabs[0]) }
+    var current by savedInstanceState { 0 }
     Column {
         Row {
-            tabs.forEach { tab ->
+            tabs.forEachIndexed { index, tab ->
                 Box(
                     Modifier.tapGestureFilter(
                         onTap = {
                             Log.e("Crossfade", "Switch to $tab")
-                            current = tab
+                            current = index
                         }
                     )
                         .weight(1f, true)
@@ -54,9 +57,13 @@ fun CrossfadeDemo() {
                 )
             }
         }
-        Crossfade(current = current) { tab ->
-            tab.lastInt = remember { Random.nextInt() }
-            Box(Modifier.fillMaxSize().background(tab.color))
+        val currentTab = tabs[current]
+        val restorableStateHolder = rememberRestorableStateHolder<Tab>()
+        Crossfade(current = currentTab) { tab ->
+            restorableStateHolder.withRestorableState(tab) {
+                tab.lastInt = rememberSavedInstanceState { Random.nextInt() }
+                Box(Modifier.fillMaxSize().background(tab.color))
+            }
         }
     }
 }
