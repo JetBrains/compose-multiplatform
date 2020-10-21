@@ -20,6 +20,9 @@ subprojects {
         configureIfExists<JavaPluginExtension> {
             sourceCompatibility = JavaVersion.VERSION_1_8
             targetCompatibility = JavaVersion.VERSION_1_8
+
+            withJavadocJar()
+            withSourcesJar()
         }
     }
 
@@ -51,7 +54,9 @@ subprojects {
 fun Project.configureGradlePlugin(config: GradlePluginConfigExtension) {
     // maven publication for plugin
     configureIfExists<PublishingExtension> {
-        publications.create<MavenPublication>("gradlePlugin") {
+        // pluginMaven is a default publication created by java-gradle-plugin
+        // https://github.com/gradle/gradle/issues/10384
+        publications.create<MavenPublication>("pluginMaven") {
             artifactId = config.artifactId
             pom {
                 name.set(config.displayName)

@@ -1,10 +1,10 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform") // kotlin("jvm") doesn't work well in IDEA/AndroidStudio (https://github.com/JetBrains/compose-jb/issues/22)
     id("org.jetbrains.compose")
-    java
-    application
+    id("org.jetbrains.compose.desktop.application")
 }
 
 kotlin {
@@ -21,6 +21,13 @@ kotlin {
     }
 }
 
-application {
-    mainClassName = "example.imageviewer.MainKt"
+compose.desktop {
+    application {
+        mainClass = "example.imageviewer.MainKt"
+
+        nativeExecutables {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "ImageViewer"
+        }
+    }
 }
