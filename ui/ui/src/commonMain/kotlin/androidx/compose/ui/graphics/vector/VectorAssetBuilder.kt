@@ -38,7 +38,7 @@ private inline class Stack<T>(private val backing: ArrayList<T> = ArrayList<T>()
  * This is useful for caching the result of expensive operations used to construct
  * a vector graphic for compose.
  * For example, the vector graphic could be serialized and downloaded from a server and represented
- * internally in a VectorAsset before it is composed through [VectorPainter]
+ * internally in a VectorAsset before it is composed through [rememberVectorPainter]
  * The generated VectorAsset is recommended to be memoized across composition calls to avoid
  * doing redundant work
  */

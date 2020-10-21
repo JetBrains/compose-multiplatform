@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.LinearGradient
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 
 /**
@@ -102,7 +102,7 @@ fun DrawWithCacheModifierStateParameterSample() {
 @Sampled
 @Composable
 fun DrawWithCacheContentSample() {
-    val vectorPainter = VectorPainter(24.dp, 24.dp) { viewportWidth, viewportHeight ->
+    val vectorPainter = rememberVectorPainter(24.dp, 24.dp) { viewportWidth, viewportHeight ->
         Path(
             pathData = PathData {
                 lineTo(viewportWidth, 0f)

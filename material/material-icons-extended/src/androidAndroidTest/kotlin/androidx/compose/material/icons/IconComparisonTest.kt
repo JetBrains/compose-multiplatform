@@ -30,7 +30,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
@@ -220,13 +220,13 @@ private fun DrawVectors(programmaticVector: VectorAsset, xmlVector: VectorAsset)
         Row(Modifier.align(Alignment.Center)) {
             Box(
                 modifier = layoutSize.paint(
-                    VectorPainter(programmaticVector),
+                    rememberVectorPainter(programmaticVector),
                     colorFilter = ColorFilter.tint(Color.Red)
                 ).testTag(ProgrammaticTestTag)
             )
             Box(
                 modifier = layoutSize.paint(
-                    VectorPainter(xmlVector),
+                    rememberVectorPainter(xmlVector),
                     colorFilter = ColorFilter.tint(Color.Red)
                 ).testTag(XmlTestTag)
             )

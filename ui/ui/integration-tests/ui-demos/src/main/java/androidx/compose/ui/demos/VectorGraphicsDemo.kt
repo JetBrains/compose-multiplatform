@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.vector.Group
 import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.PathBuilder
 import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.unit.Dp
@@ -75,7 +75,7 @@ fun VectorGraphicsDemo() {
 
 @Composable
 private fun vectorShape(width: Dp, height: Dp): Painter =
-    VectorPainter(
+    rememberVectorPainter(
         name = "vectorShape",
         defaultWidth = width,
         defaultHeight = height

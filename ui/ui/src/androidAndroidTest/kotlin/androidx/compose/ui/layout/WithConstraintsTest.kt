@@ -43,7 +43,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
@@ -241,7 +241,7 @@ class WithConstraintsTest {
                     // wasn't possible to survide Frames swicth previously so the model read
                     // within the child Layout wasn't recorded
                     val background = Modifier.paint(
-                        VectorPainter(
+                        rememberVectorPainter(
                             name = "testPainter",
                             defaultWidth = 10.dp,
                             defaultHeight = 10.dp

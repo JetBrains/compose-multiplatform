@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 
 /**
@@ -48,7 +48,7 @@ fun Icon(
     tint: Color = AmbientContentColor.current
 ) {
     Icon(
-        painter = VectorPainter(asset),
+        painter = rememberVectorPainter(asset),
         modifier = modifier,
         tint = tint
     )

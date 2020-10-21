@@ -274,20 +274,21 @@ class VectorTest {
     private fun createTestVectorPainter(size: Int = 200): VectorPainter {
         val sizePx = size.toFloat()
         val sizeDp = (size / DensityAmbient.current.density).dp
-        return VectorPainter(
+        return rememberVectorPainter(
             defaultWidth = sizeDp,
-            defaultHeight = sizeDp
-        ) { _, _ ->
-            Path(
-                pathData = PathData {
-                    lineTo(sizePx, 0.0f)
-                    lineTo(sizePx, sizePx)
-                    lineTo(0.0f, sizePx)
-                    close()
-                },
-                fill = SolidColor(Color.Black)
-            )
-        }
+            defaultHeight = sizeDp,
+            children = { _, _ ->
+                Path(
+                    pathData = PathData {
+                        lineTo(sizePx, 0.0f)
+                        lineTo(sizePx, sizePx)
+                        lineTo(0.0f, sizePx)
+                        close()
+                    },
+                    fill = SolidColor(Color.Black)
+                )
+            }
+        )
     }
 
     @Composable
@@ -299,7 +300,7 @@ class VectorTest {
         val sizePx = size.toFloat()
         val sizeDp = (size / DensityAmbient.current.density).dp
         val background = Modifier.paint(
-            VectorPainter(
+            rememberVectorPainter(
                 defaultWidth = sizeDp,
                 defaultHeight = sizeDp
             ) { _, _ ->
@@ -352,7 +353,7 @@ class VectorTest {
         val sizePx = size.toFloat()
         val sizeDp = (size / DensityAmbient.current.density).dp
         val background = Modifier.paint(
-            VectorPainter(
+            rememberVectorPainter(
                 defaultWidth = sizeDp,
                 defaultHeight = sizeDp
             ) { _, _ ->

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.Dp
 
 /**
  * Vector graphics object that is generated as a result of [VectorAssetBuilder]
- * It can be composed and rendered by passing it as an argument to [VectorPainter]
+ * It can be composed and rendered by passing it as an argument to [rememberVectorPainter]
  */
 @Immutable
 data class VectorAsset internal constructor(
