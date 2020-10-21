@@ -20,7 +20,6 @@ import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.DokkaPublicDocs
 import androidx.build.dokka.DokkaSourceDocs
-import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
@@ -83,7 +82,6 @@ class AndroidXRootPlugin : Plugin<Project> {
             buildOnServerTask.dependsOn(it)
         }
 
-        extra.set("versionChecker", GMavenVersionChecker(logger))
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
