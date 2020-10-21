@@ -30,7 +30,7 @@ import androidx.compose.runtime.mutableStateOf
  * @param offset The startOffset of the literal in the source file at the time of compilation.
  */
 @ComposeCompilerApi
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class LiveLiteralInfo(
     val key: String,
     val offset: Int
@@ -43,7 +43,7 @@ annotation class LiveLiteralInfo(
  * @param file The file path of the file the associate LiveLiterals class was produced for
  */
 @ComposeCompilerApi
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class LiveLiteralFileInfo(
     val file: String
 )
