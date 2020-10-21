@@ -31,8 +31,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -68,7 +69,16 @@ fun Modifier.paint(
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,
-        colorFilter = colorFilter
+        colorFilter = colorFilter,
+        inspectorInfo = debugInspectorInfo {
+            name = "paint"
+            properties["painter"] = painter
+            properties["sizeToIntrinsics"] = sizeToIntrinsics
+            properties["alignment"] = alignment
+            properties["contentScale"] = contentScale
+            properties["alpha"] = alpha
+            properties["colorFilter"] = colorFilter
+        }
     )
 )
 
@@ -76,14 +86,15 @@ fun Modifier.paint(
  * [DrawModifier] used to draw the provided [Painter] followed by the contents
  * of the component itself
  */
-private data class PainterModifier(
+private class PainterModifier(
     val painter: Painter,
     val sizeToIntrinsics: Boolean,
     val alignment: Alignment = Alignment.Center,
     val contentScale: ContentScale = ContentScale.Inside,
     val alpha: Float = DefaultAlpha,
-    val colorFilter: ColorFilter? = null
-) : LayoutModifier, DrawModifier, InspectableValue {
+    val colorFilter: ColorFilter? = null,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, DrawModifier, InspectorValueInfo(inspectorInfo) {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -263,15 +274,31 @@ private data class PainterModifier(
     private fun Size.hasSpecifiedAndFiniteWidth() = this != Size.Unspecified && width.isFinite()
     private fun Size.hasSpecifiedAndFiniteHeight() = this != Size.Unspecified && height.isFinite()
 
-    override val nameFallback = "paint"
+    override fun hashCode(): Int {
+        var result = painter.hashCode()
+        result = 31 * result + sizeToIntrinsics.hashCode()
+        result = 31 * result + alignment.hashCode()
+        result = 31 * result + contentScale.hashCode()
+        result = 31 * result + alpha.hashCode()
+        result = 31 * result + (colorFilter?.hashCode() ?: 0)
+        return result
+    }
 
-    override val inspectableElements: Sequence<ValueElement>
-        get() = sequenceOf(
-            ValueElement("painter", painter),
-            ValueElement("sizeToIntrinsics", sizeToIntrinsics),
-            ValueElement("alignment", alignment),
-            ValueElement("contentScale", contentScale),
-            ValueElement("alpha", alpha),
-            ValueElement("colorFilter", colorFilter)
-        )
+    override fun equals(other: Any?): Boolean {
+        val otherModifier = other as? PainterModifier ?: return false
+        return painter == otherModifier.painter &&
+            sizeToIntrinsics == otherModifier.sizeToIntrinsics &&
+            alignment == otherModifier.alignment &&
+            contentScale == otherModifier.contentScale &&
+            alpha == otherModifier.alpha &&
+            colorFilter == otherModifier.colorFilter
+    }
+
+    override fun toString(): String =
+        "PainterModifier(" +
+            "painter=$painter, " +
+            "sizeToIntrinsics=$sizeToIntrinsics, " +
+            "alignment=$alignment, " +
+            "alpha=$alpha, " +
+            "colorFilter=$colorFilter)"
 }
