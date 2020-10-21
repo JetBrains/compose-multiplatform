@@ -156,6 +156,13 @@ object Release {
             )
             return
         }
+        if (extension.publish == Publish.UNSET) {
+            project.logger.info(
+                "project ${project.name} isn't part of release, because" +
+                    " it does not set the \"publish\" property or the \"type\" property"
+            )
+            return
+        }
         if (extension.publish == Publish.SNAPSHOT_ONLY && !isSnapshotBuild()) {
             project.logger.info(
                 "project ${project.name} isn't part of release, because its" +

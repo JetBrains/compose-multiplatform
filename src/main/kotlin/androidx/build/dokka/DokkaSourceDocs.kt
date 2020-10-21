@@ -19,8 +19,8 @@
 package androidx.build.dokka
 
 import androidx.build.AndroidXExtension
+import androidx.build.LibraryType
 import androidx.build.defaultPublishVariant
-import androidx.build.isSamplesProject
 import androidx.build.java.JavaCompileInputs
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
@@ -90,7 +90,7 @@ object DokkaSourceDocs {
         library.defaultPublishVariant { variant ->
             project.afterEvaluate {
                 val inputs = JavaCompileInputs.fromLibraryVariant(library, variant, project)
-                registerInputs(inputs, project)
+                registerInputs(inputs, project, extension)
             }
         }
     }
@@ -112,11 +112,11 @@ object DokkaSourceDocs {
         val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
         project.afterEvaluate {
             val inputs = JavaCompileInputs.fromSourceSet(mainSourceSet, project)
-            registerInputs(inputs, project)
+            registerInputs(inputs, project, extension)
         }
     }
 
-    fun registerInputs(inputs: JavaCompileInputs, project: Project) {
+    fun registerInputs(inputs: JavaCompileInputs, project: Project, extension: AndroidXExtension) {
         val dokkaTasks = getDocsTasks(project)
 
         // Avoid depending on or modifying a task that has already been executed.
@@ -127,7 +127,7 @@ object DokkaSourceDocs {
 
             // Filter out sample packages from the generated documentation, we only need them in
             // Dokka to resolve @sample links
-            if (project.isSamplesProject()) {
+            if (extension.type == LibraryType.SAMPLES) {
                 val sourceFiles = inputs.sourcePaths.asFileTree.files.filter { file ->
                     file.extension == "kt"
                 }

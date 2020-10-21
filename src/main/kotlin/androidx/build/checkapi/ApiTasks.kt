@@ -44,7 +44,14 @@ fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
         )
     }
 
+    // API behavior is default for type
+    if (type.checkApi is RunApiTasks.No && runApiTasks is RunApiTasks.No) {
+        project.logger.info("Projects of type ${type.name} do not track API.")
+        return false
+    }
+
     when (runApiTasks) {
+        // API behavior for type must have been overridden, because previous check did not trigger
         is RunApiTasks.No -> {
             project.logger.info(
                 "Project ${project.name} has explicitly disabled API tasks with " +
@@ -53,6 +60,9 @@ fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
             return false
         }
         is RunApiTasks.Yes -> {
+            // API behavior is default for type; not overridden
+            if (type.checkApi is RunApiTasks.Yes) { return true }
+            // API behavior for type is overridden
             (runApiTasks as RunApiTasks.Yes).reason?.let { reason ->
                 project.logger.info(
                     "Project ${project.name} has explicitly enabled API tasks " +
@@ -62,12 +72,6 @@ fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
             return true
         }
         else -> {}
-    }
-
-    // Tooling projects cannot track APIs.
-    if (toolingProject) {
-        project.logger.info("Project ${project.name} is tooling project, ignoring API tasks.")
-        return false
     }
 
     if (project.version !is Version) {

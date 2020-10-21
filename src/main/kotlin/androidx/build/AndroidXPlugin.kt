@@ -505,9 +505,10 @@ class AndroidXPlugin : Plugin<Project> {
                 }
             }
 
-            if (androidXExtension.compilationTarget != CompilationTarget.DEVICE) {
+            if (androidXExtension.type.compilationTarget != CompilationTarget.DEVICE) {
                 throw IllegalStateException(
-                    "Android libraries must use a compilation target of DEVICE"
+                    "${androidXExtension.type.name} libraries cannot apply the android plugin, as" +
+                        " they do not target android devices"
                 )
             }
         }
