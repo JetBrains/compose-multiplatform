@@ -59,6 +59,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
@@ -72,7 +74,9 @@ import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onRoot
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -89,6 +93,16 @@ class PainterModifierTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
@@ -607,15 +621,18 @@ class PainterModifierTest {
 
     @Test
     fun testInspectable() {
-        val modifier = Modifier.paint(TestPainter(10f, 20f)) as InspectableValue
+        val painter = TestPainter(10f, 20f)
+        val modifier = Modifier.paint(painter) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("paint")
         assertThat(modifier.valueOverride).isNull()
-        assertThat(modifier.inspectableElements.map { it.name }.toList())
-            .containsExactlyElementsIn(
-                modifier.javaClass.declaredFields
-                    .filter { !it.isSynthetic && it.name != "nameFallback" }
-                    .map { it.name }
-            )
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("painter", painter),
+            ValueElement("sizeToIntrinsics", true),
+            ValueElement("alignment", Alignment.Center),
+            ValueElement("contentScale", ContentScale.Inside),
+            ValueElement("alpha", DefaultAlpha),
+            ValueElement("colorFilter", null)
+        )
     }
 
     @Composable
