@@ -1,7 +1,7 @@
-package example.todo.common.list.integration
+package example.todo.common.main.integration
 
 import com.badoo.reaktive.completable.Completable
-import com.badoo.reaktive.completable.completable
+import com.badoo.reaktive.completable.completableFromFunction
 import com.badoo.reaktive.completable.subscribeOn
 import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.observable.mapIterable
@@ -10,12 +10,12 @@ import com.squareup.sqldelight.Query
 import example.todo.common.database.TodoDatabaseQueries
 import example.todo.common.database.TodoItemEntity
 import example.todo.common.database.asObservable
-import example.todo.common.list.store.TodoItem
-import example.todo.common.list.store.TodoListStoreProvider.Database
+import example.todo.common.main.store.TodoItem
+import example.todo.common.main.store.TodoMainStoreProvider
 
-internal class TodoListStoreDatabase(
+internal class TodoMainStoreDatabase(
     private val queries: TodoDatabaseQueries
-) : Database {
+) : TodoMainStoreProvider.Database {
 
     override val updates: Observable<List<TodoItem>> =
         queries
@@ -32,6 +32,15 @@ internal class TodoListStoreDatabase(
         )
 
     override fun setDone(id: Long, isDone: Boolean): Completable =
-        completable { queries.setDone(id = id, isDone = isDone) }
+        completableFromFunction { queries.setDone(id = id, isDone = isDone) }
             .subscribeOn(ioScheduler)
+
+    override fun add(text: String): Completable =
+        completableFromFunction {
+            queries.transactionWithResult {
+                queries.add(text = text)
+                val lastId = queries.getLastInsertId().executeAsOne()
+                queries.select(id = lastId).executeAsOne()
+            }
+        }.subscribeOn(ioScheduler)
 }

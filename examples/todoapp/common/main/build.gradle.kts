@@ -9,10 +9,18 @@ kotlin {
             dependencies {
                 implementation(project(":common:utils"))
                 implementation(project(":common:database"))
-                implementation(project(":common:list"))
-                implementation(project(":common:add"))
                 implementation(Deps.ArkIvanov.Decompose.decompose)
+                implementation(Deps.ArkIvanov.MVIKotlin.mvikotlin)
+                implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinExtensionsReaktive)
                 implementation(Deps.Badoo.Reaktive.reaktive)
+            }
+        }
+
+        named("commonTest") {
+            dependencies {
+                implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
+                implementation(Deps.Badoo.Reaktive.reaktiveTesting)
+                implementation(Deps.Badoo.Reaktive.utils)
             }
         }
     }

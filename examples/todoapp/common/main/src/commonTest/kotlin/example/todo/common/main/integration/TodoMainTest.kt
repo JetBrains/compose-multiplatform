@@ -1,4 +1,4 @@
-package example.todo.common.list.integration
+package example.todo.common.main.integration
 
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.lifecycle.LifecycleRegistry
@@ -11,9 +11,10 @@ import com.badoo.reaktive.test.observable.assertValue
 import com.badoo.reaktive.test.observable.test
 import com.badoo.reaktive.test.scheduler.TestScheduler
 import example.todo.common.database.TestDatabaseDriver
-import example.todo.common.list.TodoList.Dependencies
-import example.todo.common.list.TodoList.Output
-import example.todo.common.list.store.TodoItem
+import example.todo.common.database.TodoItemEntity
+import example.todo.common.main.TodoMain.Dependencies
+import example.todo.common.main.TodoMain.Output
+import example.todo.common.main.store.TodoItem
 import example.todo.database.TodoDatabase
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -22,7 +23,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @Suppress("TestFunctionName")
-class TodoListTest {
+class TodoMainTest {
 
     private val lifecycle = LifecycleRegistry()
     private val database = TodoDatabase(TestDatabaseDriver())
@@ -32,12 +33,12 @@ class TodoListTest {
     private val queries = database.todoDatabaseQueries
 
     private val impl by lazy {
-        TodoListImpl(
+        TodoMainImpl(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
             dependencies = object : Dependencies {
                 override val storeFactory: StoreFactory = DefaultStoreFactory
-                override val database: TodoDatabase = this@TodoListTest.database
-                override val listOutput: Consumer<Output> = outputSubject
+                override val database: TodoDatabase = this@TodoMainTest.database
+                override val mainOutput: Consumer<Output> = outputSubject
             }
         )
     }
@@ -58,13 +59,13 @@ class TodoListTest {
     }
 
     @Test
-    fun WHEN_item_clicked_THEN_Output_ItemSelected_emitted() {
+    fun WHEN_item_clicked_THEN_Output_Selected_emitted() {
         queries.add("Item1")
         val id = firstItem().id
 
         impl.onItemClicked(id = id)
 
-        output.assertValue(Output.ItemSelected(id = id))
+        output.assertValue(Output.Selected(id = id))
     }
 
     @Test
@@ -99,5 +100,27 @@ class TodoListTest {
         assertEquals("New text", firstItem().text)
     }
 
+    @Test
+    fun WHEN_text_changed_THEN_text_updated() {
+        impl.onTextChanged(text = "Item text")
+
+        assertEquals("Item text", impl.state.text)
+    }
+
+    @Test
+    fun GIVEN_text_entered_WHEN_add_clicked_THEN_item_added_in_database() {
+        impl.onTextChanged(text = "Item text")
+
+        impl.onAddClicked()
+
+        assertEquals("Item text", lastInsertItem().text)
+    }
+
     private fun firstItem(): TodoItem = impl.state.items[0]
+
+    private fun lastInsertItem(): TodoItemEntity {
+        val lastInsertId = queries.getLastInsertId().executeAsOne()
+
+        return queries.select(id = lastInsertId).executeAsOne()
+    }
 }
