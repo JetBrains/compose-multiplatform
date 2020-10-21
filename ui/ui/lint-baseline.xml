@@ -267,7 +267,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onDoubleTap`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -278,7 +278,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `canDrag`, `dragObserver`, `startDragImmediately`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -289,7 +289,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `canDrag`, `onDragSlopExceeded`, `orientation`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -311,7 +311,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onBuildDrawCache`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -355,7 +355,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onFocusChange`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier = composed {"
         errorLine2="                                                                            ~~~~~~~~">
         <location
@@ -366,7 +366,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `focusRequester`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier = composed {"
         errorLine2="                                                                        ~~~~~~~~">
         <location
@@ -377,7 +377,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onKeyEvent`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
         errorLine2="                                                                           ~~~~~~~~">
         <location
@@ -388,7 +388,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onPreviewKeyEvent`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
         errorLine2="                                                                                         ~~~~~~~~">
         <location
@@ -410,7 +410,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `longPressDragObserver`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -421,7 +421,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onLongPress`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -443,7 +443,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onSizeChanged`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -454,7 +454,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onTouchEvent`, `requestDisallowInterceptTouchEvent`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -476,7 +476,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `onCancel`, `onStart`, `onStop`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -487,7 +487,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `canStartDragging`, `dragObserver`, `orientation`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -498,7 +498,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `executionPass`, `onPressStart`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -509,7 +509,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `canStartScaling`, `scaleObserver`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -520,7 +520,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `scaleObserver`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -531,7 +531,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onScaleSlopExceeded`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -542,7 +542,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `canDrag`, `orientation`, `scrollCallback`, `startDragImmediately`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -553,7 +553,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `mergeAllDescendants`, `properties`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -564,7 +564,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `block`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -575,7 +575,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onTap`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -586,7 +586,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onTap`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location

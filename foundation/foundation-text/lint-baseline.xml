@@ -14,7 +14,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `cursorColor`, `offsetMap`, `state`, `value`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location

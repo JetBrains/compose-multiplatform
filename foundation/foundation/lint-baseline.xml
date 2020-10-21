@@ -36,17 +36,6 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `brush`, `shape`, `width`"
-        errorLine1="fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed("
-        errorLine2="                                                                       ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
-            line="82"
-            column="72"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
         message="These lambda arguments are missing in the InspectorInfo: `border`"
         errorLine1="    drawBorder(size = border.size, brush = border.brush, shape = shape)"
         errorLine2="    ~~~~~~~~~~">
@@ -69,7 +58,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `brush`, `shape`, `size`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed {"
         errorLine2="                                                                          ~~~~~~~~">
         <location
@@ -80,7 +69,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `indication`, `interactionState`, `onClick`, `onClickLabel`, `onDoubleClick`, `onLongClick`, `onLongClickLabel`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -91,7 +80,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `canDrag`, `enabled`, `interactionState`, `onDrag`, `onDragStarted`, `onDragStopped`, `orientation`, `reverseDirection`, `startDragImmediately`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -113,7 +102,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `indication`, `interactionState`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -135,7 +124,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `isScrollable`, `isVertical`, `reverseScrolling`, `state`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -146,7 +135,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `canScroll`, `controller`, `enabled`, `onScrollStarted`, `onScrollStopped`, `orientation`, `reverseDirection`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
@@ -157,7 +146,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `inMutuallyExclusiveGroup`, `indication`, `interactionState`, `onClick`, `selected`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -179,7 +168,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `indication`, `interactionState`, `onClick`, `state`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -190,7 +179,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `controller`, `enabled`, `onZoomStarted`, `onZoomStopped`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -201,7 +190,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `onZoomDelta`, `onZoomStarted`, `onZoomStopped`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location

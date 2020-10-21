@@ -36,7 +36,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `anchors`, `enabled`, `interactionState`, `orientation`, `resistance`, `reverseDirection`, `state`, `thresholds`, `velocityThreshold`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -47,7 +47,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `currentTabPosition`"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="    ): Modifier = composed {"
         errorLine2="                  ~~~~~~~~">
         <location
@@ -74,7 +74,7 @@
         errorLine2="              ^">
         <location
             file="src/commonMain/kotlin/androidx/compose/material/TextFieldImpl.kt"
-            line="380"
+            line="381"
             column="15"/>
     </issue>
 
