@@ -4,12 +4,210 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = this"
+        errorLine2="              ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/foundation/gestures/AndroidScrollable.kt"
+            line="40"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `border`"
+        errorLine1="    border(width = border.width, brush = border.brush, shape = shape)"
+        errorLine2="    ~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
+            line="57"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `color`"
+        errorLine1="    border(width, SolidColor(color), shape)"
+        errorLine2="    ~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
+            line="70"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `brush`, `shape`, `width`"
+        errorLine1="fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed("
+        errorLine2="                                                                       ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
+            line="82"
+            column="72"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `border`"
+        errorLine1="    drawBorder(size = border.size, brush = border.brush, shape = shape)"
+        errorLine2="    ~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
+            line="114"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `color`"
+        errorLine1="    border(size, SolidColor(color), shape)"
+        errorLine2="    ~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
+            line="135"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `brush`, `shape`, `size`"
+        errorLine1="fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed {"
+        errorLine2="                                                                          ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
+            line="154"
+            column="75"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `indication`, `interactionState`, `onClick`, `onClickLabel`, `onDoubleClick`, `onLongClick`, `onLongClickLabel`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Clickable.kt"
+            line="62"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `canDrag`, `enabled`, `interactionState`, `onDrag`, `onDragStarted`, `onDragStopped`, `orientation`, `reverseDirection`, `startDragImmediately`"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/gestures/Draggable.kt"
+            line="73"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="            DefaultIconSizeModifier"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/Icon.kt"
             line="112"
             column="13"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `indication`, `interactionState`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Indication.kt"
+            line="93"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `progress`"
+        errorLine1="    return semantics {"
+        errorLine2="           ~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/ProgressSemantics.kt"
+            line="54"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `isScrollable`, `isVertical`, `reverseScrolling`, `state`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/Scroll.kt"
+            line="381"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `canScroll`, `controller`, `enabled`, `onScrollStarted`, `onScrollStopped`, `orientation`, `reverseDirection`"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/gestures/Scrollable.kt"
+            line="187"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `inMutuallyExclusiveGroup`, `indication`, `interactionState`, `onClick`, `selected`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/selection/Selectable.kt"
+            line="63"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `onValueChange`, `value`"
+        errorLine1=") = triStateToggleable("
+        errorLine2="    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/selection/Toggleable.kt"
+            line="65"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `indication`, `interactionState`, `onClick`, `state`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/selection/Toggleable.kt"
+            line="100"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `controller`, `enabled`, `onZoomStarted`, `onZoomStopped`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/gestures/Zoomable.kt"
+            line="116"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `enabled`, `onZoomDelta`, `onZoomStarted`, `onZoomStopped`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/gestures/Zoomable.kt"
+            line="172"
+            column="5"/>
     </issue>
 
 </issues>

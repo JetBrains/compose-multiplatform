@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.2.0-alpha06" client="gradle" variant="debug" version="4.2.0-alpha06">
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="    return this"
+        errorLine2="           ^">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/text/CoreTextField.kt"
+            line="626"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `cursorColor`, `offsetMap`, `state`, `value`"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/text/CoreTextField.kt"
+            line="667"
+            column="5"/>
+    </issue>
+
+</issues>
