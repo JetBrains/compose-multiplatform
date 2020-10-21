@@ -6,3 +6,4 @@ pluginManagement {
 }
 
 include(":compose")
+include(":compose-desktop-application")

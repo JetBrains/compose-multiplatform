@@ -1,10 +1,10 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
-    java
-    application
+    id("org.jetbrains.compose.desktop.application")
 }
 
 dependencies {
@@ -12,6 +12,13 @@ dependencies {
     implementation(project(":common"))
 }
 
-application {
-    mainClassName = "example.imageviewer.MainKt"
+compose.desktop {
+    application {
+        mainClass = "example.imageviewer.MainKt"
+
+        nativeExecutables {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "ImageViewer"
+        }
+    }
 }
