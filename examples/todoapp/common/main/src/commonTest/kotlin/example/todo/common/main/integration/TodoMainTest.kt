@@ -15,6 +15,7 @@ import example.todo.common.database.TodoItemEntity
 import example.todo.common.main.TodoMain.Dependencies
 import example.todo.common.main.TodoMain.Output
 import example.todo.common.main.store.TodoItem
+import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.database.TodoDatabase
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -59,11 +60,11 @@ class TodoMainTest {
     }
 
     @Test
-    fun WHEN_item_clicked_THEN_Output_Selected_emitted() {
+    fun WHEN_item_selected_THEN_Output_Selected_emitted() {
         queries.add("Item1")
         val id = firstItem().id
 
-        impl.onItemClicked(id = id)
+        impl.onOutput(Output.Selected(id = id))
 
         output.assertValue(Output.Selected(id = id))
     }
@@ -74,7 +75,7 @@ class TodoMainTest {
         val id = firstItem().id
         queries.setDone(id = id, isDone = false)
 
-        impl.onDoneChanged(id = id, isDone = true)
+        impl.onIntent(Intent.SetItemDone(id = id, isDone = true))
 
         assertTrue(firstItem().isDone)
     }
@@ -85,13 +86,13 @@ class TodoMainTest {
         val id = firstItem().id
         queries.setDone(id = id, isDone = true)
 
-        impl.onDoneChanged(id = id, isDone = false)
+        impl.onIntent(Intent.SetItemDone(id = id, isDone = false))
 
         assertFalse(firstItem().isDone)
     }
 
     @Test
-    fun WHEN_item_text_changed_THEN_item_updated() {
+    fun WHEN_item_text_changed_in_database_THEN_item_updated() {
         queries.add("Item1")
         val id = firstItem().id
 
@@ -102,16 +103,16 @@ class TodoMainTest {
 
     @Test
     fun WHEN_text_changed_THEN_text_updated() {
-        impl.onTextChanged(text = "Item text")
+        impl.onIntent(Intent.SetText(text = "Item text"))
 
         assertEquals("Item text", impl.state.text)
     }
 
     @Test
     fun GIVEN_text_entered_WHEN_add_clicked_THEN_item_added_in_database() {
-        impl.onTextChanged(text = "Item text")
+        impl.onIntent(Intent.SetText(text = "Item text"))
 
-        impl.onAddClicked()
+        impl.onIntent(Intent.AddItem)
 
         assertEquals("Item text", lastInsertItem().text)
     }
