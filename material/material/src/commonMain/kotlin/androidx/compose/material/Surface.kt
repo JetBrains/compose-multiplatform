@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 
 /**
  * Material surface is the central metaphor in material design. Each surface exists at a given
@@ -79,8 +78,8 @@ import androidx.compose.ui.zIndex
  * Defaults to either the matching `onFoo` color for [color], or if [color] is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param border Optional border to draw on top of the surface
- * @param elevation The z-coordinate at which to place this surface. This controls
- * the size of the shadow below the surface.
+ * @param elevation The size of the shadow below the surface. Note that It will not affect z index
+ * of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
  */
 @Composable
 fun Surface(
@@ -101,7 +100,6 @@ fun Surface(
     }
     SurfaceLayout(
         modifier.drawLayer(shadowElevation = elevationPx, shape = shape)
-            .zIndex(elevation.value)
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .background(
                 color = backgroundColor,
