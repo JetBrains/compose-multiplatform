@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -108,7 +109,7 @@ internal class TextFieldSelectionManager() {
     /**
      * [LongPressDragObserver] for long press and drag to select in TextField.
      */
-    internal val longPressDragObserver = object : LongPressDragObserver {
+    internal val touchSelectionObserver = object : LongPressDragObserver {
         override fun onLongPress(pxPosition: Offset) {
             state?.let {
                 if (it.draggingHandle) return
@@ -177,6 +178,45 @@ internal class TextFieldSelectionManager() {
             super.onStop(velocity)
             state?.showFloatingToolbar = true
             if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
+        }
+    }
+
+    internal fun mouseSelectionObserver(onStart: (Offset) -> Unit) = object : DragObserver {
+        override fun onStart(downPosition: Offset) {
+            onStart(downPosition)
+
+            state?.layoutResult?.let { layoutResult ->
+                TextFieldDelegate.setCursorOffset(
+                    downPosition,
+                    layoutResult,
+                    state!!.processor,
+                    offsetMap,
+                    onValueChange
+                )
+            }
+
+            dragBeginPosition = downPosition
+            dragTotalDistance = Offset.Zero
+        }
+
+        override fun onDrag(dragDistance: Offset): Offset {
+            // selection never started, did not consume any drag
+            if (value.text == "") return Offset.Zero
+
+            dragTotalDistance += dragDistance
+            state?.layoutResult?.let { layoutResult ->
+                val startOffset = layoutResult.getOffsetForPosition(dragBeginPosition)
+                val endOffset =
+                    layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+                updateSelection(
+                    value = value,
+                    transformedStartOffset = startOffset,
+                    transformedEndOffset = endOffset,
+                    isStartHandle = true,
+                    wordBasedSelection = false
+                )
+            }
+            return dragDistance
         }
     }
 
@@ -266,15 +306,19 @@ internal class TextFieldSelectionManager() {
      * The method for copying text.
      *
      * If there is no selection, return.
-     * Put the selected text into the [ClipboardManager], and cancel the selection.
+     * Put the selected text into the [ClipboardManager], and cancel the selection, if
+     * [cancelSelection] is true.
      * The text in the text field should be unchanged.
-     * The new cursor offset should be at the end of the previous selected text.
+     * If [cancelSelection] is true, the new cursor offset should be at the end of the previous
+     * selected text.
      */
-    internal fun copy() {
+    internal fun copy(cancelSelection: Boolean = true) {
         if (value.selection.collapsed) return
 
         // TODO(b/171947959) check if original or transformed should be copied
         clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
+
+        if (!cancelSelection) return
 
         val newCursorOffset = value.selection.max
         val newValue = createTextFieldValue(
