@@ -54,7 +54,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.InspectableValue
@@ -581,20 +581,21 @@ class PainterModifierTest {
                     .width((boxWidth / DensityAmbient.current.density).dp)
                     .height((boxHeight / DensityAmbient.current.density).dp)
                     .paint(
-                        VectorPainter(
+                        rememberVectorPainter(
                             defaultWidth = vectorWidthDp,
-                            defaultHeight = vectorHeightDp
-                        ) { viewportWidth, viewportHeight ->
-                            Path(
-                                fill = SolidColor(Color.Red),
-                                pathData = PathData {
-                                    horizontalLineToRelative(viewportWidth)
-                                    verticalLineToRelative(viewportHeight)
-                                    horizontalLineToRelative(-viewportWidth)
-                                    close()
-                                }
-                            )
-                        },
+                            defaultHeight = vectorHeightDp,
+                            children = { viewportWidth, viewportHeight ->
+                                Path(
+                                    fill = SolidColor(Color.Red),
+                                    pathData = PathData {
+                                        horizontalLineToRelative(viewportWidth)
+                                        verticalLineToRelative(viewportHeight)
+                                        horizontalLineToRelative(-viewportWidth)
+                                        close()
+                                    }
+                                )
+                            }
+                        ),
                         contentScale = ContentScale.FillHeight
                     )
             )
