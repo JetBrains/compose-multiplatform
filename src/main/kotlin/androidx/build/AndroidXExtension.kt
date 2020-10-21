@@ -26,6 +26,7 @@ import java.util.ArrayList
  * Extension for [AndroidXPlugin] that's responsible for holding configuration options.
  */
 open class AndroidXExtension(val project: Project) {
+
     var name: String? = null
     var mavenVersion: Version? = null
         set(value) {
@@ -138,9 +139,9 @@ open class AndroidXExtension(val project: Project) {
     private var licenses: MutableCollection<License> = ArrayList()
 
     // Should only be used to override LibraryType.publish, if a library isn't ready to publish yet
-    var publish: Publish = Publish.NONE
+    var publish: Publish = Publish.UNSET
         // Allow gradual transition from publish to library type
-        get() = if (type != LibraryType.UNSET) type.publish else field
+        get() = if (field == Publish.UNSET && type != LibraryType.UNSET) type.publish else field
     /**
      * Whether to run API tasks such as tracking and linting. The default value is
      * [RunApiTasks.Auto], which automatically picks based on the project's properties.
@@ -148,21 +149,9 @@ open class AndroidXExtension(val project: Project) {
     // TODO: decide whether we want to support overriding runApiTasks
     // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.runApiTasks")
     var runApiTasks: RunApiTasks = RunApiTasks.Auto
-        get() = if (type != LibraryType.UNSET) type.checkApi else field
+        get() = if (field == RunApiTasks.Auto && type != LibraryType.UNSET) type.checkApi else field
     var type: LibraryType = LibraryType.UNSET
     var failOnDeprecationWarnings = true
-    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.compilationTarget")
-    var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
-        get() = if (type != LibraryType.UNSET) type.compilationTarget else field
-
-    /**
-     * It disables docs generation and api tracking for tooling modules like annotation processors.
-     * We don't expect such modules to be used by developers as libraries, so we don't guarantee
-     * any api stability and don't expose any docs about them.
-     */
-    // This is now deprecated in favor of LibraryType
-    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.LINT and ANNOTATION_PROCESSOR")
-    var toolingProject = false
 
     /**
      * Disables just docs generation for modules that are published and should have their API
@@ -175,7 +164,6 @@ open class AndroidXExtension(val project: Project) {
     var generateDocs = true
         get() {
             if (type != LibraryType.UNSET) return type.generateDocs
-            if (toolingProject) return false
             if (!publish.shouldRelease()) return false
             return field
         }

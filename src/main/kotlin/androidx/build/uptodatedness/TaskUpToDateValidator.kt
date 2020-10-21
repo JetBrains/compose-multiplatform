@@ -109,7 +109,11 @@ val EXEMPT_TASKS = setOf(
     ":camera:integration-tests:camera-testapp-view:camera-testapp" +
         "-viewGenerateTestConfigurationdebugAndroidTest",
     ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
-    ":camera:integration-tests:camera-testapp-view:packageDebug"
+    ":camera:integration-tests:camera-testapp-view:packageDebug",
+
+    ":inspection:inspection-gradle-plugin:generatePomFileForInspectionPluginMarkerMavenPublication",
+    ":inspection:inspection-gradle-plugin:" +
+        "publishInspectionPluginMarkerMavenPublicationToMavenRepository"
 )
 
 class TaskUpToDateValidator {
