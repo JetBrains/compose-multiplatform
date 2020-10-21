@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.test.filters.SmallTest
 import androidx.ui.test.center
-import androidx.ui.test.createAnimationClockRule
+import androidx.compose.ui.test.createAnimationClockRule
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
