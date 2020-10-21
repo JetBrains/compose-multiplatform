@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.layout.LayoutOrientation.Horizontal
 import androidx.compose.foundation.layout.LayoutOrientation.Vertical
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -69,7 +68,7 @@ internal fun rowColumnMeasureBlocks(
         var crossAxisSpace = 0
         var weightChildrenCount = 0
 
-        var anyAlignWithSiblings = false
+        var anyAlignBy = false
         val placeables = arrayOfNulls<Placeable>(measurables.size)
         val rowColumnParentData = Array(measurables.size) { measurables[it].data }
 
@@ -103,7 +102,7 @@ internal fun rowColumnMeasureBlocks(
                 )
                 fixedSpace += placeable.mainAxisSize() + spaceAfterLastNoWeight
                 crossAxisSpace = max(crossAxisSpace, placeable.crossAxisSize())
-                anyAlignWithSiblings = anyAlignWithSiblings || parentData.isRelative
+                anyAlignBy = anyAlignBy || parentData.isRelative
                 placeables[i] = placeable
             }
         }
@@ -157,7 +156,7 @@ internal fun rowColumnMeasureBlocks(
                     )
                     weightedSpace += placeable.mainAxisSize()
                     crossAxisSpace = max(crossAxisSpace, placeable.crossAxisSize())
-                    anyAlignWithSiblings = anyAlignWithSiblings || parentData.isRelative
+                    anyAlignBy = anyAlignBy || parentData.isRelative
                     placeables[i] = placeable
                 }
             }
@@ -165,7 +164,7 @@ internal fun rowColumnMeasureBlocks(
 
         var beforeCrossAxisAlignmentLine = 0
         var afterCrossAxisAlignmentLine = 0
-        if (anyAlignWithSiblings) {
+        if (anyAlignBy) {
             for (i in placeables.indices) {
                 val placeable = placeables[i]!!
                 val parentData = rowColumnParentData[i]

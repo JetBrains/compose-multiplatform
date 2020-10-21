@@ -133,23 +133,29 @@ interface ColumnScope {
 
     /**
      * Position the element horizontally such that its [alignmentLine] aligns with sibling elements
-     * also configured to [alignWithSiblings]. [alignWithSiblings] is a form of [align],
+     * also configured to [alignBy]. [alignBy] is a form of [align],
      * so both modifiers will not work together if specified for the same layout.
-     * Within a [Column], all components with [alignWithSiblings] will align horizontally using
+     * Within a [Column], all components with [alignBy] will align horizontally using
      * the specified [VerticalAlignmentLine]s or values provided using the other
-     * [alignWithSiblings] overload, forming a sibling group.
+     * [alignBy] overload, forming a sibling group.
      * At least one element of the sibling group will be placed as it had [Alignment.Start] align
      * in [Column], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Column] has the
-     * [alignWithSiblings] modifier specified the element will be positioned
+     * [alignBy] modifier specified the element will be positioned
      * as if it had [Alignment.Start] align.
      *
      * Example usage:
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblingsInColumn
      */
     @Stable
-    fun Modifier.alignWithSiblings(alignmentLine: VerticalAlignmentLine) =
+    fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine) =
         this.then(SiblingsAlignedModifier.WithAlignmentLine(alignmentLine))
+
+    @Deprecated(
+        "alignWithSiblings was renamed to alignBy.",
+        ReplaceWith("alignBy(alignmentLine)")
+    )
+    fun Modifier.alignWithSiblings(alignmentLine: VerticalAlignmentLine) = alignBy(alignmentLine)
 
     /**
      * Size the element's height proportional to its [weight] relative to other weighted sibling
@@ -174,24 +180,31 @@ interface ColumnScope {
     /**
      * Position the element horizontally such that the alignment line for the content as
      * determined by [alignmentLineBlock] aligns with sibling elements also configured to
-     * [alignWithSiblings]. [alignWithSiblings] is a form of [align], so both modifiers
+     * [alignBy]. [alignBy] is a form of [align], so both modifiers
      * will not work together if specified for the same layout.
-     * Within a [Column], all components with [alignWithSiblings] will align horizontally using
+     * Within a [Column], all components with [alignBy] will align horizontally using
      * the specified [VerticalAlignmentLine]s or values obtained from [alignmentLineBlock],
      * forming a sibling group.
      * At least one element of the sibling group will be placed as it had [Alignment.Start] align
      * in [Column], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Column] has the
-     * [alignWithSiblings] modifier specified the element will be positioned
+     * [alignBy] modifier specified the element will be positioned
      * as if it had [Alignment.Start] align.
      *
      * Example usage:
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblings
      */
     @Stable
-    fun Modifier.alignWithSiblings(
+    fun Modifier.alignBy(
         alignmentLineBlock: (Measured) -> Int
     ) = this.then(SiblingsAlignedModifier.WithAlignmentLineBlock(alignmentLineBlock))
+
+    @Deprecated(
+        "alignWithSiblings was renamed to alignBy.",
+        ReplaceWith("alignBy(alignmentLineBlock)")
+    )
+    fun Modifier.alignWithSiblings(alignmentLineBlock: (Measured) -> Int) =
+        alignBy(alignmentLineBlock)
 
     companion object : ColumnScope
 }
