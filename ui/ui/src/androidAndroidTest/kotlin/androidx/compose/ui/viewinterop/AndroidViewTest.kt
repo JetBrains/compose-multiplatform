@@ -179,8 +179,9 @@ class AndroidViewTest {
         }
 
         rule.runOnIdle {
-            assertThat(viewInsideCompose.parent).isNull()
-            assertThat(viewInsideComposeHolder?.childCount).isEqualTo(0)
+            // Views don't detach from the parent when the parent is detached
+            assertThat(viewInsideCompose.parent).isNotNull()
+            assertThat(viewInsideComposeHolder?.childCount).isEqualTo(1)
             root.addView(composeView)
         }
 

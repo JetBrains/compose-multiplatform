@@ -33,6 +33,7 @@ import androidx.compose.animation.animate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
@@ -76,6 +77,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
@@ -2925,6 +2927,138 @@ class AndroidLayoutDrawTest {
         assertFalse(measureLatch.await(200, TimeUnit.MILLISECONDS))
     }
 
+    // Tests that we can draw a layout that isn't attached.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun drawDetachedLayoutNode() {
+        var frame: FrameLayout? = null
+        activityTestRule.runOnUiThread {
+            frame = FrameLayout(activity)
+            frame?.setContent(Recomposer.current()) {
+                with(DensityAmbient.current) {
+                    Box(
+                        Modifier
+                            .background(Color.Blue)
+                            .size(30.toDp())
+                            .padding(10.toDp())
+                            .background(Color.White)
+                            .drawLatchModifier()
+                    )
+                }
+            }
+            activity.setContentView(frame)
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+
+        activityTestRule.runOnUiThread {
+            val parent = frame?.parent as ViewGroup
+            parent.removeView(frame)
+        }
+        activityTestRule.runOnUiThread {
+            val bitmap = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888)
+            val canvas = android.graphics.Canvas(bitmap)
+            frame?.draw(canvas)
+            bitmap.assertRect(Color.Blue, holeSize = 10)
+            bitmap.assertRect(Color.White, size = 10)
+        }
+    }
+
+    // Tests that an invalidation on a detached view will draw correctly when attached.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun drawInvalidationInDetachedLayoutNode() {
+        var frame: FrameLayout? = null
+        var innerColor by mutableStateOf(Color.White)
+        activityTestRule.runOnUiThread {
+            frame = FrameLayout(activity)
+            frame?.setContent(Recomposer.current()) {
+                with(DensityAmbient.current) {
+                    Box(
+                        Modifier
+                            .background(Color.Blue)
+                            .size(30.toDp())
+                            .padding(10.toDp())
+                            .drawBehind {
+                                drawRect(innerColor)
+                                drawLatch.countDown()
+                            }
+                    )
+                }
+            }
+            activity.setContentView(frame)
+        }
+
+        validateSquareColors(Color.Blue, Color.White, size = 10)
+        drawLatch = CountDownLatch(1)
+
+        var parent: ViewGroup? = null
+        activityTestRule.runOnUiThread {
+            parent = frame?.parent as ViewGroup
+            parent!!.removeView(frame)
+        }
+        activityTestRule.runOnUiThread {} // wait for detach
+
+        drawLatch = CountDownLatch(1)
+        innerColor = Color.Yellow
+
+        activityTestRule.runOnUiThread {
+            parent!!.addView(frame)
+        }
+
+        validateSquareColors(Color.Blue, Color.Yellow, size = 10)
+    }
+
+    // Tests that a size invalidation on a detached view will remeasure correctly when attached.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun sizeInvalidationInDetachedLayoutNode() {
+        var frame: FrameLayout? = null
+        var size by mutableStateOf(10.dp)
+        var layoutLatch = CountDownLatch(1)
+        var measuredSize = 0.dp
+        val sizeModifier = Modifier.layout { measurable, constraints ->
+            measuredSize = size
+            layoutLatch.countDown()
+            val pxSize = size.toIntPx()
+            layout(pxSize, pxSize) {
+                measurable.measure(constraints).place(0, 0)
+            }
+        }
+        activityTestRule.runOnUiThread {
+            frame = FrameLayout(activity)
+            frame?.setContent(Recomposer.current()) {
+                Box(
+                    Modifier
+                        .background(Color.Blue)
+                        .then(sizeModifier)
+                )
+            }
+            activity.setContentView(frame)
+        }
+
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(10.dp, measuredSize)
+        layoutLatch = CountDownLatch(1)
+
+        var parent: ViewGroup? = null
+        activityTestRule.runOnUiThread {
+            parent = frame?.parent as ViewGroup
+            parent!!.removeView(frame)
+        }
+        activityTestRule.runOnUiThread {} // wait for detach
+
+        layoutLatch = CountDownLatch(1)
+        size = 30.dp
+
+        activityTestRule.runOnUiThread {
+            parent!!.addView(frame)
+        }
+
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(measuredSize, 30.dp)
+    }
+
     private fun composeSquares(model: SquareModel) {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
@@ -3114,7 +3248,7 @@ fun androidx.test.rule.ActivityTestRule<*>.validateSquareColors(
     offset: Int = 0,
     totalSize: Int = size * 3
 ) {
-    assertTrue("drawLatch timed out", drawLatch.await(1, TimeUnit.SECONDS))
+    assertTrue("drawLatch timed out", drawLatch.await(10000, TimeUnit.SECONDS))
     val bitmap = waitAndScreenShot()
     assertEquals(totalSize, bitmap.width)
     assertEquals(totalSize, bitmap.height)

@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Rect
@@ -34,7 +33,9 @@ import android.view.ViewTreeObserver
 import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
@@ -95,7 +96,7 @@ import android.view.KeyEvent as AndroidKeyEvent
     ExperimentalKeyInput::class,
     ExperimentalLayoutNodeApi::class
 )
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) : ViewGroup(context), AndroidOwner {
 
     override val view: View = this
@@ -161,6 +162,154 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
      */
     override val clipboardManager = AndroidClipboardManager(context)
 
+    private val snapshotObserver = SnapshotStateObserver { command ->
+        if (handler?.looper === Looper.myLooper()) {
+            command()
+        } else {
+            handler?.post(command)
+        }
+    }
+
+    private val onCommitAffectingMeasure: (LayoutNode) -> Unit = { layoutNode ->
+        if (layoutNode.isValid) {
+            onRequestMeasure(layoutNode)
+        }
+    }
+
+    private val onCommitAffectingLayout: (LayoutNode) -> Unit = { layoutNode ->
+        if (layoutNode.isValid && measureAndLayoutDelegate.requestRelayout(layoutNode)) {
+            scheduleMeasureAndLayout()
+        }
+    }
+
+    private val onCommitAffectingLayer: (OwnedLayer) -> Unit = { layer ->
+        if (layer.isValid) {
+            layer.invalidate()
+        }
+    }
+
+    private val onCommitAffectingLayerParams: (OwnedLayer) -> Unit = { layer ->
+        if (layer.isValid) {
+            handler?.postAtFrontOfQueue {
+                updateLayerProperties(layer)
+            }
+        }
+    }
+
+    @OptIn(InternalCoreApi::class)
+    override var showLayoutBounds = false
+
+    private val clearInvalidObservations: Runnable = Runnable {
+        if (observationClearRequested) {
+            observationClearRequested = false
+            snapshotObserver.removeObservationsFor { !(it as OwnerScope).isValid }
+        }
+    }
+
+    private var _androidViewsHandler: AndroidViewsHandler? = null
+    private val androidViewsHandler: AndroidViewsHandler
+        get() {
+            if (_androidViewsHandler == null) {
+                _androidViewsHandler = AndroidViewsHandler(context)
+                addView(_androidViewsHandler)
+            }
+            return _androidViewsHandler!!
+        }
+    private val viewLayersContainer by lazy(LazyThreadSafetyMode.NONE) {
+        ViewLayerContainer(context).also { addView(it) }
+    }
+
+    // The constraints being used by the last onMeasure. It is set to null in onLayout. It allows
+    // us to detect the case when the View was measured twice with different constraints within
+    // the same measure pass.
+    private var onMeasureConstraints: Constraints? = null
+
+    // Will be set to true when we were measured twice with different constraints during the last
+    // measure pass.
+    private var wasMeasuredWithMultipleConstraints = false
+
+    private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
+
+    private var measureAndLayoutScheduled = false
+
+    private val measureAndLayoutHandler: Handler =
+        HandlerCompat.createAsync(Looper.getMainLooper()) {
+            measureAndLayoutScheduled = false
+            measureAndLayout()
+            true
+        }
+
+    override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
+
+    override val hasPendingMeasureOrLayout
+        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
+
+    private var globalPosition: IntOffset = IntOffset.Zero
+
+    private val tmpPositionArray = intArrayOf(0, 0)
+
+    // Used to track whether or not there was an exception while creating an MRenderNode
+    // so that we don't have to continue using try/catch after fails once.
+    private var isRenderNodeCompatible = true
+
+    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? = null
+        private set
+
+    private var onViewTreeOwnersAvailable: ((AndroidOwner.ViewTreeOwners) -> Unit)? = null
+
+    // executed when the layout pass has been finished. as a result of it our view could be moved
+    // inside the window (we are interested not only in the event when our parent positioned us
+    // on a different position, but also in the position of each of the grandparents as all these
+    // positions add up to final global position)
+    private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+        updatePositionCacheAndDispatch()
+    }
+
+    // executed when a scrolling container like ScrollView of RecyclerView performed the scroll,
+    // this could affect our global position
+    private val scrollChangedListener = ViewTreeObserver.OnScrollChangedListener {
+        updatePositionCacheAndDispatch()
+    }
+
+    private val textInputServiceAndroid = TextInputServiceAndroid(this)
+
+    override val textInputService =
+        @OptIn(InternalTextApi::class)
+        @Suppress("DEPRECATION_ERROR")
+        textInputServiceFactory(textInputServiceAndroid)
+
+    override val fontLoader: Font.ResourceLoader = AndroidFontResourceLoader(context)
+
+    override var layoutDirection = context.resources.configuration.localeLayoutDirection
+        private set
+
+    /**
+     * Provide haptic feedback to the user. Use the Android version of haptic feedback.
+     */
+    override val hapticFeedBack: HapticFeedback =
+        AndroidHapticFeedback(this)
+
+    /**
+     * Provide textToolbar to the user, for text-related operation. Use the Android version of
+     * floating toolbar(post-M) and primary toolbar(pre-M).
+     */
+    override val textToolbar: TextToolbar = AndroidTextToolbar(this)
+
+    init {
+        setWillNotDraw(false)
+        isFocusable = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            focusable = View.FOCUSABLE
+            // not to add the default focus highlight to the whole compose view
+            defaultFocusHighlightEnabled = false
+        }
+        isFocusableInTouchMode = true
+        clipChildren = false
+        ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
+        AndroidOwner.onAndroidOwnerCreatedCallback?.invoke(this)
+        root.attach(this)
+    }
+
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         Log.d(FOCUS_TAG, "Owner FocusChanged($gainFocus)")
@@ -185,66 +334,8 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
-    private val snapshotObserver = SnapshotStateObserver { command ->
-        if (handler.looper === Looper.myLooper()) {
-            command()
-        } else {
-            handler.post(command)
-        }
-    }
-
-    private val onCommitAffectingMeasure: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
-            onRequestMeasure(layoutNode)
-        }
-    }
-
-    private val onCommitAffectingLayout: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid && measureAndLayoutDelegate.requestRelayout(layoutNode)) {
-            scheduleMeasureAndLayout()
-        }
-    }
-
-    private val onCommitAffectingLayer: (OwnedLayer) -> Unit = { layer ->
-        if (layer.isValid) {
-            layer.invalidate()
-        }
-    }
-
-    private val onCommitAffectingLayerParams: (OwnedLayer) -> Unit = { layer ->
-        if (layer.isValid) {
-            handler.postAtFrontOfQueue {
-                updateLayerProperties(layer)
-            }
-        }
-    }
-
-    @OptIn(InternalCoreApi::class)
-    override var showLayoutBounds = false
-
     override fun pauseModelReadObserveration(block: () -> Unit) =
         snapshotObserver.pauseObservingReads(block)
-
-    private val clearInvalidObservations: Runnable = Runnable {
-        if (observationClearRequested) {
-            observationClearRequested = false
-            snapshotObserver.removeObservationsFor { !(it as OwnerScope).isValid }
-        }
-    }
-
-    init {
-        setWillNotDraw(false)
-        isFocusable = true
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            focusable = View.FOCUSABLE
-            // not to add the default focus highlight to the whole compose view
-            defaultFocusHighlightEnabled = false
-        }
-        isFocusableInTouchMode = true
-        clipChildren = false
-        ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
-        AndroidOwner.onAndroidOwnerCreatedCallback?.invoke(this)
-    }
 
     override fun onAttach(node: LayoutNode) {
     }
@@ -255,23 +346,11 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     }
 
     fun requestClearInvalidObservations() {
-        if (!observationClearRequested) {
+        val handler = handler
+        if (!observationClearRequested && handler != null) {
             observationClearRequested = true
             handler.postAtFrontOfQueue(clearInvalidObservations)
         }
-    }
-
-    private var _androidViewsHandler: AndroidViewsHandler? = null
-    private val androidViewsHandler: AndroidViewsHandler
-        get() {
-            if (_androidViewsHandler == null) {
-                _androidViewsHandler = AndroidViewsHandler(context)
-                addView(_androidViewsHandler)
-            }
-            return _androidViewsHandler!!
-        }
-    private val viewLayersContainer by lazy(LazyThreadSafetyMode.NONE) {
-        ViewLayerContainer(context).also { addView(it) }
     }
 
     override fun addAndroidView(view: View, layoutNode: LayoutNode) {
@@ -283,28 +362,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         androidViewsHandler.removeView(view)
         androidViewsHandler.layoutNode.remove(view)
     }
-
-    // [ Layout block start ]
-
-    // The constraints being used by the last onMeasure. It is set to null in onLayout. It allows
-    // us to detect the case when the View was measured twice with different constraints within
-    // the same measure pass.
-    private var onMeasureConstraints: Constraints? = null
-
-    // Will be set to true when we were measured twice with different constraints during the last
-    // measure pass.
-    private var wasMeasuredWithMultipleConstraints = false
-
-    private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
-
-    private var measureAndLayoutScheduled = false
-
-    private val measureAndLayoutHandler: Handler =
-        HandlerCompat.createAsync(Looper.getMainLooper()) {
-            measureAndLayoutScheduled = false
-            measureAndLayout()
-            true
-        }
 
     private fun scheduleMeasureAndLayout(nodeToRemeasure: LayoutNode? = null) {
         if (!isLayoutRequested && isAttachedToWindow) {
@@ -322,14 +379,13 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
                     return
                 }
             }
-            if (!measureAndLayoutScheduled) {
+            val handler = handler
+            if (!measureAndLayoutScheduled && handler != null) {
                 measureAndLayoutScheduled = true
                 measureAndLayoutHandler.sendEmptyMessage(0)
             }
         }
     }
-
-    override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
 
     override fun measureAndLayout() {
         val rootNodeResized = measureAndLayoutDelegate.measureAndLayout()
@@ -353,6 +409,9 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         trace("AndroidOwner:onMeasure") {
+            if (!isAttachedToWindow) {
+                invalidateLayoutNodeMeasurement(root)
+            }
             val (minWidth, maxWidth) = convertMeasureSpec(widthMeasureSpec)
             val (minHeight, maxHeight) = convertMeasureSpec(heightMeasureSpec)
 
@@ -366,12 +425,8 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
                 wasMeasuredWithMultipleConstraints = true
             }
             measureAndLayoutDelegate.updateRootConstraints(constraints)
-            if (isAttachedToWindow) {
-                measureAndLayoutDelegate.measureAndLayout()
-                setMeasuredDimension(root.width, root.height)
-            } else {
-                setMeasuredDimension(minWidth, minHeight)
-            }
+            measureAndLayoutDelegate.measureAndLayout()
+            setMeasuredDimension(root.width, root.height)
         }
     }
 
@@ -400,17 +455,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
-    override val hasPendingMeasureOrLayout
-        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
-
-    private var globalPosition: IntOffset = IntOffset.Zero
-
-    private val tmpPositionArray = intArrayOf(0, 0)
-
-    // Used to track whether or not there was an exception while creating an MRenderNode
-    // so that we don't have to continue using try/catch after fails once.
-    private var isRenderNodeCompatible = true
-
     private fun updatePositionCacheAndDispatch() {
         var positionChanged = false
         getLocationOnScreen(tmpPositionArray)
@@ -420,8 +464,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks(forceDispatch = positionChanged)
     }
-
-    // [ Layout block end ]
 
     override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
         snapshotObserver.observeReads(node, onCommitAffectingLayout, block)
@@ -497,6 +539,9 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     }
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
+        if (!isAttachedToWindow) {
+            invalidateLayers(root)
+        }
         measureAndLayout()
         // we don't have to observe here because the root has a layer modifier
         // that will observe all children. The AndroidComposeView has only the
@@ -512,9 +557,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
-    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? = null
-        private set
-
     override fun setOnViewTreeOwnersAvailable(callback: (AndroidOwner.ViewTreeOwners) -> Unit) {
         val viewTreeOwners = viewTreeOwners
         if (viewTreeOwners != null) {
@@ -524,28 +566,31 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
-    private var onViewTreeOwnersAvailable: ((AndroidOwner.ViewTreeOwners) -> Unit)? = null
-
-    // executed when the layout pass has been finished. as a result of it our view could be moved
-    // inside the window (we are interested not only in the event when our parent positioned us
-    // on a different position, but also in the position of each of the grandparents as all these
-    // positions add up to final global position)
-    private val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-        updatePositionCacheAndDispatch()
+    /**
+     * Walks the entire LayoutNode sub-hierarchy and marks all nodes as needing measurement.
+     */
+    @OptIn(ExperimentalCollectionApi::class)
+    private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
+        measureAndLayoutDelegate.requestRemeasure(node)
+        node._children.forEach { invalidateLayoutNodeMeasurement(it) }
     }
 
-    // executed when a scrolling container like ScrollView of RecyclerView performed the scroll,
-    // this could affect our global position
-    private val scrollChangedListener = ViewTreeObserver.OnScrollChangedListener {
-        updatePositionCacheAndDispatch()
+    /**
+     * Walks the entire LayoutNode sub-hierarchy and marks all layers as needing to be redrawn.
+     */
+    @OptIn(ExperimentalCollectionApi::class)
+    private fun invalidateLayers(node: LayoutNode) {
+        node.invalidateLayers()
+        node._children.forEach { invalidateLayers(it) }
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        invalidateLayoutNodeMeasurement(root)
+        invalidateLayers(root)
         showLayoutBounds = getIsShowingLayoutBounds()
         snapshotObserver.enableStateUpdatesObserving(true)
         ifDebug { if (autofillSupported()) _autofill?.registerCallback() }
-        root.attach(this)
 
         if (viewTreeOwners == null) {
             val lifecycleOwner = ViewTreeLifecycleOwner.get(this) ?: throw IllegalStateException(
@@ -581,7 +626,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         if (measureAndLayoutScheduled) {
             measureAndLayoutHandler.removeMessages(0)
         }
-        root.detach()
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
 
@@ -633,30 +677,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
 
         return processResult.dispatchedToAPointerInputModifier
     }
-
-    private val textInputServiceAndroid = TextInputServiceAndroid(this)
-
-    override val textInputService =
-        @OptIn(InternalTextApi::class)
-        @Suppress("DEPRECATION_ERROR")
-        textInputServiceFactory(textInputServiceAndroid)
-
-    override val fontLoader: Font.ResourceLoader = AndroidFontResourceLoader(context)
-
-    override var layoutDirection = context.resources.configuration.localeLayoutDirection
-        private set
-
-    /**
-     * Provide haptic feedback to the user. Use the Android version of haptic feedback.
-     */
-    override val hapticFeedBack: HapticFeedback =
-        AndroidHapticFeedback(this)
-
-    /**
-     * Provide textToolbar to the user, for text-related operation. Use the Android version of
-     * floating toolbar(post-M) and primary toolbar(pre-M).
-     */
-    override val textToolbar: TextToolbar = AndroidTextToolbar(this)
 
     override fun onCheckIsTextEditor(): Boolean = textInputServiceAndroid.isEditorFocused()
 
