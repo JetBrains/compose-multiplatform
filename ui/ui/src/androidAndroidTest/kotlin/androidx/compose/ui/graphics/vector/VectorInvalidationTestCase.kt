@@ -53,7 +53,7 @@ class VectorInvalidationTestCase(var latch: CountDownLatch) {
                 vectorSize = width.toIntPx()
                 AtLeastSize(
                     size = width.toIntPx(),
-                    modifier = WhiteBackground.paint(VectorPainter(it))
+                    modifier = WhiteBackground.paint(rememberVectorPainter(it))
                 ) {
                     latch.countDown()
                 }
