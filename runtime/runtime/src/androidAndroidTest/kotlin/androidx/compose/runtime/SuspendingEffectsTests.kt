@@ -170,7 +170,8 @@ class SuspendingEffectsTests : BaseComposeTest() {
         var rememberCoroutineScopeFrameClock: MonotonicFrameClock? = null
 
         compose {
-            recomposerClock = currentComposer.recomposer.frameClock
+            recomposerClock = currentComposer.parentReference
+                .applyingCoroutineContext?.get(MonotonicFrameClock)
             LaunchedTask {
                 launchedTaskClock = coroutineContext[MonotonicFrameClock]
             }

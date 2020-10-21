@@ -150,12 +150,11 @@ class WrapperTest {
             it.setContent {
                 val ambient = ambientOf<Float>()
                 Providers(ambient provides 1f) {
-                    val recomposer = Recomposer.current()
                     val composition = compositionReference()
 
                     AndroidView({ frameLayout })
                     onCommit {
-                        frameLayout.setContent(recomposer, composition) {
+                        frameLayout.setContent(composition) {
                             value = ambient.current
                             composedLatch.countDown()
                         }

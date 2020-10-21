@@ -57,7 +57,6 @@ interface Composition {
  * for a given [key]. If the same [key] is passed in subsequent calls, the same [Composition]
  * instance will be returned.
  * @param applier The [Applier] instance to be used in the composition.
- * @param recomposer The [Recomposer] instance to be used for composition.
  * @param parent The parent composition reference, if applicable. Default is null.
  * @param onCreated A function which will be executed only when the Composition is created.
  *
@@ -69,12 +68,10 @@ interface Composition {
 fun compositionFor(
     key: Any,
     applier: Applier<*>,
-    recomposer: Recomposer,
-    parent: CompositionReference? = null,
+    parent: CompositionReference,
     onCreated: () -> Unit = {}
 ): Composition = Compositions.findOrCreate(key) {
     CompositionImpl(
-        recomposer,
         parent,
         composerFactory = { slots, rcmpsr -> Composer(slots, applier, rcmpsr) },
         onDispose = { Compositions.onDisposed(key) }
@@ -89,21 +86,19 @@ fun compositionFor(
  * @param onDispose A callback to be triggered when [dispose] is called.
  */
 private class CompositionImpl(
-    private val recomposer: Recomposer,
-    parent: CompositionReference?,
-    composerFactory: (SlotTable, Recomposer) -> Composer<*>,
+    private val parent: CompositionReference,
+    composerFactory: (SlotTable, CompositionReference) -> Composer<*>,
     private val onDispose: () -> Unit
 ) : Composition {
     private val slotTable: SlotTable = SlotTable()
-    private val composer: Composer<*> = composerFactory(slotTable, recomposer).also {
-        it.parentReference = parent
-        parent?.registerComposer(it)
+    private val composer: Composer<*> = composerFactory(slotTable, parent).also {
+        parent.registerComposer(it)
     }
 
     /**
      * Return true if this is a root (non-sub-) composition.
      */
-    val isRoot: Boolean = parent == null
+    val isRoot: Boolean = parent is Recomposer
 
     private var disposed = false
 
@@ -112,7 +107,7 @@ private class CompositionImpl(
     override fun setContent(content: @Composable () -> Unit) {
         check(!disposed) { "The composition is disposed" }
         this.composable = content
-        recomposer.composeInitial(composable, composer)
+        parent.composeInitial(composer, composable)
     }
 
     override fun dispose() {

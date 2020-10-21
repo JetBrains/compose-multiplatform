@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLifecycleObserver
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
@@ -79,8 +78,6 @@ fun <T> SubcomposeLayout(
     measureBlock: SubcomposeMeasureScope<T>.(Constraints) -> MeasureScope.MeasureResult
 ) {
     val state = remember { SubcomposeLayoutState<T>() }
-    // TODO(lelandr): refactor these APIs so that recomposer isn't necessary
-    state.recomposer = currentComposer.recomposer
     state.compositionRef = compositionReference()
 
     val materialized = currentComposer.materialize(modifier)
@@ -122,8 +119,6 @@ interface SubcomposeMeasureScope<T> : MeasureScope {
 private class SubcomposeLayoutState<T> :
     SubcomposeMeasureScope<T>,
     CompositionLifecycleObserver {
-    // Values set during the composition
-    var recomposer: Recomposer? = null
     var compositionRef: CompositionReference? = null
 
     // MeasureScope delegation
@@ -190,9 +185,14 @@ private class SubcomposeLayoutState<T> :
     private fun subcompose(node: LayoutNode, nodeState: NodeState<T>) {
         node.ignoreModelReads {
             val content = nodeState.content
-            nodeState.composition = subcomposeInto(node, recomposer!!, compositionRef!!) {
-                content()
-            }
+            nodeState.composition = subcomposeInto(
+                container = node,
+                parent = compositionRef ?: error("parent composition reference not set"),
+                // Do not optimize this by passing nodeState.content directly; the additional
+                // composable function call from the lambda expression affects the scope of
+                // recomposition and recomposition of siblings.
+                composable = { content() }
+            )
         }
     }
 

@@ -506,7 +506,6 @@ class AmbientTests : BaseComposeTest() {
             // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
             subcomposeInto(
                 container,
-                Recomposer.current(),
                 ref.value
             ) @ComposableContract(tracked = false) {
                 block()

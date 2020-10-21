@@ -26,11 +26,8 @@ import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionReference
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
@@ -81,15 +78,7 @@ internal actual fun ActualDialog(
 ) {
     val view = ViewAmbient.current
 
-    @OptIn(ExperimentalComposeApi::class)
-    val recomposer = currentComposer.recomposer
-    // The recomposer can't change.
-    val dialog = remember(view) {
-        DialogWrapper(
-            view,
-            recomposer
-        )
-    }
+    val dialog = remember(view) { DialogWrapper(view) }
     dialog.onCloseRequest = onDismissRequest
     remember(properties) { dialog.setProperties(properties) }
 
@@ -130,8 +119,7 @@ private class DialogLayout(
 ) : FrameLayout(context), DialogWindowProvider
 
 private class DialogWrapper(
-    private val composeView: View,
-    private val recomposer: Recomposer
+    private val composeView: View
 ) : Dialog(composeView.context) {
     lateinit var onCloseRequest: () -> Unit
 
@@ -139,9 +127,10 @@ private class DialogWrapper(
     private var composition: Composition? = null
 
     init {
-        window!!.requestFeature(Window.FEATURE_NO_TITLE)
-        window!!.setBackgroundDrawableResource(android.R.color.transparent)
-        dialogLayout = DialogLayout(context, window!!)
+        val window = window ?: error("Dialog has no window")
+        window.requestFeature(Window.FEATURE_NO_TITLE)
+        window.setBackgroundDrawableResource(android.R.color.transparent)
+        dialogLayout = DialogLayout(context, window)
         setContentView(dialogLayout)
         ViewTreeLifecycleOwner.set(dialogLayout, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(dialogLayout, ViewTreeViewModelStoreOwner.get(composeView))
@@ -154,8 +143,7 @@ private class DialogWrapper(
     // TODO(b/159900354): Make the Android Dialog full screen and the scrim fully transparent
 
     fun setContent(parentComposition: CompositionReference, children: @Composable () -> Unit) {
-        // TODO: This should probably create a child composition of the original
-        composition = dialogLayout.setContent(recomposer, parentComposition, children)
+        composition = dialogLayout.setContent(parentComposition, children)
     }
 
     private fun setSecureFlagEnabled(secureFlagEnabled: Boolean) {
