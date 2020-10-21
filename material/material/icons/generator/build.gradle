@@ -15,6 +15,7 @@
  */
 
 import androidx.build.LibraryGroups
+import androidx.build.LibraryType
 import androidx.build.LibraryVersions
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -43,8 +44,8 @@ dependencies {
 
 androidx {
     name = "Material Icon Generator"
+    type = LibraryType.OTHER_CODE_PROCESSOR
     publish = Publish.NONE
-    toolingProject = true
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.MATERIAL
     inceptionYear = "2020"
