@@ -1,4 +1,4 @@
-package example.todo.common.list.store
+package example.todo.common.main.store
 
 internal data class TodoItem(
     val id: Long = 0L,

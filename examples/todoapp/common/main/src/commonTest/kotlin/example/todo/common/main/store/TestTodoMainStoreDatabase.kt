@@ -1,12 +1,13 @@
-package example.todo.common.list.store
+package example.todo.common.main.store
 
 import com.badoo.reaktive.completable.Completable
 import com.badoo.reaktive.completable.completableFromFunction
 import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.subject.behavior.BehaviorSubject
-import example.todo.common.list.store.TodoListStoreProvider.Database
+import example.todo.common.main.store.TodoItem
+import example.todo.common.main.store.TodoMainStoreProvider
 
-internal class TestTodoListStoreDatabase : Database {
+internal class TestTodoMainStoreDatabase : TodoMainStoreProvider.Database {
 
     private val subject = BehaviorSubject<List<TodoItem>>(emptyList())
 
@@ -21,6 +22,12 @@ internal class TestTodoListStoreDatabase : Database {
     override fun setDone(id: Long, isDone: Boolean): Completable =
         completableFromFunction {
             update(id = id) { copy(isDone = isDone) }
+        }
+
+    override fun add(text: String): Completable =
+        completableFromFunction {
+            val id = items.maxBy(TodoItem::id)?.id?.inc() ?: 1L
+            this.items += TodoItem(id = id, order = id, text = text)
         }
 
     private fun update(id: Long, func: TodoItem.() -> TodoItem) {

@@ -1,18 +1,19 @@
-package example.todo.common.list.store
+package example.todo.common.main.store
 
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.badoo.reaktive.scheduler.overrideSchedulers
 import com.badoo.reaktive.test.scheduler.TestScheduler
+import example.todo.common.main.store.TodoMainStore.Intent
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @Suppress("TestFunctionName")
-class TodoListStoreTest {
+class TodoMainStoreTest {
 
-    private val database = TestTodoListStoreDatabase()
-    private val provider = TodoListStoreProvider(storeFactory = DefaultStoreFactory, database = database)
+    private val database = TestTodoMainStoreDatabase()
+    private val provider = TodoMainStoreProvider(storeFactory = DefaultStoreFactory, database = database)
 
     @BeforeTest
     fun before() {
@@ -45,14 +46,43 @@ class TodoListStoreTest {
     }
 
     @Test
-    fun WHEN_Intent_setDone_THEN_done_changed_in_state() {
+    fun WHEN_Intent_SetItemDone_THEN_done_changed_in_state() {
         val item1 = TodoItem(id = 1L, text = "item1")
         val item2 = TodoItem(id = 2L, text = "item2", isDone = false)
         database.items = listOf(item1, item2)
         val store = provider.provide()
 
-        store.accept(TodoListStore.Intent.SetDone(id = 2L, isDone = true))
+        store.accept(Intent.SetItemDone(id = 2L, isDone = true))
 
         assertTrue(store.state.items.first { it.id == 2L }.isDone)
+    }
+
+    @Test
+    fun WHEN_Intent_SetText_WHEN_text_changed_in_state() {
+        val store = provider.provide()
+
+        store.accept(Intent.SetText(text = "Item text"))
+
+        assertEquals("Item text", store.state.text)
+    }
+
+    @Test
+    fun GIVEN_text_entered_WHEN_Intent_AddItem_THEN_item_added_in_database() {
+        val store = provider.provide()
+        store.accept(Intent.SetText(text = "Item text"))
+
+        store.accept(Intent.AddItem)
+
+        assertTrue(database.items.any { it.text == "Item text" })
+    }
+
+    @Test
+    fun GIVEN_text_entered_WHEN_Intent_AddItem_THEN_text_cleared_in_state() {
+        val store = provider.provide()
+        store.accept(Intent.SetText(text = "Item text"))
+
+        store.accept(Intent.AddItem)
+
+        assertEquals("", store.state.text)
     }
 }
