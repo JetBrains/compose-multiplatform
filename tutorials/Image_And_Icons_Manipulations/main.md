@@ -8,7 +8,7 @@ In this tutorial we will show you how to work with images using Compose for Desk
 
 Using images from application resources is very simple. Suppose we have a PNG image that is placed in the `resources/images` directory in our project. For this tutorial we will use the image sample:
 
-<img src="sample.png" alt="Sample" width="256"/>
+![Sample](sample.png)
 
 ```kotlin
 import androidx.compose.desktop.Window
