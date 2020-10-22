@@ -20,9 +20,9 @@ package androidx.compose.runtime.internal
 
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
+import androidx.compose.runtime.EMPTY
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.RecomposeScope
-import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.Stable
 
 private const val SLOTS_PER_INT = 15
@@ -1136,7 +1136,7 @@ fun composableLambda(
 ): CLambda {
     composer.startReplaceableGroup(key)
     val slot = composer.nextSlot()
-    val result = if (slot === SlotTable.EMPTY) {
+    val result = if (slot === EMPTY) {
         val value = CLambda(key, tracked, sourceInformation)
         composer.updateValue(value)
         value
