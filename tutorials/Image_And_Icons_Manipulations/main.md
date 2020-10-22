@@ -37,18 +37,17 @@ To create `ImageAsset` from a loaded image stored in device memory you can use s
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.Modifier
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
 import java.io.File
-import javax.imageio.ImageIO
 import org.jetbrains.skija.Image
 
 fun main() {
     Window {
-        val image = pathAsImageAsset("sample.png")
+        val image = remember { imageFromFile(File("sample.png")) }
         Image(
             asset = image,
             modifier = Modifier.fillMaxSize()
@@ -56,28 +55,19 @@ fun main() {
     }
 }
 
-fun pathAsImageAsset(path: String): ImageAsset {
-    var image: BufferedImage? = null
-    try {
-        image = ImageIO.read(File(path))
-    } catch (e: Exception) {
-        // image file does not exist
-    }
+fun imageFromFile(file: File): ImageAsset {
+    return Image.makeFromEncoded(file.readBytes()).asImageAsset()
+}
 
-    if (image == null) {
-        image = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
-    }
-
-    val baos = ByteArrayOutputStream()
-    ImageIO.write(image, "png", baos)
-    
-    return Image.makeFromEncoded(baos.toByteArray()).asImageAsset()
+@Composable
+fun imageFile(file: File): ImageAsset {
+    return remember(file) { imageFromFile(file) }
 }
 ```
 
 ![Storage](image_from_resources.png)
 
-## Drawing raw images
+## Drawing raw image data using native canvas
 
 Sometimes you may want to draw raw image data, in which case you can use `Canvas` and` drawIntoCanvas`.
 
@@ -85,6 +75,7 @@ Sometimes you may want to draw raw image data, in which case you can use `Canvas
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.Modifier
@@ -99,7 +90,7 @@ import org.jetbrains.skija.IRect
 
 fun main() {
     Window {
-        val bitmap = bitmapFromByteArray()
+        val bitmap = remember { bitmapFromByteArray() }
         Canvas(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -170,6 +161,7 @@ You have 2 ways to set icon for window:
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.Modifier
@@ -184,7 +176,7 @@ fun main() {
     Window(
         icon = image
     ) {
-        val imageAsset = asImageAsset(image)
+        val imageAsset = remember { asImageAsset(image) }
         Image(
             asset = imageAsset,
             modifier = Modifier.fillMaxSize()
@@ -222,6 +214,7 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.Modifier
@@ -234,7 +227,7 @@ import org.jetbrains.skija.Image
 fun main() {
     val image = getWindowIcon()
     Window {
-        val imageAsset = asImageAsset(image)
+        val imageAsset = remember { asImageAsset(image) }
         Image(
             asset = imageAsset,
             modifier = Modifier.fillMaxSize()
