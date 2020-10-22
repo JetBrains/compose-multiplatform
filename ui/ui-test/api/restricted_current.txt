@@ -159,7 +159,6 @@ package androidx.compose.ui.test {
     method public static long getTopLeft(androidx.compose.ui.test.GestureScope);
     method public static long getTopRight(androidx.compose.ui.test.GestureScope);
     method public static inline int getWidth(androidx.compose.ui.test.GestureScope);
-    method public static long localToGlobal-ssxj34k(androidx.compose.ui.test.GestureScope, long position);
     method public static void longClick-TASV4bY(androidx.compose.ui.test.GestureScope, optional long position, optional long duration);
     method public static void move(androidx.compose.ui.test.GestureScope);
     method public static void moveBy-NAWZHwc(androidx.compose.ui.test.GestureScope, int pointerId, long delta);

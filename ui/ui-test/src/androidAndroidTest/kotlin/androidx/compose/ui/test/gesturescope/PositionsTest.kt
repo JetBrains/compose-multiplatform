@@ -35,9 +35,7 @@ import androidx.compose.ui.test.centerY
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.height
 import androidx.compose.ui.test.left
-import androidx.compose.ui.test.localToGlobal
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.percentOffset
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.right
@@ -143,12 +141,11 @@ class PositionsTest {
             }
         }
 
-        val globalRoot = rule.onRoot().fetchSemanticsNode("Failed to get root").globalPosition
         rule.onNodeWithTag("viewport").performGesture {
             assertThat(width).isEqualTo(100)
             assertThat(height).isEqualTo(100)
             assertThat(center).isEqualTo(Offset(50f, 50f))
-            assertThat(localToGlobal(topLeft)).isEqualTo(globalRoot)
+            assertThat(topLeft).isEqualTo(Offset.Zero)
         }
     }
 }

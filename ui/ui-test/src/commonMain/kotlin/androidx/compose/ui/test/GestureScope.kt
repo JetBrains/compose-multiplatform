@@ -286,7 +286,7 @@ fun GestureScope.percentOffset(
  *
  * @param position A position in local coordinates
  */
-fun GestureScope.localToGlobal(position: Offset): Offset {
+private fun GestureScope.localToGlobal(position: Offset): Offset {
     @OptIn(ExperimentalLayoutNodeApi::class)
     return position + semanticsNode.componentNode.coordinates.globalBounds.topLeft
 }
