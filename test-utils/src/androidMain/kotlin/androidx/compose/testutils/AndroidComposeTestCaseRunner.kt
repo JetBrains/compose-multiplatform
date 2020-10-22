@@ -32,15 +32,17 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.test.TestMonotonicFrameClock
+import androidx.compose.ui.test.frameDelayMillis
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -53,6 +55,7 @@ fun <T : ComposeTestCase> createAndroidComposeBenchmarkRunner(
     return AndroidComposeTestCaseRunner(testCaseFactory, activity)
 }
 
+@OptIn(ExperimentalCoroutinesApi::class) // for TestCoroutineDispatcher and friends
 internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     private val testCaseFactory: () -> T,
     private val activity: ComponentActivity
@@ -94,11 +97,13 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
             onFrame(lastFrameTime.getAndAdd(singleFrameTimeNanos))
     }
 
-    private val frameClock = AutoFrameClock()
-    private val recomposerApplyScope = CoroutineScope(
-        AndroidUiDispatcher.Main + frameClock + Job()
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    private val frameClock = TestMonotonicFrameClock(CoroutineScope(testCoroutineDispatcher))
+    private val recomposerApplyCoroutineScope = CoroutineScope(
+        testCoroutineDispatcher + frameClock + Job()
     )
-    private val recomposer: Recomposer = Recomposer(recomposerApplyScope.coroutineContext)
+    private val recomposer: Recomposer = Recomposer(recomposerApplyCoroutineScope.coroutineContext)
+        .also { recomposerApplyCoroutineScope.launch { it.runRecomposeAndApplyChanges() } }
 
     private var simulationState: SimulationState = SimulationState.Initialized
 
@@ -215,19 +220,12 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     override fun recompose() {
         if (hasPendingChanges()) {
             didLastRecomposeHaveChanges = true
-            runBlocking(frameClock) {
-                recomposer.recomposeAndApplyChanges(1)
-            }
+            testCoroutineDispatcher.advanceTimeBy(frameClock.frameDelayMillis)
         } else {
             didLastRecomposeHaveChanges = false
         }
         simulationState = SimulationState.RecomposeDone
     }
-
-    override fun launchRecomposeIn(coroutineScope: CoroutineScope): Job =
-        coroutineScope.launch(frameClock) {
-            recomposer.runRecomposeAndApplyChanges()
-        }
 
     override fun doFrame() {
         if (view == null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,53 +14,46 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime
+package androidx.compose.ui.platform
 
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * The frame manager manages how changes to state objects are observed.
+ * Platform-specific mechanism for starting a monitor of global snapshot state writes
+ * in order to schedule the periodic dispatch of snapshot apply notifications.
+ * This process should remain platform-specific; it is tied to the threading and update model of
+ * a particular platform and framework target.
  *
- * The [FrameManager] observers state reads during composition and records where in the
- * composition the state read occur. If any of the state objects are modified it will
- * invalidate the composition causing the associated [Recomposer] to schedule a recomposition.
+ * Composition bootstrapping mechanisms for a particular platform/framework should call
+ * [ensureStarted] during setup to initialize periodic global snapshot notifications.
+ * For desktop, these notifications are always sent on [Dispatchers.Swing]. Other platforms
+ * may establish different policies for these notifications.
  */
-@Deprecated(
-    "Platform/framework-specific code should schedule Snapshot.sendApplyNotifications dispatch in" +
-        " response to a Snapshot globalWriteObserver in a platform-appropriate manner"
-)
-object FrameManager {
-    private var started = false
+internal object GlobalSnapshotManager {
+    private val started = AtomicBoolean(false)
     private var commitPending = false
     private var removeWriteObserver: (() -> Unit)? = null
 
-    /**
-     * TODO: This will be merged later with the scopes used by [Recomposer]
-     */
-    private val scheduleScope = CoroutineScope(
-        EmbeddingContext().mainThreadCompositionContext() + SupervisorJob()
-    )
+    private val scheduleScope = CoroutineScope(Dispatchers.Swing + SupervisorJob())
 
     @OptIn(ExperimentalComposeApi::class)
     fun ensureStarted() {
-        if (!started) {
-            started = true
+        if (started.compareAndSet(false, true)) {
             removeWriteObserver = Snapshot.registerGlobalWriteObserver(globalWriteObserver)
         }
     }
 
-    internal fun close() {
-        removeWriteObserver?.invoke()
-        started = false
-    }
-
     @OptIn(ExperimentalComposeApi::class)
     private val globalWriteObserver: SnapshotWriteObserver = {
+        // Race, but we don't care too much if we end up with multiple calls scheduled.
         if (!commitPending) {
             commitPending = true
             schedule {
@@ -74,32 +67,30 @@ object FrameManager {
      * List of deferred callbacks to run serially. Guarded by its own monitor lock.
      */
     private val scheduledCallbacks = mutableListOf<() -> Unit>()
-    /**
-     * Pending [Job] that will execute [scheduledCallbacks].
-     * Guarded by [scheduledCallbacks]'s monitor lock.
-     */
-    private var callbackRunner: Job? = null
 
     /**
-     * Synchronously executes any outstanding callbacks and brings the [FrameManager] into a
+     * Guarded by [scheduledCallbacks]'s monitor lock.
+     */
+    private var isSynchronizeScheduled = false
+
+    /**
+     * Synchronously executes any outstanding callbacks and brings snapshots into a
      * consistent, updated state.
      */
     private fun synchronize() {
         synchronized(scheduledCallbacks) {
             scheduledCallbacks.forEach { it.invoke() }
             scheduledCallbacks.clear()
-            callbackRunner?.cancel()
-            callbackRunner = null
+            isSynchronizeScheduled = false
         }
     }
 
-    internal fun schedule(block: () -> Unit) {
+    private fun schedule(block: () -> Unit) {
         synchronized(scheduledCallbacks) {
             scheduledCallbacks.add(block)
-            if (callbackRunner == null) {
-                callbackRunner = scheduleScope.launch {
-                    synchronize()
-                }
+            if (!isSynchronizeScheduled) {
+                isSynchronizeScheduled = true
+                scheduleScope.launch { synchronize() }
             }
         }
     }

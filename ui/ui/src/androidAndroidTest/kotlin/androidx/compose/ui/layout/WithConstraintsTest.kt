@@ -492,7 +492,7 @@ class WithConstraintsTest {
 
     @Test
     fun withConstraintsSiblingWhichIsChangingTheModelInsideMeasureBlock() {
-        // WithConstraints is calling FrameManager.nextFrame() after composition
+        // WithConstraints used to call FrameManager.nextFrame() after composition
         // so this code was causing an issue as the model value change is triggering
         // remeasuring while our parent is measuring right now and this child was
         // already measured
