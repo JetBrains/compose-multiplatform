@@ -350,7 +350,6 @@ fun BackdropScaffold(
             // Snackbar host
             Box(
                 Modifier
-                    .zIndex(Float.POSITIVE_INFINITY)
                     .padding(
                         bottom = if (scaffoldState.isRevealed &&
                             revealedHeight == fullHeight - headerHeightPx
