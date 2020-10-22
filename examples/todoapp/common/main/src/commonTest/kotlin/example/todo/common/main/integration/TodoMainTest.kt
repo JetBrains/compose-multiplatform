@@ -21,6 +21,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @Suppress("TestFunctionName")
@@ -60,6 +61,16 @@ class TodoMainTest {
     }
 
     @Test
+    fun WHEN_item_deleted_from_database_THEN_item_not_displayed() {
+        queries.add("Item1")
+        val id = lastInsertItem().id
+
+        queries.delete(id = id)
+
+        assertFalse(impl.state.items.any { it.id == id })
+    }
+
+    @Test
     fun WHEN_item_selected_THEN_Output_Selected_emitted() {
         queries.add("Item1")
         val id = firstItem().id
@@ -70,25 +81,35 @@ class TodoMainTest {
     }
 
     @Test
-    fun GIVEN_item_isDone_false_WHEN_done_changed_to_true_THEN_item_isDone_true() {
+    fun GIVEN_item_isDone_false_WHEN_done_changed_to_true_THEN_item_isDone_true_in_database() {
         queries.add("Item1")
         val id = firstItem().id
         queries.setDone(id = id, isDone = false)
 
         impl.onIntent(Intent.SetItemDone(id = id, isDone = true))
 
-        assertTrue(firstItem().isDone)
+        assertTrue(queries.select(id = id).executeAsOne().isDone)
     }
 
     @Test
-    fun GIVEN_item_isDone_true_WHEN_done_changed_to_false_THEN_item_isDone_false() {
+    fun GIVEN_item_isDone_true_WHEN_done_changed_to_false_THEN_item_isDone_false_in_database() {
         queries.add("Item1")
         val id = firstItem().id
         queries.setDone(id = id, isDone = true)
 
         impl.onIntent(Intent.SetItemDone(id = id, isDone = false))
 
-        assertFalse(firstItem().isDone)
+        assertFalse(queries.select(id = id).executeAsOne().isDone)
+    }
+
+    @Test
+    fun WHEN_delete_clicked_THEN_item_deleted_in_database() {
+        queries.add("Item1")
+        val id = firstItem().id
+
+        impl.onIntent(Intent.DeleteItem(id = id))
+
+        assertNull(queries.select(id = id).executeAsOneOrNull())
     }
 
     @Test

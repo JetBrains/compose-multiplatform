@@ -1,5 +1,6 @@
 package example.todo.common.main.ui
 
+import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,8 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
+import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +47,8 @@ internal fun TodoMainUi(
             TodoList(
                 items = state.items,
                 onItemClicked = { output.onNext(Output.Selected(id = it)) },
-                onDoneChanged = { id, isDone -> intents(Intent.SetItemDone(id = id, isDone = isDone)) }
+                onDoneChanged = { id, isDone -> intents(Intent.SetItemDone(id = id, isDone = isDone)) },
+                onDeleteItemClicked = { intents(Intent.DeleteItem(id = it)) }
             )
         }
 
@@ -59,23 +64,33 @@ internal fun TodoMainUi(
 private fun TodoList(
     items: List<TodoItem>,
     onItemClicked: (id: Long) -> Unit,
-    onDoneChanged: (id: Long, isDone: Boolean) -> Unit
+    onDoneChanged: (id: Long, isDone: Boolean) -> Unit,
+    onDeleteItemClicked: (id: Long) -> Unit
 ) {
     LazyColumnFor(items = items) { item ->
-        Row(modifier = Modifier.clickable(onClick = { onItemClicked(item.id) }).padding(8.dp)) {
+        Row(modifier = Modifier.clickable(onClick = { onItemClicked(item.id) })) {
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Checkbox(
+                checked = item.isDone,
+                modifier = Modifier.align(Alignment.CenterVertically),
+                onCheckedChange = { onDoneChanged(item.id, it) }
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             Text(
                 text = AnnotatedString(item.text),
-                modifier = Modifier.weight(1F),
+                modifier = Modifier.weight(1F).align(Alignment.CenterVertically),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Checkbox(
-                checked = item.isDone,
-                onCheckedChange = { onDoneChanged(item.id, it) }
-            )
+            IconButton(onClick = { onDeleteItemClicked(item.id) }) {
+                Icon(Icons.Default.Delete)
+            }
         }
 
         Divider()

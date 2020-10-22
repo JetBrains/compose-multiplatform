@@ -28,5 +28,9 @@ UPDATE TodoItemEntity
 SET isDone = :isDone
 WHERE id = :id;
 
+delete:
+DELETE FROM TodoItemEntity
+WHERE id = :id;
+
 getLastInsertId:
 SELECT last_insert_rowid();

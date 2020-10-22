@@ -30,6 +30,7 @@ internal class TodoMainStoreProvider(
     private sealed class Result {
         data class ItemsLoaded(val items: List<TodoItem>) : Result()
         data class ItemDoneChanged(val id: Long, val isDone: Boolean) : Result()
+        data class ItemDeleted(val id: Long) : Result()
         data class TextChanged(val text: String) : Result()
     }
 
@@ -45,6 +46,7 @@ internal class TodoMainStoreProvider(
         override fun executeIntent(intent: Intent, getState: () -> State): Unit =
             when (intent) {
                 is Intent.SetItemDone -> setItemDone(id = intent.id, isDone = intent.isDone)
+                is Intent.DeleteItem -> deleteItem(id = intent.id)
                 is Intent.SetText -> dispatch(Result.TextChanged(text = intent.text))
                 is Intent.AddItem -> addItem(state = getState())
             }
@@ -52,6 +54,11 @@ internal class TodoMainStoreProvider(
         private fun setItemDone(id: Long, isDone: Boolean) {
             dispatch(Result.ItemDoneChanged(id = id, isDone = isDone))
             database.setDone(id = id, isDone = isDone).subscribeScoped()
+        }
+
+        private fun deleteItem(id: Long) {
+            dispatch(Result.ItemDeleted(id = id))
+            database.delete(id = id).subscribeScoped()
         }
 
         private fun addItem(state: State) {
@@ -65,6 +72,7 @@ internal class TodoMainStoreProvider(
             when (result) {
                 is Result.ItemsLoaded -> copy(items = result.items.sorted())
                 is Result.ItemDoneChanged -> update(id = result.id) { copy(isDone = result.isDone) }
+                is Result.ItemDeleted -> copy(items = items.filterNot { it.id == result.id })
                 is Result.TextChanged -> copy(text = result.text)
             }
 
@@ -88,6 +96,8 @@ internal class TodoMainStoreProvider(
         val updates: Observable<List<TodoItem>>
 
         fun setDone(id: Long, isDone: Boolean): Completable
+
+        fun delete(id: Long): Completable
 
         fun add(text: String): Completable
     }
