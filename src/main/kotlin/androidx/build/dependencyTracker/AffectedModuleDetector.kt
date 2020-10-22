@@ -29,7 +29,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.Logger
-import java.io.File
 
 /**
  * The subsets we allow the projects to be partitioned into.
@@ -86,10 +85,10 @@ abstract class AffectedModuleDetector {
     companion object {
         private const val ROOT_PROP_NAME = "affectedModuleDetector"
         private const val LOG_FILE_NAME = "affected_module_detector_log.txt"
-        public const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
-        public const val DEPENDENT_PROJECTS_ARG = "androidx.dependentProjects"
-        public const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
-        public const val BASE_COMMIT_ARG = "androidx.affectedModuleDetector.baseCommit"
+        const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
+        const val DEPENDENT_PROJECTS_ARG = "androidx.dependentProjects"
+        const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
+        const val BASE_COMMIT_ARG = "androidx.affectedModuleDetector.baseCommit"
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
             val enabled = rootProject.hasProperty(ENABLE_ARG)
@@ -355,12 +354,10 @@ class AffectedModuleDetectorImpl constructor(
         var buildAll = false
 
         // Should only trigger if there are no changedFiles
-        if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) buildAll =
-            true
-        unknownFiles.forEach {
-            if (affectsAllOfThisBuild(it) || affectsAllOfBothBuilds(it)) {
-                buildAll = true
-            }
+        if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) {
+            buildAll = true
+        } else if (unknownFiles.isNotEmpty()) {
+            buildAll = true
         }
         logger?.info(
             "unknownFiles: $unknownFiles, changedProjects: $changedProjects, buildAll: " +
@@ -395,23 +392,6 @@ class AffectedModuleDetectorImpl constructor(
             else -> dependentProjects
         }
     }
-
-    // TODO: simplify when resolving b/132901339 when there are no longer two builds
-    private val ROOT_FILES_OR_FOLDERS_AFFECTING_ALL_OF_BOTH_BUILDS = listOf(
-        "buildSrc", "busytown", "development", "frameworks", "gradlew" // paths from root
-    ) // there are no non-root objects affecting both builds that aren't projects (benchmark)
-    private val NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD = listOf(
-        "gradle/wrapper"
-    )
-    private fun affectsAllOfThisBuild(file: String): Boolean {
-        return !file.contains(File.separatorChar) ||
-            NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD.any { file.startsWith(it) }
-    } // objects in root are assumed to affect all projects in the build
-    private fun affectsAllOfBothBuilds(file: String): Boolean {
-        return ROOT_FILES_OR_FOLDERS_AFFECTING_ALL_OF_BOTH_BUILDS.any {
-            file.startsWith("../$it") || file.startsWith(it)
-        }
-    } // if you are in the ui build, the path is e.g. ../busytown
 
     private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<Project>> {
         return allSets.map { setPaths ->
