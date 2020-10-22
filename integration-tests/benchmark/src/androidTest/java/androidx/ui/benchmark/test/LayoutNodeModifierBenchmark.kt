@@ -35,11 +35,11 @@ import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.DisableTransitionsTestRule
+import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.test.filters.LargeTest
-import androidx.ui.test.DisableTransitionsTestRule
-import androidx.ui.test.InternalTestingApi
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

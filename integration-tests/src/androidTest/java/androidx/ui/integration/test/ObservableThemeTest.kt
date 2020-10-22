@@ -33,8 +33,8 @@ import androidx.compose.testutils.assertNoPendingChanges
 import androidx.compose.testutils.doFramesUntilNoChangesPending
 import androidx.compose.testutils.forGivenTestCase
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.test.filters.MediumTest
-import androidx.ui.test.ExperimentalTesting
 import androidx.ui.test.createAndroidComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
