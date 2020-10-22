@@ -7,6 +7,7 @@ import example.todo.common.main.store.TodoMainStore.Intent
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @Suppress("TestFunctionName")
@@ -55,6 +56,42 @@ class TodoMainStoreTest {
         store.accept(Intent.SetItemDone(id = 2L, isDone = true))
 
         assertTrue(store.state.items.first { it.id == 2L }.isDone)
+    }
+
+    @Test
+    fun WHEN_Intent_SetItemDone_THEN_done_changed_in_database() {
+        val item1 = TodoItem(id = 1L, text = "item1")
+        val item2 = TodoItem(id = 2L, text = "item2", isDone = false)
+        database.items = listOf(item1, item2)
+        val store = provider.provide()
+
+        store.accept(Intent.SetItemDone(id = 2L, isDone = true))
+
+        assertTrue(database.items.first { it.id == 2L }.isDone)
+    }
+
+    @Test
+    fun WHEN_Intent_DeleteItem_THEN_item_deleted_in_state() {
+        val item1 = TodoItem(id = 1L, text = "item1")
+        val item2 = TodoItem(id = 2L, text = "item2")
+        database.items = listOf(item1, item2)
+        val store = provider.provide()
+
+        store.accept(Intent.DeleteItem(id = 2L))
+
+        assertFalse(store.state.items.any { it.id == 2L })
+    }
+
+    @Test
+    fun WHEN_Intent_DeleteItem_THEN_item_deleted_in_database() {
+        val item1 = TodoItem(id = 1L, text = "item1")
+        val item2 = TodoItem(id = 2L, text = "item2")
+        database.items = listOf(item1, item2)
+        val store = provider.provide()
+
+        store.accept(Intent.DeleteItem(id = 2L))
+
+        assertFalse(database.items.any { it.id == 2L })
     }
 
     @Test

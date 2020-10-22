@@ -4,8 +4,6 @@ import com.badoo.reaktive.completable.Completable
 import com.badoo.reaktive.completable.completableFromFunction
 import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.subject.behavior.BehaviorSubject
-import example.todo.common.main.store.TodoItem
-import example.todo.common.main.store.TodoMainStoreProvider
 
 internal class TestTodoMainStoreDatabase : TodoMainStoreProvider.Database {
 
@@ -22,6 +20,11 @@ internal class TestTodoMainStoreDatabase : TodoMainStoreProvider.Database {
     override fun setDone(id: Long, isDone: Boolean): Completable =
         completableFromFunction {
             update(id = id) { copy(isDone = isDone) }
+        }
+
+    override fun delete(id: Long): Completable =
+        completableFromFunction {
+            this.items = items.filterNot { it.id == id }
         }
 
     override fun add(text: String): Completable =
