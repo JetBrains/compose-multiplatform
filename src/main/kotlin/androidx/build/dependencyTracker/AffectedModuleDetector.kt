@@ -149,7 +149,7 @@ abstract class AffectedModuleDetector {
 
         private fun getInstance(project: Project): AffectedModuleDetector? {
             val extensions = project.rootProject.extensions
-            return extensions.getByName(ROOT_PROP_NAME) as? AffectedModuleDetector
+            return extensions.findByName(ROOT_PROP_NAME) as? AffectedModuleDetector
         }
 
         private fun getOrThrow(project: Project): AffectedModuleDetector {
@@ -173,6 +173,13 @@ abstract class AffectedModuleDetector {
             }
         }
 
+        /**
+         * Call this method to obtain the [@link ProjectSubset] that the project is
+         * determined to fall within for this particular build.
+         *
+         * Note that this will fail if accessed before all projects have been
+         * evaluated, since the AMD does not get registered until then.
+         */
         @Throws(GradleException::class)
         @JvmStatic
         internal fun getProjectSubset(project: Project): ProjectSubset {
