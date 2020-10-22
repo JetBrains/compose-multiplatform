@@ -176,6 +176,7 @@ fun ViewGroup.setContent(
     return doSetContent(composeView, parent, content)
 }
 
+@OptIn(InternalComposeApi::class)
 private fun doSetContent(
     owner: AndroidOwner,
     parent: CompositionReference,

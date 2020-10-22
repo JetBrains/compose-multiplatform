@@ -295,6 +295,7 @@ val invalidate: () -> Unit get() {
  * invalidations. When this call leaves the composition, the reference is invalidated.
  */
 @Composable
+@OptIn(ComposeCompilerApi::class)
 fun compositionReference(): CompositionReference {
     return currentComposer.buildReference()
 }

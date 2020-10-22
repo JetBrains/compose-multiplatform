@@ -2424,6 +2424,7 @@ private class CompositionResult(
         composer.applyChanges()
         Snapshot.notifyObjectsInitialized()
         composer.slotTable.verifyWellFormed()
+        composer.insertTable.verifyWellFormed()
     }
 
     fun recompose(): Boolean = doCompose(composer) { composer.recompose() }
