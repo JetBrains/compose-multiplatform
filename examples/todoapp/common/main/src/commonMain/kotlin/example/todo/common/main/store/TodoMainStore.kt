@@ -8,6 +8,7 @@ internal interface TodoMainStore : Store<Intent, State, Nothing> {
 
     sealed class Intent {
         data class SetItemDone(val id: Long, val isDone: Boolean) : Intent()
+        data class DeleteItem(val id: Long) : Intent()
         data class SetText(val text: String) : Intent()
         object AddItem : Intent()
     }

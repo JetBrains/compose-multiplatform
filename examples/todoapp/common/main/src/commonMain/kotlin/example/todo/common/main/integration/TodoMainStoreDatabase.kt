@@ -35,6 +35,10 @@ internal class TodoMainStoreDatabase(
         completableFromFunction { queries.setDone(id = id, isDone = isDone) }
             .subscribeOn(ioScheduler)
 
+    override fun delete(id: Long): Completable =
+        completableFromFunction { queries.delete(id = id) }
+            .subscribeOn(ioScheduler)
+
     override fun add(text: String): Completable =
         completableFromFunction {
             queries.transactionWithResult {
