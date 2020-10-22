@@ -2,7 +2,7 @@
  * Copied from Decompose
  */
 
-package com.arkivanov.decompose.extensions.compose
+package example.todo.common.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -13,7 +13,6 @@ import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
 import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.value.Value
-import example.todo.common.utils.invoke
 
 private typealias SavedState = Map<String, List<Any?>>
 
