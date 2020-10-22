@@ -84,7 +84,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             desktopMain.dependencies {
                 implementation(KOTLIN_STDLIB)
-                implementation(SKIKO)
+                api(SKIKO)
             }
 
             androidTest.dependencies {
