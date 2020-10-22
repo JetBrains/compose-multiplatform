@@ -62,8 +62,10 @@ internal class TodoMainStoreProvider(
         }
 
         private fun addItem(state: State) {
-            dispatch(Result.TextChanged(text = ""))
-            database.add(text = state.text).subscribeScoped()
+            if (state.text.isNotEmpty()) {
+                dispatch(Result.TextChanged(text = ""))
+                database.add(text = state.text).subscribeScoped()
+            }
         }
     }
 

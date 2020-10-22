@@ -122,4 +122,13 @@ class TodoMainStoreTest {
 
         assertEquals("", store.state.text)
     }
+
+    @Test
+    fun GIVEN_no_text_entered_WHEN_Intent_AddItem_THEN_item_not_added() {
+        val store = provider.provide()
+
+        store.accept(Intent.AddItem)
+
+        assertEquals(0, store.state.items.size)
+    }
 }
