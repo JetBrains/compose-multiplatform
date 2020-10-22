@@ -25,13 +25,18 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
+import androidx.ui.test.createComposeRule
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
 
 class SkijaLayerTest {
+    @get:Rule
+    val rule = createComposeRule()
+
     private val layer = TestSkijaLayer()
     private val matrix = Matrix()
     private val cos45 = cos(PI / 4)
