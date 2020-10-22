@@ -33,19 +33,22 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * @see [Modifier.zIndex]
  */
-interface ZIndexModifier : Modifier.Element {
+// TODO("Made it internal to be able to later migrate Modifier.zIndex() implementation without
+//  the breaking change to work as LayoutModifier where we provide zIndex right as a param for
+//  placeable.place() call. Tracked in b/171493718")
+internal interface ZIndexModifier : Modifier.Element {
     val zIndex: Float
 }
 
 /**
- * Creates a [ZIndexModifier] that controls the drawing order for the children of the same layout
- * parent. A child with larger [zIndex] will be drawn on top of all the children with smaller
- * [zIndex]. When children have the same [zIndex] the original order in which the items were
- * added into the parent layout is applied.
+ * Creates a modifier that controls the drawing order for the children of the same layout parent.
+ * A child with larger [zIndex] will be drawn on top of all the children with smaller [zIndex].
+ * When children have the same [zIndex] the original order in which the items were added into the
+ * parent layout is applied.
  *
- * Note that if there would be multiple [ZIndexModifier] modifiers applied for the same layout
- * the sum of their values will be used as the final zIndex. If no [ZIndexModifier]s applied for the
- * layout then zIndex for this Layout is 0.
+ * Note that if there would be multiple [zIndex] modifiers applied for the same layout
+ * the sum of their values will be used as the final zIndex. If no [zIndex] were applied for the
+ * layout then the default zIndex is 0.
  *
  * @sample androidx.compose.ui.samples.ZIndexModifierSample
  */
