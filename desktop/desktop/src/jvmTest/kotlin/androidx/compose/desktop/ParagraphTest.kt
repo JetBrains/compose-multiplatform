@@ -36,8 +36,8 @@ import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.ui.test.DesktopScreenshotTestRule
-import androidx.ui.test.TestComposeWindow
+import androidx.compose.ui.test.DesktopScreenshotTestRule
+import androidx.compose.ui.test.TestComposeWindow
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
