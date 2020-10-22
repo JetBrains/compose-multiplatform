@@ -48,8 +48,8 @@ import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.DesktopScreenshotTestRule
-import androidx.ui.test.initCompose
+import androidx.compose.ui.test.DesktopScreenshotTestRule
+import androidx.compose.ui.test.initCompose
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
