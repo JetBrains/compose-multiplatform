@@ -31,7 +31,7 @@ fun main() {
 
 ## Loading images from device storage
 
-To create `ImageAsset` from a loaded image stored in device memory you can use skija `Image`:
+To create an `ImageAsset` from a loaded image stored in the device memory you can use `org.jetbrains.skija.Image`:
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -58,18 +58,13 @@ fun main() {
 fun imageFromFile(file: File): ImageAsset {
     return Image.makeFromEncoded(file.readBytes()).asImageAsset()
 }
-
-@Composable
-fun imageFile(file: File): ImageAsset {
-    return remember(file) { imageFromFile(file) }
-}
 ```
 
 ![Storage](image_from_resources.png)
 
 ## Drawing raw image data using native canvas
 
-Sometimes you may want to draw raw image data, in which case you can use `Canvas` and` drawIntoCanvas`.
+You may want to draw raw image data, in which case you can use `Canvas` and` drawIntoCanvas`.
 
 ```kotlin
 import androidx.compose.desktop.Window
