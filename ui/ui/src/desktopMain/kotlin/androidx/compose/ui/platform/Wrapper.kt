@@ -31,7 +31,7 @@ import androidx.compose.ui.node.LayoutNode
 fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
     FrameManager.ensureStarted()
 
-    val composition = compositionFor(root, DesktopUiApplier(root), Recomposer.current(), null)
+    val composition = compositionFor(root, DesktopUiApplier(root), Recomposer.current())
     composition.setContent {
         ProvideDesktopAmbients(this) {
             DesktopSelectionContainer(content)
