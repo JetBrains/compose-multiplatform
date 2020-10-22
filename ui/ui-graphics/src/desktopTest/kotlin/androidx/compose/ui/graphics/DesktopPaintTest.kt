@@ -39,7 +39,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
         assertEquals(0f, paint.strokeMiterLimit)
         assertEquals(StrokeJoin.Round, paint.strokeJoin)
         assertEquals(true, paint.isAntiAlias)
-        assertEquals(FilterQuality.None, paint.filterQuality)
+        assertEquals(FilterQuality.Medium, paint.filterQuality)
         assertEquals(BlendMode.SrcOver, paint.blendMode)
         assertEquals(null, paint.colorFilter)
         assertEquals(null, paint.shader)
@@ -98,7 +98,9 @@ class DesktopPaintTest : DesktopGraphicsTest() {
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(0, 4),
             dstSize = IntSize(4, 12),
-            paint = redPaint
+            paint = redPaint.apply {
+                filterQuality = FilterQuality.None
+            }
         )
         canvas.drawImageRect(
             image = imageFromResource("androidx/compose/desktop/test.png"),
