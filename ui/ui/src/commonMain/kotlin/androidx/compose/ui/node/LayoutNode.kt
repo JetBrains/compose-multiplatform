@@ -616,18 +616,21 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * zIndex defines the drawing order of the LayoutNode. Children with larger zIndex are drawn
      * after others (the original order is used for the nodes with the same zIndex).
-     * Default zIndex is 0. Current implementation is using the first(front) DrawLayerModifier's
-     * elevation as a zIndex. We will have a separate zIndex modifier later instead to decouple
-     * this features.
+     * Default zIndex is 0. We use sum of the values of all [ZIndexModifier] as a zIndex.
      */
-    internal val zIndex: Float
-        get() = outerZIndexModifier?.zIndex ?: 0f
+    private val zIndex: Float
+        get() = if (zIndexModifiers.isEmpty()) {
+            0f
+        } else {
+            zIndexModifiers.fold(0f) { acc, item ->
+                acc + item.zIndex
+            }
+        }
 
     /**
-     * The outermost ZIndexModifier in the modifier chain or `null` if there are no
-     * ZIndexModifier in the modifier chain.
+     * All [ZIndexModifier]s added to the node.
      */
-    private var outerZIndexModifier: ZIndexModifier? = null
+    private val zIndexModifiers = mutableVectorOf<ZIndexModifier>()
 
     /**
      * The inner-most layer wrapper. Used for performance for LayoutNodeWrapper.findLayer().
@@ -661,7 +664,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             field = value
 
             val invalidateParentLayer = shouldInvalidateParentLayer()
-            val startZIndex = outerZIndexModifier
+            val startZIndex = zIndex
 
             copyWrappersToCache()
 
@@ -673,7 +676,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             val addedCallback = hasNewPositioningCallback()
             onPositionedCallbacks.clear()
             onRemeasuredCallbacks.clear()
-            outerZIndexModifier = null
+            zIndexModifiers.clear()
             innerLayerWrapper = null
 
             // Create a new chain of LayoutNodeWrappers, reusing existing ones from wrappers
@@ -687,7 +690,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
                     onRemeasuredCallbacks += mod
                 }
                 if (mod is ZIndexModifier) {
-                    outerZIndexModifier = mod
+                    zIndexModifiers += mod
                 }
                 if (mod is RemeasurementModifier) {
                     mod.onRemeasurementAvailable(this)
@@ -777,7 +780,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             if (oldParentData != parentData) {
                 parent?.requestRemeasure()
             }
-            if (invalidateParentLayer || startZIndex != outerZIndexModifier ||
+            if (invalidateParentLayer || startZIndex != zIndex ||
                 shouldInvalidateParentLayer()
             ) {
                 parent?.invalidateLayer()
