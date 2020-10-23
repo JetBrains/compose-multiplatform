@@ -4,6 +4,10 @@
 
 This tutorial expects set and ready Compose project build similar to which is described in [Getting Started tutorial](../Getting_Started)
 
+## What is covered
+
+In this tutorial, we will see two different ways to handle keyboard events in Compose for Desktop as well as some utilities that we have to do it.
+
 ## KeySets & ShortcutHandler
 
 Compose for Desktop has a few utilities to work with shortcuts:
