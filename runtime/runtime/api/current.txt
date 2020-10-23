@@ -61,22 +61,6 @@ package androidx.compose.runtime {
   public final class BitwiseOperatorsKt {
   }
 
-  public final class BuildableMap<K, V> implements kotlin.jvm.internal.markers.KMappedMarker java.util.Map<K,V> {
-    ctor public BuildableMap(kotlinx.collections.immutable.PersistentMap<K,? extends V> map);
-    method public kotlinx.collections.immutable.PersistentMap<K,V> component1();
-    method public boolean containsKey(Object! key);
-    method public boolean containsValue(Object! value);
-    method public androidx.compose.runtime.BuildableMap<K,V> copy(kotlinx.collections.immutable.PersistentMap<K,? extends V> map);
-    method public V? get(Object! key);
-    method public java.util.Set<java.util.Map.Entry<K,V>> getEntries();
-    method public java.util.Set<K> getKeys();
-    method public kotlinx.collections.immutable.PersistentMap<K,V> getMap();
-    method public int getSize();
-    method public java.util.Collection<V> getValues();
-    method public boolean isEmpty();
-    property public final kotlinx.collections.immutable.PersistentMap<K,V> map;
-  }
-
   public interface CommitScope {
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }

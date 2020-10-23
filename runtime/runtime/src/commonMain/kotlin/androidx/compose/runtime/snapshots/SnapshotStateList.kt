@@ -18,10 +18,10 @@
 
 package androidx.compose.runtime.snapshots
 
-import androidx.compose.runtime.BuildableList
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.buildableListOf
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 /**
  * An implementation of [MutableList] that can be observed and snapshot. This is the result type
@@ -34,7 +34,7 @@ import androidx.compose.runtime.buildableListOf
 @Stable
 class SnapshotStateList<T> : MutableList<T>, StateObject {
     override var firstStateRecord: StateListStateRecord<T> =
-        StateListStateRecord<T>(buildableListOf())
+        StateListStateRecord<T>(persistentListOf())
         private set
 
     override fun prependStateRecord(value: StateRecord) {
@@ -53,7 +53,7 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
      * This is an internal implementation class of [SnapshotStateList]. Do not use.
      */
     class StateListStateRecord<T> internal constructor(
-        internal var list: BuildableList<T>
+        internal var list: PersistentList<T>
     ) : StateRecord() {
         internal var modification = 0
         override fun assign(value: StateRecord) {
@@ -85,7 +85,7 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
         it.addAll(index, elements)
     }
     override fun addAll(elements: Collection<T>) = conditionalUpdate { it.addAll(elements) }
-    override fun clear() = writable { list = buildableListOf() }
+    override fun clear() = writable { list = persistentListOf() }
     override fun remove(element: T) = conditionalUpdate { it.remove(element) }
     override fun removeAll(elements: Collection<T>) = conditionalUpdate { it.removeAll(elements) }
     override fun removeAt(index: Int) = get(index).also { update { it.removeAt(index) } }
@@ -118,7 +118,7 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
             result
         }
 
-    private inline fun update(block: (BuildableList<T>) -> BuildableList<T>) = withCurrent {
+    private inline fun update(block: (PersistentList<T>) -> PersistentList<T>) = withCurrent {
         val newList = block(list)
         if (newList !== list) writable {
             list = newList
@@ -126,7 +126,7 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
         }
     }
 
-    private inline fun conditionalUpdate(block: (BuildableList<T>) -> BuildableList<T>): Boolean =
+    private inline fun conditionalUpdate(block: (PersistentList<T>) -> PersistentList<T>): Boolean =
         withCurrent {
             val newList = block(list)
             if (newList !== list) writable {
