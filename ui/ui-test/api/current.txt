@@ -408,6 +408,7 @@ package androidx.ui.test {
   public final class AndroidComposeTestRuleKt {
     method public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.AndroidComposeTestRule<T> createAndroidComposeRule(Class<T> activityClass);
     method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.AndroidComposeTestRule<T>! createAndroidComposeRule();
+    method public static androidx.compose.ui.test.ComposeTestRuleJUnit createComposeRule();
   }
 
   public final class AssertionsStubsKt {
@@ -458,7 +459,6 @@ package androidx.ui.test {
   }
 
   public final class ComposeTestRuleKt {
-    method public static androidx.compose.ui.test.ComposeTestRuleJUnit createComposeRule();
   }
 
   public final class DpAssertionsStubsKt {

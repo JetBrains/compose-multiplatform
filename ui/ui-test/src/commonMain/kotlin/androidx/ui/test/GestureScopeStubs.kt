@@ -16,7 +16,6 @@
 
 package androidx.ui.test
 
-import androidx.annotation.FloatRange
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.LongPressTimeout
 import androidx.compose.ui.test.cancel
@@ -43,6 +42,7 @@ import androidx.compose.ui.test.up
 import androidx.compose.ui.test.width
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.milliseconds
+import androidx.compose.ui.util.annotation.FloatRange
 
 /** @Deprecated Moved to androidx.compose.ui.test */
 typealias GestureScope = androidx.compose.ui.test.GestureScope

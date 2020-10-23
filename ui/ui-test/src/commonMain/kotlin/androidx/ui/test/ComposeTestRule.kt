@@ -18,6 +18,3 @@ package androidx.ui.test
 
 /** @Deprecated Moved to androidx.compose.ui.test */
 typealias ComposeTestRule = androidx.compose.ui.test.ComposeTestRule
-
-/** @Deprecated Moved to androidx.compose.ui.test */
-fun createComposeRule() = androidx.compose.ui.test.createComposeRule()
