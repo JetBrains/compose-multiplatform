@@ -288,7 +288,7 @@ class AndroidViewTest {
         rule.setContent {
             Box {
                 AndroidView(::FrameLayout) {
-                    it.setContent(Recomposer()) {
+                    it.setContent(Recomposer.current()) {
                         Box(Modifier)
                     }
                 }

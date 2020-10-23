@@ -36,11 +36,11 @@ private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
 abstract class CompositionReference internal constructor() {
     internal abstract val compoundHashKey: Int
     internal abstract val collectingKeySources: Boolean
-    internal abstract val applyingCoroutineContext: CoroutineContext?
-    internal abstract fun recordInspectionTable(table: MutableSet<SlotTable>)
+    internal abstract val effectCoroutineContext: CoroutineContext
     internal abstract fun composeInitial(composer: Composer<*>, composable: @Composable () -> Unit)
     internal abstract fun invalidate(composer: Composer<*>)
 
+    internal open fun recordInspectionTable(table: MutableSet<SlotTable>) {}
     internal open fun <T> getAmbient(key: Ambient<T>): T = key.defaultValueHolder.value
     internal open fun getAmbientScope(): AmbientMap = EmptyAmbientMap
     internal open fun registerComposer(composer: Composer<*>) {}

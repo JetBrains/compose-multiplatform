@@ -51,19 +51,8 @@ internal fun createCompositionCoroutineScope(
         }
     )
 } else {
-    val applyContext = composer.parentReference.applyingCoroutineContext
-    if (applyContext == null) {
-        CoroutineScope(
-            Job().apply {
-                completeExceptionally(
-                    IllegalStateException(
-                        "cannot create a new composition " +
-                            "coroutine scope - Composition is not active"
-                    )
-                )
-            }
-        )
-    } else CoroutineScope(applyContext + Job(applyContext[Job]) + coroutineContext)
+    val applyContext = composer.applyCoroutineContext
+    CoroutineScope(applyContext + Job(applyContext[Job]) + coroutineContext)
 }
 
 /**
@@ -103,18 +92,15 @@ inline fun rememberCoroutineScope(
 }
 
 private class LaunchedTaskImpl(
-    private val parentRef: CompositionReference,
+    parentCoroutineContext: CoroutineContext,
     private val task: suspend CoroutineScope.() -> Unit
 ) : CompositionLifecycleObserver {
 
+    private val scope = CoroutineScope(parentCoroutineContext)
     private var job: Job? = null
 
     override fun onEnter() {
         job?.cancel("Old job was still running!")
-        val scope = CoroutineScope(
-            parentRef.applyingCoroutineContext
-                ?: error("cannot launch LaunchedTask - Recomposer is not running")
-        )
         job = scope.launch(block = task)
     }
 
@@ -136,8 +122,8 @@ private class LaunchedTaskImpl(
 fun LaunchedTask(
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val parentRef = currentComposer.parentReference
-    remember { LaunchedTaskImpl(parentRef, block) }
+    val applyContext = currentComposer.applyCoroutineContext
+    remember { LaunchedTaskImpl(applyContext, block) }
 }
 
 /**
@@ -156,8 +142,8 @@ fun LaunchedTask(
     key: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val parentRef = currentComposer.parentReference
-    remember(key) { LaunchedTaskImpl(parentRef, block) }
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(key) { LaunchedTaskImpl(applyContext, block) }
 }
 
 /**
@@ -177,8 +163,8 @@ fun LaunchedTask(
     key2: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val parentRef = currentComposer.parentReference
-    remember(key1, key2) { LaunchedTaskImpl(parentRef, block) }
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(key1, key2) { LaunchedTaskImpl(applyContext, block) }
 }
 
 /**
@@ -199,8 +185,8 @@ fun LaunchedTask(
     key3: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val parentRef = currentComposer.parentReference
-    remember(key1, key2, key3) { LaunchedTaskImpl(parentRef, block) }
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(key1, key2, key3) { LaunchedTaskImpl(applyContext, block) }
 }
 
 /**
@@ -219,6 +205,6 @@ fun LaunchedTask(
     vararg keys: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val parentRef = currentComposer.parentReference
-    remember(*keys) { LaunchedTaskImpl(parentRef, block) }
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(*keys) { LaunchedTaskImpl(applyContext, block) }
 }
