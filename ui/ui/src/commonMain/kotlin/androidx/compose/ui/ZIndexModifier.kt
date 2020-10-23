@@ -23,11 +23,12 @@ import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [Modifier.Element] that controls the drawing order for the children of the same layout
- * parent. A child with larger [zIndex] will be drawn after all the children with smaller [zIndex].
- * When children have the same [zIndex] the original order in which the items were added into the
- * parent layout is applied.
+ * parent. A child with larger [zIndex] will be drawn on top of all the children with smaller
+ * [zIndex]. When children have the same [zIndex] the original order in which the items were
+ * added into the parent layout is applied.
+ *
  * Note that if there would be multiple [ZIndexModifier] modifiers applied for the same layout
- * only the first one in the modifiers chain will be used. If no [ZIndexModifier]s applied for the
+ * the sum of their values will be used as the final zIndex. If no [ZIndexModifier]s applied for the
  * layout then zIndex for this Layout is 0.
  *
  * @see [Modifier.zIndex]
@@ -38,11 +39,12 @@ interface ZIndexModifier : Modifier.Element {
 
 /**
  * Creates a [ZIndexModifier] that controls the drawing order for the children of the same layout
- * parent. A child with larger [zIndex] will be drawn after all the children with smaller [zIndex].
- * When children have the same [zIndex] the original order in which the items were added into the
- * parent layout is applied.
+ * parent. A child with larger [zIndex] will be drawn on top of all the children with smaller
+ * [zIndex]. When children have the same [zIndex] the original order in which the items were
+ * added into the parent layout is applied.
+ *
  * Note that if there would be multiple [ZIndexModifier] modifiers applied for the same layout
- * only the first one in the modifiers chain will be used. If no [ZIndexModifier]s applied for the
+ * the sum of their values will be used as the final zIndex. If no [ZIndexModifier]s applied for the
  * layout then zIndex for this Layout is 0.
  *
  * @sample androidx.compose.ui.samples.ZIndexModifierSample

@@ -682,7 +682,7 @@ class DrawReorderingTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testFirstElevationIsUsed() {
+    fun sumOfAllZIndexesIsUsed() {
         rule.runOnUiThread {
             activity.setContent {
                 FixedSize(
@@ -691,13 +691,14 @@ class DrawReorderingTest {
                     FixedSize(
                         10,
                         PaddingModifier(10)
-                            .zIndex(3f)
-                            .zIndex(1f)
+                            .zIndex(2f)
+                            .zIndex(2f)
                             .background(Color.White)
                     )
                     FixedSize(
                         30,
-                        Modifier.zIndex(2f)
+                        Modifier.zIndex(4f)
+                            .zIndex(-1f)
                             .background(Color.Red)
                             .drawLatchModifier()
                     )
