@@ -35,6 +35,7 @@ object LibraryGroups {
     val BENCHMARK = LibraryGroup("androidx.benchmark", LibraryVersions.BENCHMARK)
     val CAMERA = LibraryGroup("androidx.camera", LibraryVersions.CAMERA)
     val CARDVIEW = LibraryGroup("androidx.cardview", LibraryVersions.CARDVIEW)
+    val CAR_APP = LibraryGroup("androidx.car.app", LibraryVersions.CAR_APP)
     val COLLECTION = LibraryGroup("androidx.collection", LibraryVersions.COLLECTION)
     val CONCURRENT = LibraryGroup("androidx.concurrent", LibraryVersions.FUTURES)
     val CONTENTACCESS = LibraryGroup("androidx.contentaccess", LibraryVersions.CONTENTACCESS)
