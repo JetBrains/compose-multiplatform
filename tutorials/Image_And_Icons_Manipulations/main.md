@@ -262,7 +262,7 @@ fun asImageAsset(image: BufferedImage): ImageAsset {
 
 ## Setting the application tray icon
 
-You can create tray icon for your application:
+You can create a tray icon for your application:
 
 ```kotlin
 import androidx.compose.desktop.AppManager
