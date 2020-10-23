@@ -21,7 +21,7 @@ import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
-class AndroidEmbeddingContext : EmbeddingContext {
+private object AndroidEmbeddingContext : EmbeddingContext {
 
     override fun isMainThread(): Boolean {
         return Looper.myLooper() == Looper.getMainLooper()
@@ -32,7 +32,7 @@ class AndroidEmbeddingContext : EmbeddingContext {
     }
 }
 
-actual fun EmbeddingContext(): EmbeddingContext = AndroidEmbeddingContext()
+actual fun EmbeddingContext(): EmbeddingContext = AndroidEmbeddingContext
 
 // TODO: Our host-side tests still grab the Android actuals based on SDK stubs that return null.
 // Satisfy their dependencies.
