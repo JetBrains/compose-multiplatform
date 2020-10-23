@@ -18,6 +18,8 @@ package androidx.compose.ui.demos.viewinterop
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -91,6 +93,7 @@ private class ColoredSquareView(context: Context) : View(context) {
         set(value) {
             if (value != field) {
                 field = value
+                rect.set(0, 0, value, value)
                 requestLayout()
             }
         }
@@ -99,6 +102,7 @@ private class ColoredSquareView(context: Context) : View(context) {
         set(value) {
             if (value != field) {
                 field = value
+                paint.color = value.toArgb()
                 invalidate()
             }
         }
@@ -107,8 +111,12 @@ private class ColoredSquareView(context: Context) : View(context) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(size, size)
     }
+
+    private var rect = Rect(0, 0, 0, 0)
+    private val paint = Paint()
+
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
-        canvas.drawColor(color.toArgb())
+        canvas.drawRect(rect, paint)
     }
 }

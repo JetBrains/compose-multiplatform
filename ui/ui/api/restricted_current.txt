@@ -2126,12 +2126,13 @@ package androidx.compose.ui.platform {
   }
 
   public interface AndroidOwner extends androidx.compose.ui.node.Owner {
-    method @androidx.compose.ui.node.ExperimentalLayoutNodeApi public void addAndroidView(android.view.View view, androidx.compose.ui.node.LayoutNode layoutNode);
+    method @androidx.compose.ui.node.ExperimentalLayoutNodeApi public void addAndroidView(androidx.compose.ui.viewinterop.AndroidViewHolder view, androidx.compose.ui.node.LayoutNode layoutNode);
+    method public void drawAndroidView(androidx.compose.ui.viewinterop.AndroidViewHolder view, android.graphics.Canvas canvas);
     method public kotlin.jvm.functions.Function1<android.content.res.Configuration,kotlin.Unit> getConfigurationChangeObserver();
     method public android.view.View getView();
     method public androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners? getViewTreeOwners();
     method public void invalidateDescendants();
-    method public void removeAndroidView(android.view.View view);
+    method public void removeAndroidView(androidx.compose.ui.viewinterop.AndroidViewHolder view);
     method public void setConfigurationChangeObserver(kotlin.jvm.functions.Function1<? super android.content.res.Configuration,kotlin.Unit> p);
     method public void setOnViewTreeOwnersAvailable(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners,kotlin.Unit> callback);
     property public abstract kotlin.jvm.functions.Function1<android.content.res.Configuration,kotlin.Unit> configurationChangeObserver;

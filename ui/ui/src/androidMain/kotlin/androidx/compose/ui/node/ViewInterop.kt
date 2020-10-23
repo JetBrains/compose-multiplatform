@@ -105,7 +105,10 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
     val coreModifier = Modifier
         .pointerInteropFilter(this)
         .drawBehind {
-            drawIntoCanvas { canvas -> draw(canvas.nativeCanvas) }
+            drawIntoCanvas { canvas ->
+                (layoutNode.owner as? AndroidOwner)
+                    ?.drawAndroidView(this@toLayoutNode, canvas.nativeCanvas)
+            }
         }.onGloballyPositioned {
             // The global position of this LayoutNode can change with it being replaced. For these
             // cases, we need to inform the View.

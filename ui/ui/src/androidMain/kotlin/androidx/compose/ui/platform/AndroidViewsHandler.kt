@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Canvas
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,8 @@ import android.view.ViewParent
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
+import androidx.compose.ui.viewinterop.AndroidViewHolder
+import androidx.compose.ui.viewinterop.InternalInteropApi
 
 /**
  * Used by [AndroidComposeView] to handle the Android [View]s attached to its hierarchy.
@@ -34,6 +37,10 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
  * children.
  */
 internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
+    init {
+        clipChildren = false
+    }
+
     val layoutNode = hashMapOf<View, LayoutNode>()
 
     // No call to super to avoid invalidating the AndroidComposeView and rely on
@@ -64,6 +71,17 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
         // the View system has forced relayout on children. This method will only be called
         // when forceLayout is called on the Views hierarchy.
         layoutNode.keys.forEach { it.layout(it.left, it.top, it.right, it.bottom) }
+    }
+
+    @OptIn(InternalInteropApi::class)
+    fun drawView(view: AndroidViewHolder, canvas: Canvas) {
+        // The canvas is already translated by the Compose logic. But the position of the
+        // AndroidViewHolder is also set on it inside the AndroidViewsHandler, for correct
+        // `getLocationInWindow` results for the Composed View. Therefore, we need to
+        // compensate here to avoid double translating.
+        canvas.translate(-view.x, -view.y)
+        drawChild(canvas, view, drawingTime)
+        canvas.translate(view.x, view.y)
     }
 
     // Touch events forwarding will be handled by component nodes.

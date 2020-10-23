@@ -16,11 +16,14 @@
 package androidx.compose.ui.platform
 
 import android.content.res.Configuration
+import android.graphics.Canvas
 import android.view.View
 import androidx.annotation.RestrictTo
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
+import androidx.compose.ui.viewinterop.AndroidViewHolder
+import androidx.compose.ui.viewinterop.InternalInteropApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
@@ -40,14 +43,22 @@ interface AndroidOwner : Owner {
      * Called to inform the owner that a new Android [View] was [attached][Owner.onAttach]
      * to the hierarchy.
      */
+    @OptIn(InternalInteropApi::class)
     @ExperimentalLayoutNodeApi
-    fun addAndroidView(view: View, layoutNode: LayoutNode)
+    fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode)
 
     /**
      * Called to inform the owner that an Android [View] was [detached][Owner.onDetach]
      * from the hierarchy.
      */
-    fun removeAndroidView(view: View)
+    @OptIn(InternalInteropApi::class)
+    fun removeAndroidView(view: AndroidViewHolder)
+
+    /**
+     * Called to ask the owner to draw a child Android [View] to [canvas].
+     */
+    @OptIn(InternalInteropApi::class)
+    fun drawAndroidView(view: AndroidViewHolder, canvas: Canvas)
 
     /**
      * Used for updating the ConfigurationAmbient when configuration changes - consume the
