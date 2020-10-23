@@ -18,10 +18,10 @@
 
 package androidx.compose.runtime.snapshots
 
-import androidx.compose.runtime.BuildableMap
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.buildableMapOf
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.persistentHashMapOf
 
 /**
  * An implementation of [MutableMap] that can be observed and snapshot. This is the result type
@@ -34,7 +34,7 @@ import androidx.compose.runtime.buildableMapOf
 @Stable
 class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
     override var firstStateRecord: StateMapStateRecord<K, V> =
-        StateMapStateRecord<K, V>(buildableMapOf())
+        StateMapStateRecord<K, V>(persistentHashMapOf())
         private set
 
     override fun prependStateRecord(value: StateRecord) {
@@ -51,7 +51,7 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
     override val keys: MutableSet<K> = SnapshotMapKeySet(this)
     override val values: MutableCollection<V> = SnapshotMapValueSet(this)
 
-    override fun clear() = update { buildableMapOf() }
+    override fun clear() = update { persistentHashMapOf() }
     override fun put(key: K, value: V): V? = mutate { it.put(key, value) }
     override fun putAll(from: Map<out K, V>) = mutate { it.putAll(from) }
     override fun remove(key: K): V? = mutate { it.remove(key) }
@@ -113,7 +113,7 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
             result
         }
 
-    private inline fun update(block: (BuildableMap<K, V>) -> BuildableMap<K, V>) = withCurrent {
+    private inline fun update(block: (PersistentMap<K, V>) -> PersistentMap<K, V>) = withCurrent {
         val newMap = block(map)
         if (newMap !== map) writable {
             map = newMap
@@ -125,7 +125,7 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
      * Implementation class of [SnapshotStateMap]. Do not use.
      */
     class StateMapStateRecord<K, V> internal constructor(
-        internal var map: BuildableMap<K, V>
+        internal var map: PersistentMap<K, V>
     ) : StateRecord() {
         internal var modification = 0
         override fun assign(value: StateRecord) {
