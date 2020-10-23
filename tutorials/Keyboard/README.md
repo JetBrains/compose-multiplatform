@@ -2,17 +2,17 @@
 
 ## Prerequisites
 
-This tutorial expects set and ready Compose project build similar to which is described in [Getting Started tutorial](../Getting_Started)
+This tutorial expects that you have already set up the Compose project as described in the [Getting Started tutorial](../Getting_Started)
 
 ## What is covered
 
-In this tutorial, we will see two different ways to handle keyboard events in Compose for Desktop as well as some utilities that we have to do it.
+In this tutorial, we will look at two different ways of handling keyboard events in Compose for Desktop as well as the utilities that we have to do this.
 
 ## KeySets & ShortcutHandler
 
 Compose for Desktop has a few utilities to work with shortcuts:
 
-`KeysSet` represents a simultaneously pressed chord of keys. You can construct a `KeysSet` using Key's extension function:
+`KeysSet` represents a set of keys that can be simultaneously pressed. You can construct a KeysSet using the Key's extension function:
 
 ``` kotlin
 Key.CtrlLeft + Key.Enter
@@ -22,14 +22,14 @@ Key.CtrlLeft + Key.Enter
 
 ## Event handlers
 
-There are two different ways how you can handle key events in Compose for Desktop:
+There are two ways to handle key events in Compose for Desktop:
 
-- By setting up an event handler based on a focused component
+- By setting up an event handler based on the element that is in focus
 - By setting up an event handler in the scope of the window
 
 ## Focus related events
 
-It's working in the same way as in Compose for Android, see for details [API Reference](https://developer.android.com/reference/kotlin/androidx/compose/ui/input/key/package-summary#keyinputfilter)
+It works the same as Compose for Android, see for details [API Reference](https://developer.android.com/reference/kotlin/androidx/compose/ui/input/key/package-summary#keyinputfilter)
 
 The most common use case is to define keyboard handlers for active controls like `TextField`. Here is an example:
 
@@ -73,13 +73,13 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
 ```
 
 
-Note an annotation `@OptIn(ExperimentalKeyInput::class)`. Keyboard-related event handlers are a still-experimental feature of Compose and API changes are possible, so it requires it to use special annotation to emphasize the experimental nature of the code.
+Note an annotation `@OptIn(ExperimentalKeyInput::class)`. Keyboard-related event handlers are still an experimental feature of Compose, and later API changes are possible. So it requires the use of a special annotation to emphasize the experimental nature of the code.
 
 ![keyInputFilter](keyInputFilter.gif)
 
 ## Window-scoped events
 
-`AppWindow` instances have `keyboard` property. Using it, it's possible to define keyboard shortcuts that are always active for the current window. See an example:
+`AppWindow` instances have a `keyboard` property. It is possible to use it to define keyboard shortcuts that are always active in the current window. Here is an example:
 
 ``` kotlin
 import androidx.compose.desktop.AppWindow
@@ -109,7 +109,7 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
                                 it.close()
                             }
                         }.show {
-                            Text("I'm popup!")
+                            Text("I'm a popup!")
                         }
                     }
             ) {
