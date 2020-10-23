@@ -4,50 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="        this.then(HorizontalAlignModifier(alignment))"
-        errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Column.kt"
-            line="128"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    fun Modifier.gravity(align: Alignment.Horizontal) = this.then(HorizontalAlignModifier(align))"
-        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Column.kt"
-            line="132"
-            column="67"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="        this.then(SiblingsAlignedModifier.WithAlignmentLine(alignmentLine))"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Column.kt"
-            line="152"
-            column="43"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    ) = this.then(SiblingsAlignedModifier.WithAlignmentLineBlock(alignmentLineBlock))"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Column.kt"
-            line="200"
-            column="43"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="        return this.then(object : ParentDataModifier {"
         errorLine2="                         ^">
         <location
@@ -109,50 +65,6 @@
             file="src/commonMain/kotlin/androidx/compose/foundation/layout/LayoutOffset.kt"
             line="78"
             column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    fun Modifier.align(alignment: Alignment.Vertical) = this.then(VerticalAlignModifier(alignment))"
-        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Row.kt"
-            line="135"
-            column="67"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    fun Modifier.gravity(align: Alignment.Vertical) = this.then(VerticalAlignModifier(align))"
-        errorLine2="                                                                ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Row.kt"
-            line="139"
-            column="65"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="        this.then(SiblingsAlignedModifier.WithAlignmentLine(alignmentLine))"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Row.kt"
-            line="163"
-            column="43"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    ) = this.then(SiblingsAlignedModifier.WithAlignmentLineBlock(alignmentLineBlock))"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Row.kt"
-            line="224"
-            column="43"/>
     </issue>
 
 </issues>
