@@ -49,11 +49,9 @@ class RecordingInputConnectionUpdateTextFieldValueTest {
     fun setup() {
         listener = mock()
         ic = RecordingInputConnection(
-            TextFieldValue(
-                "",
-                TextRange.Zero
-            ),
-            listener
+            initState = TextFieldValue("", TextRange.Zero),
+            eventListener = listener,
+            autoCorrect = true
         )
     }
 

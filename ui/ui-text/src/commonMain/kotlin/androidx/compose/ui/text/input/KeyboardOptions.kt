@@ -23,16 +23,23 @@ import androidx.compose.ui.text.ExperimentalTextApi
  * The keyboard configuration options for text field. It is not guaranteed if a software keyboard
  * will comply with the options provided here.
  *
- * @param singleLine signals the keyboard that the text field is single line and keyboard should
+ * @param singleLine informs the keyboard that the text field is single line and keyboard should
  * not show enter action.
- * @param capitalization signals the keyboard whether to automatically capitalize characters,
- * words or sentences.
+ * @param capitalization informs the keyboard whether to automatically capitalize characters,
+ * words or sentences. Applicable to  only text based [KeyboardType]s such as [KeyboardType
+ * .Text], [KeyboardType.Ascii]. It will not be applied to [KeyboardType]s such as [KeyboardType
+ * .Number].
+ * @param autoCorrect informs the keyboard whether to enable auto correct. Applicable to only
+ * text based [KeyboardType]s such as [KeyboardType.Email], [KeyboardType.Uri]. It will not be
+ * applied to [KeyboardType]s such as [KeyboardType.Number]. Most of software keyboard
+ * implementations ignore this value for [KeyboardType]s such as [KeyboardType.Text].
  */
 @ExperimentalTextApi
 @Immutable
 data class KeyboardOptions(
     val singleLine: Boolean = false,
-    val capitalization: KeyboardCapitalization = KeyboardCapitalization.None
+    val capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
+    val autoCorrect: Boolean = true
 ) {
     companion object {
         val Default = KeyboardOptions()

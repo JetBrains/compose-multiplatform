@@ -17,6 +17,7 @@
 package androidx.compose.ui.input
 
 import android.view.KeyEvent
+import android.view.inputmethod.CorrectionInfo
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.BackspaceKeyEditOp
 import androidx.compose.ui.text.input.CommitTextEditOp
@@ -39,6 +40,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -56,11 +58,9 @@ class RecordingInputConnectionTest {
     fun setup() {
         listener = mock()
         ic = RecordingInputConnection(
-            TextFieldValue(
-                "",
-                TextRange.Zero
-            ),
-            listener
+            initState = TextFieldValue("", TextRange.Zero),
+            eventListener = listener,
+            autoCorrect = true
         )
     }
 
@@ -540,6 +540,30 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
         ic.endBatchEdit()
         verify(listener, never()).onEditOperations(any())
+    }
+
+    @Test
+    fun commitCorrection_returns_true_when_autoCorrect_is_on() {
+        val inputConnection = RecordingInputConnection(
+            initState = TextFieldValue(),
+            eventListener = listener,
+            autoCorrect = true
+        )
+        val anyCorrectionInfo = CorrectionInfo(0, "", "")
+
+        assertTrue(inputConnection.commitCorrection(anyCorrectionInfo))
+    }
+
+    @Test
+    fun commitCorrection_returns_false_when_autoCorrect_is_off() {
+        val inputConnection = RecordingInputConnection(
+            initState = TextFieldValue(),
+            eventListener = listener,
+            autoCorrect = false
+        )
+        val anyCorrectionInfo = CorrectionInfo(0, "", "")
+
+        assertFalse(inputConnection.commitCorrection(anyCorrectionInfo))
     }
 
     @Test

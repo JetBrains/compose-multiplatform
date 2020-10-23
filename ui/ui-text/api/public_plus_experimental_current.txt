@@ -791,13 +791,16 @@ package androidx.compose.ui.text.input {
   }
 
   @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public final class KeyboardOptions {
-    ctor public KeyboardOptions(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization);
+    ctor public KeyboardOptions(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect);
     ctor public KeyboardOptions();
     method public boolean component1();
     method public androidx.compose.ui.text.input.KeyboardCapitalization component2();
-    method @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.input.KeyboardOptions copy(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization);
+    method public boolean component3();
+    method @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.input.KeyboardOptions copy(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect);
+    method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
     method public boolean getSingleLine();
+    property public final boolean autoCorrect;
     property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
     property public final boolean singleLine;
     field public static final androidx.compose.ui.text.input.KeyboardOptions.Companion Companion;
