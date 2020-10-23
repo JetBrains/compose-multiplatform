@@ -408,11 +408,6 @@ package androidx.compose.ui {
     property public abstract float minWidth;
   }
 
-  public interface ZIndexModifier extends androidx.compose.ui.Modifier.Element {
-    method public float getZIndex();
-    property public abstract float zIndex;
-  }
-
   public final class ZIndexModifierKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier zIndex(androidx.compose.ui.Modifier, float zIndex);
   }
