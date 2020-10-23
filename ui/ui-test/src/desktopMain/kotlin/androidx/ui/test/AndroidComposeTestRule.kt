@@ -16,20 +16,5 @@
 
 package androidx.ui.test
 
-import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.createAndroidComposeRule
-
-/** @Deprecated Moved to androidx.compose.ui.test */
-typealias AndroidComposeTestRule = androidx.compose.ui.test.AndroidComposeTestRule<*>
-
 /** @Deprecated Moved to androidx.compose.ui.test */
 actual fun createComposeRule() = androidx.compose.ui.test.createComposeRule()
-
-/** @Deprecated Moved to androidx.compose.ui.test */
-inline fun <reified T : ComponentActivity> createAndroidComposeRule() =
-    createAndroidComposeRule<T>()
-
-/** @Deprecated Moved to androidx.compose.ui.test */
-fun <T : ComponentActivity> createAndroidComposeRule(
-    activityClass: Class<T>
-) = createAndroidComposeRule(activityClass)
