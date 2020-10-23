@@ -27,6 +27,12 @@ import androidx.compose.runtime.currentComposer
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 @OptIn(ExperimentalComposeApi::class)
 class ViewApplier(root: View) : AbstractApplier<View>(root) {
+    var onBeginChangesCalled = 0
+        private set
+
+    var onEndChangesCalled = 0
+        private set
+
     override fun insert(index: Int, instance: View) {
         current.addAt(index, instance)
     }
@@ -41,6 +47,14 @@ class ViewApplier(root: View) : AbstractApplier<View>(root) {
 
     override fun onClear() {
         root.children.clear()
+    }
+
+    override fun onBeginChanges() {
+        onBeginChangesCalled++
+    }
+
+    override fun onEndChanges() {
+        onEndChangesCalled++
     }
 }
 

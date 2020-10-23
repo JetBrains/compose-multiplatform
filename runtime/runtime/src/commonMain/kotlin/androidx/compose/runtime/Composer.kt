@@ -766,6 +766,8 @@ class Composer<N>(
 
             val manager = LifecycleEventDispatcher(lifecycleObservers)
 
+            applier.onBeginChanges()
+
             // Apply all changes
             slotTable.write { slots ->
                 val applier = applier
@@ -774,6 +776,8 @@ class Composer<N>(
                 }
                 changes.clear()
             }
+
+            applier.onEndChanges()
 
             providerUpdates.clear()
 
