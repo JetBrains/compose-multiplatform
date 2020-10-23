@@ -130,29 +130,6 @@ fun <T> LazyColumnForIndexed(
     }
 }
 
-@Deprecated(
-    "LazyColumnItems was renamed to LazyColumnFor",
-    ReplaceWith("LazyColumnFor(items, modifier, contentPadding, horizontalGravity, itemContent)")
-)
-@Composable
-fun <T> LazyColumnItems(
-    items: List<T>,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    horizontalGravity: Alignment.Horizontal = Alignment.Start,
-    itemContent: @Composable (T) -> Unit
-) {
-    LazyColumnFor(
-        items = items,
-        modifier = modifier,
-        state = rememberLazyListState(),
-        contentPadding = contentPadding,
-        horizontalAlignment = horizontalGravity
-    ) {
-        itemContent(it)
-    }
-}
-
 /**
  * A horizontally scrolling list that only composes and lays out the currently visible items.
  *
@@ -246,29 +223,6 @@ fun <T> LazyRowForIndexed(
                 itemContent(index, item)
             }
         }
-    }
-}
-
-@Deprecated(
-    "LazyRowItems was renamed to LazyRowFor",
-    ReplaceWith("LazyRowFor(items, modifier, contentPadding, horizontalGravity, itemContent)")
-)
-@Composable
-fun <T> LazyRowItems(
-    items: List<T>,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    verticalGravity: Alignment.Vertical = Alignment.Top,
-    itemContent: @Composable (T) -> Unit
-) {
-    LazyRowFor(
-        items = items,
-        modifier = modifier,
-        state = rememberLazyListState(),
-        contentPadding = contentPadding,
-        verticalAlignment = verticalGravity
-    ) {
-        itemContent(it)
     }
 }
 
