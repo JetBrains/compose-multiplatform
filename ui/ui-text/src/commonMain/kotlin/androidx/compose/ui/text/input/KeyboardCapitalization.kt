@@ -17,7 +17,8 @@
 package androidx.compose.ui.text.input
 
 /**
- * Options to request software keyboard to capitalize the text.
+ * Options to request software keyboard to capitalize the text. Applies to languages which
+ * has upper-case and lower-case letters.
  */
 enum class KeyboardCapitalization {
     /**
@@ -26,17 +27,17 @@ enum class KeyboardCapitalization {
     None,
 
     /**
-     * Auto-capitalize characters.
+     * Capitalize all characters.
      */
     Characters,
 
     /**
-     * Auto-capitalize words.
+     * Capitalize the first character of every word.
      */
     Words,
 
     /**
-     * Auto-capitalize sentences.
+     * Capitalize the first character of each sentence.
      */
     Sentences
 }
