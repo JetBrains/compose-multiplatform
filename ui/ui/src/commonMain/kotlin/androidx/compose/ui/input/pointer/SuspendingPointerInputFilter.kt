@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
@@ -129,7 +129,7 @@ fun Modifier.pointerInput(
 ) = composed {
     val density = DensityAmbient.current
     remember(density) { SuspendingPointerInputFilter(density) }.apply {
-        LaunchedTask(this) {
+        LaunchedEffect(this) {
             block()
         }
     }
@@ -148,7 +148,7 @@ private val DownChangeConsumed = ConsumedData(downChange = true)
  * [Modifier.pointerInput] DSL and carries the [Density] from [DensityAmbient] at the point of
  * the modifier's materialization. Even if this value were returned to the [PointerInputFilter]
  * callbacks, we would still need the value at composition time in order for [Modifier.pointerInput]
- * to begin its internal [LaunchedTask] for the provided code block.
+ * to begin its internal [LaunchedEffect] for the provided code block.
  */
 // TODO: Suppressing deprecation for synchronized; need to move to atomicfu wrapper
 @Suppress("DEPRECATION_ERROR")
@@ -169,7 +169,7 @@ internal class SuspendingPointerInputFilter(
     /**
      * TODO: work out whether this is actually a race or not.
      * It shouldn't be, as we will have attached the [PointerInputModifier] during
-     * composition-apply by the time the [LaunchedTask] that would access this property
+     * composition-apply by the time the [LaunchedEffect] that would access this property
      * is dispatched and begins running.
      */
     override val customEventDispatcher: CustomEventDispatcher

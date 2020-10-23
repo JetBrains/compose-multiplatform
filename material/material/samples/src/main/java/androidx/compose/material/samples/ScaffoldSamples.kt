@@ -49,7 +49,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -266,7 +266,7 @@ fun ScaffoldWithCoroutinesSnackbar() {
     val snackbarHostState = remember { SnackbarHostState() }
     // we allow only one snackbar to be in the queue here, hence conflated
     val channel = remember { BroadcastChannel<Int>(Channel.Factory.CONFLATED) }
-    LaunchedTask {
+    LaunchedEffect(channel) {
         channel.asFlow().collect { index ->
             val result = snackbarHostState.showSnackbar(
                 message = "Snackbar # $index",

@@ -37,7 +37,7 @@ class ProduceStateTests {
         val emitter = Channel<Int>(Channel.BUFFERED)
 
         rule.setContent {
-            val state by produceState(0) {
+            val state by produceState(0, emitter) {
                 for (item in emitter) {
                     value = item
                 }
