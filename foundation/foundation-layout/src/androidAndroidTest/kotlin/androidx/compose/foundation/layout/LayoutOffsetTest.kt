@@ -23,9 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -33,6 +36,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assume
 import org.junit.Before
@@ -53,6 +58,12 @@ class LayoutOffsetTest : LayoutTest() {
         Assume.assumeFalse(
             Build.MODEL.contains("Nexus 5") && Build.VERSION.SDK_INT == Build.VERSION_CODES.M
         )
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     @Test
@@ -311,5 +322,47 @@ class LayoutOffsetTest : LayoutTest() {
             )
             Assert.assertEquals(offsetY, positionY)
         }
+    }
+
+    @Test
+    fun testOffsetInspectableValue() {
+        val modifier = Modifier.offset(3.0.dp, 4.5.dp) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("offset")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("x", 3.0.dp),
+            ValueElement("y", 4.5.dp)
+        )
+    }
+
+    @Test
+    fun testAbsoluteOffsetInspectableValue() {
+        val modifier = Modifier.absoluteOffset(3.0.dp, 1.5.dp) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("absoluteOffset")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("x", 3.0.dp),
+            ValueElement("y", 1.5.dp)
+        )
+    }
+
+    @Test
+    fun testOffsetPxInspectableValue() {
+        val modifier = Modifier.offsetPx(mutableStateOf(10.0f), mutableStateOf(20.0f))
+            as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("offsetPx")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+            .containsExactly("x", "y")
+    }
+
+    @Test
+    fun testAbsoluteOffsetPxInspectableValue() {
+        val modifier = Modifier.absoluteOffsetPx(mutableStateOf(10.0f), mutableStateOf(20.0f))
+            as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("absoluteOffsetPx")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+            .containsExactly("x", "y")
     }
 }

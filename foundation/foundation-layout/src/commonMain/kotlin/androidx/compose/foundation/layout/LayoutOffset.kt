@@ -19,11 +19,14 @@ package androidx.compose.foundation.layout
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -37,7 +40,18 @@ import kotlin.math.roundToInt
  * @sample androidx.compose.foundation.layout.samples.LayoutOffsetModifier
  */
 @Stable
-fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(OffsetModifier(x, y, true))
+fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
+    OffsetModifier(
+        x = x,
+        y = y,
+        rtlAware = true,
+        inspectorInfo = debugInspectorInfo {
+            name = "offset"
+            properties["x"] = x
+            properties["y"] = y
+        }
+    )
+)
 
 /**
  * Offset the content by ([x] dp, [y] dp). The offsets can be positive as well as non-positive.
@@ -48,8 +62,18 @@ fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(OffsetModifier(x, y,
  * @sample androidx.compose.foundation.layout.samples.LayoutAbsoluteOffsetModifier
  */
 @Stable
-fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) =
-    this.then(OffsetModifier(x, y, false))
+fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
+    OffsetModifier(
+        x = x,
+        y = y,
+        rtlAware = false,
+        inspectorInfo = debugInspectorInfo {
+            name = "absoluteOffset"
+            properties["x"] = x
+            properties["y"] = y
+        }
+    )
+)
 
 /**
  * Offset the content by ([x] px, [y] px). The offsets can be positive as well as non-positive.
@@ -61,7 +85,18 @@ fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) =
 fun Modifier.offsetPx(
     x: State<Float> = mutableStateOf(0f),
     y: State<Float> = mutableStateOf(0f)
-) = this.then(OffsetPxModifier(x, y, true))
+) = this.then(
+    OffsetPxModifier(
+        x = x,
+        y = y,
+        rtlAware = true,
+        inspectorInfo = debugInspectorInfo {
+            name = "offsetPx"
+            properties["x"] = x
+            properties["y"] = y
+        }
+    )
+)
 
 /**
  * Offset the content by ([x] px, [y] px). The offsets can be positive as well as non-positive.
@@ -76,9 +111,25 @@ fun Modifier.offsetPx(
 fun Modifier.absoluteOffsetPx(
     x: State<Float> = mutableStateOf(0f),
     y: State<Float> = mutableStateOf(0f)
-) = this.then(OffsetPxModifier(x, y, false))
+) = this.then(
+    OffsetPxModifier(
+        x = x,
+        y = y,
+        rtlAware = false,
+        inspectorInfo = debugInspectorInfo {
+            name = "absoluteOffsetPx"
+            properties["x"] = x
+            properties["y"] = y
+        }
+    )
+)
 
-private data class OffsetModifier(val x: Dp, val y: Dp, val rtlAware: Boolean) : LayoutModifier {
+private class OffsetModifier(
+    val x: Dp,
+    val y: Dp,
+    val rtlAware: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -92,13 +143,32 @@ private data class OffsetModifier(val x: Dp, val y: Dp, val rtlAware: Boolean) :
             }
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? OffsetModifier ?: return false
+
+        return x == otherModifier.x &&
+            y == otherModifier.y &&
+            rtlAware == otherModifier.rtlAware
+    }
+
+    override fun hashCode(): Int {
+        var result = x.hashCode()
+        result = 31 * result + y.hashCode()
+        result = 31 * result + rtlAware.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "OffsetModifier(x=$x, y=$y, rtlAware=$rtlAware)"
 }
 
-private data class OffsetPxModifier(
+private class OffsetPxModifier(
     val x: State<Float>,
     val y: State<Float>,
-    val rtlAware: Boolean
-) : LayoutModifier {
+    val rtlAware: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -112,4 +182,22 @@ private data class OffsetPxModifier(
             }
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? OffsetPxModifier ?: return false
+
+        return x == otherModifier.x &&
+            y == otherModifier.y &&
+            rtlAware == otherModifier.rtlAware
+    }
+
+    override fun hashCode(): Int {
+        var result = x.hashCode()
+        result = 31 * result + y.hashCode()
+        result = 31 * result + rtlAware.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "OffsetPxModifier(x=$x, y=$y, rtlAware=$rtlAware)"
 }

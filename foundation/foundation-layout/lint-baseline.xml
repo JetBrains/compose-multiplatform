@@ -23,48 +23,4 @@
             column="15"/>
     </issue>
 
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(OffsetModifier(x, y, true))"
-        errorLine2="                                                            ~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/LayoutOffset.kt"
-            line="39"
-            column="61"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    this.then(OffsetModifier(x, y, false))"
-        errorLine2="              ~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/LayoutOffset.kt"
-            line="51"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = this.then(OffsetPxModifier(x, y, true))"
-        errorLine2="              ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/LayoutOffset.kt"
-            line="63"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = this.then(OffsetPxModifier(x, y, false))"
-        errorLine2="              ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/LayoutOffset.kt"
-            line="78"
-            column="15"/>
-    </issue>
-
 </issues>
