@@ -34,6 +34,13 @@ import android.graphics.Outline as AndroidOutline
  * Resolves the [AndroidOutline] from the [Shape] of an [OwnedLayer].
  */
 internal class OutlineResolver(private val density: Density) {
+
+    /**
+     * Flag to determine if the shape specified on the outline is supported.
+     * On older API levels, concave shapes are not allowed
+     */
+    private var isSupportedOutline = true
+
     /**
      * The Android Outline that is used in the layer.
      */
@@ -82,7 +89,7 @@ internal class OutlineResolver(private val density: Density) {
     val outline: AndroidOutline?
         get() {
             updateCache()
-            return if (!outlineNeeded || cachedOutline.isEmpty) null else cachedOutline
+            return if (!outlineNeeded || !isSupportedOutline) null else cachedOutline
         }
 
     /**
@@ -134,6 +141,10 @@ internal class OutlineResolver(private val density: Density) {
             cacheIsDirty = false
             usePathForClip = false
             if (outlineNeeded && size.width > 0.0f && size.height > 0.0f) {
+                // Always assume the outline type is supported
+                // The methods to configure the outline will determine/update the flag
+                // if it not supported on the API level
+                isSupportedOutline = true
                 when (val outline = shape.createOutline(size, density)) {
                     is Outline.Rectangle -> updateCacheWithRect(outline.rect)
                     is Outline.Rounded -> updateCacheWithRoundRect(outline.roundRect)
@@ -179,6 +190,7 @@ internal class OutlineResolver(private val density: Density) {
             cachedOutline.setConvexPath(composePath.asAndroidPath())
             usePathForClip = !cachedOutline.canClip()
         } else {
+            isSupportedOutline = false // Concave outlines are not supported on older API levels
             cachedOutline.setEmpty()
             usePathForClip = true
         }
