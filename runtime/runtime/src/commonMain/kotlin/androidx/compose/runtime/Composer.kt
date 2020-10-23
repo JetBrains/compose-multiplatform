@@ -392,8 +392,8 @@ class Composer<N>(
     private var insertAnchor: Anchor = insertTable.read { it.anchor(0) }
     private val insertFixups = mutableListOf<Change<N>>()
 
-    internal val applyCoroutineContext: CoroutineContext
-        get() = parentReference.effectCoroutineContext
+    val applyCoroutineContext: CoroutineContext
+        @TestOnly get() = parentReference.effectCoroutineContext
 
     /**
      * Inserts a "Replaceable Group" starting marker in the slot table at the current execution

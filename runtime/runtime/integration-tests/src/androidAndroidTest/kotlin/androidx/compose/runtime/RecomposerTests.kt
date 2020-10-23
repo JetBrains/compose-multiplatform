@@ -20,7 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.compose.runtime.snapshots.currentSnapshot
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
@@ -467,9 +467,9 @@ class RecomposerTests : BaseComposeTest() {
     fun testFrameTransition() {
         var snapshotId: Int? = null
         compose {
-            snapshotId = currentSnapshot().id
+            snapshotId = Snapshot.current.id
         }.then {
-            assertNotSame(snapshotId, currentSnapshot().id)
+            assertNotSame(snapshotId, Snapshot.current.id)
         }
     }
 }
