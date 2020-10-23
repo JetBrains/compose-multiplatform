@@ -17,13 +17,16 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.satisfiedBy
@@ -45,9 +48,20 @@ import kotlin.math.roundToInt
 fun Modifier.aspectRatio(
     @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */, fromInclusive = false)
     ratio: Float
-) = this.then(AspectRatioModifier(ratio))
+) = this.then(
+    AspectRatioModifier(
+        aspectRatio = ratio,
+        inspectorInfo = debugInspectorInfo {
+            name = "aspectRatio"
+            value = ratio
+        }
+    )
+)
 
-private data class AspectRatioModifier(val aspectRatio: Float) : LayoutModifier {
+private class AspectRatioModifier(
+    val aspectRatio: Float,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     init {
         require(aspectRatio > 0) { "aspectRatio $aspectRatio must be > 0" }
     }
@@ -143,4 +157,14 @@ private data class AspectRatioModifier(val aspectRatio: Float) : LayoutModifier 
         }
         return null
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? AspectRatioModifier ?: return false
+        return aspectRatio == otherModifier.aspectRatio
+    }
+
+    override fun hashCode(): Int = aspectRatio.hashCode()
+
+    override fun toString(): String = "AspectRatioModifier(aspectRatio=$aspectRatio)"
 }

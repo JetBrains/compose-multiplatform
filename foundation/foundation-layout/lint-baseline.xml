@@ -12,15 +12,4 @@
             column="26"/>
     </issue>
 
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = this.then(AspectRatioModifier(ratio))"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/LayoutAspectRatio.kt"
-            line="47"
-            column="15"/>
-    </issue>
-
 </issues>
