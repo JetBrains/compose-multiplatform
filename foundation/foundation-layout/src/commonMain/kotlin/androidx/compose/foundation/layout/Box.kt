@@ -29,6 +29,10 @@ import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.NoInspectorInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -215,11 +219,20 @@ interface BoxScope {
      * have priority over the [Box]'s `alignment` parameter.
      */
     @Stable
-    fun Modifier.align(alignment: Alignment) = this.then(BoxChildData(alignment, false))
+    fun Modifier.align(alignment: Alignment) = this.then(
+        BoxChildData(
+            alignment = alignment,
+            matchParentSize = false,
+            inspectorInfo = debugInspectorInfo {
+                name = "align"
+                value = alignment
+            }
+        )
+    )
 
     @Stable
     @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment) = this.then(BoxChildData(align, false))
+    fun Modifier.gravity(align: Alignment) = align(align)
 
     /**
      * Size the element to match the size of the [Box] after all other content elements have
@@ -234,7 +247,13 @@ interface BoxScope {
      * available space.
      */
     @Stable
-    fun Modifier.matchParentSize() = this.then(MatchParentSizeModifier)
+    fun Modifier.matchParentSize() = this.then(
+        BoxChildData(
+            alignment = Alignment.Center,
+            matchParentSize = true,
+            inspectorInfo = debugInspectorInfo { name = "matchParentSize" }
+        )
+    )
 
     companion object : BoxScope
 }
@@ -245,15 +264,30 @@ interface BoxScope {
 )
 typealias StackScope = BoxScope
 
-@Stable
-private val MatchParentSizeModifier: ParentDataModifier = BoxChildData(Alignment.Center, true)
-
 private val Measurable.boxChildData: BoxChildData? get() = parentData as? BoxChildData
 private val Measurable.matchesParentSize: Boolean get() = boxChildData?.matchParentSize ?: false
 
-private data class BoxChildData(
+private class BoxChildData(
     var alignment: Alignment,
-    var matchParentSize: Boolean = false
-) : ParentDataModifier {
+    var matchParentSize: Boolean = false,
+    inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?) = this@BoxChildData
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? BoxChildData ?: return false
+
+        return alignment == otherModifier.alignment &&
+            matchParentSize == otherModifier.matchParentSize
+    }
+
+    override fun hashCode(): Int {
+        var result = alignment.hashCode()
+        result = 31 * result + matchParentSize.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "BoxChildData(alignment=$alignment, matchParentSize=$matchParentSize)"
 }
