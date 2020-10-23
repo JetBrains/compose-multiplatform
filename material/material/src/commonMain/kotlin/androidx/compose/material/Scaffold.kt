@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -37,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
-import androidx.compose.ui.zIndex
 
 /**
  * State for [Scaffold] composable component.
@@ -248,14 +246,7 @@ private fun ScaffoldLayout(
 
             val snackbarHeight = snackbarPlaceables.fastMaxBy { it.height }?.height ?: 0
 
-            val fabPlaceables = subcompose(ScaffoldLayoutContent.Fab) {
-                // TODO: b/169257866 - remove box and zIndex modifier
-                // Currently we need an extra box here with a high zIndex to ensure that the FAB is
-                // always placed above the bottom bar - although we control the natural drawing
-                // order below, currently the FAB has a default elevation lower than the bottom
-                // app bar, so without this box it will be placed below the bottom bar.
-                Box(Modifier.zIndex(Float.POSITIVE_INFINITY)) { fab() }
-            }.fastMap {
+            val fabPlaceables = subcompose(ScaffoldLayoutContent.Fab, fab).fastMap {
                 it.measure(looseConstraints)
             }
 
