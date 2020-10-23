@@ -39,26 +39,6 @@ import io.reactivex.plugins.RxJavaPlugins
  * Note that errors are not handled and the default [RxJavaPlugins.onError] logic will be
  * used. To handle the error in a more meaningful way you can use operators like
  * [Observable.onErrorReturn] or [Observable.onErrorResumeNext].
- */
-@Deprecated(
-    "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-        "best default, for example when you have a List it is better to start with emptyList()",
-    ReplaceWith("subscribeAsState(null)")
-)
-@Suppress("NOTHING_TO_INLINE")
-@Composable
-inline fun <T : Any> Observable<T>.subscribeAsState(): State<T?> = subscribeAsState(null)
-
-/**
- * Subscribes to this [Observable] and represents its values via [State]. Every time there would
- * be new value posted into the [Observable] the returned [State] will be updated causing
- * recomposition of every [State.value] usage.
- *
- * The internal observer will be automatically disposed when this composable disposes.
- *
- * Note that errors are not handled and the default [RxJavaPlugins.onError] logic will be
- * used. To handle the error in a more meaningful way you can use operators like
- * [Observable.onErrorReturn] or [Observable.onErrorResumeNext].
  *
  * @sample androidx.compose.runtime.rxjava2.samples.ObservableSample
  *
@@ -68,26 +48,6 @@ inline fun <T : Any> Observable<T>.subscribeAsState(): State<T?> = subscribeAsSt
 @Composable
 fun <R, T : R> Observable<T>.subscribeAsState(initial: R): State<R> =
     asState(initial) { subscribe(it) }
-
-/**
- * Subscribes to this [Flowable] and represents its values via [State]. Every time there would
- * be new value posted into the [Flowable] the returned [State] will be updated causing
- * recomposition of every [State.value] usage.
- *
- * The internal observer will be automatically disposed when this composable disposes.
- *
- * Note that errors are not handled and the default [RxJavaPlugins.onError] logic will be
- * used. To handle the error in a more meaningful way you can use operators like
- * [Flowable.onErrorReturn] or [Flowable.onErrorResumeNext].
- */
-@Deprecated(
-    "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-        "best default, for example when you have a List it is better to start with emptyList()",
-    ReplaceWith("subscribeAsState(null)")
-)
-@Suppress("NOTHING_TO_INLINE")
-@Composable
-inline fun <T : Any> Flowable<T>.subscribeAsState(): State<T?> = subscribeAsState(null)
 
 /**
  * Subscribes to this [Flowable] and represents its values via [State]. Every time there would
@@ -119,26 +79,6 @@ fun <R, T : R> Flowable<T>.subscribeAsState(initial: R): State<R> =
  * Note that errors are not handled and the default [RxJavaPlugins.onError] logic will be
  * used. To handle the error in a more meaningful way you can use operators like
  * [Single.onErrorReturn] or [Single.onErrorResumeNext].
- */
-@Deprecated(
-    "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-        "best default, for example when you have a List it is better to start with emptyList()",
-    ReplaceWith("subscribeAsState(null)")
-)
-@Suppress("NOTHING_TO_INLINE")
-@Composable
-inline fun <T : Any> Single<T>.subscribeAsState(): State<T?> = subscribeAsState(null)
-
-/**
- * Subscribes to this [Single] and represents its value via [State]. Once the value would be
- * posted into the [Single] the returned [State] will be updated causing recomposition of
- * every [State.value] usage.
- *
- * The internal observer will be automatically disposed when this composable disposes.
- *
- * Note that errors are not handled and the default [RxJavaPlugins.onError] logic will be
- * used. To handle the error in a more meaningful way you can use operators like
- * [Single.onErrorReturn] or [Single.onErrorResumeNext].
  *
  * @sample androidx.compose.runtime.rxjava2.samples.SingleSample
  *
@@ -148,26 +88,6 @@ inline fun <T : Any> Single<T>.subscribeAsState(): State<T?> = subscribeAsState(
 @Composable
 fun <R, T : R> Single<T>.subscribeAsState(initial: R): State<R> =
     asState(initial) { subscribe(it) }
-
-/**
- * Subscribes to this [Maybe] and represents its value via [State]. Once the value would be
- * posted into the [Maybe] the returned [State] will be updated causing recomposition of
- * every [State.value] usage.
- *
- * The internal observer will be automatically disposed when this composable disposes.
- *
- * Note that errors are not handled and the default [RxJavaPlugins.onError] logic will be
- * used. To handle the error in a more meaningful way you can use operators like
- * [Maybe.onErrorComplete], [Maybe.onErrorReturn] or [Maybe.onErrorResumeNext].
- */
-@Deprecated(
-    "Use subscribeAsState with an explicit initial value instead. Using null is not always the " +
-        "best default, for example when you have a List it is better to start with emptyList()",
-    ReplaceWith("subscribeAsState(null)")
-)
-@Suppress("NOTHING_TO_INLINE")
-@Composable
-inline fun <T : Any> Maybe<T>.subscribeAsState(): State<T?> = subscribeAsState(null)
 
 /**
  * Subscribes to this [Maybe] and represents its value via [State]. Once the value would be
