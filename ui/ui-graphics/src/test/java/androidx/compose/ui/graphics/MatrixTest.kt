@@ -19,7 +19,6 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -29,7 +28,6 @@ import org.junit.runners.JUnit4
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-@SmallTest
 @RunWith(JUnit4::class)
 class MatrixTest {
     @Test

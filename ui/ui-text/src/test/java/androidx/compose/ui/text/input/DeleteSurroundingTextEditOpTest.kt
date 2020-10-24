@@ -17,14 +17,12 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@SmallTest
 @RunWith(JUnit4::class)
 class DeleteSurroundingTextEditOpTest {
 

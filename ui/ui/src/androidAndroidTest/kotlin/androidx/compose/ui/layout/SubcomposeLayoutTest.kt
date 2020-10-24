@@ -42,8 +42,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertPositionInRootIsEqualTo
@@ -57,12 +59,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalSubcomposeLayoutApi::class)
 class SubcomposeLayoutTest {
 
@@ -498,6 +499,7 @@ class SubcomposeLayoutTest {
     }
 
     @Test
+    @LargeTest
     fun viewWithSubcomposeLayoutCanBeDetached() {
         // verifies that the View with composed SubcomposeLayout can be detached at any point of
         // time without runtime crashes and once the view will be attached again the change will

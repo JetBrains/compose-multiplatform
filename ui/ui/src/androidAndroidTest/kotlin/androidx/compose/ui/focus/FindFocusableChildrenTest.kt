@@ -16,22 +16,22 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
+@MediumTest
 @OptIn(ExperimentalFocus::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class FindFocusableChildrenTest {
     @get:Rule
     val rule = createComposeRule()

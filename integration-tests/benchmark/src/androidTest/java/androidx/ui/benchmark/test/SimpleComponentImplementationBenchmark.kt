@@ -34,10 +34,10 @@ import androidx.ui.integration.test.core.ComponentWithModifiersTestCase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class SimpleComponentImplementationBenchmark {
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule(enableTransitions = true)

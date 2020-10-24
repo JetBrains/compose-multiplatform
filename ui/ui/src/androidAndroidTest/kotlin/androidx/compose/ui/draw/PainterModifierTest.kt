@@ -65,6 +65,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.ui.test.ComposeTestRule
@@ -80,12 +82,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class PainterModifierTest {
 
     val containerWidth = 100.0f
@@ -621,6 +622,7 @@ class PainterModifierTest {
     }
 
     @Test
+    @SmallTest
     fun testInspectable() {
         val painter = TestPainter(10f, 20f)
         val modifier = Modifier.paint(painter) as InspectableValue

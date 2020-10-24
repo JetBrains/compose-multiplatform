@@ -18,7 +18,8 @@ package androidx.compose.ui.text.android.style
 
 import android.text.TextPaint
 import androidx.compose.ui.text.android.InternalPlatformTextApi
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
@@ -26,11 +27,10 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @OptIn(InternalPlatformTextApi::class)
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class LetterSpacingSpanPxTest {
     @Test
     fun updateDrawState() {

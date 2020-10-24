@@ -18,7 +18,6 @@ package androidx.compose.ui.hapticfeedback
 
 import android.view.HapticFeedbackConstants
 import android.view.View
-import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
@@ -27,7 +26,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@SmallTest
 @RunWith(JUnit4::class)
 class HapticFeedbackTest {
     @Test

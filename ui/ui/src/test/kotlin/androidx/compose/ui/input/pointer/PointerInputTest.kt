@@ -19,7 +19,6 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth
@@ -38,7 +37,6 @@ import org.junit.runners.JUnit4
 // consumePositionChange_changeOverConsumed_throwsException
 // consumePositionChange_consumedInWrongDirection_throwsException
 
-@SmallTest
 @RunWith(JUnit4::class)
 class PointerInputTest {
 

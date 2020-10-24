@@ -29,7 +29,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 /**
  * In this test cases, use following notations:
@@ -41,7 +41,7 @@ import org.junit.runners.JUnit4
  */
 @SmallTest
 @OptIn(InternalPlatformTextApi::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class SegmentBreakerBreakSegmentTest {
     private val sampleTypeface = ResourcesCompat.getFont(
         InstrumentationRegistry.getInstrumentation().targetContext,

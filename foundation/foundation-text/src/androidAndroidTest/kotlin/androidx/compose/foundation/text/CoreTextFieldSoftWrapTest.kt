@@ -38,10 +38,10 @@ import androidx.compose.ui.text.font.test.R
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class CoreTextFieldSoftWrapTest {
 
     private val fontFamily = ResourceFont(
