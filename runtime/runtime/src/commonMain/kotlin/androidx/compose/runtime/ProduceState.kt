@@ -213,6 +213,7 @@ fun <T> produceState(
     @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
+    @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
     LaunchedEffect(subjects = subjects) {
         ProduceStateScopeImpl(result, coroutineContext).producer()
     }
