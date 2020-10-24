@@ -23,10 +23,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class MoveCursorEditOpTest {
     private val CH1 = "\uD83D\uDE00" // U+1F600
     private val CH2 = "\uD83D\uDE01" // U+1F601

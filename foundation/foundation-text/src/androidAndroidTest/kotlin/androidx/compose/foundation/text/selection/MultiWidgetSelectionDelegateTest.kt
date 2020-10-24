@@ -52,7 +52,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 val BASIC_MEASURE_FONT = font(
     resId = R.font.sample_font,
@@ -61,7 +61,7 @@ val BASIC_MEASURE_FONT = font(
 )
 
 @OptIn(InternalTextApi::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @SmallTest
 class MultiWidgetSelectionDelegateTest {
     @get:Rule

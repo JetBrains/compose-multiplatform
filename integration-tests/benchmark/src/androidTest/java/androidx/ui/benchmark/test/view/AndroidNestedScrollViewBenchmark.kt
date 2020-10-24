@@ -31,13 +31,13 @@ import androidx.ui.integration.test.view.AndroidNestedScrollViewTestCase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 /**
  * Benchmark that runs [AndroidNestedScrollViewTestCase].
  */
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class AndroidNestedScrollViewBenchmark {
 
     @get:Rule

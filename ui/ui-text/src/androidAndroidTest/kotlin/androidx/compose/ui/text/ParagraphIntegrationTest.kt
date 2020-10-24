@@ -48,10 +48,10 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.roundToInt
 
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @SmallTest
 class ParagraphIntegrationTest {
     private val fontFamilyMeasureFont = BASIC_MEASURE_FONT.asFontFamily()

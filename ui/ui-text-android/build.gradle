@@ -40,6 +40,7 @@ dependencies {
     androidTestImplementation project(":compose:ui:ui-test-font")
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
+    androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
     androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
     androidTestImplementation(ESPRESSO_CORE)
     androidTestImplementation(JUNIT)

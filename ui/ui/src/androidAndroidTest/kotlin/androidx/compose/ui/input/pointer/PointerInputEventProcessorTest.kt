@@ -55,7 +55,7 @@ import com.nhaarman.mockitokotlin2.spy
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 // TODO(shepshapard): Write the following PointerInputEvent to PointerInputChangeEvent tests
 // 2 down, 2 move, 2 up, converted correctly
@@ -81,7 +81,7 @@ import org.junit.runners.JUnit4
 // down, move, up, on 2, hits all 5 passes
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalLayoutNodeApi::class)
 class PointerInputEventProcessorTest {
 

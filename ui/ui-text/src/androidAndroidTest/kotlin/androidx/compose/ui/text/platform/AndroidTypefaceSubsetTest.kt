@@ -28,9 +28,9 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(AndroidJUnit4::class)
 @SmallTest
 class AndroidTypefaceSubsetTest {
 

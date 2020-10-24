@@ -40,7 +40,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 /**
  * Test simulating an immutable and observable theme object, to ensure recomposition correctness
@@ -48,7 +48,7 @@ import org.junit.runners.JUnit4
  * follows this 'observable' pattern.
  */
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTesting::class)
 class ObservableThemeTest {
     @get:Rule

@@ -91,7 +91,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -104,7 +104,7 @@ import kotlin.math.roundToInt
  * It also tests that layouts with both Layout and MeasureBox work.
  */
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class AndroidLayoutDrawTest {
     @Suppress("DEPRECATION")
     @get:Rule

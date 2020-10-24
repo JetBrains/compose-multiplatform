@@ -43,12 +43,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 // Tests that pointer offsets are correct when a pointer is dispatched from Android through
 // Compose and back into Android and each layer offsets the pointer during dispatch.
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class PointerInteropFilterAndroidViewOffsetsTest {
 
     private lateinit var five: View

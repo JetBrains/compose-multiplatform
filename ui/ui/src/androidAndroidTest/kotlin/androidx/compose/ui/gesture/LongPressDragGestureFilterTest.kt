@@ -35,7 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit
 //  Should possibly wait till we have host side testing that does not require the Android runtime.
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class LongPressDragGestureFilterTest {
     @Suppress("DEPRECATION")
     @get:Rule

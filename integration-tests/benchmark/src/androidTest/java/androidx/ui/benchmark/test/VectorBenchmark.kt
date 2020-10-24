@@ -27,14 +27,14 @@ import androidx.ui.integration.test.framework.XmlVectorTestCase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 /**
  * Benchmark to compare performance of [parsing a vector asset from XML][XmlVectorTestCase] and
  * [creating the same asset purely from code][ProgrammaticVectorTestCase].
  */
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class VectorBenchmark {
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule()

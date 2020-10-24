@@ -39,14 +39,14 @@ import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
 private const val TEST_TAG = "zoomableTestTag"
 
 private const val EDGE_FUZZ_FACTOR = 0.2f
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class ZoomableTest {
     @get:Rule
     val rule = createComposeRule()
