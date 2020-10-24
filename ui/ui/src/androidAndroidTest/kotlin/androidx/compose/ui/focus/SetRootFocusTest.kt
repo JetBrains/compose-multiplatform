@@ -29,7 +29,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,7 +45,6 @@ class SetRootFocusTest {
     private val nonFocusable = "NotFocusable"
 
     @Test
-    @Ignore("Test broke while presubmit wasn't running tests, TODO: Fix!")
     fun clearFocus_byClickingOutsideFocusableComponent() {
         // Arrange.
         var isFocused = false
