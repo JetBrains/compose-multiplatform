@@ -17,15 +17,15 @@ package androidx.compose.ui.text.android.style
 
 import android.text.TextPaint
 import androidx.compose.ui.text.android.InternalPlatformTextApi
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.mockito.Mockito
 
 @OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
-@SmallTest
+@MediumTest
 class ShadowSpanTest {
     @Test
     fun updateDrawStateTest() {

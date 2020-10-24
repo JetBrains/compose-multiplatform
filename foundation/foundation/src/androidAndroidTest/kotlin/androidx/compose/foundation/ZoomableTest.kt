@@ -27,7 +27,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.ui.test.center
 import androidx.compose.ui.test.createAnimationClockRule
 import androidx.ui.test.createComposeRule
@@ -39,13 +40,12 @@ import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 private const val TEST_TAG = "zoomableTestTag"
 
 private const val EDGE_FUZZ_FACTOR = 0.2f
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ZoomableTest {
     @get:Rule

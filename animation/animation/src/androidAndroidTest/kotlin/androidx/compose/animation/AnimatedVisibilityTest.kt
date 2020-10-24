@@ -34,7 +34,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import androidx.test.filters.MediumTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.ui.test.createComposeRule
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
@@ -42,10 +43,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
+@LargeTest
 class AnimatedVisibilityTest {
 
     @get:Rule

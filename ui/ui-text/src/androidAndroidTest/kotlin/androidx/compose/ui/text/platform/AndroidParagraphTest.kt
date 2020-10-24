@@ -45,6 +45,8 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -59,7 +61,6 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.ceil
 
 @OptIn(InternalPlatformTextApi::class)
@@ -775,6 +776,7 @@ class AndroidParagraphTest {
     }
 
     @Test
+    @MediumTest
     fun testEmptyFontFamily() {
         val typefaceAdapter = mock<TypefaceAdapter>()
         val paragraph = simpleParagraph(
@@ -793,6 +795,7 @@ class AndroidParagraphTest {
     }
 
     @Test
+    @MediumTest
     fun testEmptyFontFamily_withBoldFontWeightSelection() {
         val typefaceAdapter = spy(TypefaceAdapter())
 
@@ -820,6 +823,7 @@ class AndroidParagraphTest {
     }
 
     @Test
+    @MediumTest
     fun testEmptyFontFamily_withFontStyleSelection() {
         val typefaceAdapter = spy(TypefaceAdapter())
         val paragraph = simpleParagraph(
@@ -846,6 +850,7 @@ class AndroidParagraphTest {
     }
 
     @Test
+    @MediumTest
     fun testFontFamily_withGenericFamilyName() {
         val typefaceAdapter = spy(TypefaceAdapter())
         val fontFamily = FontFamily.SansSerif
@@ -873,6 +878,7 @@ class AndroidParagraphTest {
     }
 
     @Test
+    @MediumTest
     fun testFontFamily_withCustomFont() {
         val typefaceAdapter = spy(TypefaceAdapter())
         val paragraph = simpleParagraph(
@@ -896,6 +902,7 @@ class AndroidParagraphTest {
     }
 
     @Test
+    @MediumTest
     fun testFontFamily_appliedAsSpan() {
         val text = "abc"
         val typefaceAdapter = spy(TypefaceAdapter())

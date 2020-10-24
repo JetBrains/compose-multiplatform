@@ -30,7 +30,8 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.test.filters.MediumTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.ui.test.createComposeRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
@@ -38,10 +39,9 @@ import junit.framework.TestCase.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
+@LargeTest
 class AnimationModifierTest {
 
     @get:Rule

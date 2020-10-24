@@ -35,8 +35,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import androidx.ui.test.GestureScope
 import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.StateRestorationTester
@@ -62,11 +64,10 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ScrollTest {
 
@@ -459,16 +460,19 @@ class ScrollTest {
     }
 
     @Test
+    @LargeTest
     fun verticalScroller_swipeUp_swipeDown() {
         swipeScrollerAndBack(true, GestureScope::swipeUp, GestureScope::swipeDown)
     }
 
     @Test
+    @LargeTest
     fun horizontalScroller_swipeLeft_swipeRight() {
         swipeScrollerAndBack(false, GestureScope::swipeLeft, GestureScope::swipeRight)
     }
 
     @Test
+    @LargeTest
     fun horizontalScroller_rtl_swipeLeft_swipeRight() {
         swipeScrollerAndBack(
             false,

@@ -16,9 +16,9 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -29,17 +29,17 @@ import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.roundToInt
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ListItemTest {
 

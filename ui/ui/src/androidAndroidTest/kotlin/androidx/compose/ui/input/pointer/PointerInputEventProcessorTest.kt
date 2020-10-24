@@ -49,13 +49,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.milliseconds
 import androidx.compose.ui.unit.minus
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.spy
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 // TODO(shepshapard): Write the following PointerInputEvent to PointerInputChangeEvent tests
 // 2 down, 2 move, 2 up, converted correctly
@@ -80,7 +80,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 // TODO(shepshapard): Write the following pointer input dispatch path tests:
 // down, move, up, on 2, hits all 5 passes
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalLayoutNodeApi::class)
 class PointerInputEventProcessorTest {

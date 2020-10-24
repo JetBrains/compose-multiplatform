@@ -16,10 +16,10 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.AmbientTextStyle
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -51,7 +51,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.ui.test.assertHasClickAction
@@ -72,7 +74,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.abs
 
 @MediumTest
@@ -280,6 +281,7 @@ class ButtonTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun shapeAndColorFromThemeIsUsed() {
         val shape = CutCornerShape(10.dp)
         var surface = Color.Transparent
@@ -349,6 +351,7 @@ class ButtonTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun containedButtonDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         var onSurface = Color.Transparent
@@ -381,6 +384,7 @@ class ButtonTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun containedButtonWithCustomColorDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         var onSurface = Color.Transparent
@@ -416,6 +420,7 @@ class ButtonTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun outlinedButtonDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         val padding = 8.dp
@@ -445,6 +450,7 @@ class ButtonTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun textButtonDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         rule.setMaterialContent {

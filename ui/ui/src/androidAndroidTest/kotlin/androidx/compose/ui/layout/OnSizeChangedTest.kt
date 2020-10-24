@@ -28,6 +28,8 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -36,11 +38,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class OnSizeChangedTest {
 
@@ -56,6 +57,7 @@ class OnSizeChangedTest {
     }
 
     @Test
+    @SmallTest
     fun normalSizeChange() {
         var latch = CountDownLatch(1)
         var changedSize = IntSize.Zero
@@ -160,6 +162,7 @@ class OnSizeChangedTest {
     }
 
     @Test
+    @SmallTest
     fun addedModifier() {
         var latch1 = CountDownLatch(1)
         var latch2 = CountDownLatch(1)

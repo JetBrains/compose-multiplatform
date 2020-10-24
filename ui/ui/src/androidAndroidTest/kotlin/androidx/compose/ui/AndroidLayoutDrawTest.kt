@@ -79,8 +79,9 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -91,7 +92,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -103,7 +103,7 @@ import kotlin.math.roundToInt
  * Corresponds to ContainingViewTest, but tests single composition measure, layout and draw.
  * It also tests that layouts with both Layout and MeasureBox work.
  */
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class AndroidLayoutDrawTest {
     @Suppress("DEPRECATION")

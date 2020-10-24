@@ -75,12 +75,13 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertPixels
 import androidx.ui.test.captureToBitmap
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.onNodeWithTag
 import junit.framework.TestCase.assertNotNull
 import org.hamcrest.CoreMatchers.`is`
@@ -94,13 +95,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.roundToInt
 
 /**
  * Testing the support for Android Views in Compose UI.
  */
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class AndroidViewCompatTest {
     @get:Rule
