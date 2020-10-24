@@ -23,7 +23,6 @@ import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
 import androidx.compose.testutils.fake.FakeViewStructure
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -31,7 +30,6 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
-@SmallTest
 @RunWith(ComposeUiRobolectricTestRunner::class)
 @Config(
     manifest = Config.NONE,
