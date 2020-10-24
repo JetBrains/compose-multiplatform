@@ -25,8 +25,6 @@ import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.dependencyTracker.AffectedModuleDetector
-import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
-import androidx.build.dokka.Dokka.configureJavaProjectForDokka
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
@@ -396,10 +394,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Standard lint, docs, resource API, and Metalava configuration for AndroidX projects.
         project.configureAndroidProjectForLint(libraryExtension.lintOptions, androidXExtension)
-        if (project.isDocumentationEnabled()) {
-            project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
-        }
-
         project.configureProjectForApiTasks(
             LibraryApiTaskConfig(libraryExtension),
             androidXExtension
@@ -437,10 +431,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
-        if (project.isDocumentationEnabled()) {
-            project.configureJavaProjectForDokka(extension)
-        }
-
         project.configureProjectForApiTasks(
             JavaApiTaskConfig,
             extension

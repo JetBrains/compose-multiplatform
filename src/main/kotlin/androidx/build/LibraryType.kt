@@ -58,61 +58,52 @@ package androidx.build
 enum class LibraryType(
     val publish: Publish = Publish.NONE,
     val sourceJars: Boolean = false,
-    val generateDocs: Boolean = false,
     val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
     val compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 ) {
     PUBLISHED_LIBRARY(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
-        generateDocs = true,
         checkApi = RunApiTasks.Yes()
     ),
     SAMPLES(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
-        generateDocs = true,
         checkApi = RunApiTasks.No("Sample Library")
     ),
     LINT(
         publish = Publish.NONE,
         sourceJars = false,
-        generateDocs = false,
         checkApi = RunApiTasks.No("Lint Library"),
         compilationTarget = CompilationTarget.HOST
     ),
     COMPILER_PLUGIN(
         Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
-        generateDocs = false,
         RunApiTasks.No("Compiler Plugin (Host-only)"),
         CompilationTarget.HOST
     ),
     GRADLE_PLUGIN(
         Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
-        generateDocs = false,
         RunApiTasks.No("Gradle Plugin (Host-only)"),
         CompilationTarget.HOST
     ),
     ANNOTATION_PROCESSOR(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
-        generateDocs = false,
         checkApi = RunApiTasks.No("Annotation Processor"),
         compilationTarget = CompilationTarget.HOST
     ),
     OTHER_CODE_PROCESSOR(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
-        generateDocs = false,
         checkApi = RunApiTasks.No("Code Processor (Host-only)"),
         compilationTarget = CompilationTarget.HOST
     ),
     IDE_PLUGIN(
         publish = Publish.NONE,
         sourceJars = false,
-        generateDocs = false,
         // TODO: figure out a way to make sure we don't break Studio
         checkApi = RunApiTasks.No("IDE Plugin (consumed only by Android Studio"),
         // This is a bit complicated. IDE plugins usually have an on-device component installed by
