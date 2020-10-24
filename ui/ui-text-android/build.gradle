@@ -54,7 +54,6 @@ dependencies {
 androidx {
     name = "Compose UI Text Android support"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    generateDocs = false
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2018"
