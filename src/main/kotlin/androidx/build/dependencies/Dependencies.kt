@@ -80,7 +80,7 @@ const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-
 const val KSP_VERSION = "1.4.10-dev-experimental-20201110"
 const val KOTLIN_KSP_API = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
 const val KOTLIN_KSP = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
-const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0-rc"
+const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.20"
 
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0"
