@@ -88,8 +88,13 @@ import kotlin.math.roundToInt
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling
+ * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
+ * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
+ * maxLines attribute will be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
+ * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
+ * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
  * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
@@ -122,6 +127,7 @@ fun OutlinedTextField(
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
@@ -151,6 +157,7 @@ fun OutlinedTextField(
             }
         },
         modifier = modifier,
+        singleLine = singleLine,
         textStyle = textStyle,
         label = label,
         placeholder = placeholder,
@@ -204,8 +211,13 @@ fun OutlinedTextField(
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling
+ * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
+ * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
+ * maxLines attribute will be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
+ * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
+ * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
  * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
@@ -238,6 +250,7 @@ fun OutlinedTextField(
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
@@ -251,6 +264,7 @@ fun OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
+        singleLine = singleLine,
         textStyle = textStyle,
         label = label,
         placeholder = placeholder,
