@@ -16,9 +16,11 @@
 
 package androidx.compose.ui.res
 
+import android.content.res.Resources
 import androidx.annotation.ArrayRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.compose.ui.platform.ContextAmbient
 
 /**
@@ -29,8 +31,8 @@ import androidx.compose.ui.platform.ContextAmbient
  */
 @Composable
 fun stringResource(@StringRes id: Int): String {
-    val context = ContextAmbient.current
-    return context.resources.getString(id)
+    val resources = resources()
+    return resources.getString(id)
 }
 
 /**
@@ -42,8 +44,8 @@ fun stringResource(@StringRes id: Int): String {
  */
 @Composable
 fun stringResource(@StringRes id: Int, vararg formatArgs: Any): String {
-    val context = ContextAmbient.current
-    return context.resources.getString(id, *formatArgs)
+    val resources = resources()
+    return resources.getString(id, *formatArgs)
 }
 
 /**
@@ -54,6 +56,16 @@ fun stringResource(@StringRes id: Int, vararg formatArgs: Any): String {
  */
 @Composable
 fun stringArrayResource(@ArrayRes id: Int): Array<String> {
-    val context = ContextAmbient.current
-    return context.resources.getStringArray(id)
+    val resources = resources()
+    return resources.getStringArray(id)
+}
+
+/**
+ * A composable function that returns the [Resources]. It will be recomposed when [Configuration]
+ * gets updated.
+ */
+@Composable
+private fun resources(): Resources {
+    ConfigurationAmbient.current
+    return ContextAmbient.current.resources
 }
