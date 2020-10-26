@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    implementation(compose.desktop.all)
+    implementation(compose.desktop.currentOs)
 }
 
 application {
