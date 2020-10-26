@@ -47,6 +47,8 @@ package androidx.compose.runtime {
     method public N! getCurrent();
     method public void insert(int index, N? instance);
     method public void move(int from, int to, int count);
+    method public default void onBeginChanges();
+    method public default void onEndChanges();
     method public void remove(int index, int count);
     method public void up();
     property public abstract N! current;
