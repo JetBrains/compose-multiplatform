@@ -26,7 +26,7 @@ import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.milliseconds
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture

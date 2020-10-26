@@ -23,9 +23,9 @@ package androidx.compose.ui.test
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  *
- * @see ComposeTestRule.onNode for general find method.
+ * @see SemanticsNodeInteractionsProvider.onNode for general find method.
  */
-fun ComposeTestRule.onNodeWithTag(
+fun SemanticsNodeInteractionsProvider.onNodeWithTag(
     testTag: String,
     useUnmergedTree: Boolean = false
 ): SemanticsNodeInteraction = onNode(hasTestTag(testTag), useUnmergedTree)
@@ -37,9 +37,9 @@ fun ComposeTestRule.onNodeWithTag(
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  *
- * @see ComposeTestRule.onAllNodes for general find method.
+ * @see SemanticsNodeInteractionsProvider.onAllNodes for general find method.
  */
-fun ComposeTestRule.onAllNodesWithTag(
+fun SemanticsNodeInteractionsProvider.onAllNodesWithTag(
     testTag: String,
     useUnmergedTree: Boolean = false
 ): SemanticsNodeInteractionCollection = onAllNodes(hasTestTag(testTag), useUnmergedTree)
@@ -51,9 +51,9 @@ fun ComposeTestRule.onAllNodesWithTag(
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  *
- * @see ComposeTestRule.onNode for general find method.
+ * @see SemanticsNodeInteractionsProvider.onNode for general find method.
  */
-fun ComposeTestRule.onNodeWithLabel(
+fun SemanticsNodeInteractionsProvider.onNodeWithLabel(
     label: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
@@ -66,9 +66,9 @@ fun ComposeTestRule.onNodeWithLabel(
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  * @see onNodeWithSubstring to search by substring instead of via exact match.
- * @see ComposeTestRule.onNode for general find method.
+ * @see SemanticsNodeInteractionsProvider.onNode for general find method.
  */
-fun ComposeTestRule.onNodeWithText(
+fun SemanticsNodeInteractionsProvider.onNodeWithText(
     text: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
@@ -81,9 +81,9 @@ fun ComposeTestRule.onNodeWithText(
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  * @see onNodeWithText to perform exact matches.
- * @see ComposeTestRule.onNode for general find method.
+ * @see SemanticsNodeInteractionsProvider.onNode for general find method.
  */
-fun ComposeTestRule.onNodeWithSubstring(
+fun SemanticsNodeInteractionsProvider.onNodeWithSubstring(
     text: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
@@ -96,7 +96,7 @@ fun ComposeTestRule.onNodeWithSubstring(
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  */
-fun ComposeTestRule.onAllNodesWithText(
+fun SemanticsNodeInteractionsProvider.onAllNodesWithText(
     text: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
@@ -109,7 +109,7 @@ fun ComposeTestRule.onAllNodesWithText(
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  */
-fun ComposeTestRule.onAllNodesWithLabel(
+fun SemanticsNodeInteractionsProvider.onAllNodesWithLabel(
     label: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
@@ -124,5 +124,6 @@ fun ComposeTestRule.onAllNodesWithLabel(
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  */
-fun ComposeTestRule.onRoot(useUnmergedTree: Boolean = false): SemanticsNodeInteraction =
-    onNode(isRoot(), useUnmergedTree)
+fun SemanticsNodeInteractionsProvider.onRoot(
+    useUnmergedTree: Boolean = false
+): SemanticsNodeInteraction = onNode(isRoot(), useUnmergedTree)

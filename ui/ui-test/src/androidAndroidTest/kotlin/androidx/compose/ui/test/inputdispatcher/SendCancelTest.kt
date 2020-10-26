@@ -24,7 +24,7 @@ import androidx.test.filters.SmallTest
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
-import androidx.compose.ui.test.util.expectError
+import androidx.compose.testutils.expectError
 import androidx.compose.ui.test.util.verifyEvent
 import androidx.compose.ui.test.util.verifyPointer
 import com.google.common.truth.Truth.assertThat

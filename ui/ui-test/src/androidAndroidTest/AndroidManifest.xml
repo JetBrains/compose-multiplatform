@@ -22,12 +22,5 @@
         <activity android:name="androidx.compose.ui.test.CustomActivity"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen"/>
         <activity android:name="androidx.compose.ui.test.ActivityWithActionBar" />
-        <activity android:name="androidx.compose.ui.test.MultipleActivitiesFindTest$Activity1" />
-        <activity android:name="androidx.compose.ui.test.MultipleActivitiesFindTest$Activity2" />
-        <activity android:name="androidx.compose.ui.test.MultipleActivitiesClickTest$Activity1" />
-        <activity android:name="androidx.compose.ui.test.MultipleActivitiesClickTest$Activity2" />
-        <activity android:name="androidx.compose.ui.test.MultipleActivitiesFirstDrawTest$Activity1" />
-        <activity android:name="androidx.compose.ui.test.MultipleActivitiesFirstDrawTest$Activity2" />
-        <activity android:name="androidx.compose.ui.test.LateSetContentTest$Activity" />
     </application>
 </manifest>

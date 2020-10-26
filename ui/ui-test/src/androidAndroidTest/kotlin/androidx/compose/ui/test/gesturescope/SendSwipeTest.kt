@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.milliseconds
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.bottomCenter
 import androidx.compose.ui.test.bottomRight
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.onNodeWithTag
