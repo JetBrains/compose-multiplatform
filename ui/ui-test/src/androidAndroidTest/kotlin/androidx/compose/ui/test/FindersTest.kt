@@ -125,6 +125,19 @@ class FindersTest {
         }
     }
 
+    @Test
+    fun findAllBySubstring() {
+        rule.setContent {
+            BoundaryNode { text = AnnotatedString("Hello World") }
+            BoundaryNode { text = AnnotatedString("Wello Horld") }
+        }
+
+        rule.onAllNodesWithSubstring("Yellow World").assertCountEquals(0)
+        rule.onAllNodesWithSubstring("Hello").assertCountEquals(1)
+        rule.onAllNodesWithSubstring("Wello").assertCountEquals(1)
+        rule.onAllNodesWithSubstring("ello").assertCountEquals(2)
+    }
+
     @Composable
     fun BoundaryNode(props: (SemanticsPropertyReceiver.() -> Unit)) {
         Column(Modifier.semantics(properties = props)) {}

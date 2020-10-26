@@ -95,6 +95,8 @@ fun SemanticsNodeInteractionsProvider.onNodeWithSubstring(
  * For usage patterns and semantics concepts see [SemanticsNodeInteraction]
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
+ * @see onAllNodesWithSubstring to search by substring instead of via exact match.
+ * @see SemanticsNodeInteractionsProvider.onAllNodes for general find method.
  */
 fun SemanticsNodeInteractionsProvider.onAllNodesWithText(
     text: String,
@@ -108,12 +110,28 @@ fun SemanticsNodeInteractionsProvider.onAllNodesWithText(
  * For usage patterns and semantics concepts see [SemanticsNodeInteraction]
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
+ * @see SemanticsNodeInteractionsProvider.onAllNodes for general find method.
  */
 fun SemanticsNodeInteractionsProvider.onAllNodesWithLabel(
     label: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
 ): SemanticsNodeInteractionCollection = onAllNodes(hasLabel(label, ignoreCase), useUnmergedTree)
+
+/**
+ * Finds all semantics nodes with text that contains the given substring.
+ *
+ * For usage patterns and semantics concepts see [SemanticsNodeInteraction]
+ *
+ * @param useUnmergedTree Find within merged composables like Buttons.
+ * @see onAllNodesWithText to perform exact matches.
+ * @see SemanticsNodeInteractionsProvider.onAllNodes for general find method.
+ */
+fun SemanticsNodeInteractionsProvider.onAllNodesWithSubstring(
+    text: String,
+    ignoreCase: Boolean = false,
+    useUnmergedTree: Boolean = false
+): SemanticsNodeInteractionCollection = onAllNodes(hasSubstring(text, ignoreCase), useUnmergedTree)
 
 /**
  * Finds the root semantics node of the Compose tree.

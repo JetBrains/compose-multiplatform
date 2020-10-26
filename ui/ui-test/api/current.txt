@@ -121,6 +121,7 @@ package androidx.compose.ui.test {
 
   public final class FindersKt {
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithLabel(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
+    method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithSubstring(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithTag(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String testTag, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithText(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithLabel(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
