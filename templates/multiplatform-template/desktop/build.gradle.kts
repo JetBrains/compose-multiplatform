@@ -1,15 +1,24 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
     id("org.jetbrains.compose")
     java
     application
 }
 
-dependencies {
-    implementation(compose.desktop.all)
-    implementation(project(":common"))
+kotlin {
+    jvm {
+        withJava()
+    }
+    sourceSets {
+        named("jvmMain") {
+            dependencies {
+                implementation(compose.desktop.all)
+                implementation(project(":common"))
+            }
+        }
+    }
 }
 
 application {
