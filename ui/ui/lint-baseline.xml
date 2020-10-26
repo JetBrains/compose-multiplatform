@@ -345,17 +345,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.focus(): Modifier = this.then(remember { FocusModifier(FocusState.Inactive) })"
-        errorLine2="                                                      ~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/FocusModifier.kt"
-            line="50"
-            column="55"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier = composed {"
         errorLine2="                                                                            ~~~~~~~~">
         <location
