@@ -65,7 +65,6 @@ private fun AddressBar() {
             )
             Spacer(Modifier.width(10.dp))
             Button(
-                backgroundColor = Color(16, 180, 140),
                 modifier = Modifier.preferredHeight(48.dp),
                 shape = CircleShape,
                 onClick = { BrowserState.loadURL(BrowserState.url.value) }
