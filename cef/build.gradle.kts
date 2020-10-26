@@ -5,7 +5,7 @@ import kotlin.text.capitalize
 
 plugins {
     kotlin("jvm") version "1.4.0"
-    id("org.jetbrains.compose") version "0.1.0-unmerged30"
+    id("org.jetbrains.compose") version "0.1.0-dev97"
     id("de.undercouch.download") version "4.1.1"
     application
 }
@@ -42,6 +42,8 @@ val cefUnZip = run {
 repositories {
     google()
     jcenter()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    // temp
     maven("https://packages.jetbrains.team/maven/p/ui/dev")
 }
 
