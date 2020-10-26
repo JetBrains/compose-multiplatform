@@ -66,9 +66,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.ShortcutHandler
-import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.input.key.plus
+import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.Placeholder
@@ -286,7 +285,7 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                     modifier = Modifier.padding(4.dp),
                     onClick = {
                         AppWindow(size = IntSize(400, 200)).also {
-                            it.keyboard.shortcut(Key.Escape) {
+                            it.keyboard.setShortcut(Key.Escape) {
                                 it.close()
                             }
                         }.show {
@@ -315,11 +314,14 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             value = text.value,
             onValueChange = { text.value = it },
             label = { Text(text = "Input2") },
-            modifier = Modifier.keyInputFilter(
-                ShortcutHandler(Key.MetaLeft + Key.Enter) {
+            modifier = Modifier.shortcuts {
+                on(Key.MetaLeft + Key.ShiftLeft + Key.Enter) {
+                    text.value = "Cleared with shift!"
+                }
+                on(Key.MetaLeft + Key.Enter) {
                     text.value = "Cleared!"
                 }
-            )
+            }
         )
 
         Image(imageResource("androidx/compose/desktop/example/circus.jpg"), Modifier.size(200.dp))
