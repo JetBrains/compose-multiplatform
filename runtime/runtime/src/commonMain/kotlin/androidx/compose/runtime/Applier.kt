@@ -39,6 +39,18 @@ interface Applier<N> {
     val current: N
 
     /**
+     * Called when the [Composer] is about to begin applying changes using this applier.
+     * [onEndChanges] will be called when changes are complete.
+     */
+    fun onBeginChanges() {}
+
+    /**
+     * Called when the [Composer] is finished applying changes using this applier.
+     * A call to [onBeginChanges] will always precede a call to [onEndChanges].
+     */
+    fun onEndChanges() {}
+
+    /**
      * Indicates that the applier is getting traversed "down" the tree. When this gets called,
      * [node] is expected to be a child of [current], and after this operation, [node] is
      * expected to be the new [current].
