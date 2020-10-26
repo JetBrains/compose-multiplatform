@@ -104,6 +104,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void endReplaceableGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public androidx.compose.runtime.ScopeUpdateScope? endRestartGroup();
     method public androidx.compose.runtime.Applier<N> getApplier();
+    method @org.jetbrains.annotations.TestOnly public kotlin.coroutines.CoroutineContext getApplyCoroutineContext();
     method public int getCurrentCompoundKeyHash();
     method public boolean getDefaultsInvalid();
     method public boolean getInserting();
@@ -127,6 +128,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key, String? sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public N! useNode();
     property public final androidx.compose.runtime.Applier<N> applier;
+    property @org.jetbrains.annotations.TestOnly public final kotlin.coroutines.CoroutineContext applyCoroutineContext;
     property public final int currentCompoundKeyHash;
     property public final boolean defaultsInvalid;
     property public final boolean inserting;
