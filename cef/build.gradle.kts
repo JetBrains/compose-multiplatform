@@ -47,7 +47,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.jcef:jcef-skiko:0.1")
-    implementation(compose.desktop.all)
+    implementation(compose.desktop.currentOs)
 }
 
 tasks.withType<KotlinCompile>().configureEach {
