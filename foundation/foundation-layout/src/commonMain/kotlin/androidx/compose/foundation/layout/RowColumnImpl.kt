@@ -30,6 +30,8 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.measureBlocksOf
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -707,48 +709,97 @@ internal data class LayoutWeightImpl(val weight: Float, val fill: Boolean) : Par
         }
 }
 
-internal sealed class SiblingsAlignedModifier : ParentDataModifier {
+internal sealed class SiblingsAlignedModifier(
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     abstract override fun Density.modifyParentData(parentData: Any?): Any?
 
-    internal data class WithAlignmentLineBlock(val block: (Measured) -> Int) :
-        SiblingsAlignedModifier() {
+    internal class WithAlignmentLineBlock(
+        val block: (Measured) -> Int,
+        inspectorInfo: InspectorInfo.() -> Unit
+    ) : SiblingsAlignedModifier(inspectorInfo) {
         override fun Density.modifyParentData(parentData: Any?): Any? {
             return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
                 it.crossAxisAlignment =
                     CrossAxisAlignment.Relative(AlignmentLineProvider.Block(block))
             }
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            val otherModifier = other as? WithAlignmentLineBlock ?: return false
+            return block == otherModifier.block
+        }
+
+        override fun hashCode(): Int = block.hashCode()
+
+        override fun toString(): String = "WithAlignmentLineBlock(block=$block)"
     }
 
-    internal data class WithAlignmentLine(val line: AlignmentLine) :
-        SiblingsAlignedModifier() {
+    internal class WithAlignmentLine(
+        val line: AlignmentLine,
+        inspectorInfo: InspectorInfo.() -> Unit
+    ) : SiblingsAlignedModifier(inspectorInfo) {
         override fun Density.modifyParentData(parentData: Any?): Any? {
             return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
                 it.crossAxisAlignment =
                     CrossAxisAlignment.Relative(AlignmentLineProvider.Value(line))
             }
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            val otherModifier = other as? WithAlignmentLine ?: return false
+            return line == otherModifier.line
+        }
+
+        override fun hashCode(): Int = line.hashCode()
+
+        override fun toString(): String = "WithAlignmentLine(line=$line)"
     }
 }
 
-internal data class HorizontalAlignModifier(
-    val horizontal: Alignment.Horizontal
-) : ParentDataModifier {
+internal class HorizontalAlignModifier(
+    val horizontal: Alignment.Horizontal,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?): RowColumnParentData {
         return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
             it.crossAxisAlignment = CrossAxisAlignment.horizontal(horizontal)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? HorizontalAlignModifier ?: return false
+        return horizontal == otherModifier.horizontal
+    }
+
+    override fun hashCode(): Int = horizontal.hashCode()
+
+    override fun toString(): String =
+        "HorizontalAlignModifier(horizontal=$horizontal)"
 }
 
-internal data class VerticalAlignModifier(
-    val vertical: Alignment.Vertical
-) : ParentDataModifier {
+internal class VerticalAlignModifier(
+    val vertical: Alignment.Vertical,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?): RowColumnParentData {
         return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
             it.crossAxisAlignment = CrossAxisAlignment.vertical(vertical)
         }
     }
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? VerticalAlignModifier ?: return false
+        return vertical == otherModifier.vertical
+    }
+
+    override fun hashCode(): Int = vertical.hashCode()
+
+    override fun toString(): String =
+        "VerticalAlignModifier(vertical=$vertical)"
 }
 
 /**

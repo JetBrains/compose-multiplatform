@@ -22,26 +22,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class BoxTest : LayoutTest() {
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testBox() = with(density) {
         val sizeDp = 50.toDp()
@@ -507,5 +522,23 @@ class BoxTest : LayoutTest() {
             assertEquals(0.dp.toIntPx(), maxIntrinsicHeight(50.dp.toIntPx()))
             assertEquals(0.dp.toIntPx(), maxIntrinsicHeight(Constraints.Infinity))
         }
+    }
+
+    @Test
+    fun testAlignInspectableValue() {
+        val modifier = with(object : BoxScope {}) { Modifier.align(Alignment.BottomCenter) }
+            as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("align")
+        assertThat(modifier.valueOverride).isEqualTo(Alignment.BottomCenter)
+        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testMatchParentSizeInspectableValue() {
+        val modifier = with(object : BoxScope {}) { Modifier.matchParentSize() }
+            as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("matchParentSize")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
 }
