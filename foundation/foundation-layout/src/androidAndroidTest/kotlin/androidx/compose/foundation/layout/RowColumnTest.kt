@@ -32,7 +32,9 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -46,6 +48,9 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
+import org.junit.After
+import org.junit.Before
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -55,6 +60,16 @@ import kotlin.math.roundToInt
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class RowColumnTest : LayoutTest() {
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     // region Size and position tests for Row and Column
     @Test
     fun testRow() = with(density) {
@@ -5280,6 +5295,43 @@ class RowColumnTest : LayoutTest() {
             }
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+    // endregion
+
+    // region InspectableValue tests for Row and Column
+    @Test
+    fun testRow_AlignInspectableValue() {
+        val modifier = with(object : RowScope {}) { Modifier.align(Alignment.Bottom) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("align")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(Alignment.Bottom)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testRow_AlignByInspectableValue() {
+        val modifier = with(object : RowScope {}) { Modifier.alignBy(FirstBaseline) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("alignBy")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(FirstBaseline)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+    @Test
+    fun testColumn_AlignInspectableValue() {
+        val modifier = with(object : ColumnScope {}) { Modifier.align(Alignment.Start) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("align")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(Alignment.Start)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testColumn_AlignByInspectableValue() {
+        val modifier = with(object : ColumnScope {}) { Modifier.alignBy(TestVerticalLine) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("alignBy")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(TestVerticalLine)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
     // endregion
 }

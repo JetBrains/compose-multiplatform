@@ -19,8 +19,9 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 
 /**
@@ -30,7 +31,15 @@ import androidx.compose.ui.unit.Density
  * @sample androidx.compose.ui.samples.LayoutTagChildrenUsage
  */
 @Stable
-fun Modifier.layoutId(id: Any) = this.then(LayoutId(id))
+fun Modifier.layoutId(id: Any) = this.then(
+    LayoutId(
+        id = id,
+        inspectorInfo = debugInspectorInfo {
+            name = "layoutId"
+            value = id
+        }
+    )
+)
 
 /**
  * A [ParentDataModifier] which tags the target with the given [id]. The provided tag
@@ -38,16 +47,25 @@ fun Modifier.layoutId(id: Any) = this.then(LayoutId(id))
  * composable children to [Measurable]s when doing layout, as shown below.
  */
 @Immutable
-private data class LayoutId(
-    override val id: Any
-) : ParentDataModifier, LayoutIdParentData, InspectableValue {
+private class LayoutId(
+    override val id: Any,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, LayoutIdParentData, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?): Any? {
         return this@LayoutId
     }
 
-    override val nameFallback = "layoutId"
-    override val inspectableElements: Sequence<ValueElement>
-        get() = sequenceOf(ValueElement("id", id))
+    override fun hashCode(): Int =
+        id.hashCode()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? LayoutId ?: return false
+        return id == otherModifier.id
+    }
+
+    override fun toString(): String =
+        "LayoutId(id=$id)"
 }
 
 /**

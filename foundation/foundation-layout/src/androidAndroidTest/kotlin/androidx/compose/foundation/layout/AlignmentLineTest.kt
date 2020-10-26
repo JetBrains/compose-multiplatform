@@ -17,25 +17,31 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
@@ -43,6 +49,17 @@ import kotlin.math.min
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class AlignmentLineTest : LayoutTest() {
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testRelativePaddingFrom_vertical() = with(density) {
         val layoutLatch = CountDownLatch(2)
@@ -386,6 +403,20 @@ class AlignmentLineTest : LayoutTest() {
             }
         }
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testInspectableParameter() {
+        val alignment = VerticalAlignmentLine(::min)
+        val modifier = Modifier.relativePaddingFrom(alignment, before = 2.0.dp)
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("relativePaddingFrom")
+        Truth.assertThat(modifier.valueOverride).isNull()
+        Truth.assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("alignmentLine", alignment),
+            ValueElement("before", 2.0.dp),
+            ValueElement("after", Dp.Unspecified)
+        )
     }
 
     @Composable

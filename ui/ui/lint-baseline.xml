@@ -312,17 +312,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.layoutId(id: Any) = this.then(LayoutId(id))"
-        errorLine2="                                           ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/layout/LayoutId.kt"
-            line="35"
-            column="44"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = this.then(LayoutModifierImpl(measure))"
         errorLine2="              ~~~~~~~~~~~~~~~~~~">
         <location

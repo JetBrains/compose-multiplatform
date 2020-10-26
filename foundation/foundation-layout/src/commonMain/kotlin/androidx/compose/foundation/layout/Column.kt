@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.annotation.FloatRange
 
 /**
@@ -124,12 +125,19 @@ interface ColumnScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleAlignInColumn
      */
     @Stable
-    fun Modifier.align(alignment: Alignment.Horizontal) =
-        this.then(HorizontalAlignModifier(alignment))
+    fun Modifier.align(alignment: Alignment.Horizontal) = this.then(
+        HorizontalAlignModifier(
+            horizontal = alignment,
+            inspectorInfo = debugInspectorInfo {
+                name = "align"
+                value = alignment
+            }
+        )
+    )
 
     @Stable
     @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment.Horizontal) = this.then(HorizontalAlignModifier(align))
+    fun Modifier.gravity(align: Alignment.Horizontal) = align(align)
 
     /**
      * Position the element horizontally such that its [alignmentLine] aligns with sibling elements
@@ -148,8 +156,15 @@ interface ColumnScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblingsInColumn
      */
     @Stable
-    fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine) =
-        this.then(SiblingsAlignedModifier.WithAlignmentLine(alignmentLine))
+    fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine) = this.then(
+        SiblingsAlignedModifier.WithAlignmentLine(
+            line = alignmentLine,
+            inspectorInfo = debugInspectorInfo {
+                name = "alignBy"
+                value = alignmentLine
+            }
+        )
+    )
 
     @Deprecated(
         "alignWithSiblings was renamed to alignBy.",
@@ -195,9 +210,15 @@ interface ColumnScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblings
      */
     @Stable
-    fun Modifier.alignBy(
-        alignmentLineBlock: (Measured) -> Int
-    ) = this.then(SiblingsAlignedModifier.WithAlignmentLineBlock(alignmentLineBlock))
+    fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int) = this.then(
+        SiblingsAlignedModifier.WithAlignmentLineBlock(
+            block = alignmentLineBlock,
+            inspectorInfo = debugInspectorInfo {
+                name = "alignBy"
+                value = alignmentLineBlock
+            }
+        )
+    )
 
     @Deprecated(
         "alignWithSiblings was renamed to alignBy.",

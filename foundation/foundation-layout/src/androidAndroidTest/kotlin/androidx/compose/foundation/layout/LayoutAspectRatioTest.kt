@@ -21,12 +21,17 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -36,6 +41,16 @@ import java.util.concurrent.TimeUnit
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class LayoutAspectRatioTest : LayoutTest() {
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testAspectRatioModifier_intrinsicDimensions() = with(density) {
         testIntrinsics(
@@ -111,5 +126,13 @@ class LayoutAspectRatioTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
         return size.value!!
+    }
+
+    @Test
+    fun testInspectableValue() {
+        val modifier = Modifier.aspectRatio(2.0f) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("aspectRatio")
+        assertThat(modifier.valueOverride).isEqualTo(2.0f)
+        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
 }
