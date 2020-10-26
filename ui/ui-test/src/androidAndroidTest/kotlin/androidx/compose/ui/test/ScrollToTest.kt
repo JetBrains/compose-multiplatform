@@ -18,8 +18,8 @@ package androidx.compose.ui.test
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Layout
-import androidx.compose.ui.MeasureBlock
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.MeasureBlock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color

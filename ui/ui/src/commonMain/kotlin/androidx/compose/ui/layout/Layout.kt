@@ -16,7 +16,7 @@
 
 @file:Suppress("DEPRECATION")
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
@@ -26,11 +26,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.remember
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
-import androidx.compose.ui.layout.IntrinsicMeasurable
-import androidx.compose.ui.layout.IntrinsicMeasureBlock
-import androidx.compose.ui.layout.IntrinsicMeasureScope
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode

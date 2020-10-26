@@ -22,12 +22,12 @@ import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.MultiMeasureLayout
-import androidx.compose.ui.ParentDataModifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.MultiMeasureLayout
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -119,7 +119,10 @@ fun ConstraintLayout(
 ) {
     val measurer = remember { Measurer() }
     @Suppress("Deprecation")
-    MultiMeasureLayout(modifier, children) { measurables, constraints ->
+    MultiMeasureLayout(
+        modifier,
+        children
+    ) { measurables, constraints ->
         val layoutSize = measurer.performMeasure(
             constraints,
             layoutDirection,

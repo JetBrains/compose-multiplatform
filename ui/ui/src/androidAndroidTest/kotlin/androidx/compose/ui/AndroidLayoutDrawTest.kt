@@ -55,12 +55,23 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.id
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
@@ -1456,7 +1467,7 @@ class AndroidLayoutDrawTest {
                 override fun MeasureScope.measure(
                     measurable: Measurable,
                     constraints: Constraints
-                ): MeasureScope.MeasureResult {
+                ): MeasureResult {
                     val placeable = measurable.measure(constraints)
                     assertEquals(vertical, placeable[testVerticalLine])
                     assertEquals(horizontal, placeable[testHorizontalLine])
@@ -1480,7 +1491,7 @@ class AndroidLayoutDrawTest {
                 override fun MeasureScope.measure(
                     measurable: Measurable,
                     constraints: Constraints
-                ): MeasureScope.MeasureResult {
+                ): MeasureResult {
                     val placeable = measurable.measure(constraints)
                     return layout(placeable.width, placeable.height) {
                         assertEquals(vertical, placeable[testVerticalLine])
@@ -1504,7 +1515,7 @@ class AndroidLayoutDrawTest {
                 override fun MeasureScope.measure(
                     measurable: Measurable,
                     constraints: Constraints
-                ): MeasureScope.MeasureResult {
+                ): MeasureResult {
                     val placeable = measurable.measure(constraints)
                     return layout(placeable.width, placeable.height) {
                         placeable.place(0, 0)
@@ -1830,7 +1841,7 @@ class AndroidLayoutDrawTest {
             override fun MeasureScope.measure(
                 measurable: Measurable,
                 constraints: Constraints
-            ): MeasureScope.MeasureResult {
+            ): MeasureResult {
                 val placeable = measurable.measure(constraints)
                 return layout(placeable.width, placeable.height) {
                     placeable.place(0, 0)
@@ -1917,7 +1928,7 @@ class AndroidLayoutDrawTest {
             override fun MeasureScope.measure(
                 measurable: Measurable,
                 constraints: Constraints
-            ): MeasureScope.MeasureResult {
+            ): MeasureResult {
                 layoutDirection.value = this.layoutDirection
                 latch.countDown()
                 return layout(0, 0) {}
@@ -2175,7 +2186,7 @@ class AndroidLayoutDrawTest {
                     override fun MeasureScope.measure(
                         measurable: Measurable,
                         constraints: Constraints
-                    ): MeasureScope.MeasureResult {
+                    ): MeasureResult {
                         val placeable = measurable.measure(constraints)
                         return layout(placeable.width, placeable.height) {
                             placeable.place(Offset(offset, offset))
@@ -2587,7 +2598,7 @@ class AndroidLayoutDrawTest {
             override fun MeasureScope.measure(
                 measurable: Measurable,
                 constraints: Constraints
-            ): MeasureScope.MeasureResult {
+            ): MeasureResult {
                 m = measurable
                 val p = measurable.measure(constraints)
                 drawLatch.countDown()
@@ -2643,7 +2654,7 @@ class AndroidLayoutDrawTest {
             override fun MeasureScope.measure(
                 measurable: Measurable,
                 constraints: Constraints
-            ): MeasureScope.MeasureResult {
+            ): MeasureResult {
                 m = measurable
                 val p = measurable.measure(constraints)
                 return layout(p.width, p.height) {
@@ -3576,7 +3587,7 @@ data class PaddingModifier(
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurable.measure(
             constraints.offset(
                 horizontal = -left - right,
@@ -3620,7 +3631,7 @@ internal val AlignTopLeft = object : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
         return layout(constraints.maxWidth, constraints.maxHeight) {
             placeable.placeRelative(0, 0)
@@ -3728,7 +3739,7 @@ class LayoutAndDrawModifier(val color: Color) : LayoutModifier, DrawModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurable.measure(Constraints.fixed(10, 10))
         return layout(constraints.maxWidth, constraints.maxHeight) {
             placeable.placeRelative(
@@ -3750,7 +3761,7 @@ class LayoutScale(val scale: Float) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurable.measure(
             Constraints(
                 minWidth = (constraints.minWidth / scale).roundToInt(),

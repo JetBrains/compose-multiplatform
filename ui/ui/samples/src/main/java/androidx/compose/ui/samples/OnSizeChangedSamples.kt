@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.onSizeChanged
+import androidx.compose.ui.layout.onSizeChanged
 
 @Sampled
 @Composable

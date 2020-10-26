@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
-import androidx.compose.ui.MeasureScope.MeasureResult
-import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -25,22 +23,6 @@ import androidx.compose.ui.unit.Constraints
  * measure lambda is [MeasureResult], which should be returned by [layout]
  */
 interface MeasureScope : IntrinsicMeasureScope {
-    /**
-     * Interface holding the size and alignment lines of the measured layout, as well as the
-     * children positioning logic.
-     * [placeChildren] is the function used for positioning children. [Placeable.placeAt] should
-     * be called on children inside [placeChildren].
-     * The alignment lines can be used by the parent layouts to decide layout, and can be queried
-     * using the [Placeable.get] operator. Note that alignment lines will be inherited by parent
-     * layouts, such that indirect parents will be able to query them as well.
-     */
-    interface MeasureResult {
-        val width: Int
-        val height: Int
-        val alignmentLines: Map<AlignmentLine, Int>
-        fun placeChildren()
-    }
-
     /**
      * Sets the size and alignment lines of the measured layout, as well as
      * the positioning block that defines the children positioning logic.
@@ -65,8 +47,11 @@ interface MeasureScope : IntrinsicMeasureScope {
         override val height = height
         override val alignmentLines = alignmentLines
         override fun placeChildren() {
-            Placeable.PlacementScope
-                .executeWithRtlMirroringValues(width, layoutDirection, placementBlock)
+            Placeable.PlacementScope.executeWithRtlMirroringValues(
+                width,
+                layoutDirection,
+                placementBlock
+            )
         }
     }
 }
@@ -74,4 +59,4 @@ interface MeasureScope : IntrinsicMeasureScope {
 /**
  * A function for performing layout measurement.
  */
-typealias MeasureBlock = MeasureScope.(List<Measurable>, Constraints) -> MeasureScope.MeasureResult
+typealias MeasureBlock = MeasureScope.(List<Measurable>, Constraints) -> MeasureResult

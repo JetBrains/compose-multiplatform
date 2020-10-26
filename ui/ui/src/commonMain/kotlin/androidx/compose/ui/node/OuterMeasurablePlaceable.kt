@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset

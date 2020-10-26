@@ -326,8 +326,8 @@
         errorLine1=") = this.then(LayoutModifierImpl(measure))"
         errorLine2="              ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/ui/LayoutModifier.kt"
-            line="251"
+            file="src/commonMain/kotlin/androidx/compose/ui/layout/LayoutModifier.kt"
+            line="250"
             column="15"/>
     </issue>
 
@@ -337,7 +337,7 @@
         errorLine1=") = this.then(object : OnGloballyPositionedModifier {"
         errorLine2="              ^">
         <location
-            file="src/commonMain/kotlin/androidx/compose/ui/OnGloballyPositionedModifier.kt"
+            file="src/commonMain/kotlin/androidx/compose/ui/layout/OnGloballyPositionedModifier.kt"
             line="31"
             column="15"/>
     </issue>

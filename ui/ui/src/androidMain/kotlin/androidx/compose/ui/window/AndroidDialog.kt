@@ -31,7 +31,7 @@ import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.setContent

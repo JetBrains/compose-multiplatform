@@ -16,14 +16,14 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.HorizontalAlignmentLine
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.unit.Constraints
 
 @OptIn(ExperimentalLayoutNodeApi::class)

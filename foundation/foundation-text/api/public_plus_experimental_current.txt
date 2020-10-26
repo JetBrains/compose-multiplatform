@@ -8,8 +8,8 @@ package androidx.compose.foundation.text {
 
   public final class CoreTextKt {
     method @androidx.compose.runtime.Composable public static void CoreText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.text.TextStyle style, boolean softWrap, androidx.compose.ui.text.style.TextOverflow overflow, int maxLines, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout);
-    method public static androidx.compose.ui.HorizontalAlignmentLine getFirstBaseline();
-    method public static androidx.compose.ui.HorizontalAlignmentLine getLastBaseline();
+    method public static androidx.compose.ui.layout.HorizontalAlignmentLine getFirstBaseline();
+    method public static androidx.compose.ui.layout.HorizontalAlignmentLine getLastBaseline();
   }
 
   @androidx.compose.runtime.Immutable public final class InlineTextContent {

@@ -28,9 +28,6 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
@@ -75,7 +72,7 @@ annotation class ExperimentalSubcomposeLayoutApi
 @ExperimentalSubcomposeLayoutApi
 fun <T> SubcomposeLayout(
     modifier: Modifier = Modifier,
-    measureBlock: SubcomposeMeasureScope<T>.(Constraints) -> MeasureScope.MeasureResult
+    measureBlock: SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult
 ) {
     val state = remember { SubcomposeLayoutState<T>() }
     state.compositionRef = compositionReference()
@@ -129,7 +126,7 @@ private class SubcomposeLayoutState<T> :
     // Pre-allocated lambdas to update LayoutNode
     val setRoot: LayoutNode.(Unit) -> Unit = { root = this }
     val setMeasureBlock:
-        LayoutNode.(SubcomposeMeasureScope<T>.(Constraints) -> MeasureScope.MeasureResult) -> Unit =
+        LayoutNode.(SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult) -> Unit =
             { measureBlocks = createMeasureBlocks(it) }
 
     // inner state
@@ -208,7 +205,7 @@ private class SubcomposeLayoutState<T> :
     }
 
     private fun createMeasureBlocks(
-        block: SubcomposeMeasureScope<T>.(Constraints) -> MeasureScope.MeasureResult
+        block: SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult
     ): LayoutNode.MeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
         error = "Intrinsic measurements are not currently supported by SubcomposeLayout"
     ) {
@@ -216,14 +213,14 @@ private class SubcomposeLayoutState<T> :
             measureScope: MeasureScope,
             measurables: List<Measurable>,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
+        ): MeasureResult {
             this@SubcomposeLayoutState.layoutDirection = measureScope.layoutDirection
             this@SubcomposeLayoutState.density = measureScope.density
             this@SubcomposeLayoutState.fontScale = measureScope.fontScale
             currentIndex = 0
             val result = block(constraints)
             val indexAfterMeasure = currentIndex
-            return object : MeasureScope.MeasureResult {
+            return object : MeasureResult {
                 override val width: Int
                     get() = result.width
                 override val height: Int

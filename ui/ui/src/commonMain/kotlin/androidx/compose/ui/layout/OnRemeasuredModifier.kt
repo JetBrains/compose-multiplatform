@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.unit.IntSize
 
 /**

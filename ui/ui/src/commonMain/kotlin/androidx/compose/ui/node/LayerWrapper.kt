@@ -17,7 +17,7 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect

@@ -39,7 +39,6 @@ import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.RootMeasureBlocks
 import androidx.compose.ui.autofill.AndroidAutofill
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -63,6 +62,7 @@ import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.MotionEventAdapter
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.ProcessResult
+import androidx.compose.ui.layout.RootMeasureBlocks
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.OwnerScope

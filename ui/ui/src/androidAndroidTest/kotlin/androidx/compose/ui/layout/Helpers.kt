@@ -16,10 +16,6 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.HorizontalAlignmentLine
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
@@ -251,7 +247,7 @@ internal class MeasureInMeasureBlock : SmartMeasureBlock() {
         measureScope: MeasureScope,
         measurables: List<Measurable>,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         measuresCount++
         preMeasureCallback?.invoke()
         preMeasureCallback = null
@@ -315,7 +311,7 @@ internal class MeasureInLayoutBlock : SmartMeasureBlock() {
         measureScope: MeasureScope,
         measurables: List<Measurable>,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         measuresCount++
         preMeasureCallback?.invoke()
         preMeasureCallback = null
@@ -355,7 +351,7 @@ internal class NoMeasureBlock : SmartMeasureBlock() {
         measureScope: MeasureScope,
         measurables: List<Measurable>,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         measuresCount++
         preMeasureCallback?.invoke()
         preMeasureCallback = null
@@ -377,7 +373,7 @@ internal class SpyLayoutModifier : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         measuresCount++
         return layout(constraints.maxWidth, constraints.maxHeight) {
             layoutsCount++

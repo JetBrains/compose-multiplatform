@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
 
-import androidx.compose.ui.layout.IntrinsicMeasurable
-import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 /**
  * A [Modifier.Element] that changes how its wrapped content is measured and laid out.
- * It has the same measurement and layout functionality as the [androidx.compose.ui.Layout]
+ * It has the same measurement and layout functionality as the [androidx.compose.ui.layout.Layout]
  * component, while wrapping exactly one layout due to it being a modifier. In contrast,
- * the [androidx.compose.ui.Layout] component is used to define the layout behavior of
+ * the [androidx.compose.ui.layout.Layout] component is used to define the layout behavior of
  * multiple children.
  *
- * @see androidx.compose.ui.Layout
+ * @see androidx.compose.ui.layout.Layout
  */
 interface LayoutModifier : Modifier.Element {
     /**
@@ -38,15 +37,15 @@ interface LayoutModifier : Modifier.Element {
      * to the logic of the [LayoutModifier]. The modifier needs to choose its own
      * size, which can depend on the size chosen by the wrapped content (the obtained
      * [Placeable]), if the wrapped content was measured. The size needs to be returned
-     * as part of a [MeasureScope.MeasureResult], alongside the placement logic of the
+     * as part of a [MeasureResult], alongside the placement logic of the
      * [Placeable], which defines how the wrapped content should be positioned inside
-     * the [LayoutModifier]. A convenient way to create the [MeasureScope.MeasureResult]
+     * the [LayoutModifier]. A convenient way to create the [MeasureResult]
      * is to use the [MeasureScope.layout] factory function.
      */
     fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult
+    ): MeasureResult
 
     /**
      * The function used to calculate [IntrinsicMeasurable.minIntrinsicWidth].
@@ -244,14 +243,14 @@ private object MeasuringIntrinsics {
  *
  * @sample androidx.compose.ui.samples.ConvenienceLayoutModifierSample
  *
- * @see androidx.compose.ui.LayoutModifier
+ * @see androidx.compose.ui.layout.LayoutModifier
  */
 fun Modifier.layout(
-    measure: MeasureScope.(Measurable, Constraints) -> MeasureScope.MeasureResult
+    measure: MeasureScope.(Measurable, Constraints) -> MeasureResult
 ) = this.then(LayoutModifierImpl(measure))
 
 private data class LayoutModifierImpl(
-    val measureBlock: MeasureScope.(Measurable, Constraints) -> MeasureScope.MeasureResult
+    val measureBlock: MeasureScope.(Measurable, Constraints) -> MeasureResult
 ) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,

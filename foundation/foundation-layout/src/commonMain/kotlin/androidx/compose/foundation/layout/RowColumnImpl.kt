@@ -16,17 +16,18 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.foundation.layout.LayoutOrientation.Horizontal
 import androidx.compose.foundation.layout.LayoutOrientation.Vertical
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.ParentDataModifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureBlock
 import androidx.compose.ui.layout.Measured
-import androidx.compose.ui.measureBlocksOf
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.measureBlocksOf
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.unit.Constraints
@@ -212,12 +213,12 @@ internal fun rowColumnMeasureBlocks(
                 )
             )
         }
-        val layoutWidth = if (orientation == LayoutOrientation.Horizontal) {
+        val layoutWidth = if (orientation == Horizontal) {
             mainAxisLayoutSize
         } else {
             crossAxisLayoutSize
         }
-        val layoutHeight = if (orientation == LayoutOrientation.Horizontal) {
+        val layoutHeight = if (orientation == Horizontal) {
             crossAxisLayoutSize
         } else {
             mainAxisLayoutSize
@@ -243,7 +244,7 @@ internal fun rowColumnMeasureBlocks(
 
                 val crossAxis = childCrossAlignment.align(
                     size = crossAxisLayoutSize - placeable.crossAxisSize(),
-                    layoutDirection = if (orientation == LayoutOrientation.Horizontal) {
+                    layoutDirection = if (orientation == Horizontal) {
                         LayoutDirection.Ltr
                     } else {
                         layoutDirection
@@ -252,7 +253,7 @@ internal fun rowColumnMeasureBlocks(
                     beforeCrossAxisAlignmentLine = beforeCrossAxisAlignmentLine
                 )
 
-                if (orientation == LayoutOrientation.Horizontal) {
+                if (orientation == Horizontal) {
                     placeable.place(mainAxisPositions[index], crossAxis)
                 } else {
                     placeable.place(crossAxis, mainAxisPositions[index])

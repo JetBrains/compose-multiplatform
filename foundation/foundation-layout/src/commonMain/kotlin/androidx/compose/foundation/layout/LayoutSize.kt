@@ -18,12 +18,13 @@ package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -657,7 +658,7 @@ private class FillModifier(
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val minWidth: Int
         val maxWidth: Int
         if (constraints.hasBoundedWidth && direction != Direction.Vertical) {
@@ -713,7 +714,7 @@ private class SizeModifier(
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val wrappedConstraints = targetConstraints.let { targetConstraints ->
             if (enforceIncoming) {
                 targetConstraints.enforce(constraints)
@@ -794,7 +795,7 @@ private class WrapContentModifier(
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val wrappedConstraints = Constraints(
             minWidth = if (direction != Direction.Vertical) 0 else constraints.minWidth,
             minHeight = if (direction != Direction.Horizontal) 0 else constraints.minHeight,
@@ -833,7 +834,7 @@ private class UnspecifiedConstraintsModifier(
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val wrappedConstraints = Constraints(
             if (minWidth != Dp.Unspecified && constraints.minWidth == 0) {
                 minWidth.toIntPx().coerceAtMost(constraints.maxWidth)

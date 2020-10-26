@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.layout
+
+import androidx.compose.ui.Modifier
 
 /**
  * A [Modifier.Element] that provides a [Remeasurement] object associated with the layout node

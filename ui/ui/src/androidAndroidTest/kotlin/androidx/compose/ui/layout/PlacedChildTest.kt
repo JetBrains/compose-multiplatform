@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.unit.Constraints
@@ -67,7 +65,7 @@ private val UseChildSizeButNotPlace = object : LayoutNode.NoIntrinsicsMeasureBlo
         measureScope: MeasureScope,
         measurables: List<Measurable>,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurables.first().measure(constraints)
         return measureScope.layout(placeable.width, placeable.height) {
             // do not place
