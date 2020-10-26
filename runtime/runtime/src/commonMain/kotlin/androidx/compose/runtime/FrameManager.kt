@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(
-    ExperimentalComposeApi::class,
-    InternalComposeApi::class
-)
-
 package androidx.compose.runtime
 
 import androidx.compose.runtime.snapshots.Snapshot
@@ -48,6 +43,7 @@ object FrameManager {
             .mainThreadCompositionContext() + SupervisorJob()
     )
 
+    @OptIn(ExperimentalComposeApi::class)
     fun ensureStarted() {
         if (!started) {
             started = true
@@ -60,6 +56,7 @@ object FrameManager {
         started = false
     }
 
+    @OptIn(ExperimentalComposeApi::class)
     private val globalWriteObserver: SnapshotWriteObserver = {
         if (!commitPending) {
             commitPending = true
