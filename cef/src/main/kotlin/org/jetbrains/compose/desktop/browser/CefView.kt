@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.skija.IRect
 import org.jetbrains.skija.Bitmap
 
-import androidx.compose.ui.graphics.drawscope.drawCanvas
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 
 import androidx.compose.runtime.getValue
@@ -87,7 +87,7 @@ fun CefCanvas(bitmap: Bitmap, browser: BrowserState) {
         .focus()
         .clickable(indication = null) { focusRequester.requestFocus() }
     ) {
-        drawCanvas { canvas, size ->
+        drawIntoCanvas { canvas ->
             canvas.nativeCanvas.drawBitmapRect(bitmap, IRect(0, 0, width.value, height.value).toRect())
         }
     }

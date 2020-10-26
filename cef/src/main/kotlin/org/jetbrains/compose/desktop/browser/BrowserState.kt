@@ -25,7 +25,7 @@ object BrowserState {
 
     fun loadURL(url: String) {
         if (!isReady.value) {
-            val app = AppManager.getCurrentFocusedWindow()
+            val app = AppManager.focusedWindow
             if (app != null) {
                 init(app, url)
             }
