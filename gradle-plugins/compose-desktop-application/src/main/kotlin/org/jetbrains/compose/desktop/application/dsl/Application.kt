@@ -56,8 +56,8 @@ open class Application @Inject constructor(
         this.jvmArgs.addAll(jvmArgs)
     }
 
-    val nativeExecutables: NativeExecutables = objects.newInstance(NativeExecutables::class.java)
-    fun nativeExecutables(fn: Action<NativeExecutables>) {
-        fn.execute(nativeExecutables)
+    val nativeDistributions: NativeDistributions = objects.newInstance(NativeDistributions::class.java)
+    fun nativeDistributions(fn: Action<NativeDistributions>) {
+        fn.execute(nativeDistributions)
     }
 }

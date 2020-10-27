@@ -73,7 +73,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
 }
 
 internal fun Project.configurePackagingTasks(app: Application): TaskProvider<DefaultTask> {
-    val packageFormats = app.nativeExecutables.targetFormats.map { targetFormat ->
+    val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
         tasks.composeTask<AbstractJPackageTask>(
             taskName("package", app, targetFormat.name),
             args = listOf(targetFormat)
@@ -91,7 +91,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
 
     val targetPlatformSettings = when (targetOS) {
         OS.Linux -> {
-            app.nativeExecutables.linux.also { linux ->
+            app.nativeDistributions.linux.also { linux ->
                 linuxShortcut.set(provider { linux.shortcut })
                 linuxAppCategory.set(provider { linux.appCategory })
                 linuxAppRelease.set(provider { linux.appRelease })
@@ -103,7 +103,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
             }
         }
         OS.Windows -> {
-            app.nativeExecutables.windows.also { win ->
+            app.nativeDistributions.windows.also { win ->
                 winConsole.set(provider { win.console })
                 winDirChooser.set(provider { win.dirChooser })
                 winPerUserInstall.set(provider { win.perUserInstall })
@@ -115,7 +115,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
             }
         }
         OS.MacOS -> {
-            app.nativeExecutables.macOS.also { mac ->
+            app.nativeDistributions.macOS.also { mac ->
                 macPackageName.set(provider { mac.packageName })
                 macPackageIdentifier.set(provider { mac.packageIdentifier })
                 macSign.set(provider { mac.signing.sign })
@@ -127,7 +127,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
         }
     }
 
-    app.nativeExecutables.let { executables ->
+    app.nativeDistributions.let { executables ->
         packageName.set(provider { executables.packageName ?: project.name })
         packageDescription.set(provider { executables.description })
         packageCopyright.set(provider { executables.copyright })
@@ -138,7 +138,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
         })
     }
 
-    destinationDir.set(app.nativeExecutables.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
+    destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
     javaHome.set(provider { app.javaHomeOrDefault() })
 
     launcherMainJar.set(app.mainJar.orNull)
@@ -159,7 +159,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
             files.from(project.configurations.named(target.runtimeElementsConfigurationName))
         }
     }
-    modules.set(provider { app.nativeExecutables.modules })
+    modules.set(provider { app.nativeDistributions.modules })
     launcherMainClass.set(provider { app.mainClass })
     launcherJvmArgs.set(provider { app.jvmArgs })
     launcherArgs.set(provider { app.args })

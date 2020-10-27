@@ -25,7 +25,7 @@ compose.desktop {
     application {
         mainClass = "example.imageviewer.MainKt"
 
-        nativeExecutables {
+        nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ImageViewer"
             modules("jdk.crypto.ec")
