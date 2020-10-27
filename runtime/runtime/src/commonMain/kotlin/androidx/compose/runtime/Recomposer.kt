@@ -245,7 +245,7 @@ class Recomposer(
     /**
      * Permanently shut down this [Recomposer] for future use. All ongoing recompositions will stop,
      * new composer invalidations with this [Recomposer] at the root will no longer occur,
-     * and any [LaunchedTask]s currently running in compositions managed by this [Recomposer]
+     * and any [LaunchedEffect]s currently running in compositions managed by this [Recomposer]
      * will be cancelled. Any [rememberCoroutineScope] scopes from compositions managed by this
      * [Recomposer] will also be cancelled. See [join] to await the completion of all of these
      * outstanding tasks.

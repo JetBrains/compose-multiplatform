@@ -36,6 +36,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
+@Suppress("DEPRECATION")
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class SuspendingEffectsTests : BaseComposeTest() {

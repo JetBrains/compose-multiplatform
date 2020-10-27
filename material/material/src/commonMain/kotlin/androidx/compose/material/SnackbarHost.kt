@@ -25,7 +25,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.invalidate
@@ -152,7 +152,7 @@ fun SnackbarHost(
     snackbar: @Composable (SnackbarData) -> Unit = { Snackbar(it) }
 ) {
     val currentSnackbarData = hostState.currentSnackbarData
-    LaunchedTask(currentSnackbarData) {
+    LaunchedEffect(currentSnackbarData) {
         if (currentSnackbarData != null) {
             delay(currentSnackbarData.duration.toMillis())
             currentSnackbarData.dismiss()

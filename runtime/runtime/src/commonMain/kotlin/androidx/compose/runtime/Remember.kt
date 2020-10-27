@@ -99,11 +99,11 @@ inline fun <V> remember(
  * resulting [State] without recreating the long-lived lambda or object, allowing that object to
  * persist without cancelling and resubscribing, or relaunching a long-lived operation that may
  * be expensive or prohibitive to recreate and restart.
- * This may be common when working with [DisposableEffect] or [LaunchedTask], for example:
+ * This may be common when working with [DisposableEffect] or [LaunchedEffect], for example:
  *
  * @sample androidx.compose.runtime.samples.rememberUpdatedStateSampleWithDisposableEffect
  *
- * [LaunchedTask]s often describe state machines that should not be reset and restarted if a
+ * [LaunchedEffect]s often describe state machines that should not be reset and restarted if a
  * parameter or event callback changes, but they should have the current value available when
  * needed. For example:
  *
