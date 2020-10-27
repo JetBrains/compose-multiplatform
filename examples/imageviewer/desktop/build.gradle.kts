@@ -19,6 +19,7 @@ compose.desktop {
         nativeExecutables {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ImageViewer"
+            modules("jdk.crypto.ec")
         }
     }
 }
