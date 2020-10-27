@@ -51,8 +51,8 @@ class FocusRequester {
     /**
      * Deny requests to clear focus.
      *
-     * Use this function to send a request to capture the focus. If a component is captured, it's
-     * [state][FocusState] will be set to [Captured][FocusState.Captured]. When a
+     * Use this function to send a request to capture the focus. If a component is captured,
+     * its [state][FocusState] will be set to [Captured][FocusState.Captured]. When a
      * component is in this state, it holds onto focus until [freeFocus] is called. When a
      * component is in the [Captured][FocusState.Captured] state, all focus requests from
      * other components are declined.
