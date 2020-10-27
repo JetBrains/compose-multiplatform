@@ -38,7 +38,7 @@ fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
         }
     }
 
-    keyboard?.shortcut(copyToClipboardKeySet) {
+    keyboard?.setShortcut(copyToClipboardKeySet) {
         selectionManager.recentManager?.let { selector ->
             selector.getSelectedText()?.let {
                 clipboardManager.setText(it)

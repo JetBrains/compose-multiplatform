@@ -27,9 +27,8 @@ fun ComposeWindow.setContent(content: @Composable () -> Unit): Composition {
     }
     val owners = DesktopOwners(this.layer.wrapped, this::needRedrawLayer)
     val owner = DesktopOwner(owners, density)
-    val composition = owner.setContent(content)
-
     this.owners = owners
+    val composition = owner.setContent(content)
 
     onDensityChanged(owner::density::set)
     parent.onDismissEvents.add(owner::dispose)

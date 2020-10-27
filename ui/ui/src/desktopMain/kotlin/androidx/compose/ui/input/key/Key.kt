@@ -321,6 +321,6 @@ actual inline class Key(val keyCode: Int) {
     }
 
     actual override fun toString(): String {
-        return "Key code: $keyCode"
+        return "Key: ${KeyEvent.getKeyText(keyCode)}"
     }
 }
