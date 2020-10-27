@@ -160,6 +160,9 @@ class AndroidXPlugin : Plugin<Project> {
                 exceptionFormat = TestExceptionFormat.FULL
             }
         } else {
+            task.testLogging.apply {
+                showExceptions = false
+            }
             val htmlReport = task.reports.html
 
             val zipHtmlTask = project.tasks.register(
