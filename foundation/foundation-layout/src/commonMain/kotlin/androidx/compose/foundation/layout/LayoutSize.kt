@@ -189,25 +189,6 @@ fun Modifier.preferredHeightIn(
 )
 
 /**
- * Constrain the size of the content to be within [constraints] as permitted by the incoming
- * measurement [Constraints]. If the incoming measurement constraints are more restrictive the
- * requested size will obey the incoming constraints and attempt to be as close as possible to
- * the preferred size.
- */
-@Stable
-@Deprecated(
-    "DpConstraints-based APIs were deprecated. Please use the overload taking " +
-        "individual constraint values."
-)
-@Suppress("Deprecation")
-fun Modifier.preferredSizeIn(constraints: DpConstraints) = preferredSizeIn(
-    constraints.minWidth,
-    constraints.minHeight,
-    constraints.maxWidth,
-    constraints.maxHeight
-)
-
-/**
  * Constrain the width of the content to be between [minWidth]dp and [maxWidth]dp and the height
  * of the content to be between [minHeight] and [maxHeight] as permitted by the incoming
  * measurement [Constraints]. If the incoming constraints are more restrictive the requested size
@@ -399,26 +380,6 @@ fun Modifier.heightIn(
             properties["max"] = max
         }
     )
-)
-
-/**
- * Constrain the size of the content to be within [constraints].
- * If the content chooses a size that does not satisfy the incoming [Constraints], the
- * parent layout will be reported a size coerced in the [Constraints], and the position
- * of the content will be automatically offset to be centered on the space assigned to
- * the child by the parent layout under the assumption that [Constraints] were respected.
- */
-@Stable
-@Deprecated(
-    "DpConstraints-based APIs were deprecated. Please use the overload taking " +
-        "individual constraint values."
-)
-@Suppress("Deprecation")
-fun Modifier.sizeIn(constraints: DpConstraints) = sizeIn(
-    constraints.minWidth,
-    constraints.minHeight,
-    constraints.maxWidth,
-    constraints.maxHeight
 )
 
 /**
