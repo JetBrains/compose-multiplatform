@@ -187,3 +187,26 @@ compose.desktop {
     }
 }
 ```
+
+## App icon
+
+App icon needs to be provided in OS-specific formats:
+* `.icns` for Mac;
+* `.ico` for Windows;
+* `.png` for Linux.
+
+```kotlin
+compose.desktop {
+    application {
+        macOS {
+            iconFile.set(project.file("icon.icns"))
+        }
+        windows {
+            iconFile.set(project.file("icon.ico"))
+        }
+        linux {
+            iconFile.set(project.file("icon.png"))
+        }
+    }
+}
+```
