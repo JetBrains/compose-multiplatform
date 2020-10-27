@@ -7,7 +7,7 @@ import org.gradle.api.model.ObjectFactory
 import java.util.*
 import javax.inject.Inject
 
-open class NativeExecutables @Inject constructor(
+open class NativeDistributions @Inject constructor(
         objects: ObjectFactory,
         layout: ProjectLayout
 ) {
