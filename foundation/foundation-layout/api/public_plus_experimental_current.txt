@@ -324,7 +324,7 @@ package androidx.compose.foundation.layout {
   }
 
   public final class LayoutAspectRatioKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier aspectRatio(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float ratio);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier aspectRatio(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float ratio, optional boolean matchHeightConstraintsFirst);
   }
 
   public final class LayoutOffsetKt {

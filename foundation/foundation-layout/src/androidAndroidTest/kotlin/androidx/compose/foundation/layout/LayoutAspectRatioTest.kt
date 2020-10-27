@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -102,7 +103,33 @@ class LayoutAspectRatioTest : LayoutTest() {
         )
     }
 
-    private fun getSize(aspectRatio: Float, childContraints: Constraints): IntSize {
+    @Test
+    fun testAspectRatio_sizesCorrectly_forHeightFirst() {
+        assertEquals(IntSize(30, 30), getSize(1f, Constraints(maxHeight = 30), true))
+        assertEquals(IntSize(15, 30), getSize(0.5f, Constraints(maxHeight = 30), true))
+        assertEquals(
+            IntSize(10, 10),
+            getSize(1f, Constraints(maxWidth = 10, maxHeight = 30), true)
+        )
+        assertEquals(
+            IntSize(10, 20),
+            getSize(0.5f, Constraints(maxWidth = 10, maxHeight = 30), true)
+        )
+        assertEquals(
+            IntSize(5, 10),
+            getSize(0.5f, Constraints(minWidth = 5, minHeight = 10), true)
+        )
+        assertEquals(
+            IntSize(10, 20),
+            getSize(0.5f, Constraints(minWidth = 10, minHeight = 5), true)
+        )
+    }
+
+    private fun getSize(
+        aspectRatio: Float,
+        childContraints: Constraints,
+        matchHeightConstraintsFirst: Boolean = false
+    ): IntSize {
         val positionedLatch = CountDownLatch(1)
         val size = Ref<IntSize>()
         val position = Ref<Offset>()
@@ -111,7 +138,7 @@ class LayoutAspectRatioTest : LayoutTest() {
                 @Composable {
                     Container(
                         Modifier
-                            .aspectRatio(aspectRatio)
+                            .aspectRatio(aspectRatio, matchHeightConstraintsFirst)
                             .then(Modifier.saveLayoutInfo(size, position, positionedLatch))
                     ) {
                     }
@@ -132,7 +159,9 @@ class LayoutAspectRatioTest : LayoutTest() {
     fun testInspectableValue() {
         val modifier = Modifier.aspectRatio(2.0f) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("aspectRatio")
-        assertThat(modifier.valueOverride).isEqualTo(2.0f)
-        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("ratio", 2.0f),
+            ValueElement("matchHeightConstraintsFirst", false)
+        )
     }
 }
