@@ -349,10 +349,6 @@ package androidx.compose.foundation.layout {
   }
 
   public final class IntrinsicKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static void MaxIntrinsicHeight(kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method @Deprecated @androidx.compose.runtime.Composable public static void MaxIntrinsicWidth(kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method @Deprecated @androidx.compose.runtime.Composable public static void MinIntrinsicHeight(kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method @Deprecated @androidx.compose.runtime.Composable public static void MinIntrinsicWidth(kotlin.jvm.functions.Function0<kotlin.Unit> children);
     method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredHeight(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
     method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredWidth(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
   }
