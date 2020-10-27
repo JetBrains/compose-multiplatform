@@ -20,46 +20,56 @@ import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeysSet
-import androidx.compose.ui.input.key.ShortcutInstance
-import java.lang.RuntimeException
+import androidx.compose.ui.input.key.ShortcutsInstance
+import androidx.compose.ui.input.key.shortcuts
 
-class AmbiguousShortcut(val superKeysSet: KeysSet) : RuntimeException()
-
-interface KeyboardShortcutHandler {
-    fun cancel()
-}
-
+/**
+ * Window-scoped keyboard handling.
+ *
+ * @see [shortcuts] to setup event handlers based on the element that is in focus
+ */
 @ExperimentalKeyInput
 class Keyboard {
-    private val shortcuts = mutableListOf<ShortcutInstance>()
-
-    fun shortcut(key: Key, callback: () -> Unit) = shortcut(KeysSet(listOf(key)), callback)
-
-    fun shortcut(keysSet: KeysSet, callback: () -> Unit): KeyboardShortcutHandler {
-        checkAmbiguityOfShortcut(keysSet)
-        val instance = ShortcutInstance(keysSet, callback)
-        shortcuts.add(instance)
-        return object : KeyboardShortcutHandler {
-            override fun cancel() {
-                shortcuts.remove(instance)
-            }
-        }
+    private val shortcutsInstance = lazy {
+        ShortcutsInstance()
     }
 
-    private fun checkAmbiguityOfShortcut(keysSet: KeysSet) {
-        shortcuts.forEach {
-            if (keysSet.isSubset(it.keysSet)) {
-                throw(AmbiguousShortcut(it.keysSet))
-            }
-        }
+    /**
+     * Set a callback for [KeysSet]. If callback for the same [KeysSet] already exists, it
+     * overrides it.
+     *
+     * @param keysSet: [KeysSet] instance to react
+     * @param callback: Called when all keys from keysSet are pressed
+     */
+    fun setShortcut(keysSet: KeysSet, callback: () -> Unit) {
+        shortcutsInstance.value.setHandler(keysSet, callback)
+    }
+
+    /**
+     * Set a callback for [Key]. If callback for the same [Key] already exists, it
+     * overrides it.
+     *
+     * @param key: [Key] instance to react
+     * @param callback: Called when all keys from keysSet are pressed
+     */
+    fun setShortcut(key: Key, callback: () -> Unit) {
+        shortcutsInstance.value.setHandler(KeysSet(key), callback)
+    }
+
+    /**
+     * Remove a callback for [KeysSet]. If no such callback it's noop
+     *
+     * @param keysSet: [KeysSet] instance
+     */
+    fun removeShortcut(keysSet: KeysSet) {
+        shortcutsInstance.value.removeHandler(keysSet)
     }
 
     internal fun processKeyInput(keyEvent: KeyEvent): Boolean {
-        shortcuts.forEach {
-            if (it.process(keyEvent)) {
-                return true
-            }
+        return if (shortcutsInstance.isInitialized()) {
+            shortcutsInstance.value.process(keyEvent)
+        } else {
+            false
         }
-        return false
     }
 }
