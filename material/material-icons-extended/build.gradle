@@ -111,7 +111,6 @@ androidx {
     // This module has a large number (5000+) of generated source files and so doc generation /
     // API tracking will simply take too long
     runApiTasks = new RunApiTasks.No("Five thousand generated source files")
-    generateDocs = false
     inceptionYear = "2020"
     description = "Compose Material Design extended icons. This module contains all Material icons. It is a very large dependency and should not be included directly."
 }
