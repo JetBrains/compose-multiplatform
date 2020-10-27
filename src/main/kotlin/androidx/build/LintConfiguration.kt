@@ -61,11 +61,9 @@ fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: 
         // We already run lintDebug, we don't need to run lint which lints the release variant
         task.enabled = false
     }
-    if (name != "docs-fake") {
-        afterEvaluate {
-            tasks.named("lintDebug").configure { task ->
-                AffectedModuleDetector.configureTaskGuard(task)
-            }
+    afterEvaluate {
+        tasks.named("lintDebug").configure { task ->
+            AffectedModuleDetector.configureTaskGuard(task)
         }
     }
 }

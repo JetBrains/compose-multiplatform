@@ -48,16 +48,15 @@ open class BuildOnServer : DefaultTask() {
         val buildId = getBuildId()
 
         val filesNames = mutableListOf(
-            // TODO: re-add after merge to compose merge to master
-            // "androidx-public-docs-$buildId.zip",
-            // "dokkaPublicDocs-$buildId.zip",
             "androidx_aggregate_build_info.txt",
             "top-of-tree-m2repository-all-$buildId.zip"
         )
 
         if (project.isDocumentationEnabled()) {
-            filesNames.add("androidx-tipOfTree-docs-$buildId.zip")
-            filesNames.add("dokkaTipOfTreeDocs-$buildId.zip")
+            filesNames.add("doclava-tip-of-tree-docs-$buildId.zip")
+            filesNames.add("doclava-public-docs-$buildId.zip")
+            filesNames.add("dokka-tip-of-tree-docs-$buildId.zip")
+            filesNames.add("dokka-public-docs-$buildId.zip")
         }
 
         if (project.findProject(":jetifier-standalone") != null) {

@@ -18,8 +18,6 @@ package androidx.build
 
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
-import androidx.build.dokka.DokkaPublicDocs
-import androidx.build.dokka.DokkaSourceDocs
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
@@ -47,22 +45,12 @@ class AndroidXRootPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() {
-        // This has to be first due to bad behavior by DiffAndDocs which is triggered on the root
-        // project. It calls evaluationDependsOn on each subproject. This eagerly causes evaluation
-        // *during* the root build.gradle evaluation. The subproject then applies this plugin (while
-        // we're still halfway through applying it on the root). The check licenses code runs on the
-        // subproject which then looks for the root project task to add itself as a dependency of.
-        // Without the root project having created the task prior to DiffAndDocs running this fails.
-        // TODO(alanv): do not use evaluationDependsOn in DiffAndDocs to break this cycle!
-        // Create an empty task in the root which will depend on all the per-project child tasks.
-        // TODO have the normal license check run here so it catches the buildscript classpath.
-        tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
-
         project.validateAllAndroidxArgumentsAreRecognized()
         tasks.register("listAndroidXProperties", ListAndroidXPropertiesTask::class.java)
         setDependencyVersions()
         configureKtlintCheckFile()
         configureCheckInvalidSuppress()
+        tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
 
         val buildOnServerTask = tasks.create(
             AndroidXPlugin.BUILD_ON_SERVER_TASK,
@@ -111,22 +99,10 @@ class AndroidXRootPlugin : Plugin<Project> {
                     }
                 )
             )
-            if (project.path == ":docs-runner") {
-                project.tasks.all { task ->
-                    if (DokkaPublicDocs.ARCHIVE_TASK_NAME == task.name ||
-                        DokkaSourceDocs.ARCHIVE_TASK_NAME == task.name
-                    ) {
-                        buildOnServerTask.dependsOn(task)
-                    }
-                }
-                return@subprojects
-            }
             project.plugins.withType(AndroidBasePlugin::class.java) {
                 buildOnServerTask.dependsOn("${project.path}:assembleDebug")
                 buildOnServerTask.dependsOn("${project.path}:assembleAndroidTest")
-                if (!project.rootProject.hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS) &&
-                    project.path != ":docs-fake"
-                ) {
+                if (!project.rootProject.hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)) {
                     buildOnServerTask.dependsOn("${project.path}:lintDebug")
                 }
             }
@@ -170,15 +146,6 @@ class AndroidXRootPlugin : Plugin<Project> {
         }
         buildOnServerTask.dependsOn(zipTestConfigsWithApks)
 
-        if (project.isDocumentationEnabled()) {
-            val allDocsTask = DiffAndDocs.configureDiffAndDocs(
-                this,
-                DacOptions("androidx", "ANDROIDX_DATA"),
-                listOf(RELEASE_RULE)
-            )
-            buildOnServerTask.dependsOn(allDocsTask)
-        }
-
         AffectedModuleDetector.configure(gradle, this)
 
         // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
@@ -189,10 +156,9 @@ class AndroidXRootPlugin : Plugin<Project> {
             evaluationDependsOnChildren()
             subprojects { subproject ->
                 // TODO(153485458) remove most of these exceptions
-                if (subproject.name != "docs-fake" &&
+                if (!subproject.name.contains("hilt") &&
                     subproject.name != "docs-public" &&
                     subproject.name != "docs-tip-of-tree" &&
-                    !subproject.name.contains("hilt") &&
                     subproject.name != "camera-testapp-timing" &&
                     subproject.name != "room-testapp" &&
                     subproject.name != "support-media2-test-client-previous" &&

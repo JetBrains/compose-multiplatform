@@ -16,7 +16,7 @@
 
 package androidx.build.java
 
-import androidx.build.androidJarFile
+import androidx.build.doclava.androidJarFile
 import androidx.build.multiplatformExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant

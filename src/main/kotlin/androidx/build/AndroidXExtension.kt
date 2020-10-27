@@ -153,21 +153,6 @@ open class AndroidXExtension(val project: Project) {
     var type: LibraryType = LibraryType.UNSET
     var failOnDeprecationWarnings = true
 
-    /**
-     * Disables just docs generation for modules that are published and should have their API
-     * tracked to ensure intra-library versioning compatibility, but are not expected to be
-     * directly used by developers.
-     * Now deprecated and should not be used in new code. New code should read type.generateDocs.
-     */
-    // TODO: decide whether we want to support overriding generateDocs
-    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.generateDocs")
-    var generateDocs = true
-        get() {
-            if (type != LibraryType.UNSET) return type.generateDocs
-            if (!publish.shouldRelease()) return false
-            return field
-        }
-
     var legacyDisableKotlinStrictApiMode = false
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
