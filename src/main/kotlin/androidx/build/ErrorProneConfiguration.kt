@@ -33,7 +33,7 @@ import org.gradle.kotlin.dsl.getByName
 const val ERROR_PRONE_TASK = "runErrorProne"
 
 private const val ERROR_PRONE_CONFIGURATION = "errorprone"
-private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.3.3"
+private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.4.0"
 private val log = Logging.getLogger("ErrorProneConfiguration")
 
 fun Project.configureErrorProneForJava() {
@@ -93,12 +93,34 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:ObjectToString:OFF",
             "-Xep:CatchAndPrintStackTrace:OFF",
             "-Xep:MixedMutabilityReturnType:OFF",
+            "-Xep:UnescapedEntity:OFF",
+            "-Xep:MissingSummary:OFF",
+            "-Xep:StaticAssignmentInConstructor:OFF",
+            "-Xep:InvalidLink:OFF",
+            "-Xep:InvalidInlineTag:OFF",
+            "-Xep:EmptyBlockTag:OFF",
+            "-Xep:EmptyCatch:OFF",
+            "-Xep:JdkObsolete:OFF",
+            "-Xep:PublicConstructorForAbstractClass:OFF",
+            "-Xep:MutablePublicArray:OFF",
+            "-Xep:NonCanonicalType:OFF",
+            "-Xep:ModifyCollectionInEnhancedForLoop:OFF",
+            "-Xep:InheritDoc:OFF",
+            "-Xep:InvalidParam:OFF",
+            "-Xep:InlineFormatString:OFF",
+            "-Xep:InvalidBlockTag:OFF",
+            "-Xep:ProtectedMembersInFinalClass:OFF",
+            "-Xep:SameNameButDifferent:OFF",
+            "-Xep:AnnotateFormatMethod:OFF",
+            "-Xep:ReturnFromVoid:OFF",
+            "-Xep:AlmostJavadoc:OFF",
+            "-Xep:InjectScopeAnnotationOnInterfaceOrAbstractClass:OFF",
+            "-Xep:InvalidThrows:OFF",
 
             // Enforce the following checks.
             "-Xep:JavaTimeDefaultTimeZone:ERROR",
             "-Xep:ParameterNotNullable:ERROR",
             "-Xep:MissingOverride:ERROR",
-            "-Xep:JdkObsolete:ERROR",
             "-Xep:EqualsHashCode:ERROR",
             "-Xep:NarrowingCompoundAssignment:ERROR",
             "-Xep:ClassNewInstance:ERROR",
