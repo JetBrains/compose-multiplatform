@@ -29,6 +29,17 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ImageViewer"
             modules("jdk.crypto.ec")
+
+            val iconsRoot = project.file("../common/src/desktopMain/resources/images")
+            macOS {
+                iconFile.set(iconsRoot.resolve("icon-mac.icns"))
+            }
+            windows {
+                iconFile.set(iconsRoot.resolve("icon-windows.ico"))
+            }
+            linux {
+                iconFile.set(iconsRoot.resolve("icon-linux.png"))
+            }
         }
     }
 }

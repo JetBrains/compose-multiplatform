@@ -1,14 +1,16 @@
 package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import java.io.File
+import javax.inject.Inject
 
-abstract class PlatformSettings {
-    var version: String? = null
-    var installDir: String? = null
+abstract class PlatformSettings (objects: ObjectFactory) {
+    val iconFile: RegularFileProperty = objects.fileProperty()
 }
 
-open class MacOSPlatformSettings : PlatformSettings() {
+open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
     var packageIdentifier: String? = null
     var packageName: String? = null
     val signing: MacOSSigningSettings = MacOSSigningSettings()
@@ -31,7 +33,7 @@ open class MacOSSigningSettings {
     var keyUserName: String? = null
 }
 
-open class LinuxPlatformSettings : PlatformSettings() {
+open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
     var shortcut: Boolean = false
     var packageName: String? = null
     var appRelease: String? = null
@@ -41,7 +43,7 @@ open class LinuxPlatformSettings : PlatformSettings() {
     var rpmLicenseType: String? = null
 }
 
-open class WindowsPlatformSettings : PlatformSettings() {
+open class WindowsPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
     var console: Boolean = false
     var dirChooser: Boolean = false
     var perUserInstall: Boolean = false

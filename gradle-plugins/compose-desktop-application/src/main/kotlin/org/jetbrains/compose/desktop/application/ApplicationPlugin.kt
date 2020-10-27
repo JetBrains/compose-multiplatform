@@ -25,7 +25,6 @@ private const val PLUGIN_ID = "org.jetbrains.compose.desktop.application"
 // todo: fix windows
 // todo: multiple launchers
 // todo: file associations
-// todo: icon
 // todo: use workers
 @Suppress("unused") // Gradle plugin entry point
 open class ApplicationPlugin : Plugin<Project> {
@@ -100,6 +99,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
                 linuxMenuGroup.set(provider { linux.menuGroup })
                 linuxPackageName.set(provider { linux.packageName })
                 linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
+                iconFile.set(linux.iconFile)
             }
         }
         OS.Windows -> {
@@ -111,6 +111,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
                 winMenu.set(provider { win.menu })
                 winMenuGroup.set(provider { win.menuGroup })
                 winUpgradeUuid.set(provider { win.upgradeUuid })
+                iconFile.set(win.iconFile)
             }
         }
         OS.MacOS -> {
@@ -121,6 +122,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
                 macSigningKeyUserName.set(provider { mac.signing.keyUserName })
                 macSigningKeychain.set(project.layout.file(provider { mac.signing.keychain }))
                 macBundleSigningPrefix.set(provider { mac.signing.bundlePrefix })
+                iconFile.set(mac.iconFile)
             }
         }
     }
@@ -131,8 +133,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
         packageCopyright.set(provider { executables.copyright })
         packageVendor.set(provider { executables.vendor })
         packageVersion.set(provider {
-            targetPlatformSettings.version
-                    ?: executables.version
+                executables.version
                     ?: project.version.toString().takeIf { it != "unspecified" }
         })
     }
