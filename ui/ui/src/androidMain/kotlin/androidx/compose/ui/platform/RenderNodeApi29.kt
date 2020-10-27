@@ -88,6 +88,13 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
         set(value) {
             renderNode.rotationY = value
         }
+
+    override var cameraDistance: Float
+        get() = renderNode.cameraDistance
+        set(value) {
+            renderNode.cameraDistance = value
+        }
+
     override var pivotX: Float
         get() = renderNode.pivotX
         set(value) {
@@ -168,4 +175,29 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
 
     override fun setHasOverlappingRendering(hasOverlappingRendering: Boolean): Boolean =
         renderNode.setHasOverlappingRendering(hasOverlappingRendering)
+
+    override fun dumpRenderNodeData(): DeviceRenderNodeData =
+        DeviceRenderNodeData(
+            uniqueId = renderNode.uniqueId,
+            left = renderNode.left,
+            top = renderNode.top,
+            right = renderNode.right,
+            bottom = renderNode.bottom,
+            width = renderNode.width,
+            height = renderNode.height,
+            scaleX = renderNode.scaleX,
+            scaleY = renderNode.scaleY,
+            translationX = renderNode.translationX,
+            translationY = renderNode.translationY,
+            elevation = renderNode.elevation,
+            rotationZ = renderNode.rotationZ,
+            rotationX = renderNode.rotationX,
+            rotationY = renderNode.rotationY,
+            cameraDistance = renderNode.cameraDistance,
+            pivotX = renderNode.pivotX,
+            pivotY = renderNode.pivotY,
+            clipToOutline = renderNode.clipToOutline,
+            clipToBounds = renderNode.clipToBounds,
+            alpha = renderNode.alpha
+        )
 }

@@ -19,6 +19,7 @@ package androidx.compose.ui.draw
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
@@ -32,6 +33,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
@@ -212,6 +214,35 @@ class DrawLayerTest {
             assertEquals(Rect(10f, 10f, 20f, 20f), bounds)
             // Positions aren't clipped
             assertEquals(Offset(5f, 10f), layoutCoordinates.positionInRoot)
+        }
+    }
+
+    @MediumTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testCameraDistanceWithRotationY() {
+        val testTag = "parent"
+        rule.setContent {
+            Box(modifier = Modifier.testTag(testTag).wrapContentSize()) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Gray)
+                        .drawLayer(rotationY = 25f, cameraDistance = 1.0f)
+                        .background(Color.Red)
+                ) {
+                    Box(modifier = Modifier.size(100.dp))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToBitmap().apply {
+            assertEquals(Color.Red.toArgb(), getPixel(0, 0))
+            assertEquals(Color.Red.toArgb(), getPixel(0, height - 1))
+            assertEquals(Color.Red.toArgb(), getPixel(width / 2 - 10, height / 2))
+            assertEquals(Color.Gray.toArgb(), getPixel(width - 1 - 10, height / 2))
+            assertEquals(Color.Gray.toArgb(), getPixel(width - 1, 0))
+            assertEquals(Color.Gray.toArgb(), getPixel(width - 1, height - 1))
         }
     }
 

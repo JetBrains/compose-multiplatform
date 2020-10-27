@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.draw
 
+import androidx.compose.ui.DefaultCameraDistance
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.drawLayer
@@ -55,6 +56,7 @@ class DrawLayerModifierTest {
             ValueElement("rotationX", 2.0f),
             ValueElement("rotationY", 0.0f),
             ValueElement("rotationZ", 0.0f),
+            ValueElement("cameraDistance", DefaultCameraDistance),
             ValueElement("transformOrigin", TransformOrigin.Center),
             ValueElement("shape", RectangleShape),
             ValueElement("clip", false)

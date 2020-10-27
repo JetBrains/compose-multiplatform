@@ -111,6 +111,7 @@ package androidx.compose.ui {
 
   public interface DrawLayerModifier extends androidx.compose.ui.Modifier.Element {
     method @FloatRange(from=0.0, to=1.0) public default float getAlpha();
+    method @FloatRange(from=0.0, to=3.4E38) public default float getCameraDistance();
     method public default boolean getClip();
     method @FloatRange(from=0.0, to=360.0) public default float getRotationX();
     method @FloatRange(from=0.0, to=360.0) public default float getRotationY();
@@ -123,6 +124,7 @@ package androidx.compose.ui {
     method public default float getTranslationX();
     method public default float getTranslationY();
     property @FloatRange(from=0.0, to=1.0) public default float alpha;
+    property @FloatRange(from=0.0, to=3.4E38) public default float cameraDistance;
     property public default boolean clip;
     property @FloatRange(from=0.0, to=360.0) public default float rotationX;
     property @FloatRange(from=0.0, to=360.0) public default float rotationY;
@@ -138,7 +140,8 @@ package androidx.compose.ui {
 
   public final class DrawLayerModifierKt {
     method public static inline long TransformOrigin(float pivotFractionX, float pivotFractionY);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawLayer-o4Jamzk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawLayer-qyIa3ak(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
+    field public static final float DefaultCameraDistance = 8.0f;
   }
 
   public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
