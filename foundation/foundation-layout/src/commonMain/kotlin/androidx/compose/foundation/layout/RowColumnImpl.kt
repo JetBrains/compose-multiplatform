@@ -701,12 +701,32 @@ private fun intrinsicCrossAxisSize(
     return crossAxisMax
 }
 
-internal data class LayoutWeightImpl(val weight: Float, val fill: Boolean) : ParentDataModifier {
+internal class LayoutWeightImpl(
+    val weight: Float,
+    val fill: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?) =
         ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
             it.weight = weight
             it.fill = fill
         }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? LayoutWeightImpl ?: return false
+        return weight != otherModifier.weight &&
+            fill != otherModifier.fill
+    }
+
+    override fun hashCode(): Int {
+        var result = weight.hashCode()
+        result = 31 * result + fill.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "LayoutWeightImpl(weight=$weight, fill=$fill)"
 }
 
 internal sealed class SiblingsAlignedModifier(
