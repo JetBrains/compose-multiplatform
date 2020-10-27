@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.text.LastBaseline
+import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers

@@ -18,7 +18,7 @@ package androidx.compose.foundation.layout
 
 import android.util.Log
 import androidx.annotation.FloatRange
-import androidx.compose.foundation.text.FirstBaseline
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
