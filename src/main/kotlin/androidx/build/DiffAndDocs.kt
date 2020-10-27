@@ -104,7 +104,7 @@ class DiffAndDocs private constructor(
         docsProject = root.findProject(":docs-fake")
         anchorTask = root.tasks.register("anchorDocsTask")
         val generateSdkApiTask = createGenerateSdkApiTask(
-            root, doclavaConfiguration, annotationConfiguration
+            root, doclavaConfiguration, annotationConfiguration, root.docsDir()
         )
         val offlineOverride = root.processProperty("offlineDocs")
 
@@ -485,10 +485,11 @@ private fun createDistDocsTask(
  * <p>
  * This is useful for federating docs against the platform SDK when no API XML file is available.
  */
-private fun createGenerateSdkApiTask(
+internal fun createGenerateSdkApiTask(
     project: Project,
     doclavaConfig: Configuration,
-    annotationConfig: Configuration
+    annotationConfig: Configuration,
+    destination: File
 ): TaskProvider<DoclavaTask> =
     project.tasks.register("generateSdkApi", DoclavaTask::class.java) { task ->
         task.apply {
@@ -496,7 +497,7 @@ private fun createGenerateSdkApiTask(
             dependsOn(annotationConfig)
             description = "Generates API files for the current SDK."
             setDocletpath(doclavaConfig.resolve())
-            destinationDir = project.docsDir()
+            destinationDir = destination
             // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
             classpath = androidJarFile(project)
                 .filter { it.path.contains("androidx/annotation") }
@@ -506,7 +507,7 @@ private fun createGenerateSdkApiTask(
                     .matching(PatternSet().include("**/*.java"))
             )
             exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
-            apiFile = sdkApiFile(project)
+            apiFile = File(destination, "release/sdk_current.txt")
             generateDocs = false
             coreJavadocOptions {
                 addStringOption("stubpackages", "android.*")
@@ -525,7 +526,7 @@ private val GENERATEDOCS_HIDDEN = listOf(105, 106, 107, 111, 112, 113, 115, 116,
 /**
  * Doclava checks configuration for use in generating documentation.
  */
-private val GENERATE_DOCS_CONFIG = ChecksConfig(
+internal val GENERATE_DOCS_CONFIG = ChecksConfig(
     warnings = emptyList(),
     hidden = GENERATEDOCS_HIDDEN + DEFAULT_DOCLAVA_CONFIG.hidden,
     errors = ((101..122) - GENERATEDOCS_HIDDEN)
@@ -607,11 +608,6 @@ private fun createGenerateDocsTask(
             addArtifactsAndSince()
         }
     }
-
-/**
- * @return the project's Android SDK API txt as a File.
- */
-private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 
 /**
  * @return the project's Android SDK stub JAR as a File.
