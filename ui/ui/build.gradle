@@ -102,6 +102,7 @@ dependencies {
         androidTestImplementation project(":compose:test-utils")
         androidTestImplementation project(":compose:ui:ui-test-font")
         androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
     }
 }
 
@@ -191,6 +192,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:test-utils")
                 implementation project(":compose:ui:ui-test-font")
                 implementation project(":ui:ui-test")
+                implementation "androidx.recyclerview:recyclerview:1.1.0"
             }
 
             desktopTest.dependencies {
