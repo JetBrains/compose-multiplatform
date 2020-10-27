@@ -21,7 +21,7 @@ package androidx.compose.runtime.samples
 import androidx.annotation.Sampled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -124,7 +124,7 @@ fun rememberUpdatedStateSampleWithLaunchedTask() {
         val currentOnTimeout by rememberUpdatedState(onTimeout)
 
         state.currentNotification?.let { currentNotification ->
-            LaunchedTask(currentNotification) {
+            LaunchedEffect(currentNotification) {
                 // We should not restart this delay if onTimeout changes, but we want to call
                 // the onTimeout we were last recomposed with when it completes.
                 delay(NotificationTimeout)

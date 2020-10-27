@@ -16,6 +16,9 @@
 
 package androidx.compose.runtime
 
+import android.view.Choreographer
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import kotlinx.coroutines.channels.Channel
@@ -25,6 +28,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 @Suppress("UNUSED_VARIABLE")
@@ -274,6 +280,101 @@ class SideEffectTests : BaseComposeTest() {
     }
 
     @Test
+    fun testLaunchedEffect() {
+        var counter by mutableStateOf(0)
+
+        // Used as a signal that LaunchedEffect will await
+        val ch = Channel<Unit>(Channel.CONFLATED)
+        compose {
+            LaunchedEffect(ch) {
+                counter++
+                ch.receive()
+                counter++
+                ch.receive()
+                counter++
+            }
+        }.then {
+            assertEquals(1, counter)
+            ch.offer(Unit)
+        }.then {
+            assertEquals(2, counter)
+            ch.offer(Unit)
+        }.then {
+            assertEquals(3, counter)
+        }
+    }
+
+    @Test
+    fun testAwaitFrameFromLaunchedEffect() {
+        var choreographerTime by mutableStateOf(Long.MIN_VALUE)
+        var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
+        compose {
+            LaunchedEffect(Unit) {
+                withFrameNanos {
+                    awaitFrameTime = it
+                }
+            }
+            onCommit(true) {
+                Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
+                    choreographerTime = frameTimeNanos
+                }
+            }
+        }.then {
+            assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
+            assertNotEquals(awaitFrameTime, Long.MAX_VALUE, "awaitFrameNanos callback never ran")
+            assertEquals(
+                choreographerTime, awaitFrameTime,
+                "expected same values from choreographer post and awaitFrameNanos"
+            )
+        }
+    }
+
+    @Test
+    fun testLaunchedEffectRunsAfter() {
+        var onCommitRan = false
+        var launchRanAfter = false
+        compose {
+            // Confirms that these run "out of order" with respect to one another because
+            // the launch runs dispatched.
+            LaunchedEffect(Unit) {
+                launchRanAfter = onCommitRan
+            }
+            SideEffect {
+                onCommitRan = true
+            }
+        }.then {
+            assertTrue(launchRanAfter, "expected LaunchedEffect to run after later onCommit")
+        }
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun testCoroutineScopesHaveCorrectFrameClock() {
+        var recomposerClock: MonotonicFrameClock? = null
+        var LaunchedEffectClock: MonotonicFrameClock? = null
+        var rememberCoroutineScopeFrameClock: MonotonicFrameClock? = null
+
+        compose {
+            recomposerClock = currentComposer.applyCoroutineContext[MonotonicFrameClock]
+            LaunchedEffect(Unit) {
+                LaunchedEffectClock = coroutineContext[MonotonicFrameClock]
+            }
+            val rememberedScope = rememberCoroutineScope()
+            SideEffect {
+                rememberCoroutineScopeFrameClock =
+                    rememberedScope.coroutineContext[MonotonicFrameClock]
+            }
+        }.then {
+            assertNotNull(recomposerClock, "Recomposer frameClock")
+            assertSame(recomposerClock, LaunchedEffectClock, "LaunchedEffect clock")
+            assertSame(
+                recomposerClock, rememberCoroutineScopeFrameClock,
+                "rememberCoroutineScope clock"
+            )
+        }
+    }
+
+    @Test
     fun testRememberUpdatedStateRecomposition() {
         @Composable
         fun MyComposable(
@@ -285,7 +386,7 @@ class SideEffectTests : BaseComposeTest() {
 
             // This block closes over currentArg and is long-lived; it is important that the
             // value used be updated by recomposition of MyComposable
-            LaunchedTask {
+            LaunchedEffect(inCh, outCh) {
                 inCh.receive()
                 outCh.send(currentArg)
             }

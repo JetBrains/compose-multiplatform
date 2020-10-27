@@ -16,6 +16,12 @@
 
 package androidx.compose.runtime
 
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+
 /**
  * Schedule [effect] to run when the current composition completes successfully and applies
  * changes. [SideEffect] can be used to apply side effects to objects managed by the
@@ -29,7 +35,7 @@ package androidx.compose.runtime
  * [CompositionLifecycleObserver] event callbacks.
  *
  * A [SideEffect] runs after **every** recomposition. To launch an ongoing task spanning
- * potentially many recompositions, see [LaunchedTask]. To manage an event subscription or other
+ * potentially many recompositions, see [LaunchedEffect]. To manage an event subscription or other
  * object lifecycle, see [DisposableEffect].
  */
 @Composable
@@ -82,7 +88,12 @@ private class DisposableEffectImpl(
 private const val DisposableEffectNoParamError =
     "DisposableEffect must provide one or more 'subject' parameters that define the identity of " +
         "the DisposableEffect and determine when its previous effect should be disposed and " +
-        "restart."
+        "a new effect started for the new subject."
+
+private const val LaunchedEffectNoParamError =
+    "LaunchedEffect must provide one or more 'subject' parameters that define the identity of " +
+        "the LaunchedEffect and determine when its previous effect coroutine should be cancelled " +
+        "and a new effect launched for the new subject."
 
 @Composable
 @ComposableContract(restartable = false)
@@ -112,7 +123,7 @@ fun DisposableEffect(
  *
  * A [DisposableEffect] **must** include an [onDispose][DisposableEffectScope.onDispose] clause
  * as the final statement in its [effect] block. If your operation does not require disposal
- * it might be a [SideEffect] instead, or a [LaunchedTask] if it launches a coroutine that should
+ * it might be a [SideEffect] instead, or a [LaunchedEffect] if it launches a coroutine that should
  * be managed by the composition.
  *
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
@@ -151,7 +162,7 @@ fun DisposableEffect(
  *
  * A [DisposableEffect] **must** include an [onDispose][DisposableEffectScope.onDispose] clause
  * as the final statement in its [effect] block. If your operation does not require disposal
- * it might be a [SideEffect] instead, or a [LaunchedTask] if it launches a coroutine that should
+ * it might be a [SideEffect] instead, or a [LaunchedEffect] if it launches a coroutine that should
  * be managed by the composition.
  *
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
@@ -191,7 +202,7 @@ fun DisposableEffect(
  *
  * A [DisposableEffect] **must** include an [onDispose][DisposableEffectScope.onDispose] clause
  * as the final statement in its [effect] block. If your operation does not require disposal
- * it might be a [SideEffect] instead, or a [LaunchedTask] if it launches a coroutine that should
+ * it might be a [SideEffect] instead, or a [LaunchedEffect] if it launches a coroutine that should
  * be managed by the composition.
  *
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
@@ -232,7 +243,7 @@ fun DisposableEffect(
  *
  * A [DisposableEffect] **must** include an [onDispose][DisposableEffectScope.onDispose] clause
  * as the final statement in its [effect] block. If your operation does not require disposal
- * it might be a [SideEffect] instead, or a [LaunchedTask] if it launches a coroutine that should
+ * it might be a [SideEffect] instead, or a [LaunchedEffect] if it launches a coroutine that should
  * be managed by the composition.
  *
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
@@ -249,4 +260,125 @@ fun DisposableEffect(
     effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
     remember(*subjects) { DisposableEffectImpl(effect) }
+}
+
+internal class LaunchedEffectImpl(
+    parentCoroutineContext: CoroutineContext,
+    private val task: suspend CoroutineScope.() -> Unit
+) : CompositionLifecycleObserver {
+
+    private val scope = CoroutineScope(parentCoroutineContext)
+    private var job: Job? = null
+
+    override fun onEnter() {
+        job?.cancel("Old job was still running!")
+        job = scope.launch(block = task)
+    }
+
+    override fun onLeave() {
+        job?.cancel()
+        job = null
+    }
+}
+
+/**
+ * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] when the [LaunchedEffect]
+ * leaves the composition.
+ *
+ * It is an error to call [LaunchedEffect] without at least one `subject` parameter.
+ */
+@Deprecated(LaunchedEffectNoParamError, level = DeprecationLevel.ERROR)
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Composable
+fun LaunchedEffect(
+    block: suspend CoroutineScope.() -> Unit
+): Unit = error(LaunchedEffectNoParamError)
+
+/**
+ * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedEffect] is recomposed with a different [subject]. The coroutine will be
+ * [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [subject]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+@ComposableContract(restartable = false)
+fun LaunchedEffect(
+    subject: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(subject) { LaunchedEffectImpl(applyContext, block) }
+}
+
+/**
+ * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedEffect] is recomposed with a different [subject1] or [subject2]. The coroutine will be
+ * [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+@ComposableContract(restartable = false)
+fun LaunchedEffect(
+    subject1: Any?,
+    subject2: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(subject1, subject2) { LaunchedEffectImpl(applyContext, block) }
+}
+
+/**
+ * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedEffect] is recomposed with a different [subject1], [subject2] or [subject3].
+ * The coroutine will be [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+@ComposableContract(restartable = false)
+fun LaunchedEffect(
+    subject1: Any?,
+    subject2: Any?,
+    subject3: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(subject1, subject2, subject3) { LaunchedEffectImpl(applyContext, block) }
+}
+
+/**
+ * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
+ * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
+ * [LaunchedEffect] is recomposed with any different [subjects]. The coroutine will be
+ * [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
+ */
+@Composable
+@ComposableContract(restartable = false)
+@Suppress("ArrayReturn")
+fun LaunchedEffect(
+    vararg subjects: Any?,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    val applyContext = currentComposer.applyCoroutineContext
+    remember(*subjects) { LaunchedEffectImpl(applyContext, block) }
 }

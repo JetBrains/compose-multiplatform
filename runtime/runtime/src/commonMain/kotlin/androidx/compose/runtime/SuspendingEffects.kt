@@ -21,7 +21,6 @@ package androidx.compose.runtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -71,7 +70,7 @@ internal fun createCompositionCoroutineScope(
  * interaction where the response to that event needs to unfold over time and be cancelled if the
  * composable managing that process leaves the composition. Jobs should never be launched into
  * **any** coroutine scope as a side effect of composition itself. For scoped ongoing jobs
- * initiated by composition, see [LaunchedTask].
+ * initiated by composition, see [LaunchedEffect].
  *
  * This function will not throw if preconditions are not met, as composable functions do not yet
  * fully support exceptions. Instead the returned scope's [CoroutineScope.coroutineContext] will
@@ -91,25 +90,6 @@ inline fun rememberCoroutineScope(
     return wrapper.coroutineScope
 }
 
-private class LaunchedTaskImpl(
-    parentCoroutineContext: CoroutineContext,
-    private val task: suspend CoroutineScope.() -> Unit
-) : CompositionLifecycleObserver {
-
-    private val scope = CoroutineScope(parentCoroutineContext)
-    private var job: Job? = null
-
-    override fun onEnter() {
-        job?.cancel("Old job was still running!")
-        job = scope.launch(block = task)
-    }
-
-    override fun onLeave() {
-        job?.cancel()
-        job = null
-    }
-}
-
 /**
  * When [LaunchedTask] enters the composition it will launch [block] into the composition's
  * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] when the [LaunchedTask]
@@ -119,11 +99,12 @@ private class LaunchedTaskImpl(
  * [LaunchedTask] that accept additional key parameters.
  */
 @Composable
+@Deprecated("Renamed to LaunchedEffect; no subject params not permitted")
 fun LaunchedTask(
     block: suspend CoroutineScope.() -> Unit
 ) {
     val applyContext = currentComposer.applyCoroutineContext
-    remember { LaunchedTaskImpl(applyContext, block) }
+    remember { LaunchedEffectImpl(applyContext, block) }
 }
 
 /**
@@ -138,12 +119,12 @@ fun LaunchedTask(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
+@Deprecated("Renamed to LaunchedEffect", ReplaceWith("LaunchedEffect(key, block)"))
 fun LaunchedTask(
     key: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val applyContext = currentComposer.applyCoroutineContext
-    remember(key) { LaunchedTaskImpl(applyContext, block) }
+    LaunchedEffect(key, block)
 }
 
 /**
@@ -158,13 +139,13 @@ fun LaunchedTask(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
+@Deprecated("Renamed to LaunchedEffect", ReplaceWith("LaunchedEffect(key1, key2, block)"))
 fun LaunchedTask(
     key1: Any?,
     key2: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val applyContext = currentComposer.applyCoroutineContext
-    remember(key1, key2) { LaunchedTaskImpl(applyContext, block) }
+    LaunchedEffect(key1, key2, block)
 }
 
 /**
@@ -179,14 +160,14 @@ fun LaunchedTask(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
+@Deprecated("Renamed to LaunchedEffect", ReplaceWith("LaunchedEffect(key1, key2, key3, block)"))
 fun LaunchedTask(
     key1: Any?,
     key2: Any?,
     key3: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val applyContext = currentComposer.applyCoroutineContext
-    remember(key1, key2, key3) { LaunchedTaskImpl(applyContext, block) }
+    LaunchedEffect(key1, key2, key3, block)
 }
 
 /**
@@ -201,10 +182,10 @@ fun LaunchedTask(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
+@Deprecated("Renamed to LaunchedEffect", ReplaceWith("LaunchedEffect(subjects = keys, block)"))
 fun LaunchedTask(
     vararg keys: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
-    val applyContext = currentComposer.applyCoroutineContext
-    remember(*keys) { LaunchedTaskImpl(applyContext, block) }
+    LaunchedEffect(subjects = keys, block)
 }
