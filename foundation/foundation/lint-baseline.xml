@@ -4,17 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed {"
-        errorLine2="                                                                          ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
-            line="154"
-            column="75"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
