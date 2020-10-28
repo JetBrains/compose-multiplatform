@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.ManualFrameClock
 import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.foundation.animation.FlingConfig
@@ -32,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestUiDispatcher
@@ -53,6 +56,8 @@ import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.withContext
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,6 +70,16 @@ class ScrollableTest {
     val rule = createComposeRule()
 
     private val scrollableBoxTag = "scrollableBox"
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     @OptIn(ExperimentalTesting::class)
@@ -642,6 +657,29 @@ class ScrollableTest {
 
         rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val controller = ScrollableController(
+            consumeScrollDelta = { it },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = ManualAnimationClock(0)
+        )
+        rule.setContent {
+            val modifier = Modifier.scrollable(Orientation.Vertical, controller) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("scrollable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "orientation",
+                "controller",
+                "enabled",
+                "reverseDirection",
+                "canScroll",
+                "onScrollStarted",
+                "onScrollStopped",
+            )
         }
     }
 
