@@ -37,7 +37,8 @@ import androidx.compose.ui.unit.dp
  *
  * @param asset [VectorAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [asset]
+ * @param tint tint to be applied to [asset]. If Color.Unspecified is provided, then no
+ *  tint is applied
  */
 @Deprecated(
     "Icon has been moved into the Material library: androidx.compose.material.Icon",
@@ -62,7 +63,8 @@ fun Icon(
  *
  * @param asset [ImageAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [asset]
+ * @param tint tint to be applied to [asset]. If Color.Unspecified is provided, then no
+ *  tint is applied
  */
 @Deprecated(
     "Icon has been moved into the Material library: androidx.compose.material.Icon",
@@ -88,7 +90,8 @@ fun Icon(
  *
  * @param painter Painter to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [painter]
+ * @param tint tint to be applied to [painter]. If Color.Unspecified is provided, then no
+ *  tint is applied
  */
 @Deprecated(
     "Icon has been moved into the Material library: androidx.compose.material.Icon",
@@ -103,7 +106,8 @@ fun Icon(
     // TODO: consider allowing developers to override the intrinsic size, and specify their own
     // size that this icon will be forced to take up.
     // TODO: b/149735981 semantics for content description
-    Box(modifier.defaultSizeFor(painter).paint(painter, colorFilter = ColorFilter.tint(tint)))
+    val colorFilter = if (tint == Color.Unspecified) null else ColorFilter.tint(tint)
+    Box(modifier.defaultSizeFor(painter).paint(painter, colorFilter = colorFilter))
 }
 
 private fun Modifier.defaultSizeFor(painter: Painter) =
