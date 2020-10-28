@@ -22,6 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ContentDrawScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
@@ -33,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -48,6 +52,16 @@ class IndicationTest {
     val rule = createComposeRule()
 
     val testTag = "indication"
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun indication_receivesInitialState() {
@@ -196,6 +210,21 @@ class IndicationTest {
                     }
                 }
             }
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val state = InteractionState()
+        val indication = makeIndication({}, {})
+        rule.setContent {
+            val modifier = Modifier.indication(state, indication) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("indication")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "indication",
+                "interactionState"
+            )
         }
     }
 }
