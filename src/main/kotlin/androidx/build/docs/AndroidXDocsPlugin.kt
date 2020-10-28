@@ -34,27 +34,26 @@ import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.ComponentMetadataContext
+import org.gradle.api.artifacts.ComponentMetadataRule
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.result.ResolvedArtifactResult
-import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.attributes.Attribute
-import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
-import org.gradle.jvm.JvmLibrary
+import org.gradle.kotlin.dsl.all
 import org.gradle.kotlin.dsl.named
-import org.gradle.language.base.artifact.SourcesArtifact
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
@@ -62,10 +61,8 @@ import java.io.File
 class AndroidXDocsPlugin : Plugin<Project> {
     lateinit var project: Project
     lateinit var docsType: String
-    lateinit var tipOfTreeSources: Configuration
-    lateinit var prebuiltSources: Configuration
-    lateinit var tipOfTreeSampleSources: Configuration
-    lateinit var prebuiltSampleSources: Configuration
+    lateinit var docsSourcesConfiguration: Configuration
+    lateinit var samplesSourcesConfiguration: Configuration
     lateinit var dependencyClasspath: FileCollection
 
     override fun apply(project: Project) {
@@ -87,15 +84,13 @@ class AndroidXDocsPlugin : Plugin<Project> {
         val unzipSamplesTask = configureUnzipTask(
             "unzipSampleSources",
             unzippedSamplesSources,
-            tipOfTreeSampleSources,
-            prebuiltSampleSources
+            samplesSourcesConfiguration
         )
         val unzippedDocsSources = File(project.buildDir, "unzippedDocsSources")
         val unzipDocsTask = configureUnzipTask(
             "unzipDocsSources",
             unzippedDocsSources,
-            tipOfTreeSources,
-            prebuiltSources
+            docsSourcesConfiguration
         )
 
         configureDokka(
@@ -114,47 +109,31 @@ class AndroidXDocsPlugin : Plugin<Project> {
 
     /**
      * Creates and configures a task that will build a list of all sources for projects in
-     * [tipOfTreeSourcesConfiguration] and [prebuiltSourcesConfiguration] configurations, resolve
-     * them and put them to [destinationDirectory].
+     * [docsConfiguration] configuration, resolve them and put them to [destinationDirectory].
      */
     private fun configureUnzipTask(
         taskName: String,
         destinationDirectory: File,
-        tipOfTreeSourcesConfiguration: Configuration,
-        prebuiltSourcesConfiguration: Configuration
+        docsConfiguration: Configuration
     ): TaskProvider<Sync> {
         @Suppress("UnstableApiUsage")
         return project.tasks.register(
             taskName,
             Sync::class.java
         ) { task ->
-            val sourcesTipOfTree = tipOfTreeSourcesConfiguration.incoming.artifactView { }.files
+            val sources = docsConfiguration.incoming.artifactView { }.files
             task.from(
-                sourcesTipOfTree.elements.map { jars ->
-                    jars.map { project.zipTree(it).addFilters() }
-                }
-            )
-            task.dependsOn(prebuiltSourcesConfiguration)
-            task.from(
-                project.provider {
-                    val componentIds =
-                        prebuiltSourcesConfiguration.incoming.resolutionResult.allDependencies.map {
-                            dependency ->
-                            dependency as ResolvedDependencyResult
-                            dependency.selected.id
-                        }
-                    val result = project.dependencies.createArtifactResolutionQuery()
-                        .forComponents(componentIds)
-                        .withArtifacts(JvmLibrary::class.java, SourcesArtifact::class.java)
-                        .execute()
-                    val sourcesFromPrebuilts = mutableListOf<File>()
-                    for (component in result.resolvedComponents) {
-                        component.getArtifacts(SourcesArtifact::class.java).forEach {
-                            it as ResolvedArtifactResult
-                            sourcesFromPrebuilts.add(it.file)
+                sources.elements.map { jars ->
+                    jars.map {
+                        project.zipTree(it).matching {
+                            // Filter out files that documentation tools cannot process.
+                            it.exclude("**/*.MF")
+                            it.exclude("**/*.aidl")
+                            it.exclude("**/META-INF/**")
+                            it.exclude("**/OWNERS")
+                            it.exclude("**/package.html")
                         }
                     }
-                    sourcesFromPrebuilts.map { project.zipTree(it).addFilters() }
                 }
             )
             task.into(destinationDirectory)
@@ -167,30 +146,21 @@ class AndroidXDocsPlugin : Plugin<Project> {
         }
     }
 
+    /**
+     *  The following configurations are created to build a list of projects that need to be
+     * documented and should be used from build.gradle of docs projects for the following:
+     * - docs(project(":foo:foo") or docs("androidx.foo:foo:1.0.0") for docs sources
+     * - samples(project(":foo:foo-samples") or samples("androidx.foo:foo-samples:1.0.0") for
+     *   samples sources
+     * - stubs(project(":foo:foo-stubs")) - stubs needed for a documented library
+     */
     private fun createConfigurations() {
-        // TODO(aurimas): merge tipOfTree/tipOfTreeSamples and prebuilt/prebuiltSamples
-        // configurations when Android Lint supports us adding a new variant to the runtimeElements
-        // configuration.
-        // The following configurations are created to build a list of projects that need to be
-        // documented and should be used from build.gradle of docs projects for the following:
-        // * tipOfTree(project(":foo:foo") - docs from tip of tree sources
-        // * prebuilt("androidx.foo:foo:1.0.0") - docs from prebuilt sources
-        // * tipOfTreeSamples(project(":foo:foo-samples") - samples from tip of tree sources
-        // * prebuiltSamples("androidx.foo:foo-samples:1.0.0") - samples from prebuilt sources
-        // * stubs(project(":foo:foo-stubs")) - stubs needed for a documented library
-        val tipOfTreeSourcesConfiguration = project.configurations.create("tipOfTree") {
+        project.dependencies.components.all<SourcesVariantRule>()
+        val docsConfiguration = project.configurations.create("docs") {
             it.isCanBeResolved = false
             it.isCanBeConsumed = false
         }
-        val prebuiltSourcesConfiguration = project.configurations.create("prebuilt") {
-            it.isCanBeResolved = false
-            it.isCanBeConsumed = false
-        }
-        val tipOfTreeSamplesConfiguration = project.configurations.create("tipOfTreeSamples") {
-            it.isCanBeResolved = false
-            it.isCanBeConsumed = false
-        }
-        val prebuiltSamplesConfiguration = project.configurations.create("prebuiltSamples") {
+        val samplesConfiguration = project.configurations.create("samples") {
             it.isCanBeResolved = false
             it.isCanBeConsumed = false
         }
@@ -199,83 +169,45 @@ class AndroidXDocsPlugin : Plugin<Project> {
             it.isCanBeConsumed = false
         }
 
-        tipOfTreeSources = project.configurations.create("tip-of-tree-docs-sources") {
-            it.isTransitive = false
-            it.isCanBeConsumed = false
-            it.attributes {
+        fun Configuration.setResolveSources() {
+            isTransitive = false
+            isCanBeConsumed = false
+            attributes {
                 it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
-                it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.EXTERNAL))
                 it.attribute(
                     Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.DOCUMENTATION)
                 )
                 it.attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.SOURCES))
             }
-            it.extendsFrom(tipOfTreeSourcesConfiguration)
+        }
+        docsSourcesConfiguration = project.configurations.create("docs-sources") {
+            it.setResolveSources()
+            it.extendsFrom(docsConfiguration)
+        }
+        samplesSourcesConfiguration = project.configurations.create("samples-sources") {
+            it.setResolveSources()
+            it.extendsFrom(samplesConfiguration)
         }
 
-        prebuiltSources = project.configurations.create("prebuilt-docs-sources") {
-            it.isTransitive = false
-            it.isCanBeConsumed = false
-            it.attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
-                it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.EXTERNAL))
-            }
-            it.extendsFrom(prebuiltSourcesConfiguration)
-        }
-
-        tipOfTreeSampleSources = project.configurations.create("tip-of-tree-sample-sources") {
-            it.isTransitive = false
-            it.isCanBeConsumed = false
-            it.attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
-                it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.EXTERNAL))
+        fun Configuration.setResolveClasspathForUsage(usage: String) {
+            isCanBeConsumed = false
+            attributes {
+                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(usage))
                 it.attribute(
-                    Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.DOCUMENTATION)
+                    Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY)
                 )
-                it.attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.SOURCES))
+                it.attribute(BuildTypeAttr.ATTRIBUTE, project.objects.named("release"))
             }
-            it.extendsFrom(tipOfTreeSamplesConfiguration)
-        }
-
-        prebuiltSampleSources = project.configurations.create("prebuilt-sample-sources") {
-            it.isTransitive = false
-            it.isCanBeConsumed = false
-            it.attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
-                it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.EXTERNAL))
-            }
-            it.extendsFrom(prebuiltSamplesConfiguration)
+            extendsFrom(docsConfiguration, samplesConfiguration, stubsConfiguration)
         }
 
         // Build a compile & runtime classpaths for needed for documenting the libraries
         // from the configurations above.
         val docsCompileClasspath = project.configurations.create("docs-compile-classpath") {
-            it.isCanBeConsumed = false
-            it.attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_API))
-                it.attribute(BuildTypeAttr.ATTRIBUTE, project.objects.named("release"))
-            }
-            it.extendsFrom(
-                tipOfTreeSourcesConfiguration,
-                prebuiltSourcesConfiguration,
-                tipOfTreeSamplesConfiguration,
-                prebuiltSamplesConfiguration,
-                stubsConfiguration
-            )
+            it.setResolveClasspathForUsage(Usage.JAVA_API)
         }
         val docsRuntimeClasspath = project.configurations.create("docs-runtime-classpath") {
-            it.isCanBeConsumed = false
-            it.attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
-                it.attribute(BuildTypeAttr.ATTRIBUTE, project.objects.named("release"))
-            }
-            it.extendsFrom(
-                tipOfTreeSourcesConfiguration,
-                prebuiltSourcesConfiguration,
-                tipOfTreeSamplesConfiguration,
-                prebuiltSamplesConfiguration,
-                stubsConfiguration
-            )
+            it.setResolveClasspathForUsage(Usage.JAVA_RUNTIME)
         }
         dependencyClasspath = docsCompileClasspath.incoming.artifactView {
             it.attributes.attribute(
@@ -288,19 +220,6 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 "android-classes"
             )
         }.files
-    }
-
-    /**
-     * Filter out files that documentation tools cannot process.
-     */
-    private fun FileTree.addFilters(): FileTree {
-        return matching {
-            it.exclude("**/*.MF")
-            it.exclude("**/*.aidl")
-            it.exclude("**/META-INF/**")
-            it.exclude("**/OWNERS")
-            it.exclude("**/package.html")
-        }
     }
 
     private fun configureDokka(
@@ -495,6 +414,29 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     }
                     reentrance = false
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Adapter rule to handles prebuilt dependencies that do not use Gradle Metadata (only pom).
+ * We create a new variant sources that we can later use in the same way we do for tip of tree
+ * projects and prebuilts with Gradle Metadata.
+ */
+abstract class SourcesVariantRule : ComponentMetadataRule {
+    @get:Inject
+    abstract val objects: ObjectFactory
+    override fun execute(context: ComponentMetadataContext) {
+        context.details.maybeAddVariant("sources", "runtime") {
+            it.attributes {
+                it.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                it.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.DOCUMENTATION))
+                it.attribute(DocsType.DOCS_TYPE_ATTRIBUTE, objects.named(DocsType.SOURCES))
+            }
+            it.withFiles {
+                it.removeAllFiles()
+                it.addFile("${context.details.id.name}-${context.details.id.version}-sources.jar")
             }
         }
     }
