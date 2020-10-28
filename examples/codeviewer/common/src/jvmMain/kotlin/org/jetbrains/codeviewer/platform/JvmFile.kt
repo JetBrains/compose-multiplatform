@@ -25,6 +25,7 @@ fun java.io.File.toProjectFile(): File = object : File {
         get() = isDirectory && listFiles()?.size ?: 0 > 0
 
     override suspend fun readLines(backgroundScope: CoroutineScope): TextLines {
+        // linePositions can be very big, so we are using IntList instead of List<Long>
         val linePositions = IntList()
         var size by mutableStateOf(0)
 
@@ -52,6 +53,7 @@ fun java.io.File.toProjectFile(): File = object : File {
                     try {
                         RandomAccessFile(this@toProjectFile, "rws").use {
                             it.seek(position.toLong())
+                            // NOTE: it isn't efficient, but simple
                             String(
                                 it.readLine()
                                     .toCharArray()
@@ -77,7 +79,6 @@ private suspend fun java.io.File.readLinePositions(list: IntList) = withContext(
     }
 
     val averageLineLength = 200
-    // linePositions can be very big, so we are using IntArray instead of List<Long>
     list.clear(length().toInt() / averageLineLength)
 
     var isBeginOfLine = true
@@ -107,6 +108,9 @@ private suspend fun java.io.File.readLinePositions(list: IntList) = withContext(
     list.compact()
 }
 
+/**
+ * Compact version of List<Int> (without unboxing Int and using IntArray under the hood)
+ */
 private class IntList(initialCapacity: Int = 16) {
     @Volatile
     private var array = IntArray(initialCapacity)

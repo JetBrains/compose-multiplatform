@@ -1,5 +1,5 @@
 /**
- * This file is example (we can open it in android application)
+ * This file is an example (we can open it in android application)
  */
 
 package org.jetbrains.codeviewer.ui.editor
@@ -73,7 +73,7 @@ fun EditorView(model: Editor, settings: Settings) = key(model) {
 
 @Composable
 private fun Lines(lines: Editor.Lines, settings: Settings) = with(DensityAmbient.current) {
-    val maxNum = remember(lines.lineNumberDigitCount) {
+    val maxNumber = remember(lines.lineNumberDigitCount) {
         (1..lines.lineNumberDigitCount).joinToString(separator = "") { "9" }
     }
 
@@ -89,7 +89,7 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(DensityAmbient
                 val line: Editor.Line? by loadable { lines.get(index) }
                 Box(Modifier.height(lineHeight)) {
                     if (line != null) {
-                        Line(Modifier.align(Alignment.CenterStart), maxNum, line!!, settings)
+                        Line(Modifier.align(Alignment.CenterStart), maxNumber, line!!, settings)
                     }
                 }
             }
@@ -108,11 +108,11 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(DensityAmbient
 // دعم اللغة العربية
 // 中文支持
 @Composable
-private fun Line(modifier: Modifier, maxNum: String, line: Editor.Line, settings: Settings) {
+private fun Line(modifier: Modifier, maxNumber: String, line: Editor.Line, settings: Settings) {
     Row(modifier = modifier) {
         WithoutSelection {
             Box {
-                LineNumber(maxNum, Modifier.drawOpacity(0f), settings)
+                LineNumber(maxNumber, Modifier.drawOpacity(0f), settings)
                 LineNumber(line.number.toString(), Modifier.align(Alignment.CenterEnd), settings)
             }
         }

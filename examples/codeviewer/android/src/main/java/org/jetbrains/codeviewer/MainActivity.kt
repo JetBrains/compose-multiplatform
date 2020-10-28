@@ -8,7 +8,6 @@ import org.jetbrains.codeviewer.ui.MainView
 import java.io.File
 import java.io.FileOutputStream
 
-
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
