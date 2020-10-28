@@ -1,7 +1,7 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("multiplatform")
+    kotlin("multiplatform") // kotlin("jvm") doesn't work well in IDEA/AndroidStudio (https://github.com/JetBrains/compose-jb/issues/22)
     id("org.jetbrains.compose")
     java
     application
