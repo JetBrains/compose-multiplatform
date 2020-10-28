@@ -345,17 +345,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.focus(): Modifier = this.then(remember { FocusModifier(FocusState.Inactive) })"
-        errorLine2="                                           ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/FocusModifier.kt"
-            line="50"
-            column="44"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier = composed {"
         errorLine2="                                                                            ~~~~~~~~">
         <location
@@ -395,17 +384,6 @@
             file="src/commonMain/kotlin/androidx/compose/ui/input/key/KeyInputModifier.kt"
             line="47"
             column="90"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = this.then(LayoutModifierImpl(measure))"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/layout/LayoutModifier.kt"
-            line="250"
-            column="15"/>
     </issue>
 
     <issue

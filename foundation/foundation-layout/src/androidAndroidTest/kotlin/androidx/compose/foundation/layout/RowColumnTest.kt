@@ -34,6 +34,7 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -5316,6 +5317,18 @@ class RowColumnTest : LayoutTest() {
         Truth.assertThat(modifier.valueOverride).isEqualTo(FirstBaseline)
         Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
+
+    @Test
+    fun testRow_WeightInspectableValue() {
+        val modifier = with(object : RowScope {}) { Modifier.weight(2.0f, false) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("weight")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(2.0f)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("weight", 2.0f),
+            ValueElement("fill", false)
+        )
+    }
     @Test
     fun testColumn_AlignInspectableValue() {
         val modifier = with(object : ColumnScope {}) { Modifier.align(Alignment.Start) }
@@ -5332,6 +5345,18 @@ class RowColumnTest : LayoutTest() {
         Truth.assertThat(modifier.nameFallback).isEqualTo("alignBy")
         Truth.assertThat(modifier.valueOverride).isEqualTo(TestVerticalLine)
         Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testColumn_WeightInspectableValue() {
+        val modifier = with(object : ColumnScope {}) { Modifier.weight(2.0f, false) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("weight")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(2.0f)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("weight", 2.0f),
+            ValueElement("fill", false)
+        )
     }
     // endregion
 }

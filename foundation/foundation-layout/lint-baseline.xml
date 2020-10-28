@@ -4,17 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="        return this.then(LayoutWeightImpl(weight, fill))"
-        errorLine2="                         ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Column.kt"
-            line="192"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="        return this.then(object : ParentDataModifier {"
         errorLine2="                         ^">
         <location
@@ -43,17 +32,6 @@
             file="src/commonMain/kotlin/androidx/compose/foundation/layout/Intrinsic.kt"
             line="70"
             column="62"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="        return this.then(LayoutWeightImpl(weight, fill))"
-        errorLine2="                         ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Row.kt"
-            line="217"
-            column="26"/>
     </issue>
 
 </issues>
