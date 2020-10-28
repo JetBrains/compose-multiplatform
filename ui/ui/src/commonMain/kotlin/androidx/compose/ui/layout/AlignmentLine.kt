@@ -21,7 +21,7 @@ import androidx.compose.runtime.Immutable
 /**
  * Defines an offset line that can be used by parent layouts to align and position their children.
  * Text baselines are representative examples of [AlignmentLine]s. For example, they can be used
- * by `Row`, to align its children by baseline, or by `relativePaddingFrom` to achieve a layout
+ * by `Row`, to align its children by baseline, or by `paddingFrom` to achieve a layout
  * with a specific distance from the top to the baseline of the text content. [AlignmentLine]s
  * can be understood as an abstraction over text baselines.
  *
@@ -82,7 +82,7 @@ class VerticalAlignmentLine(merger: (Int, Int) -> Int) : AlignmentLine(merger)
  * A horizontal [AlignmentLine]. Defines an horizontal offset line that can be used by parent
  * layouts usually to align or position their children vertically. Text baselines (`FirstBaseline`
  * and `LastBaseline`) are representative examples of [HorizontalAlignmentLine]s. For example,
- * they can be used by `Row`, to align its children by baseline, or by `relativePaddingFrom` to
+ * they can be used by `Row`, to align its children by baseline, or by `paddingFrom` to
  * achieve a layout with a specific from the top to the baseline of the text content.
  * The positions of the alignment lines will be automatically inherited by parent layouts from
  * their content, and the [merger] will be used to merge multiple line positions when more

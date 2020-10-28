@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.foundation.text.FirstBaseline
+import androidx.compose.foundation.text.LastBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -25,6 +27,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
@@ -61,7 +64,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_vertical() = with(density) {
+    fun testPaddingFrom_vertical() = with(density) {
         val layoutLatch = CountDownLatch(2)
         val testLine = VerticalAlignmentLine(::min)
         val beforeDp = 20f.toDp()
@@ -85,7 +88,7 @@ class AlignmentLineTest : LayoutTest() {
                         childSize.value = it.size
                         childPosition.value = it.positionInRoot
                         layoutLatch.countDown()
-                    }.relativePaddingFrom(testLine, beforeDp, afterDp)
+                    }.paddingFrom(testLine, beforeDp, afterDp)
                 )
             }
         }
@@ -107,7 +110,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_horizontal() = with(density) {
+    fun testPaddingFrom_horizontal() = with(density) {
         val layoutLatch = CountDownLatch(2)
         val testLine = HorizontalAlignmentLine(::min)
         val beforeDp = 20f.toDp()
@@ -131,7 +134,7 @@ class AlignmentLineTest : LayoutTest() {
                         childSize.value = it.size
                         childPosition.value = it.positionInRoot
                         layoutLatch.countDown()
-                    }.relativePaddingFrom(testLine, beforeDp, afterDp)
+                    }.paddingFrom(testLine, beforeDp, afterDp)
                 )
             }
         }
@@ -150,7 +153,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_vertical_withSmallOffsets() = with(density) {
+    fun testPaddingFrom_vertical_withSmallOffsets() = with(density) {
         val layoutLatch = CountDownLatch(2)
         val testLine = VerticalAlignmentLine(::min)
         val beforeDp = 5f.toDp()
@@ -166,7 +169,7 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     childDp, 0.dp, testLine, lineDp,
                     Modifier.saveLayoutInfo(childSize, childPosition, layoutLatch)
-                        .relativePaddingFrom(testLine, beforeDp, afterDp)
+                        .paddingFrom(testLine, beforeDp, afterDp)
                 )
             }
         }
@@ -181,7 +184,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_horizontal_withSmallOffsets() = with(density) {
+    fun testPaddingFrom_horizontal_withSmallOffsets() = with(density) {
         val layoutLatch = CountDownLatch(2)
         val testLine = HorizontalAlignmentLine(::min)
         val beforeDp = 5f.toDp()
@@ -197,7 +200,7 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
                     Modifier.saveLayoutInfo(childSize, childPosition, layoutLatch)
-                        .relativePaddingFrom(testLine, beforeDp, afterDp)
+                        .paddingFrom(testLine, beforeDp, afterDp)
                 )
             }
         }
@@ -212,7 +215,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_vertical_withInsufficientSpace() = with(density) {
+    fun testPaddingFrom_vertical_withInsufficientSpace() = with(density) {
         val layoutLatch = CountDownLatch(2)
         val testLine = VerticalAlignmentLine(::min)
         val maxWidth = 30f.toDp()
@@ -230,7 +233,7 @@ class AlignmentLineTest : LayoutTest() {
                     childDp, 0.dp, testLine, lineDp,
                     Modifier.preferredSizeIn(maxWidth = maxWidth)
                         .saveLayoutInfo(childSize, childPosition, layoutLatch)
-                        .relativePaddingFrom(testLine, beforeDp, afterDp)
+                        .paddingFrom(testLine, beforeDp, afterDp)
                 )
             }
         }
@@ -246,7 +249,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_horizontal_withInsufficientSpace() = with(density) {
+    fun testPaddingFrom_horizontal_withInsufficientSpace() = with(density) {
         val layoutLatch = CountDownLatch(2)
         val testLine = HorizontalAlignmentLine(::min)
         val maxHeight = 30f.toDp()
@@ -264,7 +267,7 @@ class AlignmentLineTest : LayoutTest() {
                     0.dp, childDp, testLine, lineDp,
                     Modifier.preferredSizeIn(maxHeight = maxHeight)
                         .saveLayoutInfo(childSize, childPosition, layoutLatch)
-                        .relativePaddingFrom(testLine, beforeDp, afterDp)
+                        .paddingFrom(testLine, beforeDp, afterDp)
                 )
             }
         }
@@ -280,7 +283,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_vertical_keepsCrossAxisMinConstraints() = with(density) {
+    fun testPaddingFrom_vertical_keepsCrossAxisMinConstraints() = with(density) {
         val testLine = VerticalAlignmentLine(::min)
         val latch = CountDownLatch(1)
         val minHeight = 10.dp
@@ -289,7 +292,7 @@ class AlignmentLineTest : LayoutTest() {
                 WithConstraints(
                     Modifier
                         .preferredSizeIn(minHeight = minHeight)
-                        .relativePaddingFrom(testLine)
+                        .paddingFrom(testLine, 0.dp)
                 ) {
                     Assert.assertEquals(minHeight.toIntPx(), constraints.minHeight)
                     latch.countDown()
@@ -300,7 +303,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_horizontal_keepsCrossAxisMinConstraints() = with(density) {
+    fun testPaddingFrom_horizontal_keepsCrossAxisMinConstraints() = with(density) {
         val testLine = HorizontalAlignmentLine(::min)
         val latch = CountDownLatch(1)
         val minWidth = 10.dp
@@ -309,7 +312,7 @@ class AlignmentLineTest : LayoutTest() {
                 WithConstraints(
                     Modifier
                         .preferredSizeIn(minWidth = minWidth)
-                        .relativePaddingFrom(testLine)
+                        .paddingFrom(testLine, 0.dp)
                 ) {
                     Assert.assertEquals(minWidth.toIntPx(), constraints.minWidth)
                     latch.countDown()
@@ -320,7 +323,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_vertical_whenMinConstrained() = with(density) {
+    fun testPaddingFrom_vertical_whenMinConstrained() = with(density) {
         val testLine = VerticalAlignmentLine(::min)
         val latch = CountDownLatch(2)
         val childSizePx = 20f
@@ -339,7 +342,7 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredWidth(incomingSize)
-                        .relativePaddingFrom(testLine, before = before)
+                        .paddingFrom(testLine, before = before)
                         .onGloballyPositioned {
                             Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.x)
                             latch.countDown()
@@ -348,7 +351,7 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredWidth(incomingSize)
-                        .relativePaddingFrom(testLine, after = after)
+                        .paddingFrom(testLine, after = after)
                         .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
@@ -363,7 +366,7 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativePaddingFrom_horizontal_whenMinConstrained() = with(density) {
+    fun testPaddingFrom_horizontal_whenMinConstrained() = with(density) {
         val testLine = HorizontalAlignmentLine(::min)
         val latch = CountDownLatch(2)
         val childSizePx = 20f
@@ -382,7 +385,7 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredHeight(incomingSize)
-                        .relativePaddingFrom(testLine, before = before)
+                        .paddingFrom(testLine, before = before)
                         .onGloballyPositioned {
                             Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.y)
                             latch.countDown()
@@ -391,7 +394,7 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
                     Modifier.preferredHeight(incomingSize)
-                        .relativePaddingFrom(testLine, after = after)
+                        .paddingFrom(testLine, after = after)
                         .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
@@ -406,11 +409,83 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
+    fun testPaddingFromBaseline() = with(density) {
+        val sizePx = 30
+        val sizeDp = sizePx.toDp()
+        val baselineOffsetPx = 10
+        val baselineOffsetDp = baselineOffsetPx.toDp()
+        val paddingPx = 20
+        val paddingDp = paddingPx.toDp()
+        val latch = CountDownLatch(1)
+
+        show {
+            Box(
+                Modifier.onSizeChanged { boxSize ->
+                    Assert.assertEquals(
+                        sizeDp.toIntPx() + (paddingPx - baselineOffsetPx) * 2,
+                        boxSize.height
+                    )
+                    latch.countDown()
+                }
+            ) {
+                Box(Modifier.paddingFromBaseline(paddingDp, paddingDp)) {
+                    AlignmentLineLayout(sizeDp, sizeDp, FirstBaseline, baselineOffsetDp, Modifier)
+                    AlignmentLineLayout(
+                        sizeDp,
+                        sizeDp,
+                        LastBaseline,
+                        sizeDp - baselineOffsetDp,
+                        Modifier
+                    )
+                }
+            }
+        }
+
+        Assert.assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testPaddingFromBaseline_whenMinConstrained() = with(density) {
+        val latch = CountDownLatch(1)
+        val childSizePx = 20f
+        val childSize = childSizePx.toDp()
+        val linePositionPx = 10f
+        val linePosition = linePositionPx.toDp()
+        val beforePx = 20f
+        val before = beforePx.toDp()
+        val afterPx = 20f
+        val after = afterPx.toDp()
+        val incomingSizePx = 50f
+        val incomingSize = incomingSizePx.toDp()
+
+        show {
+            Box {
+                Box(
+                    Modifier.preferredHeight(incomingSize)
+                        .paddingFromBaseline(top = before, bottom = after)
+                        .onGloballyPositioned {
+                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.y)
+                            latch.countDown()
+                        }
+                ) {
+                    AlignmentLineLayout(
+                        childSize, childSize, FirstBaseline, linePosition, Modifier
+                    )
+                    AlignmentLineLayout(
+                        childSize, childSize, LastBaseline, linePosition, Modifier
+                    )
+                }
+            }
+        }
+        Assert.assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun testInspectableParameter() {
         val alignment = VerticalAlignmentLine(::min)
-        val modifier = Modifier.relativePaddingFrom(alignment, before = 2.0.dp)
+        val modifier = Modifier.paddingFrom(alignment, before = 2.0.dp)
             as InspectableValue
-        Truth.assertThat(modifier.nameFallback).isEqualTo("relativePaddingFrom")
+        Truth.assertThat(modifier.nameFallback).isEqualTo("paddingFrom")
         Truth.assertThat(modifier.valueOverride).isNull()
         Truth.assertThat(modifier.inspectableElements.asIterable()).containsExactly(
             ValueElement("alignmentLine", alignment),
