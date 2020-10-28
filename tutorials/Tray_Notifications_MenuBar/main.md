@@ -223,7 +223,7 @@ fun main() {
 
 ![Application MenuBar](app_menubar.gif)
 
-You can to create a MenuBar for a specific window, and have the other windows use the defined MenuBar.
+You can create a MenuBar for a specific window, and have the other windows use the defined MenuBar.
 
 ```kotlin
 import androidx.compose.desktop.AppManager
