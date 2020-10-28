@@ -165,7 +165,7 @@ class IconTest {
     }
 
     @Test
-    fun iconUnspecifiedTintColorApplied() {
+    fun iconSpecifiedTintColorApplied() {
         val width = 35.dp
         val height = 83.dp
         val testTag = "testTag"
