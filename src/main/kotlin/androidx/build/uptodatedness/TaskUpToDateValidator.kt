@@ -91,7 +91,6 @@ val EXEMPT_TASKS = setOf(
     "transformClassesWithDexBuilderForTipOfTreeDebug",
     "unzipDokkaPublicDocsDeps",
     "verifyDependencyVersions",
-    "verifyReleaseResources",
     "zipEcFiles",
     "zipTestConfigsWithApks",
 
