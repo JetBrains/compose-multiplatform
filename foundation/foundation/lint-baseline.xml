@@ -4,17 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/gestures/Draggable.kt"
-            line="73"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
