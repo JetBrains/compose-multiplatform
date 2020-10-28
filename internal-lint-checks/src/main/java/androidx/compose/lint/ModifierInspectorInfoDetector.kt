@@ -29,40 +29,57 @@ import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.TextFormat
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiWildcardType
 import com.intellij.psi.impl.source.PsiClassReferenceType
+import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
 import org.jetbrains.kotlin.asJava.elements.KtLightField
 import org.jetbrains.kotlin.asJava.elements.KtLightParameter
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes.VALUE_PARAMETER
+import org.jetbrains.uast.UBinaryExpression
 import org.jetbrains.uast.UBlockExpression
+import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UExpressionList
+import org.jetbrains.uast.UIfExpression
+import org.jetbrains.uast.ULambdaExpression
 import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UObjectLiteralExpression
+import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.UReturnExpression
+import org.jetbrains.uast.USimpleNameReferenceExpression
+import org.jetbrains.uast.USwitchClauseExpression
+import org.jetbrains.uast.USwitchClauseExpressionWithBody
+import org.jetbrains.uast.USwitchExpression
+import org.jetbrains.uast.UThisExpression
+import org.jetbrains.uast.UYieldExpression
 import org.jetbrains.uast.kotlin.KotlinStringTemplateUPolyadicExpression
 import org.jetbrains.uast.kotlin.KotlinStringULiteralExpression
 import org.jetbrains.uast.kotlin.KotlinUArrayAccessExpression
-import org.jetbrains.uast.kotlin.KotlinUBinaryExpression
-import org.jetbrains.uast.kotlin.KotlinUBlockExpression
 import org.jetbrains.uast.kotlin.KotlinUFunctionCallExpression
-import org.jetbrains.uast.kotlin.KotlinUIfExpression
-import org.jetbrains.uast.kotlin.KotlinULambdaExpression
 import org.jetbrains.uast.kotlin.KotlinUQualifiedReferenceExpression
 import org.jetbrains.uast.kotlin.KotlinUSimpleReferenceExpression
+import org.jetbrains.uast.visitor.AbstractUastVisitor
 
-private const val ModifierClass = "androidx.compose.ui.Modifier"
 private const val Modifier = "Modifier"
+private const val ModifierClass = "androidx.compose.ui.Modifier"
 private const val ModifierFile = "Modifier.kt"
 private const val ComposedModifierFile = "ComposedModifier.kt"
 private const val LambdaFunction = "kotlin.jvm.functions.Function1"
 private const val InspectorInfoClass = "androidx.compose.ui.platform.InspectorInfo"
-private const val InspectableValueFile = "androidx.compose.ui.platform.InspectableValueKt"
+private const val InspectorValueInfoClass = "androidx.compose.ui.platform.InspectorValueInfo"
 private const val UnitClass = "kotlin.Unit"
 private const val DebugInspectorInfoFunction = "debugInspectorInfo"
+private const val ThenMethodName = "then"
+private const val ComposedMethodName = "composed"
+private const val RememberMethodName = "remember"
+private const val ComposedMethodPackage = "androidx.compose.ui"
+private const val RememberMethodPackage = "androidx.compose.runtime"
 
 /**
  * Lint [Detector] to ensure that we are creating debug information for the layout inspector on
@@ -121,40 +138,33 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
      * 7. An actual modifier argument is missing
      */
     private class ModifierHandler(private val context: JavaContext) : UElementHandler() {
+        private val returnVisitor = ReturnVisitor()
+        private val builderVisitor = ModifierBuilderVisitor()
+        private val modifierVisitor = ModifierVisitor()
+        private val debugInspectorVisitor = DebugInspectorVisitor()
+        private val lambdaVisitor = InspectorLambdaVisitor()
+        private var methodInfo: MethodInfo? = null
 
         override fun visitMethod(node: UMethod) {
             if (node.containingFile?.name == ModifierFile ||
                 node.containingFile?.name == ComposedModifierFile ||
-                firstParameterType(node) != ModifierClass
+                firstParameterType(node) != ModifierClass ||
+                node.returnType?.canonicalText != ModifierClass
             ) {
-                // Ignore the method if it isn't a method on Modifier,
+                // Ignore the method if it isn't a method on Modifier returning a Modifier,
                 // or if the method is defined in Modifier.kt or ComposedModifier.kt
                 return
             }
-            // For now: only look at definitions with a Modifier.then(newModifier) body.
-            // Extend that to other definitions in a later change.
-            val then = thenBody(node) ?: return
-            checkInspectorInfo(node, then)
+            methodInfo = MethodInfo(node)
+            node.uastBody?.accept(returnVisitor)
+            methodInfo = null
         }
 
         private fun firstParameterType(method: UMethod): String? =
             (method.parameters.firstOrNull() as? KtLightParameter)?.type?.canonicalText
 
-        private fun thenBody(method: UMethod): KotlinUFunctionCallExpression? {
-            val body = method.uastBody as? UBlockExpression ?: return null
-            val statement = body.expressions.singleOrNull() as? UReturnExpression ?: return null
-            val expression = statement.returnExpression as? KotlinUQualifiedReferenceExpression
-            val then = expression?.selector as? KotlinUFunctionCallExpression ?: return null
-            val thenMethod = then.resolve() ?: return null
-            val paramType = thenMethod.parameters.singleOrNull()?.type as? PsiClassReferenceType
-            if (name(thenMethod) != "then" ||
-                thenMethod.returnTypeElement?.type?.canonicalText != ModifierClass ||
-                paramType?.canonicalText != ModifierClass
-            ) {
-                return null
-            }
-            return then
-        }
+        private fun isModifierType(type: PsiType?): Boolean =
+            InheritanceUtil.isInheritor(type, ModifierClass)
 
         // Disregard the mangled part of a method with inline class parameters.
         // TODO: change this to an API call when a demangle function is available
@@ -163,6 +173,26 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
 
         private fun wildcardType(type: PsiType?): String? =
             (type as? PsiWildcardType)?.bound?.canonicalText
+
+        private fun isThenFunctionCall(node: UQualifiedReferenceExpression): Boolean {
+            if (node.receiver !is UThisExpression) return false
+            val then = node.selector as? KotlinUFunctionCallExpression ?: return false
+            return then.methodName == ThenMethodName &&
+                then.valueArguments.size == 1 &&
+                isModifierType(then.valueArguments.first().getExpressionType())
+        }
+
+        private fun isComposeFunctionCall(node: UCallExpression): Boolean =
+            node.methodName == ComposedMethodName &&
+                node.receiverType?.canonicalText == ModifierClass &&
+                node.returnType?.canonicalText == ModifierClass &&
+                methodPackageName(node) == ComposedMethodPackage
+
+        private fun isRememberFunctionCall(node: UCallExpression): Boolean =
+            node.methodName == RememberMethodName &&
+                node.receiver == null &&
+                isModifierType(node.returnType) &&
+                methodPackageName(node) == RememberMethodPackage
 
         // Return true if this is a lambda expression of the type: "InspectorInfo.() -> Unit"
         private fun isInspectorInfoLambdaType(type: PsiType?): Boolean {
@@ -173,142 +203,31 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 wildcardType(referenceType.parameters[1]) !== UnitClass
         }
 
-        private fun asInspectorInfoLambda(expr: UExpression?): KotlinULambdaExpression? {
-            val lambda = expr as? KotlinULambdaExpression ?: return null
-            return if (isInspectorInfoLambdaType(lambda.getExpressionType())) lambda else null
-        }
+        private fun isDebugInspectorInfoCall(node: UCallExpression): Boolean =
+            node.methodName == DebugInspectorInfoFunction &&
+                node.valueArgumentCount == 1 &&
+                isInspectorInfoLambdaType(node.valueArguments.first().getExpressionType()) &&
+                isInspectorInfoLambdaType(node.returnType)
 
-        private fun asDebugInspectorInfoCall(expr: UExpression?): KotlinUFunctionCallExpression? {
-            val call = expr as? KotlinUFunctionCallExpression ?: return null
-            val method = call.resolve() ?: return null
-            if (name(method) != DebugInspectorInfoFunction ||
-                method.containingClass?.qualifiedName != InspectableValueFile ||
-                call.valueArgumentCount != 1 ||
-                !isInspectorInfoLambdaType(call.valueArguments[0].getExpressionType()) ||
-                !isInspectorInfoLambdaType(call.returnType)
-            ) {
-                return null
-            }
-            return call
-        }
+        private fun methodPackageName(node: UCallExpression): String? =
+            (node.resolve()?.containingFile as? PsiJavaFile)?.packageName
 
-        // Check the modifier definition in the argument of the then operator,
-        // Allow the definition to be an conditional 'if".
-        private fun checkInspectorInfo(method: UMethod, then: KotlinUFunctionCallExpression) {
-            val thenArgument = then.valueArguments.lastOrNull() ?: return wrongLambda(then)
-            if (thenArgument is KotlinUIfExpression) {
-                checkModifierBlock(method, thenArgument.thenExpression)
-                checkModifierBlock(method, thenArgument.elseExpression)
-            } else {
-                checkModifierDefinition(method, thenArgument)
-            }
-        }
+        private fun wrongLambda(element: UElement) =
+            report(element, ISSUE.getBriefDescription(TextFormat.TEXT))
 
-        private fun checkModifierBlock(method: UMethod, block: UExpression?) {
-            if (block is KotlinUBlockExpression) {
-                checkModifierDefinition(method, block.expressions.lastOrNull())
-            } else {
-                checkModifierDefinition(method, block)
-            }
-        }
+        private fun missingDebugInfoCall(element: UElement) =
+            report(element, message = "Expected debugInspectorInfo call")
 
-        private fun checkModifierDefinition(method: UMethod, modifierSelector: UExpression?) {
-            if (modifierSelector is KotlinUSimpleReferenceExpression &&
-                modifierSelector.identifier == Modifier
-            ) {
-                // Accept a noop Modifier
-                return
-            }
-            var selector = modifierSelector ?: return
-            while (selector is KotlinUQualifiedReferenceExpression) {
-                // Support inner class modifier definitions like:
-                //    private data class SizeModifier() : Modifier.Element {
-                //      inner data class WithOption(width: Int) : SizeModifier {
-                //      }
-                //    }
-                selector = selector.selector
-            }
+        private fun reportMissing(missingVariables: Set<String>, element: UElement) = report(
+            element = element,
+            message = "These lambda arguments are missing in the InspectorInfo: " +
+                "`${missingVariables.sorted().joinToString("`, `")}`"
+        )
 
-            // The thenArgument is expected to be a modifier constructor call
-            val modifier = selector as? KotlinUFunctionCallExpression
-                ?: return wrongLambda(selector)
-
-            // The last argument of the modifier is expected to be a InspectorInfo lambda
-            val lastArgument = modifier.valueArguments.lastOrNull()
-            val debugInfo = asDebugInspectorInfoCall(lastArgument)
-                ?: return if (asInspectorInfoLambda(lastArgument) != null) {
-                    // This is an InspectorInfo lambda but the debugInspectorInfo call is missing
-                    missingDebugInfoCall(lastArgument!!)
-                } else {
-                    // This is not an InspectorInfo lambda
-                    wrongLambda(modifier)
-                }
-            val lambda = asInspectorInfoLambda(debugInfo.valueArguments.first())
-                ?: return wrongLambda(debugInfo)
-            val lambdaBody = lambda.body as? KotlinULambdaExpression.Body
-            val expressions = lambdaBody?.expressions ?: emptyList()
-            if (expressions.isEmpty()) {
-                // Empty lambda
-                return wrongLambda(debugInfo)
-            }
-            val methodInfo = MethodInfo(method)
-            expressions.forEach { expr ->
-                val binaryExpr = expr as? KotlinUBinaryExpression ?: return wrongLambda(expr)
-                val left = binaryExpr.leftOperand
-                val right = binaryExpr.rightOperand
-                val errorFound = !when {
-                    left is KotlinUSimpleReferenceExpression && left.identifier == "name" ->
-                        methodInfo.checkName(right)
-                    left is KotlinUSimpleReferenceExpression && left.identifier == "value" ->
-                        methodInfo.checkValue(right)
-                    left is KotlinUArrayAccessExpression ->
-                        methodInfo.checkArray(left, right)
-                    else ->
-                        unexpected(left)
-                }
-                if (errorFound) {
-                    return
-                }
-            }
-            methodInfo.checkComplete(lambda)
-        }
-
-        private fun wrongLambda(element: UElement) {
-            context.report(
-                ISSUE,
-                element,
-                context.getNameLocation(element),
-                ISSUE.getBriefDescription(TextFormat.TEXT)
-            )
-        }
-
-        private fun missingDebugInfoCall(element: UElement) {
-            context.report(
-                ISSUE,
-                element,
-                context.getNameLocation(element),
-                "Expected debugInspectorInfo call"
-            )
-        }
-
-        private fun reportMissing(missingVariables: Set<String>, element: UElement) {
-            context.report(
-                ISSUE,
-                element,
-                context.getNameLocation(element),
-                "These lambda arguments are missing in the InspectorInfo: " +
-                    "`${missingVariables.sorted().joinToString("`, `")}`"
-            )
-        }
-
-        private fun wrongName(expectedName: String, unexpected: UElement) {
-            context.report(
-                ISSUE,
-                unexpected,
-                context.getNameLocation(unexpected),
-                "Expected name of the modifier: `\"name\" = \"${expectedName}\"`"
-            )
-        }
+        private fun wrongName(expectedName: String, unexpected: UElement) = report(
+            element = unexpected,
+            message = "Expected name of the modifier: `\"name\" = \"${expectedName}\"`"
+        )
 
         private fun wrongArgument(args: Collection<String>, unexpected: UElement) {
             val message = when (args.size) {
@@ -316,32 +235,23 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 1 -> "Expected the variable: \"${args.first()}\""
                 else -> "Expected one of the variables: ${args.joinToString(", ", "\"", "\"")}"
             }
-            context.report(
-                ISSUE,
-                unexpected,
-                context.getNameLocation(unexpected),
-                message
-            )
+            report(unexpected, message = message)
         }
 
-        private fun wrongArgumentForIndex(indexName: String, value: UElement): Boolean {
-            context.report(
-                ISSUE,
-                value,
-                context.getNameLocation(value),
-                "The value should match the index name: `$indexName`"
-            )
-            return false
-        }
+        private fun wrongArgumentForIndex(indexName: String, value: UElement) =
+            report(value, message = "The value should match the index name: `$indexName`")
 
-        private fun unexpected(element: UElement): Boolean {
+        private fun unexpected(element: UElement) =
+            report(element, message = "Unexpected element found")
+
+        private fun report(element: UElement, message: String) {
             context.report(
                 ISSUE,
                 element,
                 context.getNameLocation(element),
-                "Unexpected element found"
+                message
             )
-            return false
+            methodInfo?.foundError = true
         }
 
         /**
@@ -359,24 +269,23 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
             val methodArguments = Arguments(findMethodArguments(method))
             val dataClassArguments = Arguments(findDataClassMembers(method))
             var foundName = false
+            var foundError = false
 
-            fun checkName(value: UExpression): Boolean {
+            fun checkName(value: UExpression) {
                 if (name == literal(value)) {
                     foundName = true
-                    return true
+                } else if (!foundError) {
+                    wrongName(name, value)
                 }
-                wrongName(name, value)
-                return false
             }
 
-            fun checkValue(value: UExpression): Boolean {
+            fun checkValue(value: UExpression, inConditional: Boolean) {
                 val (arguments, variable) = variable(value)
                 if (variable != null && arguments.expected.contains(variable)) {
                     arguments.found.add(variable)
-                    return true
+                } else if (!foundError && !(inConditional && isArgumentReceiver(value))) {
+                    wrongArgument(arguments.expected, value)
                 }
-                wrongArgument(arguments.expected, value)
-                return false
             }
 
             /**
@@ -387,27 +296,33 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
              *
              * Check the name and value against the known parameters of the modifier.
              */
-            fun checkArray(key: KotlinUArrayAccessExpression, value: UExpression): Boolean {
-                val index = key.indices.singleOrNull()
-                val keyName = literal(index)
+            fun checkArray(
+                keyExpr: KotlinUArrayAccessExpression,
+                value: UExpression,
+                inConditional: Boolean
+            ) {
+                if (foundError) {
+                    return
+                }
+                val index = keyExpr.indices.singleOrNull()
+                val key = literal(index)
                 val (arguments, variable) = variable(value)
-                if (keyName != null &&
-                    arguments.expected.contains(keyName) &&
-                    keyName == variable
-                ) {
-                    arguments.found.add(variable)
-                    return true
+                when {
+                    key != null && arguments.expected.contains(key) && key == variable ->
+                        arguments.found.add(variable)
+                    inConditional && isArgumentReceiver(value) ->
+                        {} // ignore extra information
+                    key == null || !arguments.expected.contains(key) ->
+                        wrongArgument(arguments.expected, index ?: keyExpr)
+                    else ->
+                        wrongArgumentForIndex(key, value)
                 }
-                if (keyName == null || !arguments.expected.contains(keyName)) {
-                    wrongArgument(arguments.expected, index ?: key)
-                } else {
-                    wrongArgumentForIndex(keyName, value)
-                }
-                return false
             }
 
-            fun checkComplete(lambda: KotlinULambdaExpression) {
-                if (!foundName) {
+            fun checkComplete(lambda: UExpression) {
+                if (foundError) {
+                    return
+                } else if (!foundName) {
                     wrongName(name, lambda)
                 } else {
                     val arguments =
@@ -420,10 +335,27 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 }
             }
 
+            fun checkSynonym(node: UCallExpression) {
+                foundName = true
+                node.valueArguments.forEach {
+                    val (arguments, variable) = variable(it)
+                    if (variable != null && arguments.expected.contains(variable)) {
+                        arguments.found.add(variable)
+                    }
+                }
+                checkComplete(node)
+            }
+
             private fun literal(expr: UExpression?): String? = when (expr) {
                 is KotlinStringULiteralExpression,
                 is KotlinStringTemplateUPolyadicExpression -> expr.evaluate() as? String
                 else -> null
+            }
+
+            private fun isArgumentReceiver(value: UExpression): Boolean {
+                val reference = value as? KotlinUQualifiedReferenceExpression ?: return false
+                val (arguments, variable) = variable(reference.receiver)
+                return arguments.expected.contains(variable)
             }
 
             /**
@@ -470,12 +402,14 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 val type = (singleParameter?.type as? PsiClassReferenceType)?.reference?.resolve()
                 val klass = type as? KtLightClass ?: return emptySet()
                 val mainConstructor = klass.constructors.firstOrNull() ?: return emptySet()
-                if (klass.fields.size != mainConstructor.parameters.size ||
-                    klass.fields.any { !isValueParameter(it) }
-                ) {
+                val valueParameters = klass.fields.asSequence()
+                    .filter { isValueParameter(it) }.map { it.name }.toSet()
+                val constructorParameters = mainConstructor.parameters.asSequence()
+                    .map { it.name }.toSet()
+                if (constructorParameters != valueParameters) {
                     return emptySet()
                 }
-                return klass.fields.asSequence().map { it.name }.toSet()
+                return valueParameters
             }
 
             private fun isValueParameter(field: PsiField): Boolean {
@@ -489,19 +423,252 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
         private class Arguments(val expected: Set<String>) {
             val found = mutableSetOf<String>()
         }
+
+        /**
+         * Finds all return expressions, ignores all other elements.
+         */
+        private inner class ReturnVisitor : AbstractUastVisitor() {
+            override fun visitReturnExpression(node: UReturnExpression): Boolean {
+                node.returnExpression?.accept(builderVisitor)
+                return true
+            }
+
+            // Ignore returns from a lambda expression
+            override fun visitLambdaExpression(node: ULambdaExpression): Boolean = true
+        }
+
+        /**
+         * Find and check known Modifier builder expressions.
+         *
+         * The expression is known to be the return expression from a return statement.
+         *
+         * Currently the only accepted expressions are of the form:
+         * - Modifier.then(Modifier)
+         * - Modifier.composed(InspectorInfoLambda,factory)
+         * - synonymCall()
+         * - everything else is an error
+         */
+        private inner class ModifierBuilderVisitor : UnexpectedVisitor({ wrongLambda(it) }) {
+            override fun visitQualifiedReferenceExpression(
+                node: UQualifiedReferenceExpression
+            ): Boolean {
+                if (isThenFunctionCall(node)) {
+                    val then = node.selector as KotlinUFunctionCallExpression
+                    then.valueArguments.first().accept(modifierVisitor)
+                    return true
+                }
+                return super.visitQualifiedReferenceExpression(node)
+            }
+
+            override fun visitCallExpression(node: UCallExpression): Boolean {
+                if (isComposeFunctionCall(node)) {
+                    val inspectorInfo = node.valueArguments
+                        .find { isInspectorInfoLambdaType(it.getExpressionType()) }
+                        ?: return super.visitCallExpression(node)
+                    inspectorInfo.accept(debugInspectorVisitor)
+                    return true
+                }
+                methodInfo?.checkSynonym(node)
+                return true
+            }
+
+            override fun visitSimpleNameReferenceExpression(
+                node: USimpleNameReferenceExpression
+            ): Boolean {
+                // Accept a simple reference to a different modifier definition
+                return false
+            }
+        }
+
+        /**
+         * Find and check the Modifier constructor.
+         *
+         * The expression is known to be inside one of the Modifier builder expressions accepted
+         * by [ModifierBuilderVisitor].
+         *
+         * Currently the only accepted expressions are of the form:
+         * - SomeClassExtendingModifier(p1,p2,p3,p4,inspectorInfoLambda)
+         * - SomeClass.InnerModifier(p1,p2,p3,p4,inspectorInfoLambda)
+         * - object : Modifier, InspectorValueInfoClass(inspectorInfoLambda)
+         * - remember { }
+         * - Modifier
+         * - if-then-else (with a modifier constructor in both then and else)
+         * - when (with a modifier constructor in each of the when clauses)
+         * All other expressions are considered errors.
+         */
+        private inner class ModifierVisitor : UnexpectedVisitor({ wrongLambda(it) }) {
+            override fun visitCallExpression(node: UCallExpression): Boolean {
+                val lastArgument = node.valueArguments.lastOrNull()
+                if (isInspectorInfoLambdaType(lastArgument?.getExpressionType())) {
+                    lastArgument!!.accept(debugInspectorVisitor)
+                    return true
+                }
+                if (isRememberFunctionCall(node)) {
+                    val lambda = lastArgument as? ULambdaExpression
+                    val body = lambda?.body as? UBlockExpression
+                    val ret = body?.expressions?.firstOrNull() as? UReturnExpression
+                    val definition = ret?.returnExpression ?: return super.visitCallExpression(node)
+                    definition.accept(this)
+                    return true
+                }
+                return super.visitCallExpression(node)
+            }
+
+            override fun visitQualifiedReferenceExpression(
+                node: UQualifiedReferenceExpression
+            ): Boolean {
+                node.selector.accept(this)
+                return true
+            }
+
+            override fun visitObjectLiteralExpression(node: UObjectLiteralExpression): Boolean {
+                if (node.valueArgumentCount == 1 &&
+                    node.declaration.superTypes.any { it.canonicalText == InspectorValueInfoClass }
+                ) {
+                    node.valueArguments.first().accept(debugInspectorVisitor)
+                    return true
+                }
+                return super.visitObjectLiteralExpression(node)
+            }
+
+            override fun visitSimpleNameReferenceExpression(
+                node: USimpleNameReferenceExpression
+            ): Boolean {
+                if (node.identifier == Modifier) {
+                    return true
+                }
+                return super.visitSimpleNameReferenceExpression(node)
+            }
+
+            override fun visitIfExpression(node: UIfExpression): Boolean {
+                node.thenExpression?.accept(this)
+                node.elseExpression?.accept(this)
+                return true
+            }
+
+            override fun visitSwitchExpression(node: USwitchExpression): Boolean {
+                node.body.accept(this)
+                return true
+            }
+
+            override fun visitSwitchClauseExpression(node: USwitchClauseExpression): Boolean {
+                (node as? USwitchClauseExpressionWithBody)?.let {
+                    it.body.expressions.last().accept(this)
+                    return true
+                }
+                return super.visitSwitchClauseExpression(node)
+            }
+
+            override fun visitYieldExpression(node: UYieldExpression): Boolean {
+                return false
+            }
+
+            override fun visitExpressionList(node: UExpressionList): Boolean {
+                return false
+            }
+
+            override fun visitBlockExpression(node: UBlockExpression): Boolean {
+                node.expressions.lastOrNull()?.accept(this)
+                return true
+            }
+        }
+
+        /**
+         * Expect debugInspectorInfo factory method:
+         * - debugInspectorInfo { inspectorInfoLambda }
+         * For all other expressions: complain about the missing debugInspectorInfo call.
+         */
+        private inner class DebugInspectorVisitor :
+            UnexpectedVisitor({ missingDebugInfoCall(it) }) {
+
+            override fun visitCallExpression(node: UCallExpression): Boolean {
+                if (isDebugInspectorInfoCall(node)) {
+                    node.valueArguments.single().accept(lambdaVisitor)
+                    return true
+                }
+                return super.visitCallExpression(node)
+            }
+        }
+
+        /**
+         * Find and check the InspectorInfo lambda.
+         *
+         * The expression is known to be a InspectorInfo lambda found inside a debugInspectorInfo
+         * call from one of the modifier constructors accepted by [ModifierVisitor].
+         *
+         * Check the name, value, and properties against the original modifier definition expressed
+         * by [methodInfo] found by [ModifierHandler] above. After the lambda expression check that
+         * all the elements of [methodInfo] was found.
+         */
+        private inner class InspectorLambdaVisitor : UnexpectedVisitor({ unexpected(it) }) {
+            // We allow alternate values inside conditionals.
+            // Example see the test: existingInspectorInfoWffithConditionals.
+            var inConditional = false
+
+            override fun visitBinaryExpression(node: UBinaryExpression): Boolean {
+                val left = node.leftOperand
+                val right = node.rightOperand
+                when {
+                    left is KotlinUSimpleReferenceExpression && left.identifier == "name" ->
+                        methodInfo?.checkName(right)
+                    left is KotlinUSimpleReferenceExpression && left.identifier == "value" ->
+                        methodInfo?.checkValue(right, inConditional)
+                    left is KotlinUArrayAccessExpression ->
+                        methodInfo?.checkArray(left, right, inConditional)
+                    else ->
+                        unexpected(left)
+                }
+                return true
+            }
+
+            override fun visitLambdaExpression(node: ULambdaExpression): Boolean {
+                // accept, and recurse
+                return false
+            }
+
+            override fun visitIfExpression(node: UIfExpression): Boolean {
+                inConditional = true
+                try {
+                    node.thenExpression?.accept(this)
+                    node.elseExpression?.accept(this)
+                } finally {
+                    inConditional = false
+                }
+                return true
+            }
+
+            override fun visitBlockExpression(node: UBlockExpression): Boolean {
+                // accept, and recurse
+                return false
+            }
+
+            override fun afterVisitLambdaExpression(node: ULambdaExpression) {
+                methodInfo?.checkComplete(node)
+            }
+        }
+
+        private abstract inner class UnexpectedVisitor(
+            private val error: (node: UElement) -> Unit
+        ) : AbstractUastVisitor() {
+
+            override fun visitElement(node: UElement): Boolean {
+                error(node)
+                return true
+            }
+        }
     }
 
     companion object {
         val ISSUE = Issue.create(
             id = "ModifierInspectorInfo",
             briefDescription = "Modifiers should include inspectorInfo for the Layout Inspector",
-            explanation = """
-                The Layout Inspector will see an instance of the usually private modifier class
-                where the modifier name is gone, and the fields may not reflect directly on what
-                was specified for the modifier. Instead specify the `inspectorInfo` directly on the
-                modifier. See example here:
-                `androidx.compose.ui.samples.InspectorInfoInComposedModifierSample`.
-            """,
+            explanation =
+                """
+                The Layout Inspector will see an instance of the usually private modifier class \
+                where the modifier name is gone, and the fields may not reflect directly on what \
+                was specified for the modifier. Instead specify the `inspectorInfo` directly on \
+                the modifier. See example here:
+                `androidx.compose.ui.samples.InspectorInfoInComposedModifierSample`.""",
             category = Category.PRODUCTIVITY,
             priority = 5,
             severity = Severity.ERROR,

@@ -32,29 +32,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
 
     override fun getIssues(): List<Issue> = listOf(ModifierInspectorInfoDetector.ISSUE)
 
-    private val modifierFile = kotlin(
-        """
-        package androidx.compose.ui
-
-        interface Modifier {
-          infix fun then(other: Modifier): Modifier =
-              if (other === Modifier) this else CombinedModifier(this, other)
-
-          interface Element : Modifier {
-          }
-
-          companion object : Modifier {
-            override infix fun then(other: Modifier): Modifier = other
-          }
-        }
-
-        class CombinedModifier(
-            private val outer: Modifier,
-            private val inner: Modifier
-        ) : Modifier {}
-        """
-    ).indented()
-
     private val inspectableInfoFile = kotlin(
         """
         package androidx.compose.ui.platform
@@ -121,6 +98,54 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
         """
     ).indented()
 
+    private val modifierFile = kotlin(
+        """
+        package androidx.compose.ui
+
+        import androidx.compose.ui.platform.InspectorInfo
+        import androidx.compose.ui.platform.InspectorValueInfo
+
+        interface Modifier {
+          infix fun then(other: Modifier): Modifier =
+              if (other === Modifier) this else CombinedModifier(this, other)
+
+          interface Element : Modifier {
+          }
+
+          companion object : Modifier {
+            override infix fun then(other: Modifier): Modifier = other
+          }
+        }
+
+        class CombinedModifier(
+            private val outer: Modifier,
+            private val inner: Modifier
+        ) : Modifier {}
+
+        fun Modifier.composed(
+            inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo,
+            factory: Modifier.() -> Modifier
+        ): Modifier = this.then(ComposedModifier(inspectorInfo, factory))
+
+        private class ComposedModifier(
+            inspectorInfo: InspectorInfo.() -> Unit,
+            val factory: Modifier.() -> Modifier
+        ) : Modifier.Element, InspectorValueInfo(inspectorInfo)
+
+        """
+    ).indented()
+
+    private val rememberFile = kotlin(
+        """
+        package androidx.compose.runtime
+
+        fun <T> remember(calculation: () -> T): T = calculation()
+
+        class Remember
+
+        """
+    ).indented()
+
     @Test
     fun existingInspectorInfo() {
         lint().files(
@@ -142,6 +167,55 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                         name = "preferredWidth1"
                         properties["width"] = width
                     }))
+
+                private class SizeModifier1(
+                    val width: Int,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier.Element, InspectorValueInfo(inspectorInfo)
+
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun existingInspectorInfoWithStatementsBeforeDefinition() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                inline class Dp(val value: Float)
+
+                inline fun require(value: Boolean, lazyMessage: () -> String) {
+                    if (!value) {
+                        val message = lazyMessage()
+                        throw IllegalArgumentException(message)
+                    }
+                }
+
+                fun Modifier.preferredWidth1(width: Dp): Modifier {
+                    require(width.value > 0.0f) { return "sds" }
+
+                    val x = width.value.toInt() * 2
+                    for (i in 0..4) {
+                        println("x = " + x)
+                    }
+
+                    return this.then(SizeModifier1(x, inspectorInfo = debugInspectorInfo {
+                        name = "preferredWidth1"
+                        properties["width"] = width
+                    }))
+                }
 
                 private class SizeModifier1(
                     val width: Int,
@@ -189,6 +263,70 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     }
 
     @Test
+    fun existingInspectorInfoViaSynonym() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                inline class Dp(val value: Float)
+
+                fun Modifier.preferredWidth1(width: Dp) =
+                    this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
+                        name = "preferredWidth1"
+                        properties["width"] = width
+                    }))
+
+                fun Modifier.preferredWidth2(width: Dp) = preferredWidth1(width)
+
+                fun Modifier.preferredWidth20() = preferredWidth1(Dp(20.0f))
+
+                fun Modifier.preferredIconWidth() = DefaultIconSizeModifier
+
+                private val DefaultIconSizeModifier = Modifier.preferredWidth1(Dp(24.0f))
+
+                private class SizeModifier1(
+                    val width: Int,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier.Element, InspectorValueInfo(inspectorInfo)
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun existingInspectorInfoWithAnonymousClass() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.drawBehind() = this.then(
+                  object : Modifier,
+                           InspectorValueInfo(debugInspectorInfo { name = "drawBehind" }) {}
+                )
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
     fun existingInspectorInfoWithDataClassMemberValues() {
         lint().files(
             modifierFile,
@@ -211,8 +349,31 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                         properties["bottom"] = values.bottom
                     }))
 
+                fun Modifier.border2(start: Int, top: Int, end: Int, bottom: Int) =
+                    this.then(
+                        BorderModifier2(
+                            start, top, end, bottom, inspectorInfo = debugInspectorInfo {
+                                name = "border2"
+                                properties["start"] = start
+                                properties["top"] = top
+                                properties["end"] = end
+                                properties["bottom"] = bottom
+                            }))
+
+                fun Modifier.border2(values: Borders) =
+                    border2(values.start, values.top, values.end, values.bottom)
+
                 private class BorderModifier(
                     val values: Borders,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier.Element, InspectorValueInfo(inspectorInfo) {
+                }
+
+                private class BorderModifier2(
+                    val start: Int,
+                    val top: Int,
+                    val end: Int,
+                    val bottom: Int,
                     inspectorInfo: InspectorInfo.() -> Unit
                 ): Modifier.Element, InspectorValueInfo(inspectorInfo) {
                 }
@@ -229,7 +390,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     }
 
     @Test
-    fun existingInspectorInfoWithConditionalDefinition() {
+    fun existingInspectorInfoWithConditional() {
         lint().files(
             modifierFile,
             inspectableInfoFile,
@@ -260,6 +421,165 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 }
 
                 class Painter(val size: Int)
+
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun existingInspectorInfoWithWhen() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.border(painter: Painter) =
+                    this.then(
+                        when (painter.size) {
+                            0 -> Modifier
+                            1 -> BorderModifier(inspectorInfo = debugInspectorInfo {
+                                    name = "border"
+                                    properties["painter"] = painter
+                                 })
+                            else -> Modifier
+                        }
+                    )
+
+                private class BorderModifier(
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier.Element, InspectorValueInfo(inspectorInfo) {
+                }
+
+                class Painter(val size: Int)
+
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun existingInspectorInfoWithConditionals() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                class Brush
+
+                class SolidColor(val color: Int): Brush()
+
+                fun Modifier.border(width: Int, brush: Brush, shape: Shape): Modifier = composed(
+                    factory = { BorderModifier(shape, width, brush) },
+                    inspectorInfo = debugInspectorInfo {
+                        name = "border"
+                        properties["width"] = width
+                        if (brush is SolidColor) {
+                            properties["color"] = brush.value
+                            value = brush.value
+                        } else {
+                            properties["brush"] = brush
+                        }
+                        properties["shape"] = shape
+                    }
+                )
+
+                private class BorderModifier(shape: Shape, width: Int, brush: Brush)
+
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun composedModifierWithInspectorInfo() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.border(width: Int): Modifier = composed(
+                    inspectorInfo = debugInspectorInfo {
+                        name = "border"
+                        properties["width"] = width
+                    },
+                    factory = { this.then(BorderModifier(width)) }
+                )
+
+                fun Modifier.border2(width: Int): Modifier = composed(
+                    factory = { this.then(BorderModifier(width)) },
+                    inspectorInfo = debugInspectorInfo {
+                        name = "border2"
+                        properties["width"] = width
+                    }
+                )
+
+                private class BorderModifier(private val width: Int): Modifier.Element {
+                }
+
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun rememberModifierInfo() {
+        lint().files(
+            modifierFile,
+            rememberFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.runtime.remember
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.preferredWidth1(width: Int) = this.then(
+                    remember {
+                        SizeModifier1(width, inspectorInfo = debugInspectorInfo {
+                            name = "preferredWidth1"
+                            properties["width"] = width
+                        })
+                    }
+                )
+
+                private class SizeModifier1(
+                    val width: Int,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier.Element, InspectorValueInfo(inspectorInfo)
 
                 """
             ).indented()
@@ -303,6 +623,40 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     }
 
     @Test
+    fun composedModifierWithMissingInspectorInfo() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.border(width: Int): Modifier =
+                    composed { this.then(BorderModifier(width)) }
+
+                private class BorderModifier(private val width: Int): Modifier.Element {
+                }
+
+                """
+            ).indented()
+        )
+            .run()
+            .expect(
+                """
+                    src/androidx/compose/ui/BorderModifier.kt:9: Error: Modifiers should include inspectorInfo for the Layout Inspector [ModifierInspectorInfo]
+                        composed { this.then(BorderModifier(width)) }
+                        ~~~~~~~~
+                    1 errors, 0 warnings
+                """
+            )
+    }
+
+    @Test
     fun missingInspectorInfoFromInnerClassImplementation() {
         lint().files(
             modifierFile,
@@ -319,13 +673,12 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 /**
                  * Documentation
                  */
-                @Stable
                 fun Modifier.preferredSize(width: Int) =
-                    this.then(SizeModifier.WithOption(alignmentLine))
+                    this.then(SizeModifier.WithOption(width))
 
-                private data class SizeModifier() : Modifier.Element {
-                   inner data class WithOption(width: Int) : SizeModifier {
-                   }
+                internal sealed class SizeModifier : Modifier.Element {
+                    internal data class WithOption(val width: Int) : SizeModifier() {
+                    }
                 }
 
                 """
@@ -334,12 +687,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-                    src/androidx/compose/ui/SizeModifier.kt:13: Error: Modifiers should include inspectorInfo for the Layout Inspector [ModifierInspectorInfo]
-                        this.then(SizeModifier.WithOption(alignmentLine))
+                    src/androidx/compose/ui/SizeModifier.kt:12: Error: Modifiers should include inspectorInfo for the Layout Inspector [ModifierInspectorInfo]
+                        this.then(SizeModifier.WithOption(width))
                                                ~~~~~~~~~~
                     1 errors, 0 warnings
                 """
-
             )
     }
 
@@ -647,8 +999,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                             }
                         ))
 
-                private class SizeModifier1(
-                    val width: Int,
+                private class BorderModifier(
+                    val start: Int,
+                    val top: Int,
+                    val end: Int,
+                    bottom: Int,
                     inspectorInfo: InspectorInfo.() -> Unit
                 ): Modifier.Element, InspectorValueInfo(inspectorInfo) {
                 }
@@ -659,7 +1014,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-                    src/androidx/compose/ui/SizeModifier1.kt:11: Error: These lambda arguments are missing in the InspectorInfo: bottom, end, top [ModifierInspectorInfo]
+                    src/androidx/compose/ui/BorderModifier.kt:11: Error: These lambda arguments are missing in the InspectorInfo: bottom, end, top [ModifierInspectorInfo]
                                 start, top, end, bottom, debugInspectorInfo {
                                                                             ^
                     1 errors, 0 warnings

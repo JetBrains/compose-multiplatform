@@ -4,17 +4,6 @@
     <issue
         id="BanTargetApiAnnotation"
         message="Uses @TargetApi annotation"
-        errorLine1="@TargetApi(Build.VERSION_CODES.LOLLIPOP)"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="98"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="BanTargetApiAnnotation"
-        message="Uses @TargetApi annotation"
         errorLine1="@TargetApi(Build.VERSION_CODES.M)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -195,7 +184,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="239"
+            line="302"
             column="13"/>
     </issue>
 
@@ -206,7 +195,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="241"
+            line="304"
             column="13"/>
     </issue>
 
@@ -272,8 +261,41 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.kt"
-            line="332"
+            line="291"
             column="20"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/DoubleTapGestureFilter.kt"
+            line="63"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/DragGestureFilter.kt"
+            line="61"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/DragSlopExceededGestureFilter.kt"
+            line="65"
+            column="15"/>
     </issue>
 
     <issue
@@ -290,12 +312,34 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
+            line="86"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = this.then(object : DrawModifier {"
         errorLine2="                        ^">
         <location
             file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
-            line="156"
+            line="170"
             column="25"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = if (elevation > 0.dp || clip || opacity != 1f) {"
+        errorLine2="    ^">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/draw/DrawShadow.kt"
+            line="53"
+            column="5"/>
     </issue>
 
     <issue
@@ -312,11 +356,77 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier = composed {"
+        errorLine2="                                                                            ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/FocusObserverModifier.kt"
+            line="42"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier = composed {"
+        errorLine2="                                                                        ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/FocusRequesterModifier.kt"
+            line="45"
+            column="73"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
+        errorLine2="                                                                           ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/input/key/KeyInputModifier.kt"
+            line="32"
+            column="76"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
+        errorLine2="                                                                                         ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/input/key/KeyInputModifier.kt"
+            line="47"
+            column="90"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = this.then(LayoutModifierImpl(measure))"
         errorLine2="              ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/ui/layout/LayoutModifier.kt"
             line="250"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/LongPressDragGestureFilter.kt"
+            line="121"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/LongPressGestureFilter.kt"
+            line="58"
             column="15"/>
     </issue>
 
@@ -329,6 +439,171 @@
             file="src/commonMain/kotlin/androidx/compose/ui/layout/OnGloballyPositionedModifier.kt"
             line="31"
             column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/layout/OnRemeasuredModifier.kt"
+            line="40"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/PointerInteropFilter.kt"
+            line="62"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="    return this.then(filter)"
+        errorLine2="                     ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/PointerInteropFilter.kt"
+            line="94"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/PressIndicatorGestureFilter.kt"
+            line="57"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawDragGestureFilter.kt"
+            line="153"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawPressStartGestureFilter.kt"
+            line="57"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawScaleGestureFilter.kt"
+            line="122"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/ScaleGestureFilter.kt"
+            line="106"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/ScaleSlopExceededGestureFilter.kt"
+            line="51"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/ScrollGestureFilter.kt"
+            line="120"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/semantics/SemanticsModifier.kt"
+            line="85"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/input/pointer/SuspendingPointerInputFilter.kt"
+            line="129"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
+            line="68"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
+            line="81"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="These lambda arguments are missing in the InspectorInfo: `tag`"
+        errorLine1="fun Modifier.testTag(tag: String) = semantics("
+        errorLine2="                                    ~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/platform/TestTag.kt"
+            line="31"
+            column="37"/>
     </issue>
 
 </issues>
