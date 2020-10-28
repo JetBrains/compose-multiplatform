@@ -22,7 +22,7 @@ import org.jetbrains.codeviewer.ui.filetree.FileTreeView
 import org.jetbrains.codeviewer.ui.filetree.FileTreeViewTabView
 import org.jetbrains.codeviewer.ui.statusbar.StatusBar
 import org.jetbrains.codeviewer.util.SplitterState
-import org.jetbrains.codeviewer.util.VerticalSplitable
+import org.jetbrains.codeviewer.util.VerticalSplittable
 
 @Composable
 fun CodeViewerView(model: CodeViewer) {
@@ -37,7 +37,7 @@ fun CodeViewerView(model: CodeViewer) {
         )
     }
 
-    VerticalSplitable(
+    VerticalSplittable(
         Modifier.fillMaxSize(),
         panelState.splitter,
         onResize = {

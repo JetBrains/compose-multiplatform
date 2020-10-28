@@ -20,7 +20,7 @@ import org.jetbrains.codeviewer.platform.cursorForHorizontalResize
 import org.jetbrains.codeviewer.ui.common.AppTheme
 
 @Composable
-fun VerticalSplitable(
+fun VerticalSplittable(
     modifier: Modifier,
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
