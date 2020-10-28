@@ -42,7 +42,9 @@ import kotlin.math.roundToInt
  * The size in the other dimension is determined by the aspect ratio. The combinations will be
  * tried in this order until one non-empty is found to satisfy the constraints. If no valid
  * size is obtained this way, it means that there is no non-empty size satisfying both
- * the constraints and the aspect ratio.
+ * the constraints and the aspect ratio, so the constraints will not be respected
+ * and the content will be sized such that the [Constraints.maxWidth] or [Constraints.maxHeight]
+ * is matched (depending on [matchHeightConstraintsFirst]).
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleAspectRatio
@@ -133,22 +135,30 @@ private class AspectRatioModifier(
             tryMaxHeight().also { if (it != IntSize.Zero) return it }
             tryMinWidth().also { if (it != IntSize.Zero) return it }
             tryMinHeight().also { if (it != IntSize.Zero) return it }
+            tryMaxWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMaxHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
         } else {
             tryMaxHeight().also { if (it != IntSize.Zero) return it }
             tryMaxWidth().also { if (it != IntSize.Zero) return it }
             tryMinHeight().also { if (it != IntSize.Zero) return it }
             tryMinWidth().also { if (it != IntSize.Zero) return it }
+            tryMaxHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMaxWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
         }
         return IntSize.Zero
     }
 
-    private fun Constraints.tryMaxWidth(): IntSize {
+    private fun Constraints.tryMaxWidth(enforceConstraints: Boolean = true): IntSize {
         val maxWidth = this.maxWidth
         if (maxWidth != Constraints.Infinity) {
             val height = (maxWidth / aspectRatio).roundToInt()
             if (height > 0) {
                 val size = IntSize(maxWidth, height)
-                if (satisfiedBy(size)) {
+                if (!enforceConstraints || satisfiedBy(size)) {
                     return size
                 }
             }
@@ -156,13 +166,13 @@ private class AspectRatioModifier(
         return IntSize.Zero
     }
 
-    private fun Constraints.tryMaxHeight(): IntSize {
+    private fun Constraints.tryMaxHeight(enforceConstraints: Boolean = true): IntSize {
         val maxHeight = this.maxHeight
         if (maxHeight != Constraints.Infinity) {
             val width = (maxHeight * aspectRatio).roundToInt()
             if (width > 0) {
                 val size = IntSize(width, maxHeight)
-                if (satisfiedBy(size)) {
+                if (!enforceConstraints || satisfiedBy(size)) {
                     return size
                 }
             }
@@ -170,24 +180,24 @@ private class AspectRatioModifier(
         return IntSize.Zero
     }
 
-    private fun Constraints.tryMinWidth(): IntSize {
+    private fun Constraints.tryMinWidth(enforceConstraints: Boolean = true): IntSize {
         val minWidth = this.minWidth
         val height = (minWidth / aspectRatio).roundToInt()
         if (height > 0) {
             val size = IntSize(minWidth, height)
-            if (satisfiedBy(size)) {
+            if (!enforceConstraints || satisfiedBy(size)) {
                 return size
             }
         }
         return IntSize.Zero
     }
 
-    private fun Constraints.tryMinHeight(): IntSize {
+    private fun Constraints.tryMinHeight(enforceConstraints: Boolean = true): IntSize {
         val minHeight = this.minHeight
         val width = (minHeight * aspectRatio).roundToInt()
         if (width > 0) {
             val size = IntSize(width, minHeight)
-            if (satisfiedBy(size)) {
+            if (!enforceConstraints || satisfiedBy(size)) {
                 return size
             }
         }
