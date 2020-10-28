@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.LayoutDirection
@@ -228,7 +227,6 @@ fun <T> LazyRowForIndexed(
 
 @Suppress("NOTHING_TO_INLINE")
 @Composable
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 internal inline fun LazyFor(
     itemsCount: Int,
     modifier: Modifier = Modifier,

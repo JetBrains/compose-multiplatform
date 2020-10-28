@@ -63,7 +63,6 @@ import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 class SubcomposeLayoutTest {
 
     @get:Rule

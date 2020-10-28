@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.platform.AnimationClockAmbient
@@ -98,7 +97,6 @@ fun rememberLazyListState(
     }
 }
 
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 /**
  * A state object that can be hoisted to control and observe scrolling
  *

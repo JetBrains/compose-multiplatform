@@ -56,7 +56,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
@@ -2898,7 +2897,6 @@ class AndroidLayoutDrawTest {
 
     // When a LayoutNode is removed, but it contains a layout that is being updated, the
     // layout should not be remeasured.
-    @OptIn(ExperimentalSubcomposeLayoutApi::class)
     @Test
     fun disappearingLayoutNode() {
         var size by mutableStateOf(10f)
