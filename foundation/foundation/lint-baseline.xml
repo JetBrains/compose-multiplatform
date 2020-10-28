@@ -7,17 +7,6 @@
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/selection/Selectable.kt"
-            line="63"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
             file="src/commonMain/kotlin/androidx/compose/foundation/selection/Toggleable.kt"
             line="100"
             column="5"/>

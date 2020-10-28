@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.semantics
 
@@ -60,15 +61,26 @@ fun Modifier.selectable(
     interactionState: InteractionState = remember { InteractionState() },
     indication: Indication? = AmbientIndication.current(),
     onClick: () -> Unit
-) = composed {
-    Modifier.clickable(
-        enabled = enabled,
-        interactionState = interactionState,
-        indication = indication,
-        onClick = onClick
-    ).semantics {
-        this.inMutuallyExclusiveGroup = inMutuallyExclusiveGroup
-        this.selected = selected
-        this.accessibilityValue = if (selected) Strings.Selected else Strings.NotSelected
+) = composed(
+    factory = {
+        Modifier.clickable(
+            enabled = enabled,
+            interactionState = interactionState,
+            indication = indication,
+            onClick = onClick
+        ).semantics {
+            this.inMutuallyExclusiveGroup = inMutuallyExclusiveGroup
+            this.selected = selected
+            this.accessibilityValue = if (selected) Strings.Selected else Strings.NotSelected
+        }
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "selectable"
+        properties["selected"] = selected
+        properties["enabled"] = enabled
+        properties["inMutuallyExclusiveGroup"] = inMutuallyExclusiveGroup
+        properties["interactionState"] = interactionState
+        properties["indication"] = indication
+        properties["onClick"] = onClick
     }
-}
+)
