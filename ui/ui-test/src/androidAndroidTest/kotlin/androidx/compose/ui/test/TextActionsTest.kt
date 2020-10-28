@@ -23,11 +23,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.util.BoundaryNode
-import androidx.compose.ui.test.util.expectError
+import androidx.compose.testutils.expectError
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule

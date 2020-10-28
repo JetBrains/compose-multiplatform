@@ -25,12 +25,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.inMilliseconds
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.AndroidInputDispatcher.InputDispatcherTestRule
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.util.ClickableTestBox
+import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
 import androidx.compose.ui.test.util.assertOnlyLastEventIsUp
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing

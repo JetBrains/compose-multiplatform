@@ -17,12 +17,12 @@
 package androidx.compose.ui.test.partialgesturescope
 
 import android.os.SystemClock.sleep
+import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.milliseconds
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.AndroidInputDispatcher.InputDispatcherTestRule
 import androidx.compose.ui.test.cancel
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.moveBy
@@ -30,9 +30,9 @@ import androidx.compose.ui.test.movePointerBy
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.test.util.ClickableTestBox
+import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
-import androidx.compose.ui.test.util.expectError
 import androidx.compose.ui.test.util.verify
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before

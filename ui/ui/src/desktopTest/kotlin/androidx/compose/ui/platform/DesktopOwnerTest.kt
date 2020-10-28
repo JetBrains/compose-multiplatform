@@ -35,7 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.drawLayer
@@ -48,7 +48,7 @@ import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.test.DesktopScreenshotTestRule
+import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.test.initCompose
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals

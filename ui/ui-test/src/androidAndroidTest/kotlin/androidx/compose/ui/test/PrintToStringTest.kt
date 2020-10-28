@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.util.BoundaryNode
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith

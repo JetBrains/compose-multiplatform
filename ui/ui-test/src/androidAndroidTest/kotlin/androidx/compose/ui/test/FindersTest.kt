@@ -23,9 +23,10 @@ import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.text
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.util.expectError
+import androidx.compose.testutils.expectError
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

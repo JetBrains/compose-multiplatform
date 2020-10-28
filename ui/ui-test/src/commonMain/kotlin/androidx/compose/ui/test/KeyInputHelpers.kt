@@ -31,6 +31,6 @@ fun SemanticsNodeInteraction.performKeyPress(keyEvent: KeyEvent): Boolean {
     @OptIn(ExperimentalLayoutNodeApi::class)
     val owner = semanticsNode.componentNode.owner
     requireNotNull(owner) { "Failed to find owner" }
-    @Suppress("DEPRECATION")
-    return runOnUiThread { owner.sendKeyEvent(keyEvent) }
+    @OptIn(InternalTestingApi::class)
+    return testContext.testOwner.runOnUiThread { owner.sendKeyEvent(keyEvent) }
 }

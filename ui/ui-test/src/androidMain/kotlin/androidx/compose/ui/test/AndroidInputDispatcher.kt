@@ -29,40 +29,25 @@ import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.AndroidOwner
-import androidx.compose.ui.test.android.AndroidOwnerRegistry
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
 import kotlin.math.max
 
-internal actual fun InputDispatcher(owner: Owner): InputDispatcher {
+internal actual fun InputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
     require(owner is AndroidOwner) {
         "InputDispatcher currently only supports dispatching to AndroidOwner, not to " +
             owner::class.java.simpleName
     }
     val view = owner.view
-    return AndroidInputDispatcher(owner) { view.dispatchTouchEvent(it) }
+    return AndroidInputDispatcher(testContext, owner) { view.dispatchTouchEvent(it) }
 }
 
 internal class AndroidInputDispatcher(
+    testContext: TestContext,
     owner: AndroidOwner?,
     private val sendEvent: (MotionEvent) -> Unit
-) : PersistingInputDispatcher(owner) {
-
-    companion object : AndroidOwnerRegistry.OnRegistrationChangedListener {
-        init {
-            AndroidOwnerRegistry.addOnRegistrationChangedListener(this)
-        }
-
-        override fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean) {
-            if (!registered) {
-                removeState(owner)
-            }
-        }
-    }
+) : PersistingInputDispatcher(testContext, owner) {
 
     private val batchLock = Any()
     // Batched events are generated just-in-time, given the "lateness" of the dispatching (see
@@ -72,12 +57,6 @@ internal class AndroidInputDispatcher(
     private var firstEventTime = Long.MAX_VALUE
 
     override val now: Long get() = SystemClock.uptimeMillis()
-
-    override fun saveState(owner: Owner?) {
-        if (AndroidOwnerRegistry.getUnfilteredOwners().contains(owner)) {
-            super.saveState(owner)
-        }
-    }
 
     override fun PartialGesture.enqueueDown(pointerId: Int) {
         batchMotionEvent(
@@ -225,52 +204,6 @@ internal class AndroidInputDispatcher(
             sendEvent(event)
         } finally {
             event.recycle()
-        }
-    }
-
-    /**
-     * A test rule that modifies [InputDispatcher]s behavior. Can be used to disable dispatching
-     * of MotionEvents in real time (skips the suspend before injection of an event) or to change
-     * the time between consecutive injected events.
-     *
-     * @param disableDispatchInRealTime If set, controls whether or not events with an eventTime
-     * in the future will be dispatched as soon as possible or at that exact eventTime. If
-     * `false` or not set, will suspend until the eventTime, if `true`, will send the event
-     * immediately without suspending. See also [InputDispatcher.dispatchInRealTime].
-     * @param eventPeriodOverride If set, specifies a different period in milliseconds between
-     * two consecutive injected motion events injected by this [InputDispatcher]. If not
-     * set, the event period of 10 milliseconds is unchanged.
-     *
-     * @see InputDispatcher.eventPeriod
-     */
-    internal class InputDispatcherTestRule(
-        private val disableDispatchInRealTime: Boolean = false,
-        private val eventPeriodOverride: Long? = null
-    ) : TestRule {
-
-        override fun apply(base: Statement, description: Description?): Statement {
-            return ModifyingStatement(base)
-        }
-
-        inner class ModifyingStatement(private val base: Statement) : Statement() {
-            override fun evaluate() {
-                if (disableDispatchInRealTime) {
-                    dispatchInRealTime = false
-                }
-                if (eventPeriodOverride != null) {
-                    eventPeriod = eventPeriodOverride
-                }
-                try {
-                    base.evaluate()
-                } finally {
-                    if (disableDispatchInRealTime) {
-                        dispatchInRealTime = true
-                    }
-                    if (eventPeriodOverride != null) {
-                        eventPeriod = 10L
-                    }
-                }
-            }
         }
     }
 }

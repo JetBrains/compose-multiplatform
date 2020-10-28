@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.milliseconds
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-internal expect fun InputDispatcher(owner: Owner): InputDispatcher
+internal expect fun InputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher
 
 /**
  * Dispatcher to inject full and partial gestures. An [InputDispatcher] is created at the

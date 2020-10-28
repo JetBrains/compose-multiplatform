@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.test.util
 
+import androidx.compose.testutils.expectAssertionError
 import androidx.test.filters.SmallTest
 import org.junit.Test
 import org.junit.runner.RunWith

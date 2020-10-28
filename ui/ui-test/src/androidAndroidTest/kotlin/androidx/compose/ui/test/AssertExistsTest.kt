@@ -23,11 +23,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.expectAssertionError
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.util.expectAssertionError
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

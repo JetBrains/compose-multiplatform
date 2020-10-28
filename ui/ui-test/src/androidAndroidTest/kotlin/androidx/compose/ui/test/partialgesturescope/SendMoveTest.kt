@@ -16,17 +16,17 @@
 
 package androidx.compose.ui.test.partialgesturescope
 
+import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.AndroidInputDispatcher.InputDispatcherTestRule
 import androidx.compose.ui.test.cancel
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.expectError
+import androidx.compose.ui.test.util.InputDispatcherTestRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

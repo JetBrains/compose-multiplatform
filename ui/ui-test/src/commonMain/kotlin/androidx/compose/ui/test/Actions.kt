@@ -101,8 +101,8 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
         0f
     }
 
-    @Suppress("DEPRECATION")
-    runOnUiThread {
+    @OptIn(InternalTestingApi::class)
+    testContext.testOwner.runOnUiThread {
         scrollableNode.config[SemanticsActions.ScrollBy].action(dx, dy)
     }
 
@@ -141,7 +141,7 @@ fun SemanticsNodeInteraction.performGesture(
     block: GestureScope.() -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to perform a gesture.")
-    with(GestureScope(node)) {
+    with(GestureScope(node, testContext)) {
         try {
             block()
         } finally {
@@ -185,7 +185,8 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
     }
 
     @Suppress("DEPRECATION")
-    runOnUiThread {
+    @OptIn(InternalTestingApi::class)
+    testContext.testOwner.runOnUiThread {
         invocation(node.config[key].action)
     }
 }

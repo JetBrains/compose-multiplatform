@@ -21,7 +21,6 @@ import androidx.compose.ui.text.input.DeleteAllEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.TextSemanticsProperties
-import androidx.compose.ui.semantics.SemanticsNode
 
 /**
  * Clears the text in this node in similar way to IME.
@@ -78,11 +77,6 @@ fun SemanticsNodeInteraction.performTextReplacement(
     sendTextInputCommand(listOf(DeleteAllEditOp(), CommitTextEditOp(text, 1)))
 }
 
-internal expect fun SemanticsNodeInteraction.actualPerformImeAction(
-    node: SemanticsNode,
-    actionSpecified: ImeAction
-)
-
 /**
  * Sends to this node the IME action associated with it in similar way to IME.
  *
@@ -116,17 +110,15 @@ fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) 
         )
     }
 
-    actualPerformImeAction(node, actionSpecified)
+    @OptIn(InternalTestingApi::class)
+    testContext.testOwner.sendImeAction(node, actionSpecified)
 }
-
-internal expect fun SemanticsNodeInteraction.actualSendTextInputCommand(
-    node: SemanticsNode,
-    command: List<EditOperation>
-)
 
 internal fun SemanticsNodeInteraction.sendTextInputCommand(command: List<EditOperation>) {
     val errorOnFail = "Failed to perform text input."
     val node = fetchSemanticsNode(errorOnFail)
     assert(hasInputMethodsSupport()) { errorOnFail }
-    actualSendTextInputCommand(node, command)
+
+    @OptIn(InternalTestingApi::class)
+    testContext.testOwner.sendTextInputCommand(node, command)
 }

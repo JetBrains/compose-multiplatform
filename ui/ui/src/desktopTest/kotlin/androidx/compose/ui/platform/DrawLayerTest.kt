@@ -26,7 +26,7 @@ import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.test.DesktopScreenshotTestRule
+import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.test.TestComposeWindow
 import org.junit.Rule
 import org.junit.Test

@@ -1,0 +1,125 @@
+// Signature format: 4.0
+package androidx.compose.ui.test.junit4 {
+
+  public final class AndroidAnimationClockTestRuleKt {
+    method public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
+  }
+
+  public final class AndroidComposeTestRule<T extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeTestRule {
+    ctor public AndroidComposeTestRule(androidx.test.ext.junit.rules.ActivityScenarioRule<T> activityRule);
+    method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description? description);
+    method @androidx.compose.ui.test.ExperimentalTesting public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public androidx.test.ext.junit.rules.ActivityScenarioRule<T> getActivityRule();
+    method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public long getDisplaySize-YbymL2g();
+    method public androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodes(androidx.compose.ui.test.SemanticsMatcher matcher, boolean useUnmergedTree);
+    method public androidx.compose.ui.test.SemanticsNodeInteraction onNode(androidx.compose.ui.test.SemanticsMatcher matcher, boolean useUnmergedTree);
+    method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
+    method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public void waitForIdle();
+    property public final androidx.test.ext.junit.rules.ActivityScenarioRule<T> activityRule;
+    property public androidx.compose.ui.test.junit4.AnimationClockTestRule clockTestRule;
+    property public androidx.compose.ui.unit.Density density;
+    property public long displaySize;
+  }
+
+  public final class AndroidComposeTestRule.AndroidComposeStatement extends org.junit.runners.model.Statement {
+    ctor public AndroidComposeTestRule.AndroidComposeStatement(org.junit.runners.model.Statement base);
+    method public void evaluate();
+  }
+
+  public final class AndroidComposeTestRuleKt {
+    method public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T> createAndroidComposeRule(Class<T> activityClass);
+    method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T>! createAndroidComposeRule();
+    method public static androidx.compose.ui.test.junit4.ComposeTestRule createComposeRule();
+  }
+
+  public final class AndroidSynchronizationKt {
+  }
+
+  public interface AnimationClockTestRule extends org.junit.rules.TestRule {
+    method public default void advanceClock(long milliseconds);
+    method public androidx.compose.ui.test.TestAnimationClock getClock();
+    method public boolean isPaused();
+    method public void pauseClock();
+    method public default void resumeClock();
+    property public abstract androidx.compose.ui.test.TestAnimationClock clock;
+    property public abstract boolean isPaused;
+  }
+
+  public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
+    method @androidx.compose.ui.test.ExperimentalTesting public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public long getDisplaySize-YbymL2g();
+    method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
+    method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public void waitForIdle();
+    property public abstract androidx.compose.ui.test.junit4.AnimationClockTestRule clockTestRule;
+    property public abstract androidx.compose.ui.unit.Density density;
+    property public abstract long displaySize;
+  }
+
+  @androidx.compose.ui.test.InternalTestingApi public final class DisableTransitionsTestRule implements org.junit.rules.TestRule {
+    ctor public DisableTransitionsTestRule(boolean disableTransitions);
+    ctor public DisableTransitionsTestRule();
+    method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description? description);
+  }
+
+  public final class DisableTransitionsTestRuleKt {
+  }
+
+  public final class StateRestorationTester {
+    ctor public StateRestorationTester(androidx.compose.ui.test.junit4.ComposeTestRule composeTestRule);
+    method public void emulateSavedInstanceStateRestore();
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+  }
+
+}
+
+package androidx.compose.ui.test.junit4.android {
+
+  public final class ComposeIdlingResourceKt {
+    method public static void registerComposeWithEspresso();
+    method public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+    method public static void unregisterComposeFromEspresso();
+    method public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+  }
+
+  public final class ComposeNotIdleException extends java.lang.Throwable {
+    ctor public ComposeNotIdleException(String? message, Throwable? cause);
+  }
+
+}
+
+package androidx.ui.test {
+
+  public final class AndroidComposeTestRuleKt {
+    method public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T> createAndroidComposeRule(Class<T> activityClass);
+    method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T>! createAndroidComposeRule();
+    method public static androidx.compose.ui.test.junit4.ComposeTestRule createComposeRule();
+  }
+
+  public final class ComposeTestRuleJUnitKt {
+  }
+
+  public final class ComposeTestRuleKt {
+  }
+
+  public final class StateRestorationTesterKt {
+  }
+
+}
+
+package androidx.ui.test.android {
+
+  public final class AndroidComposeTestRuleKt {
+    method @Deprecated public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T> createAndroidComposeRule(Class<T> activityClass, optional boolean disableTransitions, optional boolean disableBlinkingCursor);
+    method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T>! createAndroidComposeRule(optional boolean disableTransitions, optional boolean disableBlinkingCursor);
+  }
+
+}
+
