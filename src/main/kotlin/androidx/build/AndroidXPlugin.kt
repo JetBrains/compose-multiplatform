@@ -373,9 +373,7 @@ class AndroidXPlugin : Plugin<Project> {
             project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
         }
 
-        val reportLibraryMetrics = project.tasks.register<ReportLibraryMetricsTask>(
-            REPORT_LIBRARY_METRICS_TASK, ReportLibraryMetricsTask::class.java
-        )
+        val reportLibraryMetrics = project.configureReportLibraryMetricsTask()
         project.addToBuildOnServer(reportLibraryMetrics)
         libraryExtension.defaultPublishVariant { libraryVariant ->
             reportLibraryMetrics.configure {
