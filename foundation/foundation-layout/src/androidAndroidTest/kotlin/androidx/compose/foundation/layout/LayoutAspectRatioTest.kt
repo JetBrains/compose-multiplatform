@@ -101,6 +101,14 @@ class LayoutAspectRatioTest : LayoutTest() {
             IntSize(20, 10),
             getSize(2f, Constraints(minWidth = 5, minHeight = 10))
         )
+        assertEquals(
+            IntSize(20, 10),
+            getSize(2f, Constraints.fixed(20, 20))
+        )
+        assertEquals(
+            IntSize(50, 25),
+            getSize(2f, Constraints(minWidth = 50, minHeight = 20))
+        )
     }
 
     @Test
@@ -122,6 +130,14 @@ class LayoutAspectRatioTest : LayoutTest() {
         assertEquals(
             IntSize(10, 20),
             getSize(0.5f, Constraints(minWidth = 10, minHeight = 5), true)
+        )
+        assertEquals(
+            IntSize(10, 20),
+            getSize(0.5f, Constraints.fixed(20, 20), true)
+        )
+        assertEquals(
+            IntSize(25, 50),
+            getSize(0.5f, Constraints(minWidth = 20, minHeight = 50), true)
         )
     }
 
