@@ -49,6 +49,10 @@ abstract class AbstractComposeView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
+    init {
+        clipChildren = false
+    }
+
     private var composition: Composition? = null
 
     /**
