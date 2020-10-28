@@ -22,10 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.TextFieldValue
 
 @Sampled
 @Composable
+@OptIn(InternalTextApi::class)
 fun CoreTextFieldSample() {
     var value by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     CoreTextField(

@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Providers
@@ -523,7 +523,7 @@ class TextFieldTest {
         var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
 
         rule.setContent {
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -544,7 +544,7 @@ class TextFieldTest {
         var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
 
         rule.setContent {
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -567,7 +567,7 @@ class TextFieldTest {
         var value by mutableStateOf(TextFieldValue(text, TextRange(0, 6)))
 
         rule.setContent {
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -591,7 +591,7 @@ class TextFieldTest {
 
         rule.setContent {
             toolbar = TextToolbarAmbient.current
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
@@ -656,7 +656,7 @@ private fun TextFieldStringOverride(
         composition = composition?.constrain(0, value.length)
     )
 
-    CoreTextField(
+    BasicTextField(
         value = textFieldValue,
         onValueChange = {
             selection = it.selection

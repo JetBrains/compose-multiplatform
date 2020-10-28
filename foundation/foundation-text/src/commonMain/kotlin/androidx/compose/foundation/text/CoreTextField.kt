@@ -155,9 +155,9 @@ import kotlin.math.roundToInt
 @Composable
 @OptIn(
     ExperimentalFocus::class,
-    InternalTextApi::class,
     ExperimentalTextApi::class
 )
+@InternalTextApi
 fun CoreTextField(
     value: TextFieldValue,
     modifier: Modifier = Modifier,
