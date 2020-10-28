@@ -8,7 +8,7 @@ This tutorial expects that you have already set up the Compose project as descri
 
 In this tutorial, we will look at two different ways of handling keyboard events in Compose for Desktop as well as the utilities that we have to do this.
 
-## KeySets & ShortcutHandler
+## KeySets
 
 Compose for Desktop has a few utilities to work with shortcuts:
 
@@ -17,8 +17,6 @@ Compose for Desktop has a few utilities to work with shortcuts:
 ``` kotlin
 Key.CtrlLeft + Key.Enter
 ```
-
-`ShortcutHandler` accepts `KeysSet` and returns a handler which could be used as a callback for `keyInputFilter`
 
 ## Event handlers
 
@@ -30,6 +28,8 @@ There are two ways to handle key events in Compose for Desktop:
 ## Focus related events
 
 It works the same as Compose for Android, see for details [API Reference](https://developer.android.com/reference/kotlin/androidx/compose/ui/input/key/package-summary#keyinputfilter)
+
+`Modifier.shortcuts` is used to define one or multiple callbacks for `KeysSet`s.
 
 The most common use case is to define keyboard handlers for active controls like `TextField`. Here is an example:
 
@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.key.shortcuts
 
 @OptIn(ExperimentalKeyInput::class)
 fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
@@ -60,12 +61,16 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
             TextField(
                     value = text,
                     onValueChange = { text = it },
-                    modifier = Modifier.keyInputFilter(
-                            ShortcutHandler(Key.CtrlLeft + Key.Enter) {
-                                consumedText += text.length
-                                text = ""
-                            }
-                    )
+                    modifier = Modifier.shortcuts {
+                        on(Key.CtrlLeft + Key.Minus) {
+                            consumedText -= text.length
+                            text = ""
+                        }
+                        on(Key.CtrlLeft + Key.Equals) {
+                            consumedText += text.length
+                            text = ""
+                        }
+                    }
             )
         }
     }
@@ -105,11 +110,11 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
                     modifier = Modifier.padding(4.dp),
                     onClick = {
                         AppWindow(size = IntSize(200, 200)).also {
-                            it.keyboard.shortcut(Key.Escape) {
+                            it.keyboard.setShortcut(Key.Escape) {
                                 it.close()
                             }
                         }.show {
-                            Text("I'm a popup!")
+                            Text("I'm popup!")
                         }
                     }
             ) {
