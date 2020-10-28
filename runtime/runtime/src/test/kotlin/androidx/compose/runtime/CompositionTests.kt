@@ -2546,8 +2546,23 @@ private fun compose(
         composer.applyChanges()
     }
     composer.slotTable.verifyWellFormed()
+    validateRecomposeScopeAnchors(composer.slotTable)
 
     return CompositionResult(composer, root)
+}
+
+@OptIn(InternalComposeApi::class)
+fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
+    val scopes = slotTable.slots.map { it as? RecomposeScope }.filterNotNull()
+    for (scope in scopes) {
+        scope.anchor?.let { anchor ->
+            check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
+                val dataIndex = slotTable.slots.indexOf(scope)
+                "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
+                    "$dataIndex"
+            }
+        }
+    }
 }
 
 // Contact test data
