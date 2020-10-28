@@ -133,7 +133,10 @@ fun Project.validateAllAndroidxArgumentsAreRecognized() {
 }
 
 /**
- * Returns whether tests in the project should display output
+ * Returns whether tests in the project should display output.
+ * Build server scripts generally set displayTestOutput to false so that their failing test
+ * results aren't considered build failures, and instead pass their test failures on via build
+ * artifacts to be tracked and displayed on test dashboards in a different format
  */
 fun Project.isDisplayTestOutput(): Boolean =
     (project.findProperty(DISPLAY_TEST_OUTPUT) as? String)?.toBoolean() ?: true
