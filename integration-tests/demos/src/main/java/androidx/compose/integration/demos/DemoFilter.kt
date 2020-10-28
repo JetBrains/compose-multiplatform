@@ -16,22 +16,17 @@
 
 package androidx.compose.integration.demos
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
-import androidx.compose.runtime.onCommit
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.integration.demos.common.Demo
+import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.AmbientTextStyle
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.integration.demos.common.Demo
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -39,11 +34,18 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.onCommit
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
@@ -99,7 +101,7 @@ fun FilterAppBar(
 }
 
 /**
- * [BaseTextField] that edits the current [filterText], providing [onFilter] when edited.
+ * [BasicTextField] that edits the current [filterText], providing [onFilter] when edited.
  */
 @Composable
 @OptIn(
@@ -113,10 +115,12 @@ private fun FilterField(
 ) {
     val focusRequester = FocusRequester()
     // TODO: replace with Material text field when available
-    BaseTextField(
+    BasicTextField(
         modifier = modifier.focusRequester(focusRequester),
         value = filterText,
-        onValueChange = onFilter
+        onValueChange = onFilter,
+        textStyle = AmbientTextStyle.current,
+        cursorColor = AmbientContentColor.current
     )
     onCommit { focusRequester.requestFocus() }
 }

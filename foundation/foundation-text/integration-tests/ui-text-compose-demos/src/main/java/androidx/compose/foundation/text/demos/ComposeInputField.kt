@@ -16,12 +16,12 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -91,7 +91,7 @@ private fun EditLine(
 ) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    BaseTextField(
+    BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
         keyboardType = keyboardType,

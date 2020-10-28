@@ -88,6 +88,18 @@ import androidx.compose.ui.text.input.VisualTransformation
  * @see KeyboardType
  * @see VisualTransformation
  */
+@Deprecated(
+    "Use BasicTextField instead.",
+    replaceWith = ReplaceWith(
+        "BasicTextField(value, onValueChange, modifier, textStyle.merge(TextStyle(color = " +
+            "textColor)), keyboardType, imeAction, onImeActionPerformed, visualTransformation, " +
+            "onTextLayout, onTextInputStarted, cursorColor)",
+        "androidx.compose.foundation.text.BasicTextField",
+        "androidx.compose.foundation.AmbientContentColor",
+        "androidx.compose.foundation.AmbientTextStyle",
+        "androidx.compose.ui.text.TextStyle",
+    )
+)
 @Composable
 @ExperimentalFoundationApi
 fun BaseTextField(

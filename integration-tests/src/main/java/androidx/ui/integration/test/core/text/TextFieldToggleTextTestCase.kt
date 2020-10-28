@@ -16,13 +16,13 @@
 
 package androidx.ui.integration.test.core.text
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InternalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +66,7 @@ class TextFieldToggleTextTestCase(
     @Composable
     override fun emitMeasuredContent() {
         for (text in texts.value) {
-            BaseTextField(
+            BasicTextField(
                 value = TextFieldValue(text),
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.Black, fontSize = fontSize),

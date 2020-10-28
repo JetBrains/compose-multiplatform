@@ -35,10 +35,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 
 /**
- * Basic composable that enables users to edit text via hardware or software keyboard.
- *
- * This composable provides basic text editing functionality, however does not include any
- * decorations such as borders, hints/placeholder.
+ * Basic composable that enables users to edit text via hardware or software keyboard, but
+ * provides no decorations like hint or placeholder.
  *
  * Whenever the user edits the text, [onValueChange] is called with the most up to date state
  * represented by [String] with which developer is expected to update their state.
@@ -58,6 +56,15 @@ import androidx.compose.ui.text.input.VisualTransformation
  * via [onValueChange] callback. Any change to this value may result in a context reset and end
  * up with input session restart. Such a scenario would cause glitches in the UI or text input
  * experience for users.
+ *
+ * This composable provides basic text editing functionality, however does not include any
+ * decorations such as borders, hints/placeholder. A design system based implementation such as
+ * Material Design Filled text field is typically what is needed to cover most of the needs. This
+ * composable is designed to be used when a custom implementation for different design system is
+ * needed.
+ *
+ * For example, if you need to include a hint in your TextField you can write a composable as below:
+ * @sample androidx.compose.foundation.samples.PlaceholderBasicTextFieldSample
  *
  * @param value the input [String] text to be shown in the text field
  * @param onValueChange the callback that is triggered when the input service updates the text. An
@@ -128,10 +135,8 @@ fun BasicTextField(
 }
 
 /**
- * Basic composable that enables users to edit text via hardware or software keyboard.
- *
- * This composable provides basic text editing functionality, however does not include any
- * decorations such as borders, hints/placeholder.
+ * Basic composable that enables users to edit text via hardware or software keyboard, but
+ * provides no decorations like hint or placeholder.
  *
  * Whenever the user edits the text, [onValueChange] is called with the most up to date state
  * represented by [TextFieldValue]. [TextFieldValue] contains the text entered by user, as well
@@ -149,6 +154,15 @@ fun BasicTextField(
  * [TextFieldValue] that you get via [onValueChange] callback. Any change to the values in
  * [TextFieldValue] may result in a context reset and end up with input session restart. Such
  * a scenario would cause glitches in the UI or text input experience for users.
+ *
+ * This composable provides basic text editing functionality, however does not include any
+ * decorations such as borders, hints/placeholder. A design system based implementation such as
+ * Material Design Filled text field is typically what is needed to cover most of the needs. This
+ * composable is designed to be used when a custom implementation for different design system is
+ * needed.
+ *
+ * For example, if you need to include a hint in your TextField you can write a composable as below:
+ * @sample androidx.compose.foundation.samples.PlaceholderBasicTextFieldSample
  *
  * @param value The [androidx.compose.ui.text.input.TextFieldValue] to be shown in the
  * [BasicTextField].

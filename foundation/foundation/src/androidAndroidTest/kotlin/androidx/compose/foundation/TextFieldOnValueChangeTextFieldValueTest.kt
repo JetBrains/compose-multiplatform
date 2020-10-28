@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,7 +82,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
                         )
                     )
                 }
-                BaseTextField(
+                BasicTextField(
                     value = state.value,
                     onValueChange = {
                         state.value = it

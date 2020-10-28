@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 @Sampled
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
+@Suppress("DEPRECATION")
 fun TextFieldSample() {
     var value by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     BaseTextField(
@@ -41,6 +42,7 @@ fun TextFieldSample() {
 @Sampled
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
+@Suppress("DEPRECATION")
 fun PlaceholderTextFieldSample() {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     Box {

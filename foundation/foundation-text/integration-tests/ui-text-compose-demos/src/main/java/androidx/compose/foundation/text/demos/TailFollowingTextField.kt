@@ -16,16 +16,16 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
@@ -73,7 +73,7 @@ private fun HorizontalTailFollowingTextField(
 ) {
     Layout(
         children = @Composable {
-            BaseTextField(
+            BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 textStyle = textStyle
@@ -110,7 +110,7 @@ private fun VerticalTailFollowintTextField(
 ) {
     Layout(
         children = @Composable {
-            BaseTextField(
+            BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 textStyle = textStyle

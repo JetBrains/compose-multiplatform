@@ -17,6 +17,9 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,4 +53,20 @@ fun BasicTextFieldWithStringSample() {
             value = it
         }
     )
+}
+
+@Sampled
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+fun PlaceholderBasicTextFieldSample() {
+    var value by savedInstanceState { "initial value" }
+    Box {
+        BasicTextField(
+            value = value,
+            onValueChange = { value = it }
+        )
+        if (value.isEmpty()) {
+            Text(text = "Placeholder")
+        }
+    }
 }
