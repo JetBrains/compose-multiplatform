@@ -619,7 +619,7 @@ class AndroidXPlugin : Plugin<Project> {
             it.outputXml.fileValue(
                 File(
                     project.getTestConfigDirectory(),
-                    "${project.asFilenamePrefix()}${variantName}AndroidTest.xml"
+                    "${project.asFilenamePrefix()}$variantName.xml"
                 )
             )
             AffectedModuleDetector.configureTaskGuard(it)
@@ -686,7 +686,13 @@ class AndroidXPlugin : Plugin<Project> {
             project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK)
                 .configure { task ->
                     task as Zip
-                    task.from(packageTask.outputDirectory)
+                    task.from(packageTask.outputDirectory) {
+                        it.include("*.apk")
+                        it.duplicatesStrategy = DuplicatesStrategy.FAIL
+                        it.rename { fileName ->
+                            fileName.renameApkForTesting(project)
+                        }
+                    }
                     task.dependsOn(packageTask)
                 }
 
@@ -696,27 +702,10 @@ class AndroidXPlugin : Plugin<Project> {
                     it.include("*.apk")
                     it.into(File(project.getDistributionDirectory(), "apks"))
                     it.rename { fileName ->
-                        renameApkForTesting(fileName, project)
+                        fileName.renameApkForTesting(project)
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
-     * to determine what gets run by our test runner
-     */
-    private fun renameApkForTesting(fileName: String, project: Project): String {
-        return if (fileName.contains("media-test") || fileName.contains("media2-test")) {
-            // Exclude media-test-* and media2-test-* modules from
-            // existing support library presubmit tests.
-            fileName.replace("-debug-androidTest", "")
-        } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
-            val name = fileName.replace("-androidTest", "-androidBenchmark")
-            "${project.asFilenamePrefix()}_$name"
-        } else {
-            "${project.asFilenamePrefix()}_$fileName"
         }
     }
 
@@ -1010,6 +999,23 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
         "-Xskip-runtime-version-check",
         "-Xskip-metadata-version-check"
     )
+}
+
+/**
+ * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
+ * to determine what gets run by our test runner
+ */
+fun String.renameApkForTesting(project: Project): String {
+    return if (this.contains("media-test") || this.contains("media2-test")) {
+        // Exclude media-test-* and media2-test-* modules from
+        // existing support library presubmit tests.
+        this.replace("-debug-androidTest", "")
+    } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
+        val name = this.replace("-androidTest", "-androidBenchmark")
+        "${project.asFilenamePrefix()}_$name"
+    } else {
+        "${project.asFilenamePrefix()}_$this"
+    }
 }
 
 /**
