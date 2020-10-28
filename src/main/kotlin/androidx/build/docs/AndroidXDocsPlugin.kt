@@ -312,7 +312,6 @@ class AndroidXDocsPlugin : Plugin<Project> {
     ) {
         val dokkaTask = Dokka.createDokkaTask(
             project,
-            "", // TODO(aurimas): remove type as that is now embedded in the project name
             hiddenPackages,
             "Kotlin",
             "dac",
@@ -515,26 +514,7 @@ private val hiddenPackages = listOf(
     "androidx.camera.core.impl.utils.futures",
     "androidx.camera.core.internal",
     "androidx.camera.core.internal.utils",
-    "androidx.compose.animation.core.samples",
-    "androidx.compose.animation.samples",
-    "androidx.compose.foundation.layout.samples",
-    "androidx.compose.foundation.samples",
-    "androidx.compose.foundation.text.samples",
-    "androidx.compose.material.icons.samples",
-    "androidx.compose.material.samples",
-    "androidx.compose.runtime.livedata.samples",
-    "androidx.compose.runtime.rxjava2.samples",
-    "androidx.compose.runtime.samples",
-    "androidx.compose.runtime.savedinstancestate.samples",
-    "androidx.compose.ui.graphics.samples",
-    "androidx.compose.ui.samples",
-    "androidx.compose.ui.text.samples",
-    "androidx.compose.ui.unit.samples",
     "androidx.core.internal",
-    "androidx.navigation.compose.samples",
-    "androidx.paging.samples",
-    "androidx.paging.samples.java",
-    "androidx.paging.samples.shared",
     "androidx.preference.internal",
     "androidx.wear.internal.widget.drawer",
     "androidx.webkit.internal",
@@ -548,7 +528,5 @@ private val hiddenPackages = listOf(
     "androidx.work.impl.model",
     "androidx.work.impl.utils",
     "androidx.work.impl.utils.futures",
-    "androidx.work.impl.utils.taskexecutor",
-    "sample",
-    "sample.foo"
+    "androidx.work.impl.utils.taskexecutor"
 )

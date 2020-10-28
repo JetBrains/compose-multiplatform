@@ -29,14 +29,13 @@ import java.io.File
 import java.net.URL
 
 object Dokka {
-    private fun generatorTaskNameForType(docsType: String, language: String = ""): String {
+    private fun generatorTaskNameForType(language: String = ""): String {
         val formattedLangauage = language.toLowerCase().capitalize()
-        return "dokka${formattedLangauage}${docsType}Docs"
+        return "dokka${formattedLangauage}Docs"
     }
 
     fun createDokkaTask(
         project: Project,
-        docsType: String,
         hiddenPackages: List<String>,
         language: String,
         outputFormat: String,
@@ -45,7 +44,7 @@ object Dokka {
         // This function creates and configures a DokkaAndroidTask.
         // The meanings of these parameters are documented at https://github.com/kotlin/dokka
 
-        val docTaskName = generatorTaskNameForType(docsType, language)
+        val docTaskName = generatorTaskNameForType(language)
 
         val guavaDocLink = createExternalDocumentationLinkMapping(
             "package-lists/guava/package-list",
@@ -71,7 +70,7 @@ object Dokka {
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
             task.moduleName = project.name
             task.outputDirectory = File(project.buildDir, docTaskName).absolutePath
-            task.description = "Generates $docsType $language documentation in the style of " +
+            task.description = "Generates $language documentation in the style of " +
                 "d.android.com.  Places docs in ${task.outputDirectory}"
             task.outputFormat = outputFormat
             task.outlineRoot = "androidx/"
