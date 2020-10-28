@@ -335,17 +335,6 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 }
             }
 
-            fun checkSynonym(node: UCallExpression) {
-                foundName = true
-                node.valueArguments.forEach {
-                    val (arguments, variable) = variable(it)
-                    if (variable != null && arguments.expected.contains(variable)) {
-                        arguments.found.add(variable)
-                    }
-                }
-                checkComplete(node)
-            }
-
             private fun literal(expr: UExpression?): String? = when (expr) {
                 is KotlinStringULiteralExpression,
                 is KotlinStringTemplateUPolyadicExpression -> expr.evaluate() as? String
@@ -468,7 +457,8 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                     inspectorInfo.accept(debugInspectorVisitor)
                     return true
                 }
-                methodInfo?.checkSynonym(node)
+                // For now accept all other calls. Assume that the method being called
+                // will add inspector information.
                 return true
             }
 
@@ -478,6 +468,9 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 // Accept a simple reference to a different modifier definition
                 return false
             }
+
+            // Accept a single this expression, which essentially makes the modifier a noop
+            override fun visitThisExpression(node: UThisExpression): Boolean = false
         }
 
         /**
@@ -534,10 +527,8 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
             override fun visitSimpleNameReferenceExpression(
                 node: USimpleNameReferenceExpression
             ): Boolean {
-                if (node.identifier == Modifier) {
-                    return true
-                }
-                return super.visitSimpleNameReferenceExpression(node)
+                // Accept any variable including Modifier
+                return true
             }
 
             override fun visitIfExpression(node: UIfExpression): Boolean {

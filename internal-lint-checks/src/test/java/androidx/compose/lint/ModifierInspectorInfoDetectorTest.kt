@@ -288,7 +288,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
 
                 fun Modifier.preferredWidth20() = preferredWidth1(Dp(20.0f))
 
-                fun Modifier.preferredIconWidth() = DefaultIconSizeModifier
+                fun Modifier.preferredIconWidth(x: Int) = this.then(
+                    if (x == 7) DefaultIconSizeModifier else Modifier
+                )
 
                 private val DefaultIconSizeModifier = Modifier.preferredWidth1(Dp(24.0f))
 
@@ -363,6 +365,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 fun Modifier.border2(values: Borders) =
                     border2(values.start, values.top, values.end, values.bottom)
 
+                fun Modifier.border3(corner1: Location, corner2: Location) =
+                    border2(corner1.x, corner1.y, corner2.x, corner2.y)
+
                 private class BorderModifier(
                     val values: Borders,
                     inspectorInfo: InspectorInfo.() -> Unit
@@ -382,6 +387,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                     constructor(all: Int) : this(all, all, all, all)
                 }
 
+                data class Location(val x: Int, val y: Int)
                 """
             ).indented()
         )
@@ -581,6 +587,25 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                     inspectorInfo: InspectorInfo.() -> Unit
                 ): Modifier.Element, InspectorValueInfo(inspectorInfo)
 
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun emptyModifier() {
+        lint().files(
+            modifierFile,
+            kotlin(
+                """
+                package androidx.compose.ui
+
+                import androidx.compose.runtime.remember
+                import androidx.compose.ui.Modifier
+
+                internal actual fun Modifier.preferredWidth1(width: Int): Modifier = this
                 """
             ).indented()
         )

@@ -4,61 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="): Modifier = this"
-        errorLine2="              ~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/foundation/gestures/AndroidScrollable.kt"
-            line="40"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `border`"
-        errorLine1="    border(width = border.width, brush = border.brush, shape = shape)"
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
-            line="57"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `color`"
-        errorLine1="    border(width, SolidColor(color), shape)"
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
-            line="70"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `border`"
-        errorLine1="    drawBorder(size = border.size, brush = border.brush, shape = shape)"
-        errorLine2="    ~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
-            line="114"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `color`"
-        errorLine1="    border(size, SolidColor(color), shape)"
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Border.kt"
-            line="135"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed {"
         errorLine2="                                                                          ~~~~~~~~">
         <location
@@ -92,17 +37,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="            DefaultIconSizeModifier"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Icon.kt"
-            line="112"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -113,23 +47,12 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `progress`"
-        errorLine1="    return semantics {"
-        errorLine2="           ~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/ProgressSemantics.kt"
-            line="54"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/Scroll.kt"
-            line="381"
+            line="382"
             column="5"/>
     </issue>
 
@@ -152,17 +75,6 @@
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/selection/Selectable.kt"
             line="63"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onValueChange`, `value`"
-        errorLine1=") = triStateToggleable("
-        errorLine2="    ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/selection/Toggleable.kt"
-            line="65"
             column="5"/>
     </issue>
 
