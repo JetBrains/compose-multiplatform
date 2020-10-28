@@ -317,7 +317,7 @@ package androidx.compose.ui.draw {
   }
 
   public final class DrawShadowKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawShadow-n1HIVjc(androidx.compose.ui.Modifier, float elevation, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip, optional @FloatRange(from=0.0, to=1.0) float opacity);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawShadow-HfQes2E(androidx.compose.ui.Modifier, float elevation, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
   }
 
   public final class OpacityKt {
