@@ -1,3 +1,7 @@
+/**
+ * This file is example (we can open it in android application)
+ */
+
 package org.jetbrains.codeviewer.ui.editor
 
 import androidx.compose.foundation.AmbientContentColor
