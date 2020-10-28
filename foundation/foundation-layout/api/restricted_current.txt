@@ -22,7 +22,11 @@ package androidx.compose.foundation.layout {
   }
 
   public final class AlignmentLineKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier relativePaddingFrom-x1H7Rps(androidx.compose.ui.Modifier, androidx.compose.ui.layout.AlignmentLine alignmentLine, optional float before, optional float after);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier paddingFrom-XACvGJ4(androidx.compose.ui.Modifier, androidx.compose.ui.layout.AlignmentLine alignmentLine, optional long before, optional long after);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier paddingFrom-x1H7Rps(androidx.compose.ui.Modifier, androidx.compose.ui.layout.AlignmentLine alignmentLine, optional float before, optional float after);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier paddingFromBaseline-S2lCeAQ(androidx.compose.ui.Modifier, optional float top, optional float bottom);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier paddingFromBaseline-zCFLmh4(androidx.compose.ui.Modifier, optional long top, optional long bottom);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier relativePaddingFrom-x1H7Rps(androidx.compose.ui.Modifier, androidx.compose.ui.layout.AlignmentLine alignmentLine, optional float before, optional float after);
   }
 
   @androidx.compose.runtime.Immutable public final class Arrangement {
