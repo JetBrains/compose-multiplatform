@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
@@ -62,12 +63,24 @@ fun Modifier.toggleable(
     interactionState: InteractionState = remember { InteractionState() },
     indication: Indication? = AmbientIndication.current(),
     onValueChange: (Boolean) -> Unit
-) = triStateToggleable(
-    state = ToggleableState(value),
-    onClick = { onValueChange(!value) },
-    enabled = enabled,
-    interactionState = interactionState,
-    indication = indication
+) = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "toggleable"
+        properties["value"] = value
+        properties["enabled"] = enabled
+        properties["interactionState"] = interactionState
+        properties["indication"] = indication
+        properties["onValueChange"] = onValueChange
+    },
+    factory = {
+        toggleableImpl(
+            state = ToggleableState(value),
+            onClick = { onValueChange(!value) },
+            enabled = enabled,
+            interactionState = interactionState,
+            indication = indication
+        )
+    }
 )
 
 /**
@@ -97,7 +110,26 @@ fun Modifier.triStateToggleable(
     interactionState: InteractionState = remember { InteractionState() },
     indication: Indication? = AmbientIndication.current(),
     onClick: () -> Unit
-) = composed {
+) = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "triStateToggleable"
+        properties["state"] = state
+        properties["enabled"] = enabled
+        properties["interactionState"] = interactionState
+        properties["indication"] = indication
+        properties["onClick"] = onClick
+    },
+    factory = { toggleableImpl(state, enabled, interactionState, indication, onClick) }
+)
+
+@Composable
+private fun toggleableImpl(
+    state: ToggleableState,
+    enabled: Boolean,
+    interactionState: InteractionState,
+    indication: Indication?,
+    onClick: () -> Unit
+): Modifier {
     // TODO(pavlis): Handle multiple states for Semantics
     val semantics = Modifier.semantics(mergeAllDescendants = true) {
         this.accessibilityValue = when (state) {
@@ -131,7 +163,7 @@ fun Modifier.triStateToggleable(
             interactionState.removeInteraction(Interaction.Pressed)
         }
     }
-    semantics
+    return semantics
         .indication(interactionState, indication)
         .then(interactionUpdate)
         .then(click)
