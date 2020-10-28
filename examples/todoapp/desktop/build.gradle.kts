@@ -15,7 +15,7 @@ kotlin {
     sourceSets {
         named("jvmMain") {
             dependencies {
-                implementation(compose.desktop.all)
+                implementation(compose.desktop.currentOs)
                 implementation(project(":common:utils"))
                 implementation(project(":common:database"))
                 implementation(project(":common:root"))
