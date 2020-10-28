@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -36,7 +37,7 @@ fun SoftWrapDemo() {
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
 private fun CoreTextFieldWithWrap(softWrap: Boolean) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) {
         TextFieldValue("abc ".repeat(20))

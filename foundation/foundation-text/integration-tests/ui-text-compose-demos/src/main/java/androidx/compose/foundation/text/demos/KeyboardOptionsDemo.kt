@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -112,7 +113,8 @@ fun KeyboardOptionsDemo() {
 @Composable
 @OptIn(
     ExperimentalFoundationApi::class,
-    ExperimentalTextApi::class
+    ExperimentalTextApi::class,
+    InternalTextApi::class
 )
 private fun MyTextField(data: KeyboardOptionsData) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }

@@ -16,10 +16,9 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -91,7 +90,6 @@ import androidx.compose.ui.text.input.VisualTransformation
  */
 @Composable
 @ExperimentalFoundationApi
-@OptIn(ExperimentalFocus::class)
 fun BaseTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -109,20 +107,16 @@ fun BaseTextField(
     val color = textColor.useOrElse { textStyle.color.useOrElse { AmbientContentColor.current } }
     val mergedStyle = textStyle.merge(TextStyle(color = color))
 
-    CoreTextField(
+    BasicTextField(
         value = value,
         modifier = modifier,
-        onValueChange = {
-            onValueChange(it)
-        },
+        onValueChange = onValueChange,
         textStyle = mergedStyle,
         keyboardType = keyboardType,
         imeAction = imeAction,
         onImeActionPerformed = onImeActionPerformed,
         visualTransformation = visualTransformation,
-        onTextLayout = {
-            onTextLayout(it)
-        },
+        onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor
     )
