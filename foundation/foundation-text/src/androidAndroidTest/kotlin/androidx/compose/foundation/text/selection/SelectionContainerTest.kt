@@ -27,6 +27,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.hapticfeedback.HapticFeedback
@@ -38,6 +39,7 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.platform.HapticFeedBackAmbient
+import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
 import androidx.compose.ui.text.AnnotatedString
@@ -48,23 +50,30 @@ import androidx.compose.ui.text.font.ResourceFont
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.test.R
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.filters.SdkSuppress
 import androidx.ui.test.createAndroidComposeRule
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.Before
+import org.hamcrest.Description
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -72,9 +81,11 @@ class SelectionContainerTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
+    private var composeViewAbsolutePos = IntOffset(0, 0)
+
     private lateinit var view: View
 
-    private val textContent = "Text Demo Text Demo"
+    private val textContent = "Text Demo Text"
     private val fontFamily = ResourceFont(
         resId = R.font.sample_font,
         weight = FontWeight.Normal,
@@ -84,49 +95,17 @@ class SelectionContainerTest {
     private lateinit var gestureCountDownLatch: CountDownLatch
 
     private val selection = mutableStateOf<Selection?>(null)
-    private val fontSize = 10.sp
+    private val fontSize = 20.sp
     private val log = PointerInputChangeLog()
 
     private val hapticFeedback = mock<HapticFeedback>()
-
-    @Before
-    fun setup() {
-        rule.setContent {
-            Providers(
-                HapticFeedBackAmbient provides hapticFeedback
-            ) {
-                TestParent(Modifier.gestureSpy(log)) {
-                    SelectionContainer(
-                        selection = selection.value,
-                        onSelectionChange = {
-                            selection.value = it
-                            gestureCountDownLatch.countDown()
-                        }
-                    ) {
-                        CoreText(
-                            AnnotatedString(textContent),
-                            Modifier.fillMaxSize(),
-                            style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
-                            softWrap = true,
-                            overflow = TextOverflow.Clip,
-                            maxLines = Int.MAX_VALUE,
-                            inlineContent = mapOf(),
-                            onTextLayout = {}
-                        )
-                    }
-                }
-            }
-        }
-        rule.activityRule.scenario.onActivity {
-            view = it.findViewById<ViewGroup>(android.R.id.content)
-        }
-    }
 
     @Test
     @SdkSuppress(minSdkVersion = 27)
     fun press_to_cancel() {
         // Setup. Long press to create a selection.
         // A reasonable number.
+        createSelectionContainer()
         val position = 50f
         longPress(x = position, y = position)
         rule.runOnIdle {
@@ -151,6 +130,7 @@ class SelectionContainerTest {
     fun tapToCancelDoesNotBlockUp() {
         // Setup. Long press to create a selection.
         // A reasonable number.
+        createSelectionContainer()
         val position = 50f
         longPress(x = position, y = position)
 
@@ -172,23 +152,172 @@ class SelectionContainerTest {
 
     @Test
     fun long_press_select_a_word() {
-        // Setup.
-        val characterSize = with(rule.density) { fontSize.toPx() }
+        with(rule.density) {
+            // Setup.
+            // Long Press "m" in "Demo", and "Demo" should be selected.
+            createSelectionContainer()
+            val characterSize = fontSize.toPx()
+            val expectedLeftX = fontSize.toDp().times(textContent.indexOf('D')) - 25.dp
+            val expectedLeftY = fontSize.toDp()
+            val expectedRightX = fontSize.toDp().times(textContent.indexOf('o') + 1)
+            val expectedRightY = fontSize.toDp()
 
-        // Act.
-        longPress(
-            x = textContent.indexOf('m') * characterSize,
-            y = 0.5f * characterSize
-        )
+            // Act.
+            longPress(
+                x = textContent.indexOf('m') * characterSize,
+                y = 0.5f * characterSize
+            )
 
-        // Assert. Should select "Demo".
-        rule.runOnIdle {
-            assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
-            assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
-            verify(
-                hapticFeedback,
-                times(1)
-            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            // Assert. Should select "Demo".
+            rule.runOnIdle {
+                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
+                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
+                verify(
+                    hapticFeedback,
+                    times(1)
+                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            }
+            rule.doubleSelectionHandleMatches(
+                0,
+                matchesPosition(
+                    composeViewAbsolutePos.x.toDp() + expectedRightX,
+                    composeViewAbsolutePos.y.toDp() + expectedRightY
+                )
+            )
+            rule.doubleSelectionHandleMatches(
+                1,
+                matchesPosition(
+                    composeViewAbsolutePos.x.toDp() + expectedLeftX,
+                    composeViewAbsolutePos.y.toDp() + expectedLeftY
+                )
+            )
+        }
+    }
+
+    @Test
+    fun long_press_select_a_word_rtl_layout() {
+        with(rule.density) {
+            // Setup.
+            // Long Press "m" in "Demo", and "Demo" should be selected.
+            createSelectionContainer(isRtl = true)
+            val characterSize = fontSize.toPx()
+            val expectedLeftX =
+                rule.rootWidth() - fontSize.toDp().times(textContent.length) - 25.dp
+            val expectedLeftY = fontSize.toDp()
+            val expectedRightX = rule.rootWidth() - fontSize.toDp().times(" Demo Text".length)
+            val expectedRightY = fontSize.toDp()
+
+            // Act.
+            longPress(
+                x = rule.rootWidth().toSp().toPx() - "xt Demo Text".length * characterSize,
+                y = 0.5f * characterSize
+            )
+
+            // Assert. Should select "Demo".
+            rule.runOnIdle {
+                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('T'))
+                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('t') + 1)
+                verify(
+                    hapticFeedback,
+                    times(1)
+                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            }
+            rule.doubleSelectionHandleMatches(
+                0,
+                matchesPosition(
+                    composeViewAbsolutePos.x.toDp() + expectedRightX,
+                    composeViewAbsolutePos.y.toDp() + expectedRightY
+                )
+            )
+            rule.doubleSelectionHandleMatches(
+                1,
+                matchesPosition(
+                    composeViewAbsolutePos.x.toDp() + expectedLeftX,
+                    composeViewAbsolutePos.y.toDp() + expectedLeftY
+                )
+            )
+        }
+    }
+
+    private fun createSelectionContainer(isRtl: Boolean = false) {
+        val measureLatch = CountDownLatch(1)
+
+        val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+        with(rule.density) {
+            rule.setContent {
+                // Get the compose view position on screen
+                val composeView = androidx.compose.ui.platform.ViewAmbient.current
+                val positionArray = IntArray(2)
+                composeView.getLocationOnScreen(positionArray)
+                composeViewAbsolutePos = IntOffset(
+                    positionArray[0],
+                    positionArray[1]
+                )
+                Providers(
+                    HapticFeedBackAmbient provides hapticFeedback,
+                    LayoutDirectionAmbient provides layoutDirection
+                ) {
+                    TestParent(Modifier.gestureSpy(log)) {
+                        SelectionContainer(
+                            modifier = Modifier.onGloballyPositioned {
+                                measureLatch.countDown()
+                            },
+                            selection = selection.value,
+                            onSelectionChange = {
+                                selection.value = it
+                                gestureCountDownLatch.countDown()
+                            }
+                        ) {
+                            CoreText(
+                                AnnotatedString(textContent),
+                                Modifier.fillMaxSize(),
+                                style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                                softWrap = true,
+                                overflow = TextOverflow.Clip,
+                                maxLines = Int.MAX_VALUE,
+                                inlineContent = mapOf(),
+                                onTextLayout = {}
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        rule.activityRule.scenario.onActivity {
+            view = it.findViewById<ViewGroup>(android.R.id.content)
+        }
+    }
+
+    private fun matchesPosition(expectedX: Dp, expectedY: Dp): BoundedMatcher<View, View> {
+        return object : BoundedMatcher<View, View>(View::class.java) {
+            // (-1, -1) no position found
+            var positionFound = IntOffset(-1, -1)
+
+            override fun matchesSafely(item: View?): Boolean {
+                with(rule.density) {
+                    val position = IntArray(2)
+                    item?.getLocationOnScreen(position)
+                    positionFound = IntOffset(position[0], position[1])
+
+                    val expectedPositionXInt = expectedX.value.roundToInt()
+                    val expectedPositionYInt = expectedY.value.roundToInt()
+                    val positionFoundXInt = positionFound.x.toDp().value.roundToInt()
+                    val positionFoundYInt = positionFound.y.toDp().value.roundToInt()
+                    return abs(expectedPositionXInt - positionFoundXInt) < 5 &&
+                        abs(expectedPositionYInt - positionFoundYInt) < 5
+                }
+            }
+
+            override fun describeTo(description: Description?) {
+                with(rule.density) {
+                    description?.appendText(
+                        "with expected position: " +
+                            "${expectedX.value}, ${expectedY.value} " +
+                            "but position found:" +
+                            "${positionFound.x.toDp().value}, ${positionFound.y.toDp().value}"
+                    )
+                }
+            }
         }
     }
 
