@@ -119,7 +119,8 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     private fun writeConfigFileContent() {
         val testApk = testLoader.get().load(testFolder.get())
             ?: throw RuntimeException("Cannot load test APK for $name")
-        val testName = testApk.elements.single().outputFile.substringAfterLast("/")
+        val testName = testApk.elements.single().outputFile
+            .substringAfterLast("/").renameApkForTesting(project)
         val configContent: String
         /*
         Testing an Android Application project involves 2 APKS: an application to be instrumented,
