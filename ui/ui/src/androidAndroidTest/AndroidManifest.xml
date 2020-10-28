@@ -25,5 +25,6 @@
             android:theme="@style/Theme.AppCompat"/>
         <activity android:name="androidx.fragment.app.FragmentActivity"/>
         <activity android:name="androidx.compose.ui.window.ActivityWithFlagSecure"/>
+        <activity android:name="androidx.compose.ui.RecyclerViewActivity" />
     </application>
 </manifest>
