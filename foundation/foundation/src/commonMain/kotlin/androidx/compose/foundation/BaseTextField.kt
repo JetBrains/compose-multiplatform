@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,7 +29,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 
 /**
  * Composable that enables users to edit text via hardware or software keyboard.
@@ -113,8 +111,7 @@ fun BaseTextField(
 
     CoreTextField(
         value = value,
-        modifier = modifier
-            .defaultMinSizeConstraints(minWidth = DefaultTextFieldWidth),
+        modifier = modifier,
         onValueChange = {
             onValueChange(it)
         },
@@ -130,5 +127,3 @@ fun BaseTextField(
         cursorColor = cursorColor
     )
 }
-
-private val DefaultTextFieldWidth = 280.dp
