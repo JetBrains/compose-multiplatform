@@ -431,6 +431,13 @@ class SlotTable {
      */
     @Suppress("unused")
     private fun groupSizes() = groups.groupSizes(groupsSize * Group_Fields_Size)
+
+    @Suppress("unused")
+    internal fun slotsOf(group: Int): List<Any?> {
+        val start = groups.dataAnchor(group)
+        val end = if (group + 1 < groupsSize) groups.dataAnchor(group + 1) else slots.size
+        return slots.toList().subList(start, end)
+    }
 }
 
 /**
@@ -1797,45 +1804,47 @@ class SlotWriter internal constructor(
     private fun moveGroupGapTo(index: Int) {
         val gapLen = groupGapLen
         val gapStart = groupGapStart
-        if (gapLen > 0 && gapStart != index) {
-            val groups = groups
+        if (gapStart != index) {
             if (anchors.isNotEmpty()) updateAnchors(gapStart, index)
-            // Here physical is used to mean an index of the actual first int of the group in the
-            // array as opposed ot the logical address which is in groups of Group_Field_Size
-            // integers. IntArray.copyInto expects physical indexes.
-            val groupPhysicalAddress = index * Group_Fields_Size
-            val groupPhysicalGapLen = gapLen * Group_Fields_Size
-            val groupPhysicalGapStart = gapStart * Group_Fields_Size
-            if (index < gapStart) {
-                groups.copyInto(
-                    destination = groups,
-                    destinationOffset = groupPhysicalAddress + groupPhysicalGapLen,
-                    startIndex = groupPhysicalAddress,
-                    endIndex = groupPhysicalGapStart
-                )
-            } else {
-                groups.copyInto(
-                    destination = groups,
-                    destinationOffset = groupPhysicalGapStart,
-                    startIndex = groupPhysicalGapStart + groupPhysicalGapLen,
-                    endIndex = groupPhysicalAddress + groupPhysicalGapLen
-                )
-            }
-
-            // Gap has moved so the anchor for the groups that moved have changed so the parent
-            // anchors that refer to these groups must be updated.
-            var groupAddress = if (index < gapStart) index + gapLen else gapStart
-            val capacity = capacity
-            check(groupAddress < capacity)
-            while (groupAddress < capacity) {
-                val oldAnchor = groups.parentAnchor(groupAddress)
-                val oldIndex = parentAnchorToIndex(oldAnchor)
-                val newAnchor = parentIndexToAnchor(oldIndex, index)
-                if (newAnchor != oldAnchor) {
-                    groups.updateParentAnchor(groupAddress, newAnchor)
+            if (gapLen > 0) {
+                val groups = groups
+                // Here physical is used to mean an index of the actual first int of the group in the
+                // array as opposed ot the logical address which is in groups of Group_Field_Size
+                // integers. IntArray.copyInto expects physical indexes.
+                val groupPhysicalAddress = index * Group_Fields_Size
+                val groupPhysicalGapLen = gapLen * Group_Fields_Size
+                val groupPhysicalGapStart = gapStart * Group_Fields_Size
+                if (index < gapStart) {
+                    groups.copyInto(
+                        destination = groups,
+                        destinationOffset = groupPhysicalAddress + groupPhysicalGapLen,
+                        startIndex = groupPhysicalAddress,
+                        endIndex = groupPhysicalGapStart
+                    )
+                } else {
+                    groups.copyInto(
+                        destination = groups,
+                        destinationOffset = groupPhysicalGapStart,
+                        startIndex = groupPhysicalGapStart + groupPhysicalGapLen,
+                        endIndex = groupPhysicalAddress + groupPhysicalGapLen
+                    )
                 }
-                groupAddress++
-                if (groupAddress == index) groupAddress += gapLen
+
+                // Gap has moved so the anchor for the groups that moved have changed so the parent
+                // anchors that refer to these groups must be updated.
+                var groupAddress = if (index < gapStart) index + gapLen else gapStart
+                val capacity = capacity
+                check(groupAddress < capacity)
+                while (groupAddress < capacity) {
+                    val oldAnchor = groups.parentAnchor(groupAddress)
+                    val oldIndex = parentAnchorToIndex(oldAnchor)
+                    val newAnchor = parentIndexToAnchor(oldIndex, index)
+                    if (newAnchor != oldAnchor) {
+                        groups.updateParentAnchor(groupAddress, newAnchor)
+                    }
+                    groupAddress++
+                    if (groupAddress == index) groupAddress += gapLen
+                }
             }
         }
         this.groupGapStart = index
