@@ -65,11 +65,11 @@ import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
-import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.InternalTextApi
@@ -582,6 +582,10 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     private fun invalidateLayers(node: LayoutNode) {
         node.invalidateLayers()
         node._children.forEach { invalidateLayers(it) }
+    }
+
+    override fun invalidateDescendants() {
+        invalidateLayers(root)
     }
 
     override fun onAttachedToWindow() {

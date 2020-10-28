@@ -68,6 +68,11 @@ interface AndroidOwner : Owner {
      */
     fun setOnViewTreeOwnersAvailable(callback: (ViewTreeOwners) -> Unit)
 
+    /**
+     * Called to invalidate the Android [View] sub-hierarchy handled by this Owner.
+     */
+    fun invalidateDescendants()
+
     /** @suppress */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     companion object {
