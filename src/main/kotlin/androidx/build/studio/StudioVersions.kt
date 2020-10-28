@@ -32,7 +32,7 @@ package androidx.build.studio
  * is the [ideaMajorVersion] and the last number (5721125) is the [studioBuildNumber].
  */
 object StudioVersions {
-    val studioVersion = "4.2.0.6"
-    val ideaMajorVersion = "201"
-    val studioBuildNumber = "6712195"
+    val studioVersion = "4.2.0.15"
+    val ideaMajorVersion = "202"
+    val studioBuildNumber = "6922807"
 }
