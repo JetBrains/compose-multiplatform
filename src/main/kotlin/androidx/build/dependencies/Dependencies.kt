@@ -87,6 +87,7 @@ const val LEAKCANARY_INSTRUMENTATION =
     "com.squareup.leakcanary:leakcanary-android-instrumentation:2.2"
 const val MATERIAL = "com.google.android.material:material:1.2.1"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.25.0"
+const val MOCKITO_ANDROID = "org.mockito:mockito-android:2.25.0"
 const val MOCKITO_KOTLIN = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
 const val MULTIDEX = "androidx.multidex:multidex:2.0.1"
 const val NULLAWAY = "com.uber.nullaway:nullaway:0.3.7"
