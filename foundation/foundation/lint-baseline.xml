@@ -4,17 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/Clickable.kt"
-            line="62"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
