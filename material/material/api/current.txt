@@ -296,6 +296,7 @@ package androidx.compose.material {
 
   public final class ElevationKt {
     method public static void animateElevation-K5VTZl0(androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,?>, optional androidx.compose.foundation.Interaction? from, optional androidx.compose.foundation.Interaction? to, float target);
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Dp> getAmbientAbsoluteElevation();
   }
 
   public interface ElevationOverlay {
