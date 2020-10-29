@@ -18,8 +18,8 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSizeIn
-import androidx.compose.foundation.text.FirstBaseline
-import androidx.compose.foundation.text.LastBaseline
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi

@@ -20,9 +20,9 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.paddingFromBaseline
-import androidx.compose.foundation.text.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp

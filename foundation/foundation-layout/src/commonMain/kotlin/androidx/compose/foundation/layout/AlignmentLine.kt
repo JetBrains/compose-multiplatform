@@ -16,8 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.text.FirstBaseline
-import androidx.compose.foundation.text.LastBaseline
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.HorizontalAlignmentLine
@@ -25,6 +23,8 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
