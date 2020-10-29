@@ -36,12 +36,12 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.matchers.MSSIMMatcher
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test

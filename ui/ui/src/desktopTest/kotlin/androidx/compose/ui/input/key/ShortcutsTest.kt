@@ -26,9 +26,9 @@ import androidx.compose.ui.focus
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onRoot
-import androidx.ui.test.performKeyPress
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performKeyPress
 import com.google.common.truth.Truth
 import androidx.compose.ui.unit.dp
 import org.junit.Rule

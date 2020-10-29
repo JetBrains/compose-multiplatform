@@ -24,23 +24,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
+import androidx.compose.ui.test.isToggleable
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.move
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.up
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.test.screenshot.assertAgainstGolden
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.center
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.down
-import androidx.ui.test.isToggleable
-import androidx.ui.test.move
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
-import androidx.ui.test.up
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)

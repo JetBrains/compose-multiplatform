@@ -23,8 +23,8 @@ import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.SmallTest
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

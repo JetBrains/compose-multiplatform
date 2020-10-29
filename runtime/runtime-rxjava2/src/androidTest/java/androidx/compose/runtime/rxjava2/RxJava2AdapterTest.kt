@@ -21,8 +21,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Maybe

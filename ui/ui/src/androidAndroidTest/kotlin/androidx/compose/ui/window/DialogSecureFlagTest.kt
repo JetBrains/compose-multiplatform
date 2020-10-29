@@ -27,10 +27,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.test.isDialog
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.isDialog
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

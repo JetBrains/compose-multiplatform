@@ -43,6 +43,10 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
+import androidx.compose.ui.test.assertPixels
+import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -55,10 +59,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertPixels
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.equalTo

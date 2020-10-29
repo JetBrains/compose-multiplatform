@@ -17,7 +17,7 @@
 package androidx.compose.runtime
 
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import kotlinx.coroutines.channels.Channel
 import org.junit.Rule
 import org.junit.Test

@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.ViewAmbient
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

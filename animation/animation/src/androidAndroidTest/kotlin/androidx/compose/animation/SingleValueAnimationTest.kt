@@ -33,18 +33,18 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Position
 import androidx.compose.ui.unit.PxBounds
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest

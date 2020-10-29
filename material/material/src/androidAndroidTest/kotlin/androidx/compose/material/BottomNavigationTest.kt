@@ -15,8 +15,8 @@
  */
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.samples.BottomNavigationSample
@@ -25,29 +25,29 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.isInMutuallyExclusiveGroup
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.assertCountEquals
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsEqualTo
-import androidx.ui.test.assertIsNotDisplayed
-import androidx.ui.test.assertIsNotSelected
-import androidx.ui.test.assertIsSelected
-import androidx.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.getUnclippedBoundsInRoot
-import androidx.ui.test.isInMutuallyExclusiveGroup
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onNodeWithText
-import androidx.ui.test.performClick
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

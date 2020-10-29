@@ -34,13 +34,13 @@ import androidx.compose.testutils.doFramesUntilNoChangesPending
 import androidx.compose.testutils.forGivenTestCase
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createAndroidComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 /**
  * Test simulating an immutable and observable theme object, to ensure recomposition correctness
