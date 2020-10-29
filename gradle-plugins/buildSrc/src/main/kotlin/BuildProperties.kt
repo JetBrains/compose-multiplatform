@@ -1,6 +1,6 @@
 // "Global" properties
 object BuildProperties {
-    const val name = "Jetpack Compose Plugin"
+    const val name = "JetBrains Compose Plugin"
     const val group = "org.jetbrains.compose"
     const val website = "https://jetbrains.org/compose"
     const val vcs = "https://github.com/JetBrains/compose-jb"

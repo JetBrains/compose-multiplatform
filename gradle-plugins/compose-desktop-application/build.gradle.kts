@@ -11,7 +11,7 @@ plugins {
 gradlePluginConfig {
     pluginId = "org.jetbrains.compose.desktop.application"
     artifactId = "compose-desktop-application-gradle-plugin"
-    displayName = "Jetpack Compose Desktop Application Plugin"
+    displayName = "JetBrains Compose Desktop Application Plugin"
     description = "Plugin for creating native distributions and run configurations"
     implementationClass = "org.jetbrains.compose.desktop.application.ApplicationPlugin"
 }

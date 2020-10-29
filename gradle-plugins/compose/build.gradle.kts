@@ -9,8 +9,8 @@ plugins {
 gradlePluginConfig {
     pluginId = "org.jetbrains.compose"
     artifactId = "compose-gradle-plugin"
-    displayName = "Jetpack Compose Plugin"
-    description = "Jetpack Compose gradle plugin for easy configuration"
+    displayName = "JetBrains Compose Plugin"
+    description = "JetBrains Compose Gradle plugin for easy configuration"
     implementationClass = "org.jetbrains.compose.ComposePlugin"
 }
 
