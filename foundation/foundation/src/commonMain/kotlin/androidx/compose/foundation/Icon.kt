@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
  *
  * @param asset [VectorAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [asset]. If Color.Unspecified is provided, then no
+ * @param tint tint to be applied to [asset]. If [Color.Unspecified] is provided, then no
  *  tint is applied
  */
 @Deprecated(
@@ -63,7 +63,7 @@ fun Icon(
  *
  * @param asset [ImageAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [asset]. If Color.Unspecified is provided, then no
+ * @param tint tint to be applied to [asset]. If [Color.Unspecified] is provided, then no
  *  tint is applied
  */
 @Deprecated(
@@ -90,7 +90,7 @@ fun Icon(
  *
  * @param painter Painter to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [painter]. If Color.Unspecified is provided, then no
+ * @param tint tint to be applied to [painter]. If [Color.Unspecified] is provided, then no
  *  tint is applied
  */
 @Deprecated(
