@@ -146,6 +146,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             val appApk = appLoader.get().load(appFolder.get())
                 ?: throw RuntimeException("Cannot load application APK for $name")
             val appName = appApk.elements.single().outputFile.substringAfterLast("/")
+                .renameApkForTesting(project)
             TEMPLATE.replace("TEST_FILE_NAME", testName)
                 .replace("APP_FILE_NAME", appName)
                 .replace("APPLICATION_ID", testApk.applicationId)
