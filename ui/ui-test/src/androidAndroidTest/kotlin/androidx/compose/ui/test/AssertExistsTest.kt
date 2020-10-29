@@ -28,13 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.FlakyTest
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class AssertExistsTest {
 
