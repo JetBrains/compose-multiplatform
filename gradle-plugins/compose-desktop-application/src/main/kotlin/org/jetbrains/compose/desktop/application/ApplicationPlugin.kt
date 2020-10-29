@@ -212,7 +212,7 @@ private inline fun <reified T : Task> TaskContainer.composeTask(
     noinline configureFn: T.() -> Unit = {}
 ) = register(name, T::class.java, *args.toTypedArray()).apply {
     configure {
-        it.group = "compose-desktop-application"
+        it.group = "compose desktop"
         it.configureFn()
     }
 }
