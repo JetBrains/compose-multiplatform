@@ -12,6 +12,7 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.ConfigurationSource
 import org.jetbrains.compose.desktop.application.internal.OS
+import org.jetbrains.compose.desktop.application.internal.configureWix
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.provider
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
@@ -22,7 +23,6 @@ import java.util.*
 
 private const val PLUGIN_ID = "org.jetbrains.compose.desktop.application"
 
-// todo: fix windows
 // todo: multiple launchers
 // todo: file associations
 // todo: use workers
@@ -43,6 +43,7 @@ open class ApplicationPlugin : Plugin<Project> {
         }
         project.afterEvaluate {
             project.configurePackagingTasks(listOf(mainApplication))
+            project.configureWix()
         }
     }
 }

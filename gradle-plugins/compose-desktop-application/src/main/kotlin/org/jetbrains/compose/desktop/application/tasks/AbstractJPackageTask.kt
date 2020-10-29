@@ -12,6 +12,7 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecOperations
+import org.gradle.process.ExecSpec
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.cliArg
@@ -53,6 +54,11 @@ abstract class AbstractJPackageTask @Inject constructor(
             .map { "true".equals(it, ignoreCase = true) }
         set(providers.provider { logger.isDebugEnabled }.orElse(composeVerbose))
     }
+
+    @get:InputDirectory
+    @get:Optional
+    /** @see internal/wixToolset.kt */
+    val wixToolsetDir: DirectoryProperty = objects.directoryProperty()
 
     @get:Input
     @get:Optional
@@ -285,12 +291,22 @@ abstract class AbstractJPackageTask @Inject constructor(
             val argsFile = composeBuildDir.resolve("${name}.args.txt")
             argsFile.writeText(args.joinToString("\n"))
 
-            execOperations.exec {
-                it.executable = jpackage.absolutePath
-                it.setArgs(listOf("@${argsFile.absolutePath}"))
+            execOperations.exec { exec ->
+                configureWixPathIfNeeded(exec)
+                exec.executable = jpackage.absolutePath
+                exec.setArgs(listOf("@${argsFile.absolutePath}"))
             }.assertNormalExitValue()
         } finally {
             tmpDir.deleteRecursively()
+        }
+    }
+
+    private fun configureWixPathIfNeeded(exec: ExecSpec) {
+        if (currentOS == OS.Windows) {
+            val wixDir = wixToolsetDir.asFile.orNull ?: return
+            val wixPath = wixDir.absolutePath
+            val path = System.getenv("PATH") ?: ""
+            exec.environment("PATH", "$wixPath;$path")
         }
     }
 }
