@@ -1,6 +1,7 @@
 package org.jetbrains.compose.desktop.application
 
 import org.gradle.api.*
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskContainer
@@ -17,7 +18,9 @@ import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.provider
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationToRunnableFiles
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import java.io.File
 import java.util.*
 
@@ -157,7 +160,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
             val target = configSource.target
             dependsOn(target.artifactsTaskName)
             launcherMainJar.set(app.mainJar.orElse(jarFromJarTaskByName(target.artifactsTaskName)))
-            files.from(project.configurations.named(target.runtimeElementsConfigurationName))
+            files.from(target.runtimeFiles())
         }
     }
     modules.set(provider { app.nativeDistributions.modules })
@@ -191,13 +194,16 @@ private fun Project.configureRunTask(app: Application) {
             is ConfigurationSource.KotlinMppTarget -> {
                 val target = configSource.target
                 dependsOn(target.artifactsTaskName)
-                cp.from(configurations.named(target.runtimeElementsConfigurationName))
+                cp.from(target.runtimeFiles())
             }
         }
 
         classpath = cp
     }
 }
+
+private fun KotlinTarget.runtimeFiles(): FileCollection =
+    (compilations.getByName("main") as KotlinCompilationToRunnableFiles).runtimeDependencyFiles
 
 private fun Application.javaHomeOrDefault(): String =
     javaHome ?: System.getProperty("java.home")
