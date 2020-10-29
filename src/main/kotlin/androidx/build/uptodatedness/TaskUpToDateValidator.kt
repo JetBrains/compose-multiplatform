@@ -86,13 +86,11 @@ val EXEMPT_TASKS = setOf(
      * https://github.com/johnrengelman/shadow/issues/561
      */
     "relocateShadowJar",
-    "reportLibraryMetrics",
     "stripArchiveForPartialDejetification",
     "transformClassesWithDexBuilderForPublicDebug",
     "transformClassesWithDexBuilderForTipOfTreeDebug",
     "unzipDokkaPublicDocsDeps",
     "verifyDependencyVersions",
-    "verifyReleaseResources",
     "zipEcFiles",
     "zipTestConfigsWithApks",
 

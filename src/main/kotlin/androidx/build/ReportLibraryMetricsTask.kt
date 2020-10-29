@@ -18,12 +18,15 @@ package androidx.build
 
 import com.jakewharton.dex.DexParser.Companion.toDexParser
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.json.simple.JSONObject
 import java.io.File
-import java.lang.IllegalStateException
 
 private const val AAR_FILE_EXTENSION = ".aar"
 private const val BYTECODE_SIZE = "bytecode_size"
@@ -45,15 +48,13 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
     @get:InputFiles
     abstract val jarFiles: ConfigurableFileCollection
 
+    @get:OutputFile
+    abstract val outputFile: Property<File>
+
     @TaskAction
     fun reportLibraryMetrics() {
-        val distDir = project.rootProject.getDistributionDirectory()
-        val outputDir = File(distDir.canonicalPath + '/' + METRICS_DIRECTORY)
-        outputDir.mkdirs()
-        val outputFile = File(
-            outputDir,
-            "${project.group}_${project.name}$JSON_FILE_EXTENSION"
-        )
+        val file = outputFile.get()
+        file.parentFile.mkdirs()
         val json = JSONObject()
 
         val jarFiles = getJarFiles()
@@ -67,7 +68,7 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
             json[METHOD_COUNT] = methodCount
         }
 
-        outputFile.writeText(json.toJSONString())
+        file.writeText(json.toJSONString())
     }
 
     private fun getJarFiles(): List<File> {
@@ -88,4 +89,20 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
                 throw IllegalStateException("One or more of the items in $jarFiles is not a file.")
         }
     }
+}
+
+fun Project.configureReportLibraryMetricsTask(): TaskProvider<ReportLibraryMetricsTask> {
+    val task = tasks.register(
+        AndroidXPlugin.REPORT_LIBRARY_METRICS_TASK,
+        ReportLibraryMetricsTask::class.java
+    )
+    task.configure {
+        val outputDir = File(project.rootProject.getDistributionDirectory(), METRICS_DIRECTORY)
+        it.outputFile.set(
+            task.map {
+                File(outputDir, "${project.group}_${project.name}$JSON_FILE_EXTENSION")
+            }
+        )
+    }
+    return task
 }
