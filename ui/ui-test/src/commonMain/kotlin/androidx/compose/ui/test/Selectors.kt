@@ -33,6 +33,7 @@ internal val SemanticsNode.siblings: List<SemanticsNode>
  */
 fun SemanticsNodeInteraction.onParent(): SemanticsNodeInteraction {
     return SemanticsNodeInteraction(
+        testContext,
         useUnmergedTree,
         selector.addSelectionFromSingleNode("parent") { listOfNotNull(it.parent) }
     )
@@ -43,6 +44,7 @@ fun SemanticsNodeInteraction.onParent(): SemanticsNodeInteraction {
  */
 fun SemanticsNodeInteraction.onChildren(): SemanticsNodeInteractionCollection {
     return SemanticsNodeInteractionCollection(
+        testContext,
         useUnmergedTree,
         selector.addSelectionFromSingleNode("children") { it.children }
     )
@@ -59,6 +61,7 @@ fun SemanticsNodeInteraction.onChildren(): SemanticsNodeInteractionCollection {
  */
 fun SemanticsNodeInteraction.onChild(): SemanticsNodeInteraction {
     return SemanticsNodeInteraction(
+        testContext,
         useUnmergedTree,
         selector.addSelectionFromSingleNode("child") { it.children }
     )
@@ -85,6 +88,7 @@ fun SemanticsNodeInteraction.onChildAt(index: Int): SemanticsNodeInteraction = o
  */
 fun SemanticsNodeInteraction.onSiblings(): SemanticsNodeInteractionCollection {
     return SemanticsNodeInteractionCollection(
+        testContext,
         useUnmergedTree,
         selector.addSelectionFromSingleNode("siblings") { it.siblings }
     )
@@ -101,6 +105,7 @@ fun SemanticsNodeInteraction.onSiblings(): SemanticsNodeInteractionCollection {
  */
 fun SemanticsNodeInteraction.onSibling(): SemanticsNodeInteraction {
     return SemanticsNodeInteraction(
+        testContext,
         useUnmergedTree,
         selector.addSelectionFromSingleNode("sibling") { it.siblings }
     )
@@ -119,6 +124,7 @@ fun SemanticsNodeInteraction.onSibling(): SemanticsNodeInteraction {
  */
 fun SemanticsNodeInteraction.onAncestors(): SemanticsNodeInteractionCollection {
     return SemanticsNodeInteractionCollection(
+        testContext,
         useUnmergedTree,
         selector.addSelectionFromSingleNode("ancestors") { it.ancestors.toList() }
     )
@@ -143,7 +149,11 @@ fun SemanticsNodeInteractionCollection.onFirst(): SemanticsNodeInteraction {
  * no element is found.
  */
 fun SemanticsNodeInteractionCollection.onLast(): SemanticsNodeInteraction {
-    return SemanticsNodeInteraction(useUnmergedTree, selector.addLastNodeSelector())
+    return SemanticsNodeInteraction(
+        testContext,
+        useUnmergedTree,
+        selector.addLastNodeSelector()
+    )
 }
 
 /**
@@ -155,6 +165,7 @@ fun SemanticsNodeInteractionCollection.filter(
     matcher: SemanticsMatcher
 ): SemanticsNodeInteractionCollection {
     return SemanticsNodeInteractionCollection(
+        testContext,
         useUnmergedTree,
         selector.addSelectorViaMatcher("filter", matcher)
     )
@@ -173,6 +184,7 @@ fun SemanticsNodeInteractionCollection.filterToOne(
     matcher: SemanticsMatcher
 ): SemanticsNodeInteraction {
     return SemanticsNodeInteraction(
+        testContext,
         useUnmergedTree,
         selector.addSelectorViaMatcher("filterToOne", matcher)
     )

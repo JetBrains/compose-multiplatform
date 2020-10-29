@@ -18,7 +18,7 @@ package androidx.compose.ui.test.assertions
 
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag

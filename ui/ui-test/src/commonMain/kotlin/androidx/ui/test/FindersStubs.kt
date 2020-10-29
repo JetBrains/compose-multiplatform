@@ -16,6 +16,7 @@
 
 package androidx.ui.test
 
+import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.onAllNodesWithLabel
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -26,51 +27,52 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onNodeWithTag(
+fun SemanticsNodeInteractionsProvider.onNodeWithTag(
     testTag: String,
     useUnmergedTree: Boolean = false
 ) = onNodeWithTag(testTag, useUnmergedTree)
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onAllNodesWithTag(
+fun SemanticsNodeInteractionsProvider.onAllNodesWithTag(
     testTag: String,
     useUnmergedTree: Boolean = false
 ) = onAllNodesWithTag(testTag, useUnmergedTree)
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onNodeWithLabel(
+fun SemanticsNodeInteractionsProvider.onNodeWithLabel(
     label: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
 ) = onNodeWithLabel(label, ignoreCase, useUnmergedTree)
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onNodeWithText(
+fun SemanticsNodeInteractionsProvider.onNodeWithText(
     text: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
 ) = onNodeWithText(text, ignoreCase, useUnmergedTree)
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onNodeWithSubstring(
+fun SemanticsNodeInteractionsProvider.onNodeWithSubstring(
     text: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
 ) = onNodeWithSubstring(text, ignoreCase, useUnmergedTree)
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onAllNodesWithText(
+fun SemanticsNodeInteractionsProvider.onAllNodesWithText(
     text: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
 ) = onAllNodesWithText(text, ignoreCase, useUnmergedTree)
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onAllNodesWithLabel(
+fun SemanticsNodeInteractionsProvider.onAllNodesWithLabel(
     label: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
 ) = onAllNodesWithLabel(label, ignoreCase, useUnmergedTree)
 
 /** @Deprecated Moved to androidx.compose.ui.test */
-fun ComposeTestRule.onRoot(useUnmergedTree: Boolean = false) = onRoot(useUnmergedTree)
+fun SemanticsNodeInteractionsProvider.onRoot(useUnmergedTree: Boolean = false) =
+    onRoot(useUnmergedTree)

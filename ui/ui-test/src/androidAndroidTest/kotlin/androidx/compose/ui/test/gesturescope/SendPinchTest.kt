@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.inMilliseconds
 import androidx.compose.ui.unit.milliseconds
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.pinch

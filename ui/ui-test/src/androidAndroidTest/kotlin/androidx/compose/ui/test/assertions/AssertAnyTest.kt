@@ -18,7 +18,7 @@ package androidx.compose.ui.test.assertions
 
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.assertAny
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag

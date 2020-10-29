@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.accessibilityLabel
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
 import org.junit.Rule
 import org.junit.Test

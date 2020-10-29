@@ -17,7 +17,7 @@
 package androidx.compose.ui.test.inputdispatcher
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.test.util.expectError
+import androidx.compose.testutils.expectError
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 

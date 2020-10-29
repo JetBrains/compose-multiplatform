@@ -98,7 +98,7 @@ private val doubleClickDelay = 145.milliseconds
  *    }
  * ```
  */
-class GestureScope(node: SemanticsNode) {
+class GestureScope(node: SemanticsNode, testContext: TestContext) {
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _semanticsNode: SemanticsNode? = node
     internal val semanticsNode
@@ -112,7 +112,7 @@ class GestureScope(node: SemanticsNode) {
 
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _inputDispatcher: InputDispatcher? =
-        InputDispatcher(checkNotNull(owner))
+        InputDispatcher(testContext, checkNotNull(owner))
     internal val inputDispatcher
         get() = checkNotNull(_inputDispatcher) {
             "Can't send gesture, (Partial)GestureScope has already been disposed"

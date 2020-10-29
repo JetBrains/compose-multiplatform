@@ -35,7 +35,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.DisableTransitionsTestRule
+import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex

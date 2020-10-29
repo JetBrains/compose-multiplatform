@@ -17,15 +17,19 @@
 package androidx.compose.ui.test.inputdispatcher
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.AndroidInputDispatcher
-import androidx.compose.ui.test.AndroidInputDispatcher.InputDispatcherTestRule
+import androidx.compose.ui.test.InputDispatcher
+import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.createTestContext
+import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MotionEventRecorder
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
 import org.junit.Rule
 import org.junit.rules.TestRule
 
+@OptIn(InternalTestingApi::class)
 open class InputDispatcherTest(eventPeriodOverride: Long? = null) {
 
     @get:Rule
@@ -35,7 +39,8 @@ open class InputDispatcherTest(eventPeriodOverride: Long? = null) {
     )
 
     internal val recorder = MotionEventRecorder()
-    internal val subject = AndroidInputDispatcher(null, recorder::recordEvent)
+    private val testContext = createTestContext(mock())
+    internal val subject = AndroidInputDispatcher(testContext, null, recorder::recordEvent)
 
     @After
     fun tearDown() {

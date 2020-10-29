@@ -19,9 +19,8 @@ package androidx.compose.ui.test.gesturescope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.doubleTapGestureFilter
-import androidx.compose.ui.test.AndroidInputDispatcher.InputDispatcherTestRule
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
-import androidx.compose.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.doubleClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -31,6 +30,7 @@ import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.ClickableTestBox.defaultSize
 import androidx.compose.ui.test.util.ClickableTestBox.defaultTag
+import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
 import androidx.compose.ui.test.util.recordedDuration
 import com.google.common.truth.Truth.assertThat

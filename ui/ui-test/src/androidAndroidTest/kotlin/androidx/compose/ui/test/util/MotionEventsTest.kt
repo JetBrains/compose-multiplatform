@@ -17,6 +17,7 @@
 package androidx.compose.ui.test.util
 
 import android.view.MotionEvent
+import androidx.compose.testutils.expectAssertionError
 import androidx.test.filters.SmallTest
 import org.junit.After
 import org.junit.Before

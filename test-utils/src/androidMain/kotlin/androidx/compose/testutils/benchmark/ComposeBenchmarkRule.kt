@@ -23,7 +23,7 @@ import androidx.compose.testutils.ComposeBenchmarkScope
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
-import androidx.compose.ui.test.DisableTransitionsTestRule
+import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
 import androidx.compose.ui.test.InternalTestingApi
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule

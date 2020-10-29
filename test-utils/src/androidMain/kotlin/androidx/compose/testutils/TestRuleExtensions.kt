@@ -17,7 +17,7 @@
 package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.AndroidComposeTestRule
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 
 /**
  * Takes the given test case and prepares it for execution-controlled test via
