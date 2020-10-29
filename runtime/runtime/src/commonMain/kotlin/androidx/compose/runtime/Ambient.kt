@@ -92,7 +92,17 @@ abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> 
      * @see ProvidableAmbient
      */
     @Suppress("UNCHECKED_CAST")
-    infix fun provides(value: T) = ProvidedValue(this, value)
+    infix fun provides(value: T) = ProvidedValue(this, value, true)
+
+    /**
+     * Associates an ambient key to a value in a call to [Providers] if the key does not
+     * already have an associated value.
+     *
+     * @see Ambient
+     * @see ProvidableAmbient
+     */
+    @Suppress("UNCHECKED_CAST")
+    infix fun providesDefault(value: T) = ProvidedValue(this, value, false)
 }
 
 /**

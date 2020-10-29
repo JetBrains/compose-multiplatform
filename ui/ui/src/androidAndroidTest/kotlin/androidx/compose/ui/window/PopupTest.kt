@@ -30,9 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Owner
+import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.test.espresso.Espresso
@@ -206,6 +208,21 @@ class PopupTest {
         }
         rule.runOnIdle {
             assertThat(value).isEqualTo(1f)
+        }
+    }
+
+    @Test
+    fun preservesLayoutDirection() {
+        var value = LayoutDirection.Ltr
+        rule.setContent {
+            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+                Popup {
+                    value = LayoutDirectionAmbient.current
+                }
+            }
+        }
+        rule.runOnIdle {
+            assertThat(value).isEqualTo(LayoutDirection.Rtl)
         }
     }
 
