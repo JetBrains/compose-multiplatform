@@ -38,8 +38,9 @@ import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.IntrinsicMeasureBlock
+import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -67,8 +68,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 /** The default selection color if none is specified. */
@@ -335,16 +334,6 @@ private class TextController(val state: TextState) {
         }
     }
 }
-
-/**
- * [AlignmentLine] defined by the baseline of a first line of a [CoreText].
- */
-val FirstBaseline = HorizontalAlignmentLine(::min)
-
-/**
- * [AlignmentLine] defined by the baseline of the last line of a [CoreText].
- */
-val LastBaseline = HorizontalAlignmentLine(::max)
 
 @OptIn(InternalTextApi::class)
 @VisibleForTesting

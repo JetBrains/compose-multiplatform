@@ -17,6 +17,8 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Immutable
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Defines an offset line that can be used by parent layouts to align and position their children.
@@ -92,3 +94,13 @@ class VerticalAlignmentLine(merger: (Int, Int) -> Int) : AlignmentLine(merger)
  * @param merger How to merge two alignment line values defined by different children
  */
 class HorizontalAlignmentLine(merger: (Int, Int) -> Int) : AlignmentLine(merger)
+
+/**
+ * [AlignmentLine] defined by the baseline of a first line of a [androidx.foundation.text.CoreText]
+ */
+val FirstBaseline = HorizontalAlignmentLine(::min)
+
+/**
+ * [AlignmentLine] defined by the baseline of the last line of a [androidx.foundation.text.CoreText]
+ */
+val LastBaseline = HorizontalAlignmentLine(::max)
