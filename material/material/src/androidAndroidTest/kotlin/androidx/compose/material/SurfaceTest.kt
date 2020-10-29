@@ -18,13 +18,18 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.assertPixels
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -32,6 +37,7 @@ import androidx.ui.test.assertShape
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
+import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,5 +77,72 @@ class SurfaceTest {
                 shapeColor = Color.Green,
                 backgroundColor = Color.White
             )
+    }
+
+    @Test
+    fun absoluteElevationAmbientIsSet() {
+        var outerElevation: Dp? = null
+        var innerElevation: Dp? = null
+        rule.setMaterialContent {
+            Surface(elevation = 2.dp) {
+                outerElevation = AmbientAbsoluteElevation.current
+                Surface(elevation = 4.dp) {
+                    innerElevation = AmbientAbsoluteElevation.current
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(outerElevation).isEqualTo(2.dp)
+            Truth.assertThat(innerElevation).isEqualTo(6.dp)
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun absoluteElevationIsNotUsedForShadows() {
+        rule.setMaterialContent {
+            Column {
+                Box(
+                    Modifier
+                        .padding(10.dp)
+                        .preferredSize(10.dp, 10.dp)
+                        .semantics(mergeAllDescendants = true) {}
+                        .testTag("top level")
+                ) {
+                    Surface(
+                        Modifier.fillMaxSize().padding(2.dp),
+                        elevation = 2.dp,
+                        color = Color.Blue,
+                        content = emptyContent()
+                    )
+                }
+
+                // Nested surface to increase the absolute elevation
+                Surface(elevation = 2.dp) {
+                    Box(
+                        Modifier
+                            .padding(10.dp)
+                            .preferredSize(10.dp, 10.dp)
+                            .semantics(mergeAllDescendants = true) {}
+                            .testTag("nested")
+                    ) {
+                        Surface(
+                            Modifier.fillMaxSize().padding(2.dp),
+                            elevation = 2.dp,
+                            color = Color.Blue,
+                            content = emptyContent()
+                        )
+                    }
+                }
+            }
+        }
+
+        val topLevelSurfaceBitmap = rule.onNodeWithTag("top level").captureToBitmap()
+        val nestedSurfaceBitmap = rule.onNodeWithTag("nested").captureToBitmap()
+
+        topLevelSurfaceBitmap.assertPixels {
+            Color(nestedSurfaceBitmap.getPixel(it.x, it.y))
+        }
     }
 }

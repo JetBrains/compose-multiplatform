@@ -46,13 +46,16 @@ import androidx.compose.ui.unit.dp
  * 1) Clipping: Surface clips its children to the shape specified by [shape]
  *
  * 2) Elevation: Surface elevates its children on the Z axis by [elevation] pixels,
- *   and draws the appropriate shadow.
+ * and draws the appropriate shadow.
  *
  * 3) Borders: If [shape] has a border, then it will also be drawn.
  *
  * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
  * [Colors.surface], the [ElevationOverlay] from [AmbientElevationOverlay] will be used to apply
- * an overlay - by default this will only occur in dark theme.
+ * an overlay - by default this will only occur in dark theme. The color of the overlay depends
+ * on the [elevation] of this Surface, and the [AmbientAbsoluteElevation] set by any parent
+ * surfaces. This ensures that a Surface never appears to have a lower elevation overlay than its
+ * ancestors, by summing the elevation of all previous Surfaces.
  *
  * 5) Content color: Surface uses [contentColor] to specify a preferred color for the content of
  * this surface - this is used by the [Text] and [Icon] components as a default color.
@@ -93,8 +96,9 @@ fun Surface(
 ) {
     val elevationPx = with(DensityAmbient.current) { elevation.toPx() }
     val elevationOverlay = AmbientElevationOverlay.current
+    val absoluteElevation = AmbientAbsoluteElevation.current + elevation
     val backgroundColor = if (color == MaterialTheme.colors.surface && elevationOverlay != null) {
-        elevationOverlay.apply(color, elevation)
+        elevationOverlay.apply(color, absoluteElevation)
     } else {
         color
     }
@@ -107,7 +111,11 @@ fun Surface(
             )
             .clip(shape)
     ) {
-        Providers(AmbientContentColor provides contentColor, children = content)
+        Providers(
+            AmbientContentColor provides contentColor,
+            AmbientAbsoluteElevation provides absoluteElevation,
+            children = content
+        )
     }
 }
 
