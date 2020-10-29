@@ -45,10 +45,11 @@ open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
 
 open class WindowsPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
     var console: Boolean = false
-    var dirChooser: Boolean = false
+    var dirChooser: Boolean = true
     var perUserInstall: Boolean = false
     var shortcut: Boolean = false
     var menu: Boolean = false
+        get() = field || menuGroup != null
     var menuGroup: String? = null
     var upgradeUuid: String? = null
 }
