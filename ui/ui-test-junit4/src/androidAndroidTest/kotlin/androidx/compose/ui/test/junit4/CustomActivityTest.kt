@@ -24,7 +24,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.onNodeWithText
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +50,7 @@ class CustomActivity : ComponentActivity() {
 /**
  * Tests that we can launch custom activities via [createAndroidComposeRule].
  */
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class CustomActivityTest {
 
