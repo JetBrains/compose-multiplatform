@@ -149,9 +149,6 @@ tasks.withType(KotlinCompile).configureEach {
 
 // Screenshot tests related setup
 android {
-    defaultConfig {
-        testInstrumentationRunnerArgument("thisisignored", "thisisignored --no-isolated-storage")
-    }
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/material/material"
 }
