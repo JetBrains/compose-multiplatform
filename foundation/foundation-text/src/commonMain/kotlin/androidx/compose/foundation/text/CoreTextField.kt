@@ -428,8 +428,7 @@ fun CoreTextField(
         }
     }
 
-    val cursorModifier =
-        Modifier.cursor(state, value, offsetMap, cursorColor)
+    val cursorModifier = Modifier.cursor(state, value, offsetMap, cursorColor)
 
     onDispose { manager.hideSelectionToolbar() }
 
@@ -471,9 +470,10 @@ fun CoreTextField(
         if (state.hasFocus && state.selectionIsOn) {
             manager.state?.layoutResult?.let {
                 if (!value.selection.collapsed) {
-                    val startDirection = it.getBidiRunDirection(value.selection.start)
-                    val endDirection =
-                        it.getBidiRunDirection(max(value.selection.end - 1, 0))
+                    val startOffset = offsetMap.originalToTransformed(value.selection.start)
+                    val endOffset = offsetMap.originalToTransformed(value.selection.end)
+                    val startDirection = it.getBidiRunDirection(startOffset)
+                    val endDirection = it.getBidiRunDirection(max(endOffset - 1, 0))
                     val directions = Pair(startDirection, endDirection)
                     TextFieldSelectionHandle(
                         isStartHandle = true,
