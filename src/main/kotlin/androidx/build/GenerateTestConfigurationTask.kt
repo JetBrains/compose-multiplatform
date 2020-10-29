@@ -26,7 +26,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.getValue
 import java.io.File
 
 private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
@@ -44,7 +43,7 @@ private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         -->
         <configuration description="Runs tests for the module">
         <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
-            <option name="min-api-level" value="MIN_SDK">
+            <option name="min-api-level" value="MIN_SDK" />
         </object>
         <option name="test-suite-tag" value="androidx_unit_tests" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
@@ -77,7 +76,7 @@ private const val SELF_INSTRUMENTING_TEMPLATE = """<?xml version="1.0" encoding=
         -->
         <configuration description="Runs tests for the module">
         <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
-            <option name="min-api-level" value="MIN_SDK">
+            <option name="min-api-level" value="MIN_SDK" />
         </object>
         <option name="test-suite-tag" value="androidx_unit_tests" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
