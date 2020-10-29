@@ -23,7 +23,6 @@ import android.os.Build
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
@@ -104,7 +103,6 @@ class TextFieldTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val DefaultTextFieldWidth = 280.dp
     private val Tag = "textField"
 
     @Test
@@ -339,49 +337,6 @@ class TextFieldTest {
 
             // Don't care about the intermediate state update. It should eventually be "123"
             assertThat(layoutCaptor.lastValue.layoutInput.text.text).isEqualTo("123")
-        }
-    }
-
-    @Test
-    fun textField_hasDefaultWidth() {
-        var size: Int? = null
-        rule.setContent {
-            Box {
-                BaseTextField(
-                    value = TextFieldValue(),
-                    onValueChange = {},
-                    modifier = Modifier.onGloballyPositioned {
-                        size = it.size.width
-                    }
-                )
-            }
-        }
-
-        with(rule.density) {
-            assertThat(size).isEqualTo(DefaultTextFieldWidth.toIntPx())
-        }
-    }
-
-    @Test
-    fun textField_respectsWidthSetByModifier() {
-        val textFieldWidth = 100.dp
-        var size: Int? = null
-        rule.setContent {
-            Box {
-                BaseTextField(
-                    value = TextFieldValue(),
-                    onValueChange = {},
-                    modifier = Modifier
-                        .preferredWidth(textFieldWidth)
-                        .onGloballyPositioned {
-                            size = it.size.width
-                        }
-                )
-            }
-        }
-
-        with(rule.density) {
-            assertThat(size).isEqualTo(textFieldWidth.toIntPx())
         }
     }
 
