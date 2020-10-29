@@ -38,13 +38,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.test.espresso.Espresso.onIdle
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 
-@MediumTest
+@LargeTest
 class TestAnimationClockTest {
 
     private var animationRunning = false
