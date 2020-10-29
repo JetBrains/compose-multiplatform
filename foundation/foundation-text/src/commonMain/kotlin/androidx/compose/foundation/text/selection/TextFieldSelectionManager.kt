@@ -34,6 +34,7 @@ import androidx.compose.ui.selection.getAdjustedCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -123,7 +124,7 @@ internal class TextFieldSelectionManager() {
                     )
                     hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
-                    val newValue = TextFieldValue(
+                    val newValue = createTextFieldValue(
                         text = value.text,
                         selection = TextRange(offset, offset)
                     )
@@ -137,13 +138,11 @@ internal class TextFieldSelectionManager() {
             if (value.text == "") return
             enterSelectionMode()
             state?.layoutResult?.let { layoutResult ->
-                val offset = offsetMap.transformedToOriginal(
-                    layoutResult.getOffsetForPosition(pxPosition)
-                )
+                val offset = layoutResult.getOffsetForPosition(pxPosition)
                 updateSelection(
                     value = value,
-                    startOffset = offset,
-                    endOffset = offset,
+                    transformedStartOffset = offset,
+                    transformedEndOffset = offset,
                     isStartHandle = true,
                     wordBasedSelection = true
                 )
@@ -159,12 +158,13 @@ internal class TextFieldSelectionManager() {
             dragTotalDistance += dragDistance
             state?.layoutResult?.let { layoutResult ->
                 val startOffset = layoutResult.getOffsetForPosition(dragBeginPosition)
-                val endOffset =
-                    layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+                val endOffset = layoutResult.getOffsetForPosition(
+                    dragBeginPosition + dragTotalDistance
+                )
                 updateSelection(
                     value = value,
-                    startOffset = startOffset,
-                    endOffset = endOffset,
+                    transformedStartOffset = startOffset,
+                    transformedEndOffset = endOffset,
                     isStartHandle = true,
                     wordBasedSelection = true
                 )
@@ -199,22 +199,20 @@ internal class TextFieldSelectionManager() {
                 dragTotalDistance += dragDistance
 
                 state?.layoutResult?.let { layoutResult ->
-                    val startOffset =
-                        if (isStartHandle)
-                            layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
-                        else
-                            value.selection.start
+                    val startOffset = if (isStartHandle)
+                        layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+                    else
+                        offsetMap.originalToTransformed(value.selection.start)
 
-                    val endOffset =
-                        if (isStartHandle)
-                            value.selection.end
-                        else
-                            layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+                    val endOffset = if (isStartHandle)
+                        offsetMap.originalToTransformed(value.selection.end)
+                    else
+                        layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
 
                     updateSelection(
                         value = value,
-                        startOffset = startOffset,
-                        endOffset = endOffset,
+                        transformedStartOffset = startOffset,
+                        transformedEndOffset = endOffset,
                         isStartHandle = isStartHandle,
                         wordBasedSelection = false
                     )
@@ -275,10 +273,11 @@ internal class TextFieldSelectionManager() {
     internal fun copy() {
         if (value.selection.collapsed) return
 
+        // TODO(b/171947959) check if original or transformed should be copied
         clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
 
         val newCursorOffset = value.selection.max
-        val newValue = TextFieldValue(
+        val newValue = createTextFieldValue(
             text = value.text,
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
@@ -303,7 +302,7 @@ internal class TextFieldSelectionManager() {
             value.getTextAfterSelection(value.text.length)
         val newCursorOffset = value.selection.min + text.length
 
-        val newValue = TextFieldValue(
+        val newValue = createTextFieldValue(
             text = newText,
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
@@ -323,13 +322,14 @@ internal class TextFieldSelectionManager() {
     internal fun cut() {
         if (value.selection.collapsed) return
 
+        // TODO(b/171947959) check if original or transformed should be cut
         clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
 
         val newText = value.getTextBeforeSelection(value.text.length) +
             value.getTextAfterSelection(value.text.length)
         val newCursorOffset = value.selection.min
 
-        val newValue = TextFieldValue(
+        val newValue = createTextFieldValue(
             text = newText,
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
@@ -341,7 +341,7 @@ internal class TextFieldSelectionManager() {
     internal fun selectAll() {
         setSelectionStatus(true)
 
-        val newValue = TextFieldValue(
+        val newValue = createTextFieldValue(
             text = value.text,
             selection = TextRange(0, value.text.length)
         )
@@ -352,14 +352,14 @@ internal class TextFieldSelectionManager() {
         return if (isStartHandle)
             getSelectionHandleCoordinates(
                 textLayoutResult = state?.layoutResult!!,
-                offset = value.selection.start,
+                offset = offsetMap.originalToTransformed(value.selection.start),
                 isStart = true,
                 areHandlesCrossed = value.selection.reversed
             )
         else
             getSelectionHandleCoordinates(
                 textLayoutResult = state?.layoutResult!!,
-                offset = value.selection.end,
+                offset = offsetMap.originalToTransformed(value.selection.end),
                 isStart = false,
                 areHandlesCrossed = value.selection.reversed
             )
@@ -471,28 +471,38 @@ internal class TextFieldSelectionManager() {
 
     private fun updateSelection(
         value: TextFieldValue,
-        startOffset: Int,
-        endOffset: Int,
+        transformedStartOffset: Int,
+        transformedEndOffset: Int,
         isStartHandle: Boolean,
         wordBasedSelection: Boolean
     ) {
-        val range = getTextFieldSelection(
+        val transformedSelection = TextRange(
+            offsetMap.originalToTransformed(value.selection.start),
+            offsetMap.originalToTransformed(value.selection.end)
+        )
+
+        val newTransformedSelection = getTextFieldSelection(
             textLayoutResult = state?.layoutResult,
-            rawStartOffset = startOffset,
-            rawEndOffset = endOffset,
-            previousSelection = if (value.selection.collapsed) null else value.selection,
-            previousHandlesCrossed = value.selection.reversed,
+            rawStartOffset = transformedStartOffset,
+            rawEndOffset = transformedEndOffset,
+            previousSelection = if (transformedSelection.collapsed) null else transformedSelection,
+            previousHandlesCrossed = transformedSelection.reversed,
             isStartHandle = isStartHandle,
             wordBasedSelection = wordBasedSelection
         )
 
-        if (range == value.selection) return
+        val originalSelection = TextRange(
+            start = offsetMap.transformedToOriginal(newTransformedSelection.start),
+            end = offsetMap.transformedToOriginal(newTransformedSelection.end)
+        )
+
+        if (originalSelection == value.selection) return
 
         hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
-        val newValue = TextFieldValue(
+        val newValue = createTextFieldValue(
             text = value.text,
-            selection = range
+            selection = originalSelection
         )
         onValueChange(newValue)
     }
@@ -501,6 +511,13 @@ internal class TextFieldSelectionManager() {
         state?.let {
             it.selectionIsOn = on
         }
+    }
+
+    private fun createTextFieldValue(
+        text: String,
+        selection: TextRange,
+    ): TextFieldValue {
+        return TextFieldValue(text = text, selection = selection.constrain(0, text.length))
     }
 
     /** Returns true if the screen coordinates position (x,y) corresponds to a character displayed
