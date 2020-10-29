@@ -17,11 +17,11 @@
 package androidx.compose.material.textfield
 
 import android.os.Build
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.TextFieldScroller
 import androidx.compose.material.TextFieldScrollerPosition
 import androidx.compose.runtime.remember
@@ -73,7 +73,7 @@ class TextFieldImplTest {
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp)
                 ) {
-                    BaseTextField(
+                    BasicTextField(
                         value = TextFieldValue(LONG_TEXT),
                         onValueChange = {}
                     )
@@ -97,7 +97,7 @@ class TextFieldImplTest {
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp)
                 ) {
-                    BaseTextField(
+                    BasicTextField(
                         value = TextFieldValue(text),
                         onValueChange = {}
                     )
@@ -130,7 +130,7 @@ class TextFieldImplTest {
                         remember { scrollerPosition },
                         Modifier.preferredSize(textFieldSize.toDp())
                     ) {
-                        BaseTextField(
+                        BasicTextField(
                             value = TextFieldValue(LONG_TEXT),
                             onValueChange = {}
                         )
@@ -158,7 +158,7 @@ class TextFieldImplTest {
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp).testTag(TextfieldTag)
                 ) {
-                    BaseTextField(
+                    BasicTextField(
                         value = TextFieldValue(LONG_TEXT),
                         onValueChange = {}
                     )
@@ -200,7 +200,7 @@ class TextFieldImplTest {
                 scrollerPosition,
                 Modifier.preferredSize(width = 300.dp, height = 50.dp).testTag(TextfieldTag)
             ) {
-                BaseTextField(
+                BasicTextField(
                     value = TextFieldValue(LONG_TEXT),
                     onValueChange = {}
                 )

@@ -16,9 +16,9 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.text.TextStyle
@@ -41,7 +41,7 @@ fun InputFieldTrickyUseCase() {
 @OptIn(ExperimentalFoundationApi::class)
 private fun RejectNonDigits() {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    BaseTextField(
+    BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
         textStyle = TextStyle(fontSize = 32.sp),
@@ -58,7 +58,7 @@ private fun RejectNonDigits() {
 @OptIn(ExperimentalFoundationApi::class)
 private fun RejectComposition() {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    BaseTextField(
+    BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
         textStyle = TextStyle(fontSize = 32.sp),

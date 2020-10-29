@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -29,31 +29,44 @@ import androidx.compose.ui.text.input.TextFieldValue
 
 @Sampled
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
-@Suppress("DEPRECATION")
-fun TextFieldSample() {
+fun BasicTextFieldSample() {
     var value by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    BaseTextField(
+    BasicTextField(
         value = value,
-        onValueChange = { value = it }
+        onValueChange = {
+            // it is crucial that the update is fed back into BasicTextField in order to
+            // see updates on the text
+            value = it
+        }
+    )
+}
+
+@Sampled
+@Composable
+fun BasicTextFieldWithStringSample() {
+    var value by savedInstanceState { "initial value" }
+    BasicTextField(
+        value = value,
+        onValueChange = {
+            // it is crucial that the update is fed back into BasicTextField in order to
+            // see updates on the text
+            value = it
+        }
     )
 }
 
 @Sampled
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-@Suppress("DEPRECATION")
-fun PlaceholderTextFieldSample() {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+fun PlaceholderBasicTextFieldSample() {
+    var value by savedInstanceState { "initial value" }
     Box {
-        BaseTextField(
-            value = state.value,
-            onValueChange = { state.value = it }
+        BasicTextField(
+            value = value,
+            onValueChange = { value = it }
         )
-        if (state.value.text.isEmpty()) {
-            Text(
-                text = "Placeholder"
-            )
+        if (value.isEmpty()) {
+            Text(text = "Placeholder")
         }
     }
 }

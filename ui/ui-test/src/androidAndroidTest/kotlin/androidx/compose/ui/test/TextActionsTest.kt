@@ -16,25 +16,25 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.expectError
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.util.BoundaryNode
+import androidx.compose.ui.test.util.expectErrorMessageStartsWith
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.util.BoundaryNode
-import androidx.compose.testutils.expectError
-import androidx.compose.ui.test.util.expectErrorMessageStartsWith
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -53,7 +53,7 @@ class TextActionsTest {
         textCallback: (String) -> Unit = {}
     ) {
         val state = remember { mutableStateOf(TextFieldValue("")) }
-        BaseTextField(
+        BasicTextField(
             modifier = Modifier.testTag(fieldTag),
             value = state.value,
             imeAction = imeAction,

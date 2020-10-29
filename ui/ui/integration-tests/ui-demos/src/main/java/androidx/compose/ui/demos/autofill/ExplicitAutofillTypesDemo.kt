@@ -17,13 +17,13 @@
 package androidx.compose.ui.demos.autofill
 
 import android.graphics.Rect
-import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -63,7 +63,7 @@ fun ExplicitAutofillTypesDemo() {
             autofillTypes = listOf(AutofillType.PersonFullName),
             onFill = { nameState.value = TextFieldValue(it) }
         ) { autofillNode ->
-            BaseTextField(
+            BasicTextField(
                 modifier = Modifier.focusObserver {
                     autofill?.apply {
                         if (it.isFocused) {
@@ -88,7 +88,7 @@ fun ExplicitAutofillTypesDemo() {
             autofillTypes = listOf(AutofillType.EmailAddress),
             onFill = { emailState.value = TextFieldValue(it) }
         ) { autofillNode ->
-            BaseTextField(
+            BasicTextField(
                 modifier = Modifier.focusObserver {
                     autofill?.run {
                         if (it.isFocused) {

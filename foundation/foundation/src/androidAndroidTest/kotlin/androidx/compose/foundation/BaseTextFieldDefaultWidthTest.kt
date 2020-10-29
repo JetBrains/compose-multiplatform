@@ -19,6 +19,7 @@ package androidx.compose.foundation
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
@@ -195,7 +196,7 @@ private fun DefaultWidthTextField(
 
     Providers(DensityAmbient provides density) {
         androidx.compose.foundation.layout.Box {
-            BaseTextField(
+            BasicTextField(
                 value = TextFieldValue(text),
                 textStyle = TextStyle(fontSize = fontSize, fontFamily = font.asFontFamily()),
                 onValueChange = {},

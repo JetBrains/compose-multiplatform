@@ -16,10 +16,10 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +38,7 @@ fun TextFieldWithScrollerDemo() {
                 )
             )
         }
-        BaseTextField(
+        BasicTextField(
             value = state.value,
             onValueChange = { state.value = it },
             modifier = Modifier

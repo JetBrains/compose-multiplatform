@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +61,7 @@ class SoftwareKeyboardTest {
                 TextInputServiceAmbient provides textInputService
             ) {
                 val state = remember { mutableStateOf(TextFieldValue("")) }
-                BaseTextField(
+                BasicTextField(
                     value = state.value,
                     modifier = Modifier.fillMaxSize(),
                     onValueChange = {
