@@ -54,6 +54,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
@@ -379,44 +380,53 @@ private fun Modifier.scroll(
     reverseScrolling: Boolean,
     isScrollable: Boolean,
     isVertical: Boolean
-) = composed {
-    val semantics = Modifier.semantics {
-        if (isScrollable) {
-            val accessibilityScrollState = AccessibilityScrollState(
-                value = state.value,
-                maxValue = state.maxValue,
-                reverseScrolling = reverseScrolling
-            )
-            if (isVertical) {
-                this.verticalAccessibilityScrollState = accessibilityScrollState
-            } else {
-                this.horizontalAccessibilityScrollState = accessibilityScrollState
-            }
-            // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
-            scrollBy(
-                action = { x: Float, y: Float ->
-                    if (isVertical) {
-                        state.scrollBy(y)
-                    } else {
-                        state.scrollBy(x)
-                    }
-                    return@scrollBy true
+) = composed(
+    factory = {
+        val semantics = Modifier.semantics {
+            if (isScrollable) {
+                val accessibilityScrollState = AccessibilityScrollState(
+                    value = state.value,
+                    maxValue = state.maxValue,
+                    reverseScrolling = reverseScrolling
+                )
+                if (isVertical) {
+                    this.verticalAccessibilityScrollState = accessibilityScrollState
+                } else {
+                    this.horizontalAccessibilityScrollState = accessibilityScrollState
                 }
-            )
+                // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
+                scrollBy(
+                    action = { x: Float, y: Float ->
+                        if (isVertical) {
+                            state.scrollBy(y)
+                        } else {
+                            state.scrollBy(x)
+                        }
+                        return@scrollBy true
+                    }
+                )
+            }
         }
+        val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val scrolling = Modifier.scrollable(
+            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+            // reverse scroll by default, to have "natural" gesture that goes reversed to layout
+            // if rtl and horizontal, do not reverse to make it right-to-left
+            reverseDirection = if (!isVertical && isRtl) reverseScrolling else !reverseScrolling,
+            enabled = isScrollable,
+            controller = state.scrollableController
+        )
+        val layout = ScrollingLayoutModifier(state, reverseScrolling, isVertical)
+        semantics.then(scrolling).clipToBounds().then(layout)
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "scroll"
+        properties["state"] = state
+        properties["reverseScrolling"] = reverseScrolling
+        properties["isScrollable"] = isScrollable
+        properties["isVertical"] = isVertical
     }
-    val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
-    val scrolling = Modifier.scrollable(
-        orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-        // reverse scroll by default, to have "natural" gesture that goes reversed to layout
-        // if rtl and horizontal, do not reverse to make it right-to-left
-        reverseDirection = if (!isVertical && isRtl) reverseScrolling else !reverseScrolling,
-        enabled = isScrollable,
-        controller = state.scrollableController
-    )
-    val layout = ScrollingLayoutModifier(state, reverseScrolling, isVertical)
-    semantics.then(scrolling).clipToBounds().then(layout)
-}
+)
 
 private data class ScrollingLayoutModifier(
     val scrollerState: ScrollState,

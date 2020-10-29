@@ -151,9 +151,15 @@ fun Modifier.drawBorder(size: Dp, color: Color, shape: Shape = RectangleShape) =
         "androidx.ui.foundation.border"
     )
 )
-fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed {
-    BorderModifier(remember { BorderModifierCache() }, shape, size, brush)
-}
+fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed(
+    factory = { BorderModifier(remember { BorderModifierCache() }, shape, size, brush) },
+    inspectorInfo = debugInspectorInfo {
+        name = "drawBorder"
+        properties["size"] = size
+        properties["brush"] = brush
+        properties["shape"] = shape
+    }
+)
 
 private class BorderModifier(
     private val cache: BorderModifierCache,

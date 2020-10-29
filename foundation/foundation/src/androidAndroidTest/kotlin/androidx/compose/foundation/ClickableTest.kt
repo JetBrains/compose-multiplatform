@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
@@ -45,6 +47,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,6 +61,16 @@ class ClickableTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun clickableTest_defaultSemantics() {
@@ -546,6 +560,26 @@ class ClickableTest {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
             assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val onClick: () -> Unit = { }
+        rule.setContent {
+            val modifier = Modifier.clickable(onClick = onClick) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("clickable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "enabled",
+                "onClickLabel",
+                "onClick",
+                "onDoubleClick",
+                "onLongClick",
+                "onLongClickLabel",
+                "indication",
+                "interactionState"
+            )
         }
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.gesture.doubleTapGestureFilter
 import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
@@ -59,49 +60,62 @@ fun Modifier.clickable(
     onLongClick: (() -> Unit)? = null,
     onDoubleClick: (() -> Unit)? = null,
     onClick: () -> Unit
-) = composed {
-    val semanticModifier = Modifier.semantics(mergeAllDescendants = true) {
-        if (enabled) {
-            // b/156468846:  add long click semantics and double click if needed
-            onClick(action = { onClick(); true }, label = onClickLabel)
-            if (onLongClick != null) {
-                onLongClick(action = { onLongClick(); true }, label = onLongClickLabel)
+) = composed(
+    factory = {
+        val semanticModifier = Modifier.semantics(mergeAllDescendants = true) {
+            if (enabled) {
+                // b/156468846:  add long click semantics and double click if needed
+                onClick(action = { onClick(); true }, label = onClickLabel)
+                if (onLongClick != null) {
+                    onLongClick(action = { onLongClick(); true }, label = onLongClickLabel)
+                }
+            } else {
+                disabled()
             }
-        } else {
-            disabled()
         }
-    }
-    val interactionUpdate =
-        if (enabled) {
-            Modifier.pressIndicatorGestureFilter(
-                onStart = { interactionState.addInteraction(Interaction.Pressed, it) },
-                onStop = { interactionState.removeInteraction(Interaction.Pressed) },
-                onCancel = { interactionState.removeInteraction(Interaction.Pressed) }
-            )
-        } else {
-            Modifier
-        }
-    val tap = if (enabled) tapGestureFilter(onTap = { onClick() }) else Modifier
-    val longTap = if (enabled && onLongClick != null) {
-        longPressGestureFilter(onLongPress = { onLongClick() })
-    } else {
-        Modifier
-    }
-    val doubleTap =
-        if (enabled && onDoubleClick != null) {
-            doubleTapGestureFilter(onDoubleTap = { onDoubleClick() })
+        val interactionUpdate =
+            if (enabled) {
+                Modifier.pressIndicatorGestureFilter(
+                    onStart = { interactionState.addInteraction(Interaction.Pressed, it) },
+                    onStop = { interactionState.removeInteraction(Interaction.Pressed) },
+                    onCancel = { interactionState.removeInteraction(Interaction.Pressed) }
+                )
+            } else {
+                Modifier
+            }
+        val tap = if (enabled) tapGestureFilter(onTap = { onClick() }) else Modifier
+        val longTap = if (enabled && onLongClick != null) {
+            longPressGestureFilter(onLongPress = { onLongClick() })
         } else {
             Modifier
         }
-    onCommit(interactionState) {
-        onDispose {
-            interactionState.removeInteraction(Interaction.Pressed)
+        val doubleTap =
+            if (enabled && onDoubleClick != null) {
+                doubleTapGestureFilter(onDoubleTap = { onDoubleClick() })
+            } else {
+                Modifier
+            }
+        onCommit(interactionState) {
+            onDispose {
+                interactionState.removeInteraction(Interaction.Pressed)
+            }
         }
+        semanticModifier
+            .then(interactionUpdate)
+            .indication(interactionState, indication)
+            .then(tap)
+            .then(longTap)
+            .then(doubleTap)
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "clickable"
+        properties["enabled"] = enabled
+        properties["onClickLabel"] = onClickLabel
+        properties["onClick"] = onClick
+        properties["onDoubleClick"] = onDoubleClick
+        properties["onLongClick"] = onLongClick
+        properties["onLongClickLabel"] = onLongClickLabel
+        properties["indication"] = indication
+        properties["interactionState"] = interactionState
     }
-    semanticModifier
-        .then(interactionUpdate)
-        .indication(interactionState, indication)
-        .then(tap)
-        .then(longTap)
-        .then(doubleTap)
-}
+)
