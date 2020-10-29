@@ -38,7 +38,7 @@ import javax.swing.WindowConstants
 val AppWindowAmbient = ambientOf<AppWindow?>()
 
 fun Window(
-    title: String = "JetpackDesktopDialog",
+    title: String = "JetpackDesktopWindow",
     size: IntSize = IntSize(800, 600),
     location: IntOffset = IntOffset.Zero,
     centered: Boolean = true,

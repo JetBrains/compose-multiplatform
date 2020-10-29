@@ -79,22 +79,28 @@ fun content() {
         color = Color(55, 55, 55)
     ) {
         Column {
-            WindowDraggableArea(
+            Row(
                 modifier = Modifier.background(color = Color(75, 75, 75))
                     .fillMaxWidth()
                     .preferredHeight(30.dp)
+                    .padding(start = 20.dp, end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.padding(start = 20.dp, end = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                WindowDraggableArea(
+                    modifier = Modifier.weight(1f)
                 ) {
                     TextBox(text = AppState.wndTitle.value)
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button("", {}, Color(232, 182, 109), IntSize(16, 16))
+                }
+                Row {
+                    Button(color = Color(232, 182, 109), size = IntSize(16, 16))
                     Spacer(modifier = Modifier.width(3.dp))
-                    Button("", {}, Color(150, 232, 150), IntSize(16, 16))
+                    Button(color = Color(150, 232, 150), size = IntSize(16, 16))
                     Spacer(modifier = Modifier.width(3.dp))
-                    Button("", { AppManager.exit() }, Color(232, 100, 100), IntSize(16, 16))
+                    Button(
+                        onClick = { AppManager.exit() },
+                        color = Color(232, 100, 100),
+                        size = IntSize(16, 16)
+                    )
                 }
             }
             Row {
@@ -287,8 +293,8 @@ fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
 
 @Composable
 fun Button(
-    text: String = "Button",
-    onClick: () -> Unit,
+    text: String = "",
+    onClick: () -> Unit = {},
     color: Color = Color(10, 162, 232),
     size: IntSize = IntSize(150, 30)
 ) {
