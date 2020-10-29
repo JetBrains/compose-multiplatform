@@ -26,6 +26,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.getValue
 import java.io.File
 
 private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
@@ -42,6 +43,9 @@ private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         limitations under the License.
         -->
         <configuration description="Runs tests for the module">
+        <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
+            <option name="min-api-level" value="MIN_SDK">
+        </object>
         <option name="test-suite-tag" value="androidx_unit_tests" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
         <option name="wifi:disable" value="true" />
@@ -72,6 +76,9 @@ private const val SELF_INSTRUMENTING_TEMPLATE = """<?xml version="1.0" encoding=
         limitations under the License.
         -->
         <configuration description="Runs tests for the module">
+        <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
+            <option name="min-api-level" value="MIN_SDK">
+        </object>
         <option name="test-suite-tag" value="androidx_unit_tests" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
         <option name="wifi:disable" value="true" />
@@ -108,6 +115,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Internal
     abstract val testLoader: Property<BuiltArtifactsLoader>
 
+    @get:Internal
+    abstract val minSdk: Property<Int>
+
     @get:OutputFile
     val outputXml: RegularFileProperty = project.objects.fileProperty()
 
@@ -131,6 +141,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         configContent = if (!appLoader.isPresent) {
             SELF_INSTRUMENTING_TEMPLATE.replace("TEST_FILE_NAME", testName)
                 .replace("APPLICATION_ID", testApk.applicationId)
+                .replace("MIN_SDK", minSdk.get().toString())
         } else {
             val appApk = appLoader.get().load(appFolder.get())
                 ?: throw RuntimeException("Cannot load application APK for $name")
@@ -138,6 +149,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             TEMPLATE.replace("TEST_FILE_NAME", testName)
                 .replace("APP_FILE_NAME", appName)
                 .replace("APPLICATION_ID", testApk.applicationId)
+                .replace("MIN_SDK", minSdk.get().toString())
         }
         val resolvedOutputFile: File = outputXml.asFile.get()
         if (!resolvedOutputFile.exists()) {
