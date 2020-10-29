@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,20 +61,13 @@ fun <T> LazyColumnFor(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-    LazyFor(
-        itemsCount = items.size,
+    LazyColumn(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
-        horizontalAlignment = horizontalAlignment,
-        isVertical = true
-    ) { index ->
-        val item = items[index]
-        {
-            key(index) {
-                itemContent(item)
-            }
-        }
+        horizontalAlignment = horizontalAlignment
+    ) {
+        items(items, itemContent)
     }
 }
 
@@ -112,20 +104,13 @@ fun <T> LazyColumnForIndexed(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
-    LazyFor(
-        itemsCount = items.size,
+    LazyColumn(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
-        horizontalAlignment = horizontalAlignment,
-        isVertical = true
-    ) { index ->
-        val item = items[index]
-        {
-            key(index) {
-                itemContent(index, item)
-            }
-        }
+        horizontalAlignment = horizontalAlignment
+    ) {
+        itemsIndexed(items, itemContent)
     }
 }
 
@@ -159,20 +144,13 @@ fun <T> LazyRowFor(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-    LazyFor(
-        itemsCount = items.size,
+    LazyRow(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
-        isVertical = false
-    ) { index ->
-        val item = items[index]
-        {
-            key(index) {
-                itemContent(item)
-            }
-        }
+    ) {
+        items(items, itemContent)
     }
 }
 
@@ -208,20 +186,13 @@ fun <T> LazyRowForIndexed(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
-    LazyFor(
-        itemsCount = items.size,
+    LazyRow(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
-        isVertical = false
-    ) { index ->
-        val item = items[index]
-        {
-            key(index) {
-                itemContent(index, item)
-            }
-        }
+    ) {
+        itemsIndexed(items, itemContent)
     }
 }
 
