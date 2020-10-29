@@ -18,27 +18,26 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSizeIn
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.getAlignmentLinePosition
+import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.ComposeTestRule
-import androidx.ui.test.ComposeTestRuleJUnit
-import androidx.ui.test.SemanticsNodeInteraction
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsEqualTo
-import androidx.ui.test.assertWidthIsEqualTo
-import androidx.ui.test.getAlignmentLinePosition
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onRoot
 
-fun ComposeTestRuleJUnit.setMaterialContent(
+fun ComposeTestRule.setMaterialContent(
     modifier: Modifier = Modifier,
     composable: @Composable () -> Unit
 ) {
@@ -102,7 +101,7 @@ fun ComposeTestRule.rootHeight(): Dp {
 val BigTestMaxWidth = 5000.dp
 val BigTestMaxHeight = 5000.dp
 
-fun ComposeTestRuleJUnit.setMaterialContentForSizeAssertions(
+fun ComposeTestRule.setMaterialContentForSizeAssertions(
     parentMaxWidth: Dp = BigTestMaxWidth,
     parentMaxHeight: Dp = BigTestMaxHeight,
     // TODO : figure out better way to make it flexible

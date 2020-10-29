@@ -31,6 +31,13 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.test.assertPixels
+import androidx.compose.ui.test.assertShape
+import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -40,13 +47,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertPixels
-import androidx.ui.test.assertShape
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.hasInputMethodsSupport
-import androidx.ui.test.performClick
-import androidx.ui.test.performTextReplacement
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

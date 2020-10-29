@@ -26,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.AccessibilityIterators
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -38,8 +40,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test

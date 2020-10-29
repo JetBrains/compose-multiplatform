@@ -21,6 +21,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.DeleteSurroundingTextEditOp
@@ -32,10 +36,6 @@ import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.click
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.hasInputMethodsSupport
-import androidx.ui.test.performGesture
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
