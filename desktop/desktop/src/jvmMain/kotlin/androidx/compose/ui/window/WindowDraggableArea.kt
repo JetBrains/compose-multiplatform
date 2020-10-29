@@ -20,10 +20,11 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
+import androidx.compose.ui.gesture.dragGestureFilter
 import java.awt.MouseInfo
 
 @Composable
@@ -32,9 +33,9 @@ fun WindowDraggableArea(
     children: @Composable() () -> Unit = emptyContent()
 ) {
     Box(
-        modifier = modifier.rawDragGestureFilter(
-            dragObserver = DragHandler(),
-            canStartDragging = { true }
+        modifier = modifier.dragGestureFilter(
+            dragObserver = remember { DragHandler() },
+            startDragImmediately = true
         )
     ) {
         children()
@@ -73,12 +74,10 @@ private class DragHandler : DragObserver {
     override fun onDrag(dragDistance: Offset): Offset {
         val point = MouseInfo.getPointerInfo().getLocation()
 
-        try {
-            window.setLocation(
-                (location.x - (cursor.x - point.x)).toInt(),
-                (location.y - (cursor.y - point.y)).toInt()
-            )
-        } catch (e: Throwable) {}
+        window.setLocation(
+            (location.x - (cursor.x - point.x)).toInt(),
+            (location.y - (cursor.y - point.y)).toInt()
+        )
 
         return dragDistance
     }
