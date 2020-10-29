@@ -184,7 +184,7 @@ class LazyColumnTest {
 
     @Test
     fun lazyColumnScrollHidesItem() {
-        val items = (1..3).map { it.toString() }
+        val items = (1..4).map { it.toString() }
 
         rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp).testTag(LazyColumnTag)) {
@@ -195,7 +195,7 @@ class LazyColumnTest {
         }
 
         rule.onNodeWithTag(LazyColumnTag)
-            .scrollBy(y = 102.dp, density = rule.density)
+            .scrollBy(y = 103.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
             .assertDoesNotExist()

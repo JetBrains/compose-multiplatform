@@ -32,10 +32,10 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.listSaver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Constraints
@@ -184,6 +184,11 @@ class LazyListState constructor(
     //  fine-grained control over scrolling
     @VisibleForTesting
     internal fun onScroll(distance: Float): Float {
+        if (distance < 0 && !scrollPosition.canScrollForward ||
+            distance > 0 && !scrollPosition.canScrollBackward
+        ) {
+            return 0f
+        }
         check(abs(scrollToBeConsumed) < 0.5f) {
             "entered drag with non-zero pending scroll: $scrollToBeConsumed"
         }
@@ -227,7 +232,11 @@ class LazyListState constructor(
         constraints.assertNotNestingScrollableContainers(isVertical)
         if (itemsCount <= 0) {
             // empty data set. reset the current scroll and report zero size
-            scrollPosition.update(DataIndex(0), 0)
+            scrollPosition.update(
+                index = DataIndex(0),
+                scrollOffset = 0,
+                canScrollForward = false
+            )
             layout(constraints.constrainWidth(0), constraints.constrainHeight(0)) {}
         } else {
             var currentFirstItemIndex = scrollPosition.index
@@ -381,7 +390,11 @@ class LazyListState constructor(
             )
 
             // update state with the new calculated scroll position
-            scrollPosition.update(currentFirstItemIndex, currentFirstItemScrollOffset)
+            scrollPosition.update(
+                index = currentFirstItemIndex,
+                scrollOffset = currentFirstItemScrollOffset,
+                canScrollForward = mainAxisUsed > maxMainAxis
+            )
 
             return layout(layoutWidth, layoutHeight) {
                 var currentMainAxis = -currentFirstItemScrollOffset
@@ -442,7 +455,10 @@ class LazyListState constructor(
  * once we update the values in the end of the measure block. Abstracting the variables
  * duplication into a separate class allows us maintain the contract of keeping them in sync.
  */
-private class ItemRelativeScrollPosition(initialIndex: Int = 0, initialScrollOffset: Int = 0) {
+private class ItemRelativeScrollPosition(
+    initialIndex: Int = 0,
+    initialScrollOffset: Int = 0
+) {
     var index = DataIndex(initialIndex)
         private set
 
@@ -455,10 +471,15 @@ private class ItemRelativeScrollPosition(initialIndex: Int = 0, initialScrollOff
     private val scrollOffsetState = mutableStateOf(scrollOffset)
     val observableScrollOffset get() = scrollOffsetState.value
 
-    fun update(index: DataIndex, scrollOffset: Int) {
+    val canScrollBackward: Boolean get() = index.value != 0 || scrollOffset != 0
+    var canScrollForward: Boolean = false
+        private set
+
+    fun update(index: DataIndex, scrollOffset: Int, canScrollForward: Boolean) {
         this.index = index
         indexState.value = index.value
         this.scrollOffset = scrollOffset
         scrollOffsetState.value = scrollOffset
+        this.canScrollForward = canScrollForward
     }
 }

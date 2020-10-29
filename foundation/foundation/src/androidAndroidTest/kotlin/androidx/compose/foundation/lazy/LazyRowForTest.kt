@@ -611,7 +611,7 @@ class LazyRowForTest {
 
         rule.runOnIdle {
             with(rule.density) {
-                state.onScroll(110.dp.toPx())
+                state.onScroll(-110.dp.toPx())
             }
         }
 
