@@ -28,7 +28,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         <!-- Copyright (C) 2019 The Android Open Source Project
         Licensed under the Apache License, Version 2.0 (the "License")
         you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         </test>
         </configuration>"""
 
-private const val SELF_INSTRUMENTING_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+const val SELF_INSTRUMENTING_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         <!-- Copyright (C) 2019 The Android Open Source Project
         Licensed under the Apache License, Version 2.0 (the "License")
         you may not use this file except in compliance with the License.
