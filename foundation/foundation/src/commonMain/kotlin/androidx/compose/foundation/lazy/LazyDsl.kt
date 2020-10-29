@@ -187,7 +187,7 @@ fun LazyRow(
     val scope = LazyListScopeImpl()
     scope.apply(content)
 
-    LazyFor(
+    LazyList(
         itemsCount = scope.totalSize,
         modifier = modifier,
         state = state,
@@ -228,7 +228,7 @@ fun LazyColumn(
     val scope = LazyListScopeImpl()
     scope.apply(content)
 
-    LazyFor(
+    LazyList(
         itemsCount = scope.totalSize,
         modifier = modifier,
         state = state,

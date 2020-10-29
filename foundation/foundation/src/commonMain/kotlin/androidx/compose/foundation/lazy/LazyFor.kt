@@ -16,19 +16,11 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.LayoutDirectionAmbient
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 /**
@@ -193,48 +185,5 @@ fun <T> LazyRowForIndexed(
         verticalAlignment = verticalAlignment,
     ) {
         itemsIndexed(items, itemContent)
-    }
-}
-
-@Suppress("NOTHING_TO_INLINE")
-@Composable
-internal inline fun LazyFor(
-    itemsCount: Int,
-    modifier: Modifier = Modifier,
-    state: LazyListState,
-    contentPadding: PaddingValues,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
-    isVertical: Boolean,
-    noinline itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
-) {
-    val reverseDirection = LayoutDirectionAmbient.current == LayoutDirection.Rtl && !isVertical
-
-    val cachingItemContentFactory = remember { CachingItemContentFactory(itemContentFactory) }
-    cachingItemContentFactory.itemContentFactory = itemContentFactory
-
-    SubcomposeLayout<DataIndex>(
-        modifier
-            .scrollable(
-                orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-                reverseDirection = reverseDirection,
-                controller = state.scrollableController
-            )
-            .clipToBounds()
-            .padding(contentPadding)
-            .then(state.remeasurementModifier)
-    ) { constraints ->
-        // this will update the scope object if the constrains have been changed
-        cachingItemContentFactory.updateItemScope(this, constraints)
-
-        state.measure(
-            this,
-            constraints,
-            isVertical,
-            horizontalAlignment,
-            verticalAlignment,
-            itemsCount,
-            cachingItemContentFactory
-        )
     }
 }
