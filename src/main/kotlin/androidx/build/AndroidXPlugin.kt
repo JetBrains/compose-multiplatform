@@ -562,7 +562,8 @@ class AndroidXPlugin : Plugin<Project> {
                                 "getArtifacts"
                             ).invoke(
                                 androidTest
-                            ) as Artifacts
+                            ) as Artifacts,
+                            defaultConfig.minSdk!!
                         )
                     }
                 )
@@ -600,7 +601,8 @@ class AndroidXPlugin : Plugin<Project> {
                                 ).invoke(androidTest) as String,
                                 androidTest.javaClass.getMethod(
                                     "getArtifacts"
-                                ).invoke(androidTest) as Artifacts
+                                ).invoke(androidTest) as Artifacts,
+                                defaultConfig.minSdk!!
                             )
                         }
                     )
@@ -611,7 +613,8 @@ class AndroidXPlugin : Plugin<Project> {
     private fun createTestConfigurationGenerationTask(
         project: Project,
         variantName: String,
-        artifacts: Artifacts
+        artifacts: Artifacts,
+        minSdk: Int
     ) {
         val generateTestConfigurationTask = project.tasks.register(
             "${project.name}${GENERATE_TEST_CONFIGURATION_TASK}$variantName",
@@ -625,6 +628,7 @@ class AndroidXPlugin : Plugin<Project> {
                     "${project.asFilenamePrefix()}$variantName.xml"
                 )
             )
+            it.minSdk.set(minSdk)
             AffectedModuleDetector.configureTaskGuard(it)
         }
         project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
