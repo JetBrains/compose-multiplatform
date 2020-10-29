@@ -38,7 +38,7 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,7 +57,7 @@ fun MutableState<ToggleableState>.toggle() {
  * These are tests but also demonstration of our capability to test Compose as part of legacy
  * Android hierarchy. This also includes showcase of multiple Compose roots.
  */
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class MultipleComposeRootsTest {
 
