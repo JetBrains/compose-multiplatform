@@ -102,6 +102,13 @@ inline class Offset(val packedValue: Long) {
         // This is included for completeness, because [Size.infinite] exists.
         @Stable
         val Infinite = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+
+        /**
+         * Represents an unspecified [Offset] value, usually a replacement for `null`
+         * when a primitive value is desired.
+         */
+        @Stable
+        val Unspecified = Offset(Float.NaN, Float.NaN)
     }
 
     @Stable
