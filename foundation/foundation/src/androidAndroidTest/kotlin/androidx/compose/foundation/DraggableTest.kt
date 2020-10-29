@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
@@ -42,6 +44,8 @@ import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,6 +58,16 @@ class DraggableTest {
     val rule = createComposeRule()
 
     private val draggableBoxTag = "dragTag"
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun draggable_horizontalDrag() {
@@ -383,6 +397,26 @@ class DraggableTest {
 
         rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+    }
+
+    @Test
+    fun testInspectableValue() {
+        rule.setContent {
+            val modifier = Modifier.draggable(Orientation.Horizontal) {} as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("draggable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "orientation",
+                "enabled",
+                "reverseDirection",
+                "interactionState",
+                "startDragImmediately",
+                "canDrag",
+                "onDragStarted",
+                "onDragStopped",
+                "onDrag",
+            )
         }
     }
 

@@ -26,6 +26,7 @@ import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Generic interface to define visual effects when certain interaction happens. Examples might
@@ -90,12 +91,19 @@ interface IndicationInstance {
 fun Modifier.indication(
     interactionState: InteractionState,
     indication: Indication? = null
-) = composed {
-    val resolvedIndication = indication ?: NoIndication
-    remember(interactionState, resolvedIndication) {
-        IndicationModifier(interactionState, resolvedIndication.createInstance())
+) = composed(
+    factory = {
+        val resolvedIndication = indication ?: NoIndication
+        remember(interactionState, resolvedIndication) {
+            IndicationModifier(interactionState, resolvedIndication.createInstance())
+        }
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "indication"
+        properties["indication"] = indication
+        properties["interactionState"] = interactionState
     }
-}
+)
 
 /**
  * Ambient to provide [IndicationInstance] to draw visual indication for press and other events.

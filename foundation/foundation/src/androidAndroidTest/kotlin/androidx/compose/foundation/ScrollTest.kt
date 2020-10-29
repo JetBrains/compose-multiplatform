@@ -29,7 +29,9 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.GestureScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -58,8 +60,10 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -90,6 +94,16 @@ class ScrollTest {
         Color(red = 0, green = 0, blue = 0xFF, alpha = 0xFF),
         Color(red = 0xA5, green = 0, blue = 0xFF, alpha = 0xFF)
     )
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @SdkSuppress(minSdkVersion = 26)
     @Test
@@ -905,5 +919,25 @@ class ScrollTest {
         assertWithMessage("Scroll didn't finish after 20 seconds")
             .that(latch.await(20, TimeUnit.SECONDS)).isTrue()
         return this
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val state = ScrollState(
+            initial = 0f,
+            flingConfig = FlingConfig(ExponentialDecay()),
+            animationClock = ManualAnimationClock(0)
+        )
+        rule.setContent {
+            val modifier = Modifier.verticalScroll(state) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("scroll")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "state",
+                "reverseScrolling",
+                "isScrollable",
+                "isVertical"
+            )
+        }
     }
 }

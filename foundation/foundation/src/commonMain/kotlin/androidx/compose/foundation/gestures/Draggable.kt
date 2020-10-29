@@ -28,6 +28,7 @@ import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 
 /**
@@ -70,48 +71,62 @@ fun Modifier.draggable(
     onDragStarted: (startedPosition: Offset) -> Unit = {},
     onDragStopped: (velocity: Float) -> Unit = {},
     onDrag: Density.(Float) -> Unit
-): Modifier = composed {
-    val density = DensityAmbient.current
-    onDispose {
-        interactionState?.removeInteraction(Interaction.Dragged)
+): Modifier = composed(
+    factory = {
+        val density = DensityAmbient.current
+        onDispose {
+            interactionState?.removeInteraction(Interaction.Dragged)
+        }
+
+        scrollGestureFilter(
+            scrollCallback = object : ScrollCallback {
+
+                override fun onStart(downPosition: Offset) {
+                    if (enabled) {
+                        interactionState?.addInteraction(Interaction.Dragged)
+                        onDragStarted(downPosition)
+                    }
+                }
+
+                override fun onScroll(scrollDistance: Float): Float {
+                    if (!enabled) return scrollDistance
+                    val toConsume = if (reverseDirection) scrollDistance * -1 else scrollDistance
+                    with(density) { onDrag(toConsume) }
+                    // we explicitly disallow nested scrolling in draggable, as it should be
+                    // accessible via Modifier.scrollable. For drags, usually nested dragging is not
+                    // required
+                    return scrollDistance
+                }
+
+                override fun onCancel() {
+                    if (enabled) {
+                        interactionState?.removeInteraction(Interaction.Dragged)
+                        onDragStopped(0f)
+                    }
+                }
+
+                override fun onStop(velocity: Float) {
+                    if (enabled) {
+                        interactionState?.removeInteraction(Interaction.Dragged)
+                        onDragStopped(if (reverseDirection) velocity * -1 else velocity)
+                    }
+                }
+            },
+            orientation = orientation,
+            canDrag = canDrag,
+            startDragImmediately = startDragImmediately
+        )
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "draggable"
+        properties["orientation"] = orientation
+        properties["enabled"] = enabled
+        properties["reverseDirection"] = reverseDirection
+        properties["interactionState"] = interactionState
+        properties["startDragImmediately"] = startDragImmediately
+        properties["canDrag"] = canDrag
+        properties["onDragStarted"] = onDragStarted
+        properties["onDragStopped"] = onDragStopped
+        properties["onDrag"] = onDrag
     }
-
-    scrollGestureFilter(
-        scrollCallback = object : ScrollCallback {
-
-            override fun onStart(downPosition: Offset) {
-                if (enabled) {
-                    interactionState?.addInteraction(Interaction.Dragged)
-                    onDragStarted(downPosition)
-                }
-            }
-
-            override fun onScroll(scrollDistance: Float): Float {
-                if (!enabled) return scrollDistance
-                val toConsume = if (reverseDirection) scrollDistance * -1 else scrollDistance
-                with(density) { onDrag(toConsume) }
-                // we explicitly disallow nested scrolling in draggable, as it should be
-                // accessible via Modifier.scrollable. For drags, usually nested dragging is not
-                // required
-                return scrollDistance
-            }
-
-            override fun onCancel() {
-                if (enabled) {
-                    interactionState?.removeInteraction(Interaction.Dragged)
-                    onDragStopped(0f)
-                }
-            }
-
-            override fun onStop(velocity: Float) {
-                if (enabled) {
-                    interactionState?.removeInteraction(Interaction.Dragged)
-                    onDragStopped(if (reverseDirection) velocity * -1 else velocity)
-                }
-            }
-        },
-        orientation = orientation,
-        canDrag = canDrag,
-        startDragImmediately = startDragImmediately
-    )
-}
+)
