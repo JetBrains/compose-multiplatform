@@ -20,21 +20,20 @@ import androidx.build.AndroidXExtension
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
-import org.gradle.workers.WorkerExecutor
 import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
 // MetalavaRunner stores common configuration for executing Metalava
 
 fun runMetalavaWithArgs(
-    metalavaConfiguration: Configuration,
+    metalavaClasspath: FileCollection,
     args: List<String>,
     workerExecutor: WorkerExecutor
 ) {
@@ -43,45 +42,41 @@ fun runMetalavaWithArgs(
         "--hide",
         "HiddenSuperclass" // We allow having a hidden parent class
     ) + args
-
     val workQueue = workerExecutor.processIsolation()
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
-        parameters.getArgs().set(allArgs)
-        parameters.getMetalavaClasspath().set(metalavaConfiguration.files)
+        parameters.args.set(allArgs)
+        parameters.metalavaClasspath.set(metalavaClasspath.files)
     }
 }
 
 interface MetalavaParams : WorkParameters {
-    fun getArgs(): ListProperty<String>
-    fun getMetalavaClasspath(): SetProperty<File>
+    val args: ListProperty<String>
+    val metalavaClasspath: SetProperty<File>
 }
 
 abstract class MetalavaWorkAction @Inject constructor (
     private val execOperations: ExecOperations
 ) : WorkAction<MetalavaParams> {
-
     override fun execute() {
-        val allArgs = getParameters().getArgs().get()
-        val metalavaJar = getParameters().getMetalavaClasspath().get()
-
         execOperations.javaexec {
             // Intellij core reflects into java.util.ResourceBundle
             it.jvmArgs = listOf(
                 "--add-opens",
                 "java.base/java.util=ALL-UNNAMED"
             )
-            it.classpath(metalavaJar)
+            it.classpath(parameters.metalavaClasspath.get())
             it.main = "com.android.tools.metalava.Driver"
-            it.args = allArgs
+            it.args = parameters.args.get()
         }
     }
 }
 
-fun Project.getMetalavaConfiguration(): Configuration {
-    return configurations.findByName("metalava") ?: configurations.create("metalava") {
+fun Project.getMetalavaClasspath(): FileCollection {
+    val configuration = configurations.findByName("metalava") ?: configurations.create("metalava") {
         val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha02")
         it.dependencies.add(dependency)
     }
+    return project.files(configuration)
 }
 
 // Metalava arguments to hide all experimental API surfaces.
@@ -224,7 +219,7 @@ fun Project.generateApi(
         bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
         generateApiMode, apiLintMode, pathToManifest
     )
-    runMetalavaWithArgs(getMetalavaConfiguration(), args, workerExecutor)
+    runMetalavaWithArgs(getMetalavaClasspath(), args, workerExecutor)
 }
 
 // Generates the specified api file

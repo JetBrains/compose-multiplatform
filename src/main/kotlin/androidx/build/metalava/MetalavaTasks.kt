@@ -48,7 +48,7 @@ object MetalavaTasks {
         builtApiLocation: ApiLocation,
         outputApiLocations: List<ApiLocation>
     ) {
-        val metalavaConfiguration = project.getMetalavaConfiguration()
+        val metalavaClasspath = project.getMetalavaClasspath()
 
         // Policy: If the artifact belongs to an atomic (e.g. same-version) group, we don't enforce
         // binary compatibility for APIs annotated with @RestrictTo(LIBRARY_GROUP). This is
@@ -60,10 +60,9 @@ object MetalavaTasks {
             task.group = "API"
             task.description = "Generates API files from source"
             task.apiLocation.set(builtApiLocation)
-            task.configuration = metalavaConfiguration
+            task.metalavaClasspath.from(metalavaClasspath)
             task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
             task.baselines.set(baselinesApiLocation)
-            task.dependsOn(metalavaConfiguration)
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
@@ -81,10 +80,9 @@ object MetalavaTasks {
                 "checkApiRelease",
                 CheckApiCompatibilityTask::class.java
             ) { task ->
-                task.configuration = metalavaConfiguration
+                task.metalavaClasspath.from(metalavaClasspath)
                 task.referenceApi.set(lastReleasedApiFile)
                 task.baselines.set(baselinesApiLocation)
-                task.dependsOn(metalavaConfiguration)
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
@@ -97,7 +95,7 @@ object MetalavaTasks {
                 "ignoreApiChanges",
                 IgnoreApiChangesTask::class.java
             ) { task ->
-                task.configuration = metalavaConfiguration
+                task.metalavaClasspath.from(metalavaClasspath)
                 task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
                 task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
                 task.api.set(builtApiLocation)
@@ -111,7 +109,7 @@ object MetalavaTasks {
             "updateApiLintBaseline",
             UpdateApiLintBaselineTask::class.java
         ) { task ->
-            task.configuration = metalavaConfiguration
+            task.metalavaClasspath.from(metalavaClasspath)
             task.baselines.set(baselinesApiLocation)
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
@@ -213,7 +211,7 @@ object MetalavaTasks {
         ) { task ->
             task.apiStubsDirectory.set(apiStubsDirectory)
             task.docStubsDirectory.set(docsStubsDirectory)
-            task.configuration = project.getMetalavaConfiguration()
+            task.metalavaClasspath.from(project.getMetalavaClasspath())
             applyInputs(javaCompileInputs, task)
         }
 
