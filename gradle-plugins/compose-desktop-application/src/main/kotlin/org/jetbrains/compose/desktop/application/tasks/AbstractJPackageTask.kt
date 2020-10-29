@@ -191,16 +191,16 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     private fun makeArgs(vararg inputDirs: File) = arrayListOf<String>().apply {
         for (dir in inputDirs) {
-            cliArg("--input", dir.absolutePath)
+            cliArg("--input", dir)
         }
 
         cliArg("--type", targetFormat.id)
-        cliArg("--dest", destinationDir.asFile.get().absolutePath)
+        cliArg("--dest", destinationDir.asFile.get())
         cliArg("--verbose", verbose)
 
         cliArg("--install-dir", installationPath)
-        cliArg("--license-file", licenseFile.asFile.orNull?.absolutePath)
-        cliArg("--icon", iconFile.asFile.orNull?.absolutePath)
+        cliArg("--license-file", licenseFile.asFile.orNull)
+        cliArg("--icon", iconFile.asFile.orNull)
 
         cliArg("--name", packageName)
         cliArg("--description", packageDescription)

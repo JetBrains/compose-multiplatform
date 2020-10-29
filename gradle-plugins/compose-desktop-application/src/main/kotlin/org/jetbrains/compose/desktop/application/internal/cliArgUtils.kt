@@ -1,6 +1,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.provider.Provider
+import java.io.File
 
 internal fun <T : Any?> MutableCollection<String>.cliArg(
     name: String,
@@ -24,4 +25,10 @@ internal fun <T : Any?> MutableCollection<String>.cliArg(
 }
 
 private fun <T : Any?> defaultToString(): (T) -> String =
-    { "\"${it.toString()}\"" }
+    {
+        val asString = if (it is File) it.normalizedPath() else it.toString()
+        "\"$asString\""
+    }
+
+private fun File.normalizedPath() =
+    if (currentOS == OS.Windows) absolutePath.replace("\\", "\\\\") else absolutePath
