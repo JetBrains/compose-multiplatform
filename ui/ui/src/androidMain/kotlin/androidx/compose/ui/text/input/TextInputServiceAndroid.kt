@@ -44,8 +44,6 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     private var onImeActionPerformed: (ImeAction) -> Unit = {}
 
     private var state = TextFieldValue(text = "", selection = TextRange.Zero)
-    private var keyboardType = KeyboardType.Text
-    private var imeAction = ImeAction.Unspecified
     private var keyboardOptions = KeyboardOptions.Default
     private var ic: RecordingInputConnection? = null
     private var focusedRect: android.graphics.Rect? = null
@@ -80,7 +78,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         if (!editorHasFocus) {
             return null
         }
-        fillEditorInfo(keyboardType, imeAction, keyboardOptions, outAttrs)
+        fillEditorInfo(keyboardOptions, outAttrs)
 
         return RecordingInputConnection(
             initState = state,
@@ -104,8 +102,6 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
 
     override fun startInput(
         value: TextFieldValue,
-        keyboardType: KeyboardType,
-        imeAction: ImeAction,
         keyboardOptions: KeyboardOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
@@ -113,8 +109,6 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         editorHasFocus = true
         state = value
-        this.keyboardType = keyboardType
-        this.imeAction = imeAction
         this.keyboardOptions = keyboardOptions
         this.onEditCommand = onEditCommand
         this.onImeActionPerformed = onImeActionPerformed
@@ -171,12 +165,10 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
      * Fills necessary info of EditorInfo.
      */
     private fun fillEditorInfo(
-        keyboardType: KeyboardType,
-        imeAction: ImeAction,
         keyboardOptions: KeyboardOptions,
         outInfo: EditorInfo
     ) {
-        outInfo.imeOptions = when (imeAction) {
+        outInfo.imeOptions = when (keyboardOptions.imeAction) {
             ImeAction.Unspecified -> {
                 if (keyboardOptions.singleLine) {
                     // this is the last resort to enable single line
@@ -194,9 +186,11 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             ImeAction.Search -> EditorInfo.IME_ACTION_SEARCH
             ImeAction.Send -> EditorInfo.IME_ACTION_SEND
             ImeAction.Done -> EditorInfo.IME_ACTION_DONE
-            else -> throw IllegalArgumentException("Unknown ImeAction: $imeAction")
+            else -> throw IllegalArgumentException(
+                "Unknown ImeAction: ${keyboardOptions.imeAction}"
+            )
         }
-        when (keyboardType) {
+        when (keyboardOptions.keyboardType) {
             KeyboardType.Text -> outInfo.inputType = InputType.TYPE_CLASS_TEXT
             KeyboardType.Ascii -> {
                 outInfo.inputType = InputType.TYPE_CLASS_TEXT
@@ -217,7 +211,9 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 outInfo.inputType =
                     InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
             }
-            else -> throw IllegalArgumentException("Unknown KeyboardType: $keyboardType")
+            else -> throw IllegalArgumentException(
+                "Unknown KeyboardType: ${keyboardOptions.keyboardType}"
+            )
         }
 
         if (!keyboardOptions.singleLine) {

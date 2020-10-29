@@ -37,7 +37,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
@@ -105,8 +104,6 @@ class TextFieldToggleTextTestCase(
     private class TestPlatformTextInputService : PlatformTextInputService {
         override fun startInput(
             value: TextFieldValue,
-            keyboardType: KeyboardType,
-            imeAction: ImeAction,
             keyboardOptions: KeyboardOptions,
             onEditCommand: (List<EditOperation>) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit

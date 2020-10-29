@@ -19,9 +19,7 @@ package androidx.compose.ui.text
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
@@ -48,16 +46,12 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
         )
         val secondToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -74,8 +68,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -93,8 +85,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -103,8 +93,6 @@ class TextInputServiceTest {
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -122,8 +110,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -141,8 +127,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -151,8 +135,6 @@ class TextInputServiceTest {
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -170,8 +152,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -190,8 +170,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -200,8 +178,6 @@ class TextInputServiceTest {
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -220,8 +196,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -240,8 +214,6 @@ class TextInputServiceTest {
 
         val firstToken = textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed
@@ -250,8 +222,6 @@ class TextInputServiceTest {
         // Start another session. The firstToken is now expired.
         textInputService.startInput(
             TextFieldValue(),
-            KeyboardType.Text,
-            ImeAction.NoAction,
             KeyboardOptions.Default,
             {}, // onEditCommand
             {} // onImeActionPerformed

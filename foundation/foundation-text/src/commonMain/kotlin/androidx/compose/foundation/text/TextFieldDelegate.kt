@@ -41,7 +41,6 @@ import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
 import androidx.compose.ui.text.input.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
@@ -316,25 +315,21 @@ class TextFieldDelegate {
          * @param textInputService The text input service
          * @param value The editor state
          * @param editProcessor The edit processor
-         * @param keyboardType The keyboard type
          * @param onValueChange The callback called when the new editor state arrives.
          * @param onImeActionPerformed The callback called when the editor action arrives.
+         * @param keyboardOptions Keyboard configuration such as single line, auto correct etc.
          */
         @JvmStatic
         internal fun onFocus(
             textInputService: TextInputService?,
             value: TextFieldValue,
             editProcessor: EditProcessor,
-            keyboardType: KeyboardType,
-            imeAction: ImeAction,
             keyboardOptions: KeyboardOptions,
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): InputSessionToken {
             val inputSessionToken = textInputService?.startInput(
                 value = TextFieldValue(value.text, value.selection, value.composition),
-                keyboardType = keyboardType,
-                imeAction = imeAction,
                 keyboardOptions = keyboardOptions,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed

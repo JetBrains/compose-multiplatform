@@ -21,7 +21,6 @@ import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
 import androidx.compose.ui.text.input.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
@@ -43,8 +42,6 @@ internal class TextInputServiceForTests(
 
     override fun startInput(
         value: TextFieldValue,
-        keyboardType: KeyboardType,
-        imeAction: ImeAction,
         keyboardOptions: KeyboardOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
@@ -53,8 +50,6 @@ internal class TextInputServiceForTests(
         this.onImeActionPerformed = onImeActionPerformed
         return super.startInput(
             value,
-            keyboardType,
-            imeAction,
             keyboardOptions,
             onEditCommand,
             onImeActionPerformed

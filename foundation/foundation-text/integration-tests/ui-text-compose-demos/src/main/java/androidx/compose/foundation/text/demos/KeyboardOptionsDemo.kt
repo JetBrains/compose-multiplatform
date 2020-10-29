@@ -39,62 +39,80 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalTextApi::class)
 private class KeyboardOptionsData(
     val keyboardOptions: KeyboardOptions,
-    val keyboardType: KeyboardType,
     val name: String,
-    val imeAction: ImeAction = ImeAction.Unspecified
 )
 
 @OptIn(ExperimentalTextApi::class)
 private val KeyboardOptionsList = listOf(
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(singleLine = true),
-        keyboardType = KeyboardType.Text,
+        keyboardOptions = KeyboardOptions(
+            singleLine = true,
+            keyboardType = KeyboardType.Text
+        ),
         name = "singleLine/Text"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(singleLine = false),
-        keyboardType = KeyboardType.Text,
+        keyboardOptions = KeyboardOptions(
+            singleLine = false,
+            keyboardType = KeyboardType.Text
+        ),
         name = "multiLine/Text"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(singleLine = true),
-        keyboardType = KeyboardType.Text,
-        imeAction = ImeAction.Search,
+        keyboardOptions = KeyboardOptions(
+            singleLine = true,
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Search
+        ),
         name = "singleLine/Text/Search"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(singleLine = true),
-        keyboardType = KeyboardType.Number,
+        keyboardOptions = KeyboardOptions(
+            singleLine = true,
+            keyboardType = KeyboardType.Number
+        ),
         name = "singleLine/Number"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(singleLine = false),
-        keyboardType = KeyboardType.Number,
+        keyboardOptions = KeyboardOptions(
+            singleLine = false,
+            keyboardType = KeyboardType.Number
+        ),
         name = "multiLine/Number"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
-        keyboardType = KeyboardType.Text,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Characters,
+            keyboardType = KeyboardType.Text
+        ),
         name = "Capitalize Characters"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-        keyboardType = KeyboardType.Text,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Words,
+            keyboardType = KeyboardType.Text
+        ),
         name = "Capitalize Words"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-        keyboardType = KeyboardType.Text,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Text
+        ),
         name = "Capitalize Sentences"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(autoCorrect = true),
-        keyboardType = KeyboardType.Text,
+        keyboardOptions = KeyboardOptions(
+            autoCorrect = true,
+            keyboardType = KeyboardType.Text
+        ),
         name = "AutoCorrect On"
     ),
     KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(autoCorrect = false),
-        keyboardType = KeyboardType.Text,
+        keyboardOptions = KeyboardOptions(
+            autoCorrect = false,
+            keyboardType = KeyboardType.Text
+        ),
         name = "AutoCorrect Off"
     )
 )
@@ -122,8 +140,6 @@ private fun MyTextField(data: KeyboardOptionsData) {
     CoreTextField(
         modifier = demoTextFieldModifiers.defaultMinSizeConstraints(100.dp),
         value = state.value,
-        keyboardType = data.keyboardType,
-        imeAction = data.imeAction,
         keyboardOptions = data.keyboardOptions,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),

@@ -159,17 +159,15 @@ class TextFieldDelegateTest {
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
         val keyboardOptions = KeyboardOptions(
             singleLine = true,
-            capitalization = KeyboardCapitalization.Sentences
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Phone,
+            imeAction = ImeAction.Search
         )
-        val keyboardType = KeyboardType.Phone
-        val imeAction = ImeAction.Search
 
         TextFieldDelegate.onFocus(
             textInputService = textInputService,
             value = editorState,
             editProcessor = processor,
-            keyboardType = keyboardType,
-            imeAction = imeAction,
             keyboardOptions = keyboardOptions,
             onValueChange = onValueChange,
             onImeActionPerformed = onEditorActionPerformed
@@ -181,8 +179,6 @@ class TextFieldDelegateTest {
                     selection = editorState.selection
                 )
             ),
-            eq(keyboardType),
-            eq(imeAction),
             eq(keyboardOptions),
             any(),
             eq(onEditorActionPerformed)
