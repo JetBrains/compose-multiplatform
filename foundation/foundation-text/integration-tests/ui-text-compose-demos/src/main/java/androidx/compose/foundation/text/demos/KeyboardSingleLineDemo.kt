@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.text.CoreTextField
@@ -30,14 +29,13 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalTextApi::class)
-private class KeyboardOptionsData(
+internal class KeyboardOptionsData(
     val keyboardOptions: KeyboardOptions,
     val name: String,
 )
@@ -68,6 +66,14 @@ private val KeyboardOptionsList = listOf(
     ),
     KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(
+            singleLine = false,
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Search
+        ),
+        name = "multiLine/Text/Search"
+    ),
+    KeyboardOptionsData(
+        keyboardOptions = KeyboardOptions(
             singleLine = true,
             keyboardType = KeyboardType.Number
         ),
@@ -82,44 +88,25 @@ private val KeyboardOptionsList = listOf(
     ),
     KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Characters,
-            keyboardType = KeyboardType.Text
+            singleLine = true,
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Send
         ),
-        name = "Capitalize Characters"
+        name = "singleLine/Number/Send"
     ),
     KeyboardOptionsData(
         keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Words,
-            keyboardType = KeyboardType.Text
+            singleLine = false,
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Send
         ),
-        name = "Capitalize Words"
-    ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences,
-            keyboardType = KeyboardType.Text
-        ),
-        name = "Capitalize Sentences"
-    ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
-            autoCorrect = true,
-            keyboardType = KeyboardType.Text
-        ),
-        name = "AutoCorrect On"
-    ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
-            autoCorrect = false,
-            keyboardType = KeyboardType.Text
-        ),
-        name = "AutoCorrect Off"
+        name = "multiLine/Number/Send"
     )
 )
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
-fun KeyboardOptionsDemo() {
+fun KeyboardSingleLineDemo() {
     ScrollableColumn {
         for (data in KeyboardOptionsList) {
             TagLine(tag = "${data.name}")
@@ -130,7 +117,6 @@ fun KeyboardOptionsDemo() {
 
 @Composable
 @OptIn(
-    ExperimentalFoundationApi::class,
     ExperimentalTextApi::class,
     InternalTextApi::class
 )
