@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 @file:Suppress("DEPRECATION_ERROR")
 
 package androidx.compose.foundation.text
@@ -156,9 +155,9 @@ import kotlin.math.roundToInt
 @Composable
 @OptIn(
     ExperimentalFocus::class,
-    InternalTextApi::class,
     ExperimentalTextApi::class
 )
+@InternalTextApi
 fun CoreTextField(
     value: TextFieldValue,
     modifier: Modifier = Modifier,

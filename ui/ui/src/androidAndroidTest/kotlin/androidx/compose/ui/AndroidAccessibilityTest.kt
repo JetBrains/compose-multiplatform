@@ -29,12 +29,12 @@ import android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_SELECTION
 import android.view.accessibility.AccessibilityNodeProvider
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -147,7 +147,7 @@ class AndroidAccessibilityTest {
                         }
                     )
                     if (isTextFieldVisible) {
-                        BaseTextField(
+                        BasicTextField(
                             modifier = Modifier
                                 .semantics {
                                     // Make sure this block will be executed when selection changes.

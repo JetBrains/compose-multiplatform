@@ -27,17 +27,18 @@ import androidx.compose.animation.core.TransitionSpec
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
-import androidx.compose.foundation.BaseTextField
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
@@ -48,12 +49,7 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -64,7 +60,12 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -140,8 +141,9 @@ internal fun TextFieldImpl(
                 },
                 modifier = tagModifier
             ) {
-                BaseTextField(
+                BasicTextField(
                     value = value,
+                    modifier = Modifier.defaultMinSizeConstraints(minWidth = TextFieldMinWidth),
                     textStyle = textStyle,
                     onValueChange = onValueChange,
                     cursorColor = if (isErrorValue) errorColor else activeColor,

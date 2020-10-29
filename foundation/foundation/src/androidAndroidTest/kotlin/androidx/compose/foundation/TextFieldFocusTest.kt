@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +48,7 @@ class TextFieldFocusTest {
     private fun TextFieldApp(dataList: List<FocusTestData>) {
         for (data in dataList) {
             val editor = remember { mutableStateOf(TextFieldValue()) }
-            CoreTextField(
+            BasicTextField(
                 value = editor.value,
                 modifier = Modifier
                     .focusRequester(data.focusRequester)

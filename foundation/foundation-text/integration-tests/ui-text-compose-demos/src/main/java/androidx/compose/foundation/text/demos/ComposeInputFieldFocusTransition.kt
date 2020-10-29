@@ -16,9 +16,9 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +66,7 @@ private fun TextFieldWithFocusRequesters(
     }
     var color by remember { mutableStateOf(Black) }
 
-    BaseTextField(
+    BasicTextField(
         value = state.value,
         modifier = demoTextFieldModifiers
             .focusObserver { color = if (it.isFocused) Red else Black }

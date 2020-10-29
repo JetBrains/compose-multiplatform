@@ -16,11 +16,11 @@
 
 package androidx.compose.ui
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.AccessibilityIterators
@@ -451,7 +451,7 @@ class AccessibilityIteratorsTest {
         rule.setContent {
             ScrollableColumn {
                 val state = remember { mutableStateOf(TextFieldValue(text = InputText)) }
-                BaseTextField(
+                BasicTextField(
                     value = state.value,
                     onValueChange = { state.value = it },
                     modifier = Modifier.testTag(TextFieldTag),

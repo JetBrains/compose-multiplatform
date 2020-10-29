@@ -17,9 +17,9 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,11 +39,11 @@ fun stateSample() {
 
         fun login() = Api.login(username.text, password.text)
 
-        BaseTextField(
+        BasicTextField(
             value = username,
             onValueChange = { username = it }
         )
-        BaseTextField(
+        BasicTextField(
             value = password,
             onValueChange = { password = it }
         )
