@@ -23,12 +23,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.selection.DisableSelection
-import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -54,13 +51,9 @@ fun TextSelectionDemo() {
 
 @Composable
 fun TextDemoSelection() {
-    val selection = remember { mutableStateOf<Selection?>(null) }
     val arabicSentence =
         "\nكلمة شين في قاموس المعاني الفوري مجال البحث مصطلحات المعجم الوسيط ،اللغة"
-    SelectionContainer(
-        selection = selection.value,
-        onSelectionChange = { selection.value = it }
-    ) {
+    SelectionContainer {
         Text(
             style = TextStyle(
                 color = Color(0xFFFF0000),
@@ -100,11 +93,7 @@ fun TextDemoSelection() {
 
 @Composable
 fun TextDemoSelectionWithStringInput() {
-    val selection = remember { mutableStateOf<Selection?>(null) }
-    SelectionContainer(
-        selection = selection.value,
-        onSelectionChange = { selection.value = it }
-    ) {
+    SelectionContainer {
         Text(
             text = "$displayText    $displayTextChinese    $displayTextHindi",
             color = Color(0xFFFF0000),
@@ -134,11 +123,7 @@ fun TextDemoSelection2DArrayVertical() {
         Color(0xFFFF0000)
     )
 
-    val selection = remember { mutableStateOf<Selection?>(null) }
-    SelectionContainer(
-        selection = selection.value,
-        onSelectionChange = { selection.value = it }
-    ) {
+    SelectionContainer {
         Column(Modifier.fillMaxHeight()) {
             for (i in 0..2) {
                 Row(Modifier.fillMaxWidth()) {
@@ -163,12 +148,7 @@ fun TextDemoSelectionEnableAndDisable() {
     val textSelectable = "This text is selectable."
     val textNotSelectable = "This text is not selectable."
 
-    val selection = remember { mutableStateOf<Selection?>(null) }
-
-    SelectionContainer(
-        selection = selection.value,
-        onSelectionChange = { selection.value = it }
-    ) {
+    SelectionContainer {
         Column(Modifier.fillMaxHeight()) {
             Text(
                 text = textSelectable,

@@ -25,11 +25,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -74,12 +71,8 @@ val langContent = arrayOf(
 
 @Composable
 fun TextSelectionSample() {
-    val selection = remember { mutableStateOf<Selection?>(null) }
     ScrollableColumn {
-        SelectionContainer(
-            selection = selection.value,
-            onSelectionChange = { selection.value = it }
-        ) {
+        SelectionContainer {
             Column(Modifier.padding(12.dp)) {
                 Basics()
                 AddTextElement()
