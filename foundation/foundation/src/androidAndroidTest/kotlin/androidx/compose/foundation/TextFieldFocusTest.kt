@@ -27,15 +27,15 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
 @OptIn(ExperimentalFocus::class)

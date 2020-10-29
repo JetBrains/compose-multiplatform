@@ -24,15 +24,15 @@ import androidx.compose.ui.focus
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @OptIn(ExperimentalFocus::class)

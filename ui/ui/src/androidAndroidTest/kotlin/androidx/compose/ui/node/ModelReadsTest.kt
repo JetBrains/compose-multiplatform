@@ -21,9 +21,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.AtLeastSize
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity

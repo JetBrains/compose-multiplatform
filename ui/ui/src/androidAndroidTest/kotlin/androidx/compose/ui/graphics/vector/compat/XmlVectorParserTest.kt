@@ -25,13 +25,13 @@ import androidx.compose.ui.graphics.vector.VectorPath
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.test.R
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)

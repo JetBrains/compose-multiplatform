@@ -28,20 +28,20 @@ import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.vector.VectorAssetBuilder
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertPixels
+import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertWidthIsEqualTo
-import androidx.ui.test.createComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.ui.test.assertPixels
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.onNodeWithTag
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

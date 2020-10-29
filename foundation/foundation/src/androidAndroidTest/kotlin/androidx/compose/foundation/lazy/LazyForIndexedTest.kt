@@ -22,11 +22,11 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithText
 import org.junit.Rule
 import org.junit.Test
 

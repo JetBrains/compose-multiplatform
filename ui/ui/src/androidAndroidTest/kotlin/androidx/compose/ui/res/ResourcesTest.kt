@@ -23,10 +23,10 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.test.R
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

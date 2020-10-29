@@ -22,25 +22,25 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.MotionEvent
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 

@@ -21,11 +21,11 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.ComposeTestRuleJUnit
-import androidx.ui.test.SemanticsNodeInteraction
-import androidx.ui.test.onNodeWithTag
 
 /**
  * Constant to emulate very big but finite constraints
@@ -33,7 +33,7 @@ import androidx.ui.test.onNodeWithTag
 val BigTestMaxWidth = 5000.dp
 val BigTestMaxHeight = 5000.dp
 
-fun ComposeTestRuleJUnit.setContentForSizeAssertions(
+fun ComposeTestRule.setContentForSizeAssertions(
     parentMaxWidth: Dp = BigTestMaxWidth,
     parentMaxHeight: Dp = BigTestMaxHeight,
     children: @Composable () -> Unit

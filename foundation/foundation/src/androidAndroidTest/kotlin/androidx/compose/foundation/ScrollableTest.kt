@@ -33,29 +33,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.LargeTest
 import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestUiDispatcher
-import androidx.ui.test.center
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.down
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.monotonicFrameAnimationClockOf
-import androidx.ui.test.moveBy
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
+import androidx.compose.ui.test.moveBy
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.runBlockingWithManualClock
-import androidx.ui.test.swipe
-import androidx.ui.test.swipeWithVelocity
-import androidx.ui.test.up
+import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.test.up
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.milliseconds
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

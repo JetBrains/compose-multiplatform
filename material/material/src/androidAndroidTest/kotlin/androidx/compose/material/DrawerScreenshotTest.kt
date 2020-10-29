@@ -24,19 +24,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.test.screenshot.assertAgainstGolden
-import androidx.ui.test.ComposeTestRuleJUnit
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -49,7 +49,7 @@ class DrawerScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
-    private fun ComposeTestRuleJUnit.setBottomDrawer(drawerValue: BottomDrawerValue) {
+    private fun ComposeTestRule.setBottomDrawer(drawerValue: BottomDrawerValue) {
         setMaterialContent {
             Box(Modifier.size(10.dp, 100.dp).testTag("container")) {
                 BottomDrawerLayout(
@@ -61,7 +61,7 @@ class DrawerScreenshotTest {
         }
     }
 
-    private fun ComposeTestRuleJUnit.setModalDrawer(drawerValue: DrawerValue) {
+    private fun ComposeTestRule.setModalDrawer(drawerValue: DrawerValue) {
         setMaterialContent {
             Box(Modifier.size(100.dp, 10.dp).testTag("container")) {
                 ModalDrawerLayout(

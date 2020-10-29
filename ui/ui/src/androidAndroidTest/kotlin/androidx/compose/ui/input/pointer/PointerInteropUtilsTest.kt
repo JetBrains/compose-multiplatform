@@ -22,11 +22,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)

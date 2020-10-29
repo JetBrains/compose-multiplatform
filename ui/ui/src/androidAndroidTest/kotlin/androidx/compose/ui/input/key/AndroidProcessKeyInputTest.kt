@@ -31,8 +31,8 @@ import androidx.compose.ui.input.key.Key.Companion.A
 import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.KeyEventType.KeyUp
 import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.SmallTest
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

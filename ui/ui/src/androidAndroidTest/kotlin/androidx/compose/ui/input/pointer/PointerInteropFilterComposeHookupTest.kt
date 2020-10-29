@@ -30,14 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createAndroidComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 // Tests basic operations to make sure that pointerInputModifier(view: AndroidViewHolder) is
 // hooked up to PointerInteropFilter correctly.
