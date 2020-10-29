@@ -8,9 +8,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
