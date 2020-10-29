@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
+import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumeDownChange
@@ -45,7 +46,7 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
- * Receiver scope for [tapGestureDetector]'s `onPress` lambda. This offers
+ * Receiver scope for [detectTapGestures]'s `onPress` lambda. This offers
  * two methods to allow waiting for the press to be released.
  */
 interface PressGestureScope : Density {
@@ -86,7 +87,7 @@ private val NoPressGesture: suspend PressGestureScope.(Offset) -> Unit = { }
  * called after a gesture has been canceled.
  */
 @ExperimentalPointerInput
-suspend fun PointerInputScope.tapGestureDetector(
+suspend fun PointerInputScope.detectTapGestures(
     onDoubleTap: (() -> Unit)? = null,
     onLongPress: (() -> Unit)? = null,
     onPress: suspend PressGestureScope.(Offset) -> Unit = NoPressGesture,
@@ -182,15 +183,21 @@ suspend fun PointerInputScope.tapGestureDetector(
 }
 
 /**
- * Reads events until the first down is received and it isn't consumed in the
- * [PointerEventPass.Main] pass.
+ * Reads events until the first down is received. If [requireUnconsumed] is `true` and the first
+ * down is consumed in the [PointerEventPass.Main] pass, that gesture is ignored.
  */
 @ExperimentalPointerInput
-suspend fun HandlePointerInputScope.waitForFirstDown(): PointerInputChange {
+suspend fun HandlePointerInputScope.waitForFirstDown(
+    requireUnconsumed: Boolean = true
+): PointerInputChange {
     var event: PointerEvent
     do {
         event = awaitPointerEvent()
-    } while (!event.changes.fastAll { it.changedToDown() })
+    } while (
+        !event.changes.fastAll {
+            if (requireUnconsumed) it.changedToDown() else it.changedToDownIgnoreConsumed()
+        }
+    )
     return event.changes[0]
 }
 
@@ -262,7 +269,7 @@ private suspend fun PointerInputScope.detectSecondTapDown(
 }
 
 /**
- * [tapGestureDetector]'s implementation of [PressGestureScope].
+ * [detectTapGestures]'s implementation of [PressGestureScope].
  */
 private class PressGestureScopeImpl(
     density: Density
