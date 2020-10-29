@@ -18,12 +18,10 @@ package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 
-@ExperimentalLazyDsl
 @Sampled
 @Composable
 fun LazyColumnSample() {
@@ -45,7 +43,6 @@ fun LazyColumnSample() {
     }
 }
 
-@ExperimentalLazyDsl
 @Sampled
 @Composable
 fun LazyRowSample() {

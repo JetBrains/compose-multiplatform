@@ -43,9 +43,9 @@ import androidx.compose.ui.unit.dp
  * @param items the backing list of data to display
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
- * @param contentPadding convenience param to specify a padding around the whole content. This will
- * add padding for the content after it has been clipped, which is not possible via [modifier]
- * param. Note that it is *not* a padding applied for each item's content
+ * @param contentPadding a padding around the whole content. This will add padding for the
+ * content after it has been clipped, which is not possible via [modifier] param. Note that it is
+ * **not** a padding applied for each item's content
  * @param horizontalAlignment the horizontal alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. May emit any number of components,
  * which will be stacked vertically. Note that [LazyColumnFor] can start scrolling incorrectly
@@ -92,9 +92,9 @@ fun <T> LazyColumnFor(
  * @param items the backing list of data to display
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
- * @param contentPadding convenience param to specify a padding around the whole content. This will
- * add padding for the content after it has been clipped, which is not possible via [modifier]
- * param. Note that it is *not* a padding applied for each item's content
+ * @param contentPadding a padding around the whole content. This will add padding for the
+ * content after it has been clipped, which is not possible via [modifier] param. Note that it is
+ * **not** a padding applied for each item's content
  * @param horizontalAlignment the horizontal alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. It has two params: first one is
  * an index in the [items] list, and the second one is the item at this index from [items] list.
@@ -140,9 +140,9 @@ fun <T> LazyColumnForIndexed(
  * @param items the backing list of data to display
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
- * @param contentPadding convenience param to specify a padding around the whole content. This will
- * add padding for the content after it has been clipped, which is not possible via [modifier]
- * param. Note that it is *not* a padding applied for each item's content
+ * @param contentPadding a padding around the whole content. This will add padding for the
+ * content after it has been clipped, which is not possible via [modifier] param. Note that it is
+ * **not** a padding applied for each item's content
  * @param verticalAlignment the vertical alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. May emit any number of components,
  * which will be stacked horizontally. Note that [LazyRowFor] can start scrolling incorrectly
@@ -188,9 +188,9 @@ fun <T> LazyRowFor(
  * @param items the backing list of data to display
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
- * @param contentPadding convenience param to specify a padding around the whole content. This will
- * add padding for the content after it has been clipped, which is not possible via [modifier]
- * param. Note that it is *not* a padding applied for each item's content
+ * @param contentPadding a padding around the whole content. This will add padding for the
+ * content after it has been clipped, which is not possible via [modifier] param. Note that it is
+ * **not** a padding applied for each item's content
  * @param verticalAlignment the vertical alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. It has two params: first one is
  * an index in the [items] list, and the second one is the item at this index from [items] list.

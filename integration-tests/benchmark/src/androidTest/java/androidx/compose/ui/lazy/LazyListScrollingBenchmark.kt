@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
@@ -114,7 +113,6 @@ class LazyListScrollingTestCase(
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
 private val LazyColumnWithItemAndItems = LazyListScrollingTestCase("LazyColumnWithItemAndItems") {
     LazyColumn(modifier = Modifier.height(400.dp).fillMaxWidth()) {
         item {
@@ -126,7 +124,6 @@ private val LazyColumnWithItemAndItems = LazyListScrollingTestCase("LazyColumnWi
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
 private val LazyColumnWithItems = LazyListScrollingTestCase("LazyColumnWithItems") {
     LazyColumn(modifier = Modifier.height(400.dp).fillMaxWidth()) {
         items(items) {
@@ -139,7 +136,6 @@ private val LazyColumnWithItems = LazyListScrollingTestCase("LazyColumnWithItems
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
 private val LazyColumnWithItemsIndexed = LazyListScrollingTestCase("LazyColumnWithItemsIndexed") {
     LazyColumn(modifier = Modifier.height(400.dp).fillMaxWidth()) {
         itemsIndexed(items) { index, _ ->
@@ -172,7 +168,6 @@ private val LazyColumnForIndexed = LazyListScrollingTestCase("LazyColumnForIndex
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
 private val LazyRowWithItemAndItems = LazyListScrollingTestCase("LazyRowWithItemAndItems") {
     LazyRow(modifier = Modifier.width(400.dp).fillMaxHeight()) {
         item {
@@ -184,7 +179,6 @@ private val LazyRowWithItemAndItems = LazyListScrollingTestCase("LazyRowWithItem
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
 private val LazyRowWithItems = LazyListScrollingTestCase("LazyRowWithItems") {
     LazyRow(modifier = Modifier.width(400.dp).fillMaxHeight()) {
         items(items) {
@@ -197,7 +191,6 @@ private val LazyRowWithItems = LazyListScrollingTestCase("LazyRowWithItems") {
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
 private val LazyRowWithItemsIndexed = LazyListScrollingTestCase("LazyRowWithItemsIndexed") {
     LazyRow(modifier = Modifier.width(400.dp).fillMaxHeight()) {
         itemsIndexed(items) { index, _ ->
