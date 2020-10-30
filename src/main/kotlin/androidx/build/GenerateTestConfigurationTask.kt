@@ -21,6 +21,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
@@ -45,10 +46,9 @@ const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
             <option name="min-api-level" value="MIN_SDK" />
         </object>
-        <option name="test-suite-tag" value="androidx_unit_tests" />
+        <option name="test-suite-tag" value="TEST_SUITE_TAG" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
         <option name="wifi:disable" value="true" />
-        <option name="check-min-sdk" value="true" />
         <include name="google/unbundled/common/setup" />
         <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
         <option name="cleanup-apks" value="true" />
@@ -56,7 +56,7 @@ const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         <option name="test-file-name" value="APP_FILE_NAME" />
         </target_preparer>
         <test class="com.android.tradefed.testtype.AndroidJUnitTest">
-        <option name="runner" value="androidx.test.runner.AndroidJUnitRunner"/>
+        <option name="runner" value="TEST_RUNNER"/>
         <option name="package" value="APPLICATION_ID" />
         </test>
         </configuration>"""
@@ -78,26 +78,25 @@ const val SELF_INSTRUMENTING_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?
         <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
             <option name="min-api-level" value="MIN_SDK" />
         </object>
-        <option name="test-suite-tag" value="androidx_unit_tests" />
+        <option name="test-suite-tag" value="TEST_SUITE_TAG" />
         <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
         <option name="wifi:disable" value="true" />
-        <option name="check-min-sdk" value="true" />
         <include name="google/unbundled/common/setup" />
         <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
         <option name="cleanup-apks" value="true" />
         <option name="test-file-name" value="TEST_FILE_NAME" />
         </target_preparer>
         <test class="com.android.tradefed.testtype.AndroidJUnitTest">
-        <option name="runner" value="androidx.test.runner.AndroidJUnitRunner"/>
+        <option name="runner" value="TEST_RUNNER"/>
         <option name="package" value="APPLICATION_ID" />
         </test>
         </configuration>"""
 
 /**
-Writes a configuration file in
-<a href=https://source.android.com/devices/tech/test_infra/tradefed/testing/through-suite/android-test-structure>AndroidTest.xml</a>
-format that gets zipped alongside the APKs to be tested.
- This config gets ingested by Tradefed.
+ * Writes a configuration file in
+ * <a href=https://source.android.com/devices/tech/test_infra/tradefed/testing/through-suite/android-test-structure>AndroidTest.xml</a>
+ * format that gets zipped alongside the APKs to be tested.
+ * This config gets ingested by Tradefed.
  */
 abstract class GenerateTestConfigurationTask : DefaultTask() {
 
@@ -114,11 +113,20 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Internal
     abstract val testLoader: Property<BuiltArtifactsLoader>
 
-    @get:Internal
+    @get:Input
     abstract val minSdk: Property<Int>
 
+    @get:Input
+    abstract val hasBenchmarkPlugin: Property<Boolean>
+
+    @get:Input
+    abstract val testRunner: Property<String>
+
+    @get:Input
+    abstract val projectPath: Property<String>
+
     @get:OutputFile
-    val outputXml: RegularFileProperty = project.objects.fileProperty()
+    abstract val outputXml: RegularFileProperty
 
     @TaskAction
     fun generateAndroidTestZip() {
@@ -126,31 +134,32 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     }
 
     private fun writeConfigFileContent() {
-        val testApk = testLoader.get().load(testFolder.get())
-            ?: throw RuntimeException("Cannot load test APK for $name")
-        val testName = testApk.elements.single().outputFile
-            .substringAfterLast("/").renameApkForTesting(project)
-        val configContent: String
         /*
         Testing an Android Application project involves 2 APKS: an application to be instrumented,
         and a test APK. Testing an Android Library project involves only 1 APK, since the library
         is bundled inside the test APK, meaning it is self instrumenting. We add extra data to
         configurations testing Android Application projects, so that both APKs get installed.
          */
-        configContent = if (!appLoader.isPresent) {
-            SELF_INSTRUMENTING_TEMPLATE.replace("TEST_FILE_NAME", testName)
-                .replace("APPLICATION_ID", testApk.applicationId)
-                .replace("MIN_SDK", minSdk.get().toString())
-        } else {
+        var configContent: String = if (appLoader.isPresent) {
             val appApk = appLoader.get().load(appFolder.get())
                 ?: throw RuntimeException("Cannot load application APK for $name")
             val appName = appApk.elements.single().outputFile.substringAfterLast("/")
-                .renameApkForTesting(project)
-            TEMPLATE.replace("TEST_FILE_NAME", testName)
-                .replace("APP_FILE_NAME", appName)
-                .replace("APPLICATION_ID", testApk.applicationId)
-                .replace("MIN_SDK", minSdk.get().toString())
+                .renameApkForTesting(projectPath.get(), hasBenchmarkPlugin.get())
+            TEMPLATE.replace("APP_FILE_NAME", appName)
+        } else {
+            SELF_INSTRUMENTING_TEMPLATE
         }
+        val tag = if (hasBenchmarkPlugin.get()) "MetricTests" else "androidx_unit_tests"
+        val testApk = testLoader.get().load(testFolder.get())
+            ?: throw RuntimeException("Cannot load test APK for $name")
+        val testName = testApk.elements.single().outputFile
+            .substringAfterLast("/")
+            .renameApkForTesting(projectPath.get(), hasBenchmarkPlugin.get())
+        configContent = configContent.replace("TEST_FILE_NAME", testName)
+            .replace("APPLICATION_ID", testApk.applicationId)
+            .replace("MIN_SDK", minSdk.get().toString())
+            .replace("TEST_SUITE_TAG", tag)
+            .replace("TEST_RUNNER", testRunner.get())
         val resolvedOutputFile: File = outputXml.asFile.get()
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
