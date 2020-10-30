@@ -276,6 +276,17 @@ package androidx.compose.ui.test {
   public final class TestContext {
   }
 
+  @kotlinx.coroutines.ExperimentalCoroutinesApi public final class TestMonotonicFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
+    ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, kotlinx.coroutines.test.DelayController delayController, long frameDelayNanos);
+    method public long getFrameDelayNanos();
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    property public final long frameDelayNanos;
+  }
+
+  public final class TestMonotonicFrameClockKt {
+    method @kotlinx.coroutines.ExperimentalCoroutinesApi public static androidx.compose.ui.test.TestMonotonicFrameClock TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, optional long frameDelayNanos);
+  }
+
   @androidx.compose.ui.test.InternalTestingApi public interface TestOwner {
     method public java.util.Set<androidx.compose.ui.node.Owner> getOwners();
     method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
