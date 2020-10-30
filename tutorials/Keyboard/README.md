@@ -27,7 +27,7 @@ There are two ways to handle key events in Compose for Desktop:
 
 ## Focus related events
 
-It works the same as Compose for Android, see for details [API Reference](https://developer.android.com/reference/kotlin/androidx/compose/ui/input/key/package-summary#keyinputfilter)
+It works the same as Compose for Android, for details see [API Reference](https://developer.android.com/reference/kotlin/androidx/compose/ui/input/key/package-summary#keyinputfilter)
 
 `Modifier.shortcuts` is used to define one or multiple callbacks for `KeysSet`s.
 
@@ -78,7 +78,7 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
 ```
 
 
-Note an annotation `@OptIn(ExperimentalKeyInput::class)`. Keyboard-related event handlers are still an experimental feature of Compose, and later API changes are possible. So it requires the use of a special annotation to emphasize the experimental nature of the code.
+Note the annotation `@OptIn(ExperimentalKeyInput::class)`. Keyboard-related event handlers are still an experimental feature of Compose, and later API changes are possible. So it requires the use of a special annotation to emphasize the experimental nature of the code.
 
 ![keyInputFilter](keyInputFilter.gif)
 
