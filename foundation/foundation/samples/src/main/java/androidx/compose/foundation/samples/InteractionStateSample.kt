@@ -17,7 +17,6 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -31,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

@@ -16,8 +16,6 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
@@ -41,6 +39,8 @@ import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.material.AmbientContentColor
+import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers

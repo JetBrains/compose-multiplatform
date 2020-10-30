@@ -17,8 +17,8 @@
 
 package androidx.compose.material.ripple
 
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Interaction
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable

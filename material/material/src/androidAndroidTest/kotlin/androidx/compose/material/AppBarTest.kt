@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable

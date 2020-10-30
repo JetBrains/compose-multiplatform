@@ -16,9 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.AmbientIndication
-import androidx.compose.foundation.ProvideTextStyle
+import androidx.compose.foundation.Indication
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract

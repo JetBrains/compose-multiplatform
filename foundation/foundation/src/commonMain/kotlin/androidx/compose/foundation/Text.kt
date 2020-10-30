@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation
 
 import androidx.compose.foundation.text.BasicText
@@ -115,7 +117,6 @@ fun Text(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = AmbientTextStyle.current
 ) {
-    @Suppress("DEPRECATION")
     Text(
         AnnotatedString(text),
         modifier,
@@ -249,6 +250,13 @@ fun Text(
  *
  * @see ProvideTextStyle
  */
+@Deprecated(
+    message = "AmbientTextStyle has moved to the Material library. For non-Material applications," +
+        " create your own design system specific theming ambients.",
+    replaceWith = ReplaceWith(
+        "AmbientTextStyle", "androidx.compose.material.AmbientTextStyle"
+    )
+)
 val AmbientTextStyle = ambientOf(
     @OptIn(ExperimentalComposeApi::class) structuralEqualityPolicy()
 ) { TextStyle() }
@@ -261,6 +269,14 @@ val AmbientTextStyle = ambientOf(
  *
  * @see AmbientTextStyle
  */
+@Deprecated(
+    message = "ProvideTextStyle has moved to the Material library. For non-Material applications," +
+        " create your own design system specific theming ambients.",
+    replaceWith = ReplaceWith(
+        "ProvideTextStyle(value, children)",
+        "androidx.compose.material.ProvideTextStyle"
+    )
+)
 @Composable
 fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
     val mergedStyle = AmbientTextStyle.current.merge(value)
