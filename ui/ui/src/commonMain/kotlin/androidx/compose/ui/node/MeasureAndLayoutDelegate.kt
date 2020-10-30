@@ -25,7 +25,6 @@ import androidx.compose.ui.node.LayoutNode.UsageByParent.InLayoutBlock
 import androidx.compose.ui.node.LayoutNode.UsageByParent.InMeasureBlock
 import androidx.compose.ui.node.LayoutNode.UsageByParent.NotUsed
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.isZero
 import androidx.compose.ui.util.fastForEach
 
 /**
@@ -80,7 +79,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      */
     private val postponedMeasureRequests = mutableListOf<LayoutNode>()
 
-    private var rootConstraints = Constraints.fixed(width = 0, height = 0)
+    private var rootConstraints: Constraints? = null
 
     /**
      * @param constraints The constraints to measure the root [LayoutNode] with
@@ -167,7 +166,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         }
     }
 
-    private fun doRemeasure(layoutNode: LayoutNode): Boolean {
+    private fun doRemeasure(layoutNode: LayoutNode, rootConstraints: Constraints): Boolean {
         val sizeChanged = if (layoutNode === root) {
             layoutNode.remeasure(rootConstraints)
         } else {
@@ -195,9 +194,8 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         require(root.isPlaced)
         require(!duringMeasureLayout)
         // we don't need to measure any children unless we have the correct root constraints
-        if (rootConstraints.isZero) {
-            return false
-        }
+        val rootConstraints = rootConstraints ?: return false
+
         var rootNodeResized = false
         if (relayoutNodes.isNotEmpty()) {
             duringMeasureLayout = true
@@ -211,7 +209,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                         )
                 ) {
                     if (layoutNode.layoutState == NeedsRemeasure) {
-                        if (doRemeasure(layoutNode)) {
+                        if (doRemeasure(layoutNode, rootConstraints)) {
                             rootNodeResized = true
                         }
                     }
