@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
@@ -32,6 +34,8 @@ import example.todo.common.main.TodoMain.Output
 import example.todo.common.main.store.TodoItem
 import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.common.main.store.TodoMainStore.State
+import example.todo.common.utils.compose.VerticalScrollbar
+import example.todo.common.utils.compose.rememberScrollbarAdapter
 import example.todo.common.utils.onKeyUp
 
 @Composable
@@ -67,33 +71,46 @@ private fun TodoList(
     onDoneChanged: (id: Long, isDone: Boolean) -> Unit,
     onDeleteItemClicked: (id: Long) -> Unit
 ) {
-    LazyColumnFor(items = items) { item ->
-        Row(modifier = Modifier.clickable(onClick = { onItemClicked(item.id) })) {
-            Spacer(modifier = Modifier.width(8.dp))
+    Box {
+        val listState = rememberLazyListState()
 
-            Checkbox(
-                checked = item.isDone,
-                modifier = Modifier.align(Alignment.CenterVertically),
-                onCheckedChange = { onDoneChanged(item.id, it) }
-            )
+        LazyColumnFor(items = items, state = listState) { item ->
+            Row(modifier = Modifier.clickable(onClick = { onItemClicked(item.id) })) {
+                Spacer(modifier = Modifier.width(8.dp))
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Checkbox(
+                    checked = item.isDone,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    onCheckedChange = { onDoneChanged(item.id, it) }
+                )
 
-            Text(
-                text = AnnotatedString(item.text),
-                modifier = Modifier.weight(1F).align(Alignment.CenterVertically),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+                Spacer(modifier = Modifier.width(8.dp))
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = AnnotatedString(item.text),
+                    modifier = Modifier.weight(1F).align(Alignment.CenterVertically),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-            IconButton(onClick = { onDeleteItemClicked(item.id) }) {
-                Icon(Icons.Default.Delete)
+                Spacer(modifier = Modifier.width(8.dp))
+
+                IconButton(onClick = { onDeleteItemClicked(item.id) }) {
+                    Icon(Icons.Default.Delete)
+                }
             }
+
+            Divider()
         }
 
-        Divider()
+        VerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            adapter = rememberScrollbarAdapter(
+                scrollState = listState,
+                itemCount = items.size,
+                averageItemSize = 37.dp
+            )
+        )
     }
 }
 
