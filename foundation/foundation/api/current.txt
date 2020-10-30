@@ -449,5 +449,10 @@ package androidx.compose.foundation.text {
     method @androidx.compose.runtime.Composable public static void BasicTextField-l6wg7Pw(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
   }
 
+  public final class BasicTextKt {
+    method @androidx.compose.runtime.Composable public static void BasicText(String text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines);
+    method @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent);
+  }
+
 }
 

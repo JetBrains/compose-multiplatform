@@ -209,7 +209,6 @@ fun Text(
             letterSpacing = letterSpacing
         )
     )
-    // TODO: text could contain composables, should be the final text
     CoreText(
         text,
         modifier.semantics { this.text = text },
