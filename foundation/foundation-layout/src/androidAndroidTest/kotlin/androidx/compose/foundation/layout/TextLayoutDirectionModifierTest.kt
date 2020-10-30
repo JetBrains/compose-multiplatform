@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.CoreText
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.text.AnnotatedString
@@ -66,17 +66,18 @@ class TextLayoutDirectionModifierTest : LayoutTest() {
         var layoutDirection: LayoutDirection? = null
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                CoreText(
+                BasicText(
                     text = AnnotatedString("..."),
                     style = TextStyle.Default,
+                    onTextLayout = { result ->
+                        layoutDirection = result.layoutInput.layoutDirection
+                        latch.countDown()
+                    },
                     softWrap = true,
                     overflow = TextOverflow.Clip,
                     maxLines = 1,
                     inlineContent = mapOf()
-                ) { result ->
-                    layoutDirection = result.layoutInput.layoutDirection
-                    latch.countDown()
-                }
+                )
             }
         }
 
