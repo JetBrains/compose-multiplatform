@@ -292,14 +292,18 @@ internal class RecomposeScope(var composer: Composer<*>?) : ScopeUpdateScope {
 
 /**
  * An instance to hold a value provided by [Providers] and is created by the
- * [ProvidableAmbient.provides] infixed operator.
+ * [ProvidableAmbient.provides] infixed operator. If [canOverride] is `false`, the
+ * provided value will not overwrite a potentially already existing value in the scope.
  */
-class ProvidedValue<T> internal constructor(val ambient: Ambient<T>, val value: T)
+class ProvidedValue<T> internal constructor(
+    val ambient: Ambient<T>,
+    val value: T,
+    val canOverride: Boolean
+)
 
 /**
  * An ambient map is is an immutable map that maps ambient keys to a provider of their current
- * value. It is used both to represent the values provided by a [Providers] call and the combined
- * scope of all provided ambients.
+ * value. It is used to represent the combined scope of all provided ambients.
  */
 internal typealias AmbientMap = PersistentMap<Ambient<Any?>, State<Any?>>
 
@@ -314,12 +318,14 @@ internal fun <T> AmbientMap.contains(key: Ambient<T>) = this.containsKey(key as 
 internal fun <T> AmbientMap.getValueOf(key: Ambient<T>) = this[key as Ambient<Any?>]?.value as T
 
 @Composable
-private fun ambientMapOf(values: Array<out ProvidedValue<*>>): AmbientMap {
+private fun ambientMapOf(values: Array<out ProvidedValue<*>>, parentScope: AmbientMap): AmbientMap {
     val result: AmbientMap = persistentHashMapOf()
     return result.mutate {
         for (provided in values) {
-            @Suppress("UNCHECKED_CAST")
-            it[provided.ambient as Ambient<Any?>] = provided.ambient.provided(provided.value)
+            if (provided.canOverride || !parentScope.contains(provided.ambient)) {
+                @Suppress("UNCHECKED_CAST")
+                it[provided.ambient as Ambient<Any?>] = provided.ambient.provided(provided.value)
+            }
         }
     }
 }
@@ -1216,7 +1222,7 @@ class Composer<N>(
         // slots consumed depending on the content of values to remember, for example, the value
         // holders used last time.
         startGroup(providerValuesKey, providerValues)
-        val currentProviders = invokeComposableForResult(this) { ambientMapOf(values) }
+        val currentProviders = invokeComposableForResult(this) { ambientMapOf(values, parentScope) }
         endGroup()
         val providers: AmbientMap
         val invalid: Boolean
