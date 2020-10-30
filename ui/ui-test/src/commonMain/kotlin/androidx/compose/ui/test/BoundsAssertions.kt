@@ -127,15 +127,15 @@ fun SemanticsNodeInteraction.assertTopPositionInRootIsEqualTo(
  * Asserts that the layout of this node has the left position in the root composable that is
  * equal to the given position.
  *
- * @param expectedTop The left (x) position to assert.
+ * @param expectedLeft The left (x) position to assert.
  *
  * @throws AssertionError if comparison fails.
  */
 fun SemanticsNodeInteraction.assertLeftPositionInRootIsEqualTo(
-    expectedTop: Dp
+    expectedLeft: Dp
 ): SemanticsNodeInteraction {
     return withUnclippedBoundsInRoot {
-        it.left.toDp().assertIsEqualTo(expectedTop, "left")
+        it.left.toDp().assertIsEqualTo(expectedLeft, "left")
     }
 }
 

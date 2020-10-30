@@ -16,5 +16,12 @@
 
 package androidx.ui.test
 
-/** @Deprecated Moved to androidx.compose.ui.test.junit4 */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4
+ * library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    replaceWith = ReplaceWith("ComposeTestRule", "androidx.compose.ui.test.junit4")
+)
 typealias ComposeTestRule = androidx.compose.ui.test.junit4.ComposeTestRule

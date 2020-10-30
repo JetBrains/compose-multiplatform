@@ -16,8 +16,22 @@
 
 package androidx.ui.test
 
-/** @Deprecated Moved to androidx.compose.ui.test */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4
+ * library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    replaceWith = ReplaceWith("ComposeTestRule", "androidx.compose.ui.test.junit4")
+)
 typealias ComposeTestRuleJUnit = androidx.compose.ui.test.junit4.ComposeTestRule
 
-/** @Deprecated Moved to androidx.compose.ui.test */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4
+ * library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    replaceWith = ReplaceWith("createComposeRule()", "androidx.compose.ui.test.junit4")
+)
 expect fun createComposeRule(): androidx.compose.ui.test.junit4.ComposeTestRule
