@@ -148,21 +148,13 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
     launcherMainJar.set(app.mainJar.orNull)
     app._fromFiles.forEach { files.from(it) }
     dependsOn(*app._dependenciesTaskNames.toTypedArray())
-    when (val configSource = app._configurationSource) {
-        is ConfigurationSource.None -> {}
-        is ConfigurationSource.GradleSourceSet -> {
-            val sourceSet = configSource.sourceSet
-            dependsOn(sourceSet.jarTaskName)
-            launcherMainJar.set(app.mainJar.orElse(jarFromJarTaskByName(sourceSet.jarTaskName)))
-            files.from(sourceSet.runtimeClasspath)
-        }
-        is ConfigurationSource.KotlinMppTarget -> {
-            val target = configSource.target
-            dependsOn(target.artifactsTaskName)
-            launcherMainJar.set(app.mainJar.orElse(jarFromJarTaskByName(target.artifactsTaskName)))
-            files.from(target.runtimeFiles())
-        }
+
+    app._configurationSource?.let { configSource ->
+        dependsOn(configSource.jarTaskName)
+        files.from(configSource.runtimeClasspath)
+        launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
     }
+
     modules.set(provider { app.nativeDistributions.modules })
     launcherMainClass.set(provider { app.mainClass })
     launcherJvmArgs.set(provider { app.jvmArgs })
@@ -184,26 +176,14 @@ private fun Project.configureRunTask(app: Application) {
         cp.from(app._fromFiles)
         dependsOn(*app._dependenciesTaskNames.toTypedArray())
 
-        when (val configSource = app._configurationSource) {
-            is ConfigurationSource.None -> {}
-            is ConfigurationSource.GradleSourceSet -> {
-                val sourceSet = configSource.sourceSet
-                dependsOn(sourceSet.jarTaskName)
-                cp.from(sourceSet.runtimeClasspath)
-            }
-            is ConfigurationSource.KotlinMppTarget -> {
-                val target = configSource.target
-                dependsOn(target.artifactsTaskName)
-                cp.from(target.runtimeFiles())
-            }
+        app._configurationSource?.let { configSource ->
+            dependsOn(configSource.jarTaskName)
+            cp.from(configSource.runtimeClasspath)
         }
 
         classpath = cp
     }
 }
-
-private fun KotlinTarget.runtimeFiles(): FileCollection =
-    (compilations.getByName("main") as KotlinCompilationToRunnableFiles).runtimeDependencyFiles
 
 private fun Application.javaHomeOrDefault(): String =
     javaHome ?: System.getProperty("java.home")

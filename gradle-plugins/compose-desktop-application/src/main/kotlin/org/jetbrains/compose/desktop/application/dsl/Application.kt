@@ -15,7 +15,7 @@ open class Application @Inject constructor(
     val name: String,
     objects: ObjectFactory
 ) {
-    internal var _configurationSource: ConfigurationSource = ConfigurationSource.None
+    internal var _configurationSource: ConfigurationSource? = null
     internal val _fromFiles = objects.fileCollection()
     internal val _dependenciesTaskNames = ArrayList<String>()
 
@@ -28,7 +28,7 @@ open class Application @Inject constructor(
         _configurationSource = ConfigurationSource.KotlinMppTarget(from)
     }
     fun disableDefaultConfiguration() {
-        _configurationSource = ConfigurationSource.None
+        _configurationSource = null
     }
 
     fun fromFiles(vararg files: Any) {
