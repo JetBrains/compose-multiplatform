@@ -31,7 +31,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -215,7 +215,7 @@ fun BasicTextField(
         onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor,
-        keyboardOptions = KeyboardOptions(
+        imeOptions = ImeOptions(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),

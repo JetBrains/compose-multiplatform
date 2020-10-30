@@ -22,7 +22,7 @@ import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.MoveCursorEditOp
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.SetComposingTextEditOp
@@ -66,12 +66,12 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
 
     override fun startInput(
         value: TextFieldValue,
-        keyboardOptions: KeyboardOptions,
+        imeOptions: ImeOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
         val input = CurrentInput(
-            value, onEditCommand, onImeActionPerformed, keyboardOptions.imeAction
+            value, onEditCommand, onImeActionPerformed, imeOptions.imeAction
         )
         currentInput = input
 

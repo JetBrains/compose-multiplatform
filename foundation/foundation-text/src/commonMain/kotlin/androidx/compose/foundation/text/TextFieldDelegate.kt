@@ -40,7 +40,7 @@ import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
@@ -317,20 +317,20 @@ class TextFieldDelegate {
          * @param editProcessor The edit processor
          * @param onValueChange The callback called when the new editor state arrives.
          * @param onImeActionPerformed The callback called when the editor action arrives.
-         * @param keyboardOptions Keyboard configuration such as single line, auto correct etc.
+         * @param imeOptions Keyboard configuration such as single line, auto correct etc.
          */
         @JvmStatic
         internal fun onFocus(
             textInputService: TextInputService?,
             value: TextFieldValue,
             editProcessor: EditProcessor,
-            keyboardOptions: KeyboardOptions,
+            imeOptions: ImeOptions,
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): InputSessionToken {
             val inputSessionToken = textInputService?.startInput(
                 value = TextFieldValue(value.text, value.selection, value.composition),
-                keyboardOptions = keyboardOptions,
+                imeOptions = imeOptions,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
             ) ?: INVALID_SESSION

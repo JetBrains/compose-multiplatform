@@ -28,7 +28,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
@@ -59,14 +59,14 @@ class CoreTextFieldInputServiceIntegrationTest {
     val rule = createComposeRule()
 
     @Test
-    fun textField_KeyboardOptions_isPassedTo_platformTextInputService() {
+    fun textField_ImeOptions_isPassedTo_platformTextInputService() {
         val platformTextInputService = mock<PlatformTextInputService>()
         @Suppress("DEPRECATION_ERROR")
         textInputServiceFactory = { TextInputService(platformTextInputService) }
 
         val testTag = "KeyboardOption"
         val value = TextFieldValue("abc")
-        val keyboardOptions = KeyboardOptions(
+        val imeOptions = ImeOptions(
             singleLine = true,
             capitalization = KeyboardCapitalization.Words,
             autoCorrect = false,
@@ -79,7 +79,7 @@ class CoreTextFieldInputServiceIntegrationTest {
         rule.setContent {
             CoreTextField(
                 value = value,
-                keyboardOptions = keyboardOptions,
+                imeOptions = imeOptions,
                 modifier = Modifier
                     .testTag(testTag)
                     .focusObserver { focused = it.isFocused },
@@ -94,7 +94,7 @@ class CoreTextFieldInputServiceIntegrationTest {
 
             verify(platformTextInputService, times(1)).startInput(
                 eq(value),
-                eq(keyboardOptions),
+                eq(imeOptions),
                 any(), // onEditCommand
                 any() // onImeActionPerformed
             )

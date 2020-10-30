@@ -61,13 +61,13 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
      */
     open fun startInput(
         value: TextFieldValue,
-        keyboardOptions: KeyboardOptions,
+        imeOptions: ImeOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ): InputSessionToken {
         platformTextInputService.startInput(
             value,
-            keyboardOptions,
+            imeOptions,
             onEditCommand,
             onImeActionPerformed
         )
@@ -127,7 +127,7 @@ interface PlatformTextInputService {
      */
     fun startInput(
         value: TextFieldValue,
-        keyboardOptions: KeyboardOptions,
+        imeOptions: ImeOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     )

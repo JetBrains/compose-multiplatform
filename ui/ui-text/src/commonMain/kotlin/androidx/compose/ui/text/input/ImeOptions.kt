@@ -20,18 +20,18 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
- * The keyboard configuration options for text field. It is not guaranteed if a software keyboard
+ * The IME configuration options for [TextInputService]. It is not guaranteed if IME
  * will comply with the options provided here.
  *
- * @param singleLine informs the keyboard that the text field is single line and keyboard should
- * not show enter action.
- * @param capitalization informs the keyboard whether to automatically capitalize characters,
- * words or sentences. Applicable to  only text based [KeyboardType]s such as [KeyboardType
- * .Text], [KeyboardType.Ascii]. It will not be applied to [KeyboardType]s such as [KeyboardType
- * .Number].
- * @param autoCorrect informs the keyboard whether to enable auto correct. Applicable to only
+ * @param singleLine informs the IME that the text field is single line and IME
+ * should not show return key.
+ * @param capitalization informs the IME whether to automatically capitalize characters,
+ * words or sentences. Only applicable to only text based [KeyboardType]s such as
+ * [KeyboardType.Text], [KeyboardType.Ascii]. It will not be applied to [KeyboardType]s such as
+ * [KeyboardType.Number].
+ * @param autoCorrect informs the IME whether to enable auto correct. Only applicable to
  * text based [KeyboardType]s such as [KeyboardType.Email], [KeyboardType.Uri]. It will not be
- * applied to [KeyboardType]s such as [KeyboardType.Number]. Most of software keyboard
+ * applied to [KeyboardType]s such as [KeyboardType.Number]. Most of IME
  * implementations ignore this value for [KeyboardType]s such as [KeyboardType.Text].
  * @param keyboardType The keyboard type to be used in this text field. Note that this input type
  * is honored by IME and shows corresponding keyboard but this is not guaranteed. For example,
@@ -42,7 +42,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
  */
 @ExperimentalTextApi
 @Immutable
-data class KeyboardOptions(
+data class ImeOptions(
     val singleLine: Boolean = false,
     val capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
     val autoCorrect: Boolean = true,
@@ -50,6 +50,6 @@ data class KeyboardOptions(
     val imeAction: ImeAction = ImeAction.Unspecified,
 ) {
     companion object {
-        val Default = KeyboardOptions()
+        val Default = ImeOptions()
     }
 }

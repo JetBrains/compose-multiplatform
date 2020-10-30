@@ -167,7 +167,7 @@ class TextFieldTest {
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
-                keyboardOptions = any(),
+                imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
@@ -238,7 +238,7 @@ class TextFieldTest {
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
-                keyboardOptions = any(),
+                imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
@@ -305,7 +305,7 @@ class TextFieldTest {
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
-                keyboardOptions = any(),
+                imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
