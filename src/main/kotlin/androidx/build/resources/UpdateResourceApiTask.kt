@@ -20,6 +20,7 @@ import androidx.build.checkapi.ApiLocation
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFiles
@@ -33,6 +34,9 @@ abstract class UpdateResourceApiTask : DefaultTask() {
     /** Generated resource API file (in build output). */
     @get:Internal
     abstract val apiLocation: Property<ApiLocation>
+
+    @get:Input
+    abstract val forceUpdate: Property<Boolean>
 
     @InputFile
     fun getTaskInput(): File {
@@ -59,7 +63,7 @@ abstract class UpdateResourceApiTask : DefaultTask() {
             val version = outputApi.version()
             if (version != null && version.isFinalApi() &&
                 outputApi.publicApiFile.exists() &&
-                !project.hasProperty("force")
+                !forceUpdate.get()
             ) {
                 permitOverwriting = false
             }
@@ -72,7 +76,7 @@ abstract class UpdateResourceApiTask : DefaultTask() {
                 inputApi,
                 outputApi.resourceFile,
                 permitOverwriting,
-                project.logger
+                logger
             )
         }
     }
