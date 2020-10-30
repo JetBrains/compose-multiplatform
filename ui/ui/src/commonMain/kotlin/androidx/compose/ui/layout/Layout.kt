@@ -521,7 +521,6 @@ private inline fun Density.MeasuringMaxIntrinsicHeight(
  *
  * @param modifier Modifier to be applied to the introduced layout.
  */
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 @Composable
 fun WithConstraints(
     modifier: Modifier = Modifier,
