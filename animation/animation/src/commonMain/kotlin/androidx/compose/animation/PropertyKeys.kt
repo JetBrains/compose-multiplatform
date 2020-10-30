@@ -106,10 +106,10 @@ private val ColorToVector: (colorSpace: ColorSpace) -> TwoWayConverter<Color, An
             },
             convertFromVector = {
                 Color(
-                    alpha = it.v1,
-                    red = it.v2,
-                    green = it.v3,
-                    blue = it.v4,
+                    alpha = it.v1.coerceIn(0.0f, 1.0f),
+                    red = it.v2.coerceIn(0.0f, 1.0f),
+                    green = it.v3.coerceIn(0.0f, 1.0f),
+                    blue = it.v4.coerceIn(0.0f, 1.0f),
                     colorSpace = ColorSpaces.LinearExtendedSrgb
                 ).convert(colorSpace)
             }

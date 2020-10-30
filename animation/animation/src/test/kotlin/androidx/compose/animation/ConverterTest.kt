@@ -45,6 +45,58 @@ class ConverterTest {
     }
 
     @Test
+    fun testColorConverterClampValuesOutOfRange() {
+        val converter = (Color.VectorConverter)(ColorSpaces.Srgb)
+
+        // Alpha channel above 1.0f clamps to 1.0f and result is red
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(1.1f, 1f, 0f, 0f)),
+            Color.Red
+        )
+        // Alpha channel below 0.0f clamps to 0.0f and the result is transparent red
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(-0.1f, 1f, 0f, 0f)),
+            Color.Red.copy(alpha = 0.0f)
+        )
+
+        // Red channel above 1.0f clamps to 1.0f and the result is red
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(1.0f, 1.1f, 0f, 0f)),
+            Color.Red
+        )
+
+        // Red channel below 0.0f clamps to 0.0f and the result is black
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(1.0f, -0.1f, 0f, 0f)),
+            Color.Black
+        )
+
+        // Green channel above 1.0f clamps to 1.0f and the result is green
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(1.0f, 0.0f, 1.1f, 0f)),
+            Color.Green
+        )
+
+        // Green channel below 0.0f clamps to 0.0f and result is black
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(1.0f, 0f, -0.1f, 0f)),
+            Color.Black
+        )
+
+        // Blue channel above 1.0f clamps to 1.0f and result is blue
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(1.0f, 0f, 0f, 1.1f)),
+            Color.Blue
+        )
+
+        // Blue channel below 0.0f clamps to 0.0f and the result is black
+        assertEquals(
+            converter.convertFromVector(AnimationVector4D(1.0f, 0f, 0f, -0.1f)),
+            Color.Black
+        )
+    }
+
+    @Test
     fun testRectConverter() {
         assertEquals(
             Rect.VectorConverter.convertToVector(Rect(1f, 2f, 3f, 4f)),
