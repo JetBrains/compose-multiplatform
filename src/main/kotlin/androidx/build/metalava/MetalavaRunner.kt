@@ -16,25 +16,23 @@
 
 package androidx.build.metalava
 
-import androidx.build.AndroidXExtension
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
-import org.gradle.workers.WorkerExecutor
 import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
 // MetalavaRunner stores common configuration for executing Metalava
 
 fun runMetalavaWithArgs(
-    metalavaConfiguration: Configuration,
+    metalavaClasspath: FileCollection,
     args: List<String>,
     workerExecutor: WorkerExecutor
 ) {
@@ -43,45 +41,41 @@ fun runMetalavaWithArgs(
         "--hide",
         "HiddenSuperclass" // We allow having a hidden parent class
     ) + args
-
     val workQueue = workerExecutor.processIsolation()
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
-        parameters.getArgs().set(allArgs)
-        parameters.getMetalavaClasspath().set(metalavaConfiguration.files)
+        parameters.args.set(allArgs)
+        parameters.metalavaClasspath.set(metalavaClasspath.files)
     }
 }
 
 interface MetalavaParams : WorkParameters {
-    fun getArgs(): ListProperty<String>
-    fun getMetalavaClasspath(): SetProperty<File>
+    val args: ListProperty<String>
+    val metalavaClasspath: SetProperty<File>
 }
 
 abstract class MetalavaWorkAction @Inject constructor (
     private val execOperations: ExecOperations
 ) : WorkAction<MetalavaParams> {
-
     override fun execute() {
-        val allArgs = getParameters().getArgs().get()
-        val metalavaJar = getParameters().getMetalavaClasspath().get()
-
         execOperations.javaexec {
             // Intellij core reflects into java.util.ResourceBundle
             it.jvmArgs = listOf(
                 "--add-opens",
                 "java.base/java.util=ALL-UNNAMED"
             )
-            it.classpath(metalavaJar)
+            it.classpath(parameters.metalavaClasspath.get())
             it.main = "com.android.tools.metalava.Driver"
-            it.args = allArgs
+            it.args = parameters.args.get()
         }
     }
 }
 
-fun Project.getMetalavaConfiguration(): Configuration {
-    return configurations.findByName("metalava") ?: configurations.create("metalava") {
+fun Project.getMetalavaClasspath(): FileCollection {
+    val configuration = configurations.findByName("metalava") ?: configurations.create("metalava") {
         val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha02")
         it.dependencies.add(dependency)
     }
+    return project.files(configuration)
 }
 
 // Metalava arguments to hide all experimental API surfaces.
@@ -92,7 +86,7 @@ val HIDE_EXPERIMENTAL_ARGS: List<String> = listOf(
     "--hide-meta-annotation", "kotlin.Experimental"
 )
 
-fun Project.getApiLintArgs(): List<String> {
+fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
     val args = mutableListOf(
         "--api-lint",
         "--hide",
@@ -148,15 +142,11 @@ fun Project.getApiLintArgs(): List<String> {
             "HiddenSuperclass"
         ).joinToString()
     )
-
-    val androidXExtension = project.extensions.findByType(AndroidXExtension::class.java)
-
-    if (!androidXExtension!!.targetsJavaConsumers) {
-        args.addAll(listOf("--hide", "MissingJvmstatic"))
-    } else {
+    if (targetsJavaConsumers) {
         args.addAll(listOf("--error", "MissingJvmstatic"))
+    } else {
+        args.addAll(listOf("--hide", "MissingJvmstatic"))
     }
-
     return args
 }
 
@@ -168,12 +158,16 @@ sealed class GenerateApiMode {
 }
 
 sealed class ApiLintMode {
-    class CheckBaseline(val apiLintBaseline: File) : ApiLintMode()
+    class CheckBaseline(
+        val apiLintBaseline: File,
+        val targetsJavaConsumers: Boolean
+    ) : ApiLintMode()
     object Skip : ApiLintMode()
 }
 
 // Generates all of the specified api files
-fun Project.generateApi(
+fun generateApi(
+    metalavaClasspath: FileCollection,
     files: JavaCompileInputs,
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
@@ -182,11 +176,11 @@ fun Project.generateApi(
     pathToManifest: String? = null
 ) {
     generateApi(
-        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor, pathToManifest
     )
     generateApi(
-        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode, workerExecutor, pathToManifest
     )
 
@@ -196,7 +190,7 @@ fun Project.generateApi(
         GenerateApiMode.RestrictToLibraryGroupPrefixApis
     }
     generateApi(
-        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation, restrictedAPIMode, ApiLintMode.Skip, workerExecutor
     )
     workerExecutor.await()
@@ -210,7 +204,8 @@ fun Project.generateApi(
 }
 
 // Gets arguments for generating the specified api file
-fun Project.generateApi(
+fun generateApi(
+    metalavaClasspath: FileCollection,
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
@@ -224,11 +219,11 @@ fun Project.generateApi(
         bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
         generateApiMode, apiLintMode, pathToManifest
     )
-    runMetalavaWithArgs(getMetalavaConfiguration(), args, workerExecutor)
+    runMetalavaWithArgs(metalavaClasspath, args, workerExecutor)
 }
 
 // Generates the specified api file
-fun Project.getGenerateApiArgs(
+fun getGenerateApiArgs(
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
@@ -309,7 +304,7 @@ fun Project.getGenerateApiArgs(
 
     when (apiLintMode) {
         is ApiLintMode.CheckBaseline -> {
-            args += getApiLintArgs()
+            args += getApiLintArgs(apiLintMode.targetsJavaConsumers)
             if (apiLintMode.apiLintBaseline.exists()) {
                 args += listOf("--baseline", apiLintMode.apiLintBaseline.toString())
             }

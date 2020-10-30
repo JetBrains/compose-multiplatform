@@ -16,8 +16,8 @@
 
 package androidx.build.metalava
 
-import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.ApiBaselinesLocation
+import androidx.build.checkapi.ApiLocation
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -44,6 +44,9 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(
     @get:Input
     abstract val baselines: Property<ApiBaselinesLocation>
 
+    @get:Input
+    abstract val targetsJavaConsumers: Property<Boolean>
+
     @OutputFile
     fun getApiLintBaseline(): File = baselines.get().apiLintFile
 
@@ -51,10 +54,11 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(
     fun updateBaseline() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         val baselineFile = baselines.get().apiLintFile
-        val checkArgs = project.getGenerateApiArgs(
+        val checkArgs = getGenerateApiArgs(
             bootClasspath, dependencyClasspath,
             sourcePaths.filter { it.exists() }, null, GenerateApiMode.PublicApi,
-            ApiLintMode.CheckBaseline(baselineFile), manifestPath.orNull?.asFile?.absolutePath
+            ApiLintMode.CheckBaseline(baselineFile, targetsJavaConsumers.get()),
+            manifestPath.orNull?.asFile?.absolutePath
         )
         val args = checkArgs + getCommonBaselineUpdateArgs(baselineFile)
 
