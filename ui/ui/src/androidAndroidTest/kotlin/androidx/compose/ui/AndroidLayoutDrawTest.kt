@@ -31,6 +31,7 @@ import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animate
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -76,11 +77,13 @@ import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.RenderNodeApi23
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.test.assertPixels
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -3068,6 +3071,49 @@ class AndroidLayoutDrawTest {
         assertEquals(measuredSize, 30.dp)
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun zeroSizedComposeViewCanDrawOutsideItsBounds() {
+        val padding = 10
+        val size = padding * 2
+
+        lateinit var frameLayout: FrameLayout
+
+        activityTestRule.runOnUiThread {
+            val composeView = ComposeView(activity)
+            composeView.setContent {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .drawBehind {
+                            val marginFloat = padding.toFloat()
+                            drawRect(
+                                color = Color.Red,
+                                topLeft = Offset(-marginFloat, -marginFloat),
+                                size = Size(marginFloat * 2, marginFloat * 2)
+                            )
+                        }
+                )
+            }
+            frameLayout = FrameLayout(activity)
+            frameLayout.clipToPadding = false
+            frameLayout.clipChildren = false
+            frameLayout.setPadding(padding, padding, padding, padding)
+            frameLayout.addView(composeView, ViewGroup.LayoutParams(0, 0))
+            activity.setContentView(
+                frameLayout,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+
+        activityTestRule.waitAndScreenShot(frameLayout)
+            .assertPixels(expectedSize = IntSize(size, size)) {
+                Color.Red
+            }
+    }
+
     private fun composeSquares(model: SquareModel) {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
@@ -3686,8 +3732,14 @@ fun findAndroidComposeView(parent: ViewGroup): ViewGroup? {
 @RequiresApi(Build.VERSION_CODES.O)
 fun androidx.test.rule.ActivityTestRule<*>.waitAndScreenShot(
     forceInvalidate: Boolean = true
+): Bitmap = waitAndScreenShot(findAndroidComposeView(), forceInvalidate)
+
+@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.O)
+fun androidx.test.rule.ActivityTestRule<*>.waitAndScreenShot(
+    view: View,
+    forceInvalidate: Boolean = true
 ): Bitmap {
-    val view = findAndroidComposeView()
     val flushListener = DrawCounterListener(view)
     val offset = intArrayOf(0, 0)
     var handler: Handler? = null
