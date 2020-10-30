@@ -126,6 +126,7 @@ object LibraryVersions {
     val WEAR_TILES = Version("1.0.0-alpha01")
     val WEAR_TILES_DATA = WEAR_TILES
     val WEAR_WATCHFACE = Version("1.0.0-alpha02")
+    val WEAR_WATCHFACE_CLIENT = Version("1.0.0-alpha02")
     val WEAR_WATCHFACE_DATA = Version("1.0.0-alpha02")
     val WEAR_WATCHFACE_STYLE = Version("1.0.0-alpha02")
     val WEBKIT = Version("1.4.0-beta01")
