@@ -16,7 +16,6 @@
 
 package androidx.build.metalava
 
-import androidx.build.AndroidXExtension
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.Project
@@ -87,7 +86,7 @@ val HIDE_EXPERIMENTAL_ARGS: List<String> = listOf(
     "--hide-meta-annotation", "kotlin.Experimental"
 )
 
-fun Project.getApiLintArgs(): List<String> {
+fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
     val args = mutableListOf(
         "--api-lint",
         "--hide",
@@ -143,15 +142,11 @@ fun Project.getApiLintArgs(): List<String> {
             "HiddenSuperclass"
         ).joinToString()
     )
-
-    val androidXExtension = project.extensions.findByType(AndroidXExtension::class.java)
-
-    if (!androidXExtension!!.targetsJavaConsumers) {
-        args.addAll(listOf("--hide", "MissingJvmstatic"))
-    } else {
+    if (targetsJavaConsumers) {
         args.addAll(listOf("--error", "MissingJvmstatic"))
+    } else {
+        args.addAll(listOf("--hide", "MissingJvmstatic"))
     }
-
     return args
 }
 
@@ -163,12 +158,16 @@ sealed class GenerateApiMode {
 }
 
 sealed class ApiLintMode {
-    class CheckBaseline(val apiLintBaseline: File) : ApiLintMode()
+    class CheckBaseline(
+        val apiLintBaseline: File,
+        val targetsJavaConsumers: Boolean
+    ) : ApiLintMode()
     object Skip : ApiLintMode()
 }
 
 // Generates all of the specified api files
-fun Project.generateApi(
+fun generateApi(
+    metalavaClasspath: FileCollection,
     files: JavaCompileInputs,
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
@@ -177,11 +176,11 @@ fun Project.generateApi(
     pathToManifest: String? = null
 ) {
     generateApi(
-        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor, pathToManifest
     )
     generateApi(
-        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode, workerExecutor, pathToManifest
     )
 
@@ -191,7 +190,7 @@ fun Project.generateApi(
         GenerateApiMode.RestrictToLibraryGroupPrefixApis
     }
     generateApi(
-        files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation, restrictedAPIMode, ApiLintMode.Skip, workerExecutor
     )
     workerExecutor.await()
@@ -205,7 +204,8 @@ fun Project.generateApi(
 }
 
 // Gets arguments for generating the specified api file
-fun Project.generateApi(
+fun generateApi(
+    metalavaClasspath: FileCollection,
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
@@ -219,11 +219,11 @@ fun Project.generateApi(
         bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
         generateApiMode, apiLintMode, pathToManifest
     )
-    runMetalavaWithArgs(getMetalavaClasspath(), args, workerExecutor)
+    runMetalavaWithArgs(metalavaClasspath, args, workerExecutor)
 }
 
 // Generates the specified api file
-fun Project.getGenerateApiArgs(
+fun getGenerateApiArgs(
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
@@ -304,7 +304,7 @@ fun Project.getGenerateApiArgs(
 
     when (apiLintMode) {
         is ApiLintMode.CheckBaseline -> {
-            args += getApiLintArgs()
+            args += getApiLintArgs(apiLintMode.targetsJavaConsumers)
             if (apiLintMode.apiLintBaseline.exists()) {
                 args += listOf("--baseline", apiLintMode.apiLintBaseline.toString())
             }

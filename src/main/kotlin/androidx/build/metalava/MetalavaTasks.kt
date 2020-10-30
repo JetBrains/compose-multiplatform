@@ -63,6 +63,7 @@ object MetalavaTasks {
             task.metalavaClasspath.from(metalavaClasspath)
             task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
             task.baselines.set(baselinesApiLocation)
+            task.targetsJavaConsumers = extension.targetsJavaConsumers
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
@@ -111,6 +112,7 @@ object MetalavaTasks {
         ) { task ->
             task.metalavaClasspath.from(metalavaClasspath)
             task.baselines.set(baselinesApiLocation)
+            task.targetsJavaConsumers.set(extension.targetsJavaConsumers)
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
@@ -161,6 +163,7 @@ object MetalavaTasks {
             task.description = "Updates the checked in API files to match source code API"
             task.inputApiLocation.set(generateApi.flatMap { it.apiLocation })
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
+            task.forceUpdate = project.hasProperty("force")
             task.dependsOn(generateApi)
 
             // If a developer (accidentally) makes a non-backwards compatible change to an API,
