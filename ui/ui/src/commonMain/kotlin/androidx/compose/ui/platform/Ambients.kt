@@ -119,7 +119,7 @@ internal fun ProvideCommonAmbients(
         FocusManagerAmbient provides owner.focusManager,
         FontLoaderAmbient provides owner.fontLoader,
         HapticFeedBackAmbient provides owner.hapticFeedBack,
-        LayoutDirectionAmbient provides owner.layoutDirection,
+        LayoutDirectionAmbient providesDefault owner.layoutDirection,
         TextInputServiceAmbient provides owner.textInputService,
         TextToolbarAmbient provides owner.textToolbar,
         UriHandlerAmbient provides uriHandler,

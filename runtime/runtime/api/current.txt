@@ -322,12 +322,15 @@ package androidx.compose.runtime {
 
   @androidx.compose.runtime.Stable public abstract class ProvidableAmbient<T> extends androidx.compose.runtime.Ambient<T> {
     method public final infix androidx.compose.runtime.ProvidedValue<T> provides(T? value);
+    method public final infix androidx.compose.runtime.ProvidedValue<T> providesDefault(T? value);
   }
 
   public final class ProvidedValue<T> {
     method public androidx.compose.runtime.Ambient<T> getAmbient();
+    method public boolean getCanOverride();
     method public T! getValue();
     property public final androidx.compose.runtime.Ambient<T> ambient;
+    property public final boolean canOverride;
     property public final T! value;
   }
 
