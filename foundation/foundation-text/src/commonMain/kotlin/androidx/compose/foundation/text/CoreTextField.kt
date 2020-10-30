@@ -93,7 +93,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
@@ -129,13 +128,6 @@ import kotlin.math.roundToInt
  * @param onValueChange Called when the input service updates the values in [TextFieldValue].
  * @param modifier optional [Modifier] for this text field.
  * @param textStyle Style configuration that applies at character level such as color, font etc.
- * @param keyboardType The keyboard type to be used in this text field. Note that this input type
- * is honored by IME and shows corresponding keyboard but this is not guaranteed. For example,
- * some IME may send non-ASCII character even if you set [KeyboardType.Ascii].
- * @param imeAction The IME action. This IME action is honored by IME and may show specific icons
- * on the keyboard. For example, search icon may be shown if [ImeAction.Search] is specified.
- * Then, when user tap that key, the [onImeActionPerformed] callback is called with specified
- * ImeAction.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
  * that this IME action may be different from what you specified in [imeAction].
@@ -163,8 +155,6 @@ fun CoreTextField(
     modifier: Modifier = Modifier,
     onValueChange: (TextFieldValue) -> Unit,
     textStyle: TextStyle = TextStyle.Default,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
@@ -247,8 +237,6 @@ fun CoreTextField(
                 textInputService,
                 value,
                 state.processor,
-                keyboardType,
-                imeAction,
                 keyboardOptions,
                 onValueChangeWrapper,
                 onImeActionPerformedWrapper
@@ -361,7 +349,7 @@ fun CoreTextField(
     }
 
     val semanticsModifier = Modifier.semantics {
-        this.imeAction = imeAction
+        this.imeAction = keyboardOptions.imeAction
         this.supportsInputMethods()
         this.text = AnnotatedString(value.text)
         this.textSelectionRange = value.selection
