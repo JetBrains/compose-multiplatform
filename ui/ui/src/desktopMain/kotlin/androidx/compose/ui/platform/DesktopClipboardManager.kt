@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.text.AnnotatedString
 import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 
 class DesktopClipboardManager : ClipboardManager {
@@ -25,10 +26,10 @@ class DesktopClipboardManager : ClipboardManager {
         Toolkit.getDefaultToolkit().getSystemClipboard()
     } catch (e: java.awt.HeadlessException) { null }
 
-    // TODO(demin): implement ClipboardManager copy.
     override fun getText(): AnnotatedString? {
-        println("ClipboardManager.getText not implemented yet")
-        return null
+        return systemClipboard?.let {
+            AnnotatedString(it.getData(DataFlavor.stringFlavor) as String)
+        }
     }
 
     override fun setText(annotatedString: AnnotatedString) {
