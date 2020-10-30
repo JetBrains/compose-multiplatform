@@ -15,12 +15,3 @@ actual fun SelectionContainer(children: @Composable () -> Unit) {
         children = children
     )
 }
-
-@Composable
-actual fun WithoutSelection(children: @Composable () -> Unit) {
-    androidx.compose.ui.selection.SelectionContainer(
-        selection = null,
-        onSelectionChange = {},
-        children = children
-    )
-}

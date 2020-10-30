@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -66,15 +66,14 @@ fun VerticalSplitter(
             .fillMaxHeight()
             .run {
                 if (splitterState.isResizeEnabled) {
-                    this.
-                        draggable(
-                            Orientation.Horizontal,
-                            startDragImmediately = true,
-                            onDragStarted = { splitterState.isResizing = true },
-                            onDragStopped = { splitterState.isResizing = false }
-                        ) {
-                            onResize(it.toDp())
-                        }
+                    this.draggable(
+                        Orientation.Horizontal,
+                        startDragImmediately = true,
+                        onDragStarted = { splitterState.isResizing = true },
+                        onDragStopped = { splitterState.isResizing = false }
+                    ) {
+                        onResize(it.toDp())
+                    }
                         .cursorForHorizontalResize()
                 } else {
                     this

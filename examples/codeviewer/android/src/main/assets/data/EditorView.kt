@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
@@ -26,7 +27,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import org.jetbrains.codeviewer.platform.SelectionContainer
 import org.jetbrains.codeviewer.platform.VerticalScrollbar
-import org.jetbrains.codeviewer.platform.WithoutSelection
 import org.jetbrains.codeviewer.ui.common.AppTheme
 import org.jetbrains.codeviewer.ui.common.Fonts
 import org.jetbrains.codeviewer.ui.common.Settings
@@ -110,7 +110,7 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(DensityAmbient
 @Composable
 private fun Line(modifier: Modifier, maxNumber: String, line: Editor.Line, settings: Settings) {
     Row(modifier = modifier) {
-        WithoutSelection {
+        DisableSelection {
             Box {
                 LineNumber(maxNumber, Modifier.drawOpacity(0f), settings)
                 LineNumber(line.number.toString(), Modifier.align(Alignment.CenterEnd), settings)
