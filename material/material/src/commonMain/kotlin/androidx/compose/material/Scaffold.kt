@@ -28,7 +28,6 @@ import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -216,7 +215,6 @@ fun Scaffold(
  * @param bottomBar the content to place at the bottom of the [Scaffold], on top of the
  * [bodyContent], typically a [BottomAppBar].
  */
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 @Composable
 private fun ScaffoldLayout(
     isFabDocked: Boolean,

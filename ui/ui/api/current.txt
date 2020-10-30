@@ -1577,9 +1577,6 @@ package androidx.compose.ui.layout {
   public final class ContentScaleKt {
   }
 
-  @kotlin.RequiresOptIn(message="This is an experimental API for being able to perform subcomposition during the " + "measuring. API is likely to change before becoming stable.") public @interface ExperimentalSubcomposeLayoutApi {
-  }
-
   @androidx.compose.runtime.Immutable public final class FixedScale implements androidx.compose.ui.layout.ContentScale {
     ctor public FixedScale(float value);
     method public float component1();
@@ -1768,10 +1765,10 @@ package androidx.compose.ui.layout {
   }
 
   public final class SubcomposeLayoutKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi public static <T> void SubcomposeLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope<T>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
+    method @androidx.compose.runtime.Composable public static <T> void SubcomposeLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope<T>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
   }
 
-  @androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi public interface SubcomposeMeasureScope<T> extends androidx.compose.ui.layout.MeasureScope {
+  public interface SubcomposeMeasureScope<T> extends androidx.compose.ui.layout.MeasureScope {
     method public java.util.List<androidx.compose.ui.layout.Measurable> subcompose(T? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 

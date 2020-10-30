@@ -18,7 +18,6 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLifecycleObserver
 import androidx.compose.runtime.CompositionReference
@@ -42,12 +41,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastForEach
 
-@RequiresOptIn(
-    "This is an experimental API for being able to perform subcomposition during the " +
-        "measuring. API is likely to change before becoming stable."
-)
-annotation class ExperimentalSubcomposeLayoutApi
-
 /**
  * Analogue of [Layout] which allows to subcompose the actual content during the measuring stage
  * for example to use the values calculated during the measurement as params for the composition
@@ -56,8 +49,7 @@ annotation class ExperimentalSubcomposeLayoutApi
  * Possible use cases:
  * * You need to know the constraints passed by the parent during the composition and can't solve
  * your use case with just custom [Layout] or [LayoutModifier]. See [WithConstraints].
- * * You want to use the size of one child during the composition of the second child. Example is
- * using the sizes of the tabs in TabRow as a input in tabs indicator composable
+ * * You want to use the size of one child during the composition of the second child.
  * * You want to compose your items lazily based on the available size. For example you have a
  * list of 100 items and instead of composing all of them you only compose the ones which are
  * currently visible(say 5 of them) and compose next items when the component is scrolled.
@@ -68,8 +60,7 @@ annotation class ExperimentalSubcomposeLayoutApi
  * @param measureBlock Measure block which provides ability to subcompose during the measuring.
  */
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class, ComposeCompilerApi::class)
-@ExperimentalSubcomposeLayoutApi
+@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
 fun <T> SubcomposeLayout(
     modifier: Modifier = Modifier,
     measureBlock: SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult
@@ -96,7 +87,6 @@ fun <T> SubcomposeLayout(
  * The receiver scope of a [SubcomposeLayout]'s measure lambda which adds ability to dynamically
  * subcompose a content during the measuring on top of the features provided by [MeasureScope].
  */
-@ExperimentalSubcomposeLayoutApi
 interface SubcomposeMeasureScope<T> : MeasureScope {
     /**
      * Performs subcomposition of the provided [content] with given [slotId].
@@ -112,7 +102,7 @@ interface SubcomposeMeasureScope<T> : MeasureScope {
     fun subcompose(slotId: T, content: @Composable () -> Unit): List<Measurable>
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalSubcomposeLayoutApi::class)
+@OptIn(ExperimentalLayoutNodeApi::class)
 private class SubcomposeLayoutState<T> :
     SubcomposeMeasureScope<T>,
     CompositionLifecycleObserver {
