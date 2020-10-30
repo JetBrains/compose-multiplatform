@@ -72,8 +72,8 @@ import kotlin.math.roundToInt
 
 /** The default selection color if none is specified. */
 internal val DefaultSelectionColor = Color(0x6633B5E5)
-internal typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
-internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (String) -> Unit>
+private typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
+private typealias InlineContentRange = AnnotatedString.Range<@Composable (String) -> Unit>
 
 /**
  * CoreText is a low level element that displays text with multiple different styles. The text to
@@ -96,7 +96,7 @@ internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (Str
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  */
 @Composable
-@OptIn(InternalTextApi::class)
+@InternalTextApi
 fun CoreText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
@@ -400,12 +400,15 @@ internal fun updateTextDelegate(
     }
 }
 
-internal fun resolveInlineContent(
+private val EmptyInlineContent: Pair<List<PlaceholderRange>, List<InlineContentRange>> =
+    Pair(emptyList(), emptyList())
+
+private fun resolveInlineContent(
     text: AnnotatedString,
     inlineContent: Map<String, InlineTextContent>
 ): Pair<List<PlaceholderRange>, List<InlineContentRange>> {
     if (inlineContent.isEmpty()) {
-        return Pair(listOf(), listOf())
+        return EmptyInlineContent
     }
     val inlineContentAnnotations = text.getStringAnnotations(INLINE_CONTENT_TAG, 0, text.length)
 
