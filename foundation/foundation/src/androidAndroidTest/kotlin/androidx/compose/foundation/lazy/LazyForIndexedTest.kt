@@ -16,11 +16,11 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
@@ -41,7 +41,7 @@ class LazyForIndexedTest {
 
         rule.setContent {
             LazyColumnForIndexed(items, Modifier.preferredHeight(200.dp)) { index, item ->
-                Text("${index}x$item", Modifier.fillParentMaxWidth().height(100.dp))
+                BasicText("${index}x$item", Modifier.fillParentMaxWidth().height(100.dp))
             }
         }
 
@@ -58,7 +58,7 @@ class LazyForIndexedTest {
 
         rule.setContent {
             LazyRowForIndexed(items, Modifier.preferredWidth(200.dp)) { index, item ->
-                Text("${index}x$item", Modifier.fillParentMaxHeight().width(100.dp))
+                BasicText("${index}x$item", Modifier.fillParentMaxHeight().width(100.dp))
             }
         }
 

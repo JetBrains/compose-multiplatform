@@ -15,8 +15,8 @@
  */
 package androidx.compose.ui.window
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +53,7 @@ class DialogUiTest {
 
             if (showDialog.value) {
                 Dialog(onDismissRequest = {}) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -77,7 +77,7 @@ class DialogUiTest {
                         showDialog.value = false
                     }
                 ) {
-                    Text(
+                    BasicText(
                         text = text.value,
                         modifier = Modifier.clickable {
                             text.value = textAfterClick
@@ -109,7 +109,7 @@ class DialogUiTest {
                         showDialog.value = false
                     }
                 ) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -131,7 +131,7 @@ class DialogUiTest {
 
             if (showDialog.value) {
                 Dialog(onDismissRequest = {}) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -158,7 +158,7 @@ class DialogUiTest {
                         showDialog.value = false
                     }
                 ) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -181,7 +181,7 @@ class DialogUiTest {
 
             if (showDialog.value) {
                 Dialog(onDismissRequest = {}) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }

@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -76,7 +77,10 @@ class ClickableTest {
     fun clickableTest_defaultSemantics() {
         rule.setContent {
             Box {
-                Text("ClickableText", modifier = Modifier.testTag("myClickable").clickable {})
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier.testTag("myClickable").clickable {}
+                )
             }
         }
 
@@ -89,7 +93,7 @@ class ClickableTest {
     fun clickableTest_disabledSemantics() {
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(enabled = false) {}
                 )
@@ -108,9 +112,11 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
-                    modifier = Modifier.testTag("myClickable").clickable(onLongClick = onClick) {}
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .clickable(onLongClick = onClick) {}
                 )
             }
         }
@@ -140,7 +146,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(onClick = onClick)
                 )
@@ -163,14 +169,14 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_clickOnChildText() {
+    fun clickableTest_clickOnChildBasicText() {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
 
         rule.setContent {
             Box(modifier = Modifier.clickable(onClick = onClick)) {
-                Text("Foo")
-                Text("Bar")
+                BasicText("Foo")
+                BasicText("Bar")
             }
         }
 
@@ -198,9 +204,11 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
-                    modifier = Modifier.testTag("myClickable").clickable(onLongClick = onClick) {}
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .clickable(onLongClick = onClick) {}
                 )
             }
         }
@@ -233,7 +241,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -275,7 +283,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -319,7 +327,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -372,9 +380,11 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
-                    modifier = Modifier.testTag("myClickable").clickable(onDoubleClick = onClick) {}
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .clickable(onDoubleClick = onClick) {}
                 )
             }
         }
@@ -404,7 +414,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -440,7 +450,7 @@ class ClickableTest {
         rule.setContent {
             Box {
                 if (emitClickableText) {
-                    Text(
+                    BasicText(
                         "ClickableText",
                         modifier = Modifier
                             .testTag("myClickable")
@@ -484,7 +494,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")

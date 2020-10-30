@@ -85,6 +85,17 @@ import androidx.compose.ui.unit.TextUnit
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  * @param style Style configuration for the text such as color, font, line height etc.
  */
+@Deprecated(
+    message = "Use androidx.compose.material.Text for a high level Text component that " +
+        "consumes theming information, or androidx.compose.foundation.text.BasicText for a basic " +
+        "unopinionated component that does not have default theming",
+    replaceWith = ReplaceWith(
+        "Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
+            "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, " +
+            "onTextLayout, style)",
+        "androidx.compose.material.Text"
+    )
+)
 @Composable
 fun Text(
     text: String,
@@ -104,6 +115,7 @@ fun Text(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = AmbientTextStyle.current
 ) {
+    @Suppress("DEPRECATION")
     Text(
         AnnotatedString(text),
         modifier,
@@ -173,6 +185,17 @@ fun Text(
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  * @param style Style configuration for the text such as color, font, line height etc.
  */
+@Deprecated(
+    message = "Use androidx.compose.material.Text for a high level Text component that " +
+        "consumes theming information, or androidx.compose.foundation.text.BasicText for a basic " +
+        "unopinionated component that does not have default theming",
+    replaceWith = ReplaceWith(
+        "Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
+            "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, " +
+            "inlineContent, onTextLayout, style)",
+        "androidx.compose.material.Text"
+    )
+)
 @Composable
 fun Text(
     text: AnnotatedString,

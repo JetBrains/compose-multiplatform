@@ -17,9 +17,9 @@
 package androidx.compose.runtime
 
 import android.app.Activity
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ModalDrawerLayout
+import androidx.compose.material.Text
 import androidx.compose.runtime.benchmark.ComposeActivity
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.setContent

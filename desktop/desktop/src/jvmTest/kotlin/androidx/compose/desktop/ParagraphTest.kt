@@ -17,7 +17,7 @@
 package androidx.ui.desktop
 
 import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

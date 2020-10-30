@@ -20,7 +20,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
@@ -58,7 +58,7 @@ class ComposeViewTest {
             val composeView = ComposeView(activity)
             activity.setContentView(composeView)
             composeView.setContent {
-                Text("Hello, World!", Modifier.testTag("text"))
+                BasicText("Hello, World!", Modifier.testTag("text"))
             }
         }
         Espresso.onView(instanceOf(ComposeView::class.java))
@@ -78,7 +78,7 @@ class ComposeViewTest {
             val composeView = ComposeView(activity).also { it.id = id }
             activity.setContentView(composeView)
             composeView.setContent {
-                Text("Hello", Modifier.testTag("text"))
+                BasicText("Hello", Modifier.testTag("text"))
             }
         }
 
@@ -87,7 +87,7 @@ class ComposeViewTest {
         rule.activityRule.scenario.onActivity { activity ->
             val composeView: ComposeView = activity.findViewById(id)
             composeView.setContent {
-                Text("World", Modifier.testTag("text"))
+                BasicText("World", Modifier.testTag("text"))
             }
         }
 
@@ -116,7 +116,7 @@ class ComposeViewTest {
             }
             activity.setContentView(composeView)
             composeView.setContent {
-                Text("Hello", Modifier.testTag("text"))
+                BasicText("Hello", Modifier.testTag("text"))
             }
         }
 

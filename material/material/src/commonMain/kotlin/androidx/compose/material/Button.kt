@@ -23,12 +23,11 @@ import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.AmbientIndication
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Arrangement

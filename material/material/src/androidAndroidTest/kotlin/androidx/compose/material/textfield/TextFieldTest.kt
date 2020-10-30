@@ -22,7 +22,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.AmbientTextStyle
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +30,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent

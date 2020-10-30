@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.Interaction
@@ -42,6 +41,7 @@ import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
@@ -55,8 +55,8 @@ import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.random.Random
 import androidx.paging.compose.demos.PagingDemos
+import kotlin.random.Random
 
 val LazyListDemos = listOf(
     ComposableDemo("Simple column") { LazyColumnDemo() },
