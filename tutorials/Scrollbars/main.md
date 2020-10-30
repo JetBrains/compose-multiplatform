@@ -2,11 +2,11 @@
 
 ## What is covered
 
-In this tutorial we will show you how to add scrollbars into scrollable lists using Compose for Desktop.
+In this tutorial, we will show you how to add scrollbars to scrollable lists using Compose for Desktop.
 
 ## Scrollbars applying
 
-You can apply scrollbars to scrollable components. The scrollbar and scrollable component share a common state to synchronize with each other. For example, VerticalScrollbar can be attached to ScrollableColumn, LazyColumnFor and HorizontalScrollbar can be attached to ScrollableRow, LazyRowFor.
+You can apply scrollbars to scrollable components. The scrollbar and scrollable components share a common state to synchronize with each other. For example, VerticalScrollbar can be attached to ScrollableColumn, and LazyColumnFor and HorizontalScrollbar can be attached to ScrollableRow and LazyRowFor.
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -171,7 +171,7 @@ fun TextBox(text: String = "Item") {
 
 ## Theme applying
 
-The scrollbars support themes to change their appearance. Example below shows how to use DesktopTheme.
+Scrollbars support themes to change their appearance. The example below shows how to use the DesktopTheme appearance for the scrollbar.
 
 ```kotlin
 import androidx.compose.desktop.DesktopTheme
