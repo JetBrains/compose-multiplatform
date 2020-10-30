@@ -223,6 +223,10 @@ package androidx.compose.material {
     method public static androidx.compose.material.Colors lightColors-hW7iGhc(optional long primary, optional long primaryVariant, optional long secondary, optional long secondaryVariant, optional long background, optional long surface, optional long error, optional long onPrimary, optional long onSecondary, optional long onBackground, optional long onSurface, optional long onError);
   }
 
+  public final class ContentColorKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getAmbientContentColor();
+  }
+
   public enum DismissDirection {
     enum_constant public static final androidx.compose.material.DismissDirection EndToStart;
     enum_constant public static final androidx.compose.material.DismissDirection StartToEnd;
