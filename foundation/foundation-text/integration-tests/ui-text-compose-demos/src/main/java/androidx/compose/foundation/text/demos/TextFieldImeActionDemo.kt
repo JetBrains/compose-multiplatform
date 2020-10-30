@@ -17,30 +17,15 @@
 package androidx.compose.foundation.text.demos
 
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.ImeAction
 
 @Composable
-fun TextFieldWithScrollerDemo() {
+fun ImeActionDemo() {
     ScrollableColumn {
-        val state = remember {
-            mutableStateOf(
-                TextFieldValue(
-                    text = List(100) { "Line: $it" }.joinToString("\n")
-                )
-            )
+        for (action in ImeAction.values()) {
+            TagLine(tag = "Ime Action: ${action.name}")
+            EditLine(imeAction = action)
         }
-        BasicTextField(
-            value = state.value,
-            onValueChange = { state.value = it },
-            modifier = Modifier
-                .padding(20.dp)
-        )
     }
 }

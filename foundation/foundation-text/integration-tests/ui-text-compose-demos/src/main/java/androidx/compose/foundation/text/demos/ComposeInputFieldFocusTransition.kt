@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
@@ -52,10 +51,7 @@ fun TextFieldFocusTransition() {
     }
 }
 
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalFocus::class)
 @Composable
 private fun TextFieldWithFocusRequesters(
     focusRequester: FocusRequester,

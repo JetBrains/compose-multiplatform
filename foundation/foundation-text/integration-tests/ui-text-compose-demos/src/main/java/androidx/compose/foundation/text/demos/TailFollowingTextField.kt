@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -64,7 +63,6 @@ fun TailFollowingTextFieldDemo() {
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun HorizontalTailFollowingTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -101,7 +99,6 @@ private fun HorizontalTailFollowingTextField(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun VerticalTailFollowintTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,

@@ -413,7 +413,7 @@ class TextInputServiceAndroidTest {
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertFalse((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
-            assertFalse((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
         }
     }
 
@@ -473,7 +473,7 @@ class TextInputServiceAndroidTest {
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
-            assertFalse((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
         }
     }
 

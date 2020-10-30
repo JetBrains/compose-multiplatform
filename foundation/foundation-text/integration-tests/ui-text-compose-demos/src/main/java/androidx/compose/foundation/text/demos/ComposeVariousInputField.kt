@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
@@ -237,7 +236,6 @@ fun VariousInputFieldDemo() {
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun VariousEditLine(
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Unspecified,
@@ -271,7 +269,6 @@ private fun TextRange.constrain(minimumValue: Int, maximumValue: Int): TextRange
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun HintEditText(hintText: @Composable () -> Unit) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
 
