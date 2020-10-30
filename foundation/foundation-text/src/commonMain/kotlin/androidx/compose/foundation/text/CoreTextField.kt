@@ -94,7 +94,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
@@ -165,7 +165,7 @@ fun CoreTextField(
     cursorColor: Color = Color.Unspecified,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    imeOptions: ImeOptions = ImeOptions.Default
 ) {
     require(maxLines > 0) {
         "maxLines should be greater than 0"
@@ -240,7 +240,7 @@ fun CoreTextField(
                 textInputService,
                 value,
                 state.processor,
-                keyboardOptions,
+                imeOptions,
                 onValueChangeWrapper,
                 onImeActionPerformedWrapper
             )
@@ -362,7 +362,7 @@ fun CoreTextField(
     }
 
     val semanticsModifier = Modifier.semantics {
-        this.imeAction = keyboardOptions.imeAction
+        this.imeAction = imeOptions.imeAction
         this.supportsInputMethods()
         this.text = AnnotatedString(value.text)
         this.textSelectionRange = value.selection

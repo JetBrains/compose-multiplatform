@@ -29,73 +29,73 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalTextApi::class)
-internal class KeyboardOptionsData(
-    val keyboardOptions: KeyboardOptions,
+internal class ImeOptionsData(
+    val imeOptions: ImeOptions,
     val name: String,
 )
 
 @OptIn(ExperimentalTextApi::class)
-private val KeyboardOptionsList = listOf(
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+private val ImeOptionsList = listOf(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = true,
             keyboardType = KeyboardType.Text
         ),
         name = "singleLine/Text"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = false,
             keyboardType = KeyboardType.Text
         ),
         name = "multiLine/Text"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = true,
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Search
         ),
         name = "singleLine/Text/Search"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = false,
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Search
         ),
         name = "multiLine/Text/Search"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = true,
             keyboardType = KeyboardType.Number
         ),
         name = "singleLine/Number"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = false,
             keyboardType = KeyboardType.Number
         ),
         name = "multiLine/Number"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = true,
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Send
         ),
         name = "singleLine/Number/Send"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             singleLine = false,
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Send
@@ -106,9 +106,9 @@ private val KeyboardOptionsList = listOf(
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
-fun KeyboardSingleLineDemo() {
+fun ImeSingleLineDemo() {
     ScrollableColumn {
-        for (data in KeyboardOptionsList) {
+        for (data in ImeOptionsList) {
             TagLine(tag = "${data.name}")
             MyTextField(data)
         }
@@ -120,13 +120,13 @@ fun KeyboardSingleLineDemo() {
     ExperimentalTextApi::class,
     InternalTextApi::class
 )
-private fun MyTextField(data: KeyboardOptionsData) {
+private fun MyTextField(data: ImeOptionsData) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     CoreTextField(
         modifier = demoTextFieldModifiers.defaultMinSizeConstraints(100.dp),
         value = state.value,
-        keyboardOptions = data.keyboardOptions,
+        imeOptions = data.imeOptions,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
         onTextInputStarted = { controller.value = it },

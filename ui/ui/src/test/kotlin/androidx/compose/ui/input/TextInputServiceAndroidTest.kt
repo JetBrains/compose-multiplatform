@@ -24,7 +24,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
@@ -59,7 +59,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_text() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Unspecified
             ),
@@ -81,7 +81,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_ascii() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Unspecified
             ),
@@ -104,7 +104,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_number() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Unspecified
             ),
@@ -126,7 +126,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_phone() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Phone,
                 imeAction = ImeAction.Unspecified
             ),
@@ -148,7 +148,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_uri() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Uri,
                 imeAction = ImeAction.Unspecified
             ),
@@ -171,7 +171,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_email() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Unspecified
             ),
@@ -194,7 +194,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_password() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Unspecified
             ),
@@ -217,7 +217,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_number_password() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.NumberPassword,
                 imeAction = ImeAction.Unspecified
             ),
@@ -240,7 +240,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_action_none() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.NoAction
             ),
@@ -263,7 +263,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_action_go() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Go
             ),
@@ -286,7 +286,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_action_next() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Next
             ),
@@ -309,7 +309,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_action_previous() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Previous
             ),
@@ -332,7 +332,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_action_search() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Search,
             ),
@@ -355,7 +355,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_action_send() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Send
             ),
@@ -378,7 +378,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_action_done() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
             ),
@@ -401,7 +401,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_multi_line() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 singleLine = false,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
@@ -421,7 +421,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_single_line() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 singleLine = true,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
@@ -441,7 +441,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_single_line_changes_ime_from_unspecified_to_done() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 singleLine = true,
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Unspecified,
@@ -461,7 +461,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_multi_line_not_set_when_input_type_is_not_text() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 singleLine = false,
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -481,7 +481,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_capitalization_none() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 capitalization = KeyboardCapitalization.None,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
@@ -502,7 +502,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_capitalization_characters() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 capitalization = KeyboardCapitalization.Characters,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
@@ -523,7 +523,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_capitalization_words() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 capitalization = KeyboardCapitalization.Words,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
@@ -544,7 +544,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_capitalization_sentences() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done,
@@ -565,7 +565,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_capitalization_not_added_when_input_type_is_not_text() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done,
@@ -586,7 +586,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_auto_correct_on() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 autoCorrect = true,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
@@ -605,7 +605,7 @@ class TextInputServiceAndroidTest {
     fun test_fill_editor_info_auto_correct_off() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 autoCorrect = false,
                 keyboardType = KeyboardType.Ascii,
                 imeAction = ImeAction.Done
@@ -624,7 +624,7 @@ class TextInputServiceAndroidTest {
     fun autocorrect_not_added_when_input_type_is_not_text() {
         textInputService.startInput(
             value = TextFieldValue(""),
-            keyboardOptions = KeyboardOptions(
+            imeOptions = ImeOptions(
                 autoCorrect = true,
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done

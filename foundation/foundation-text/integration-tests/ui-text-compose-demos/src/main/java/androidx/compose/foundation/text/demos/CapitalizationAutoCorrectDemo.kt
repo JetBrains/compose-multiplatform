@@ -29,44 +29,44 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalTextApi::class)
-private val KeyboardOptionsList = listOf(
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+private val ImeOptionsList = listOf(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             keyboardType = KeyboardType.Text,
             capitalization = KeyboardCapitalization.Characters
         ),
 
         name = "Capitalize Characters"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             keyboardType = KeyboardType.Text,
             capitalization = KeyboardCapitalization.Words
         ),
         name = "Capitalize Words"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             keyboardType = KeyboardType.Text,
             capitalization = KeyboardCapitalization.Sentences
         ),
         name = "Capitalize Sentences"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             keyboardType = KeyboardType.Text,
             autoCorrect = true
         ),
         name = "AutoCorrect On"
     ),
-    KeyboardOptionsData(
-        keyboardOptions = KeyboardOptions(
+    ImeOptionsData(
+        imeOptions = ImeOptions(
             keyboardType = KeyboardType.Text,
             autoCorrect = false
         ),
@@ -78,7 +78,7 @@ private val KeyboardOptionsList = listOf(
 @Composable
 fun CapitalizationAutoCorrectDemo() {
     ScrollableColumn {
-        for (data in KeyboardOptionsList) {
+        for (data in ImeOptionsList) {
             TagLine(tag = "${data.name}")
             MyTextField(data)
         }
@@ -90,13 +90,13 @@ fun CapitalizationAutoCorrectDemo() {
     ExperimentalTextApi::class,
     InternalTextApi::class
 )
-private fun MyTextField(data: KeyboardOptionsData) {
+private fun MyTextField(data: ImeOptionsData) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     CoreTextField(
         modifier = demoTextFieldModifiers.defaultMinSizeConstraints(100.dp),
         value = state.value,
-        keyboardOptions = data.keyboardOptions,
+        imeOptions = data.imeOptions,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
         onTextInputStarted = { controller.value = it },

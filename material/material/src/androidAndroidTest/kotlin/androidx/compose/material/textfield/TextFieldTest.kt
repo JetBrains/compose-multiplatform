@@ -66,7 +66,7 @@ import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -765,8 +765,8 @@ class TextFieldTest {
         rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
                 value = any(),
-                keyboardOptions = eq(
-                    KeyboardOptions(
+                imeOptions = eq(
+                    ImeOptions(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Go
                     )

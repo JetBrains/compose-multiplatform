@@ -44,7 +44,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     private var onImeActionPerformed: (ImeAction) -> Unit = {}
 
     private var state = TextFieldValue(text = "", selection = TextRange.Zero)
-    private var keyboardOptions = KeyboardOptions.Default
+    private var imeOptions = ImeOptions.Default
     private var ic: RecordingInputConnection? = null
     private var focusedRect: android.graphics.Rect? = null
 
@@ -78,11 +78,11 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         if (!editorHasFocus) {
             return null
         }
-        fillEditorInfo(keyboardOptions, outAttrs)
+        fillEditorInfo(outAttrs)
 
         return RecordingInputConnection(
             initState = state,
-            autoCorrect = keyboardOptions.autoCorrect,
+            autoCorrect = imeOptions.autoCorrect,
             eventListener = object : InputEventListener {
                 override fun onEditOperations(editOps: List<EditOperation>) {
                     onEditCommand(editOps)
@@ -102,14 +102,14 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
 
     override fun startInput(
         value: TextFieldValue,
-        keyboardOptions: KeyboardOptions,
+        imeOptions: ImeOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
         imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         editorHasFocus = true
         state = value
-        this.keyboardOptions = keyboardOptions
+        this.imeOptions = imeOptions
         this.onEditCommand = onEditCommand
         this.onImeActionPerformed = onImeActionPerformed
 
@@ -164,13 +164,10 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     /**
      * Fills necessary info of EditorInfo.
      */
-    private fun fillEditorInfo(
-        keyboardOptions: KeyboardOptions,
-        outInfo: EditorInfo
-    ) {
-        outInfo.imeOptions = when (keyboardOptions.imeAction) {
+    private fun fillEditorInfo(outInfo: EditorInfo) {
+        outInfo.imeOptions = when (imeOptions.imeAction) {
             ImeAction.Unspecified -> {
-                if (keyboardOptions.singleLine) {
+                if (imeOptions.singleLine) {
                     // this is the last resort to enable single line
                     // Android IME still show return key even if multi line is not send
                     // TextView.java#onCreateInputConnection
@@ -187,10 +184,10 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             ImeAction.Send -> EditorInfo.IME_ACTION_SEND
             ImeAction.Done -> EditorInfo.IME_ACTION_DONE
             else -> throw IllegalArgumentException(
-                "Unknown ImeAction: ${keyboardOptions.imeAction}"
+                "Unknown ImeAction: ${imeOptions.imeAction}"
             )
         }
-        when (keyboardOptions.keyboardType) {
+        when (imeOptions.keyboardType) {
             KeyboardType.Text -> outInfo.inputType = InputType.TYPE_CLASS_TEXT
             KeyboardType.Ascii -> {
                 outInfo.inputType = InputType.TYPE_CLASS_TEXT
@@ -212,11 +209,11 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                     InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
             }
             else -> throw IllegalArgumentException(
-                "Unknown KeyboardType: ${keyboardOptions.keyboardType}"
+                "Unknown KeyboardType: ${imeOptions.keyboardType}"
             )
         }
 
-        if (!keyboardOptions.singleLine) {
+        if (!imeOptions.singleLine) {
             if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {
                 // TextView.java#setInputTypeSingleLine
                 outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
@@ -228,7 +225,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         }
 
         if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {
-            when (keyboardOptions.capitalization) {
+            when (imeOptions.capitalization) {
                 KeyboardCapitalization.None -> {
                     /* do nothing */
                 }
@@ -243,7 +240,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 }
             }
 
-            if (keyboardOptions.autoCorrect) {
+            if (imeOptions.autoCorrect) {
                 outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
             }
         }
