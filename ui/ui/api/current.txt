@@ -1374,6 +1374,10 @@ package androidx.compose.ui.input.key {
 
 package androidx.compose.ui.input.pointer {
 
+  public final class AndroidMouseKt {
+    method public static boolean isMouseInput();
+  }
+
   public final class ConsumedData {
     method public boolean getDownChange();
     method public long getPositionChange-F1C5BW0();
@@ -1401,6 +1405,9 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class MotionEventAdapterKt {
+  }
+
+  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is a temporary API and should be removed after proper mouse handling is " + "settled (b/171402426).") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface MouseTemporaryApi {
   }
 
   public final class PointerEvent {

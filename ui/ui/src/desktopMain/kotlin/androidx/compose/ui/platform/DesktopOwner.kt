@@ -141,8 +141,8 @@ class DesktopOwner(
         get() = container.keyboard
 
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
-        return keyboard?.processKeyInput(keyEvent) ?: false ||
-            keyInputModifier.processKeyInput(keyEvent)
+        return keyInputModifier.processKeyInput(keyEvent) ||
+            keyboard?.processKeyInput(keyEvent) ?: false
     }
 
     override var showLayoutBounds = false

@@ -131,6 +131,17 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                     exclude group: 'org.mockito' // to keep control on the mockito version
                 }
             }
+
+            desktopTest.dependencies {
+                implementation project(':ui:ui-test')
+                implementation(TRUTH)
+                implementation(JUNIT)
+                implementation(SKIKO_CURRENT_OS)
+                implementation(MOCKITO_CORE)
+                implementation MOCKITO_KOTLIN, {
+                    exclude group: 'org.mockito' // to keep control on the mockito version
+                }
+            }
         }
     }
 }

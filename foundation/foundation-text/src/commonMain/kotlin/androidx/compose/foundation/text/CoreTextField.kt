@@ -59,6 +59,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.input.pointer.MouseTemporaryApi
+import androidx.compose.ui.input.pointer.isMouseInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AnimationClockAmbient
@@ -147,7 +149,8 @@ import kotlin.math.roundToInt
 @Composable
 @OptIn(
     ExperimentalFocus::class,
-    ExperimentalTextApi::class
+    ExperimentalTextApi::class,
+    MouseTemporaryApi::class
 )
 @InternalTextApi
 fun CoreTextField(
@@ -308,9 +311,19 @@ fun CoreTextField(
         }
     )
 
-    val selectionLongPressModifier = Modifier.longPressDragGestureFilter(
-        manager.longPressDragObserver
-    )
+    val pointerModifier = if (isMouseInput) {
+        Modifier.dragGestureFilter(
+            manager.mouseSelectionObserver(onStart = { focusRequester.requestFocus() }),
+            startDragImmediately = true
+        )
+    } else {
+        val selectionModifier = Modifier.longPressDragGestureFilter(
+            manager.touchSelectionObserver
+        )
+        dragPositionGestureModifier
+            .then(selectionModifier)
+            .then(focusRequestTapModifier)
+    }
 
     val drawModifier = Modifier.drawBehind {
         state.layoutResult?.let { layoutResult ->
@@ -423,12 +436,11 @@ fun CoreTextField(
     val modifiers = modifier.focusRequester(focusRequester)
         .then(focusObserver)
         .then(cursorModifier)
-        .then(dragPositionGestureModifier)
-        .then(selectionLongPressModifier)
-        .then(focusRequestTapModifier)
+        .then(pointerModifier)
         .then(drawModifier)
         .then(onPositionedModifier)
         .then(semanticsModifier)
+        .then(textFieldKeyboardModifier(manager))
         .focus()
 
     SimpleLayout(modifiers) {
@@ -455,7 +467,7 @@ fun CoreTextField(
             }
         }
 
-        if (state.hasFocus && state.selectionIsOn) {
+        if (state.hasFocus && state.selectionIsOn && !isMouseInput) {
             manager.state?.layoutResult?.let {
                 if (!value.selection.collapsed) {
                     val startOffset = offsetMap.originalToTransformed(value.selection.start)
@@ -489,6 +501,9 @@ fun CoreTextField(
         } else manager.hideSelectionToolbar()
     }
 }
+
+@Composable
+internal expect fun textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
 
 @OptIn(InternalTextApi::class)
 internal class TextFieldState(
