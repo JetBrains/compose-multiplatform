@@ -220,9 +220,11 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {
                 // TextView.java#setInputTypeSingleLine
                 outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+
+                // adding this flag caused b/171598334, leaving here on purpose for future reference
+                // TextView.java#onCreateInputConnection
+                // outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_ENTER_ACTION
             }
-            // TextView.java#onCreateInputConnection
-            outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_ENTER_ACTION
         }
 
         if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {

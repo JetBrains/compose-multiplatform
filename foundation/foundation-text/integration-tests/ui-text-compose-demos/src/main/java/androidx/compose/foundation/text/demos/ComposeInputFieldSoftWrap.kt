@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.text.CoreTextField
@@ -37,7 +36,7 @@ fun SoftWrapDemo() {
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
+@OptIn(InternalTextApi::class)
 private fun CoreTextFieldWithWrap(softWrap: Boolean) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) {
         TextFieldValue("abc ".repeat(20))

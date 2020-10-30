@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
@@ -39,7 +38,7 @@ fun CoreTextFieldMinMaxDemo() {
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
+@OptIn(InternalTextApi::class)
 private fun CoreTextFieldWithMaxLines(str: String? = null, maxLines: Int) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) {
         TextFieldValue(str ?: "abc ".repeat(20))
