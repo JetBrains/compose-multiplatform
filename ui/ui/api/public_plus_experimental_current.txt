@@ -2051,6 +2051,7 @@ package androidx.compose.ui.platform {
     method public kotlin.jvm.functions.Function1<android.content.res.Configuration,kotlin.Unit> getConfigurationChangeObserver();
     method public android.view.View getView();
     method public androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners? getViewTreeOwners();
+    method public void invalidateDescendants();
     method public void removeAndroidView(android.view.View view);
     method public void setConfigurationChangeObserver(kotlin.jvm.functions.Function1<? super android.content.res.Configuration,kotlin.Unit> p);
     method public void setOnViewTreeOwnersAvailable(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners,kotlin.Unit> callback);
