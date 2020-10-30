@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -189,7 +191,7 @@ fun BasicTextField(
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
  */
 @Composable
-@OptIn(InternalTextApi::class)
+@OptIn(InternalTextApi::class, ExperimentalTextApi::class)
 fun BasicTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -204,16 +206,18 @@ fun BasicTextField(
     cursorColor: Color = Color.Black
 ) {
     CoreTextField(
-        value,
-        modifier,
-        onValueChange,
-        textStyle,
-        keyboardType,
-        imeAction,
-        onImeActionPerformed,
-        visualTransformation,
-        onTextLayout,
-        onTextInputStarted,
-        cursorColor
+        value = value,
+        modifier = modifier,
+        onValueChange = onValueChange,
+        textStyle = textStyle,
+        onImeActionPerformed = onImeActionPerformed,
+        visualTransformation = visualTransformation,
+        onTextLayout = onTextLayout,
+        onTextInputStarted = onTextInputStarted,
+        cursorColor = cursorColor,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        ),
     )
 }

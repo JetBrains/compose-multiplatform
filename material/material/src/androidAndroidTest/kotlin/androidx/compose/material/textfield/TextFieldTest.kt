@@ -63,8 +63,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -738,6 +740,7 @@ class TextFieldTest {
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun testTextField_imeActionAndKeyboardTypePropagatedDownstream() {
         val textInputService = mock<TextInputService>()
@@ -762,9 +765,12 @@ class TextFieldTest {
         rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
                 value = any(),
-                keyboardType = eq(KeyboardType.Email),
-                imeAction = eq(ImeAction.Go),
-                keyboardOptions = any(),
+                keyboardOptions = eq(
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Go
+                    )
+                ),
                 onEditCommand = any(),
                 onImeActionPerformed = any()
             )

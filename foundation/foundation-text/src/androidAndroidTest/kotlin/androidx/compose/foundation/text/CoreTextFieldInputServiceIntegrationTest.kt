@@ -69,18 +69,17 @@ class CoreTextFieldInputServiceIntegrationTest {
         val keyboardOptions = KeyboardOptions(
             singleLine = true,
             capitalization = KeyboardCapitalization.Words,
-            autoCorrect = false
+            autoCorrect = false,
+            keyboardType = KeyboardType.Phone,
+            imeAction = ImeAction.Search
         )
-        val keyboardType = KeyboardType.Phone
-        val imeAction = ImeAction.Search
+
         var focused = false
 
         rule.setContent {
             CoreTextField(
                 value = value,
                 keyboardOptions = keyboardOptions,
-                keyboardType = keyboardType,
-                imeAction = imeAction,
                 modifier = Modifier
                     .testTag(testTag)
                     .focusObserver { focused = it.isFocused },
@@ -95,8 +94,6 @@ class CoreTextFieldInputServiceIntegrationTest {
 
             verify(platformTextInputService, times(1)).startInput(
                 eq(value),
-                eq(keyboardType),
-                eq(imeAction),
                 eq(keyboardOptions),
                 any(), // onEditCommand
                 any() // onImeActionPerformed
