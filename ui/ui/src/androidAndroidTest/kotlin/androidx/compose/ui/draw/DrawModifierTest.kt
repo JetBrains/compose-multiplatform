@@ -72,7 +72,7 @@ class DrawModifierTest {
                         close()
                     }
                     cacheBuildCount++
-                    onDraw {
+                    onDrawBehind {
                         drawRect(rectColor)
                         drawPath(path, Color.Red)
                     }
@@ -144,7 +144,7 @@ class DrawModifierTest {
                         close()
                     }
                     cacheBuildCount++
-                    onDraw {
+                    onDrawBehind {
                         drawRect(Color.Red)
                         drawPath(path, Color.Blue)
                     }
@@ -210,7 +210,7 @@ class DrawModifierTest {
                         close()
                     }
                     cacheBuildCount++
-                    onDraw {
+                    onDrawBehind {
                         drawPath(path, Color.Red)
                     }
                 }.clickable {
@@ -261,7 +261,7 @@ class DrawModifierTest {
             AtLeastSize(
                 size = testSize,
                 modifier = Modifier.testTag(testTag).drawWithCache {
-                    onDraw {
+                    onDrawBehind {
                         drawRect(Color.Red, size = Size(size.width / 2, size.height))
                     }
                 }.background(Color.Blue)
