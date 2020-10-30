@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.DesktopSelectionContainer
 import androidx.compose.ui.selection.Selection
-import androidx.compose.ui.text.InternalTextApi
 
 @Composable
 actual fun SelectionContainer(children: @Composable () -> Unit) {
@@ -13,16 +12,6 @@ actual fun SelectionContainer(children: @Composable () -> Unit) {
     DesktopSelectionContainer(
         selection = selection.value,
         onSelectionChange = { selection.value = it },
-        children = children
-    )
-}
-
-@Composable
-@OptIn(InternalTextApi::class)
-actual fun WithoutSelection(children: @Composable () -> Unit) {
-    androidx.compose.ui.selection.SelectionContainer(
-        selection = null,
-        onSelectionChange = {},
         children = children
     )
 }

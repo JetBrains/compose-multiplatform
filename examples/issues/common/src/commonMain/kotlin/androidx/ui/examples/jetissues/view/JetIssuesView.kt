@@ -1,7 +1,6 @@
 package androidx.ui.examples.jetissues.view
 
 import androidx.compose.foundation.*
-import androidx.ui.examples.jetissues.view.common.WithoutSelection
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -11,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -34,7 +33,7 @@ fun JetIssuesView() {
     MaterialTheme(
         colors = lightThemeColors
     ) {
-        WithoutSelection {
+        DisableSelection {
             Main()
         }
     }
