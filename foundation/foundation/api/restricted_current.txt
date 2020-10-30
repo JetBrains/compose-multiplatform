@@ -454,5 +454,30 @@ package androidx.compose.foundation.text {
     method @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent);
   }
 
+  @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public final class KeyboardOptions {
+    ctor public KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
+    ctor public KeyboardOptions();
+    method public androidx.compose.ui.text.input.KeyboardCapitalization component1();
+    method public boolean component2();
+    method public androidx.compose.ui.text.input.KeyboardType component3();
+    method public androidx.compose.ui.text.input.ImeAction component4();
+    method @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.foundation.text.KeyboardOptions copy(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
+    method public boolean getAutoCorrect();
+    method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
+    method public androidx.compose.ui.text.input.ImeAction getImeAction();
+    method public androidx.compose.ui.text.input.KeyboardType getKeyboardType();
+    method public androidx.compose.ui.text.input.ImeOptions toImeOptions(optional boolean singleLine);
+    property public final boolean autoCorrect;
+    property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
+    property public final androidx.compose.ui.text.input.ImeAction imeAction;
+    property public final androidx.compose.ui.text.input.KeyboardType keyboardType;
+    field public static final androidx.compose.foundation.text.KeyboardOptions.Companion Companion;
+  }
+
+  public static final class KeyboardOptions.Companion {
+    method public androidx.compose.foundation.text.KeyboardOptions getDefault();
+    property public final androidx.compose.foundation.text.KeyboardOptions Default;
+  }
+
 }
 
