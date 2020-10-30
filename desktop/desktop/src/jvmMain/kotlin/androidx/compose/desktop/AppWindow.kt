@@ -184,8 +184,8 @@ class AppWindow : AppFrame {
     override fun setIcon(image: BufferedImage?) {
         this.icon = image
         if (icon != null) {
-            val taskbar = java.awt.Taskbar.getTaskbar()
             try {
+                val taskbar = java.awt.Taskbar.getTaskbar()
                 taskbar.setIconImage(icon)
             } catch (e: UnsupportedOperationException) {
                 println("The os does not support: 'Taskbar.setIconImage'")
