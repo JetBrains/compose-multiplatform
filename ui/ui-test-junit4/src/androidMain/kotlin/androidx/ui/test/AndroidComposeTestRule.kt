@@ -18,17 +18,41 @@ package androidx.ui.test
 
 import androidx.activity.ComponentActivity
 
-/** @Deprecated Moved to androidx.compose.ui.test.junit4 */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 l
+ * ibrary
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    replaceWith = ReplaceWith("AndroidComposeTestRule", "androidx.compose.ui.test.junit4")
+)
 typealias AndroidComposeTestRule = androidx.compose.ui.test.junit4.AndroidComposeTestRule<*>
 
 /** @Deprecated Moved to androidx.compose.ui.test.junit4 */
 actual fun createComposeRule() = androidx.compose.ui.test.junit4.createComposeRule()
 
-/** @Deprecated Moved to androidx.compose.ui.test.junit4 */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4
+ * library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    replaceWith = ReplaceWith("createAndroidComposeRule()", "androidx.compose.ui.test.junit4")
+)
 inline fun <reified T : ComponentActivity> createAndroidComposeRule() =
     androidx.compose.ui.test.junit4.createAndroidComposeRule<T>()
 
-/** @Deprecated Moved to androidx.compose.ui.test.junit4 */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4
+ * library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    replaceWith = ReplaceWith(
+        "createAndroidComposeRule(activityClass)",
+        "androidx.compose.ui.test.junit4"
+    )
+)
 fun <T : ComponentActivity> createAndroidComposeRule(
     activityClass: Class<T>
 ) = androidx.compose.ui.test.junit4.createAndroidComposeRule(activityClass)

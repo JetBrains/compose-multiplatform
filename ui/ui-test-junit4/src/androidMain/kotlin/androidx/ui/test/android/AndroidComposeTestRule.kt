@@ -31,11 +31,12 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
  * If you don't care about specific activity and just want to test composables in general, see
  * [createComposeRule].
  *
- * @Deprecated Moved to androidx.compose.ui.test
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4
+ * library
  */
 @Deprecated(
-    "Moved to androidx.compose.ui.test",
-    ReplaceWith("androidx.compose.ui.test.createAndroidComposeRule<T>()")
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    ReplaceWith("androidx.compose.ui.test.junit4.createAndroidComposeRule<T>()")
 )
 @Suppress("UNUSED_PARAMETER")
 inline fun <reified T : ComponentActivity> createAndroidComposeRule(
@@ -54,11 +55,12 @@ inline fun <reified T : ComponentActivity> createAndroidComposeRule(
  * If you don't care about specific activity and just want to test composables in general, see
  * [createComposeRule].
  *
- * @Deprecated Moved to androidx.compose.ui.test
+ * @Deprecated Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4
+ * library
  */
 @Deprecated(
-    "Moved to androidx.compose.ui.test",
-    ReplaceWith("androidx.compose.ui.test.createAndroidComposeRule(activityClass)")
+    "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
+    ReplaceWith("androidx.compose.ui.test.junit4.createAndroidComposeRule(activityClass)")
 )
 @Suppress("UNUSED_PARAMETER")
 fun <T : ComponentActivity> createAndroidComposeRule(

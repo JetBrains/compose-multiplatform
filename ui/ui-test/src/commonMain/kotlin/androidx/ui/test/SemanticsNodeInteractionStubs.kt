@@ -16,12 +16,39 @@
 
 package androidx.ui.test
 
-/** @Deprecated Moved to androidx.compose.ui.test */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library",
+    replaceWith = ReplaceWith("SemanticsMatcher", "androidx.compose.ui.test")
+)
 typealias SemanticsMatcher = androidx.compose.ui.test.SemanticsMatcher
 
-/** @Deprecated Moved to androidx.compose.ui.test */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library",
+    replaceWith = ReplaceWith("SemanticsNodeInteractionCollection", "androidx.compose.ui.test")
+)
 typealias SemanticsNodeInteractionCollection =
     androidx.compose.ui.test.SemanticsNodeInteractionCollection
 
-/** @Deprecated Moved to androidx.compose.ui.test */
+/**
+ * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library",
+    replaceWith = ReplaceWith("SemanticsNodeInteraction", "androidx.compose.ui.test")
+)
 typealias SemanticsNodeInteraction = androidx.compose.ui.test.SemanticsNodeInteraction
+
+/**
+ * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
+ */
+@Deprecated(
+    "Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library",
+    replaceWith = ReplaceWith("GestureScope", "androidx.compose.ui.test")
+)
+typealias GestureScope = androidx.compose.ui.test.GestureScope
