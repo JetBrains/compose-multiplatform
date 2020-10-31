@@ -144,7 +144,7 @@ class AndroidXPlugin : Plugin<Project> {
         AffectedModuleDetector.configureTaskGuard(task)
 
         val xmlReportDestDir = project.getHostTestResultDirectory()
-        val archiveName = "${project.asFilenamePrefix()}_${task.name}.zip"
+        val archiveName = "${project.path.asFilenamePrefix()}_${task.name}.zip"
         if (project.isDisplayTestOutput()) {
             // Enable tracing to see results in command line
             task.testLogging.apply {
@@ -532,42 +532,41 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         val commonExtension = project.extensions.getByType(CommonExtension::class.java)
-        if (hasAndroidTestSourceCode(project, this)) {
-            try {
-                val androidComponentsExtensionType =
-                    Class.forName("com.android.build.api.extension.AndroidComponentsExtension")
-                val androidComponentsExtension =
-                    project.extensions.getByType(androidComponentsExtensionType)
-                val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
-                val selector = androidComponentsExtensionType.getMethod("selector")
-                    .invoke(androidComponentsExtension)
-                androidComponentsExtension.javaClass.getMethod(
-                    "androidTest",
-                    selectorType,
-                    Function1::class.java
-                ).invoke(
-                    androidComponentsExtension,
-                    selector.javaClass.getMethod("all").invoke(selector),
-                    { androidTest: Any ->
-                        createTestConfigurationGenerationTask(
-                            project,
-                            androidTest.javaClass.getMethod(
-                                "getName"
-                            ).invoke(
-                                androidTest
-                            ) as String,
-                            androidTest.javaClass.getMethod(
-                                "getArtifacts"
-                            ).invoke(
-                                androidTest
-                            ) as Artifacts,
-                            defaultConfig.minSdk!!
-                        )
-                    }
-                )
-            } catch (cnfe: ClassNotFoundException) {
-                commonExtension.configureTestConfigGeneration(project)
-            }
+        try {
+            val androidComponentsExtensionType =
+                Class.forName("com.android.build.api.extension.AndroidComponentsExtension")
+            val androidComponentsExtension =
+                project.extensions.getByType(androidComponentsExtensionType)
+            val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
+            val selector = androidComponentsExtensionType.getMethod("selector")
+                .invoke(androidComponentsExtension)
+            androidComponentsExtension.javaClass.getMethod(
+                "androidTest",
+                selectorType,
+                Function1::class.java
+            ).invoke(
+                androidComponentsExtension,
+                selector.javaClass.getMethod("all").invoke(selector),
+                { androidTest: Any ->
+                    createTestConfigurationGenerationTask(
+                        project,
+                        androidTest.javaClass.getMethod(
+                            "getName"
+                        ).invoke(
+                            androidTest
+                        ) as String,
+                        androidTest.javaClass.getMethod(
+                            "getArtifacts"
+                        ).invoke(
+                            androidTest
+                        ) as Artifacts,
+                        defaultConfig.minSdk!!,
+                        defaultConfig.testInstrumentationRunner!!
+                    )
+                }
+            )
+        } catch (cnfe: ClassNotFoundException) {
+            commonExtension.configureTestConfigGeneration(project)
         }
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
@@ -575,7 +574,7 @@ class AndroidXPlugin : Plugin<Project> {
             buildTestApksTask.configure {
                 it.dependsOn(variant.assembleProvider)
             }
-            variant.configureApkCopy(project, this, true)
+            variant.configureApkCopy(project, true)
         }
     }
 
@@ -600,7 +599,8 @@ class AndroidXPlugin : Plugin<Project> {
                                 androidTest.javaClass.getMethod(
                                     "getArtifacts"
                                 ).invoke(androidTest) as Artifacts,
-                                defaultConfig.minSdk!!
+                                defaultConfig.minSdk!!,
+                                defaultConfig.testInstrumentationRunner!!
                             )
                         }
                     )
@@ -612,10 +612,11 @@ class AndroidXPlugin : Plugin<Project> {
         project: Project,
         variantName: String,
         artifacts: Artifacts,
-        minSdk: Int
+        minSdk: Int,
+        testRunner: String
     ) {
         val generateTestConfigurationTask = project.tasks.register(
-            "${project.name}${GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+            "${GENERATE_TEST_CONFIGURATION_TASK}$variantName",
             GenerateTestConfigurationTask::class.java
         ) {
             it.testFolder.set(artifacts.get(ArtifactType.APK))
@@ -623,11 +624,20 @@ class AndroidXPlugin : Plugin<Project> {
             it.outputXml.fileValue(
                 File(
                     project.getTestConfigDirectory(),
-                    "${project.asFilenamePrefix()}$variantName.xml"
+                    "${project.path.asFilenamePrefix()}$variantName.xml"
                 )
             )
             it.minSdk.set(minSdk)
+            it.hasBenchmarkPlugin.set(project.hasBenchmarkPlugin())
+            it.testRunner.set(testRunner)
+            it.projectPath.set(project.path)
             AffectedModuleDetector.configureTaskGuard(it)
+        }
+        // Disable xml generation for projects that have no test sources
+        project.afterEvaluate {
+            generateTestConfigurationTask.configure {
+                it.enabled = hasAndroidTestSourceCode(project)
+            }
         }
         project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
             .dependsOn(generateTestConfigurationTask)
@@ -653,12 +663,16 @@ class AndroidXPlugin : Plugin<Project> {
             )
     }
 
-    private fun hasAndroidTestSourceCode(project: Project, extension: TestedExtension): Boolean {
+    /**
+     * Expected to be called in afterEvaluate when all extensions are available
+     */
+    private fun hasAndroidTestSourceCode(project: Project): Boolean {
         // check Java androidTest source set
-        extension.sourceSets.findByName("androidTest")?.let { sourceSet ->
-            // using getSourceFiles() instead of sourceFiles due to b/150800094
-            if (!sourceSet.java.getSourceFiles().isEmpty) return true
-        }
+        project.extensions.findByType(TestedExtension::class.java)?.sourceSets
+            ?.findByName("androidTest")?.let { sourceSet ->
+                // using getSourceFiles() instead of sourceFiles due to b/150800094
+                if (!sourceSet.java.getSourceFiles().isEmpty) return true
+            }
 
         // check kotlin-android androidTest source set
         project.extensions.findByType(KotlinAndroidProjectExtension::class.java)
@@ -678,13 +692,12 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun ApkVariant.configureApkCopy(
         project: Project,
-        extension: TestedExtension,
         testApk: Boolean
     ) {
         packageApplicationProvider.get().let { packageTask ->
             AffectedModuleDetector.configureTaskGuard(packageTask)
             // Skip copying AndroidTest apks if they have no source code (no tests to run).
-            if (testApk && !hasAndroidTestSourceCode(project, extension)) {
+            if (testApk && !hasAndroidTestSourceCode(project)) {
                 return
             }
 
@@ -695,7 +708,7 @@ class AndroidXPlugin : Plugin<Project> {
                         it.include("*.apk")
                         it.duplicatesStrategy = DuplicatesStrategy.FAIL
                         it.rename { fileName ->
-                            fileName.renameApkForTesting(project)
+                            fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
                         }
                     }
                     task.dependsOn(packageTask)
@@ -707,7 +720,7 @@ class AndroidXPlugin : Plugin<Project> {
                     it.include("*.apk")
                     it.into(File(project.getDistributionDirectory(), "apks"))
                     it.rename { fileName ->
-                        fileName.renameApkForTesting(project)
+                        fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
                     }
                 }
             }
@@ -815,27 +828,27 @@ class AndroidXPlugin : Plugin<Project> {
                     it.dependsOn(variant.assembleProvider)
                 }
             }
-            variant.configureApkCopy(project, this, false)
+            variant.configureApkCopy(project, false)
         }
     }
 
-    private fun Project.createVerifyDependencyVersionsTask():
-        TaskProvider<VerifyDependencyVersionsTask>? {
-            /**
-             * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
-             * hypothetical build which is only intended to check for forward compatibility.
-             */
-            if (hasProperty(USE_MAX_DEP_VERSIONS)) {
-                return null
-            }
-
-            val taskProvider = tasks.register(
-                "verifyDependencyVersions",
-                VerifyDependencyVersionsTask::class.java
-            )
-            addToBuildOnServer(taskProvider)
-            return taskProvider
+    private fun Project.createVerifyDependencyVersionsTask(
+    ): TaskProvider<VerifyDependencyVersionsTask>? {
+        /**
+         * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
+         * hypothetical build which is only intended to check for forward compatibility.
+         */
+        if (hasProperty(USE_MAX_DEP_VERSIONS)) {
+            return null
         }
+
+        val taskProvider = tasks.register(
+            "verifyDependencyVersions",
+            VerifyDependencyVersionsTask::class.java
+        )
+        addToBuildOnServer(taskProvider)
+        return taskProvider
+    }
 
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
@@ -891,7 +904,7 @@ class AndroidXPlugin : Plugin<Project> {
 
                 it.xml.destination = File(
                     getHostTestCoverageDirectory(),
-                    "${project.asFilenamePrefix()}.xml"
+                    "${project.path.asFilenamePrefix()}.xml"
                 )
             }
         }
@@ -947,6 +960,7 @@ private fun Project.addToProjectMap(extension: AndroidXExtension) {
             val group = extension.mavenGroup?.group
             if (group != null) {
                 val module = "$group:$name"
+
                 @Suppress("UNCHECKED_CAST")
                 val projectModules = getProjectsMap()
                 projectModules[module] = path
@@ -1010,25 +1024,29 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
  * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
  * to determine what gets run by our test runner
  */
-fun String.renameApkForTesting(project: Project): String {
+fun String.renameApkForTesting(projectPath: String, hasBenchmarkPlugin: Boolean): String {
     return if (this.contains("media-test") || this.contains("media2-test")) {
         // Exclude media-test-* and media2-test-* modules from
         // existing support library presubmit tests.
         this.replace("-debug-androidTest", "")
-    } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
+    } else if (hasBenchmarkPlugin) {
         val name = this.replace("-androidTest", "-androidBenchmark")
-        "${project.asFilenamePrefix()}_$name"
+        "${projectPath.asFilenamePrefix()}_$name"
     } else {
-        "${project.asFilenamePrefix()}_$this"
+        "${projectPath.asFilenamePrefix()}_$this"
     }
+}
+
+fun Project.hasBenchmarkPlugin(): Boolean {
+    return this.plugins.hasPlugin(BenchmarkPlugin::class.java)
 }
 
 /**
  * Returns a string that is a valid filename and loosely based on the project name
  * The value returned for each project will be distinct
  */
-fun Project.asFilenamePrefix(): String {
-    return project.path.substring(1).replace(':', '-')
+fun String.asFilenamePrefix(): String {
+    return this.substring(1).replace(':', '-')
 }
 
 /**

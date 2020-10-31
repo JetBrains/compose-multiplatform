@@ -96,14 +96,10 @@ val EXEMPT_TASKS = setOf(
     ":camera:integration-tests:camera-testapp-core:packageDebug",
     ":camera:integration-tests:camera-testapp-uiwidgets:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-uiwidgets:packageDebug",
-    ":camera:integration-tests:camera-testapp-core:camera-testapp" +
-        "-coreGenerateTestConfigurationdebug",
-    ":camera:integration-tests:camera-testapp-core:camera-testapp" +
-        "-coreGenerateTestConfigurationdebugAndroidTest",
-    ":camera:integration-tests:camera-testapp-view:camera-testapp" +
-        "-viewGenerateTestConfigurationdebug",
-    ":camera:integration-tests:camera-testapp-view:camera-testapp" +
-        "-viewGenerateTestConfigurationdebugAndroidTest",
+    ":camera:integration-tests:camera-testapp-core:GenerateTestConfigurationdebug",
+    ":camera:integration-tests:camera-testapp-core:GenerateTestConfigurationdebugAndroidTest",
+    ":camera:integration-tests:camera-testapp-view:GenerateTestConfigurationdebug",
+    ":camera:integration-tests:camera-testapp-view:GenerateTestConfigurationdebugAndroidTest",
     ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-view:packageDebug",
 
