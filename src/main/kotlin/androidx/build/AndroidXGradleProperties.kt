@@ -154,8 +154,13 @@ fun Project.isWriteVersionedApiFilesEnabled(): Boolean =
 /**
  * Returns whether the project should generate documentation.
  */
-fun Project.isDocumentationEnabled(): Boolean =
-    (project.findProperty(ENABLE_DOCUMENTATION) as? String)?.toBoolean() ?: true
+fun Project.isDocumentationEnabled(): Boolean {
+    if (System.getenv().containsKey("ANDROIDX_PROJECTS")) {
+        val projects = System.getenv()["ANDROIDX_PROJECTS"] as String
+        if (projects != "ALL") return false
+    }
+    return (project.findProperty(ENABLE_DOCUMENTATION) as? String)?.toBoolean() ?: true
+}
 
 /**
  * Returns whether the project has coverage enabled.
