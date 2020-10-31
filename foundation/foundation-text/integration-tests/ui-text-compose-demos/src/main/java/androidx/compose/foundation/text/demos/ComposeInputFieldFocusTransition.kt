@@ -18,6 +18,7 @@ package androidx.compose.foundation.text.demos
 
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,7 +70,7 @@ private fun TextFieldWithFocusRequesters(
             .focusRequester(focusRequester),
         textStyle = TextStyle(color = color, fontSize = 32.sp),
         onValueChange = { state.value = it },
-        imeAction = ImeAction.Next,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         onImeActionPerformed = { if (it == ImeAction.Next) nextFocusRequester.requestFocus() }
     )
 }

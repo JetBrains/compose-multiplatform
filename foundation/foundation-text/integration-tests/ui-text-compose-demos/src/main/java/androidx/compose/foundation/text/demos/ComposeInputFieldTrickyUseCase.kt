@@ -18,6 +18,7 @@ package androidx.compose.foundation.text.demos
 
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.text.TextStyle
@@ -48,7 +49,7 @@ private fun RejectNonDigits() {
                 state.value = it
             }
         },
-        keyboardType = KeyboardType.Number
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
 }
 
