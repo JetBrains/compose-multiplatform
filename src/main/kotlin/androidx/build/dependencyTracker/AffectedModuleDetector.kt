@@ -262,6 +262,18 @@ class AffectedModuleDetectorImpl constructor(
         ALWAYS_BUILD.map { path -> rootProject.project(path) }
     }
 
+    /**
+     * Gets set to true when there are unknown files in the build. There
+     * are two cases when we want to build all by default, even though the
+     * real detector is in use; in presubmit, or in postsubmit. We know the
+     * build is postsubmit when there are no files changed. Thus, we can
+     * change the behavior of presubmit builds based on this flag.
+     *
+     * In this case, we return a different ProjectSubset in presubmit vs.
+     * postsubmit, to get the desired test behaviors.
+     */
+    private var isPresubmit: Boolean = false
+
     override fun shouldInclude(project: Project): Boolean {
         return (project.isRoot || affectedProjects.contains(project)).also {
             logger?.info(
@@ -275,8 +287,13 @@ class AffectedModuleDetectorImpl constructor(
             changedProjects.contains(project) -> {
                 ProjectSubset.CHANGED_PROJECTS
             }
-            dependentProjects.contains(project) -> {
+            dependentProjects.contains(project) || isPresubmit -> {
                 ProjectSubset.DEPENDENT_PROJECTS
+            }
+            // This should only happen in situations where everything gets built
+            // and there are no changed files (aka postsubmit)
+            affectedProjects.contains(project) -> {
+                ProjectSubset.ALL_AFFECTED_PROJECTS
             }
             else -> {
                 ProjectSubset.NONE
@@ -365,6 +382,7 @@ class AffectedModuleDetectorImpl constructor(
             buildAll = true
         } else if (unknownFiles.isNotEmpty()) {
             buildAll = true
+            isPresubmit = true
         }
         logger?.info(
             "unknownFiles: $unknownFiles, changedProjects: $changedProjects, buildAll: " +
