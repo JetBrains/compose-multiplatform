@@ -31,7 +31,6 @@ import org.jetbrains.codeviewer.ui.common.AppTheme
 import org.jetbrains.codeviewer.ui.common.Fonts
 import org.jetbrains.codeviewer.ui.common.Settings
 import org.jetbrains.codeviewer.util.LazyColumnFor
-import org.jetbrains.codeviewer.util.loadable
 import org.jetbrains.codeviewer.util.loadableScoped
 import org.jetbrains.codeviewer.util.withoutWidthConstraints
 import kotlin.text.Regex.Companion.fromLiteral
@@ -86,11 +85,13 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(DensityAmbient
             modifier = Modifier.fillMaxSize(),
             state = scrollState,
             itemContent = { index ->
-                val line: Editor.Line? by loadable { lines.get(index) }
                 Box(Modifier.height(lineHeight)) {
-                    if (line != null) {
-                        Line(Modifier.align(Alignment.CenterStart), maxNumber, line!!, settings)
-                    }
+                    Line(
+                        Modifier.align(Alignment.CenterStart),
+                        maxNumber,
+                        lines[index],
+                        settings
+                    )
                 }
             }
         )
