@@ -36,12 +36,6 @@ kotlin {
     }
 }
 
-project.extensions.findByType<com.android.build.gradle.LibraryExtension>()!!.apply {
-    sourceSets.findByName("main")?.apply {
-        res.srcDirs("src/commonMain/resources")
-    }
-}
-
 android {
     compileSdkVersion(30)
 
@@ -60,7 +54,7 @@ android {
     sourceSets {
         named("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
-            res.srcDirs("src/androidMain/res")
+            res.srcDirs("src/androidMain/res", "src/commonMain/resources")
         }
     }
 }
