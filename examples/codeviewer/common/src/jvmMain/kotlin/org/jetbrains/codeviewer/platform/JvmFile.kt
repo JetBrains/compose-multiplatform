@@ -12,6 +12,7 @@ import java.io.FileInputStream
 import java.io.FilenameFilter
 import java.io.IOException
 import java.io.RandomAccessFile
+import java.nio.ByteBuffer
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
@@ -48,21 +49,19 @@ fun java.io.File.toProjectFile(): File = object : File {
             size = lineStartPositions.size
         }
 
-        // Try to preload file.
-        backgroundScope.launch {
-            byteBuffer.load()
-        }
-
         return object : TextLines {
             override val size get() = size
 
             override suspend fun get(index: Int): String {
                 return withContext(Dispatchers.IO) {
                     val startPosition = lineStartPositions[index]
-                    val length =
-                        if (index  + 1 < size) lineStartPositions[index + 1] - startPosition else
+                    val length = if (index + 1 < size) lineStartPositions[index + 1] - startPosition else
                             byteBufferSize - startPosition
-                    StandardCharsets.UTF_8.decode(byteBuffer.slice(startPosition, length)).toString()
+                    // Only JDK since 13 has slice() method we need, so do ugly for now.
+                    byteBuffer.position(startPosition)
+                    val slice = byteBuffer.slice()
+                    slice.limit(length)
+                    StandardCharsets.UTF_8.decode(slice).toString()
                 }
             }
         }

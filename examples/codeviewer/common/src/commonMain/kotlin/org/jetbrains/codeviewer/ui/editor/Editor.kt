@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.codeviewer.platform.File
+import org.jetbrains.codeviewer.util.EmptyTextLines
 import org.jetbrains.codeviewer.util.SingleSelection
 import org.jetbrains.codeviewer.util.afterSet
 
@@ -35,7 +36,12 @@ class Editor(
 fun Editor(file: File) = Editor(
     fileName = file.name
 ) { backgroundScope ->
-    val textLines = file.readLines(backgroundScope)
+    val textLines = try {
+        file.readLines(backgroundScope)
+    } catch (e: Throwable) {
+        e.printStackTrace()
+        EmptyTextLines
+    }
     val indexToEditedText = mutableMapOf<Int, String>()
     val isCode = file.name.endsWith(".kt", ignoreCase = true)
 
