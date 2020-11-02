@@ -4,17 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    ): Modifier = composed {"
-        errorLine2="                  ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/Tab.kt"
-            line="221"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1="    this.then(object : LayoutModifier {"
         errorLine2="              ^">
         <location
