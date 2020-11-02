@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.runOnIdleWithDensity
@@ -601,8 +602,10 @@ class OutlinedTextFieldTest {
                     value = text.value,
                     onValueChange = { text.value = it },
                     label = {},
-                    imeAction = ImeAction.Go,
-                    keyboardType = KeyboardType.Email
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Go,
+                        keyboardType = KeyboardType.Email
+                    )
                 )
             }
         }
@@ -687,7 +690,7 @@ class OutlinedTextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                imeAction = ImeAction.Go,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
                 onImeActionPerformed = { _, softwareKeyboardController ->
                     controller = softwareKeyboardController
                 }

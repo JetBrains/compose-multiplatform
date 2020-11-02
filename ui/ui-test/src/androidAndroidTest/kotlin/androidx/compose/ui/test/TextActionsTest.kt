@@ -18,6 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +57,7 @@ class TextActionsTest {
         BasicTextField(
             modifier = Modifier.testTag(fieldTag),
             value = state.value,
-            imeAction = imeAction,
+            keyboardOptions = KeyboardOptions(imeAction = imeAction),
             onImeActionPerformed = onImeActionPerformed,
             onValueChange = {
                 state.value = it

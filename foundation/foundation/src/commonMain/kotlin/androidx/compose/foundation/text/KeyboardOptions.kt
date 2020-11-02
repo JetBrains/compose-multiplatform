@@ -17,7 +17,6 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -43,7 +42,6 @@ import androidx.compose.ui.text.input.KeyboardType
  * When [ImeOptions.singleLine] is false, the keyboard might show return key rather than the action
  * requested here.
  */
-@ExperimentalTextApi
 @Immutable
 data class KeyboardOptions constructor(
     val capitalization: KeyboardCapitalization = ImeOptions.Default.capitalization,

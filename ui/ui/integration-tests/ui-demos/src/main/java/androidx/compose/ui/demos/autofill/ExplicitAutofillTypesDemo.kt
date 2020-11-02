@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -74,8 +75,10 @@ fun ExplicitAutofillTypesDemo() {
                     }
                 },
                 value = nameState.value,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Unspecified,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Unspecified
+                ),
                 onValueChange = { nameState.value = it },
                 textStyle = textStyle
             )
@@ -99,8 +102,10 @@ fun ExplicitAutofillTypesDemo() {
                     }
                 },
                 value = emailState.value,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Unspecified,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Unspecified
+                ),
                 onValueChange = { emailState.value = it },
                 textStyle = textStyle
             )

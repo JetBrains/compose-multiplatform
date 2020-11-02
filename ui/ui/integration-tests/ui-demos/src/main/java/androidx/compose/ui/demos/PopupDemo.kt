@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -522,8 +523,10 @@ private fun EditLine(
     BasicTextField(
         value = state.value,
         modifier = modifier.background(color = color),
-        keyboardType = keyboardType,
-        imeAction = imeAction,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        ),
         onValueChange = {
             state.value = it
             onValueChange(it.text)

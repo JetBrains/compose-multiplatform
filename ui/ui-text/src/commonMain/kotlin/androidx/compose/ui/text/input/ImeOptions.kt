@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
  * The IME configuration options for [TextInputService]. It is not guaranteed if IME
@@ -40,7 +39,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
  * on the keyboard. For example, search icon may be shown if [ImeAction.Search] is specified.
  * When [singleLine] is false, the IME might show return key rather than the action requested here.
  */
-@ExperimentalTextApi
 @Immutable
 data class ImeOptions(
     val singleLine: Boolean = false,
