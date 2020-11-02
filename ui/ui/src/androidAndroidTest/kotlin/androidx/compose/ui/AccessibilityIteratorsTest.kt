@@ -18,8 +18,8 @@ package androidx.compose.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -427,7 +427,7 @@ class AccessibilityIteratorsTest {
         rule.setContent {
             // TODO(yingleiw): use predefined DensityAmbient.current when b/163142237 is fixed.
             with(DensityAmbient.current) {
-                Text(
+                BasicText(
                     style = TextStyle(
                         fontSize = fontSize,
                         fontFamily = font(

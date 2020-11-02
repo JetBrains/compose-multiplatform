@@ -16,7 +16,6 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +26,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.RadioButton
+import androidx.compose.material.Text
 import androidx.compose.material.samples.BottomNavigationSample
 import androidx.compose.material.samples.BottomNavigationWithOnlySelectedLabelsSample
 import androidx.compose.runtime.Composable

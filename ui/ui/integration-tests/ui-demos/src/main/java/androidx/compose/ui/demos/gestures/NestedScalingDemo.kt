@@ -16,19 +16,19 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.RawScaleObserver
 import androidx.compose.ui.gesture.rawScaleGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import kotlin.math.roundToInt
 
 /**

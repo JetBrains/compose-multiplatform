@@ -19,7 +19,7 @@ package androidx.compose.foundation.samples
 import android.util.Log
 import androidx.annotation.Sampled
 import androidx.compose.foundation.ClickableText
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember

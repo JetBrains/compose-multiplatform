@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Text
 import androidx.compose.ui.test.captureToBitmap
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule

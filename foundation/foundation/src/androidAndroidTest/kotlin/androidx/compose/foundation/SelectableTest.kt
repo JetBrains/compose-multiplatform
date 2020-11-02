@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,7 +68,7 @@ class SelectableTest {
     @Test
     fun selectable_defaultSemantics() {
         rule.setContent {
-            Text(
+            BasicText(
                 "Text in item",
                 modifier = Modifier.selectable(selected = true, onClick = {})
             )
@@ -84,7 +85,7 @@ class SelectableTest {
     fun selectable_defaultClicks() {
         rule.setContent {
             val (selected, onSelected) = remember { mutableStateOf(false) }
-            Text(
+            BasicText(
                 "Text in item",
                 modifier = Modifier.selectable(
                     selected = selected,
@@ -105,7 +106,7 @@ class SelectableTest {
     fun selectable_noClicksNoChanges() {
         rule.setContent {
             val (selected, _) = remember { mutableStateOf(false) }
-            Text(
+            BasicText(
                 "Text in item",
                 modifier = Modifier.selectable(
                     selected = selected,
@@ -133,7 +134,7 @@ class SelectableTest {
                         onClick = {}
                     )
                 ) {
-                    Text("SelectableText")
+                    BasicText("SelectableText")
                 }
             }
         }
@@ -172,7 +173,7 @@ class SelectableTest {
                             onClick = {}
                         )
                     ) {
-                        Text("SelectableText")
+                        BasicText("SelectableText")
                     }
                 }
             }

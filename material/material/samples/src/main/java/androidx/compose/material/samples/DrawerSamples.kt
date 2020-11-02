@@ -17,7 +17,6 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +27,7 @@ import androidx.compose.material.BottomDrawerValue
 import androidx.compose.material.Button
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.ModalDrawerLayout
+import androidx.compose.material.Text
 import androidx.compose.material.rememberBottomDrawerState
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable

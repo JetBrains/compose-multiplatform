@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.ManualAnimationClock
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +31,7 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
@@ -230,7 +230,7 @@ class LazyColumnForTest {
         val tag = "List"
         rule.setContent {
             LazyColumnFor((1..numItemsModel).toList(), modifier = Modifier.testTag(tag)) {
-                Text("$it")
+                BasicText("$it")
             }
         }
 
@@ -269,7 +269,7 @@ class LazyColumnForTest {
         val tag = "List"
         rule.setContent {
             LazyColumnFor(dataModel, modifier = Modifier.testTag(tag)) {
-                Text("$it")
+                BasicText("$it")
             }
         }
 

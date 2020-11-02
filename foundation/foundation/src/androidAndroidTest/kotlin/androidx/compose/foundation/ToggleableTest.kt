@@ -22,6 +22,7 @@ import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.foundation.semantics.FoundationSemanticsProperties
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -81,7 +82,7 @@ class ToggleableTest {
                         .triStateToggleable(state = ToggleableState.On, onClick = {})
                         .testTag("checkedToggleable"),
                     children = {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 )
                 Box(
@@ -89,7 +90,7 @@ class ToggleableTest {
                         .triStateToggleable(state = ToggleableState.Off, onClick = {})
                         .testTag("unCheckedToggleable"),
                     children = {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 )
                 Box(
@@ -97,7 +98,7 @@ class ToggleableTest {
                         .triStateToggleable(state = ToggleableState.Indeterminate, onClick = {})
                         .testTag("indeterminateToggleable"),
                     children = {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 )
             }
@@ -130,7 +131,7 @@ class ToggleableTest {
                         .toggleable(value = true, onValueChange = {})
                         .testTag("checkedToggleable"),
                     children = {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 )
                 Box(
@@ -138,7 +139,7 @@ class ToggleableTest {
                         .toggleable(value = false, onValueChange = {})
                         .testTag("unCheckedToggleable"),
                     children = {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 )
             }
@@ -165,7 +166,7 @@ class ToggleableTest {
                         enabled = false
                     ),
                     children = {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 )
             }
@@ -186,7 +187,7 @@ class ToggleableTest {
                 Box(
                     Modifier.toggleable(value = checked, onValueChange = onCheckedChange),
                     children = {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 )
             }
@@ -213,7 +214,7 @@ class ToggleableTest {
                         onValueChange = {}
                     )
                 ) {
-                    Text("ToggleableText")
+                    BasicText("ToggleableText")
                 }
             }
         }
@@ -252,7 +253,7 @@ class ToggleableTest {
                             onValueChange = {}
                         )
                     ) {
-                        Text("ToggleableText")
+                        BasicText("ToggleableText")
                     }
                 }
             }

@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.test
 
+import androidx.compose.foundation.text.TextSemanticsProperties
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.DeleteAllEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.foundation.text.TextSemanticsProperties
 
 /**
  * Clears the text in this node in similar way to IME.

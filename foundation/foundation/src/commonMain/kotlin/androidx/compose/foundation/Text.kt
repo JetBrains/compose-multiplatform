@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation
 
 import androidx.compose.foundation.text.BasicText
@@ -85,6 +87,17 @@ import androidx.compose.ui.unit.TextUnit
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  * @param style Style configuration for the text such as color, font, line height etc.
  */
+@Deprecated(
+    message = "Use androidx.compose.material.Text for a high level Text component that " +
+        "consumes theming information, or androidx.compose.foundation.text.BasicText for a basic " +
+        "unopinionated component that does not have default theming",
+    replaceWith = ReplaceWith(
+        "Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
+            "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, " +
+            "onTextLayout, style)",
+        "androidx.compose.material.Text"
+    )
+)
 @Composable
 fun Text(
     text: String,
@@ -173,6 +186,17 @@ fun Text(
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  * @param style Style configuration for the text such as color, font, line height etc.
  */
+@Deprecated(
+    message = "Use androidx.compose.material.Text for a high level Text component that " +
+        "consumes theming information, or androidx.compose.foundation.text.BasicText for a basic " +
+        "unopinionated component that does not have default theming",
+    replaceWith = ReplaceWith(
+        "Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
+            "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, " +
+            "inlineContent, onTextLayout, style)",
+        "androidx.compose.material.Text"
+    )
+)
 @Composable
 fun Text(
     text: AnnotatedString,
@@ -226,6 +250,13 @@ fun Text(
  *
  * @see ProvideTextStyle
  */
+@Deprecated(
+    message = "AmbientTextStyle has moved to the Material library. For non-Material applications," +
+        " create your own design system specific theming ambients.",
+    replaceWith = ReplaceWith(
+        "AmbientTextStyle", "androidx.compose.material.AmbientTextStyle"
+    )
+)
 val AmbientTextStyle = ambientOf(
     @OptIn(ExperimentalComposeApi::class) structuralEqualityPolicy()
 ) { TextStyle() }
@@ -238,6 +269,14 @@ val AmbientTextStyle = ambientOf(
  *
  * @see AmbientTextStyle
  */
+@Deprecated(
+    message = "ProvideTextStyle has moved to the Material library. For non-Material applications," +
+        " create your own design system specific theming ambients.",
+    replaceWith = ReplaceWith(
+        "ProvideTextStyle(value, children)",
+        "androidx.compose.material.ProvideTextStyle"
+    )
+)
 @Composable
 fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
     val mergedStyle = AmbientTextStyle.current.merge(value)

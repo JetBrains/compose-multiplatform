@@ -18,13 +18,13 @@ package androidx.compose.integration.demos
 
 import androidx.compose.androidview.demos.AndroidViewDemos
 import androidx.compose.animation.demos.AnimationDemos
-import androidx.compose.ui.demos.CoreDemos
-import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.foundation.demos.FoundationDemos
 import androidx.compose.foundation.layout.demos.LayoutDemos
+import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.foundation.text.demos.TextDemos
 import androidx.compose.material.demos.MaterialDemos
 import androidx.compose.material.studies.MaterialStudies
-import androidx.compose.foundation.text.demos.TextDemos
+import androidx.compose.ui.demos.CoreDemos
 import androidx.navigation.compose.demos.NavigationDemos
 
 /**

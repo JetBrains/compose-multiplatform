@@ -16,12 +16,12 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.samples.SliderSample
 import androidx.compose.material.samples.StepsSliderSample
 import androidx.compose.runtime.Composable
