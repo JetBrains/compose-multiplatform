@@ -3,10 +3,7 @@ package org.jetbrains.codeviewer.platform
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.codeviewer.util.TextLines
 import java.io.FileInputStream
 import java.io.FilenameFilter
@@ -31,38 +28,44 @@ fun java.io.File.toProjectFile(): File = object : File {
     override val hasChildren: Boolean
         get() = isDirectory && listFiles()?.size ?: 0 > 0
 
-    private lateinit var byteBuffer: MappedByteBuffer
-    private var byteBufferSize = 0
 
     override suspend fun readLines(backgroundScope: CoroutineScope): TextLines {
-        RandomAccessFile(this@toProjectFile, "r").use { file ->
-            byteBuffer = file.channel
-                .map(FileChannel.MapMode.READ_ONLY, 0, file.length())
+        var byteBufferSize: Int
+        val byteBuffer = RandomAccessFile(this@toProjectFile, "r").use { file ->
             byteBufferSize = file.length().toInt()
+            file.channel
+                .map(FileChannel.MapMode.READ_ONLY, 0, file.length())
         }
 
         val lineStartPositions = IntList()
         var size by mutableStateOf(0)
+        val refreshJob = backgroundScope.launch {
+            delay(100)
+            size = lineStartPositions.size
+            while (true) {
+                delay(1000)
+                size = lineStartPositions.size
+            }
+        }
 
         backgroundScope.launch {
             readLinePositions(lineStartPositions)
+            refreshJob.cancel()
             size = lineStartPositions.size
         }
 
         return object : TextLines {
             override val size get() = size
 
-            override suspend fun get(index: Int): String {
-                return withContext(Dispatchers.IO) {
-                    val startPosition = lineStartPositions[index]
-                    val length = if (index + 1 < size) lineStartPositions[index + 1] - startPosition else
-                            byteBufferSize - startPosition
-                    // Only JDK since 13 has slice() method we need, so do ugly for now.
-                    byteBuffer.position(startPosition)
-                    val slice = byteBuffer.slice()
-                    slice.limit(length)
-                    StandardCharsets.UTF_8.decode(slice).toString()
-                }
+            override fun get(index: Int): String {
+                val startPosition = lineStartPositions[index]
+                val length = if (index + 1 < size) lineStartPositions[index + 1] - startPosition else
+                    byteBufferSize - startPosition
+                // Only JDK since 13 has slice() method we need, so do ugly for now.
+                byteBuffer.position(startPosition)
+                val slice = byteBuffer.slice()
+                slice.limit(length)
+                return StandardCharsets.UTF_8.decode(slice).toString()
             }
         }
     }
@@ -95,6 +98,7 @@ private suspend fun java.io.File.readLinePositions(
                 isBeginOfLine = byte.toChar() == '\n'
                 position++
             }
+            channel.close()
         }
     } catch (e: IOException) {
         e.printStackTrace()

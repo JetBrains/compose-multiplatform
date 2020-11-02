@@ -27,7 +27,7 @@ class Editor(
     interface Lines {
         val lineNumberDigitCount: Int get() = size.toString().length
         val size: Int
-        suspend fun get(index: Int): Line
+        fun get(index: Int): Line
     }
 
     class Content(val value: State<String>, val isCode: Boolean)
@@ -42,21 +42,18 @@ fun Editor(file: File) = Editor(
         e.printStackTrace()
         EmptyTextLines
     }
-    val indexToEditedText = mutableMapOf<Int, String>()
     val isCode = file.name.endsWith(".kt", ignoreCase = true)
 
-    suspend fun content(index: Int): Editor.Content {
-        val text = indexToEditedText[index] ?: textLines.get(index)
-        val state = mutableStateOf(text).afterSet {
-            indexToEditedText[index] = it
-        }
+    fun content(index: Int): Editor.Content {
+        val text = textLines.get(index)
+        val state = mutableStateOf(text)
         return Editor.Content(state, isCode)
     }
 
     object : Editor.Lines {
         override val size get() = textLines.size
 
-        override suspend fun get(index: Int) = Editor.Line(
+        override fun get(index: Int) = Editor.Line(
             number = index + 1,
             content = content(index)
         )

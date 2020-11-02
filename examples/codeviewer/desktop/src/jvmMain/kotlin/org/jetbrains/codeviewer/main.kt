@@ -6,15 +6,21 @@ import androidx.compose.ui.unit.IntSize
 import org.jetbrains.codeviewer.ui.MainView
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
+import javax.swing.SwingUtilities.invokeLater
 
 @OptIn(ExperimentalLayout::class)
-fun main() = Window(
-    title = "Code Viewer",
-    size = IntSize(1280, 768),
-    icon = loadImageResource("ic_launcher.png")
-) {
-    MainView()
+fun main() {
+    invokeLater {
+        Window(
+            title = "Code Viewer",
+            size = IntSize(1280, 768),
+            icon = loadImageResource("ic_launcher.png")
+        ) {
+            MainView()
+        }
+    }
 }
+
 
 @Suppress("SameParameterValue")
 private fun loadImageResource(path: String): BufferedImage {
