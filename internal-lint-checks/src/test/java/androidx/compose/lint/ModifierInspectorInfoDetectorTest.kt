@@ -409,24 +409,30 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.border(painter: Painter) =
+                fun Modifier.padding(size: Int) =
                     this.then(
-                        if (painter.size > 0) {
-                            BorderModifier(inspectorInfo = debugInspectorInfo {
-                                name = "border"
-                                properties["painter"] = painter
-                            })
+                        if (size >= 10) {
+                            PaddingModifier(
+                                paddingSize = size,
+                                inspectorInfo = debugInspectorInfo {
+                                    name = "padding"
+                                    properties["size"] = size
+                                }
+                            )
                         } else {
                             Modifier
                         }
                     )
 
-                private class BorderModifier(
+                fun Modifier.paddingFromBaseline(top: Int, bottom: Int) = this
+                    .then(if (bottom > 0) padding(bottom) else Modifier)
+                    .then(if (top > 0) padding(top) else Modifier)
+
+                private class PaddingModifier(
+                    paddingSize: Int,
                     inspectorInfo: InspectorInfo.() -> Unit
                 ): Modifier.Element, InspectorValueInfo(inspectorInfo) {
                 }
-
-                class Painter(val size: Int)
 
                 """
             ).indented()
