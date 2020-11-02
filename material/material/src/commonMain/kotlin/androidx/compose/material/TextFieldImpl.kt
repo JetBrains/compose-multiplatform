@@ -108,6 +108,7 @@ internal fun TextFieldImpl(
     isErrorValue: Boolean,
     visualTransformation: VisualTransformation,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
     interactionState: InteractionState,
@@ -148,6 +149,7 @@ internal fun TextFieldImpl(
                     cursorColor = if (isErrorValue) errorColor else activeColor,
                     visualTransformation = visualTransformation,
                     keyboardOptions = keyboardOptions,
+                    maxLines = maxLines,
                     onImeActionPerformed = {
                         onImeActionPerformed(it, keyboardController.value)
                     },

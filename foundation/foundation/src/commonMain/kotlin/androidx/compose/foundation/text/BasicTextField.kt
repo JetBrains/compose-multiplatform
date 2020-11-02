@@ -74,6 +74,8 @@ import androidx.compose.ui.text.input.VisualTransformation
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
+ * equal or greater than 1.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
  * that this IME action may be different from what you specified in [imeAction].
@@ -94,6 +96,7 @@ fun BasicTextField(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
@@ -121,6 +124,7 @@ fun BasicTextField(
         modifier = modifier,
         textStyle = textStyle,
         keyboardOptions = keyboardOptions,
+        maxLines = maxLines,
         onImeActionPerformed = onImeActionPerformed,
         visualTransformation = visualTransformation,
         onTextLayout = onTextLayout,
@@ -166,6 +170,8 @@ fun BasicTextField(
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
+ * equal or greater than 1.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
  * that this IME action may be different from what you specified in [imeAction].
@@ -186,6 +192,7 @@ fun BasicTextField(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
@@ -202,6 +209,7 @@ fun BasicTextField(
         onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor,
-        imeOptions = keyboardOptions.toImeOptions()
+        imeOptions = keyboardOptions.toImeOptions(),
+        maxLines = maxLines
     )
 }

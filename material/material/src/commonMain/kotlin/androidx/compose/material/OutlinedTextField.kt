@@ -91,6 +91,8 @@ import kotlin.math.roundToInt
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
+ * equal or greater than 1.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
  * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
@@ -123,6 +125,7 @@ fun OutlinedTextField(
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
@@ -159,6 +162,7 @@ fun OutlinedTextField(
         isErrorValue = isErrorValue,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
+        maxLines = maxLines,
         onImeActionPerformed = onImeActionPerformed,
         onTextInputStarted = onTextInputStarted,
         interactionState = interactionState,
@@ -203,6 +207,8 @@ fun OutlinedTextField(
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
+ * equal or greater than 1.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
  * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
@@ -235,6 +241,7 @@ fun OutlinedTextField(
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
@@ -255,6 +262,7 @@ fun OutlinedTextField(
         isErrorValue = isErrorValue,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
+        maxLines = maxLines,
         onImeActionPerformed = onImeActionPerformed,
         onTextInputStarted = onTextInputStarted,
         interactionState = interactionState,
