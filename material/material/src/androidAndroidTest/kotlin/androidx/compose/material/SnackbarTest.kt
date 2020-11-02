@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.Providers
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
@@ -30,10 +31,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsNotEqualTo
-import androidx.compose.ui.test.assertShape
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getAlignmentLinePosition
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -354,7 +354,7 @@ class SnackbarTest {
         }
 
         rule.onNodeWithTag("snackbar")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = shape,

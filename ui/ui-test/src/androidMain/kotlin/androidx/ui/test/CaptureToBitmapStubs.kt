@@ -18,8 +18,9 @@ package androidx.ui.test
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 
 /**
  * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
@@ -30,4 +31,4 @@ import androidx.compose.ui.test.captureToBitmap
     replaceWith = ReplaceWith("captureToBitmap()", "androidx.compose.ui.test")
 )
 @RequiresApi(Build.VERSION_CODES.O)
-fun SemanticsNodeInteraction.captureToBitmap() = captureToBitmap()
+fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()

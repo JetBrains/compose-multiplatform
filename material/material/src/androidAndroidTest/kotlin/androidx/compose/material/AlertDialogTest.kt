@@ -18,10 +18,10 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.border
+import androidx.compose.testutils.assertContainsColor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.assertContainsColor
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
@@ -62,7 +62,7 @@ class AlertDialogTest {
 
         // Assert background
         rule.onNode(isDialog())
-            .captureToBitmap()
+            .captureToImage()
             .assertContainsColor(Color.Yellow) // Background
             .assertContainsColor(Color.Blue) // Modifier border
 

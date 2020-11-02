@@ -56,6 +56,7 @@ dependencies {
         testImplementation(JUNIT)
         testImplementation(TRUTH)
 
+        androidTestImplementation project(":compose:test-utils")
         androidTestImplementation project(':ui:ui-test')
         androidTestImplementation project(":compose:ui:ui-test-font")
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
@@ -109,6 +110,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidAndroidTest.dependencies {
+                implementation project(":compose:test-utils")
                 implementation project(':ui:ui-test')
                 implementation project(":compose:ui:ui-test-font")
 

@@ -17,6 +17,7 @@ package androidx.compose.material
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
@@ -29,9 +30,8 @@ import androidx.compose.ui.graphics.vector.VectorAssetBuilder
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertPixels
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
@@ -161,7 +161,7 @@ class IconTest {
         }
 
         // With no color provided for a tint, the icon should render the original pixels
-        rule.onNodeWithTag(testTag).captureToBitmap().assertPixels { Color.Red }
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Red }
     }
 
     @Test
@@ -183,7 +183,7 @@ class IconTest {
         }
 
         // With a tint color provided, all pixels should be blue
-        rule.onNodeWithTag(testTag).captureToBitmap().assertPixels { Color.Blue }
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Blue }
     }
 
     private fun createBitmapWithColor(

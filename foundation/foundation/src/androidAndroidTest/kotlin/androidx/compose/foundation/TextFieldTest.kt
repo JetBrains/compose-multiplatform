@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
@@ -51,9 +52,8 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertShape
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasImeAction
 import androidx.compose.ui.test.hasInputMethodsSupport
 import androidx.compose.ui.test.isFocused
@@ -404,7 +404,7 @@ class TextFieldTest {
         }
 
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,

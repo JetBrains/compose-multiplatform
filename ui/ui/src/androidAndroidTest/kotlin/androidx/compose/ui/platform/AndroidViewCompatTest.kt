@@ -43,6 +43,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Align
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
@@ -67,8 +68,7 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.isAttached
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
@@ -198,7 +198,7 @@ class AndroidViewCompatTest {
         }
         rule.onNodeWithTag("content")
             .assertIsDisplayed()
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedColorProvider = expectedPixelColor)
 
         rule.runOnUiThread {
@@ -212,7 +212,7 @@ class AndroidViewCompatTest {
             .check(matches(`is`(squareView)))
         rule.onNodeWithTag("content")
             .assertIsDisplayed()
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedColorProvider = expectedPixelColor)
 
         rule.runOnUiThread {
@@ -226,7 +226,7 @@ class AndroidViewCompatTest {
             .check(matches(`is`(squareView)))
         rule.onNodeWithTag("content")
             .assertIsDisplayed()
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedColorProvider = expectedPixelColor)
     }
 
@@ -418,15 +418,15 @@ class AndroidViewCompatTest {
                 view.setBackgroundColor(android.graphics.Color.BLUE)
             }
         }
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
     }
 
@@ -558,7 +558,7 @@ class AndroidViewCompatTest {
             }
         }
 
-        rule.onNodeWithTag("box").captureToBitmap().assertPixels(
+        rule.onNodeWithTag("box").captureToImage().assertPixels(
             IntSize((padding * 2 + size * 2).roundToInt(), (padding * 2 + size).roundToInt())
         ) { offset ->
             if (offset.y < padding || offset.y >= padding + size || offset.x < padding ||
@@ -654,12 +654,12 @@ class AndroidViewCompatTest {
         }
 
         rule.onNodeWithTag("view")
-            .captureToBitmap().assertPixels(IntSize(sizePx, sizePx)) { Color.Green }
+            .captureToImage().assertPixels(IntSize(sizePx, sizePx)) { Color.Green }
 
         rule.runOnIdle { first = false }
 
         rule.onNodeWithTag("view")
-            .captureToBitmap().assertPixels(IntSize(sizePx, sizePx)) { Color.Blue }
+            .captureToImage().assertPixels(IntSize(sizePx, sizePx)) { Color.Blue }
     }
 
     @Test
@@ -692,14 +692,14 @@ class AndroidViewCompatTest {
             }
         }
 
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(sizePx * 2, sizePx)) {
                 if (it.x < sizePx) Color.Green else Color.Blue
             }
 
         rule.runOnIdle { first = false }
 
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(sizePx * 2, sizePx)) {
                 if (it.x < sizePx) Color.Blue else Color.Green
             }

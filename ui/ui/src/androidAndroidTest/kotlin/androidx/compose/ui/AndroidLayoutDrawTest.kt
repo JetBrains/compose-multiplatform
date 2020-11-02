@@ -47,12 +47,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
@@ -87,7 +89,6 @@ import androidx.compose.ui.platform.ViewLayer
 import androidx.compose.ui.platform.ViewLayerContainer
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
-import androidx.compose.ui.test.assertPixels
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -3179,7 +3180,7 @@ class AndroidLayoutDrawTest {
             )
         }
 
-        activityTestRule.waitAndScreenShot(frameLayout)
+        activityTestRule.waitAndScreenShot(frameLayout).asImageAsset()
             .assertPixels(expectedSize = IntSize(size, size)) {
                 Color.Red
             }

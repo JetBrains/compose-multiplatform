@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.layout
 
-import android.graphics.Bitmap
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
@@ -33,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
@@ -41,7 +42,7 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
@@ -347,7 +348,7 @@ class SubcomposeLayoutTest {
         rule.waitForIdle()
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Green)
     }
 
@@ -375,7 +376,7 @@ class SubcomposeLayoutTest {
         }
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Green)
 
         rule.runOnIdle {
@@ -383,7 +384,7 @@ class SubcomposeLayoutTest {
         }
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 
@@ -408,7 +409,7 @@ class SubcomposeLayoutTest {
         }
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 
@@ -492,7 +493,7 @@ class SubcomposeLayoutTest {
         rule.waitForIdle()
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 
@@ -551,6 +552,6 @@ class SubcomposeLayoutTest {
     }
 }
 
-fun Bitmap.assertCenterPixelColor(expectedColor: Color) {
-    assertColor(expectedColor, width / 2, height / 2)
+fun ImageAsset.assertCenterPixelColor(expectedColor: Color) {
+    asAndroidBitmap().assertColor(expectedColor, width / 2, height / 2)
 }

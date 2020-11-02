@@ -13,14 +13,16 @@ package androidx.compose.ui.test {
   }
 
   public final class AndroidBitmapHelpersKt {
-    method public static android.graphics.Bitmap assertContainsColor-VZNGtkI(android.graphics.Bitmap, long expectedColor);
-    method public static void assertPixelColor-eWrXCG0(android.graphics.Bitmap, long expected, int x, int y, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,java.lang.String> error);
-    method public static void assertPixels-mvPU1zk(android.graphics.Bitmap, optional androidx.compose.ui.unit.IntSize? expectedSize, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntOffset,androidx.compose.ui.graphics.Color> expectedColorProvider);
-    method public static void assertShape-LBqplUo(android.graphics.Bitmap, androidx.compose.ui.unit.Density density, androidx.compose.ui.graphics.Shape shape, long shapeColor, long backgroundColor, optional androidx.compose.ui.graphics.Shape backgroundShape, optional float sizeX, optional float sizeY, optional float shapeSizeX, optional float shapeSizeY, optional float centerX, optional float centerY, optional float shapeOverlapPixelCount);
-    method public static void assertShape-WOPiG5A(android.graphics.Bitmap, androidx.compose.ui.unit.Density density, float horizontalPadding, float verticalPadding, long backgroundColor, long shapeColor, optional androidx.compose.ui.graphics.Shape shape, optional float shapeOverlapPixelCount);
-    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static android.graphics.Bitmap captureToBitmap(androidx.compose.ui.test.SemanticsNodeInteraction);
-    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static android.graphics.Bitmap captureToBitmap(android.view.View);
-    method public static boolean contains-ej0GBII(androidx.compose.ui.graphics.Path, long offset);
+    method @Deprecated public static android.graphics.Bitmap assertContainsColor-VZNGtkI(android.graphics.Bitmap, long expectedColor);
+    method @Deprecated public static void assertPixelColor-eWrXCG0(android.graphics.Bitmap, long expected, int x, int y, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,java.lang.String> error);
+    method @Deprecated public static void assertPixels-mvPU1zk(android.graphics.Bitmap, optional androidx.compose.ui.unit.IntSize? expectedSize, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntOffset,androidx.compose.ui.graphics.Color> expectedColorProvider);
+    method @Deprecated public static void assertShape-LBqplUo(android.graphics.Bitmap, androidx.compose.ui.unit.Density density, androidx.compose.ui.graphics.Shape shape, long shapeColor, long backgroundColor, optional androidx.compose.ui.graphics.Shape backgroundShape, optional float sizeX, optional float sizeY, optional float shapeSizeX, optional float shapeSizeY, optional float centerX, optional float centerY, optional float shapeOverlapPixelCount);
+    method @Deprecated public static void assertShape-WOPiG5A(android.graphics.Bitmap, androidx.compose.ui.unit.Density density, float horizontalPadding, float verticalPadding, long backgroundColor, long shapeColor, optional androidx.compose.ui.graphics.Shape shape, optional float shapeOverlapPixelCount);
+    method @Deprecated @RequiresApi(android.os.Build.VERSION_CODES.O) public static android.graphics.Bitmap captureToBitmap(androidx.compose.ui.test.SemanticsNodeInteraction);
+    method @Deprecated @RequiresApi(android.os.Build.VERSION_CODES.O) public static android.graphics.Bitmap captureToBitmap(android.view.View);
+    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageAsset captureToImage(androidx.compose.ui.test.SemanticsNodeInteraction);
+    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageAsset captureToImage(android.view.View);
+    method @Deprecated public static boolean contains-ej0GBII(androidx.compose.ui.graphics.Path, long offset);
   }
 
   public final class AndroidInputDispatcherKt {
