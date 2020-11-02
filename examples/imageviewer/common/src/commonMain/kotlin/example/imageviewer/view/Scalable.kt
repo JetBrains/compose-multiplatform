@@ -1,7 +1,6 @@
 package example.imageviewer.view
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onDispose
 import androidx.compose.ui.gesture.RawScaleObserver
 import androidx.compose.ui.gesture.doubleTapGestureFilter
 import androidx.compose.ui.gesture.rawScaleGestureFilter

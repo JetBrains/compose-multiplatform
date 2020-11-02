@@ -59,7 +59,9 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import org.jetbrains.skija.Image
 import org.jetbrains.skija.IRect
+import java.awt.event.KeyEvent
 import java.awt.Rectangle
+import androidx.compose.ui.input.key.*
 
 @Composable
 fun setImageFullScreen(
@@ -203,6 +205,9 @@ fun getFilterImage(type: FilterType, content: ContentState): ImageAsset {
     }
 }
 
+@OptIn(
+    ExperimentalKeyInput::class
+)
 @Composable
 fun setImage(content: ContentState) {
     val drag = DragHandler()
@@ -213,7 +218,18 @@ fun setImage(content: ContentState) {
         modifier = Modifier.fillMaxSize()
     ) {
         Draggable(onDrag = drag, modifier = Modifier.fillMaxSize()) {
-            Scalable(onScale = scale, modifier = Modifier.fillMaxSize()) {
+            Zoomable(
+                onScale = scale,
+                modifier = Modifier.fillMaxSize()
+                    .shortcuts {
+                        on(Key(KeyEvent.VK_LEFT)) {
+                            content.swipePrevious()
+                        }
+                        on(Key(KeyEvent.VK_RIGHT)) {
+                            content.swipeNext()
+                        }
+                    }
+            ) {
                 val bitmap = imageByGesture(content, scale, drag)
                 Image(
                     asset = bitmap.asImageAsset(),
@@ -231,20 +247,7 @@ fun imageByGesture(
     drag: DragHandler
 ): Image {
     val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)
-    val image = Image.makeFromEncoded(toByteArray(bitmap))
-    if (scale.factor.value > 1f)
-        return image
-
-    if (abs(drag.getDistance().x) > displayWidth() / 10) {
-        if (drag.getDistance().x < 0) {
-            content.swipeNext()
-        } else {
-            content.swipePrevious()
-        }
-        drag.onCancel()
-    }
-
-    return image
+    return Image.makeFromEncoded(toByteArray(bitmap))
 }
 
 private fun cropBitmapByScale(bitmap: BufferedImage, scale: Float, drag: DragHandler): BufferedImage {

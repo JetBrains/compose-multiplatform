@@ -131,10 +131,7 @@ fun toByteArray(bitmap: BufferedImage) : ByteArray {
 }
 
 fun cropImage(bitmap: BufferedImage, crop: Rectangle) : BufferedImage {
-    val result = BufferedImage(crop.width, crop.height, bitmap.type)
-    val graphics = result.createGraphics()
-    graphics.drawImage(bitmap, crop.x, crop.y, crop.width, crop.height, null)
-    return result
+    return bitmap.getSubimage(crop.x, crop.y, crop.width, crop.height)
 }
 
 fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): IntSize {
