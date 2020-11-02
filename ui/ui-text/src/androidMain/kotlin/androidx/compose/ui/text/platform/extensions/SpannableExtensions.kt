@@ -263,7 +263,7 @@ private fun Spannable.setShadow(shadow: Shadow?, start: Int, end: Int) {
     }
 }
 
-private fun Spannable.setBackground(color: Color, start: Int, end: Int) {
+internal fun Spannable.setBackground(color: Color, start: Int, end: Int) {
     if (color.isSpecified) {
         setSpan(
             BackgroundColorSpan(color.toArgb()),
@@ -329,7 +329,7 @@ private fun Spannable.setFontFeatureSettings(fontFeatureSettings: String?, start
     }
 }
 
-private fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: Int, end: Int) {
+internal fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: Int, end: Int) {
     when (fontSize.type) {
         TextUnitType.Sp -> with(density) {
             setSpan(
@@ -346,7 +346,7 @@ private fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: I
     }
 }
 
-private fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: Int, end: Int) {
+internal fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: Int, end: Int) {
     textDecoration?.let {
         if (TextDecoration.Underline in it) {
             setSpan(UnderlineSpan(), start, end)
@@ -357,7 +357,7 @@ private fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: 
     }
 }
 
-private fun Spannable.setColor(color: Color, start: Int, end: Int) {
+internal fun Spannable.setColor(color: Color, start: Int, end: Int) {
     if (color.isSpecified) {
         setSpan(ForegroundColorSpan(color.toArgb()), start, end)
     }

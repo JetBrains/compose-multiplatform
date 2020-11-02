@@ -234,7 +234,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // TODO: we need a AnnotedString to CharSequence conversion function
         info.text = trimToSize(
             semanticsNode.config.getOrNull(SemanticsProperties.Text)
-                ?.toAccessibilitySpannableString(),
+                ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
             ParcelSafeTextLength
         )
         info.stateDescription =
