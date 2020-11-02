@@ -29,6 +29,11 @@ import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 
 /**
+ * Default camera distance for all layers
+ */
+const val DefaultCameraDistance = 8.0f
+
+/**
  * Constructs a [TransformOrigin] from the given fractional values from the Layer's
  * width and height
  */
@@ -154,6 +159,30 @@ interface DrawLayerModifier : Modifier.Element {
         get() = 0f
 
     /**
+     * Sets the distance along the Z axis (orthogonal to the X/Y plane on which
+     * layers are drawn) from the camera to this layer. The camera's distance
+     * affects 3D transformations, for instance rotations around the X and Y
+     * axis. If the rotationX or rotationY properties are changed and this view is
+     * large (more than half the size of the screen), it is recommended to always
+     * use a camera distance that's greater than the height (X axis rotation) or
+     * the width (Y axis rotation) of this view.
+     *
+     * The distance of the camera from the drawing plane can have an affect on the
+     * perspective distortion of the layer when it is rotated around the x or y axis.
+     * For example, a large distance will result in a large viewing angle, and there
+     * will not be much perspective distortion of the view as it rotates. A short
+     * distance may cause much more perspective distortion upon rotation, and can
+     * also result in some drawing artifacts if the rotated view ends up partially
+     * behind the camera (which is why the recommendation is to use a distance at
+     * least as far as the size of the view, if the view is to be rotated.)
+     *
+     * The distance is expressed in pixels and must always be positive
+     */
+    @get:FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */)
+    val cameraDistance: Float
+        get() = DefaultCameraDistance
+
+    /**
      * Offset percentage along the x and y axis for which contents are rotated and scaled.
      * The default value of 0.5f, 0.5f indicates the pivot point will be at the midpoint of the
      * left and right as well as the top and bottom bounds of the layer
@@ -183,6 +212,7 @@ private class SimpleDrawLayerModifier(
     override val rotationX: Float,
     override val rotationY: Float,
     override val rotationZ: Float,
+    override val cameraDistance: Float,
     override val transformOrigin: TransformOrigin,
     override val shape: Shape,
     override val clip: Boolean,
@@ -199,6 +229,7 @@ private class SimpleDrawLayerModifier(
         result = 31 * result + rotationX.hashCode()
         result = 31 * result + rotationY.hashCode()
         result = 31 * result + rotationZ.hashCode()
+        result = 31 * result + cameraDistance.hashCode()
         result = 31 * result + transformOrigin.hashCode()
         result = 31 * result + shape.hashCode()
         result = 31 * result + clip.hashCode()
@@ -216,6 +247,7 @@ private class SimpleDrawLayerModifier(
             rotationX == otherModifier.rotationX &&
             rotationY == otherModifier.rotationY &&
             rotationZ == otherModifier.rotationZ &&
+            cameraDistance == otherModifier.cameraDistance &&
             transformOrigin == otherModifier.transformOrigin &&
             shape == otherModifier.shape &&
             clip == otherModifier.clip
@@ -232,6 +264,7 @@ private class SimpleDrawLayerModifier(
             "rotationX=$rotationX, " +
             "rotationY=$rotationY, " +
             "rotationZ=$rotationZ, " +
+            "cameraDistance=$cameraDistance, " +
             "transformOrigin=$transformOrigin, " +
             "shape=$shape, " +
             "clip=$clip)"
@@ -269,6 +302,7 @@ fun Modifier.drawLayer(
     rotationX: Float = 0f,
     rotationY: Float = 0f,
     rotationZ: Float = 0f,
+    cameraDistance: Float = DefaultCameraDistance,
     transformOrigin: TransformOrigin = TransformOrigin.Center,
     shape: Shape = RectangleShape,
     clip: Boolean = false
@@ -283,6 +317,7 @@ fun Modifier.drawLayer(
         rotationX = rotationX,
         rotationY = rotationY,
         rotationZ = rotationZ,
+        cameraDistance = cameraDistance,
         transformOrigin = transformOrigin,
         shape = shape,
         clip = clip,
@@ -297,6 +332,7 @@ fun Modifier.drawLayer(
             properties["rotationX"] = rotationX
             properties["rotationY"] = rotationY
             properties["rotationZ"] = rotationZ
+            properties["cameraDistance"] = cameraDistance
             properties["transformOrigin"] = transformOrigin
             properties["shape"] = shape
             properties["clip"] = clip

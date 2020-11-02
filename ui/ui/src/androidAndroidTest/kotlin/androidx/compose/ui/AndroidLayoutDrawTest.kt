@@ -76,11 +76,15 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.RenderNodeApi23
+import androidx.compose.ui.platform.RenderNodeApi29
+import androidx.compose.ui.platform.ViewLayer
+import androidx.compose.ui.platform.ViewLayerContainer
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertPixels
@@ -166,6 +170,73 @@ class AndroidLayoutDrawTest {
         } finally {
             RenderNodeApi23.testFailCreateRenderNode = false
         }
+    }
+
+    @Test
+    fun testLayerCameraDistance() {
+        val targetCameraDistance = 15f
+        drawLatch = CountDownLatch(1)
+
+        var cameraDistanceApplied = false
+        activity.runOnUiThread {
+            // Verify that the camera distance parameters are consumed properly across API levels.
+            // camera distance on the View API assumes Dp however, the compose API consumes pixels
+            // Additionally RenderNode consumed the negative value of the camera distance.
+            // Ensure that each implementation of camera distance consumes positive pixel values
+            // properly. Layer implementations backed by View should be compatible on all
+            // API versions
+            cameraDistanceApplied = when (Build.VERSION.SDK_INT) {
+                // Use public RenderNode API
+                in Build.VERSION_CODES.Q..Int.MAX_VALUE ->
+                    verifyRenderNode29CameraDistance(targetCameraDistance) &&
+                        verifyViewLayerCameraDistance(targetCameraDistance)
+                // Cannot access private APIs on P
+                Build.VERSION_CODES.P -> verifyViewLayerCameraDistance(targetCameraDistance)
+                // Use stub access to framework RenderNode API
+                in Build.VERSION_CODES.M..Int.MAX_VALUE ->
+                    verifyRenderNode23CameraDistance(targetCameraDistance) &&
+                        verifyViewLayerCameraDistance(targetCameraDistance)
+                // No RenderNodes, use Views instead
+                else -> verifyViewLayerCameraDistance(targetCameraDistance)
+            }
+            drawLatch.countDown()
+        }
+
+        drawLatch.await(1, TimeUnit.SECONDS)
+
+        assertTrue(cameraDistanceApplied)
+    }
+
+    private fun verifyRenderNode29CameraDistance(cameraDistance: Float): Boolean =
+        // Verify that the internal render node has the camera distance property
+        // given to the wrapper
+        RenderNodeApi29(AndroidComposeView(activity)).apply {
+            this.cameraDistance = cameraDistance
+        }.dumpRenderNodeData().cameraDistance == cameraDistance
+
+    private fun verifyRenderNode23CameraDistance(cameraDistance: Float): Boolean =
+        // Verify that the internal render node has the camera distance property
+        // given to the wrapper
+        RenderNodeApi23(AndroidComposeView(activity)).apply {
+            this.cameraDistance = cameraDistance
+        }.dumpRenderNodeData().cameraDistance == -cameraDistance // Camera distance is negative
+
+    private fun verifyViewLayerCameraDistance(cameraDistance: Float): Boolean {
+        val layer = ViewLayer(
+            AndroidComposeView(activity),
+            ViewLayerContainer(activity),
+            object : DrawLayerModifier {
+                override val cameraDistance: Float
+                    get() = cameraDistance
+            },
+            {},
+            {}
+        ).apply {
+            updateLayerProperties()
+        }
+        // Verify that the camera distance is applied properly even after accounting for
+        // the internal dp conversion within View
+        return layer.cameraDistance == cameraDistance * layer.resources.displayMetrics.densityDpi
     }
 
     // Tests that simple drawing works with draw with nested children

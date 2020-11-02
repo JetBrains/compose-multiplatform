@@ -55,6 +55,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.rotation = renderNode.rotation
             renderNode.rotationX = renderNode.rotationX
             renderNode.rotationY = renderNode.rotationY
+            renderNode.cameraDistance = renderNode.cameraDistance
             renderNode.pivotX = renderNode.pivotX
             renderNode.pivotY = renderNode.pivotY
             renderNode.clipToOutline = renderNode.clipToOutline
@@ -126,6 +127,15 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         get() = renderNode.rotationY
         set(value) {
             renderNode.rotationY = value
+        }
+
+    override var cameraDistance: Float
+        // Camera distance was negated in older API levels. Maintain the same input parameters
+        // and negate the given camera distance before it is applied and also negate it when
+        // it is queried
+        get() = -renderNode.cameraDistance
+        set(value) {
+            renderNode.cameraDistance = -value
         }
 
     override var pivotX: Float
@@ -217,6 +227,34 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
 
     override fun setHasOverlappingRendering(hasOverlappingRendering: Boolean): Boolean =
         renderNode.setHasOverlappingRendering(hasOverlappingRendering)
+
+    override fun dumpRenderNodeData(): DeviceRenderNodeData =
+        DeviceRenderNodeData(
+            // Platform RenderNode for API level 23-29 does not provide bounds/dimension properties
+            uniqueId = 0,
+            left = 0,
+            top = 0,
+            right = 0,
+            bottom = 0,
+            width = 0,
+            height = 0,
+            scaleX = renderNode.scaleX,
+            scaleY = renderNode.scaleY,
+            translationX = renderNode.translationX,
+            translationY = renderNode.translationY,
+            elevation = renderNode.elevation,
+            rotationZ = renderNode.rotation,
+            rotationX = renderNode.rotationX,
+            rotationY = renderNode.rotationY,
+            cameraDistance = renderNode.cameraDistance,
+            pivotX = renderNode.pivotX,
+            pivotY = renderNode.pivotY,
+            clipToOutline = renderNode.clipToOutline,
+            // No getter on RenderNode for clipToBounds, always return the value we have configured
+            // on it since this is a write only field
+            clipToBounds = clipToBounds,
+            alpha = renderNode.alpha
+        )
 
     companion object {
         // Used by tests to force failing creating a RenderNode to simulate a device that

@@ -91,6 +91,9 @@ class SkijaLayer(
     }
 
     // TODO(demin): support perspective projection for rotationX/rotationY (as in Android)
+    // TODO(njawad) Add camera distance leveraging Sk3DView along with rotationX/rotationY
+    // see https://cs.android.com/search?q=RenderProperties.cpp&sq= updateMatrix method
+    // for how 3d transformations along with camera distance are applied
     private fun updateMatrix() {
         val pivotX = modifier.transformOrigin.pivotFractionX * size.width
         val pivotY = modifier.transformOrigin.pivotFractionY * size.height
