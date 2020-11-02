@@ -66,8 +66,6 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.input.pointer.MouseTemporaryApi
-import androidx.compose.ui.input.pointer.isMouseInput
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -95,8 +93,7 @@ internal enum class TextFieldType {
 @Composable
 @OptIn(
     ExperimentalFocus::class,
-    ExperimentalFoundationApi::class,
-    MouseTemporaryApi::class
+    ExperimentalFoundationApi::class
 )
 internal fun TextFieldImpl(
     type: TextFieldType,
@@ -170,18 +167,14 @@ internal fun TextFieldImpl(
         .focusRequester(focusRequester)
         .focusObserver { isFocused = it.isFocused }
         .let {
-            if (isMouseInput) {
-                it
-            } else {
-                it.clickable(interactionState = interactionState, indication = null) {
-                    focusRequester.requestFocus()
-                    // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
-                    //  The requestFocus() call here should be enough to trigger the software keyboard.
-                    //  Investiate why this is needed here. If it is really needed, instead of doing
-                    //  this in the onClick callback, we should move this logic to the focusObserver
-                    //  so that it can show or hide the keyboard based on the focus state.
-                    keyboardController.value?.showSoftwareKeyboard()
-                }
+            it.clickable(interactionState = interactionState, indication = null) {
+                focusRequester.requestFocus()
+                // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
+                //  The requestFocus() call here should be enough to trigger the software keyboard.
+                //  Investiate why this is needed here. If it is really needed, instead of doing
+                //  this in the onClick callback, we should move this logic to the focusObserver
+                //  so that it can show or hide the keyboard based on the focus state.
+                keyboardController.value?.showSoftwareKeyboard()
             }
         }
 
