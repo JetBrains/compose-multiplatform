@@ -90,6 +90,7 @@ internal class RenderNodeLayer(
         renderNode.rotationZ = modifier.rotationZ
         renderNode.rotationX = modifier.rotationX
         renderNode.rotationY = modifier.rotationY
+        renderNode.cameraDistance = modifier.cameraDistance
         renderNode.pivotX = transformOrigin.pivotFractionX * renderNode.width
         renderNode.pivotY = transformOrigin.pivotFractionY * renderNode.height
         val shape = modifier.shape
