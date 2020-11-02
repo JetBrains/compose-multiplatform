@@ -223,6 +223,20 @@ package androidx.compose.material {
     method public static androidx.compose.material.Colors lightColors-hW7iGhc(optional long primary, optional long primaryVariant, optional long secondary, optional long secondaryVariant, optional long background, optional long surface, optional long error, optional long onPrimary, optional long onSecondary, optional long onBackground, optional long onSurface, optional long onError);
   }
 
+  public final class ContentAlpha {
+    method public float getDisabled();
+    method public float getHigh();
+    method public float getMedium();
+    property public final float disabled;
+    property public final float high;
+    property public final float medium;
+    field public static final androidx.compose.material.ContentAlpha INSTANCE;
+  }
+
+  public final class ContentAlphaKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<java.lang.Float> getAmbientContentAlpha();
+  }
+
   public final class ContentColorKt {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getAmbientContentColor();
   }
@@ -311,19 +325,19 @@ package androidx.compose.material {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ElevationOverlay> getAmbientElevationOverlay();
   }
 
-  @androidx.compose.runtime.Immutable public interface Emphasis {
-    method public long applyEmphasis-8_81llA(long color);
+  @Deprecated @androidx.compose.runtime.Immutable public interface Emphasis {
+    method @Deprecated public long applyEmphasis-8_81llA(long color);
   }
 
   public final class EmphasisKt {
-    method @androidx.compose.runtime.Composable public static void ProvideEmphasis(androidx.compose.material.Emphasis emphasis, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static androidx.compose.runtime.Ambient<androidx.compose.material.EmphasisLevels> getAmbientEmphasisLevels();
+    method @Deprecated @androidx.compose.runtime.Composable public static void ProvideEmphasis(androidx.compose.material.Emphasis emphasis, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static androidx.compose.runtime.Ambient<androidx.compose.material.EmphasisLevels> getAmbientEmphasisLevels();
   }
 
-  public interface EmphasisLevels {
-    method public androidx.compose.material.Emphasis getDisabled();
-    method public androidx.compose.material.Emphasis getHigh();
-    method public androidx.compose.material.Emphasis getMedium();
+  @Deprecated public interface EmphasisLevels {
+    method @Deprecated public androidx.compose.material.Emphasis getDisabled();
+    method @Deprecated public androidx.compose.material.Emphasis getHigh();
+    method @Deprecated public androidx.compose.material.Emphasis getMedium();
     property public abstract androidx.compose.material.Emphasis disabled;
     property public abstract androidx.compose.material.Emphasis high;
     property public abstract androidx.compose.material.Emphasis medium;

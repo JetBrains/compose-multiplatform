@@ -257,13 +257,13 @@ class MenuTest {
         var onSurface = Color.Unspecified
         var enabledContentColor = Color.Unspecified
         var disabledContentColor = Color.Unspecified
-        lateinit var enabledEmphasis: Emphasis
-        lateinit var disabledEmphasis: Emphasis
+        var enabledContentAlpha = 1f
+        var disabledContentAlpha = 1f
 
         rule.setContent {
             onSurface = MaterialTheme.colors.onSurface
-            enabledEmphasis = AmbientEmphasisLevels.current.high
-            disabledEmphasis = AmbientEmphasisLevels.current.disabled
+            enabledContentAlpha = ContentAlpha.high
+            disabledContentAlpha = ContentAlpha.disabled
             DropdownMenu(
                 toggle = { Box(Modifier.size(20.dp)) },
                 onDismissRequest = {},
@@ -271,15 +271,17 @@ class MenuTest {
             ) {
                 DropdownMenuItem(onClick = {}) {
                     enabledContentColor = AmbientContentColor.current
+                        .copy(alpha = AmbientContentAlpha.current)
                 }
                 DropdownMenuItem(enabled = false, onClick = {}) {
                     disabledContentColor = AmbientContentColor.current
+                        .copy(alpha = AmbientContentAlpha.current)
                 }
             }
         }
 
-        assertThat(enabledContentColor).isEqualTo(enabledEmphasis.applyEmphasis(onSurface))
-        assertThat(disabledContentColor).isEqualTo(disabledEmphasis.applyEmphasis(onSurface))
+        assertThat(enabledContentColor).isEqualTo(onSurface.copy(alpha = enabledContentAlpha))
+        assertThat(disabledContentColor).isEqualTo(onSurface.copy(alpha = disabledContentAlpha))
     }
 
     @Test

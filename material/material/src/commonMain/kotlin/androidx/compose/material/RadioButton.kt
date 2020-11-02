@@ -137,9 +137,7 @@ object RadioButtonConstants {
     fun defaultColors(
         selectedColor: Color = MaterialTheme.colors.secondary,
         unselectedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-        disabledColor: Color = AmbientEmphasisLevels.current.disabled.applyEmphasis(
-            MaterialTheme.colors.onSurface
-        )
+        disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
     ): RadioButtonColors {
         val clock = AnimationClockAmbient.current.asDisposableClock()
         return remember(

@@ -205,12 +205,8 @@ object CheckboxConstants {
         checkedColor: Color = MaterialTheme.colors.secondary,
         uncheckedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
         checkmarkColor: Color = MaterialTheme.colors.surface,
-        disabledColor: Color = AmbientEmphasisLevels.current.disabled.applyEmphasis(
-            MaterialTheme.colors.onSurface
-        ),
-        disabledIndeterminateColor: Color = AmbientEmphasisLevels.current.disabled.applyEmphasis(
-            checkedColor
-        )
+        disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+        disabledIndeterminateColor: Color = checkedColor.copy(alpha = ContentAlpha.disabled)
     ): CheckboxColors {
         val clock = AnimationClockAmbient.current.asDisposableClock()
         return remember(

@@ -66,7 +66,8 @@ fun MaterialTheme(
         AmbientColors provides rememberedColors,
         AmbientIndication provides indicationFactory,
         AmbientTypography provides typography,
-        AmbientShapes provides shapes
+        AmbientShapes provides shapes,
+        AmbientContentAlpha provides ContentAlpha.high
     ) {
         ProvideTextStyle(value = typography.body1, children = content)
     }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.material
 
 import androidx.compose.runtime.Ambient
@@ -46,6 +48,9 @@ import androidx.compose.ui.util.annotation.FloatRange
  * For more information on emphasis and ensuring legibility for content, see
  * [Text legibility](https://material.io/design/color/text-legibility.html)
  */
+@Deprecated(
+    message = "Emphasis has been simplified and replaced with ContentAlpha"
+)
 @Immutable
 interface Emphasis {
     /**
@@ -68,6 +73,9 @@ interface Emphasis {
  *
  * See [AmbientEmphasisLevels] to retrieve the current [EmphasisLevels]
  */
+@Deprecated(
+    message = "Emphasis has been simplified and replaced with ContentAlpha"
+)
 interface EmphasisLevels {
     /**
      * Emphasis used to express high emphasis, such as for selected text fields.
@@ -91,15 +99,24 @@ interface EmphasisLevels {
  *
  * See [AmbientEmphasisLevels] to retrieve the levels of emphasis provided in the theme,
  * so they can be applied with this function.
- *
- * @sample androidx.compose.material.samples.EmphasisSample
  */
+@Deprecated(
+    message = "Emphasis has been simplified and replaced with ContentAlpha",
+    replaceWith = ReplaceWith(
+        "Providers(AmbientContentAlpha provides ContentAlpha.high, children = content)",
+        "androidx.compose.runtime.Providers",
+        "androidx.compose.material.ContentAlpha"
+    )
+)
 @Composable
 fun ProvideEmphasis(emphasis: Emphasis, content: @Composable () -> Unit) {
     val emphasizedColor = emphasis.applyEmphasis(AmbientContentColor.current)
     Providers(AmbientContentColor provides emphasizedColor, children = content)
 }
 
+@Deprecated(
+    message = "Emphasis has been simplified and replaced with ContentAlpha"
+)
 /**
  * Ambient containing the current [EmphasisLevels] in this hierarchy.
  */
