@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.gesture
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.DelayUpEvent
 import androidx.compose.ui.gesture.customevents.DelayUpMessage
@@ -29,6 +30,8 @@ import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
@@ -40,6 +43,7 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import kotlinx.coroutines.CoroutineScope
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,6 +72,12 @@ class DoubleTapGestureFilterTest {
         filter.onDoubleTap = onDoubleTap
         filter.doubleTapTimeout = DoubleTapTimeoutMillis
         filter.onInit(customEventDispatcher)
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun tearDown() {
+        isDebugInspectorInfoEnabled = false
     }
 
     // Tests that verify conditions under which onDoubleTap will not be called.
@@ -970,5 +980,14 @@ class DoubleTapGestureFilterTest {
         verify(customEventDispatcher)
             .retainHitPaths(setOf(PointerId(456)))
         verifyNoMoreInteractions(customEventDispatcher)
+    }
+
+    @Test
+    fun testInspectableValue() {
+        val onDoubleTap: (Offset) -> Unit = {}
+        val modifier = Modifier.doubleTapGestureFilter(onDoubleTap) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("doubleTapGestureFilter")
+        assertThat(modifier.valueOverride).isEqualTo(onDoubleTap)
+        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
 }

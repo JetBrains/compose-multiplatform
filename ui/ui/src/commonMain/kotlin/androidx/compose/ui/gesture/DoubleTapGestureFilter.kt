@@ -35,6 +35,7 @@ import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.inMilliseconds
 import androidx.compose.ui.util.annotation.VisibleForTesting
@@ -60,7 +61,12 @@ import kotlinx.coroutines.launch
  */
 fun Modifier.doubleTapGestureFilter(
     onDoubleTap: (Offset) -> Unit
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "doubleTapGestureFilter"
+        value = onDoubleTap
+    }
+) {
     val scope = rememberCoroutineScope()
     val filter = remember { DoubleTapGestureFilter(scope) }
     filter.onDoubleTap = onDoubleTap
