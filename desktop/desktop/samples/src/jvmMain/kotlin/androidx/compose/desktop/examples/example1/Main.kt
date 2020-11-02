@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
@@ -350,7 +349,6 @@ fun Animations(isCircularEnabled: Boolean) = Row {
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
 @Composable
 private fun RightColumn(modifier: Modifier) = LazyColumn(modifier.drawLayer(alpha = 0.5f)) {
     items((1..10000).toList()) { x ->

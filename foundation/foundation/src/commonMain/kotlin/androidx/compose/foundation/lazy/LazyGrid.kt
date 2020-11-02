@@ -47,7 +47,7 @@ internal fun LazyGrid(
     scope.apply(content)
 
     val rows = (scope.totalSize + columns - 1) / columns
-    LazyFor(
+    LazyList(
         itemsCount = rows,
         modifier = modifier,
         state = state,

@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
@@ -208,7 +207,6 @@ private val colors = listOf(
 )
 
 @Composable
-@OptIn(ExperimentalLazyDsl::class)
 private fun LazyColumnScope() {
     LazyColumn {
         items((1..10).toList()) {
@@ -227,7 +225,6 @@ private fun LazyColumnScope() {
 }
 
 @Composable
-@OptIn(ExperimentalLazyDsl::class)
 private fun LazyRowScope() {
     LazyRow {
         items((1..10).toList()) {
