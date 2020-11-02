@@ -66,6 +66,8 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -380,23 +382,31 @@ internal fun heightOrZero(placeable: Placeable?) = placeable?.height ?: 0
  * A modifier that applies padding only if the size of the element is not zero
  */
 internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
-    this.then(object : LayoutModifier {
-        override fun MeasureScope.measure(
-            measurable: Measurable,
-            constraints: Constraints
-        ): MeasureResult {
-            val horizontal = start.toIntPx() + end.toIntPx()
-            val placeable = measurable.measure(constraints.offset(-horizontal))
-            val width = if (placeable.nonZero) {
-                constraints.constrainWidth(placeable.width + horizontal)
-            } else {
-                0
+    this.then(
+        object : LayoutModifier, InspectorValueInfo(
+            debugInspectorInfo {
+                name = "iconPadding"
+                properties["start"] = start
+                properties["end"] = end
             }
-            return layout(width, placeable.height) {
-                placeable.placeRelative(start.toIntPx(), 0)
+        ) {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val horizontal = start.toIntPx() + end.toIntPx()
+                val placeable = measurable.measure(constraints.offset(-horizontal))
+                val width = if (placeable.nonZero) {
+                    constraints.constrainWidth(placeable.width + horizontal)
+                } else {
+                    0
+                }
+                return layout(width, placeable.height) {
+                    placeable.placeRelative(start.toIntPx(), 0)
+                }
             }
         }
-    })
+    )
 
 private object TextFieldTransitionScope {
     private val LabelColorProp = ColorPropKey()
