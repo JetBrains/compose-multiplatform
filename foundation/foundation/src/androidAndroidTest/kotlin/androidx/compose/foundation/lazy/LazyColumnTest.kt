@@ -32,7 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
-@OptIn(ExperimentalLazyDsl::class)
 @RunWith(AndroidJUnit4::class)
 class LazyColumnTest {
     private val LazyColumnTag = "LazyColumnTag"
