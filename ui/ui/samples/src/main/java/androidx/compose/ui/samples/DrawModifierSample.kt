@@ -57,7 +57,7 @@ fun DrawWithCacheModifierSample() {
                 endY = size.height,
                 colors = listOf(Color.Red, Color.Blue)
             )
-            onDraw {
+            onDrawBehind {
                 drawRect(gradient)
             }
         }
@@ -86,7 +86,7 @@ fun DrawWithCacheModifierStateParameterSample() {
                 endY = size.height,
                 colors = if (toggle) colors1 else colors2
             )
-            onDraw {
+            onDrawBehind {
                 drawRect(gradient)
             }
         }
