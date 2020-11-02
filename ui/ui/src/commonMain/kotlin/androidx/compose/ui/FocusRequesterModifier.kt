@@ -42,6 +42,6 @@ internal class FocusRequesterModifierImpl(
  * Add this modifier to a component to observe changes to focus state.
  */
 @ExperimentalFocus
-fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier = composed {
-    FocusRequesterModifierImpl(focusRequester)
+fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier {
+    return this.then(FocusRequesterModifierImpl(focusRequester))
 }

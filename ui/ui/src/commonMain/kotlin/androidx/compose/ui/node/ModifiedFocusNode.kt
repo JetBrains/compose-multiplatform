@@ -63,6 +63,7 @@ internal class ModifiedFocusNode(
 
                 if (focusedChild.clearFocus()) {
                     grantFocus(propagateFocus)
+                    modifier.focusedChild = null
                 }
             }
             Inactive -> {
@@ -148,7 +149,6 @@ internal class ModifiedFocusNode(
     internal fun clearFocus(forcedClear: Boolean = false): Boolean {
         return when (modifier.focusState) {
             Active -> {
-                findParentFocusNode()?.modifier?.focusedChild = null
                 modifier.focusState = Inactive
                 true
             }
@@ -159,12 +159,12 @@ internal class ModifiedFocusNode(
             ActiveParent -> {
                 val focusedChild = modifier.focusedChild
                 requireNotNull(focusedChild)
-                val success = focusedChild.clearFocus(forcedClear)
-                if (success) {
-                    findParentFocusNode()?.modifier?.focusedChild = null
-                    modifier.focusState = Inactive
+                focusedChild.clearFocus(forcedClear).also { success ->
+                    if (success) {
+                        modifier.focusState = Inactive
+                        modifier.focusedChild = null
+                    }
                 }
-                success
             }
             /**
              * If the node is [Captured], deny requests to clear focus, except for a forced clear.
@@ -172,7 +172,6 @@ internal class ModifiedFocusNode(
             Captured -> {
                 if (forcedClear) {
                     modifier.focusState = Inactive
-                    findParentFocusNode()?.modifier?.focusedChild = null
                 }
                 forcedClear
             }
@@ -276,36 +275,18 @@ internal class ModifiedFocusNode(
     }
 
     override fun detach() {
-        // Find the next focus node.
-        val nextFocusNode = wrapped.findNextFocusWrapper()
-            ?: layoutNode.searchChildrenForFocusNode()
-
         when (modifier.focusState) {
             // If this node is focused, set the focus on the root layoutNode before removing it.
             Active, Captured -> {
-                if (modifier.focusState == Captured) {
-                    freeFocus()
-                }
-
-                layoutNode
-                    .owner
-                    ?.root
-                    ?.outerLayoutNodeWrapper
-                    ?.findNextFocusWrapper()
-                    ?.requestFocus(propagateFocus = false)
-
-                // TODO(b/163150504): The current logic in LayoutNode detaches layoutwrappers by
-                //  iterating through a list of unused layoutWrappers. This might lead us to a
-                //  state where we detach a wrapper before detaching layoutWrappers that is wraps.
-                //  We need to change this so that we are able to propagate FocusStateChanges to
-                //  the observers before detaching a focus node.
-                wrappedBy?.propagateFocusStateChange(
-                    nextFocusNode?.modifier?.focusState ?: Inactive
-                )
+                layoutNode.owner?.focusManager?.clearFocus(forcedClear = true)
             }
             // Propagate the state of the next focus node to any focus observers in the hierarchy.
             ActiveParent -> {
+                // Find the next focus node.
+                val nextFocusNode = wrapped.findNextFocusWrapper()
+                    ?: layoutNode.searchChildrenForFocusNode()
                 if (nextFocusNode != null) {
+                    findParentFocusNode()?.modifier?.focusedChild = nextFocusNode
                     wrappedBy?.propagateFocusStateChange(nextFocusNode.modifier.focusState)
                 } else {
                     wrappedBy?.propagateFocusStateChange(Inactive)

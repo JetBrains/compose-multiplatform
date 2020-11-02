@@ -28,8 +28,11 @@ interface FocusManager {
     /**
      * Call this function to clear focus from the currently focused component, and set the focus to
      * the root focus modifier.
+     *
+     *  @param forcedClear: Whether we should forcefully clear focus regardless of whether we have
+     *  any components that have [Captured][FocusState.Captured] focus.
      */
-    fun clearFocus()
+    fun clearFocus(forcedClear: Boolean = false)
 }
 
 /**
@@ -86,11 +89,14 @@ internal class FocusManagerImpl(
     /**
      * Call this function to set the focus to the root focus modifier.
      *
+     * @param forcedClear: Whether we should forcefully clear focus regardless of whether we have
+     * any components that have [Captured][FocusState.Captured] focus.
+     *
      * This could be used to clear focus when a user clicks on empty space outside a focusable
      * component.
      */
-    override fun clearFocus() {
-        if (focusModifier.focusNode.clearFocus(forcedClear = false)) {
+    override fun clearFocus(forcedClear: Boolean) {
+        if (focusModifier.focusNode.clearFocus(forcedClear)) {
             focusModifier.focusState = Active
         }
     }
