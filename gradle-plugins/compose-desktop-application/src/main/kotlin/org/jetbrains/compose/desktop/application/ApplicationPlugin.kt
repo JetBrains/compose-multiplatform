@@ -1,17 +1,14 @@
 package org.jetbrains.compose.desktop.application
 
 import org.gradle.api.*
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.desktop.DesktopBasePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.Application
-import org.jetbrains.compose.desktop.application.dsl.ConfigurationSource
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.configureWix
@@ -19,9 +16,7 @@ import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.provider
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationToRunnableFiles
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import java.io.File
 import java.util.*
 
