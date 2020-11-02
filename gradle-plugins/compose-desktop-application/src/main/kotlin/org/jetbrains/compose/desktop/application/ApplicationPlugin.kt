@@ -12,6 +12,7 @@ import org.jetbrains.compose.desktop.DesktopBasePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.ConfigurationSource
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.configureWix
 import org.jetbrains.compose.desktop.application.internal.currentOS
@@ -91,9 +92,44 @@ internal fun Project.configurePackagingTasks(app: Application): TaskProvider<Def
 }
 
 internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
-    enabled = (currentOS == targetOS)
+    enabled = targetFormat.isCompatibleWithCurrentOS
 
-    val targetPlatformSettings = when (targetOS) {
+    if (targetFormat != TargetFormat.AppImage) {
+        configurePlatformSettings(app)
+    }
+
+    app.nativeDistributions.let { executables ->
+        packageName.set(provider { executables.packageName ?: project.name })
+        packageDescription.set(provider { executables.description })
+        packageCopyright.set(provider { executables.copyright })
+        packageVendor.set(provider { executables.vendor })
+        packageVersion.set(provider {
+                executables.version
+                    ?: project.version.toString().takeIf { it != "unspecified" }
+        })
+    }
+
+    destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
+    javaHome.set(provider { app.javaHomeOrDefault() })
+
+    launcherMainJar.set(app.mainJar.orNull)
+    app._fromFiles.forEach { files.from(it) }
+    dependsOn(*app._dependenciesTaskNames.toTypedArray())
+
+    app._configurationSource?.let { configSource ->
+        dependsOn(configSource.jarTaskName)
+        files.from(configSource.runtimeClasspath)
+        launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
+    }
+
+    modules.set(provider { app.nativeDistributions.modules })
+    launcherMainClass.set(provider { app.mainClass })
+    launcherJvmArgs.set(provider { app.jvmArgs })
+    launcherArgs.set(provider { app.args })
+}
+
+internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
+    when (currentOS) {
         OS.Linux -> {
             app.nativeDistributions.linux.also { linux ->
                 linuxShortcut.set(provider { linux.shortcut })
@@ -130,39 +166,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
             }
         }
     }
-
-    app.nativeDistributions.let { executables ->
-        packageName.set(provider { executables.packageName ?: project.name })
-        packageDescription.set(provider { executables.description })
-        packageCopyright.set(provider { executables.copyright })
-        packageVendor.set(provider { executables.vendor })
-        packageVersion.set(provider {
-                executables.version
-                    ?: project.version.toString().takeIf { it != "unspecified" }
-        })
-    }
-
-    destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
-    javaHome.set(provider { app.javaHomeOrDefault() })
-
-    launcherMainJar.set(app.mainJar.orNull)
-    app._fromFiles.forEach { files.from(it) }
-    dependsOn(*app._dependenciesTaskNames.toTypedArray())
-
-    app._configurationSource?.let { configSource ->
-        dependsOn(configSource.jarTaskName)
-        files.from(configSource.runtimeClasspath)
-        launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
-    }
-
-    modules.set(provider { app.nativeDistributions.modules })
-    launcherMainClass.set(provider { app.mainClass })
-    launcherJvmArgs.set(provider { app.jvmArgs })
-    launcherArgs.set(provider { app.args })
 }
-
-private fun AbstractJPackageTask.jarFromJarTaskByName(jarTaskName: String) =
-    project.tasks.named(jarTaskName).map { (it as Jar).archiveFile.get() }
 
 private fun Project.configureRunTask(app: Application) {
     project.tasks.composeTask<JavaExec>(taskName("run", app)) {

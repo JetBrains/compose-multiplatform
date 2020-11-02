@@ -1,16 +1,21 @@
 package org.jetbrains.compose.desktop.application.dsl
 
 import org.jetbrains.compose.desktop.application.internal.OS
+import org.jetbrains.compose.desktop.application.internal.currentOS
 
 enum class TargetFormat(
     internal val id: String,
-    internal val os: OS
+    private vararg val compatibleOSs: OS
 ) {
+    AppImage("app-image", *OS.values()),
     Deb("deb", OS.Linux),
     Rpm("rpm", OS.Linux),
-    App("app-image", OS.MacOS),
     Dmg("dmg", OS.MacOS),
     Pkg("pkg", OS.MacOS),
     Exe("exe", OS.Windows),
-    Msi("msi", OS.Windows)
+    Msi("msi", OS.Windows);
+
+    val isCompatibleWithCurrentOS: Boolean by lazy { isCompatibleWith(currentOS) }
+
+    internal fun isCompatibleWith(targetOS: OS): Boolean = targetOS in compatibleOSs
 }
