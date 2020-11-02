@@ -1,6 +1,5 @@
 package example.todo.common.main.ui
 
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,6 +14,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TopAppBar
@@ -34,6 +34,7 @@ import example.todo.common.main.TodoMain.Output
 import example.todo.common.main.store.TodoItem
 import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.common.main.store.TodoMainStore.State
+import example.todo.common.utils.compose.MARGIN_SCROLLBAR
 import example.todo.common.utils.compose.VerticalScrollbar
 import example.todo.common.utils.compose.rememberScrollbarAdapter
 import example.todo.common.utils.onKeyUp
@@ -74,31 +75,13 @@ private fun TodoList(
     Box {
         val listState = rememberLazyListState()
 
-        LazyColumnFor(items = items, state = listState) { item ->
-            Row(modifier = Modifier.clickable(onClick = { onItemClicked(item.id) })) {
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Checkbox(
-                    checked = item.isDone,
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    onCheckedChange = { onDoneChanged(item.id, it) }
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = AnnotatedString(item.text),
-                    modifier = Modifier.weight(1F).align(Alignment.CenterVertically),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(onClick = { onDeleteItemClicked(item.id) }) {
-                    Icon(Icons.Default.Delete)
-                }
-            }
+        LazyColumnFor(items = items, state = listState) {
+            Item(
+                item = it,
+                onItemClicked = onItemClicked,
+                onDoneChanged = onDoneChanged,
+                onDeleteItemClicked = onDeleteItemClicked
+            )
 
             Divider()
         }
@@ -111,6 +94,41 @@ private fun TodoList(
                 averageItemSize = 37.dp
             )
         )
+    }
+}
+
+@Composable
+private fun Item(
+    item: TodoItem,
+    onItemClicked: (id: Long) -> Unit,
+    onDoneChanged: (id: Long, isDone: Boolean) -> Unit,
+    onDeleteItemClicked: (id: Long) -> Unit
+) {
+    Row(modifier = Modifier.clickable(onClick = { onItemClicked(item.id) })) {
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Checkbox(
+            checked = item.isDone,
+            modifier = Modifier.align(Alignment.CenterVertically),
+            onCheckedChange = { onDoneChanged(item.id, it) }
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = AnnotatedString(item.text),
+            modifier = Modifier.weight(1F).align(Alignment.CenterVertically),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        IconButton(onClick = { onDeleteItemClicked(item.id) }) {
+            Icon(Icons.Default.Delete)
+        }
+
+        Spacer(modifier = Modifier.width(MARGIN_SCROLLBAR))
     }
 }
 

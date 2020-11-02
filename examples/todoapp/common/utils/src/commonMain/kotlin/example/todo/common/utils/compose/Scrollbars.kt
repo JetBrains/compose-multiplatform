@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 
+expect val MARGIN_SCROLLBAR: Dp
+
 expect interface ScrollbarAdapter
 
 @Composable

@@ -5,6 +5,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+actual val MARGIN_SCROLLBAR: Dp = 8.dp
 
 actual typealias ScrollbarAdapter = androidx.compose.foundation.ScrollbarAdapter
 
