@@ -44,12 +44,15 @@ import androidx.compose.ui.text.input.KeyboardType
  */
 @Immutable
 data class KeyboardOptions constructor(
-    val capitalization: KeyboardCapitalization = ImeOptions.Default.capitalization,
-    val autoCorrect: Boolean = ImeOptions.Default.autoCorrect,
-    val keyboardType: KeyboardType = ImeOptions.Default.keyboardType,
-    val imeAction: ImeAction = ImeOptions.Default.imeAction,
+    val capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
+    val autoCorrect: Boolean = true,
+    val keyboardType: KeyboardType = KeyboardType.Text,
+    val imeAction: ImeAction = ImeAction.Unspecified
 ) {
     companion object {
+        /**
+         * Default [KeyboardOptions]. Please see parameter descriptions for default values.
+         */
         val Default = KeyboardOptions()
     }
 
@@ -59,7 +62,7 @@ data class KeyboardOptions constructor(
      *
      * @param singleLine see [ImeOptions.singleLine]
      */
-    fun toImeOptions(singleLine: Boolean = ImeOptions.Default.singleLine) = ImeOptions(
+    internal fun toImeOptions(singleLine: Boolean = ImeOptions.Default.singleLine) = ImeOptions(
         singleLine = singleLine,
         capitalization = capitalization,
         autoCorrect = autoCorrect,
