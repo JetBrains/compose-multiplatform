@@ -24,7 +24,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.EMPTY
 import kotlin.jvm.functions.FunctionN
 
-private const val SLOTS_PER_INT = 15
+private const val SLOTS_PER_INT = 10
 
 @Stable
 @ComposeCompilerApi
