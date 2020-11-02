@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.material.runOnIdleWithDensity
@@ -754,8 +755,10 @@ class TextFieldTest {
                     value = text.value,
                     onValueChange = { text.value = it },
                     label = {},
-                    imeAction = ImeAction.Go,
-                    keyboardType = KeyboardType.Email
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Go,
+                        keyboardType = KeyboardType.Email
+                    )
                 )
             }
         }
@@ -889,7 +892,7 @@ class TextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                imeAction = ImeAction.Go,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
                 onImeActionPerformed = { _, softwareKeyboardController ->
                     controller = softwareKeyboardController
                 }

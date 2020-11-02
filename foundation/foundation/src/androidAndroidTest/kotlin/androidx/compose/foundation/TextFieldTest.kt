@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Providers
@@ -503,7 +504,7 @@ class TextFieldTest {
         rule.setContent {
             BasicTextField(
                 value = TextFieldValue(),
-                imeAction = ImeAction.Search,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 onValueChange = {}
             )
         }

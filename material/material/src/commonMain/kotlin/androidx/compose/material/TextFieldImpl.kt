@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
@@ -70,7 +71,6 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.lerp
@@ -107,8 +107,7 @@ internal fun TextFieldImpl(
     trailing: @Composable (() -> Unit)?,
     isErrorValue: Boolean,
     visualTransformation: VisualTransformation,
-    keyboardType: KeyboardType,
-    imeAction: ImeAction,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
     interactionState: InteractionState,
@@ -148,8 +147,7 @@ internal fun TextFieldImpl(
                     onValueChange = onValueChange,
                     cursorColor = if (isErrorValue) errorColor else activeColor,
                     visualTransformation = visualTransformation,
-                    keyboardType = keyboardType,
-                    imeAction = imeAction,
+                    keyboardOptions = keyboardOptions,
                     onImeActionPerformed = {
                         onImeActionPerformed(it, keyboardController.value)
                     },

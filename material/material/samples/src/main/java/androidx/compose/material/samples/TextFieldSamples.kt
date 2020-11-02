@@ -20,6 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -146,7 +147,7 @@ fun PasswordTextField() {
         onValueChange = { password = it },
         label = { Text("Enter password") },
         visualTransformation = PasswordVisualTransformation(),
-        keyboardType = KeyboardType.Password
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
     )
 }
 
@@ -187,7 +188,7 @@ fun TextFieldWithHideKeyboardOnImeAction() {
         value = text,
         onValueChange = { text = it },
         label = { Text("Label") },
-        imeAction = ImeAction.Done,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         onImeActionPerformed = { action, softwareController ->
             if (action == ImeAction.Done) {
                 softwareController?.hideSoftwareKeyboard()
