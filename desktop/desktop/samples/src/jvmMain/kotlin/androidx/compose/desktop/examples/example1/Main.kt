@@ -313,6 +313,9 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             value = text.value,
             onValueChange = { text.value = it },
             label = { Text(text = "Input2") },
+            placeholder = {
+                Text(text = "Important input" )
+            },
             modifier = Modifier.shortcuts {
                 on(Key.MetaLeft + Key.ShiftLeft + Key.Enter) {
                     text.value = "Cleared with shift!"
