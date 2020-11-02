@@ -1,5 +1,5 @@
 buildscript {
-    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.1.0-dev97"
+    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.1.0-m1-build57"
 
     repositories {
         google()

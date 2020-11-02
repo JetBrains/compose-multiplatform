@@ -19,9 +19,9 @@ function mavenDep {
 }
 
 PLATFORM=macos
-SKIKO_VERSION=0.1.5
+SKIKO_VERSION=0.1.10
 KOTLIN_VERSION=1.4.0
-COMPOSE_VERSION=0.1.0-build53
+COMPOSE_VERSION=0.1.0-m1-build57
 COROUTINES_VERSION=1.3.6
 COLLECTIONS_VERSION=0.3
 SPACE_REPO="https://packages.jetbrains.team/maven/p/ui/dev"

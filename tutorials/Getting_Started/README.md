@@ -21,6 +21,10 @@ The following software has to be preinstalled:
 The recommended way of building Compose for Desktop projects is by using Gradle.
 JetBrains provides a simple way of building Compose for Desktop projects
 using a special Gradle plugin.
+
+One could clone an existing template [desktop](https://github.com/JetBrains/compose-jb/tree/master/templates/desktop-template) or
+[multiplatform](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template) application templates, or create it from scratch.
+
 First create a new directory, named `sample`.
 ```shell script
 mkdir sample
@@ -42,7 +46,7 @@ import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.4.0"
-    id("org.jetbrains.compose") version "0.1.0-dev97"
+    id("org.jetbrains.compose") version "0.1.0-m1-build57"
     application
 }
 
@@ -94,7 +98,6 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
         }
     }
 }
-
 ```
 ## Running the project
 

@@ -80,7 +80,7 @@ fun TextBox(text: String = "Item") {
     Box(
         modifier = Modifier.height(32.dp)
             .width(400.dp)
-            .background(color = Color(0, 0, 0, 20))
+            .background(color = Color(200, 0, 0, 20))
             .padding(start = 10.dp),
         alignment = Alignment.CenterStart
     ) {
@@ -208,7 +208,7 @@ fun main() {
                         .padding(10.dp)
                 ) {
                     val state = rememberScrollState(0f)
-        
+
                     ScrollableColumn(
                         modifier = Modifier.fillMaxSize().padding(end = 12.dp),
                         scrollState = state
