@@ -293,17 +293,6 @@
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/ui/gesture/DragGestureFilter.kt"
-            line="61"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
             file="src/commonMain/kotlin/androidx/compose/ui/gesture/DragSlopExceededGestureFilter.kt"
             line="65"
             column="15"/>
