@@ -180,6 +180,18 @@ class LazyListState constructor(
         }
     }
 
+    // currently used by the desktop for scrollbars. to be made public
+    internal suspend fun snapToItemIndex(index: Int, scrollOffset: Int) {
+        scrollPosition.update(
+            index = DataIndex(index),
+            // scrollOffset can only be positive
+            scrollOffset = maxOf(scrollOffset, 0),
+            // `true` will be replaced with the real value during the forceRemeasure() execution
+            canScrollForward = true
+        )
+        remeasurement.forceRemeasure()
+    }
+
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
     @VisibleForTesting
@@ -241,10 +253,6 @@ class LazyListState constructor(
         } else {
             var currentFirstItemIndex = scrollPosition.index
             var currentFirstItemScrollOffset = scrollPosition.scrollOffset
-
-            // assert for the incorrect initial state
-            require(currentFirstItemScrollOffset >= 0f)
-            require(currentFirstItemIndex.value >= 0f)
 
             if (currentFirstItemIndex.value >= itemsCount) {
                 // the data set has been updated and now we have less items that we were
@@ -476,6 +484,8 @@ private class ItemRelativeScrollPosition(
         private set
 
     fun update(index: DataIndex, scrollOffset: Int, canScrollForward: Boolean) {
+        require(index.value >= 0f) { "Index can only be positive (${index.value})" }
+        require(scrollOffset >= 0f) { "scrollOffset can only be positive ($scrollOffset)" }
         this.index = index
         indexState.value = index.value
         this.scrollOffset = scrollOffset

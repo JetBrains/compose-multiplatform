@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -740,6 +741,30 @@ class LazyRowForTest {
         rule.runOnIdle {
             assertThat(state!!.firstVisibleItemIndex).isEqualTo(index)
             assertThat(state!!.firstVisibleItemScrollOffset).isEqualTo(scrollOffset)
+        }
+    }
+
+    @Test
+    fun snapToItemIndex() {
+        val items by mutableStateOf((1..20).toList())
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.snapToItemIndex(3, 10)
+            }
+            assertThat(state.firstVisibleItemIndex).isEqualTo(3)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
         }
     }
 }
