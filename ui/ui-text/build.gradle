@@ -49,7 +49,6 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         implementation(KOTLIN_STDLIB)
         implementation "androidx.collection:collection:1.1.0"
         implementation "androidx.core:core:1.5.0-alpha01"
-        implementation project(":compose:ui:ui-text-android")
 
         testImplementation project(":compose:ui:ui-test-font")
         testImplementation(ANDROIDX_TEST_RULES)
@@ -75,7 +74,14 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation MOCKITO_KOTLIN, {
             exclude group: 'org.mockito' // to keep control on the mockito version
         }
+    }
 
+    android {
+        sourceSets {
+            main {
+                java.srcDirs += "../../../text/text/src/main/java"
+            }
+        }
     }
 }
 
@@ -110,8 +116,9 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 api "androidx.annotation:annotation:1.1.0"
                 implementation "androidx.collection:collection:1.1.0"
                 implementation "androidx.core:core:1.5.0-alpha01"
-                implementation project(":compose:ui:ui-text-android")
             }
+
+            androidMain.kotlin.srcDirs("../../../text/text/src/main/java")
 
             androidTest.dependencies {
                 implementation project(":compose:ui:ui-test-font")
