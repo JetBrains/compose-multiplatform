@@ -6,9 +6,11 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.*
 import org.jetbrains.codeviewer.util.TextLines
 import java.io.FileInputStream
+import java.io.FilenameFilter
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.channels.FileChannel
+import java.nio.charset.StandardCharsets
 
 fun java.io.File.toProjectFile(): File = object : File {
     override val name: String get() = this@toProjectFile.name
@@ -17,72 +19,67 @@ fun java.io.File.toProjectFile(): File = object : File {
 
     override val children: List<File>
         get() = this@toProjectFile
-            .listFiles()
+            .listFiles(FilenameFilter { _, name -> !name.startsWith(".")})
             .orEmpty()
             .map { it.toProjectFile() }
 
     override val hasChildren: Boolean
         get() = isDirectory && listFiles()?.size ?: 0 > 0
 
-    override suspend fun readLines(backgroundScope: CoroutineScope): TextLines {
-        // linePositions can be very big, so we are using IntList instead of List<Long>
-        val linePositions = IntList()
+
+    override fun readLines(scope: CoroutineScope): TextLines {
+        var byteBufferSize: Int
+        val byteBuffer = RandomAccessFile(this@toProjectFile, "r").use { file ->
+            byteBufferSize = file.length().toInt()
+            file.channel
+                .map(FileChannel.MapMode.READ_ONLY, 0, file.length())
+        }
+
+        val lineStartPositions = IntList()
+
         var size by mutableStateOf(0)
 
-        val refreshJob = backgroundScope.launch {
+        val refreshJob = scope.launch {
             delay(100)
-            size = linePositions.size
+            size = lineStartPositions.size
             while (true) {
                 delay(1000)
-                size = linePositions.size
+                size = lineStartPositions.size
             }
         }
 
-        backgroundScope.launch {
-            readLinePositions(linePositions)
+        scope.launch(Dispatchers.IO) {
+            readLinePositions(lineStartPositions)
             refreshJob.cancel()
-            size = linePositions.size
+            size = lineStartPositions.size
         }
 
         return object : TextLines {
             override val size get() = size
 
-            override suspend fun get(index: Int): String {
-                return withContext(Dispatchers.IO) {
-                    val position = linePositions[index]
-                    try {
-                        RandomAccessFile(this@toProjectFile, "rws").use {
-                            it.seek(position.toLong())
-                            // NOTE: it isn't efficient, but simple
-                            String(
-                                it.readLine()
-                                    .toCharArray()
-                                    .map(Char::toByte)
-                                    .toByteArray(),
-                                Charsets.UTF_8
-                            )
-                        }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                        "<Error on opening the file>"
-                    }
-                }
+            override fun get(index: Int): String {
+                val startPosition = lineStartPositions[index]
+                val length = if (index + 1 < size) lineStartPositions[index + 1] - startPosition else
+                    byteBufferSize - startPosition
+                // Only JDK since 13 has slice() method we need, so do ugly for now.
+                byteBuffer.position(startPosition)
+                val slice = byteBuffer.slice()
+                slice.limit(length)
+                return StandardCharsets.UTF_8.decode(slice).toString()
             }
         }
     }
 }
 
-@Suppress("BlockingMethodInNonBlockingContext")
-private suspend fun java.io.File.readLinePositions(list: IntList) = withContext(Dispatchers.IO) {
+private fun java.io.File.readLinePositions(
+    starts: IntList
+) {
     require(length() <= Int.MAX_VALUE) {
         "Files with size over ${Int.MAX_VALUE} aren't supported"
     }
 
     val averageLineLength = 200
-    list.clear(length().toInt() / averageLineLength)
-
-    var isBeginOfLine = true
-    var position = 0L
+    starts.clear(length().toInt() / averageLineLength)
 
     try {
         FileInputStream(this@readLinePositions).use {
@@ -90,22 +87,25 @@ private suspend fun java.io.File.readLinePositions(list: IntList) = withContext(
             val ib = channel.map(
                 FileChannel.MapMode.READ_ONLY, 0, channel.size()
             )
+            var isBeginOfLine = true
+            var position = 0L
             while (ib.hasRemaining()) {
                 val byte = ib.get()
                 if (isBeginOfLine) {
-                    list.add(position.toInt())
+                    starts.add(position.toInt())
                 }
                 isBeginOfLine = byte.toChar() == '\n'
                 position++
             }
+            channel.close()
         }
     } catch (e: IOException) {
         e.printStackTrace()
-        list.clear(1)
-        list.add(0)
+        starts.clear(1)
+        starts.add(0)
     }
 
-    list.compact()
+    starts.compact()
 }
 
 /**
