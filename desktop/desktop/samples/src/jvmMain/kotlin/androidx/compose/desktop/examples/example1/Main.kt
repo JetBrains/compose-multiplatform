@@ -18,6 +18,7 @@ package androidx.compose.desktop.examples.example1
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
@@ -77,15 +78,15 @@ import androidx.compose.ui.text.annotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.IntSize
 
 private const val title = "Desktop Compose Elements"
 
 fun main() {
-    AppWindow(title, IntSize(1024, 850)).show {
+    Window(title, IntSize(1024, 850)) {
         Scaffold(
             topBar = {
                 TopAppBar(
