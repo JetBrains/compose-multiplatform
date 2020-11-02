@@ -71,10 +71,9 @@ fun java.io.File.toProjectFile(): File = object : File {
     }
 }
 
-@Suppress("BlockingMethodInNonBlockingContext")
-private suspend fun java.io.File.readLinePositions(
+private fun java.io.File.readLinePositions(
     starts: IntList
-) = withContext(Dispatchers.IO) {
+) {
     require(length() <= Int.MAX_VALUE) {
         "Files with size over ${Int.MAX_VALUE} aren't supported"
     }
