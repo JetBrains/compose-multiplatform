@@ -9,8 +9,6 @@ import java.io.FileInputStream
 import java.io.FilenameFilter
 import java.io.IOException
 import java.io.RandomAccessFile
-import java.nio.ByteBuffer
-import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 
@@ -29,7 +27,7 @@ fun java.io.File.toProjectFile(): File = object : File {
         get() = isDirectory && listFiles()?.size ?: 0 > 0
 
 
-    override suspend fun readLines(backgroundScope: CoroutineScope): TextLines {
+    override fun readLines(scope: CoroutineScope): TextLines {
         var byteBufferSize: Int
         val byteBuffer = RandomAccessFile(this@toProjectFile, "r").use { file ->
             byteBufferSize = file.length().toInt()
@@ -38,8 +36,10 @@ fun java.io.File.toProjectFile(): File = object : File {
         }
 
         val lineStartPositions = IntList()
+
         var size by mutableStateOf(0)
-        val refreshJob = backgroundScope.launch {
+
+        val refreshJob = scope.launch {
             delay(100)
             size = lineStartPositions.size
             while (true) {
@@ -48,7 +48,7 @@ fun java.io.File.toProjectFile(): File = object : File {
             }
         }
 
-        backgroundScope.launch {
+        scope.launch(Dispatchers.IO) {
             readLinePositions(lineStartPositions)
             refreshJob.cancel()
             size = lineStartPositions.size

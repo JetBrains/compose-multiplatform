@@ -10,7 +10,7 @@ import org.jetbrains.codeviewer.util.afterSet
 
 class Editor(
     val fileName: String,
-    val lines: suspend (backgroundScope: CoroutineScope) -> Lines,
+    val lines: (backgroundScope: CoroutineScope) -> Lines,
 ) {
     var close: (() -> Unit)? = null
     lateinit var selection: SingleSelection

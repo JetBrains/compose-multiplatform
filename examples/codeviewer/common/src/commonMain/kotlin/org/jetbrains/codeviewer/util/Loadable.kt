@@ -5,12 +5,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun <T : Any> loadable(load: suspend () -> T): MutableState<T?> {
+fun <T : Any> loadable(load: () -> T): MutableState<T?> {
     return loadableScoped { load() }
 }
 
 @Composable
-fun <T : Any> loadableScoped(load: suspend CoroutineScope.() -> T): MutableState<T?> {
+fun <T : Any> loadableScoped(load: CoroutineScope.() -> T): MutableState<T?> {
     val state: MutableState<T?> = remember { mutableStateOf(null) }
     LaunchedTask {
         try {
