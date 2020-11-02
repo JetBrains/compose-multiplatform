@@ -29,148 +29,19 @@ import androidx.compose.runtime.snapshots.writable
 import kotlin.reflect.KProperty
 
 /**
- * A composable used to introduce a state value of type [T] into a composition.
- *
- * This is useful when you have a value that you would like to locally mutate and use in the
- * context of a composition. Since the returned [MutableState] instance implements snapshot
- * changes to the [MutableState.value] property will be automatically tracked in composition and
- * schedule a recompose.
- *
- * The [MutableState] class can be used several different ways. For example, the most basic way
- * is to store the returned state value into a local immutable variable, and then set the
- * [MutableState.value] property on it.
- *
- * @sample androidx.compose.runtime.samples.SimpleStateSample
- *
- * @sample androidx.compose.runtime.samples.stateSample
- *
- * In this example, `LoginScreen` is recomposed every time the username and password of the model
- * updates, keeping the UI synchronized with the state.
- *
- * Additionally, you can destructure the [MutableState] object into a value and a "setter" function.
- *
- * @sample androidx.compose.runtime.samples.DestructuredStateSample
- *
- * Finally, the [MutableState] instance can be used as a variable delegate to a local mutable
- * variable.
- *
- * @sample androidx.compose.runtime.samples.DelegatedStateSample
- *
- * @param policy a policy to control how changes are handled in mutable snapshots.
-
- * @return An instance of [MutableState] that wraps the value.
- *
- * @see [stateFor]
- * @see [remember]
- * @see [SnapshotMutationPolicy]
- */
-@Deprecated(
-    "Replace with explicit use of remember {}",
-    ReplaceWith("remember { mutableStateOf(init(), policy) }")
-)
-@Composable
-inline fun <T> state(
-    policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
-    init: @ComposableContract(preventCapture = true) () -> T
-) = remember { mutableStateOf(init(), policy) }
-
-/**
- * An effect to introduce a state value of type [T] into a composition that will last as long as
- * the input [v1] does not change.
- *
- * This is useful when you have a value that you would like to locally mutate and use in the
- * context of a composition, and its value is scoped to another value and you want it to be reset
- * every time the other value changes.
- *
- * The returned [MutableState] instance implements snapshot so that changes to the
- * [MutableState.value] property will be automatically tracked in composition and schedule a
- * recompose.
- *
- * @param v1 An input value that, when changed, will cause the state to reset and [init] to be rerun
- * @param init A factory function to create the initial value of this state
- * @return An instance of [MutableState] that wraps the value.
- *
- * @sample androidx.compose.runtime.samples.observeUserSample
- *
- * @see [state]
- * @see [remember]
- */
-@Deprecated(
-    "Replace with explicit use of remember {}",
-    ReplaceWith("remember(v1) { mutableStateOf(init()) }")
-)
-@Composable
-inline fun <T, /*reified*/ V1> stateFor(
-    v1: V1,
-    init: @ComposableContract(preventCapture = true) () -> T
-) = remember(v1) { mutableStateOf(init()) }
-
-/**
- * An effect to introduce a state value of type [T] into a composition that will last as long as
- * the inputs [v1] and [v2] do not change.
- *
- * This is useful when you have a value that you would like to locally mutate and use in the
- * context of a composition, and its value is scoped to another value and you want it to be reset
- * every time the other value changes.
- *
- * The returned [MutableState] instance implements snapshots such that changes to the
- * [MutableState.value] property will be automatically tracked in composition and schedule a
- * recompose.
- *
- * @param v1 An input value that, when changed, will cause the state to reset and [init] to be rerun
- * @param v2 An input value that, when changed, will cause the state to reset and [init] to be rerun
- * @param init A factory function to create the initial value of this state
- * @return An instance of [MutableState] that wraps the value.
- *
- * @see [state]
- * @see [remember]
- */
-@Composable
-inline fun <T, reified V1, reified V2> stateFor(
-    v1: V1,
-    v2: V2,
-    init: @ComposableContract(preventCapture = true) () -> T
-) = remember(v1, v2) { mutableStateOf(init()) }
-
-/**
- * An effect to introduce a state value of type [T] into a composition that will last as long as
- * the inputs [inputs] do not change.
- *
- * This is useful when you have a value that you would like to locally mutate and use in the
- * context of a composition, and its value is scoped to another value and you want it to be reset
- * every time the other value changes.
- *
- * The returned [MutableState] instance implements snapshots so that changes to the
- * [MutableState.value] property will be automatically tracked in composition and schedule a
- * recompose.
- *
- * @param inputs A set of inputs such that, when any of them have changed, will cause the state
- * to reset and [init] to be rerun
- * @param init A factory function to create the initial value of this state
- * @return An instance of [MutableState] that wraps the value.
- *
- * @see [state]
- * @see [remember]
- */
-@Composable
-inline fun <T> stateFor(
-    vararg inputs: Any?,
-    init: @ComposableContract(preventCapture = true) () -> T
-) = remember(*inputs) { mutableStateOf(init()) }
-
-/**
  * Return a new [MutableState] initialized with the passed in [value]
  *
  * The MutableState class is a single value holder whose reads and writes are observed by
  * Compose. Additionally, writes to it are transacted as part of the [Snapshot] system.
- * During composition, you will likely want to use the [state] and [stateFor] composables instead
- * of this factory function.
  *
  * @param value the initial value for the [MutableState]
  * @param policy a policy to controls how changes are handled in mutable snapshots.
  *
- * @see state
- * @see stateFor
+ * @sample androidx.compose.runtime.samples.SimpleStateSample
+ * @sample androidx.compose.runtime.samples.DestructuredStateSample
+ * @sample androidx.compose.runtime.samples.observeUserSample
+ * @sample androidx.compose.runtime.samples.stateSample
+ *
  * @see State
  * @see MutableState
  * @see SnapshotMutationPolicy
@@ -181,50 +52,9 @@ fun <T> mutableStateOf(
 ): MutableState<T> = SnapshotMutableState(value, policy)
 
 /**
- * Simple comparison callback using referential `===` equality
- */
-@Deprecated(
-    "areEquivalent callbacks have been replaced by MutableStateSnapshotPolicy",
-    ReplaceWith(
-        "referentialEqualityPolicy()",
-        "androidx.compose.runtime.referentialEqualityPolicy"
-    )
-)
-val ReferentiallyEqual = fun(old: Any?, new: Any?) = old === new
-
-/**
- * Simple comparison callback using structural [Any.equals] equality
- */
-@Deprecated(
-    "areEquivalent callbacks have been replaced by MutableStateSnapshotPolicy",
-    ReplaceWith(
-        "structuralEqualityPolicy()",
-        "androidx.compose.runtime.structuralEqualityPolicy"
-    )
-)
-val StructurallyEqual = fun(old: Any?, new: Any?) = old == new
-
-/**
- * Simple comparison callback that always returns false, for mutable objects that will be
- * compared with the same reference.
- *
- * In this case we cannot correctly compare for equality, and so we trust that something else
- * correctly triggered a recomposition.
- */
-@Deprecated(
-    "areEquivalent callbacks have been replaced by MutableStateSnapshotPolicy",
-    ReplaceWith(
-        "neverEqualPolicy()",
-        "androidx.compose.runtime.neverEqualPolicy"
-    )
-)
-val NeverEqual = fun(_: Any?, _: Any?) = false
-
-/**
  * A value holder where reads to the [value] property during the execution of a [Composable]
  * function, the current [RecomposeScope] will be subscribed to changes of that value.
  *
- * @see [state]
  * @see [MutableState]
  * @see [mutableStateOf]
  */
@@ -248,7 +78,6 @@ inline operator fun <T> State<T>.getValue(thisObj: Any?, property: KProperty<*>)
  * will be scheduled. If [value] is written to with the same value, no recompositions will be
  * scheduled.
  *
- * @see [state]
  * @see [State]
  * @see [mutableStateOf]
  */
@@ -279,8 +108,6 @@ inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KPrope
  * @property value the wrapped value
  * @property policy a policy to control how changes are handled in a mutable snapshot.
  *
- * @see state
- * @see stateFor
  * @see mutableStateOf
  * @see SnapshotMutationPolicy
  */
@@ -360,10 +187,10 @@ private class SnapshotMutableState<T>(
 }
 
 /**
- * A policy to control how the result of [mutableStateOf] and [state] report and merge changes to
+ * A policy to control how the result of [mutableStateOf] report and merge changes to
  * the state object.
  *
- * A mutation policy can be passed as an parameter to [state], [mutableStateOf], and [ambientOf].
+ * A mutation policy can be passed as an parameter to [mutableStateOf], and [ambientOf].
  *
  * Typically, one of the stock policies should be used such as [referentialEqualityPolicy],
  * [structuralEqualityPolicy], or [neverEqualPolicy]. However, a custom mutation policy can be
