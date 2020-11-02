@@ -26,13 +26,14 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.MenuBar
 import java.awt.Dimension
 import java.awt.Frame
-import java.awt.image.BufferedImage
 import java.awt.Toolkit
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
+import java.awt.image.BufferedImage
 import javax.swing.JMenuBar
+import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 val AppWindowAmbient = ambientOf<AppWindow?>()
@@ -48,7 +49,7 @@ fun Window(
     events: WindowEvents = WindowEvents(),
     onDismissEvent: (() -> Unit)? = null,
     content: @Composable () -> Unit = emptyContent()
-) {
+) = SwingUtilities.invokeLater {
     AppWindow(
         title = title,
         size = size,
@@ -69,6 +70,10 @@ class AppWindow : AppFrame {
     override val window: ComposeWindow
 
     init {
+        require(SwingUtilities.isEventDispatchThread()) {
+            "AppWindow should be created inside AWT Event Thread (use SwingUtilities.invokeLater " +
+                "or just dsl for creating window: Window { })"
+        }
         window = ComposeWindow(parent = this)
         window.apply {
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE

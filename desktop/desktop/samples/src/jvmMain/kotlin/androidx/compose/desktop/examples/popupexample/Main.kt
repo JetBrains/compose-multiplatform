@@ -22,8 +22,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuBar
+import javax.swing.SwingUtilities
 
-fun main() {
+fun main() = SwingUtilities.invokeLater {
     AppManager.apply {
         setEvents(
             onAppStart = { println("onAppStart") },
