@@ -110,6 +110,18 @@ class CacheDrawScope internal constructor(
     /**
      * Issue drawing commands to be executed before the layout content is drawn
      */
+    fun onDrawBehind(block: DrawScope.() -> Unit): DrawResult = onDrawWithContent {
+        block()
+        drawContent()
+    }
+
+    /**
+     * Issue drawing commands to be executed before the layout content is drawn
+     */
+    @Deprecated(
+        "Use onDrawBehind instead",
+        ReplaceWith("onDrawBehind(block)", "androidx.compose.ui")
+    )
     fun onDraw(block: DrawScope.() -> Unit): DrawResult = onDrawWithContent {
         block()
         drawContent()

@@ -81,7 +81,8 @@ package androidx.compose.ui {
     method public float getDensity();
     method public float getFontScale();
     method public long getSize-NH-jbRc();
-    method public androidx.compose.ui.DrawResult onDraw(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method @Deprecated public androidx.compose.ui.DrawResult onDraw(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public androidx.compose.ui.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public androidx.compose.ui.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> block);
     property public float density;
     property public float fontScale;
