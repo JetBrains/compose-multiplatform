@@ -34,6 +34,7 @@ dependencies {
     implementation(KOTLIN_STDLIB)
     compileOnly project(":annotation:annotation-sampled")
     implementation project(":compose:foundation:foundation")
+    implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime-livedata")
 }
 

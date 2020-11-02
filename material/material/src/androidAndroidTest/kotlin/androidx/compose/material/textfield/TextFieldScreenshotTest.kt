@@ -17,9 +17,9 @@
 package androidx.compose.material.textfield
 
 import android.os.Build
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.GOLDEN_MATERIAL
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.Providers

@@ -35,9 +35,10 @@ dependencies {
 
     compileOnly project(":annotation:annotation-sampled")
 
+    implementation project(":compose:foundation:foundation")
+    implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:runtime:runtime-saved-instance-state")
-    implementation project(":compose:foundation:foundation")
 }
 
 android {

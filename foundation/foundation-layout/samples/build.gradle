@@ -37,6 +37,7 @@ dependencies {
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:foundation:foundation-text")
+    implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-text")

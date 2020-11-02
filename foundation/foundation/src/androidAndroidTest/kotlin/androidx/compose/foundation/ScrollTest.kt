@@ -24,6 +24,7 @@ import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
@@ -559,7 +560,7 @@ class ScrollTest {
                     modifier = Modifier.preferredSize(100.dp).testTag(scrollerTag)
                 ) {
                     for (i in 0..itemCount.value) {
-                        Text(i.toString())
+                        BasicText(i.toString())
                     }
                 }
             }
@@ -869,7 +870,7 @@ class ScrollTest {
         rule.setContent {
             val content = @Composable {
                 repeat(itemCount) {
-                    Text(text = "$it")
+                    BasicText(text = "$it")
                 }
             }
             Box {

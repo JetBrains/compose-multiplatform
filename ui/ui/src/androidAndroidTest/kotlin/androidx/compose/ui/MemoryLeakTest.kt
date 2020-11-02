@@ -18,9 +18,9 @@ package androidx.compose.ui
 
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
@@ -50,7 +50,7 @@ class MemoryLeakTest {
                 Column {
                     repeat(3) {
                         Box {
-                            Text("Hello")
+                            BasicText("Hello")
                         }
                     }
                 }
@@ -94,7 +94,7 @@ class MemoryLeakTest {
                     Column {
                         repeat(3) {
                             Box {
-                                Text("Hello")
+                                BasicText("Hello")
                             }
                         }
                     }

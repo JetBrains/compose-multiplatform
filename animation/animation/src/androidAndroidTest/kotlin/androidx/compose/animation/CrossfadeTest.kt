@@ -17,7 +17,7 @@ package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onDispose
@@ -46,7 +46,7 @@ class CrossfadeTest {
         rule.setContent {
             val showFirst by remember { mutableStateOf(true) }
             Crossfade(showFirst) {
-                Text(if (it) First else Second)
+                BasicText(if (it) First else Second)
             }
         }
         rule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
@@ -62,7 +62,7 @@ class CrossfadeTest {
         var disposed = false
         rule.setContent {
             Crossfade(showFirst) {
-                Text(if (it) First else Second)
+                BasicText(if (it) First else Second)
                 onDispose {
                     disposed = true
                 }
@@ -98,7 +98,7 @@ class CrossfadeTest {
                 showFirst,
                 animation = TweenSpec(durationMillis = duration)
             ) {
-                Text(if (it) First else Second)
+                BasicText(if (it) First else Second)
                 onDispose {
                     disposed = true
                 }
@@ -126,7 +126,7 @@ class CrossfadeTest {
 
         rule.setContent {
             Crossfade(current) { value ->
-                Text(if (value == null) First else Second)
+                BasicText(if (value == null) First else Second)
             }
         }
         rule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())

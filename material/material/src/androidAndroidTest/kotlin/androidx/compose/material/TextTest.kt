@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.material
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color

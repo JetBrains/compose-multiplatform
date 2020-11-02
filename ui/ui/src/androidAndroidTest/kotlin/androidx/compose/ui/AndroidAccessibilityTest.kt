@@ -30,10 +30,10 @@ import android.view.accessibility.AccessibilityNodeProvider
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
@@ -143,7 +143,7 @@ class AndroidAccessibilityTest {
                             .toggleable(value = checked, onValueChange = { checked = it })
                             .testTag(ToggleableTag),
                         children = {
-                            Text("ToggleableText")
+                            BasicText("ToggleableText")
                         }
                     )
                     if (isTextFieldVisible) {

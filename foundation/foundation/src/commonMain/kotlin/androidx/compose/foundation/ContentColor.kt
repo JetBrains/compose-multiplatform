@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
  * @return the preferred content color specified by a parent, defaulting to [Color.Black] if
  * unspecified.
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     message = "Use AmbientContentColor.current directly",
     replaceWith = ReplaceWith(
@@ -49,4 +50,11 @@ fun contentColor() = AmbientContentColor.current
  *
  * Defaults to [Color.Black] if no color has been explicitly set.
  */
+@Deprecated(
+    message = "AmbientContentColor has moved to the Material library. For non-Material " +
+        "applications, create your own design system specific theming ambients.",
+    replaceWith = ReplaceWith(
+        "AmbientContentColor", "androidx.compose.material.AmbientContentColor"
+    )
+)
 val AmbientContentColor = ambientOf { Color.Black }
