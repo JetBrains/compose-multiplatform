@@ -6,11 +6,6 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.asImageAsset
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +17,13 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.material.Surface
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -32,9 +32,14 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import example.imageviewer.model.AppState
 import example.imageviewer.model.Picture
 import example.imageviewer.model.ScreenType
@@ -186,7 +191,7 @@ fun setMiniatureUI(
     val infoButtonHover = remember { mutableStateOf(false) }
     Card(
         backgroundColor = if (cardHover.value) MiniatureHoverColor else MiniatureColor,
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp).preferredHeight(70.dp)
+        modifier = Modifier.padding(start = 10.dp, end = 18.dp).preferredHeight(70.dp)
             .fillMaxWidth()
             .hover(onEnter = {
                 cardHover.value = true
@@ -199,8 +204,7 @@ fun setMiniatureUI(
             .clickable {
                 content.setMainImage(picture)
             },
-        shape = RectangleShape,
-        elevation = 20.dp
+        shape = RectangleShape
     ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Clickable(
@@ -265,19 +269,29 @@ fun setMiniatureUI(
 
 @Composable
 fun setScrollableArea(content: ContentState) {
-
-    ScrollableColumn {
-        var index = 1
-        Column {
-            for (picture in content.getMiniatures()) {
-                setMiniatureUI(
-                    picture = picture,
-                    content = content
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                index++
+    Box(
+        modifier = Modifier.fillMaxSize()
+        .padding(end = 8.dp)
+    ) {
+        val stateVertical = rememberScrollState(0f)
+        ScrollableColumn(scrollState = stateVertical) {
+            var index = 1
+            Column {
+                for (picture in content.getMiniatures()) {
+                    setMiniatureUI(
+                        picture = picture,
+                        content = content
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    index++
+                }
             }
         }
+        VerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd)
+                .fillMaxHeight(),
+            adapter = rememberScrollbarAdapter(stateVertical)
+        )
     }
 }
 
