@@ -81,6 +81,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
+import androidx.compose.ui.viewinterop.AndroidViewHolder
+import androidx.compose.ui.viewinterop.InternalInteropApi
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewTreeLifecycleOwner
@@ -353,14 +355,21 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
-    override fun addAndroidView(view: View, layoutNode: LayoutNode) {
+    @OptIn(InternalInteropApi::class)
+    override fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
         androidViewsHandler.layoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
     }
 
-    override fun removeAndroidView(view: View) {
+    @OptIn(InternalInteropApi::class)
+    override fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
         androidViewsHandler.layoutNode.remove(view)
+    }
+
+    @OptIn(InternalInteropApi::class)
+    override fun drawAndroidView(view: AndroidViewHolder, canvas: android.graphics.Canvas) {
+        androidViewsHandler.drawView(view, canvas)
     }
 
     private fun scheduleMeasureAndLayout(nodeToRemeasure: LayoutNode? = null) {
