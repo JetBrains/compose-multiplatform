@@ -160,6 +160,10 @@ class AndroidXPlugin : Plugin<Project> {
         } else {
             task.testLogging.apply {
                 showExceptions = false
+                // Disable all output, including the names of the failing tests, by specifying
+                // that the minimum granularity we're interested in is this very high number
+                // (which is higher than the current maximum granularity that Gradle offers (3))
+                minGranularity = 1000
             }
             val htmlReport = task.reports.html
 
