@@ -21,17 +21,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertShape
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
@@ -84,7 +85,7 @@ class CanvasTest {
         val paintBoxColor = Color.Red.toArgb()
         val containerBgColor = Color.White.toArgb()
         val strokeOffset = (strokeWidth / 2).toInt() + 3
-        rule.onRoot().captureToBitmap().apply {
+        rule.onRoot().captureToImage().asAndroidBitmap().apply {
             val imageStartX = width / 2 - boxWidth / 2
             val imageStartY = height / 2 - boxHeight / 2
 
@@ -180,7 +181,7 @@ class CanvasTest {
         }
             .assertWidthIsEqualTo(100.dp)
             .assertHeightIsEqualTo(100.dp)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.Red,
@@ -203,7 +204,7 @@ class CanvasTest {
         }
             .assertWidthIsEqualTo(100.dp)
             .assertHeightIsEqualTo(100.dp)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.Red,

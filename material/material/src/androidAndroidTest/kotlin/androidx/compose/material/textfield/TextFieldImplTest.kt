@@ -27,14 +27,14 @@ import androidx.compose.material.TextFieldScrollerPosition
 import androidx.compose.material.iconPadding
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -158,7 +158,7 @@ class TextFieldImplTest {
         rule.runOnIdle {}
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(parentSize, parentSize)) { position ->
                 if (position.x > textFieldSize && position.y > textFieldSize) Color.White else null
             }

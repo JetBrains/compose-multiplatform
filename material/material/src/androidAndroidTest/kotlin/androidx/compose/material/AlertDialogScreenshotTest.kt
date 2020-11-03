@@ -17,14 +17,14 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.testutils.assertAgainstGolden
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import androidx.test.screenshot.assertAgainstGolden
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,7 +61,7 @@ class AlertDialogScreenshotTest {
         }
 
         rule.onNode(isDialog())
-            .captureToBitmap()
+            .captureToImage()
             .assertAgainstGolden(screenshotRule, "dialog_sideBySideButtons")
     }
 
@@ -86,7 +86,7 @@ class AlertDialogScreenshotTest {
         }
 
         rule.onNode(isDialog())
-            .captureToBitmap()
+            .captureToImage()
             .assertAgainstGolden(screenshotRule, "dialog_stackedButtons")
     }
 }

@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -51,9 +52,8 @@ import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertShape
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -294,7 +294,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = shape,
@@ -369,7 +369,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 horizontalPadding = padding,
@@ -405,7 +405,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 horizontalPadding = padding,
@@ -436,7 +436,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -464,7 +464,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,

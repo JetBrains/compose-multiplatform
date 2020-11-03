@@ -32,11 +32,12 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -129,7 +130,7 @@ class LayerTouchTransformTest {
             await(5, TimeUnit.SECONDS)
         }
 
-        node.captureToBitmap().apply {
+        node.captureToImage().asAndroidBitmap().apply {
             Assert.assertEquals(
                 Color.Red.toArgb(),
                 getPixel(

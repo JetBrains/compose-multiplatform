@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
+import androidx.compose.testutils.assertContainsColor
+import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -81,7 +83,7 @@ class BitmapCapturingTest(val config: TestConfig) {
 
         var calledCount = 0
         rule.onNodeWithTag(tag11)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(100, 50)) {
                 calledCount++
                 color11
@@ -89,17 +91,17 @@ class BitmapCapturingTest(val config: TestConfig) {
         assertThat(calledCount).isEqualTo(100 * 50)
 
         rule.onNodeWithTag(tag12)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(100, 50)) {
                 color12
             }
         rule.onNodeWithTag(tag21)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(100, 50)) {
                 color21
             }
         rule.onNodeWithTag(tag22)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(100, 50)) {
                 color22
             }
@@ -110,7 +112,7 @@ class BitmapCapturingTest(val config: TestConfig) {
         composeCheckerboard()
 
         rule.onNodeWithTag(rootTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(200, 100)) {
                 if (it.y >= 100 || it.x >= 200) {
                     throw AssertionError("$it is out of range!")
@@ -124,7 +126,7 @@ class BitmapCapturingTest(val config: TestConfig) {
         composeCheckerboard()
 
         rule.onNodeWithTag(tag11)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(100, 50)) {
                 color22 // Assuming wrong color
             }
@@ -135,7 +137,7 @@ class BitmapCapturingTest(val config: TestConfig) {
         composeCheckerboard()
 
         rule.onNodeWithTag(tag11)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(10, 10)) {
                 color21
             }
@@ -150,7 +152,7 @@ class BitmapCapturingTest(val config: TestConfig) {
         }
 
         rule.onNode(isDialog())
-            .captureToBitmap()
+            .captureToImage()
             .assertContainsColor(Color.Red)
     }
 
@@ -169,7 +171,7 @@ class BitmapCapturingTest(val config: TestConfig) {
             expectedMessage = ".*Popups currently cannot be captured to bitmap.*"
         ) {
             rule.onNode(isPopup())
-                .captureToBitmap()
+                .captureToImage()
         }
     }
 

@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
@@ -65,7 +66,7 @@ import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -660,10 +661,10 @@ class PainterModifierTest {
 }
 
 private fun ComposeTestRule.obtainScreenshotBitmap(width: Int, height: Int = width): Bitmap {
-    val bitmap = onRoot().captureToBitmap()
+    val bitmap = onRoot().captureToImage()
     assertEquals(width, bitmap.width)
     assertEquals(height, bitmap.height)
-    return bitmap
+    return bitmap.asAndroidBitmap()
 }
 
 private class TestPainter(

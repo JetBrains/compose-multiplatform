@@ -25,11 +25,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -44,6 +46,19 @@ import org.junit.Assert.assertTrue
 import kotlin.math.roundToInt
 
 /**
+ * Captures the underlying semantics node's surface into an image.
+ *
+ * This has a limitation that if there is another window covering part of this node, such a
+ * window won't occur in this image.
+ *
+ * @throws IllegalArgumentException if an image is taken inside of a popup.
+ */
+@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.O)
+fun SemanticsNodeInteraction.captureToImage(): ImageAsset =
+    captureToBitmap().asImageAsset()
+
+/**
  * Captures the underlying semantics node's surface into bitmap.
  *
  * This has a limitation that if there is another window covering part of this node, such a
@@ -51,6 +66,10 @@ import kotlin.math.roundToInt
  *
  * @throws IllegalArgumentException if a bitmap is taken inside of a popup.
 */
+@Deprecated(
+    "Replaced with captureToImage()",
+    replaceWith = ReplaceWith("captureToImage()")
+)
 @RequiresApi(Build.VERSION_CODES.O)
 fun SemanticsNodeInteraction.captureToBitmap(): Bitmap {
     val node = fetchSemanticsNode("Failed to capture a node to bitmap.")
@@ -121,12 +140,27 @@ private fun findDialogWindowProviderInParent(view: View): DialogWindowProvider? 
 }
 
 /**
+ * Captures the underlying view's surface into an image.
+ *
+ * This has currently several limitations. Currently we assume that the view is hosted in
+ * Activity's window. Also if there is another window covering part of the component if won't occur
+ * in the image as this is taken from the component's window surface.
+ */
+@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.O)
+fun View.captureToImage(): ImageAsset = captureToBitmap().asImageAsset()
+
+/**
  * Captures the underlying view's surface into bitmap.
  *
  * This has currently several limitations. Currently we assume that the view is hosted in
  * Activity's window. Also if there is another window covering part of the component if won't occur
  * in the bitmap as this is taken from the component's window surface.
  */
+@Deprecated(
+    "Replaced with captureToImage()",
+    replaceWith = ReplaceWith("captureToImage()")
+)
 @RequiresApi(Build.VERSION_CODES.O)
 fun View.captureToBitmap(): Bitmap {
     val locationInWindow = intArrayOf(0, 0)
@@ -145,7 +179,10 @@ fun View.captureToBitmap(): Bitmap {
  * The returned color is then asserted as the expected one on the given bitmap.
  *
  * @throws AssertionError if size or colors don't match.
+ * @Deprecated This API is going to be removed entirely
  */
+@Suppress("DEPRECATION")
+@Deprecated("This API is going to be removed entirely.")
 fun Bitmap.assertPixels(
     expectedSize: IntSize? = null,
     expectedColorProvider: (pos: IntOffset) -> Color?
@@ -172,7 +209,10 @@ fun Bitmap.assertPixels(
 
 /**
  * Asserts that the color at a specific pixel in the bitmap at ([x], [y]) is [expected].
+ *
+ * @Deprecated This API is going to be removed entirely
  */
+@Deprecated("This API is going to be removed entirely.")
 fun Bitmap.assertPixelColor(
     expected: Color,
     x: Int,
@@ -191,7 +231,9 @@ fun Bitmap.assertPixelColor(
  * Asserts that the expected color is present in this bitmap.
  *
  * @throws AssertionError if the expected color is not present.
+ * @Deprecated This API is going to be removed entirely
  */
+@Deprecated("This API is going to be removed entirely.")
 fun Bitmap.assertContainsColor(
     expectedColor: Color
 ): Bitmap {
@@ -224,7 +266,10 @@ private fun Bitmap.containsColor(expectedColor: Color): Boolean {
  * The `point` argument is interpreted as an offset from the origin.
  *
  * Returns true if the point is in the path, and false otherwise.
+ *
+ * @Deprecated This API is going to be removed entirely
  */
+@Deprecated("This API is going to be removed entirely.")
 fun Path.contains(offset: Offset): Boolean {
     val path = android.graphics.Path()
     path.addRect(
@@ -259,8 +304,12 @@ fun Path.contains(offset: Offset): Boolean {
  * @param centerY the Y position of the center of the [shape] inside the [sizeY]
  * @param shapeOverlapPixelCount The size of the border area from the shape outline to leave it
  * untested as it is likely anti-aliased. The default is 1 pixel
+ *
+ * @Deprecated This API is going to be removed entirely
  */
 // TODO (mount, malkov) : to investigate why it flakes when shape is not rect
+@Suppress("DEPRECATION")
+@Deprecated("This API is going to be removed entirely.")
 fun Bitmap.assertShape(
     density: Density,
     shape: Shape,
@@ -343,7 +392,11 @@ fun Bitmap.assertShape(
  * @param shape defines the [Shape]
  * @param shapeOverlapPixelCount The size of the border area from the shape outline to leave it
  * untested as it is likely anti-aliased. The default is 1 pixel
+ *
+ * @Deprecated This API is going to be removed entirely
  */
+@Suppress("DEPRECATION")
+@Deprecated("This API is going to be removed entirely.")
 fun Bitmap.assertShape(
     density: Density,
     horizontalPadding: Dp,

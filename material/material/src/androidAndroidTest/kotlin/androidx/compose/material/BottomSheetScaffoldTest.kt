@@ -32,13 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawShadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -381,7 +382,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.onNodeWithTag("Scaffold")
-            .captureToBitmap().apply {
+            .captureToImage().asAndroidBitmap().apply {
                 // asserts the appbar(top half part) has the shadow
                 val yPos = height / 2 + 2
                 Truth.assertThat(Color(getPixel(0, yPos))).isNotEqualTo(Color.White)

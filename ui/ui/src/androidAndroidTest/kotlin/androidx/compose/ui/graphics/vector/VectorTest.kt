@@ -35,11 +35,12 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
@@ -229,7 +230,7 @@ class VectorTest {
         }
 
         rule.onNodeWithTag(testTag).apply {
-            captureToBitmap().apply {
+            captureToImage().asAndroidBitmap().apply {
                 assertEquals(Color.Red.toArgb(), getPixel(width - 2, 0))
                 assertEquals(Color.Red.toArgb(), getPixel(2, 0))
                 assertEquals(Color.Red.toArgb(), getPixel(width - 1, height - 2))
@@ -243,7 +244,7 @@ class VectorTest {
 
         rule.waitForIdle()
 
-        rule.onNodeWithTag(testTag).captureToBitmap().apply {
+        rule.onNodeWithTag(testTag).captureToImage().asAndroidBitmap().apply {
             assertEquals(Color.Black.toArgb(), getPixel(width - 2, 0))
             assertEquals(Color.Black.toArgb(), getPixel(2, 0))
             assertEquals(Color.Black.toArgb(), getPixel(width - 1, height - 2))
@@ -386,7 +387,7 @@ class VectorTest {
     }
 
     private fun takeScreenShot(width: Int, height: Int = width): Bitmap {
-        val bitmap = rule.onRoot().captureToBitmap()
+        val bitmap = rule.onRoot().captureToImage().asAndroidBitmap()
         Assert.assertEquals(width, bitmap.width)
         Assert.assertEquals(height, bitmap.height)
         return bitmap

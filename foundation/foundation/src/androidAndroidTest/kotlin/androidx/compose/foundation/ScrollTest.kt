@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.InspectableValue
@@ -38,8 +39,7 @@ import androidx.compose.ui.test.GestureScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -830,7 +830,7 @@ class ScrollTest {
         rowHeight: Int = 5
     ) {
         rule.onNodeWithTag(scrollerTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(width, height)) { pos ->
                 val colorIndex = (offset + pos.y) / rowHeight
                 colors[colorIndex]
@@ -847,7 +847,7 @@ class ScrollTest {
         val scrollerWidth = colors.size * defaultCellSize
         val absoluteOffset = if (checkInRtl) scrollerWidth - width - offset else offset
         rule.onNodeWithTag(scrollerTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(width, height)) { pos ->
                 val colorIndex = (absoluteOffset + pos.x) / defaultCellSize
                 if (checkInRtl) colors[colors.size - 1 - colorIndex] else colors[colorIndex]

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +32,7 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertShape
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
@@ -78,7 +78,7 @@ class BackgroundTest {
                 }
             }
         }
-        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.Magenta,
@@ -104,7 +104,7 @@ class BackgroundTest {
                 }
             }
         }
-        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.Magenta,
@@ -126,7 +126,7 @@ class BackgroundTest {
                 )
             }
         }
-        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.Magenta,
@@ -150,7 +150,7 @@ class BackgroundTest {
                 )
             }
         }
-        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.Magenta,

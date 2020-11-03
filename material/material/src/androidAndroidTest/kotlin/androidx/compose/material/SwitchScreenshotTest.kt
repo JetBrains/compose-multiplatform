@@ -23,12 +23,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isToggleable
@@ -43,7 +44,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import androidx.test.screenshot.assertAgainstGolden
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -224,7 +224,7 @@ class SwitchScreenshotTest {
     private fun assertToggeableAgainstGolden(goldenName: String) {
         // TODO: replace with find(isToggeable()) after b/157687898 is fixed
         rule.onNodeWithTag(wrapperTestTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenName)
     }
 }
