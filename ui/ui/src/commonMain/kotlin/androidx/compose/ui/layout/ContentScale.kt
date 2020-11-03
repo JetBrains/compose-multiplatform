@@ -22,8 +22,6 @@ import androidx.compose.ui.geometry.Size
 import kotlin.math.max
 import kotlin.math.min
 
-private const val OriginalScale = 1.0f
-
 /**
  * Represents a rule to apply to scale a source rectangle to be inscribed into a destination
  */
@@ -31,10 +29,26 @@ private const val OriginalScale = 1.0f
 interface ContentScale {
 
     /**
+     * Computes the scale factor to apply to the horizontal and vertical axes independently
+     * of one another to fit the source appropriately with the given destination
+     */
+    fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor
+
+    /**
      * Computes the scale factor to apply to both dimensions in order to fit the source
      * appropriately with the given destination size
      */
-    fun scale(srcSize: Size, dstSize: Size): Float
+    @Deprecated(
+        "use computeScaleFactor instead",
+        ReplaceWith(
+            "computeScaleFactor(srcSize, dstSize)",
+            "androidx.compose.ui.layout"
+        )
+    )
+    fun scale(srcSize: Size, dstSize: Size): Float =
+        // Returning scaleX here as previous implementations of ContentScale all provided
+        // uniform scale values which were identical for both scaleX and scaleY
+        computeScaleFactor(srcSize, dstSize).scaleX
 
     /**
      * Companion object containing commonly used [ContentScale] implementations
@@ -51,8 +65,10 @@ interface ContentScale {
          */
         @Stable
         val Crop = object : ContentScale {
-            override fun scale(srcSize: Size, dstSize: Size): Float =
-                computeFillMaxDimension(srcSize, dstSize)
+            override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
+                computeFillMaxDimension(srcSize, dstSize).let {
+                    ScaleFactor(it, it)
+                }
         }
 
         /**
@@ -65,8 +81,10 @@ interface ContentScale {
          */
         @Stable
         val Fit = object : ContentScale {
-            override fun scale(srcSize: Size, dstSize: Size): Float =
-                computeFillMinDimension(srcSize, dstSize)
+            override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
+                computeFillMinDimension(srcSize, dstSize).let {
+                    ScaleFactor(it, it)
+                }
         }
 
         /**
@@ -76,8 +94,10 @@ interface ContentScale {
          */
         @Stable
         val FillHeight = object : ContentScale {
-            override fun scale(srcSize: Size, dstSize: Size): Float =
-                computeFillHeight(srcSize, dstSize)
+            override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
+                computeFillHeight(srcSize, dstSize).let {
+                    ScaleFactor(it, it)
+                }
         }
 
         /**
@@ -87,8 +107,10 @@ interface ContentScale {
          */
         @Stable
         val FillWidth = object : ContentScale {
-            override fun scale(srcSize: Size, dstSize: Size): Float =
-                computeFillWidth(srcSize, dstSize)
+            override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
+                computeFillWidth(srcSize, dstSize).let {
+                    ScaleFactor(it, it)
+                }
         }
 
         /**
@@ -102,19 +124,37 @@ interface ContentScale {
          */
         @Stable
         val Inside = object : ContentScale {
-            override fun scale(srcSize: Size, dstSize: Size): Float =
-                if (srcSize.width <= dstSize.width && srcSize.height <= dstSize.height) {
-                    OriginalScale
+
+            override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor {
+                return if (srcSize.width <= dstSize.width &&
+                    srcSize.height <= dstSize.height
+                ) {
+                    ScaleFactor(1.0f, 1.0f)
                 } else {
-                    computeFillMinDimension(srcSize, dstSize)
+                    computeFillMinDimension(srcSize, dstSize).let {
+                        ScaleFactor(it, it)
+                    }
                 }
+            }
         }
 
         /**
          * Do not apply any scaling to the source
          */
         @Stable
-        val None = FixedScale(OriginalScale)
+        val None = FixedScale(1.0f)
+
+        /**
+         * Scale horizontal and vertically non-uniformly to fill the destination bounds.
+         */
+        @Stable
+        val FillBounds = object : ContentScale {
+            override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
+                ScaleFactor(
+                    computeFillWidth(srcSize, dstSize),
+                    computeFillHeight(srcSize, dstSize)
+                )
+        }
     }
 }
 
@@ -124,7 +164,8 @@ interface ContentScale {
  */
 @Immutable
 data class FixedScale(val value: Float) : ContentScale {
-    override fun scale(srcSize: Size, dstSize: Size): Float = value
+    override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
+        ScaleFactor(value, value)
 }
 
 private fun computeFillMaxDimension(srcSize: Size, dstSize: Size): Float {

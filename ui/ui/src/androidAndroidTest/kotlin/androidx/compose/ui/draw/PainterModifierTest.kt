@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.AlignTopLeft
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.AtLeastSize
@@ -44,6 +45,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
@@ -561,6 +563,35 @@ class PainterModifierTest {
                 getPixel(boxWidth / 2 + srcImage.width - 5, boxHeight - 1)
             )
         }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testImagePainterScalesNonUniformly() {
+        // The composable dimensions are larger than the ImageAsset. By not passing in
+        // a ContentScale parameter to the painter, the ImageAsset should be stretched
+        // non-uniformly to fully occupy the bounds of the composable
+        val boxWidth = 60
+        val boxHeight = 40
+        val srcImage = ImageAsset(10, 20)
+        val canvas = Canvas(srcImage)
+        val paint = Paint().apply { this.color = Color.Red }
+        canvas.drawRect(0f, 0f, 40f, 20f, paint)
+
+        val testTag = "testTag"
+
+        rule.setContent {
+            Box(
+                modifier = Modifier
+                    .testTag(testTag)
+                    .background(color = Color.Gray)
+                    .width((boxWidth / DensityAmbient.current.density).dp)
+                    .height((boxHeight / DensityAmbient.current.density).dp)
+                    .paint(ImagePainter(srcImage), contentScale = ContentScale.FillBounds)
+            )
+        }
+
+        rule.obtainScreenshotBitmap(boxWidth, boxHeight).asImageAsset().assertPixels { Color.Red }
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
