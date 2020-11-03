@@ -273,7 +273,7 @@ package androidx.compose.ui.geometry {
 
   public final class SizeKt {
     method @androidx.compose.runtime.Stable public static long Size(float width, float height);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Size? lerp-3tf5JpU(long start, long stop, float fraction);
+    method @androidx.compose.runtime.Stable public static long lerp-3tf5JpU(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static inline operator long times-2DtskRk(float, long size);
     method @androidx.compose.runtime.Stable public static inline operator long times-B9jgaKk(double, long size);
     method @androidx.compose.runtime.Stable public static inline operator long times-cEP68aU(int, long size);

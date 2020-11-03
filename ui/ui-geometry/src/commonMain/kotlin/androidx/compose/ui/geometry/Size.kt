@@ -154,7 +154,7 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
  * an `AnimationController`.
  */
 @Stable
-fun lerp(start: Size, stop: Size, fraction: Float): Size? {
+fun lerp(start: Size, stop: Size, fraction: Float): Size {
     return Size(
         lerp(start.width, stop.width, fraction),
         lerp(start.height, stop.height, fraction)
