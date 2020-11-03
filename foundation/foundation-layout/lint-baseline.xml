@@ -19,7 +19,7 @@
         errorLine2="                                                            ~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/layout/Intrinsic.kt"
-            line="49"
+            line="47"
             column="61"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                                                             ~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/layout/Intrinsic.kt"
-            line="70"
+            line="68"
             column="62"/>
     </issue>
 

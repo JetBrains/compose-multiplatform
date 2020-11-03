@@ -13,6 +13,28 @@
     </issue>
 
     <issue
+        id="BanUncheckedReflection"
+        message="Calling Method.invoke without an SDK check"
+        errorLine1="            getBooleanMethod?.invoke(null, &quot;debug.layout&quot;, false) as? Boolean ?: false"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
+            line="729"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling Method.invoke without an SDK check"
+        errorLine1="            updateDisplayListIfDirtyMethod?.invoke(view)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.kt"
+            line="287"
+            column="13"/>
+    </issue>
+
+    <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
         errorLine1="    var index = root.addChildCount(autofillTree.children.count())"
@@ -184,7 +206,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="302"
+            line="304"
             column="13"/>
     </issue>
 
@@ -195,7 +217,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="304"
+            line="306"
             column="13"/>
     </issue>
 
@@ -250,7 +272,7 @@
         errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
-            line="163"
+            line="164"
             column="31"/>
     </issue>
 
@@ -327,41 +349,41 @@
         errorLine2="                        ^">
         <location
             file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
-            line="170"
+            line="182"
             column="25"/>
     </issue>
 
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = if (elevation > 0.dp || clip || opacity != 1f) {"
+        errorLine1=") = if (elevation > 0.dp || clip) {"
         errorLine2="    ^">
         <location
             file="src/commonMain/kotlin/androidx/compose/ui/draw/DrawShadow.kt"
-            line="53"
+            line="50"
             column="5"/>
     </issue>
 
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier = composed {"
-        errorLine2="                                                                            ~~~~~~~~">
+        errorLine1="    return this.then(FocusObserverModifierImpl(onFocusChange))"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/ui/FocusObserverModifier.kt"
-            line="42"
-            column="77"/>
+            line="43"
+            column="22"/>
     </issue>
 
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier = composed {"
-        errorLine2="                                                                        ~~~~~~~~">
+        errorLine1="    return this.then(FocusRequesterModifierImpl(focusRequester))"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/ui/FocusRequesterModifier.kt"
-            line="45"
-            column="73"/>
+            line="46"
+            column="22"/>
     </issue>
 
     <issue
@@ -439,17 +461,6 @@
             file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/PointerInteropFilter.kt"
             line="62"
             column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="    return this.then(filter)"
-        errorLine2="                     ~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/PointerInteropFilter.kt"
-            line="94"
-            column="22"/>
     </issue>
 
     <issue
@@ -571,17 +582,6 @@
             file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
             line="81"
             column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `tag`"
-        errorLine1="fun Modifier.testTag(tag: String) = semantics("
-        errorLine2="                                    ~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/platform/TestTag.kt"
-            line="31"
-            column="37"/>
     </issue>
 
 </issues>
