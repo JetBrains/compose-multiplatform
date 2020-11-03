@@ -59,13 +59,18 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected open val installParentDir: File = project.rootDir
 
+    private val OurStudioVersions: StudioVersions
+        get() {
+            return StudioVersions.loadFrom(installParentDir)
+        }
+
     /**
      * Directory name (not path) that Studio will be unzipped into.
      */
     private val studioDirectoryName: String
         get() {
             val osName = StudioPlatformUtilities.osName
-            with(StudioVersions) {
+            with(OurStudioVersions) {
                 return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
             }
         }
@@ -133,7 +138,7 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(project, StudioVersions, studioArchiveName, studioArchivePath)
+            studioArchiveCreator(project, OurStudioVersions, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
             with(platformUtilities) { updateJvmHeapSize() }
