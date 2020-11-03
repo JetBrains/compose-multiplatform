@@ -48,8 +48,7 @@ open class BuildOnServer : DefaultTask() {
         val buildId = getBuildId()
 
         val filesNames = mutableListOf(
-            "androidx_aggregate_build_info.txt",
-            "top-of-tree-m2repository-all-$buildId.zip"
+            "androidx_aggregate_build_info.txt"
         )
 
         if (project.isDocumentationEnabled()) {
@@ -61,7 +60,6 @@ open class BuildOnServer : DefaultTask() {
 
         if (project.findProject(":jetifier-standalone") != null) {
             filesNames.add("jetifier-standalone.zip")
-            filesNames.add("top-of-tree-m2repository-partially-dejetified-$buildId.zip")
         }
 
         return filesNames.map { fileName -> File(distributionDirectory, fileName) }
