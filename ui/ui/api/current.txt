@@ -21,8 +21,9 @@ package androidx.compose.ui {
     field public static final androidx.compose.ui.AbsoluteAlignment INSTANCE;
   }
 
-  @androidx.compose.runtime.Immutable public interface Alignment {
-    method public long align-rlJ4snA(long size, optional androidx.compose.ui.unit.LayoutDirection layoutDirection);
+  @androidx.compose.runtime.Immutable public fun interface Alignment {
+    method public long align-oYSo38o(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @Deprecated public default long align-rlJ4snA(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     field public static final androidx.compose.ui.Alignment.Companion Companion;
   }
 
@@ -59,28 +60,30 @@ package androidx.compose.ui {
     property public final androidx.compose.ui.Alignment TopStart;
   }
 
-  @androidx.compose.runtime.Immutable public static interface Alignment.Horizontal {
-    method public int align(int size, optional androidx.compose.ui.unit.LayoutDirection layoutDirection);
+  @androidx.compose.runtime.Immutable public static fun interface Alignment.Horizontal {
+    method public int align(int size, int space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @Deprecated public default int align(int size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
   }
 
-  @androidx.compose.runtime.Immutable public static interface Alignment.Vertical {
-    method public int align(int size);
+  @androidx.compose.runtime.Immutable public static fun interface Alignment.Vertical {
+    method public int align(int size, int space);
+    method @Deprecated public default int align(int size);
   }
 
   @androidx.compose.runtime.Immutable public final class BiasAbsoluteAlignment implements androidx.compose.ui.Alignment {
-    method public long align-rlJ4snA(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public long align-oYSo38o(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAbsoluteAlignment copy(float horizontalBias, float verticalBias);
   }
 
   @androidx.compose.runtime.Immutable public static final class BiasAbsoluteAlignment.Horizontal implements androidx.compose.ui.Alignment.Horizontal {
     ctor public BiasAbsoluteAlignment.Horizontal(float bias);
-    method public int align(int size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public int align(int size, int space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAbsoluteAlignment.Horizontal copy(float bias);
   }
 
   @androidx.compose.runtime.Immutable public final class BiasAlignment implements androidx.compose.ui.Alignment {
     ctor public BiasAlignment(float horizontalBias, float verticalBias);
-    method public long align-rlJ4snA(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public long align-oYSo38o(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method public float component1();
     method public float component2();
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment copy(float horizontalBias, float verticalBias);
@@ -92,13 +95,13 @@ package androidx.compose.ui {
 
   @androidx.compose.runtime.Immutable public static final class BiasAlignment.Horizontal implements androidx.compose.ui.Alignment.Horizontal {
     ctor public BiasAlignment.Horizontal(float bias);
-    method public int align(int size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public int align(int size, int space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment.Horizontal copy(float bias);
   }
 
   @androidx.compose.runtime.Immutable public static final class BiasAlignment.Vertical implements androidx.compose.ui.Alignment.Vertical {
     ctor public BiasAlignment.Vertical(float bias);
-    method public int align(int size);
+    method public int align(int size, int space);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment.Vertical copy(float bias);
   }
 

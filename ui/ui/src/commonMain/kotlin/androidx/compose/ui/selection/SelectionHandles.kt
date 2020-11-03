@@ -277,11 +277,13 @@ internal class SelectionHandlePositionProvider(
 
         // Get the aligned point inside the parent
         val parentAlignmentPoint = alignment.align(
+            IntSize.Zero,
             IntSize(parentGlobalBounds.width, parentGlobalBounds.height),
             layoutDirection
         )
         // Get the aligned point inside the child
         val relativePopupPos = alignment.align(
+            IntSize.Zero,
             IntSize(popupContentSize.width, popupContentSize.height),
             layoutDirection
         )

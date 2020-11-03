@@ -368,7 +368,9 @@ class PopupAlignmentTest {
             layout(layoutWidth, layoutHeight) {
                 if (placeable != null) {
                     val position = Alignment.TopStart.align(
-                        IntSize(layoutWidth - placeable.width, layoutHeight - placeable.height)
+                        IntSize(placeable.width, placeable.height),
+                        IntSize(layoutWidth, layoutHeight),
+                        layoutDirection
                     )
                     placeable.placeRelative(position.x, position.y)
                 }

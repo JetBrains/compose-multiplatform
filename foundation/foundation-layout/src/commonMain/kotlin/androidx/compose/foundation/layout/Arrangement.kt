@@ -302,7 +302,7 @@ object Arrangement {
      */
     fun spacedBy(space: Dp, alignment: Alignment.Horizontal): Horizontal =
         SpacedAligned(space, true) { size, layoutDirection ->
-            alignment.align(size, layoutDirection)
+            alignment.align(0, size, layoutDirection)
         }
 
     /**
@@ -315,7 +315,7 @@ object Arrangement {
      * @param alignment The alignment of the spaced children inside the parent.
      */
     fun spacedBy(space: Dp, alignment: Alignment.Vertical): Vertical =
-        SpacedAligned(space, false) { size, _ -> alignment.align(size) }
+        SpacedAligned(space, false) { size, _ -> alignment.align(0, size) }
 
     /**
      * Place children horizontally one next to the other and align the obtained group
@@ -325,7 +325,7 @@ object Arrangement {
      */
     fun aligned(alignment: Alignment.Horizontal): Horizontal =
         SpacedAligned(0.dp, true) { size, layoutDirection ->
-            alignment.align(size, layoutDirection)
+            alignment.align(0, size, layoutDirection)
         }
 
     /**
@@ -335,7 +335,7 @@ object Arrangement {
      * @param alignment The alignment of the children inside the parent.
      */
     fun aligned(alignment: Alignment.Vertical): Vertical =
-        SpacedAligned(0.dp, false) { size, _ -> alignment.align(size) }
+        SpacedAligned(0.dp, false) { size, _ -> alignment.align(0, size) }
 
     /**
      * Arrangement with spacing between adjacent children and alignment for the spaced group.
@@ -587,7 +587,7 @@ object AbsoluteArrangement {
      */
     fun spacedBy(space: Dp, alignment: Alignment.Horizontal): Arrangement.Horizontal =
         Arrangement.SpacedAligned(space, false) { size, layoutDirection ->
-            alignment.align(size, layoutDirection)
+            alignment.align(0, size, layoutDirection)
         }
 
     /**
@@ -603,7 +603,7 @@ object AbsoluteArrangement {
      * @param alignment The alignment of the spaced children inside the parent.
      */
     fun spacedBy(space: Dp, alignment: Alignment.Vertical): Arrangement.Vertical =
-        Arrangement.SpacedAligned(space, false) { size, _ -> alignment.align(size) }
+        Arrangement.SpacedAligned(space, false) { size, _ -> alignment.align(0, size) }
 
     /**
      * Place children horizontally one next to the other and align the obtained group
@@ -616,6 +616,6 @@ object AbsoluteArrangement {
      */
     fun aligned(alignment: Alignment.Horizontal): Arrangement.Horizontal =
         Arrangement.SpacedAligned(0.dp, false) { size, layoutDirection ->
-            alignment.align(size, layoutDirection)
+            alignment.align(0, size, layoutDirection)
         }
 }

@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import kotlin.math.max
@@ -474,6 +475,7 @@ private fun IconsWithTextFieldLayout(
                 place(
                     width,
                     height,
+                    layoutDirection,
                     textFieldPlaceable,
                     labelPlaceable,
                     placeholderPlaceable,
@@ -545,6 +547,7 @@ private fun calculateHeight(
 private fun Placeable.PlacementScope.place(
     width: Int,
     height: Int,
+    layoutDirection: LayoutDirection,
     textfieldPlaceable: Placeable,
     labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
@@ -556,18 +559,17 @@ private fun Placeable.PlacementScope.place(
 ) {
     leadingPlaceable?.placeRelative(
         0,
-        Alignment.CenterVertically.align(height - leadingPlaceable.height)
+        Alignment.CenterVertically.align(leadingPlaceable.height, height)
     )
     trailingPlaceable?.placeRelative(
         width - trailingPlaceable.width,
-        Alignment.CenterVertically.align(height - trailingPlaceable.height)
+        Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
     if (labelPlaceable != null) {
         val labelCenterPosition = Alignment.CenterStart.align(
-            IntSize(
-                width - labelPlaceable.width,
-                height - labelPlaceable.height
-            )
+            IntSize(labelPlaceable.width, labelPlaceable.height),
+            IntSize(width, height),
+            layoutDirection
         )
         val labelDistance = labelCenterPosition.y - labelEndPosition
         val labelPositionY =
@@ -591,19 +593,19 @@ private fun Placeable.PlacementScope.placeWithoutLabel(
 ) {
     leadingPlaceable?.placeRelative(
         0,
-        Alignment.CenterVertically.align(height - leadingPlaceable.height)
+        Alignment.CenterVertically.align(leadingPlaceable.height, height)
     )
     trailingPlaceable?.placeRelative(
         width - trailingPlaceable.width,
-        Alignment.CenterVertically.align(height - trailingPlaceable.height)
+        Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
     textPlaceable.placeRelative(
         widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(height - textPlaceable.height)
+        Alignment.CenterVertically.align(textPlaceable.height, height)
     )
     placeholderPlaceable?.placeRelative(
         widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(height - placeholderPlaceable.height)
+        Alignment.CenterVertically.align(placeholderPlaceable.height, height)
     )
 }
 
