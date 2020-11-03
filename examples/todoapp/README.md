@@ -23,6 +23,17 @@ Features:
 - View state is preserved when navigating between screens, Android configuration change, etc.
 - Model-View-Intent (aka MVI) architectural pattern
 
-To run the desktop application execute the following command: `./gradlew desktop:run`.
+### Running desktop application
+```
+./gradlew :desktop:run
+```
 
-To run the Android application you will need to open the project in Intellij IDEA or Android Studio and run "android" configuration.
+### Building native desktop distribution
+```
+./gradlew :desktop:package
+# outputs are written to desktop/build/compose/binaries
+```
+
+### Running Android application
+
+Open project in Intellij IDEA or Android Studio and run "android" configuration.

@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        // TODO: remove after new build is published
         mavenLocal().mavenContent {
             includeModule("org.jetbrains.compose", "compose-gradle-plugin")
         }

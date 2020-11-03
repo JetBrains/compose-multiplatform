@@ -1,7 +1,17 @@
 MPP Code Viewer example for desktop/android written in Multiplatform Compose library.
 
-To run desktop application execute in a terminal:
-`./gradlew desktop:run`
+### Running desktop application
+```
+./gradlew :desktop:run
+```
 
-To install android application on device/emulator:
-'./gradlew installDebug'
+### Building native desktop distribution
+```
+./gradlew :desktop:package
+# outputs are written to desktop/build/compose/binaries
+```
+
+### Installing Android application on device/emulator
+```
+./gradlew installDebug
+```
