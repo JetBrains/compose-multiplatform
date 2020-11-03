@@ -15,10 +15,14 @@
  */
 package androidx.build
 
+import androidx.build.dependencyTracker.AffectedModuleDetector
+import androidx.build.dependencyTracker.ProjectSubset
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
+import org.gradle.BuildAdapter
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskProvider
@@ -194,7 +198,14 @@ object Release {
         val publishTask = project.tasks.named("publish")
         zipTasks.forEach {
             it.configure {
-                it.candidates.add(artifact)
+                project.rootProject.gradle.addBuildListener(object : BuildAdapter() {
+                    override fun projectsEvaluated(gradle: Gradle?) {
+                        if (AffectedModuleDetector.getProjectSubset(project) != ProjectSubset.NONE
+                        ) {
+                            it.candidates.add(artifact)
+                        }
+                    }
+                })
                 it.dependsOn(publishTask)
             }
         }
