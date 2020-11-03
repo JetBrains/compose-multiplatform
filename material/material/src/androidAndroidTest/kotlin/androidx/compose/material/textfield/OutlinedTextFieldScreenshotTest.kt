@@ -23,11 +23,12 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.Providers
+import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -40,7 +41,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import androidx.test.screenshot.assertAgainstGolden
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -168,7 +168,7 @@ class OutlinedTextFieldScreenshotTest {
 
     private fun assertAgainstGolden(goldenIdentifier: String) {
         rule.onNodeWithTag(TextFieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
     }
 }

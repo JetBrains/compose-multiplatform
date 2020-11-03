@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
@@ -33,6 +34,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
@@ -42,8 +44,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
@@ -236,7 +237,7 @@ class DrawLayerTest {
             }
         }
 
-        rule.onNodeWithTag(testTag).captureToBitmap().apply {
+        rule.onNodeWithTag(testTag).captureToImage().asAndroidBitmap().apply {
             assertEquals(Color.Red.toArgb(), getPixel(0, 0))
             assertEquals(Color.Red.toArgb(), getPixel(0, height - 1))
             assertEquals(Color.Red.toArgb(), getPixel(width / 2 - 10, height / 2))
@@ -268,7 +269,7 @@ class DrawLayerTest {
 
         // Results should match background color of parent. Because the child Box is clipped to
         // an empty rectangle, no red pixels from its background should be visible
-        rule.onNodeWithTag(tag).captureToBitmap().assertPixels { Color.Blue }
+        rule.onNodeWithTag(tag).captureToImage().assertPixels { Color.Blue }
     }
 
     @Test

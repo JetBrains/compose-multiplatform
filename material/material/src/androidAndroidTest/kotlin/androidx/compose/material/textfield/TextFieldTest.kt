@@ -38,6 +38,7 @@ import androidx.compose.material.setMaterialContentForSizeAssertions
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -56,8 +57,7 @@ import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertShape
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -797,7 +797,7 @@ class TextFieldTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,
@@ -832,7 +832,7 @@ class TextFieldTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,
@@ -846,7 +846,7 @@ class TextFieldTest {
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,

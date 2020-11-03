@@ -37,14 +37,16 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -53,7 +55,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import androidx.test.screenshot.assertAgainstGolden
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
@@ -529,7 +530,7 @@ class RippleIndicationTest {
         }
 
         with(rule.onNodeWithTag(Tag)) {
-            val centerPixel = captureToBitmap()
+            val centerPixel = captureToImage().asAndroidBitmap()
                 .run {
                     getPixel(width / 2, height / 2)
                 }
@@ -548,7 +549,7 @@ class RippleIndicationTest {
         }
 
         with(rule.onNodeWithTag(Tag)) {
-            val centerPixel = captureToBitmap()
+            val centerPixel = captureToImage().asAndroidBitmap()
                 .run {
                     getPixel(width / 2, height / 2)
                 }
@@ -594,7 +595,7 @@ class RippleIndicationTest {
 
         // Capture and compare screenshots
         rule.onNodeWithTag(Tag)
-            .captureToBitmap()
+            .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
 
         // Advance until after the end of the ripple animation, so we have a stable final opacity
@@ -604,7 +605,7 @@ class RippleIndicationTest {
 
         // Compare expected and actual pixel color
         val centerPixel = rule.onNodeWithTag(Tag)
-            .captureToBitmap()
+            .captureToImage().asAndroidBitmap()
             .run {
                 getPixel(width / 2, height / 2)
             }

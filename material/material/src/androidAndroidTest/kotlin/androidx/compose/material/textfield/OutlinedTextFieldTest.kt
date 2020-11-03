@@ -33,6 +33,7 @@ import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
@@ -45,8 +46,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertShape
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -644,7 +644,7 @@ class OutlinedTextFieldTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,

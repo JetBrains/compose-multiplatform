@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation
 
-import android.graphics.Bitmap
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -25,15 +24,16 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixels
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.assertShape
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasInputMethodsSupport
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
@@ -95,7 +95,7 @@ class TextFieldCursorTest {
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
             rule.onNode(hasInputMethodsSupport())
-                .captureToBitmap()
+                .captureToImage()
                 .assertCursor(2.dp, this)
         }
     }
@@ -133,14 +133,14 @@ class TextFieldCursorTest {
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
             rule.onNode(hasInputMethodsSupport())
-                .captureToBitmap()
+                .captureToImage()
                 .assertCursor(2.dp, this)
         }
 
         // cursor invisible during next 500 ms
         rule.clockTestRule.advanceClock(700)
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -182,7 +182,7 @@ class TextFieldCursorTest {
         // no cursor when usually shown
         rule.clockTestRule.advanceClock(100)
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -194,7 +194,7 @@ class TextFieldCursorTest {
         // no cursor when should be no cursor
         rule.clockTestRule.advanceClock(700)
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -249,12 +249,12 @@ class TextFieldCursorTest {
         rule.clockTestRule.advanceClock(400)
         with(rule.density) {
             rule.onNode(hasInputMethodsSupport())
-                .captureToBitmap()
+                .captureToImage()
                 .assertCursor(2.dp, this)
         }
     }
 
-    private fun Bitmap.assertCursor(cursorWidth: Dp, density: Density) {
+    private fun ImageAsset.assertCursor(cursorWidth: Dp, density: Density) {
         val cursorWidthPx = (with(density) { cursorWidth.toIntPx() })
         val width = width
         val height = height

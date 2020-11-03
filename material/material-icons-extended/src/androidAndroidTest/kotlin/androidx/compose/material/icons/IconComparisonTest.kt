@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.ContextAmbient
@@ -36,7 +37,7 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.filters.LargeTest
@@ -122,8 +123,8 @@ class IconComparisonTest(
             assertVectorAssetsAreEqual(xmlVector!!, programmaticVector, iconName)
 
             matcher.assertBitmapsAreEqual(
-                rule.onNodeWithTag(XmlTestTag).captureToBitmap(),
-                rule.onNodeWithTag(ProgrammaticTestTag).captureToBitmap(),
+                rule.onNodeWithTag(XmlTestTag).captureToImage().asAndroidBitmap(),
+                rule.onNodeWithTag(ProgrammaticTestTag).captureToImage().asAndroidBitmap(),
                 iconName
             )
 

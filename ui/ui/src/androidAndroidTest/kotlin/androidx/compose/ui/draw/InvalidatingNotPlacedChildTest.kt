@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.assertCenterPixelColor
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -69,7 +69,7 @@ class InvalidatingNotPlacedChildTest {
         }
 
         composeTestRule.onNodeWithTag("node")
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Blue)
 
         composeTestRule.runOnIdle {
@@ -77,7 +77,7 @@ class InvalidatingNotPlacedChildTest {
         }
 
         composeTestRule.onNodeWithTag("node")
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 
@@ -102,7 +102,7 @@ class InvalidatingNotPlacedChildTest {
         }
 
         composeTestRule.onNodeWithTag("node")
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Blue)
 
         composeTestRule.runOnIdle {
@@ -110,7 +110,7 @@ class InvalidatingNotPlacedChildTest {
         }
 
         composeTestRule.onNodeWithTag("node")
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Gray)
     }
 
@@ -148,7 +148,7 @@ class InvalidatingNotPlacedChildTest {
         }
 
         composeTestRule.onNodeWithTag("node")
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 }

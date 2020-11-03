@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -29,8 +30,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertShape
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
@@ -71,7 +71,7 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.Red,
@@ -98,7 +98,7 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.Red,
@@ -122,7 +122,7 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.White,
@@ -144,7 +144,7 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.White,
@@ -169,7 +169,7 @@ class BorderTest(val shape: Shape) {
                 }
             }
         }
-        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToImage()
         bitmap.assertShape(
             density = rule.density,
             backgroundColor = Color.White,

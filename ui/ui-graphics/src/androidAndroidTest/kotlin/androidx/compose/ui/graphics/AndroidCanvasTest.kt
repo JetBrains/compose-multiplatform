@@ -28,16 +28,16 @@ import android.widget.FrameLayout
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.test.captureToImage
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.compose.ui.test.captureToBitmap
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -77,7 +77,7 @@ class AndroidCanvasTest {
         // Not sure why this test is flaky, so this is just going to make sure that
         // the drawn content can get onto the screen before we capture the bitmap.
         activityTestRule.runOnUiThread { }
-        val bitmap = groupView!!.captureToBitmap()
+        val bitmap = groupView!!.captureToImage().asAndroidBitmap()
         assertEquals(Color.WHITE, bitmap.getPixel(0, 0))
         assertEquals(Color.WHITE, bitmap.getPixel(9, 9))
         assertNotEquals(Color.WHITE, bitmap.getPixel(10, 10))

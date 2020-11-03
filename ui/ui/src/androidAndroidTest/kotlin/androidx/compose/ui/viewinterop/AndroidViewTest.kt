@@ -35,6 +35,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -43,8 +44,7 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
@@ -250,7 +250,7 @@ class AndroidViewTest {
             AndroidView({ frameLayout }, Modifier.testTag("view").background(color = Color.Blue))
         }
 
-        rule.onNodeWithTag("view").captureToBitmap().assertPixels(IntSize(size, size)) {
+        rule.onNodeWithTag("view").captureToImage().assertPixels(IntSize(size, size)) {
             Color.Blue
         }
     }

@@ -23,14 +23,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.emptyContent
+import androidx.compose.testutils.assertPixels
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.assertShape
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
@@ -70,7 +71,7 @@ class SurfaceTest {
         }
 
         rule.onNodeWithTag("box")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -138,8 +139,9 @@ class SurfaceTest {
             }
         }
 
-        val topLevelSurfaceBitmap = rule.onNodeWithTag("top level").captureToBitmap()
-        val nestedSurfaceBitmap = rule.onNodeWithTag("nested").captureToBitmap()
+        val topLevelSurfaceBitmap = rule.onNodeWithTag("top level").captureToImage()
+        val nestedSurfaceBitmap = rule.onNodeWithTag("nested").captureToImage()
+            .asAndroidBitmap()
 
         topLevelSurfaceBitmap.assertPixels {
             Color(nestedSurfaceBitmap.getPixel(it.x, it.y))

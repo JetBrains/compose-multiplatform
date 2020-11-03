@@ -20,14 +20,14 @@ import android.os.Build
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.captureToBitmap
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
@@ -59,7 +59,7 @@ class AndroidViewBindingTest {
 
         val size = 50.dp
         val sizePx = with(rule.density) { size.toIntPx() }
-        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
+        rule.onNodeWithTag("layout").captureToImage().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else Color.Black
         }
     }
@@ -76,14 +76,16 @@ class AndroidViewBindingTest {
 
         val size = 50.dp
         val sizePx = with(rule.density) { size.toIntPx() }
-        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
-            if (it.y < sizePx) Color.Blue else color.value
-        }
+        rule.onNodeWithTag("layout").captureToImage()
+            .assertPixels(IntSize(sizePx, sizePx * 2)) {
+                if (it.y < sizePx) Color.Blue else color.value
+            }
 
         rule.runOnIdle { color.value = Color.DarkGray }
-        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
-            if (it.y < sizePx) Color.Blue else color.value
-        }
+        rule.onNodeWithTag("layout").captureToImage()
+            .assertPixels(IntSize(sizePx, sizePx * 2)) {
+                if (it.y < sizePx) Color.Blue else color.value
+            }
     }
 
     @Test
