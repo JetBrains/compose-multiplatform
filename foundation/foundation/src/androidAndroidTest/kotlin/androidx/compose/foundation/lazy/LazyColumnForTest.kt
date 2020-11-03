@@ -71,6 +71,7 @@ import com.google.common.collect.Range
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -747,7 +748,7 @@ class LazyColumnForTest {
 
         rule.runOnIdle {
             with(rule.density) {
-                state.onScroll(110.dp.toPx())
+                state.onScroll(-110.dp.toPx())
             }
         }
 
@@ -945,6 +946,30 @@ class LazyColumnForTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun snapToItemIndex() {
+        val items by mutableStateOf((1..20).toList())
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.snapToItemIndex(3, 10)
+            }
+            assertThat(state.firstVisibleItemIndex).isEqualTo(3)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
     }
 
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
