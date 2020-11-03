@@ -8,7 +8,7 @@ plugins {
 
 subprojects {
     group = BuildProperties.group
-    version = BuildProperties.version
+    version = BuildProperties.deployVersion(project)
 
     repositories {
         maven("https://dl.bintray.com/kotlin/kotlin-dev")

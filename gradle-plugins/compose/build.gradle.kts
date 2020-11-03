@@ -20,7 +20,7 @@ gradlePluginConfig {
 buildConfig {
     packageName = "org.jetbrains.compose"
     clsName = "ComposeBuildConfig"
-    buildConfigField("String", "composeVersion", BuildProperties.composeVersion)
+    buildConfigField("String", "composeVersion", BuildProperties.composeVersion(project))
 }
 
 val embedded by configurations.creating
