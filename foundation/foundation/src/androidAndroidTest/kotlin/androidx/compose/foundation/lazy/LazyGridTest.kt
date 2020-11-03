@@ -144,7 +144,7 @@ class LazyGridTest {
         }
 
         rule.onNodeWithTag(LazyGridTag)
-            .scrollBy(y = 102.dp, density = rule.density)
+            .scrollBy(y = 103.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
             .assertDoesNotExist()
