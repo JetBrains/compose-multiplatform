@@ -466,7 +466,6 @@ package androidx.compose.foundation.text {
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
     method public androidx.compose.ui.text.input.ImeAction getImeAction();
     method public androidx.compose.ui.text.input.KeyboardType getKeyboardType();
-    method public androidx.compose.ui.text.input.ImeOptions toImeOptions(optional boolean singleLine);
     property public final boolean autoCorrect;
     property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
     property public final androidx.compose.ui.text.input.ImeAction imeAction;
