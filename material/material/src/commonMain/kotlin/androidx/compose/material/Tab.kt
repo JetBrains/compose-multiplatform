@@ -52,6 +52,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -218,7 +219,12 @@ object TabConstants {
      */
     fun Modifier.defaultTabIndicatorOffset(
         currentTabPosition: TabPosition
-    ): Modifier = composed {
+    ): Modifier = composed(
+        inspectorInfo = debugInspectorInfo {
+            name = "defaultTabIndicatorOffset"
+            value = currentTabPosition
+        }
+    ) {
         // TODO: should we animate the width of the indicator as it moves between tabs of different
         // sizes inside a scrollable tab row?
         val currentTabWidth = currentTabPosition.width
