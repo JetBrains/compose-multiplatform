@@ -384,6 +384,54 @@ class LazyRowForTest {
     }
 
     @Test
+    fun itemFillingParentWidthFraction() {
+        rule.setContent {
+            LazyRowFor(
+                items = listOf(0),
+                modifier = Modifier.size(width = 100.dp, height = 150.dp)
+            ) {
+                Spacer(Modifier.fillParentMaxWidth(0.7f).height(50.dp).testTag(firstItemTag))
+            }
+        }
+
+        rule.onNodeWithTag(firstItemTag)
+            .assertWidthIsEqualTo(70.dp)
+            .assertHeightIsEqualTo(50.dp)
+    }
+
+    @Test
+    fun itemFillingParentHeightFraction() {
+        rule.setContent {
+            LazyRowFor(
+                items = listOf(0),
+                modifier = Modifier.size(width = 100.dp, height = 150.dp)
+            ) {
+                Spacer(Modifier.width(50.dp).fillParentMaxHeight(0.3f).testTag(firstItemTag))
+            }
+        }
+
+        rule.onNodeWithTag(firstItemTag)
+            .assertWidthIsEqualTo(50.dp)
+            .assertHeightIsEqualTo(45.dp)
+    }
+
+    @Test
+    fun itemFillingParentSizeFraction() {
+        rule.setContent {
+            LazyRowFor(
+                items = listOf(0),
+                modifier = Modifier.size(width = 100.dp, height = 150.dp)
+            ) {
+                Spacer(Modifier.fillParentMaxSize(0.5f).testTag(firstItemTag))
+            }
+        }
+
+        rule.onNodeWithTag(firstItemTag)
+            .assertWidthIsEqualTo(50.dp)
+            .assertHeightIsEqualTo(75.dp)
+    }
+
+    @Test
     fun itemFillingParentSizeParentResized() {
         var parentSize by mutableStateOf(100.dp)
         rule.setContent {
