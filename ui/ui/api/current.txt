@@ -1,34 +1,24 @@
 // Signature format: 4.0
 package androidx.compose.ui {
 
-  @androidx.compose.runtime.Immutable public final class AbsoluteAlignment implements androidx.compose.ui.Alignment {
-    method public long align-rlJ4snA(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.AbsoluteAlignment copy(float verticalBias, float horizontalBias);
-    field public static final androidx.compose.ui.AbsoluteAlignment.Companion Companion;
-  }
-
-  public static final class AbsoluteAlignment.Companion {
-    method public androidx.compose.ui.AbsoluteAlignment getBottomLeft();
-    method public androidx.compose.ui.AbsoluteAlignment getBottomRight();
-    method public androidx.compose.ui.AbsoluteAlignment getCenterLeft();
-    method public androidx.compose.ui.AbsoluteAlignment getCenterRight();
-    method public androidx.compose.ui.AbsoluteAlignment.Horizontal getLeft();
-    method public androidx.compose.ui.AbsoluteAlignment.Horizontal getRight();
-    method public androidx.compose.ui.AbsoluteAlignment getTopLeft();
-    method public androidx.compose.ui.AbsoluteAlignment getTopRight();
-    property public final androidx.compose.ui.AbsoluteAlignment BottomLeft;
-    property public final androidx.compose.ui.AbsoluteAlignment BottomRight;
-    property public final androidx.compose.ui.AbsoluteAlignment CenterLeft;
-    property public final androidx.compose.ui.AbsoluteAlignment CenterRight;
-    property public final androidx.compose.ui.AbsoluteAlignment.Horizontal Left;
-    property public final androidx.compose.ui.AbsoluteAlignment.Horizontal Right;
-    property public final androidx.compose.ui.AbsoluteAlignment TopLeft;
-    property public final androidx.compose.ui.AbsoluteAlignment TopRight;
-  }
-
-  @androidx.compose.runtime.Immutable public static final class AbsoluteAlignment.Horizontal implements androidx.compose.ui.Alignment.Horizontal {
-    method public int align(int size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.AbsoluteAlignment.Horizontal copy(float bias);
+  public final class AbsoluteAlignment {
+    method public androidx.compose.ui.Alignment getBottomLeft();
+    method public androidx.compose.ui.Alignment getBottomRight();
+    method public androidx.compose.ui.Alignment getCenterLeft();
+    method public androidx.compose.ui.Alignment getCenterRight();
+    method public androidx.compose.ui.Alignment.Horizontal getLeft();
+    method public androidx.compose.ui.Alignment.Horizontal getRight();
+    method public androidx.compose.ui.Alignment getTopLeft();
+    method public androidx.compose.ui.Alignment getTopRight();
+    property public final androidx.compose.ui.Alignment BottomLeft;
+    property public final androidx.compose.ui.Alignment BottomRight;
+    property public final androidx.compose.ui.Alignment CenterLeft;
+    property public final androidx.compose.ui.Alignment CenterRight;
+    property public final androidx.compose.ui.Alignment.Horizontal Left;
+    property public final androidx.compose.ui.Alignment.Horizontal Right;
+    property public final androidx.compose.ui.Alignment TopLeft;
+    property public final androidx.compose.ui.Alignment TopRight;
+    field public static final androidx.compose.ui.AbsoluteAlignment INSTANCE;
   }
 
   @androidx.compose.runtime.Immutable public interface Alignment {
@@ -75,6 +65,41 @@ package androidx.compose.ui {
 
   @androidx.compose.runtime.Immutable public static interface Alignment.Vertical {
     method public int align(int size);
+  }
+
+  @androidx.compose.runtime.Immutable public final class BiasAbsoluteAlignment implements androidx.compose.ui.Alignment {
+    method public long align-rlJ4snA(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAbsoluteAlignment copy(float horizontalBias, float verticalBias);
+  }
+
+  @androidx.compose.runtime.Immutable public static final class BiasAbsoluteAlignment.Horizontal implements androidx.compose.ui.Alignment.Horizontal {
+    ctor public BiasAbsoluteAlignment.Horizontal(float bias);
+    method public int align(int size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAbsoluteAlignment.Horizontal copy(float bias);
+  }
+
+  @androidx.compose.runtime.Immutable public final class BiasAlignment implements androidx.compose.ui.Alignment {
+    ctor public BiasAlignment(float horizontalBias, float verticalBias);
+    method public long align-rlJ4snA(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public float component1();
+    method public float component2();
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment copy(float horizontalBias, float verticalBias);
+    method public float getHorizontalBias();
+    method public float getVerticalBias();
+    property public final float horizontalBias;
+    property public final float verticalBias;
+  }
+
+  @androidx.compose.runtime.Immutable public static final class BiasAlignment.Horizontal implements androidx.compose.ui.Alignment.Horizontal {
+    ctor public BiasAlignment.Horizontal(float bias);
+    method public int align(int size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment.Horizontal copy(float bias);
+  }
+
+  @androidx.compose.runtime.Immutable public static final class BiasAlignment.Vertical implements androidx.compose.ui.Alignment.Vertical {
+    ctor public BiasAlignment.Vertical(float bias);
+    method public int align(int size);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment.Vertical copy(float bias);
   }
 
   public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
