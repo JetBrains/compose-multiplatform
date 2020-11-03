@@ -5,6 +5,8 @@ package org.jetbrains.compose
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.jetbrains.compose.desktop.DesktopExtension
+import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -12,7 +14,16 @@ private val composeVersion get() = ComposeBuildConfig.composeVersion
 
 class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        val composeExtension = project.extensions.create("compose", ComposeExtension::class.java)
+        val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
+
         project.afterEvaluate {
+            if (desktopExtension._isApplicationInitialized) {
+                // If application object was not accessed in a script,
+                // we want to avoid creating tasks like package, run, etc. to avoid conflicts with other plugins
+                configureApplicationImpl(project, desktopExtension.application)
+            }
+
             project.dependencies.add(
                     "kotlinCompilerPluginClasspath",
                     "org.jetbrains.compose.compiler:compiler:$composeVersion"

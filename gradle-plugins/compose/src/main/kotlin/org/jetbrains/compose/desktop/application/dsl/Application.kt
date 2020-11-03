@@ -16,6 +16,9 @@ open class Application @Inject constructor(
     objects: ObjectFactory
 ) {
     internal var _configurationSource: ConfigurationSource? = null
+        private set
+    internal var _isDefaultConfigurationEnabled = true
+        private set
     internal val _fromFiles = objects.fileCollection()
     internal val _dependenciesTaskNames = ArrayList<String>()
 
@@ -28,7 +31,7 @@ open class Application @Inject constructor(
         _configurationSource = ConfigurationSource.KotlinMppTarget(from)
     }
     fun disableDefaultConfiguration() {
-        _configurationSource = null
+        _isDefaultConfigurationEnabled = false
     }
 
     fun fromFiles(vararg files: Any) {
