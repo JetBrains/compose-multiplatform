@@ -4,39 +4,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="            DefaultIconSizeModifier"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/Icon.kt"
-            line="102"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `borderParams`"
-        errorLine1="): Modifier = drawBehind {"
-        errorLine2="              ~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/OutlinedTextField.kt"
-            line="580"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `onValueChange`, `position`, `steps`, `value`, `valueRange`"
-        errorLine1="    return semantics {"
-        errorLine2="           ~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/Slider.kt"
-            line="360"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
@@ -52,19 +19,8 @@
         errorLine2="                  ~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/material/Tab.kt"
-            line="223"
+            line="221"
             column="19"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="These lambda arguments are missing in the InspectorInfo: `color`, `lineWidth`"
-        errorLine1="    return drawBehind {"
-        errorLine2="           ~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/TextField.kt"
-            line="622"
-            column="12"/>
     </issue>
 
     <issue
@@ -74,7 +30,7 @@
         errorLine2="              ^">
         <location
             file="src/commonMain/kotlin/androidx/compose/material/TextFieldImpl.kt"
-            line="381"
+            line="383"
             column="15"/>
     </issue>
 

@@ -8,7 +8,7 @@
         errorLine2="           ^">
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/text/CoreTextField.kt"
-            line="626"
+            line="630"
             column="12"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="    ~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/text/CoreTextField.kt"
-            line="667"
+            line="671"
             column="5"/>
     </issue>
 
