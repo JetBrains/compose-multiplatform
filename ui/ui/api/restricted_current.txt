@@ -1957,16 +1957,6 @@ package androidx.compose.ui.node {
     method public static androidx.compose.ui.node.LayoutNode? findClosestParentNode(androidx.compose.ui.node.LayoutNode, kotlin.jvm.functions.Function1<? super androidx.compose.ui.node.LayoutNode,java.lang.Boolean> selector);
   }
 
-  @Deprecated public final class ModelObserver {
-    ctor @Deprecated public ModelObserver(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> commitExecutor);
-    method @Deprecated public void clear(Object target);
-    method @Deprecated public void enableModelUpdatesObserving(boolean enabled);
-    method @Deprecated @androidx.compose.ui.node.InternalCoreApi public kotlin.jvm.functions.Function2<java.util.Set<?>,androidx.compose.runtime.frames.Frame,kotlin.Unit> getFrameCommitObserver();
-    method @Deprecated public <T> void observeReads(T target, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onCommit, kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method @Deprecated public void pauseObservingReads(kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    property @androidx.compose.ui.node.InternalCoreApi public final kotlin.jvm.functions.Function2<java.util.Set<?>,androidx.compose.runtime.frames.Frame,kotlin.Unit> frameCommitObserver;
-  }
-
   public final class ModifierInfo {
     ctor public ModifierInfo(androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.LayoutCoordinates coordinates, Object? extra);
     method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
