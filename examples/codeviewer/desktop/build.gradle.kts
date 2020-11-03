@@ -27,7 +27,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "ComoseCodeViewer"
+            packageName = "ComposeCodeViewer"
 
             windows {
                 menu = true

@@ -13,4 +13,4 @@ An example of image gallery for remote server image viewing, based on Jetpack Co
 
 ### Running Android application
 
-Open project in Intellij IDEA or Android Studio and run "android" configuration.
+Open project in IntelliJ IDEA or Android Studio and run "android" configuration.
