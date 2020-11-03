@@ -292,6 +292,13 @@ abstract class AbstractJPackageTask @Inject constructor(
                 exec.executable = jpackage.absolutePath
                 exec.setArgs(listOf("@${argsFile.absolutePath}"))
             }.assertNormalExitValue()
+
+            val destinationDirFile = destinationDir.asFile.get()
+            val finalLocation = when (targetFormat) {
+                TargetFormat.AppImage -> destinationDirFile
+                else -> destinationDirFile.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
+            }
+            logger.lifecycle("The distribution is written to ${finalLocation.canonicalPath}")
         } finally {
             tmpDir.deleteRecursively()
         }

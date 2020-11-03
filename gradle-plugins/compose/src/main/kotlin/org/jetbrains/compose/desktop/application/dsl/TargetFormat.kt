@@ -18,4 +18,10 @@ enum class TargetFormat(
     val isCompatibleWithCurrentOS: Boolean by lazy { isCompatibleWith(currentOS) }
 
     internal fun isCompatibleWith(targetOS: OS): Boolean = targetOS in compatibleOSs
+
+    val fileExt: String
+        get() {
+            check(this != AppImage) { "$this cannot have a file extension" }
+            return ".$id"
+        }
 }
