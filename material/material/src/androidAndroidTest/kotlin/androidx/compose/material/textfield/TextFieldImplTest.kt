@@ -24,10 +24,14 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.TextFieldScroller
 import androidx.compose.material.TextFieldScrollerPosition
+import androidx.compose.material.iconPadding
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertPixels
 import androidx.compose.ui.test.captureToBitmap
@@ -44,6 +48,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +69,16 @@ class TextFieldImplTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun testTextField_scrollable_withLongInput() {
@@ -225,5 +241,16 @@ class TextFieldImplTest {
         rule.runOnIdle {
             assertThat(scrollerPosition.current).isEqualTo(swipePosition)
         }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val modifier = Modifier.iconPadding(10.0.dp, 200.0.dp) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("iconPadding")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("start", 10.0.dp),
+            ValueElement("end", 200.0.dp)
+        )
     }
 }

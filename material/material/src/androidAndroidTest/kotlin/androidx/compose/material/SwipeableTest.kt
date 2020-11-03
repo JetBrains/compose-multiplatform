@@ -27,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.junit4.StateRestorationTester
@@ -41,6 +43,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -62,6 +65,12 @@ class SwipeableTest {
     @Before
     fun init() {
         clock = ManualAnimationClock(initTimeMillis = 0L)
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     /**
@@ -1483,6 +1492,32 @@ class SwipeableTest {
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")
             assertThat(swipeableState.offset.value).isEqualTo(50f)
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val state = SwipeableState("A", clock)
+        val anchors = mapOf(0f to "A", 100f to "B")
+        rule.setContent {
+            val modifier = Modifier.swipeable(
+                state = state,
+                anchors = anchors,
+                orientation = Orientation.Horizontal
+            ) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("swipeable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "state",
+                "anchors",
+                "orientation",
+                "enabled",
+                "reverseDirection",
+                "interactionState",
+                "thresholds",
+                "resistance",
+                "velocityThreshold"
+            )
         }
     }
 

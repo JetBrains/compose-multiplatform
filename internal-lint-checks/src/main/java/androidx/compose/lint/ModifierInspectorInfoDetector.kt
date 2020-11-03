@@ -66,7 +66,6 @@ import org.jetbrains.uast.kotlin.KotlinUQualifiedReferenceExpression
 import org.jetbrains.uast.kotlin.KotlinUSimpleReferenceExpression
 import org.jetbrains.uast.visitor.AbstractUastVisitor
 
-private const val Modifier = "Modifier"
 private const val ModifierClass = "androidx.compose.ui.Modifier"
 private const val ModifierFile = "Modifier.kt"
 private const val ComposedModifierFile = "ComposedModifier.kt"
@@ -175,7 +174,7 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
             (type as? PsiWildcardType)?.bound?.canonicalText
 
         private fun isThenFunctionCall(node: UQualifiedReferenceExpression): Boolean {
-            if (node.receiver !is UThisExpression) return false
+            if (!isModifierType(node.receiver.getExpressionType())) return false
             val then = node.selector as? KotlinUFunctionCallExpression ?: return false
             return then.methodName == ThenMethodName &&
                 then.valueArguments.size == 1 &&
@@ -442,6 +441,7 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 node: UQualifiedReferenceExpression
             ): Boolean {
                 if (isThenFunctionCall(node)) {
+                    node.receiver.accept(this)
                     val then = node.selector as KotlinUFunctionCallExpression
                     then.valueArguments.first().accept(modifierVisitor)
                     return true
@@ -502,6 +502,11 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                     val ret = body?.expressions?.firstOrNull() as? UReturnExpression
                     val definition = ret?.returnExpression ?: return super.visitCallExpression(node)
                     definition.accept(this)
+                    return true
+                }
+                if (isModifierType(node.receiverType) && isModifierType(node.returnType)) {
+                    // For now accept all other calls. Assume that the method being called
+                    // will add inspector information.
                     return true
                 }
                 return super.visitCallExpression(node)
