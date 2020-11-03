@@ -8,7 +8,7 @@
         errorLine2="              ~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/animation/AnimationModifier.kt"
-            line="61"
+            line="62"
             column="15"/>
     </issue>
 
