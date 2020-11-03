@@ -71,6 +71,7 @@ package androidx.compose.ui {
   }
 
   @androidx.compose.runtime.Immutable public final class BiasAbsoluteAlignment implements androidx.compose.ui.Alignment {
+    ctor public BiasAbsoluteAlignment(float horizontalBias, float verticalBias);
     method public long align-oYSo38o(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAbsoluteAlignment copy(float horizontalBias, float verticalBias);
   }

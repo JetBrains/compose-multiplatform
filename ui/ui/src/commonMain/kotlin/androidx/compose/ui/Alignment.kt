@@ -258,7 +258,7 @@ data class BiasAlignment(
  * @see Alignment
  */
 @Immutable
-data class BiasAbsoluteAlignment internal constructor(
+data class BiasAbsoluteAlignment(
     private val horizontalBias: Float,
     private val verticalBias: Float
 ) : Alignment {
