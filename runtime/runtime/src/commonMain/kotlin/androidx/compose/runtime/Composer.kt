@@ -732,37 +732,33 @@ class Composer<N>(
         }
 
         fun dispatchLifecycleObservers() {
-            trace("Compose:lifecycles") {
-                // Send lifecycle leaves
-                if (leaves.isNotEmpty()) {
-                    for (holder in leaves.reversed()) {
-                        // The count of the holder might be greater than 0 here as it might leave one
-                        // part of the composition and reappear in another. Only send a leave if the
-                        // count is still 0 after all changes have been applied.
-                        if (holder.count == 0) {
-                            holder.instance.onLeave()
-                            lifecycleObservers.remove(holder)
-                        }
+            // Send lifecycle leaves
+            if (leaves.isNotEmpty()) {
+                for (holder in leaves.reversed()) {
+                    // The count of the holder might be greater than 0 here as it might leave one
+                    // part of the composition and reappear in another. Only send a leave if the
+                    // count is still 0 after all changes have been applied.
+                    if (holder.count == 0) {
+                        holder.instance.onLeave()
+                        lifecycleObservers.remove(holder)
                     }
                 }
+            }
 
-                // Send lifecycle enters
-                if (enters.isNotEmpty()) {
-                    for (holder in enters) {
-                        holder.instance.onEnter()
-                    }
+            // Send lifecycle enters
+            if (enters.isNotEmpty()) {
+                for (holder in enters) {
+                    holder.instance.onEnter()
                 }
             }
         }
 
         fun dispatchSideEffects() {
-            trace("Compose:sideEffects") {
-                if (sideEffects.isNotEmpty()) {
-                    for (sideEffect in sideEffects) {
-                        sideEffect()
-                    }
-                    sideEffects.clear()
+            if (sideEffects.isNotEmpty()) {
+                for (sideEffect in sideEffects) {
+                    sideEffect()
                 }
+                sideEffects.clear()
             }
         }
     }
