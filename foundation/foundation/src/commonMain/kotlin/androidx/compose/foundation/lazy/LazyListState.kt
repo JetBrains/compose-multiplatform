@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.util.annotation.IntRange
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
@@ -181,7 +182,10 @@ class LazyListState constructor(
     }
 
     // currently used by the desktop for scrollbars. to be made public
-    internal suspend fun snapToItemIndex(index: Int, scrollOffset: Int) {
+    internal suspend fun snapToItemIndex(
+        @IntRange(from = 0) index: Int,
+        @IntRange(from = 0) scrollOffset: Int = 0
+    ) {
         scrollPosition.update(
             index = DataIndex(index),
             // scrollOffset can only be positive
@@ -484,8 +488,8 @@ private class ItemRelativeScrollPosition(
         private set
 
     fun update(index: DataIndex, scrollOffset: Int, canScrollForward: Boolean) {
-        require(index.value >= 0f) { "Index can only be positive (${index.value})" }
-        require(scrollOffset >= 0f) { "scrollOffset can only be positive ($scrollOffset)" }
+        require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
+        require(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
         this.index = index
         indexState.value = index.value
         this.scrollOffset = scrollOffset
