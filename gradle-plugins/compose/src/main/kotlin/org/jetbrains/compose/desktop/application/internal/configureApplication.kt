@@ -1,53 +1,33 @@
-package org.jetbrains.compose.desktop.application
+package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.*
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.jvm.tasks.Jar
-import org.jetbrains.compose.ComposeExtension
-import org.jetbrains.compose.desktop.DesktopBasePlugin
-import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.Application
-import org.jetbrains.compose.desktop.application.dsl.ConfigurationSource
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.configureWix
-import org.jetbrains.compose.desktop.application.internal.currentOS
-import org.jetbrains.compose.desktop.application.internal.provider
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationToRunnableFiles
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import java.io.File
 import java.util.*
-
-private const val PLUGIN_ID = "org.jetbrains.compose.desktop.application"
 
 // todo: multiple launchers
 // todo: file associations
 // todo: use workers
-@Suppress("unused") // Gradle plugin entry point
-open class ApplicationPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        project.plugins.apply(DesktopBasePlugin::class.java)
-        val composeExt = project.extensions.getByType(ComposeExtension::class.java)
-        val desktopExt = composeExt.extensions.getByType(DesktopExtension::class.java)
-        val mainApplication = project.objects.newInstance(Application::class.java, "main")
-        desktopExt.extensions.add("application", mainApplication)
-        project.plugins.withId("org.jetbrains.kotlin.jvm") {
-            val mainSourceSet = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main")
-            mainApplication.from(mainSourceSet)
+fun configureApplicationImpl(project: Project, app: Application) {
+    project.afterEvaluate {
+        if (app._isDefaultConfigurationEnabled) {
+            if (project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+                project.configureFromMppPlugin(app)
+            } else if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
+                val mainSourceSet = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main")
+                app.from(mainSourceSet)
+            }
         }
-        project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
-            project.configureFromMppPlugin(mainApplication)
-        }
-        project.afterEvaluate {
-            project.configurePackagingTasks(listOf(mainApplication))
-            project.configureWix()
-        }
+        project.configurePackagingTasks(listOf(app))
+        project.configureWix()
     }
 }
 
@@ -60,7 +40,7 @@ internal fun Project.configureFromMppPlugin(mainApplication: Application) {
                 mainApplication.from(target)
                 isJvmTargetConfigured = true
             } else {
-                logger.error("w: Default configuration for '$PLUGIN_ID' is disabled: " +
+                logger.error("w: Default configuration for Compose Desktop Application is disabled: " +
                         "multiple Kotlin JVM targets definitions are detected. " +
                         "Specify, which target to use by using `compose.desktop.application.from(kotlinMppTarget)`")
                 mainApplication.disableDefaultConfiguration()
@@ -91,9 +71,44 @@ internal fun Project.configurePackagingTasks(app: Application): TaskProvider<Def
 }
 
 internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
-    enabled = (currentOS == targetOS)
+    enabled = targetFormat.isCompatibleWithCurrentOS
 
-    val targetPlatformSettings = when (targetOS) {
+    if (targetFormat != TargetFormat.AppImage) {
+        configurePlatformSettings(app)
+    }
+
+    app.nativeDistributions.let { executables ->
+        packageName.set(provider { executables.packageName ?: project.name })
+        packageDescription.set(provider { executables.description })
+        packageCopyright.set(provider { executables.copyright })
+        packageVendor.set(provider { executables.vendor })
+        packageVersion.set(provider {
+                executables.version
+                    ?: project.version.toString().takeIf { it != "unspecified" }
+        })
+    }
+
+    destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
+    javaHome.set(provider { app.javaHomeOrDefault() })
+
+    launcherMainJar.set(app.mainJar.orNull)
+    app._fromFiles.forEach { files.from(it) }
+    dependsOn(*app._dependenciesTaskNames.toTypedArray())
+
+    app._configurationSource?.let { configSource ->
+        dependsOn(configSource.jarTaskName)
+        files.from(configSource.runtimeClasspath)
+        launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
+    }
+
+    modules.set(provider { app.nativeDistributions.modules })
+    launcherMainClass.set(provider { app.mainClass })
+    launcherJvmArgs.set(provider { app.jvmArgs })
+    launcherArgs.set(provider { app.args })
+}
+
+internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
+    when (currentOS) {
         OS.Linux -> {
             app.nativeDistributions.linux.also { linux ->
                 linuxShortcut.set(provider { linux.shortcut })
@@ -130,39 +145,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
             }
         }
     }
-
-    app.nativeDistributions.let { executables ->
-        packageName.set(provider { executables.packageName ?: project.name })
-        packageDescription.set(provider { executables.description })
-        packageCopyright.set(provider { executables.copyright })
-        packageVendor.set(provider { executables.vendor })
-        packageVersion.set(provider {
-                executables.version
-                    ?: project.version.toString().takeIf { it != "unspecified" }
-        })
-    }
-
-    destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
-    javaHome.set(provider { app.javaHomeOrDefault() })
-
-    launcherMainJar.set(app.mainJar.orNull)
-    app._fromFiles.forEach { files.from(it) }
-    dependsOn(*app._dependenciesTaskNames.toTypedArray())
-
-    app._configurationSource?.let { configSource ->
-        dependsOn(configSource.jarTaskName)
-        files.from(configSource.runtimeClasspath)
-        launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
-    }
-
-    modules.set(provider { app.nativeDistributions.modules })
-    launcherMainClass.set(provider { app.mainClass })
-    launcherJvmArgs.set(provider { app.jvmArgs })
-    launcherArgs.set(provider { app.args })
 }
-
-private fun AbstractJPackageTask.jarFromJarTaskByName(jarTaskName: String) =
-    project.tasks.named(jarTaskName).map { (it as Jar).archiveFile.get() }
 
 private fun Project.configureRunTask(app: Application) {
     project.tasks.composeTask<JavaExec>(taskName("run", app)) {

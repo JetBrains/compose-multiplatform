@@ -5,10 +5,9 @@
 In this tutorial, we'll show you how to create native distributions (installers/packages) for all the supported systems.
 We will also demonstrate how to run an application locally with the same settings as for distributions.
 
-## Desktop application Gradle plugin
+## Gradle plugin
 
-`org.jetbrains.compose.desktop.application` 
-simplifies the packaging of applications into native distributions and running an application locally.
+`org.jetbrains.compose` Gradle plugin simplifies the packaging of applications into native distributions and running an application locally.
 Currently, the plugin uses [jpackage](https://openjdk.java.net/jeps/343) for packaging self-contained applications.
 
 ## Basic usage
@@ -26,7 +25,6 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
-    id("org.jetbrains.compose.desktop.application")
 }
 
 dependencies {
@@ -53,6 +51,8 @@ Tasks that are not compatible with the current OS are skipped by default.
 aggregating all package tasks for an application.
 * `run` is used to run an app locally. You need to define a `mainClass` — an fq-name of a class, 
 containing the `main` function.
+  
+Note, that the tasks are created only if the `application` block/property is used in a script.
 
 After a build, output binaries can be found in `${project.buildDir}/compose/binaries`.
 
@@ -144,7 +144,7 @@ If the default configuration is ambiguous or not sufficient, the plugin can be c
 ```kotlin
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.compose.desktop.application")
+    id("org.jetbrains.compose")
 } 
 
 val customSourceSet = sourceSets.create("customSourceSet")
@@ -158,7 +158,7 @@ compose.desktop {
 ```kotlin
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose.desktop.application")
+    id("org.jetbrains.compose")
 } 
 
 kotlin {

@@ -48,7 +48,7 @@ internal fun Project.configureWix() {
 
 private fun Project.eachWindowsPackageTask(fn: AbstractJPackageTask.() -> Unit) {
     tasks.withType(AbstractJPackageTask::class.java).configureEach { packageTask ->
-        if (packageTask.targetOS == OS.Windows) {
+        if (packageTask.targetFormat.isCompatibleWith(OS.Windows)) {
             packageTask.fn()
         }
     }
