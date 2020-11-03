@@ -2,6 +2,7 @@ package example.todo.desktop
 
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.DesktopTheme
+import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -23,7 +24,7 @@ fun main() {
     val lifecycle = LifecycleRegistry()
     lifecycle.resume()
 
-    AppWindow("Todo").show {
+    Window("Todo") {
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme {
                 DesktopTheme {

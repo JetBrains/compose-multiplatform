@@ -3,9 +3,9 @@ package org.jetbrains.codeviewer.ui
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.Spring.StiffnessLow
 import androidx.compose.animation.core.SpringSpec
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack

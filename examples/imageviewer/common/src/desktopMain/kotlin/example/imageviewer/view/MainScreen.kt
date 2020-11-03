@@ -288,9 +288,9 @@ fun setScrollableArea(content: ContentState) {
             }
         }
         VerticalScrollbar(
+            adapter = rememberScrollbarAdapter(stateVertical),
             modifier = Modifier.align(Alignment.CenterEnd)
-                .fillMaxHeight(),
-            adapter = rememberScrollbarAdapter(stateVertical)
+                .fillMaxHeight()
         )
     }
 }
