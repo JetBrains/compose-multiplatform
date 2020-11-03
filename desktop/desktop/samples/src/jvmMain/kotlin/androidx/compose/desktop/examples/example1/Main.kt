@@ -18,22 +18,30 @@ package androidx.compose.desktop.examples.example1
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.material.Text
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -86,6 +94,13 @@ private const val title = "Desktop Compose Elements"
 
 fun main() {
     Window(title, IntSize(1024, 850)) {
+        App()
+    }
+}
+
+@Composable
+private fun App() {
+    DesktopMaterialTheme {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -125,15 +140,26 @@ fun main() {
     }
 }
 
+@Composable
+private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
+    val state = rememberScrollState(0f)
+    ScrollableContent(state)
+
+    VerticalScrollbar(
+        rememberScrollbarAdapter(state),
+        Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+    )
+}
+
 @OptIn(ExperimentalKeyInput::class)
 @Composable
-private fun LeftColumn(modifier: Modifier) = Column(modifier) {
+private fun ScrollableContent(scrollState: ScrollState) {
     val amount = remember { mutableStateOf(0) }
     val animation = remember { mutableStateOf(true) }
     val text = remember {
         mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0\nПривет")
     }
-    ScrollableColumn(Modifier.fillMaxSize()) {
+    ScrollableColumn(Modifier.fillMaxSize(), scrollState) {
         Text(
             text = "Привет! 你好! Desktop Compose ${amount.value}",
             color = Color.Black,
@@ -353,9 +379,21 @@ fun Animations(isCircularEnabled: Boolean) = Row {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RightColumn(modifier: Modifier) = LazyColumn(modifier.drawLayer(alpha = 0.5f)) {
-    items((1..10000).toList()) { x ->
-        Text(x.toString(), Modifier.drawLayer(alpha = 0.5f))
+private fun RightColumn(modifier: Modifier) = Box {
+    val state = rememberLazyListState()
+    val itemCount = 100000
+    val itemHeight = 20.dp
+
+    LazyColumn(modifier.drawLayer(alpha = 0.5f), state = state) {
+        items((1..itemCount).toList()) { x ->
+            Text(x.toString(), Modifier.drawLayer(alpha = 0.5f).height(itemHeight))
+        }
     }
+
+    VerticalScrollbar(
+        rememberScrollbarAdapter(state, itemCount, itemHeight),
+        Modifier.align(Alignment.CenterEnd)
+    )
 }
