@@ -16,7 +16,7 @@ The following software has to be preinstalled:
 
 ## Creating a new project
 
-*TBD: new project wizard*
+Kotlin plugin has Compose new project wizard, but it is possible to create project manually.
 
 The recommended way of building Compose for Desktop projects is by using Gradle.
 JetBrains provides a simple way of building Compose for Desktop projects
@@ -46,8 +46,7 @@ import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.4.0"
-    id("org.jetbrains.compose") version "0.1.0-m1-build57"
-    application
+    id("org.jetbrains.compose") version "0.1.0-m1-build62"
 }
 
 repositories {
@@ -59,8 +58,10 @@ dependencies {
     implementation(compose.desktop.currentOs)
 }
 
-application {
-    mainClassName = "MainKt"
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+    }
 }
 ```
 Then create file `src/main/kotlin/main.kt` and put there:
@@ -104,7 +105,6 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
 Open `build.gradle.kts` as a project in IntelliJ IDEA.
 
 ![New project](screen1.png)
-
 
 After you download the Compose for Desktop dependencies from the Maven repositories your new project is ready
 to go. Open the Gradle toolbar on the right, and select `sample/Tasks/applications/run`.
