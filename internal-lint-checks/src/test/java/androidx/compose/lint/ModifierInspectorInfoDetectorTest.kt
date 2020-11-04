@@ -645,7 +645,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-                    src/androidx/compose/ui/SizeModifier2.kt:8: Error: Modifiers should include inspectorInfo for the Layout Inspector [ModifierInspectorInfo]
+                    src/androidx/compose/ui/SizeModifier2.kt:8: Error: Modifier missing inspectorInfo [ModifierInspectorInfo]
                     fun Modifier.preferredWidth2(width: Int) = this.then(SizeModifier2(width))
                                                                          ~~~~~~~~~~~~~
                     1 errors, 0 warnings
@@ -679,7 +679,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-                    src/androidx/compose/ui/BorderModifier.kt:9: Error: Modifiers should include inspectorInfo for the Layout Inspector [ModifierInspectorInfo]
+                    src/androidx/compose/ui/BorderModifier.kt:9: Error: Modifier missing inspectorInfo [ModifierInspectorInfo]
                         composed { this.then(BorderModifier(width)) }
                         ~~~~~~~~
                     1 errors, 0 warnings
@@ -718,7 +718,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-                    src/androidx/compose/ui/SizeModifier.kt:12: Error: Modifiers should include inspectorInfo for the Layout Inspector [ModifierInspectorInfo]
+                    src/androidx/compose/ui/SizeModifier.kt:12: Error: Modifier missing inspectorInfo [ModifierInspectorInfo]
                         this.then(SizeModifier.WithOption(width))
                                                ~~~~~~~~~~
                     1 errors, 0 warnings

@@ -3,7 +3,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        message="Modifier missing inspectorInfo"
         errorLine1="    composed {"
         errorLine2="    ~~~~~~~~">
         <location
