@@ -31,4 +31,5 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
 @ExperimentalComposeApi
+@Deprecated("Union Types are no longer supported by the Compose Compiler")
 annotation class UnionType(vararg val types: KClass<*>)
