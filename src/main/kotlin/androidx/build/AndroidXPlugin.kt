@@ -84,27 +84,9 @@ import java.util.concurrent.ConcurrentHashMap
 class AndroidXPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         if (project.isRoot) throw Exception("Root project should use AndroidXRootPlugin instead")
-        // This has to be first due to bad behavior by DiffAndDocs which is triggered on the root
-        // project. It calls evaluationDependsOn on each subproject. This eagerly causes evaluation
-        // *during* the root build.gradle evaluation. The subproject then applies this plugin (while
-        // we're still halfway through applying it on the root). The check licenses code runs on the
-        // subproject which then looks for the root project task to add itself as a dependency of.
-        // Without the root project having created the task prior to DiffAndDocs running this fails.
-        // TODO(alanv): do not use evaluationDependsOn in DiffAndDocs to break this cycle!
-        project.configureExternalDependencyLicenseCheck()
-
         val extension = project.extensions.create<AndroidXExtension>(EXTENSION_NAME, project)
-
-        // This has to be first due to bad behavior by DiffAndDocs. It fails if this configuration
-        // is called after DiffAndDocs.configureDiffAndDocs. b/129762955
-        project.configureMavenArtifactUpload(extension)
-
-        if (project.isCoverageEnabled()) {
-            project.configureJacoco()
-        }
-
         // Perform different actions based on which plugins have been applied to the project.
-        // Many of the actions overlap, ex. API tracking and documentation.
+        // Many of the actions overlap, ex. API tracking.
         project.plugins.all { plugin ->
             when (plugin) {
                 is JavaPlugin -> configureWithJavaPlugin(project, extension)
@@ -118,13 +100,17 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Configure all Jar-packing tasks for hermetic builds.
         project.tasks.withType(Jar::class.java).configureEach { it.configureForHermeticBuild() }
-
         project.tasks.withType(Copy::class.java).configureEach { it.configureForHermeticBuild() }
 
         // copy host side test results to DIST
         project.tasks.withType(Test::class.java) { task -> configureTestTask(project, task) }
 
         project.configureTaskTimeouts()
+        project.configureMavenArtifactUpload(extension)
+        project.configureExternalDependencyLicenseCheck()
+        if (project.isCoverageEnabled()) {
+            project.configureJacoco()
+        }
     }
 
     /**
