@@ -7,10 +7,10 @@
 // You can follow the progress for HMPP JVM & Android intermediate source sets here:
 // https://youtrack.jetbrains.com/issue/KT-42466
 //
-// The workaround used here to access JVM libraries causes IntelliJ IDEA to not
-// resolve symbols in this file properly.
+// Because of the workaround used, some tooling might not behave as expected.
 //
-// Resolution errors in your IDE do not indicate a problem with your setup.
+// Resolution errors (expect/actual, red code) in your IDE
+// do not indicate a problem with your setup.
 
 
 package androidx.ui.examples.jetissues.data
