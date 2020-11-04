@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.times
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutModifier
@@ -183,7 +184,7 @@ private class PainterModifier(
             }
 
             val srcSize = Size(srcWidth, srcHeight)
-            srcSize * contentScale.scale(srcSize, dstSize)
+            srcSize * contentScale.computeScaleFactor(srcSize, dstSize)
         }
     }
 
@@ -246,7 +247,7 @@ private class PainterModifier(
         }
 
         val srcSize = Size(srcWidth, srcHeight)
-        val scale = contentScale.scale(srcSize, size)
+        val scale = contentScale.computeScaleFactor(srcSize, size)
 
         // Compute the offset to translate the content based on the given alignment
         // and size to draw based on the ContentScale parameter

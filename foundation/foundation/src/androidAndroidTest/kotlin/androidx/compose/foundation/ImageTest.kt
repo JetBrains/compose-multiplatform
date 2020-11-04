@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -47,7 +48,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.testutils.assertPixels
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -290,6 +293,46 @@ class ImageTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun testImageScalesNonuniformly() {
+        val imageComposableWidth = imageWidth * 3
+        val imageComposableHeight = imageHeight * 7
+
+        rule.setContent {
+            val density = DensityAmbient.current
+            val size = (containerSize * 2 / density.density).dp
+            val imageAsset = ImageAsset(imageWidth, imageHeight)
+            CanvasDrawScope().draw(
+                density,
+                LayoutDirection.Ltr,
+                Canvas(imageAsset),
+                Size(imageWidth.toFloat(), imageHeight.toFloat())
+            ) {
+                drawRect(color = Color.Blue)
+            }
+            Box(
+                Modifier.preferredSize(size)
+                    .background(color = Color.White)
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                Image(
+                    asset = imageAsset,
+                    modifier = Modifier
+                        .testTag(contentTag)
+                        .preferredSize(
+                            (imageComposableWidth / density.density).dp,
+                            (imageComposableHeight / density.density).dp
+                        ),
+                    // Scale the image non-uniformly within the bounds of the composable
+                    contentScale = ContentScale.FillBounds,
+                    alignment = Alignment.BottomEnd
+                )
+            }
+        }
+
+        rule.onNodeWithTag(contentTag).captureToImage().assertPixels { Color.Blue }
     }
 
     @Test
