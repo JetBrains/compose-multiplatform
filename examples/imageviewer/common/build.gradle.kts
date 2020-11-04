@@ -9,24 +9,26 @@ plugins {
 kotlin {
     android()
     jvm("desktop")
-
     sourceSets {
         named("commonMain") {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation("io.ktor:ktor-client-core:1.4.1")
             }
         }
         named("androidMain") {
             dependencies {
                 api("androidx.appcompat:appcompat:1.1.0")
                 api("androidx.core:core-ktx:1.3.1")
+                implementation("io.ktor:ktor-client-cio:1.4.1")
             }
         }
         named("desktopMain") {
             dependencies {
                 api(compose.desktop.common)
+                implementation("io.ktor:ktor-client-cio:1.4.1")
             }
         }
     }
