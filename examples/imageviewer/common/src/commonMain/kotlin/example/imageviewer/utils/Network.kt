@@ -14,13 +14,24 @@
 
 package example.imageviewer.utils
 
-import java.net.InetAddress
+import io.ktor.client.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+
+//import java.net.InetAddress
 
 fun isInternetAvailable(): Boolean {
-    return try {
-        val ipAddress: InetAddress = InetAddress.getByName("google.com")
-        !ipAddress.equals("")
-    } catch (e: Exception) {
-        false
+    return runBlocking {
+        try {
+            ktorHttpClient.head<String>("http://google.com")
+            true
+        } catch (e: Exception) {
+            println(e.message)
+            false
+        }
     }
 }
+
+val ktorHttpClient = HttpClient {}

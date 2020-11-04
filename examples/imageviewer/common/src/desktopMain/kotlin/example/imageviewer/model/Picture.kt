@@ -2,7 +2,7 @@ package example.imageviewer.model
 
 import java.awt.image.BufferedImage
 
-data class Picture(
+actual data class Picture(
     var source: String = "",
     var name: String = "",
     var image: BufferedImage,
