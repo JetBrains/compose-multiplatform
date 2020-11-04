@@ -132,4 +132,11 @@ class SizeTest {
             // no-op
         }
     }
+
+    @Test
+    fun testSizeLerp() {
+        val size1 = Size(100f, 200f)
+        val size2 = Size(300f, 500f)
+        Assert.assertEquals(Size(200f, 350f), lerp(size1, size2, 0.5f))
+    }
 }
