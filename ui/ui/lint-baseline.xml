@@ -290,39 +290,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = this.then(DrawBackgroundModifier(onDraw))"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
-            line="58"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1=") = composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
-            line="86"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
-        errorLine1="): Modifier = this.then(object : DrawModifier {"
-        errorLine2="                        ^">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/DrawModifier.kt"
-            line="182"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
         errorLine1=") = if (elevation > 0.dp || clip) {"
         errorLine2="    ^">
         <location

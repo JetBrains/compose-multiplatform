@@ -24,14 +24,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.AtLeastSize
+import androidx.compose.ui.CacheDrawScope
+import androidx.compose.ui.DrawResult
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawWithCache
+import androidx.compose.ui.drawWithContent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.captureToImage
@@ -41,7 +48,10 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,6 +62,16 @@ class DrawModifierTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
@@ -341,6 +361,42 @@ class DrawModifierTest {
                 assertEquals(Color.Cyan.toArgb(), getPixel(width - 1, height - 1))
                 assertEquals(Color.Cyan.toArgb(), getPixel(0, height - 1))
             }
+        }
+    }
+
+    @Test
+    fun testInspectorValueForDrawBehind() {
+        val onDraw: DrawScope.() -> Unit = {}
+        rule.setContent {
+            val modifier = Modifier.drawBehind(onDraw) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("drawBehind")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("onDraw")
+        }
+    }
+
+    @Test
+    fun testInspectorValueForDrawWithCache() {
+        val onBuildDrawCache: CacheDrawScope.() -> DrawResult = { DrawResult {} }
+        rule.setContent {
+            val modifier = Modifier.drawWithCache(onBuildDrawCache) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("drawWithCache")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("onBuildDrawCache")
+        }
+    }
+
+    @Test
+    fun testInspectorValueForDrawWithContent() {
+        val onDraw: DrawScope.() -> Unit = {}
+        rule.setContent {
+            val modifier = Modifier.drawWithContent(onDraw) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("drawWithContent")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("onDraw")
         }
     }
 

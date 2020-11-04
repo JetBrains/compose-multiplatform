@@ -20,6 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 
 /**
@@ -55,11 +58,20 @@ interface DrawCacheModifier : DrawModifier {
  */
 fun Modifier.drawBehind(
     onDraw: DrawScope.() -> Unit
-) = this.then(DrawBackgroundModifier(onDraw))
+) = this.then(
+    DrawBackgroundModifier(
+        onDraw = onDraw,
+        inspectorInfo = debugInspectorInfo {
+            name = "drawBehind"
+            properties["onDraw"] = onDraw
+        }
+    )
+)
 
 private class DrawBackgroundModifier(
-    val onDraw: DrawScope.() -> Unit
-) : DrawModifier {
+    val onDraw: DrawScope.() -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : DrawModifier, InspectorValueInfo(inspectorInfo) {
     override fun ContentDrawScope.draw() {
         onDraw()
         drawContent()
@@ -83,7 +95,12 @@ private class DrawBackgroundModifier(
  */
 fun Modifier.drawWithCache(
     onBuildDrawCache: CacheDrawScope.() -> DrawResult
-) = composed {
+) = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "drawWithCache"
+        properties["onBuildDrawCache"] = onBuildDrawCache
+    }
+) {
     val cacheDrawScope = remember { CacheDrawScope() }
     this.then(DrawContentCacheModifier(cacheDrawScope, onBuildDrawCache))
 }
@@ -179,8 +196,15 @@ class DrawResult internal constructor(internal var block: ContentDrawScope.() ->
 // TODO: Inline this function -- it breaks with current compiler
 /*inline*/ fun Modifier.drawWithContent(
     onDraw: ContentDrawScope.() -> Unit
-): Modifier = this.then(object : DrawModifier {
-    override fun ContentDrawScope.draw() {
-        onDraw()
+): Modifier = this.then(
+    object : DrawModifier, InspectorValueInfo(
+        debugInspectorInfo {
+            name = "drawWithContent"
+            properties["onDraw"] = onDraw
+        }
+    ) {
+        override fun ContentDrawScope.draw() {
+            onDraw()
+        }
     }
-})
+)
