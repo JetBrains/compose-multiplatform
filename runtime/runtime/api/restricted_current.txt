@@ -569,8 +569,8 @@ package androidx.compose.runtime {
   public final class TraceKt {
   }
 
-  @androidx.compose.runtime.ExperimentalComposeApi @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface UnionType {
-    method public abstract Class<?>[] types();
+  @Deprecated @androidx.compose.runtime.ExperimentalComposeApi @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface UnionType {
+    method @Deprecated public abstract Class<?>[] types();
     property public abstract Class<?>![] types;
   }
 
