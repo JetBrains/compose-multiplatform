@@ -16,8 +16,11 @@
 
 package androidx.build
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.TestedExtension
 import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -40,28 +43,13 @@ class AndroidXUiPlugin : Plugin<Project> {
                     val library = project.extensions.findByType(LibraryExtension::class.java)
                         ?: throw Exception("Failed to find Android extension")
 
-                    library.defaultConfig.minSdkVersion(21)
+                    project.configureAndroidCommonOptions(library)
+                }
+                is AppPlugin -> {
+                    val app = project.extensions.findByType(AppExtension::class.java)
+                        ?: throw Exception("Failed to find Android extension")
 
-                    // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
-                    project.configurations.getByName("lintChecks").exclude(
-                        mapOf("module" to "lint-checks")
-                    )
-                    // TODO: figure out how to apply this to multiplatform modules
-                    project.dependencies.add(
-                        "lintChecks",
-                        project.dependencies.project(
-                            mapOf(
-                                "path" to ":compose:internal-lint-checks",
-                                "configuration" to "shadow"
-                            )
-                        )
-                    )
-
-                    library.lintOptions.apply {
-                        // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
-                        // remove these accessors
-                        disable("SyntheticAccessor")
-                    }
+                    project.configureAndroidCommonOptions(app)
                 }
                 is KotlinBasePluginWrapper -> {
                     val conf = project.configurations.create("kotlinPlugin")
@@ -111,6 +99,31 @@ class AndroidXUiPlugin : Plugin<Project> {
                 // Needed to enable `expect` and `actual` keywords
                 compile.kotlinOptions.freeCompilerArgs += "-Xmulti-platform"
             }
+        }
+
+        private fun Project.configureAndroidCommonOptions(testedExtension: TestedExtension) {
+            testedExtension.defaultConfig.minSdkVersion(21)
+
+            testedExtension.lintOptions.apply {
+                // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
+                // remove these accessors
+                disable("SyntheticAccessor")
+            }
+
+            // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
+            configurations.getByName("lintChecks").exclude(
+                mapOf("module" to "lint-checks")
+            )
+            // TODO: figure out how to apply this to multiplatform modules
+            dependencies.add(
+                "lintChecks",
+                project.dependencies.project(
+                    mapOf(
+                        "path" to ":compose:internal-lint-checks",
+                        "configuration" to "shadow"
+                    )
+                )
+            )
         }
 
         private fun Project.configureManifests() {
