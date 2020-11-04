@@ -2,6 +2,17 @@
 <issues format="5" by="lint 4.2.0-alpha06" client="gradle" variant="debug" version="4.2.0-alpha06">
 
     <issue
+        id="IllegalExperimentalApiUsage"
+        message="Experimental/OptIn APIs should only be used from within the same library or libraries within the same requireSameVersion group"
+        errorLine1="    performKeyPress(keyEvent)"
+        errorLine2="    ~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/ui/test/ActionsStubs.kt"
+            line="44"
+            column="5"/>
+    </issue>
+
+    <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 29, the call containing class androidx.compose.ui.test.android.WindowCaptureKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
         errorLine1="            decorView.viewTreeObserver.registerFrameCommitCallback {"
