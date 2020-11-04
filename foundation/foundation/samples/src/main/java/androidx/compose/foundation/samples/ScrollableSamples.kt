@@ -43,7 +43,7 @@ fun ScrollableSample() {
     // state for Scrollable, describes how to consume scrolling delta and update offset
     Box(
         Modifier
-            .preferredSize(200.dp)
+            .preferredSize(150.dp)
             .scrollable(
                 orientation = Orientation.Vertical,
                 controller = rememberScrollableController { delta ->
@@ -54,6 +54,6 @@ fun ScrollableSample() {
             .background(Color.LightGray),
         alignment = Alignment.Center
     ) {
-        Text(offset.value.roundToInt().toString(), style = TextStyle(fontSize = 50.sp))
+        Text(offset.value.roundToInt().toString(), style = TextStyle(fontSize = 32.sp))
     }
 }

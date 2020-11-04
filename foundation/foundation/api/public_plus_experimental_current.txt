@@ -72,6 +72,10 @@ package androidx.compose.foundation {
   @kotlin.RequiresOptIn(message="This foundation API is experimental and is likely to change or be removed in the " + "future.") public @interface ExperimentalFoundationApi {
   }
 
+  public final class FocusableKt {
+    method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState? interactionState);
+  }
+
   public final class IconKt {
     method @Deprecated @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.ui.Modifier modifier, optional long tint);
     method @Deprecated @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
@@ -103,6 +107,10 @@ package androidx.compose.foundation {
 
   public static final class Interaction.Dragged implements androidx.compose.foundation.Interaction {
     field public static final androidx.compose.foundation.Interaction.Dragged INSTANCE;
+  }
+
+  public static final class Interaction.Focused implements androidx.compose.foundation.Interaction {
+    field public static final androidx.compose.foundation.Interaction.Focused INSTANCE;
   }
 
   public static final class Interaction.Pressed implements androidx.compose.foundation.Interaction {
