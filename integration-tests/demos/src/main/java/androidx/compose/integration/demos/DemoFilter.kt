@@ -62,9 +62,7 @@ fun DemoFilter(launchableDemos: List<Demo>, filterText: String, onNavigate: (Dem
             FilteredDemoListItem(
                 demo,
                 filterText = filterText,
-                onNavigate = {
-                    onNavigate(it)
-                }
+                onNavigate = onNavigate
             )
         }
     }
