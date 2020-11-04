@@ -92,9 +92,7 @@ fun Tab(
     icon: @Composable () -> Unit = emptyContent(),
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
-    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        selectedContentColor
-    )
+    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
     val styledText = @Composable {
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
@@ -140,9 +138,7 @@ fun Tab(
     modifier: Modifier = Modifier,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
-    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        selectedContentColor
-    ),
+    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium),
     content: @Composable ColumnScope.() -> Unit
 ) {
     // The color of the Ripple should always the selected color, as we want to show the color
@@ -300,7 +296,12 @@ private fun TabTransition(
         }
     }
     val state = transition(transitionDefinition, selected)
-    Providers(AmbientContentColor provides state[TabTintColor], children = content)
+    val color = state[TabTintColor]
+    Providers(
+        AmbientContentColor provides color.copy(alpha = 1f),
+        AmbientContentAlpha provides color.alpha,
+        children = content
+    )
 }
 
 /**

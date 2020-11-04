@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 fun Icon(
     asset: VectorAsset,
     modifier: Modifier = Modifier,
-    tint: Color = AmbientContentColor.current
+    tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
 ) {
     Icon(
         painter = rememberVectorPainter(asset),
@@ -90,7 +90,7 @@ fun Icon(
 fun Icon(
     painter: Painter,
     modifier: Modifier = Modifier,
-    tint: Color = AmbientContentColor.current
+    tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
 ) {
     // TODO: consider allowing developers to override the intrinsic size, and specify their own
     // size that this icon will be forced to take up.

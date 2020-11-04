@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
@@ -407,10 +408,14 @@ class OutlinedTextFieldTest {
                 label = {},
                 placeholder = {
                     Text("placeholder")
-                    assertThat(AmbientContentColor.current)
+                    assertThat(
+                        AmbientContentColor.current.copy(
+                            alpha = AmbientContentAlpha.current
+                        )
+                    )
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
-                                0.6f
+                                alpha = 0.6f
                             )
                         )
                     assertThat(AmbientTextStyle.current)

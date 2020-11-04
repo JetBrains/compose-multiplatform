@@ -145,9 +145,7 @@ fun BottomNavigationItem(
     alwaysShowLabels: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
-    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        selectedContentColor
-    )
+    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
     val styledLabel = @Composable {
         val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
@@ -214,7 +212,10 @@ private fun BottomNavigationTransition(
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
 
-    Providers(AmbientContentColor provides color) {
+    Providers(
+        AmbientContentColor provides color.copy(alpha = 1f),
+        AmbientContentAlpha provides color.alpha,
+    ) {
         content(animationProgress)
     }
 }

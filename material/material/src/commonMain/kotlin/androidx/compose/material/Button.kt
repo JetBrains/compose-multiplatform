@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -106,10 +107,11 @@ fun Button(
     // the ripple below the clip once http://b/157687898 is fixed and we have
     // more flexibility to move the clickable modifier (see candidate approach
     // aosp/1361921)
+    val contentColor = colors.contentColor(enabled)
     Surface(
         shape = shape,
         color = colors.backgroundColor(enabled),
-        contentColor = colors.contentColor(enabled),
+        contentColor = contentColor.copy(alpha = 1f),
         border = border,
         elevation = elevation?.elevation(enabled, interactionState) ?: 0.dp,
         modifier = modifier.clickable(
@@ -119,21 +121,23 @@ fun Button(
             indication = null
         )
     ) {
-        ProvideTextStyle(
-            value = MaterialTheme.typography.button
-        ) {
-            Row(
-                Modifier
-                    .defaultMinSizeConstraints(
-                        minWidth = ButtonConstants.DefaultMinWidth,
-                        minHeight = ButtonConstants.DefaultMinHeight
-                    )
-                    .indication(interactionState, AmbientIndication.current())
-                    .padding(contentPadding),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                children = content
-            )
+        Providers(AmbientContentAlpha provides contentColor.alpha) {
+            ProvideTextStyle(
+                value = MaterialTheme.typography.button
+            ) {
+                Row(
+                    Modifier
+                        .defaultMinSizeConstraints(
+                            minWidth = ButtonConstants.DefaultMinWidth,
+                            minHeight = ButtonConstants.DefaultMinHeight
+                        )
+                        .indication(interactionState, AmbientIndication.current())
+                        .padding(contentPadding),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    children = content
+                )
+            }
         }
     }
 }
@@ -394,8 +398,8 @@ object ButtonConstants {
         disabledBackgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
             .compositeOver(MaterialTheme.colors.surface),
         contentColor: Color = contentColorFor(backgroundColor),
-        disabledContentColor: Color = AmbientEmphasisLevels.current.disabled
-            .applyEmphasis(MaterialTheme.colors.onSurface)
+        disabledContentColor: Color = MaterialTheme.colors.onSurface
+            .copy(alpha = ContentAlpha.disabled)
     ): ButtonColors = DefaultButtonColors(
         backgroundColor,
         disabledBackgroundColor,
@@ -416,8 +420,8 @@ object ButtonConstants {
     fun defaultOutlinedButtonColors(
         backgroundColor: Color = MaterialTheme.colors.surface,
         contentColor: Color = MaterialTheme.colors.primary,
-        disabledContentColor: Color = AmbientEmphasisLevels.current.disabled
-            .applyEmphasis(MaterialTheme.colors.onSurface)
+        disabledContentColor: Color = MaterialTheme.colors.onSurface
+            .copy(alpha = ContentAlpha.disabled)
     ): ButtonColors = DefaultButtonColors(
         backgroundColor,
         backgroundColor,
@@ -438,8 +442,8 @@ object ButtonConstants {
     fun defaultTextButtonColors(
         backgroundColor: Color = Color.Transparent,
         contentColor: Color = MaterialTheme.colors.primary,
-        disabledContentColor: Color = AmbientEmphasisLevels.current.disabled
-            .applyEmphasis(MaterialTheme.colors.onSurface)
+        disabledContentColor: Color = MaterialTheme.colors.onSurface
+            .copy(alpha = ContentAlpha.disabled)
     ): ButtonColors = DefaultButtonColors(
         backgroundColor,
         backgroundColor,

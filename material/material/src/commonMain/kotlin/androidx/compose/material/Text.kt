@@ -53,8 +53,9 @@ import androidx.compose.ui.unit.TextUnit
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
- * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
- * adapt to different background colors and still maintain contrast and accessibility.
+ * [AmbientContentColor] will be used with an alpha of [AmbientContentAlpha]- this allows this
+ * [Text] or element containing this [Text] to adapt to different background colors and still
+ * maintain contrast and accessibility.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
@@ -139,8 +140,9 @@ fun Text(
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
- * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
- * adapt to different background colors and still maintain contrast and accessibility.
+ * [AmbientContentColor] will be used with an alpha of [AmbientContentAlpha]- this allows this
+ * [Text] or element containing this [Text] to adapt to different background colors and still
+ * maintain contrast and accessibility.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
@@ -191,7 +193,11 @@ fun Text(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = AmbientTextStyle.current
 ) {
-    val textColor = color.useOrElse { style.color.useOrElse { AmbientContentColor.current } }
+    val textColor = color.useOrElse {
+        style.color.useOrElse {
+            AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+        }
+    }
     val mergedStyle = style.merge(
         TextStyle(
             color = textColor,

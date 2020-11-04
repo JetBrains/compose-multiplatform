@@ -29,8 +29,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.Checkbox
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -218,7 +218,7 @@ private fun TextFieldWithMessage(
     val typography = MaterialTheme.typography.caption
     val color = when (helperMessageOption) {
         Option.Helper -> {
-            AmbientEmphasisLevels.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
+            MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
         }
         Option.Error -> MaterialTheme.colors.error
         else -> Color.Unspecified
@@ -228,7 +228,8 @@ private fun TextFieldWithMessage(
         Box(modifier = Modifier.weight(1f, fill = false)) { textField() }
         Text(
             text = "Helper message",
-            style = typography.copy(color = color),
+            color = color,
+            style = typography,
             modifier = Modifier.padding(start = 16.dp)
         )
     }

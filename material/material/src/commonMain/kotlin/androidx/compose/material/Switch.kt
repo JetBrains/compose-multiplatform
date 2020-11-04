@@ -235,17 +235,17 @@ object SwitchConstants {
         uncheckedThumbColor: Color = MaterialTheme.colors.surface,
         uncheckedTrackColor: Color = MaterialTheme.colors.onSurface,
         uncheckedTrackAlpha: Float = 0.38f,
-        disabledCheckedThumbColor: Color = AmbientEmphasisLevels.current.disabled
-            .applyEmphasis(checkedThumbColor)
+        disabledCheckedThumbColor: Color = checkedThumbColor
+            .copy(alpha = ContentAlpha.disabled)
             .compositeOver(MaterialTheme.colors.surface),
-        disabledCheckedTrackColor: Color = AmbientEmphasisLevels.current.disabled
-            .applyEmphasis(checkedTrackColor)
+        disabledCheckedTrackColor: Color = checkedTrackColor
+            .copy(alpha = ContentAlpha.disabled)
             .compositeOver(MaterialTheme.colors.surface),
-        disabledUncheckedThumbColor: Color = AmbientEmphasisLevels.current.disabled
-            .applyEmphasis(uncheckedThumbColor)
+        disabledUncheckedThumbColor: Color = uncheckedThumbColor
+            .copy(alpha = ContentAlpha.disabled)
             .compositeOver(MaterialTheme.colors.surface),
-        disabledUncheckedTrackColor: Color = AmbientEmphasisLevels.current.disabled
-            .applyEmphasis(uncheckedTrackColor)
+        disabledUncheckedTrackColor: Color = uncheckedTrackColor
+            .copy(alpha = ContentAlpha.disabled)
             .compositeOver(MaterialTheme.colors.surface)
     ): SwitchColors = DefaultSwitchColors(
         checkedThumbColor = checkedThumbColor,
