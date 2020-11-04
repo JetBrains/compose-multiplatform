@@ -1591,18 +1591,21 @@ package androidx.compose.ui.layout {
   }
 
   @androidx.compose.runtime.Stable public interface ContentScale {
-    method public float scale-AhF4CD4(long srcSize, long dstSize);
+    method public long computeScaleFactor-AhF4CD4(long srcSize, long dstSize);
+    method @Deprecated public default float scale-AhF4CD4(long srcSize, long dstSize);
     field public static final androidx.compose.ui.layout.ContentScale.Companion Companion;
   }
 
   public static final class ContentScale.Companion {
     method public androidx.compose.ui.layout.ContentScale getCrop();
+    method public androidx.compose.ui.layout.ContentScale getFillBounds();
     method public androidx.compose.ui.layout.ContentScale getFillHeight();
     method public androidx.compose.ui.layout.ContentScale getFillWidth();
     method public androidx.compose.ui.layout.ContentScale getFit();
     method public androidx.compose.ui.layout.ContentScale getInside();
     method public androidx.compose.ui.layout.FixedScale getNone();
     property public final androidx.compose.ui.layout.ContentScale Crop;
+    property public final androidx.compose.ui.layout.ContentScale FillBounds;
     property public final androidx.compose.ui.layout.ContentScale FillHeight;
     property public final androidx.compose.ui.layout.ContentScale FillWidth;
     property public final androidx.compose.ui.layout.ContentScale Fit;
@@ -1633,9 +1636,9 @@ package androidx.compose.ui.layout {
   @androidx.compose.runtime.Immutable public final class FixedScale implements androidx.compose.ui.layout.ContentScale {
     ctor public FixedScale(float value);
     method public float component1();
+    method public long computeScaleFactor-AhF4CD4(long srcSize, long dstSize);
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.layout.FixedScale copy(float value);
     method public float getValue();
-    method public float scale-AhF4CD4(long srcSize, long dstSize);
     property public final float value;
   }
 
@@ -1845,6 +1848,36 @@ package androidx.compose.ui.layout {
 
   public interface RemeasurementModifier extends androidx.compose.ui.Modifier.Element {
     method public void onRemeasurementAvailable(androidx.compose.ui.layout.Remeasurement remeasurement);
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class ScaleFactor {
+    ctor public ScaleFactor();
+    method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
+    method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
+    method public static long constructor-impl(internal long packedValue);
+    method public static long copy-_hLwfpc(long $this, optional float scaleX, optional float scaleY);
+    method @androidx.compose.runtime.Stable public static operator long div-_hLwfpc(long $this, float operand);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static float getScaleX-impl(long $this);
+    method public static float getScaleY-impl(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Stable public static operator long times-_hLwfpc(long $this, float operand);
+    method public static String toString-impl(long $this);
+    field public static final androidx.compose.ui.layout.ScaleFactor.Companion Companion;
+  }
+
+  public static final class ScaleFactor.Companion {
+    method public long getUnspecified-_hLwfpc();
+    property public final long Unspecified;
+  }
+
+  public final class ScaleFactorKt {
+    method @androidx.compose.runtime.Stable public static long ScaleFactor(float scaleX, float scaleY);
+    method @androidx.compose.runtime.Stable public static operator long div-ngKnWWw(long, long scaleFactor);
+    method @androidx.compose.runtime.Stable public static long lerp-bKVCie4(long start, long stop, float fraction);
+    method @androidx.compose.runtime.Stable public static operator long times-Sp6zcS4(long, long size);
+    method @androidx.compose.runtime.Stable public static operator long times-ngKnWWw(long, long scaleFactor);
   }
 
   public final class SubcomposeLayoutKt {

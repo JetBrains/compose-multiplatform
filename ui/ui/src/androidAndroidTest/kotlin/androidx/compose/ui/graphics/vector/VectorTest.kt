@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
@@ -253,6 +254,40 @@ class VectorTest {
             assertEquals(Color.Red.toArgb(), getPixel(0, height - 2))
             assertEquals(Color.Red.toArgb(), getPixel(width - 2, height - 1))
         }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testVectorScaleNonUniformly() {
+        val defaultWidth = 24.dp
+        val defaultHeight = 24.dp
+        val testTag = "testTag"
+        rule.setContent {
+            val vectorPainter = rememberVectorPainter(
+                defaultWidth = defaultWidth,
+                defaultHeight = defaultHeight
+            ) { viewportWidth, viewportHeight ->
+                Path(
+                    fill = SolidColor(Color.Blue),
+                    pathData = PathData {
+                        lineTo(viewportWidth, 0f)
+                        lineTo(viewportWidth, viewportHeight)
+                        lineTo(0f, viewportHeight)
+                        close()
+                    }
+                )
+            }
+            Image(
+                painter = vectorPainter,
+                modifier = Modifier
+                    .testTag(testTag)
+                    .preferredSize(defaultWidth * 7, defaultHeight * 3)
+                    .background(Color.Red),
+                contentScale = ContentScale.FillBounds
+            )
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Blue }
     }
 
     @Composable
