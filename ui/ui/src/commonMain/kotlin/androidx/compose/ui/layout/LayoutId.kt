@@ -25,30 +25,30 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 
 /**
- * Tag the element with [id] to identify the element within its parent.
+ * Tag the element with [layoutId] to identify the element within its parent.
  *
  * Example usage:
  * @sample androidx.compose.ui.samples.LayoutTagChildrenUsage
  */
 @Stable
-fun Modifier.layoutId(id: Any) = this.then(
+fun Modifier.layoutId(layoutId: Any) = this.then(
     LayoutId(
-        id = id,
+        layoutId = layoutId,
         inspectorInfo = debugInspectorInfo {
             name = "layoutId"
-            value = id
+            value = layoutId
         }
     )
 )
 
 /**
- * A [ParentDataModifier] which tags the target with the given [id]. The provided tag
+ * A [ParentDataModifier] which tags the target with the given [id][layoutId]. The provided tag
  * will act as parent data, and can be used for example by parent layouts to associate
  * composable children to [Measurable]s when doing layout, as shown below.
  */
 @Immutable
 private class LayoutId(
-    override val id: Any,
+    override val layoutId: Any,
     inspectorInfo: InspectorInfo.() -> Unit
 ) : ParentDataModifier, LayoutIdParentData, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?): Any? {
@@ -56,25 +56,25 @@ private class LayoutId(
     }
 
     override fun hashCode(): Int =
-        id.hashCode()
+        layoutId.hashCode()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         val otherModifier = other as? LayoutId ?: return false
-        return id == otherModifier.id
+        return layoutId == otherModifier.layoutId
     }
 
     override fun toString(): String =
-        "LayoutId(id=$id)"
+        "LayoutId(id=$layoutId)"
 }
 
 /**
  * Can be implemented by values used as parent data to make them usable as tags.
  * If a parent data value implements this interface, it can then be returned when querying
- * [Measurable.id] for the corresponding child.
+ * [Measurable.layoutId] for the corresponding child.
  */
 interface LayoutIdParentData {
-    val id: Any
+    val layoutId: Any
 }
 
 /**
@@ -85,5 +85,11 @@ interface LayoutIdParentData {
  * Example usage:
  * @sample androidx.compose.ui.samples.LayoutTagChildrenUsage
  */
-val Measurable.id: Any?
-    get() = (parentData as? LayoutIdParentData)?.id
+val Measurable.layoutId: Any?
+    get() = (parentData as? LayoutIdParentData)?.layoutId
+
+@Deprecated(
+    "id was renamed to layoutId",
+    ReplaceWith("layoutId", "androidx.compose.ui.layout.layoutId")
+)
+val Measurable.id get() = layoutId

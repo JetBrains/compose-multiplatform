@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.measureBlocksOf
@@ -162,7 +161,7 @@ fun LayoutTagChildrenUsage(header: @Composable () -> Unit, footer: @Composable (
         Box(Modifier.layoutId("footer")) { footer() }
     }) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
-            when (measurable.id) {
+            when (measurable.layoutId) {
                 // You should use appropriate constraints. Here we measure fake constraints.
                 "header" -> measurable.measure(Constraints.fixed(100, 100))
                 "footer" -> measurable.measure(constraints)
