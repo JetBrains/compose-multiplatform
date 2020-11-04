@@ -197,17 +197,6 @@ internal val EmptyBoxMeasureBlocks = MeasuringIntrinsicsMeasureBlocks { _, const
     layout(constraints.minWidth, constraints.minHeight) {}
 }
 
-@Composable
-@Deprecated(
-    "Stack was renamed to Box.",
-    ReplaceWith("Box", "androidx.compose.foundation.layout.Box")
-)
-fun Stack(
-    modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.TopStart,
-    children: @Composable BoxScope.() -> Unit
-) = Box(modifier, alignment, children)
-
 /**
  * A BoxScope provides a scope for the children of a [Box].
  */
@@ -229,10 +218,6 @@ interface BoxScope {
             }
         )
     )
-
-    @Stable
-    @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment) = align(align)
 
     /**
      * Size the element to match the size of the [Box] after all other content elements have
@@ -257,12 +242,6 @@ interface BoxScope {
 
     companion object : BoxScope
 }
-
-@Deprecated(
-    "Stack was renamed to Box.",
-    ReplaceWith("BoxScope", "androidx.compose.foundation.layout.BoxScope")
-)
-typealias StackScope = BoxScope
 
 private val Measurable.boxChildData: BoxChildData? get() = parentData as? BoxChildData
 private val Measurable.matchesParentSize: Boolean get() = boxChildData?.matchParentSize ?: false
