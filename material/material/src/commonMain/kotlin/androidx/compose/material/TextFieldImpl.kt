@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-// TODO(b/160821157): Replace FocusDetailedState with FocusState2 DEPRECATION
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.material
 
 import androidx.compose.animation.ColorPropKey
@@ -131,7 +128,7 @@ internal fun TextFieldImpl(
         Decoration(
             contentColor = inactiveColor,
             typography = MaterialTheme.typography.subtitle1,
-            emphasis = AmbientEmphasisLevels.current.high
+            contentAlpha = ContentAlpha.high
         ) {
             TextFieldScroller(
                 scrollerPosition = rememberSavedInstanceState(
@@ -178,25 +175,23 @@ internal fun TextFieldImpl(
             }
         }
 
-    val emphasisLevels = AmbientEmphasisLevels.current
-
     TextFieldTransitionScope.transition(
         inputState = inputState,
         showLabel = label != null,
         activeColor = if (isErrorValue) {
             errorColor
         } else {
-            emphasisLevels.high.applyEmphasis(activeColor)
+            activeColor.applyAlpha(alpha = ContentAlpha.high)
         },
         labelInactiveColor = if (isErrorValue) {
             errorColor
         } else {
-            emphasisLevels.medium.applyEmphasis(inactiveColor)
+            inactiveColor.applyAlpha(alpha = ContentAlpha.medium)
         },
         indicatorInactiveColor = when {
             isErrorValue -> errorColor
             type == TextFieldType.Filled -> inactiveColor.applyAlpha(alpha = IndicatorInactiveAlpha)
-            else -> emphasisLevels.disabled.applyEmphasis(inactiveColor)
+            else -> inactiveColor.applyAlpha(alpha = ContentAlpha.disabled)
         }
 
     ) { labelProgress, animatedLabelColor, indicatorWidth, indicatorColor, placeholderOpacity ->
@@ -227,7 +222,7 @@ internal fun TextFieldImpl(
                         Decoration(
                             contentColor = inactiveColor,
                             typography = MaterialTheme.typography.subtitle1,
-                            emphasis = AmbientEmphasisLevels.current.medium,
+                            contentAlpha = ContentAlpha.medium,
                             children = placeholder
                         )
                     }
@@ -360,14 +355,14 @@ internal fun Color.applyAlpha(alpha: Float): Color {
 internal fun Decoration(
     contentColor: Color,
     typography: TextStyle? = null,
-    emphasis: Emphasis? = null,
+    contentAlpha: Float? = null,
     children: @Composable () -> Unit
 ) {
     val colorAndEmphasis = @Composable {
         Providers(AmbientContentColor provides contentColor) {
-            if (emphasis != null) ProvideEmphasis(
-                emphasis,
-                children
+            if (contentAlpha != null) Providers(
+                AmbientContentAlpha provides contentAlpha,
+                children = children
             ) else children()
         }
     }

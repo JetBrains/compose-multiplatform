@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -78,12 +79,14 @@ fun TopAppBar(
     elevation: Dp = TopAppBarElevation
 ) {
     AppBar(backgroundColor, contentColor, elevation, RectangleShape, modifier) {
-        val emphasisLevels = AmbientEmphasisLevels.current
         if (navigationIcon == null) {
             Spacer(TitleInsetWithoutIcon)
         } else {
             Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
-                ProvideEmphasis(emphasisLevels.high, navigationIcon)
+                Providers(
+                    AmbientContentAlpha provides ContentAlpha.high,
+                    children = navigationIcon
+                )
             }
         }
 
@@ -92,11 +95,11 @@ fun TopAppBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                ProvideEmphasis(emphasisLevels.high, title)
+                Providers(AmbientContentAlpha provides ContentAlpha.high, children = title)
             }
         }
 
-        ProvideEmphasis(emphasisLevels.medium) {
+        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
             Row(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.End,

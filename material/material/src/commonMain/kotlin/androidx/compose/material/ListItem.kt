@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -70,13 +71,12 @@ fun ListItem(
     trailing: @Composable (() -> Unit)? = null,
     text: @Composable () -> Unit
 ) {
-    val emphasisLevels = AmbientEmphasisLevels.current
     val typography = MaterialTheme.typography
 
-    val styledText = applyTextStyle(typography.subtitle1, emphasisLevels.high, text)!!
-    val styledSecondaryText = applyTextStyle(typography.body2, emphasisLevels.medium, secondaryText)
-    val styledOverlineText = applyTextStyle(typography.overline, emphasisLevels.high, overlineText)
-    val styledTrailing = applyTextStyle(typography.caption, emphasisLevels.high, trailing)
+    val styledText = applyTextStyle(typography.subtitle1, ContentAlpha.high, text)!!
+    val styledSecondaryText = applyTextStyle(typography.body2, ContentAlpha.medium, secondaryText)
+    val styledOverlineText = applyTextStyle(typography.overline, ContentAlpha.high, overlineText)
+    val styledTrailing = applyTextStyle(typography.caption, ContentAlpha.high, trailing)
 
     val semanticsModifier = modifier.semantics(mergeAllDescendants = true) {}
 
@@ -405,12 +405,12 @@ private fun OffsetToBaselineOrCenter(
 
 private fun applyTextStyle(
     textStyle: TextStyle,
-    emphasis: Emphasis,
+    contentAlpha: Float,
     icon: @Composable (() -> Unit)?
 ): @Composable (() -> Unit)? {
     if (icon == null) return null
     return {
-        ProvideEmphasis(emphasis) {
+        Providers(AmbientContentAlpha provides contentAlpha) {
             ProvideTextStyle(textStyle, icon)
         }
     }

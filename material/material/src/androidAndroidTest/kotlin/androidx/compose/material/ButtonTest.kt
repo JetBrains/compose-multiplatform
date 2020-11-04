@@ -477,48 +477,48 @@ class ButtonTest {
     fun containedButtonDisabledContentColorIsCorrect() {
         var onSurface = Color.Transparent
         var content = Color.Transparent
-        var emphasis: Emphasis? = null
+        var disabledAlpha = 1f
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = AmbientEmphasisLevels.current.disabled
+            disabledAlpha = ContentAlpha.disabled
             Button(onClick = {}, enabled = false) {
-                content = AmbientContentColor.current
+                content = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
             }
         }
 
-        assertThat(content).isEqualTo(emphasis!!.applyEmphasis(onSurface))
+        assertThat(content).isEqualTo(onSurface.copy(alpha = disabledAlpha))
     }
 
     @Test
     fun outlinedButtonDisabledContentColorIsCorrect() {
         var onSurface = Color.Transparent
         var content = Color.Transparent
-        var emphasis: Emphasis? = null
+        var disabledAlpha = 1f
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = AmbientEmphasisLevels.current.disabled
+            disabledAlpha = ContentAlpha.disabled
             OutlinedButton(onClick = {}, enabled = false) {
-                content = AmbientContentColor.current
+                content = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
             }
         }
 
-        assertThat(content).isEqualTo(emphasis!!.applyEmphasis(onSurface))
+        assertThat(content).isEqualTo(onSurface.copy(alpha = disabledAlpha))
     }
 
     @Test
     fun textButtonDisabledContentColorIsCorrect() {
         var onSurface = Color.Transparent
         var content = Color.Transparent
-        var emphasis: Emphasis? = null
+        var disabledAlpha = 1f
         rule.setMaterialContent {
             onSurface = MaterialTheme.colors.onSurface
-            emphasis = AmbientEmphasisLevels.current.disabled
+            disabledAlpha = ContentAlpha.disabled
             TextButton(onClick = {}, enabled = false) {
-                content = AmbientContentColor.current
+                content = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
             }
         }
 
-        assertThat(content).isEqualTo(emphasis!!.applyEmphasis(onSurface))
+        assertThat(content).isEqualTo(onSurface.copy(alpha = disabledAlpha))
     }
 
     @Test

@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -95,13 +96,15 @@ fun FloatingActionButton(
         contentColor = contentColor,
         elevation = elevation.elevation(interactionState)
     ) {
-        ProvideTextStyle(MaterialTheme.typography.button) {
-            Box(
-                modifier = Modifier
-                    .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
-                    .indication(interactionState, AmbientIndication.current()),
-                alignment = Alignment.Center
-            ) { icon() }
+        Providers(AmbientContentAlpha provides contentColor.alpha) {
+            ProvideTextStyle(MaterialTheme.typography.button) {
+                Box(
+                    modifier = Modifier
+                        .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
+                        .indication(interactionState, AmbientIndication.current()),
+                    alignment = Alignment.Center
+                ) { icon() }
+            }
         }
     }
 }
