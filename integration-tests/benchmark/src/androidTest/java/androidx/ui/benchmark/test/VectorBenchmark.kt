@@ -35,7 +35,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class VectorBenchmark {
+open class VectorBenchmark {
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule()
 
