@@ -50,7 +50,6 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.style.TextAlign
@@ -320,13 +319,13 @@ private fun TabBaselineLayout(
             Box(Modifier.layoutId("icon")) { icon() }
         }
     ) { measurables, constraints ->
-        val textPlaceable = measurables.first { it.id == "text" }.measure(
+        val textPlaceable = measurables.first { it.layoutId == "text" }.measure(
             // Measure with loose constraints for height as we don't want the text to take up more
             // space than it needs
             constraints.copy(minHeight = 0)
         )
 
-        val iconPlaceable = measurables.first { it.id == "icon" }.measure(constraints)
+        val iconPlaceable = measurables.first { it.layoutId == "icon" }.measure(constraints)
 
         val hasTextPlaceable =
             textPlaceable.width != 0 && textPlaceable.height != 0

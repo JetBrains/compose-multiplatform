@@ -38,7 +38,6 @@ import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -408,13 +407,13 @@ private fun IconsWithTextFieldLayout(
         // measure leading icon
         val constraints = incomingConstraints.copy(minWidth = 0, minHeight = 0)
         val leadingPlaceable =
-            measurables.find { it.id == "leading" }?.measure(constraints)
+            measurables.find { it.layoutId == "leading" }?.measure(constraints)
         occupiedSpaceHorizontally += widthOrZero(
             leadingPlaceable
         )
 
         // measure trailing icon
-        val trailingPlaceable = measurables.find { it.id == "trailing" }
+        val trailingPlaceable = measurables.find { it.layoutId == "trailing" }
             ?.measure(constraints.offset(horizontal = -occupiedSpaceHorizontally))
         occupiedSpaceHorizontally += widthOrZero(
             trailingPlaceable
@@ -427,7 +426,7 @@ private fun IconsWithTextFieldLayout(
                 horizontal = -occupiedSpaceHorizontally
             )
         val labelPlaceable =
-            measurables.find { it.id == LabelId }?.measure(labelConstraints)
+            measurables.find { it.layoutId == LabelId }?.measure(labelConstraints)
         val lastBaseline = labelPlaceable?.get(LastBaseline)?.let {
             if (it != AlignmentLine.Unspecified) it else labelPlaceable.height
         } ?: 0
@@ -441,13 +440,13 @@ private fun IconsWithTextFieldLayout(
                 horizontal = -occupiedSpaceHorizontally
             )
         val textFieldPlaceable = measurables
-            .first { it.id == TextFieldId }
+            .first { it.layoutId == TextFieldId }
             .measure(textFieldConstraints)
 
         // measure placeholder
         val placeholderConstraints = textFieldConstraints.copy(minWidth = 0)
         val placeholderPlaceable = measurables
-            .find { it.id == PlaceholderId }
+            .find { it.layoutId == PlaceholderId }
             ?.measure(placeholderConstraints)
 
         val width = calculateWidth(
