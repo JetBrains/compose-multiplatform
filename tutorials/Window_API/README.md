@@ -10,9 +10,21 @@ The main class for creating windows is AppWindow. The easiest way to create and 
 
 ```kotlin
 import androidx.compose.desktop.AppWindow
+import javax.swing.SwingUtilities.invokeLater
+
+fun main() = invokeLater {
+    AppWindow().show {
+        // content
+    }
+}
+```
+
+Note that AppWindow should be created in AWT Event Thread. Instead of calling invokeLater explicitly you can use Window DSL:
+```kotlin
+import androidx.compose.desktop.Window
 
 fun main() {
-    AppWindow().show {
+    Window {
         // content
     }
 }
