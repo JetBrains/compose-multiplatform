@@ -1,9 +1,7 @@
 package org.jetbrains.compose.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.MutableState
-import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
@@ -19,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TextField
 import androidx.compose.material.Button
 import androidx.compose.foundation.Text
@@ -27,8 +23,7 @@ import org.jetbrains.compose.desktop.browser.BrowserState
 import org.jetbrains.compose.desktop.browser.CefView
 
 fun main() {
-
-    AppWindow("CEF-compose", IntSize(800, 800)).show {
+    Window("CEF-compose", IntSize(800, 800)) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = Color.DarkGray
