@@ -663,6 +663,7 @@ private val cursorAnimationSpec: AnimationSpec<Float>
 private val DefaultCursorThickness = 2.dp
 
 @OptIn(InternalTextApi::class)
+@Suppress("ModifierInspectorInfo")
 private fun Modifier.cursor(
     state: TextFieldState,
     value: TextFieldValue,

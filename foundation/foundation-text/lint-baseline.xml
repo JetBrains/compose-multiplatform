@@ -8,19 +8,8 @@
         errorLine2="           ^">
         <location
             file="src/commonMain/kotlin/androidx/compose/foundation/text/CoreTextField.kt"
-            line="630"
+            line="631"
             column="12"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1=") = composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/text/CoreTextField.kt"
-            line="671"
-            column="5"/>
     </issue>
 
 </issues>
