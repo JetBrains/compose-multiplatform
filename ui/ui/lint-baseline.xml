@@ -686,17 +686,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifier missing inspectorInfo"
-        errorLine1="    composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/draw/DrawShadow.kt"
-            line="51"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
         errorLine1="    return this.then(FocusObserverModifierImpl(onFocusChange))"
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
