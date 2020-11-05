@@ -26,6 +26,7 @@ import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
@@ -194,6 +195,11 @@ interface Owner {
     fun onSemanticsChange()
 
     val measureIteration: Long
+
+    /**
+     * The [ViewConfiguration] to use in the application.
+     */
+    val viewConfiguration: ViewConfiguration
 
     companion object {
         /**

@@ -1428,6 +1428,10 @@ package androidx.compose.ui.input.pointer {
   @androidx.compose.ui.gesture.ExperimentalPointerInput @kotlin.coroutines.RestrictsSuspension public interface HandlePointerInputScope {
     method public suspend Object? awaitCustomEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.CustomEvent> p);
     method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent> p);
+    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputData> getCurrentPointers();
+    method public long getSize-YbymL2g();
+    property public abstract java.util.List<androidx.compose.ui.input.pointer.PointerInputData> currentPointers;
+    property public abstract long size;
   }
 
   public final class HitPathTrackerKt {
@@ -1457,6 +1461,7 @@ package androidx.compose.ui.input.pointer {
     method public static void consumeAllChanges(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumeDownChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumePositionChange(androidx.compose.ui.input.pointer.PointerInputChange, float consumedDx, float consumedDy);
+    method public static boolean isOutOfBounds-MReStF0(androidx.compose.ui.input.pointer.PointerInputChange, long size);
     method public static long positionChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static long positionChangeIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean positionChanged(androidx.compose.ui.input.pointer.PointerInputChange);
@@ -1549,9 +1554,11 @@ package androidx.compose.ui.input.pointer {
   @androidx.compose.ui.gesture.ExperimentalPointerInput public interface PointerInputScope extends androidx.compose.ui.unit.Density {
     method public androidx.compose.ui.input.pointer.CustomEventDispatcher getCustomEventDispatcher();
     method public long getSize-YbymL2g();
+    method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     method public suspend <R> Object? handlePointerInput(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.HandlePointerInputScope,? super kotlin.coroutines.Continuation<? super R>,?> handler, kotlin.coroutines.Continuation<? super R> p);
     property public abstract androidx.compose.ui.input.pointer.CustomEventDispatcher customEventDispatcher;
     property public abstract long size;
+    property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
 
   public final class PointerInputTestUtilKt {
@@ -2060,6 +2067,7 @@ package androidx.compose.ui.node {
     method public boolean getShowLayoutBounds();
     method public androidx.compose.ui.text.input.TextInputService getTextInputService();
     method public androidx.compose.ui.platform.TextToolbar getTextToolbar();
+    method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     method public void measureAndLayout();
     method public void observeLayoutModelReads(androidx.compose.ui.node.LayoutNode node, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void observeMeasureModelReads(androidx.compose.ui.node.LayoutNode node, kotlin.jvm.functions.Function0<kotlin.Unit> block);
@@ -2087,6 +2095,7 @@ package androidx.compose.ui.node {
     property public abstract boolean showLayoutBounds;
     property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
     property public abstract androidx.compose.ui.platform.TextToolbar textToolbar;
+    property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
     field public static final androidx.compose.ui.node.Owner.Companion Companion;
   }
 
@@ -2161,6 +2170,7 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.input.TextInputService> getTextInputServiceAmbient();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar> getTextToolbarAmbient();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getUriHandlerAmbient();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getViewConfigurationAmbient();
   }
 
   public final class AndroidAmbientsKt {
@@ -2211,6 +2221,18 @@ package androidx.compose.ui.platform {
   public final class AndroidUriHandler implements androidx.compose.ui.platform.UriHandler {
     ctor public AndroidUriHandler(android.content.Context context);
     method public void openUri(String uri);
+  }
+
+  public final class AndroidViewConfiguration implements androidx.compose.ui.platform.ViewConfiguration {
+    ctor public AndroidViewConfiguration(android.view.ViewConfiguration viewConfiguration);
+    method public long getDoubleTapMinTime-ojFfpTE();
+    method public long getDoubleTapTimeout-ojFfpTE();
+    method public long getLongPressTimeout-ojFfpTE();
+    method public float getTouchSlop();
+    property public long doubleTapMinTime;
+    property public long doubleTapTimeout;
+    property public long longPressTimeout;
+    property public float touchSlop;
   }
 
   public interface ClipboardManager {
@@ -2316,6 +2338,17 @@ package androidx.compose.ui.platform {
     ctor public ValueElementSequence();
     method public java.util.Iterator<androidx.compose.ui.platform.ValueElement> iterator();
     method public operator void set(String name, Object? value);
+  }
+
+  public interface ViewConfiguration {
+    method public long getDoubleTapMinTime-ojFfpTE();
+    method public long getDoubleTapTimeout-ojFfpTE();
+    method public long getLongPressTimeout-ojFfpTE();
+    method public float getTouchSlop();
+    property public abstract long doubleTapMinTime;
+    property public abstract long doubleTapTimeout;
+    property public abstract long longPressTimeout;
+    property public abstract float touchSlop;
   }
 
   public final class WrapperKt {

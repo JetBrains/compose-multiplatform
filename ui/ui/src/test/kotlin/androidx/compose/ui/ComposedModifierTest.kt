@@ -206,7 +206,7 @@ class ComposedModifierTest {
 }
 
 @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
-private fun compose(
+fun compose(
     recomposer: Recomposer,
     block: @Composable () -> Unit
 ): Composer<Unit> {
@@ -225,7 +225,7 @@ private fun compose(
     }
 }
 
-private class TestFrameClock : MonotonicFrameClock {
+internal class TestFrameClock : MonotonicFrameClock {
 
     private val frameCh = Channel<Long>()
 

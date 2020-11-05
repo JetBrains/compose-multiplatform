@@ -102,6 +102,11 @@ val TextToolbarAmbient = staticAmbientOf<TextToolbar>()
  */
 val UriHandlerAmbient = staticAmbientOf<UriHandler>()
 
+/**
+ * The ambient that provides the ViewConfiguration.
+ */
+val ViewConfigurationAmbient = staticAmbientOf<ViewConfiguration>()
+
 @OptIn(ExperimentalFocus::class)
 @Composable
 internal fun ProvideCommonAmbients(
@@ -123,6 +128,7 @@ internal fun ProvideCommonAmbients(
         TextInputServiceAmbient provides owner.textInputService,
         TextToolbarAmbient provides owner.textToolbar,
         UriHandlerAmbient provides uriHandler,
+        ViewConfigurationAmbient provides owner.viewConfiguration,
         children = content
     )
 }

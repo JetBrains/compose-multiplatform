@@ -137,6 +137,8 @@ class DesktopOwner(
 
     override val autofill: Autofill? get() = null
 
+    override val viewConfiguration: ViewConfiguration = DesktopViewConfiguration(density)
+
     val keyboard: Keyboard?
         get() = container.keyboard
 
