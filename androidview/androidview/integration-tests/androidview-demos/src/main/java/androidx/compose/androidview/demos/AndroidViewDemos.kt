@@ -17,6 +17,7 @@
 package androidx.compose.androidview.demos
 
 import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
 val AndroidViewDemos = DemoCategory(
@@ -25,6 +26,7 @@ val AndroidViewDemos = DemoCategory(
         ComposeInAndroidDemos,
         AndroidInComposeDemos,
         ComplexTouchInterop,
-        ActivityDemo("WebComponent", WebComponentActivity::class)
+        ActivityDemo("WebComponent", WebComponentActivity::class),
+        ComposableDemo("TextField Interop") { EditTextInteropDemo() },
     )
 )
