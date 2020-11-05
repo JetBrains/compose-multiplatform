@@ -45,7 +45,6 @@ dependencies {
         implementation(ANDROIDX_TEST_RUNNER)
         implementation(ESPRESSO_CORE)
         implementation project(":compose:animation:animation")
-        implementation project(":compose:foundation:foundation-text")
         implementation project(":compose:foundation:foundation")
 
         testImplementation(TRUTH)
@@ -72,7 +71,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 api project(":compose:ui:ui-test")
                 implementation project(":compose:animation:animation")
-                implementation project(":compose:foundation:foundation-text")
                 implementation project(":compose:foundation:foundation")
 
                 implementation(KOTLIN_STDLIB_COMMON)
