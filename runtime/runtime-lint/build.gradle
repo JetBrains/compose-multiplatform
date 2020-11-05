@@ -1,0 +1,48 @@
+/*
+ * Copyright 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.LibraryGroups
+import androidx.build.LibraryType
+
+import static androidx.build.dependencies.DependenciesKt.*
+
+plugins {
+    id("AndroidXPlugin")
+    id("kotlin")
+}
+
+dependencies {
+    // compileOnly because we use lintChecks and it doesn't allow other types of deps
+    // this ugly hack exists because of b/63873667
+    if (rootProject.hasProperty("android.injected.invoked.from.ide")) {
+        compileOnly LINT_API_LATEST
+    } else {
+        compileOnly LINT_API_MIN
+    }
+    compileOnly KOTLIN_STDLIB
+
+    testImplementation KOTLIN_STDLIB
+    testImplementation LINT_CORE
+    testImplementation LINT_TESTS
+}
+
+androidx {
+    name = "Compose Runtime Lint Checks"
+    type = LibraryType.LINT
+    mavenGroup = LibraryGroups.Compose.RUNTIME
+    inceptionYear = "2020"
+    description = "Compose Runtime Lint Checks"
+}

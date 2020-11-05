@@ -98,7 +98,7 @@ fun ComposeInAndroidInComposeEtcTargetingDemo() {
                                             .fillMaxSize()
                                             .wrapContentSize(Alignment.Center)
                                     ) {
-                                        colorButton()
+                                        ColorButton()
                                     }
                                 }
                             }
@@ -111,7 +111,7 @@ fun ComposeInAndroidInComposeEtcTargetingDemo() {
 }
 
 @Composable
-fun colorButton() {
+private fun ColorButton() {
     val state = remember { mutableStateOf(false) }
     val color =
         if (state.value) {

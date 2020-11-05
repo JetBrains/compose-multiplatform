@@ -40,7 +40,7 @@ class TextInColumnTestCase(
     private val fontSize = mutableStateOf(20.sp)
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         MaterialTheme {
             Surface {
                 Column {

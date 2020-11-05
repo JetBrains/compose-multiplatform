@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 
 @Sampled
-@Composable
 fun simpleImmutableClass() {
     @Immutable
     data class Person(val name: String, val phoneNumber: String)

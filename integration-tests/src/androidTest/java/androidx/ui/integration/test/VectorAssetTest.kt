@@ -59,8 +59,8 @@ class VectorAssetTest {
 
         rule.setContent {
             Column {
-                xmlTestCase.emitContent()
-                programmaticTestCase.emitContent()
+                xmlTestCase.Content()
+                programmaticTestCase.Content()
             }
         }
 

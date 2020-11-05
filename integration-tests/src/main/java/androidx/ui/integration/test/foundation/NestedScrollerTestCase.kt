@@ -50,7 +50,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     private lateinit var scrollState: ScrollState
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         scrollState = rememberScrollState()
         MaterialTheme {
             Surface {

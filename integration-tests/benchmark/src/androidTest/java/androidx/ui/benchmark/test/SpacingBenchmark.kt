@@ -167,7 +167,7 @@ private sealed class PaddingTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val padding = remember { mutableStateOf(5.dp) }
         paddingState = padding
 

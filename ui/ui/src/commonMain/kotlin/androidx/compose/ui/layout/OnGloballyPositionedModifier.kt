@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
  * Note that it will be called **after** a composition when the coordinates are finalized.
  *
  * Usage example:
- * @sample androidx.compose.ui.samples.onGloballyPositionedSample
+ * @sample androidx.compose.ui.samples.OnGloballyPositioned
  */
 inline fun Modifier.onGloballyPositioned(
     crossinline onGloballyPositioned: (LayoutCoordinates) -> Unit
@@ -40,7 +40,7 @@ inline fun Modifier.onGloballyPositioned(
  * Note that it will be called after a composition when the coordinates are finalized.
  *
  * Usage example:
- * @sample androidx.compose.ui.samples.onGloballyPositionedSample
+ * @sample androidx.compose.ui.samples.OnGloballyPositioned
  */
 interface OnGloballyPositionedModifier : Modifier.Element {
     /**

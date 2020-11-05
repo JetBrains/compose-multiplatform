@@ -68,7 +68,7 @@ private sealed class TrailingLambdaTestCase : ComposeTestCase, ToggleableTestCas
     var numberState: MutableState<Int>? = null
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val number = remember { mutableStateOf(5) }
         numberState = number
 

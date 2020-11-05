@@ -297,7 +297,7 @@ class ListRemeasureTestCase(
     }
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         content()
     }
 

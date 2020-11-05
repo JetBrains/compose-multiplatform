@@ -70,6 +70,7 @@ import androidx.compose.ui.util.nativeClass
  * component. If [Color.Unspecified] is provided the color will be calculated by
  * [RippleTheme.defaultColor]. This color will then have [RippleTheme.rippleOpacity] applied
  */
+@Suppress("ComposableNaming")
 @Deprecated(
     "Replaced with rememberRippleIndication",
     ReplaceWith(

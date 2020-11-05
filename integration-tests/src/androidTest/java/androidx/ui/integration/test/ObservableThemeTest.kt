@@ -110,7 +110,7 @@ private sealed class ThemeTestCase : ComposeTestCase, ToggleableTestCase {
     private val secondaryTracker = CompositionTracker()
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val primary = remember { mutableStateOf(Color.Red) }
         primaryState = primary
 

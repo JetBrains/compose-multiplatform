@@ -52,16 +52,16 @@ fun AnimateContentSizeDemo() {
             .fillMaxWidth()
             .padding(50.dp)
     ) {
-        text()
+        Text()
         Spacer(Modifier.height(20.dp))
-        button()
+        Button()
         Spacer(Modifier.height(20.dp))
-        image()
+        Image()
     }
 }
 
 @Composable
-fun text() {
+private fun Text() {
     val shortText = "Click me"
     val longText = "Very long text\nthat spans across\nmultiple lines"
     var short by remember { mutableStateOf(true) }
@@ -88,7 +88,7 @@ fun text() {
 }
 
 @Composable
-fun button() {
+private fun Button() {
     val shortText = "Short"
     val longText = "Very loooooong text"
     var short by remember { mutableStateOf(true) }
@@ -108,7 +108,7 @@ fun button() {
 }
 
 @Composable
-fun image() {
+private fun Image() {
     var portraitMode by remember { mutableStateOf(true) }
     Box(
         Modifier.clickable { portraitMode = !portraitMode }

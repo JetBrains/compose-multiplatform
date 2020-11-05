@@ -24,6 +24,7 @@ import androidx.compose.runtime.emit
 import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.ContextAmbient
 
+@Suppress("ComposableNaming")
 @Composable
 @Deprecated(
     "emitView will be removed. Use AndroidView instead if possible. " +
@@ -43,6 +44,7 @@ fun <T : View> emitView(
     )
 }
 
+@Suppress("ComposableNaming")
 @Composable
 @Deprecated(
     "emitView will be removed. Use AndroidView instead if possible. " +

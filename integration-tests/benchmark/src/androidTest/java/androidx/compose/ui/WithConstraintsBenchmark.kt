@@ -71,7 +71,7 @@ private class NoWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     private lateinit var state: MutableState<Dp>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         Box(Modifier.preferredSize(300.dp), alignment = Alignment.Center) {
@@ -89,7 +89,7 @@ private class WithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     private lateinit var state: MutableState<Dp>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         WithConstraints {
@@ -109,7 +109,7 @@ private class ChangingConstraintsTestCase : ComposeTestCase, ToggleableTestCase 
     private lateinit var state: MutableState<Int>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(100) }
         this.state = size
         ChangingConstraintsLayout(state) {

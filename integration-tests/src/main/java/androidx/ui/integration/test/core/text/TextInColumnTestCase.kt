@@ -43,14 +43,14 @@ class TextInColumnTestCase(
     private val color = mutableStateOf(Color.Black)
 
     @Composable
-    override fun emitMeasuredContent() {
+    override fun MeasuredContent() {
         for (text in texts) {
             Text(text = text, color = color.value, fontSize = fontSize)
         }
     }
 
     @Composable
-    override fun emitContentWrappers(content: @Composable () -> Unit) {
+    override fun ContentWrappers(content: @Composable () -> Unit) {
         Column(
             modifier = Modifier.wrapContentSize(Alignment.Center).preferredWidth(width)
         ) {

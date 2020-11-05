@@ -63,7 +63,7 @@ class TextFieldToggleTextTestCase(
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun emitMeasuredContent() {
+    override fun MeasuredContent() {
         for (text in texts.value) {
             BasicTextField(
                 value = TextFieldValue(text),
@@ -76,7 +76,7 @@ class TextFieldToggleTextTestCase(
 
     @OptIn(InternalFoundationApi::class)
     @Composable
-    override fun emitContentWrappers(content: @Composable () -> Unit) {
+    override fun ContentWrappers(content: @Composable () -> Unit) {
         // Override IME input connection since we are not interested in it, and it might cause
         // flakiness
         @Suppress("DEPRECATION_ERROR")

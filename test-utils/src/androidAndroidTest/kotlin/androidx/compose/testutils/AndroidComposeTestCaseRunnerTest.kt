@@ -43,7 +43,7 @@ class AndroidComposeTestCaseRunnerTest {
     ): ComposeTestCaseSetup {
         return forGivenTestCase(object : ComposeTestCase {
             @Composable
-            override fun emitContent() {
+            override fun Content() {
                 composable()
             }
         })

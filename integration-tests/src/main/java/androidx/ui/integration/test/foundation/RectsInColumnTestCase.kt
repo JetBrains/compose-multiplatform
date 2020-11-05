@@ -45,7 +45,7 @@ class RectsInColumnTestCase(
     private val states = mutableListOf<MutableState<Color>>()
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         MaterialTheme {
             Surface {
                 Column {

@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 class ComponentWithModifiersTestCase : SimpleComponentImplenentationTestCase() {
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val innerSize = getInnerSize()
         Box(
             Modifier.preferredSize(48.dp)

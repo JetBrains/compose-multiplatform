@@ -139,7 +139,7 @@ fun Slider(
         val minPx = 0f
         position.setBounds(minPx, maxPx)
 
-        val flingConfig = SliderFlingConfig(position, position.anchorsPx)
+        val flingConfig = sliderFlingConfig(position, position.anchorsPx)
         val gestureEndAction = { velocity: Float ->
             if (flingConfig != null) {
                 position.holder.fling(velocity, flingConfig) { reason, endValue, _ ->
@@ -325,7 +325,7 @@ private fun calcFraction(a: Float, b: Float, pos: Float) =
     (if (b - a == 0f) 0f else (pos - a) / (b - a)).coerceIn(0f, 1f)
 
 @Composable
-private fun SliderFlingConfig(
+private fun sliderFlingConfig(
     value: SliderPosition,
     anchors: List<Float>
 ): FlingConfig? {
