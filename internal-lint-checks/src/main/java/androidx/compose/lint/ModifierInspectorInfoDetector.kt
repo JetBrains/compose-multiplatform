@@ -56,7 +56,6 @@ import org.jetbrains.uast.USimpleNameReferenceExpression
 import org.jetbrains.uast.USwitchClauseExpression
 import org.jetbrains.uast.USwitchClauseExpressionWithBody
 import org.jetbrains.uast.USwitchExpression
-import org.jetbrains.uast.UThisExpression
 import org.jetbrains.uast.UYieldExpression
 import org.jetbrains.uast.kotlin.KotlinStringTemplateUPolyadicExpression
 import org.jetbrains.uast.kotlin.KotlinStringULiteralExpression
@@ -430,13 +429,12 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
          *
          * The expression is known to be the return expression from a return statement.
          *
-         * Currently the only accepted expressions are of the form:
+         * Currently the only check the following expressions:
          * - Modifier.then(Modifier)
          * - Modifier.composed(InspectorInfoLambda,factory)
-         * - synonymCall()
-         * - everything else is an error
+         * - everything else is ignored
          */
-        private inner class ModifierBuilderVisitor : UnexpectedVisitor({ wrongLambda(it) }) {
+        private inner class ModifierBuilderVisitor : AbstractUastVisitor() {
             override fun visitQualifiedReferenceExpression(
                 node: UQualifiedReferenceExpression
             ): Boolean {
@@ -453,24 +451,15 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 if (isComposeFunctionCall(node)) {
                     val inspectorInfo = node.valueArguments
                         .find { isInspectorInfoLambdaType(it.getExpressionType()) }
-                        ?: return super.visitCallExpression(node)
-                    inspectorInfo.accept(debugInspectorVisitor)
+                    if (inspectorInfo == null) {
+                        wrongLambda(node)
+                    } else {
+                        inspectorInfo.accept(debugInspectorVisitor)
+                    }
                     return true
                 }
-                // For now accept all other calls. Assume that the method being called
-                // will add inspector information.
-                return true
+                return super.visitCallExpression(node)
             }
-
-            override fun visitSimpleNameReferenceExpression(
-                node: USimpleNameReferenceExpression
-            ): Boolean {
-                // Accept a simple reference to a different modifier definition
-                return false
-            }
-
-            // Accept a single this expression, which essentially makes the modifier a noop
-            override fun visitThisExpression(node: UThisExpression): Boolean = false
         }
 
         /**

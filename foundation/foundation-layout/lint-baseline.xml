@@ -8,30 +8,8 @@
         errorLine2="                         ^">
         <location
             file="src/androidMain/kotlin/androidx/compose/foundation/layout/ConstraintLayout.kt"
-            line="533"
+            line="534"
             column="26"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="fun Modifier.preferredWidth(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {"
-        errorLine2="                                                            ~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Intrinsic.kt"
-            line="47"
-            column="61"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="fun Modifier.preferredHeight(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {"
-        errorLine2="                                                             ~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/layout/Intrinsic.kt"
-            line="68"
-            column="62"/>
     </issue>
 
 </issues>

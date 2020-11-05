@@ -686,11 +686,11 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifier missing inspectorInfo"
-        errorLine1=") = if (elevation > 0.dp || clip) {"
-        errorLine2="    ^">
+        errorLine1="    composed {"
+        errorLine2="    ~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/ui/draw/DrawShadow.kt"
-            line="50"
+            line="51"
             column="5"/>
     </issue>
 
