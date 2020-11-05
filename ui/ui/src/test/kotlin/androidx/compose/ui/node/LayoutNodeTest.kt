@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
@@ -1794,10 +1795,12 @@ private class MockOwner(
     }
 
     override val measureIteration: Long = 0
+    override val viewConfiguration: ViewConfiguration
+        get() = TODO("Not yet implemented")
 }
 
 @OptIn(ExperimentalLayoutNodeApi::class)
-internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
+fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = modifier
         measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("not supported") {

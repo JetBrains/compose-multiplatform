@@ -226,6 +226,20 @@ package androidx.compose.foundation.gestures {
     method public static androidx.compose.ui.Modifier draggable(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.InteractionState? interactionState, optional boolean startDragImmediately, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean> canDrag, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStarted, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDragStopped, kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.Density,? super java.lang.Float,kotlin.Unit> onDrag);
   }
 
+  public final class ForEachGestureKt {
+    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? forEachGesture(androidx.compose.ui.input.pointer.PointerInputScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+  }
+
+  public final class GestureCancellationException extends java.util.concurrent.CancellationException {
+    ctor public GestureCancellationException(String? message);
+    ctor public GestureCancellationException();
+  }
+
+  public interface PressGestureScope extends androidx.compose.ui.unit.Density {
+    method public suspend Object? awaitRelease(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
+  }
+
   public final class ScrollableController {
     ctor public ScrollableController(internal kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta, internal androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, internal androidx.compose.foundation.InteractionState? interactionState);
     method public boolean isAnimationRunning();
@@ -237,6 +251,12 @@ package androidx.compose.foundation.gestures {
   public final class ScrollableKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.ScrollableController rememberScrollableController(optional androidx.compose.foundation.InteractionState? interactionState, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta);
     method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, androidx.compose.foundation.gestures.ScrollableController controller, optional boolean enabled, optional boolean reverseDirection, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean> canScroll, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onScrollStarted, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onScrollStopped);
+  }
+
+  public final class TapGestureDetectorKt {
+    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? tapGestureDetector(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleTap, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongPress, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.PressGestureScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onPress, kotlin.jvm.functions.Function0<kotlin.Unit> onTap, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? waitForFirstDown(androidx.compose.ui.input.pointer.HandlePointerInputScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? waitForUpOrCancel(androidx.compose.ui.input.pointer.HandlePointerInputScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
   }
 
   public final class ZoomableController {

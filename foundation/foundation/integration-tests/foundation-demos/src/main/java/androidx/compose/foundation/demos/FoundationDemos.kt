@@ -32,6 +32,9 @@ val FoundationDemos = DemoCategory(
         ComposableDemo("Draw Modifiers") { DrawModifiersDemo() },
         DemoCategory("Lazy lists", LazyListDemos),
         ComposableDemo("Priority InteractionState") { PriorityInteractionStateSample() },
-        ComposableDemo("Multiple-interaction InteractionState") { MultipleInteractionStateSample() }
+        ComposableDemo("Multiple-interaction InteractionState") {
+            MultipleInteractionStateSample()
+        },
+        DemoCategory("Suspending Gesture Detectors", CoroutineGestureDemos)
     )
 )

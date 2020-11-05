@@ -242,6 +242,8 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
+    override val viewConfiguration: ViewConfiguration =
+        AndroidViewConfiguration(android.view.ViewConfiguration.get(context))
 
     override val hasPendingMeasureOrLayout
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout

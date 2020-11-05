@@ -39,6 +39,7 @@ import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
@@ -3208,6 +3209,9 @@ private class MockOwner(
 
     override val measureIteration: Long
         get() = 0
+
+    override val viewConfiguration: ViewConfiguration
+        get() = TODO("Not yet implemented")
 
     override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
         block()

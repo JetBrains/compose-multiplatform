@@ -55,6 +55,7 @@ dependencies {
         testImplementation(ANDROIDX_TEST_RUNNER)
         testImplementation(JUNIT)
         testImplementation(TRUTH)
+        testImplementation(KOTLIN_COROUTINES_TEST)
 
         androidTestImplementation project(":compose:test-utils")
         androidTestImplementation project(':ui:ui-test')
@@ -107,6 +108,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(JUNIT)
+            }
+
+            commonTest.dependencies {
+                implementation(KOTLIN_COROUTINES_TEST)
             }
 
             androidAndroidTest.dependencies {
