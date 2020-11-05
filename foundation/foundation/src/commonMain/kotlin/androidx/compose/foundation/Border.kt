@@ -50,7 +50,7 @@ import androidx.compose.ui.util.nativeClass
  *
  * @sample androidx.compose.foundation.samples.BorderSample()
  *
- * @param border [Border] class that specifies border appearance, such as size and color
+ * @param border [BorderStroke] class that specifies border appearance, such as size and color
  * @param shape shape of the border
  */
 fun Modifier.border(border: BorderStroke, shape: Shape = RectangleShape) =
@@ -90,73 +90,6 @@ fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed(
         } else {
             properties["brush"] = brush
         }
-        properties["shape"] = shape
-    }
-)
-
-/**
- * Returns a [Modifier] that adds border with appearance specified with a [border] and a [shape]
- *
- * @sample androidx.compose.foundation.samples.BorderSample()
- *
- * @param border [Border] class that specifies border appearance, such as size and color
- * @param shape shape of the border
- */
-@Deprecated(
-    "Use Modifier.border instead",
-    replaceWith = ReplaceWith(
-        "this.border(BorderStroke(border.size, border.brush), shape)",
-        "androidx.ui.foundation.border"
-    )
-)
-@Suppress("DEPRECATION")
-fun Modifier.drawBorder(border: Border, shape: Shape = RectangleShape) =
-    drawBorder(size = border.size, brush = border.brush, shape = shape)
-
-/**
- * Returns a [Modifier] that adds border with appearance specified with [size], [color] and a
- * [shape]
- *
- * @sample androidx.compose.foundation.samples.BorderSampleWithDataClass()
- *
- * @param size width of the border. Use [Dp.Hairline] for a hairline border.
- * @param color color to paint the border with
- * @param shape shape of the border
- */
-@Deprecated(
-    "Use Modifier.border instead",
-    replaceWith = ReplaceWith(
-        "this.border(size, color, shape)",
-        "androidx.ui.foundation.border"
-    )
-)
-@Suppress("DEPRECATION")
-fun Modifier.drawBorder(size: Dp, color: Color, shape: Shape = RectangleShape) =
-    border(size, SolidColor(color), shape)
-
-/**
- * Returns a [Modifier] that adds border with appearance specified with [size], [brush] and a
- * [shape]
- *
- * @sample androidx.compose.foundation.samples.BorderSampleWithBrush()
- *
- * @param size width of the border. Use [Dp.Hairline] for a hairline border.
- * @param brush brush to paint the border with
- * @param shape shape of the border
- */
-@Deprecated(
-    "Use Modifier.border instead",
-    replaceWith = ReplaceWith(
-        "this.border(size, brush, shape)",
-        "androidx.ui.foundation.border"
-    )
-)
-fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed(
-    factory = { BorderModifier(remember { BorderModifierCache() }, shape, size, brush) },
-    inspectorInfo = debugInspectorInfo {
-        name = "drawBorder"
-        properties["size"] = size
-        properties["brush"] = brush
         properties["shape"] = shape
     }
 )

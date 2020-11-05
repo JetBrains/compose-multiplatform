@@ -143,10 +143,6 @@ interface RowScope {
         )
     )
 
-    @Stable
-    @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment.Vertical) = align(align)
-
     /**
      * Position the element vertically such that its [alignmentLine] aligns with sibling elements
      * also configured to [alignBy]. [alignBy] is a form of [align],

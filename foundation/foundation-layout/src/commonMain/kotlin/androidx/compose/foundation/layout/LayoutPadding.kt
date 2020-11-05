@@ -255,6 +255,3 @@ data class PaddingValues(
 ) {
     constructor(all: Dp) : this(all, all, all, all)
 }
-
-@Deprecated("InnerPadding was renamed to PaddingValues.", ReplaceWith("PaddingValues"))
-typealias InnerPadding = PaddingValues
