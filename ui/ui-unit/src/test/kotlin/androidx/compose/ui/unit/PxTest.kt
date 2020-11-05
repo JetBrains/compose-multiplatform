@@ -17,9 +17,7 @@
 package androidx.compose.ui.unit
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.lerp
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -96,35 +94,5 @@ class PxTest {
         val a = Offset(3f, 10f)
         val b = IntOffset(5, 8)
         assertEquals(Offset(8f, 18f), a + b)
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun boundsWidth() {
-        val bounds = PxBounds(10f, 5f, 25f, 15f)
-        assertEquals(15f, bounds.width)
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun boundsHeight() {
-        val bounds = PxBounds(10f, 5f, 25f, 15f)
-        assertEquals(10f, bounds.height)
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun toBounds() {
-        val size = Size(15f, 10f)
-        val bounds = PxBounds(0f, 0f, 15f, 10f)
-        assertEquals(bounds, size.toBounds())
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun toSize() {
-        val size = Size(15f, 10f)
-        val bounds = PxBounds(10f, 5f, 25f, 15f)
-        Assert.assertEquals(size, bounds.toSize())
     }
 }

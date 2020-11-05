@@ -95,17 +95,6 @@ interface Modifier {
      *
      * Returns a [Modifier] representing this modifier followed by [other] in sequence.
      */
-    @Deprecated(
-        "Use \"then\" instead.",
-        replaceWith = ReplaceWith("this.then(other)")
-    )
-    operator fun plus(other: Modifier): Modifier = then(other)
-
-    /**
-     * Concatenates this modifier with another.
-     *
-     * Returns a [Modifier] representing this modifier followed by [other] in sequence.
-     */
     infix fun then(other: Modifier): Modifier =
         if (other === Modifier) this else CombinedModifier(this, other)
 
@@ -142,29 +131,8 @@ interface Modifier {
         override fun <R> foldOut(initial: R, operation: (Element, R) -> R): R = initial
         override fun any(predicate: (Element) -> Boolean): Boolean = false
         override fun all(predicate: (Element) -> Boolean): Boolean = true
-        @Deprecated(
-            "Use \"then\" instead.",
-            replaceWith = ReplaceWith("this.then(other)")
-        )
-        override operator fun plus(other: Modifier): Modifier = then(other)
         override infix fun then(other: Modifier): Modifier = other
         override fun toString() = "Modifier"
-
-        /**
-         * An empty [Modifier] that contains no [elements][Element].
-         * Suitable for use as a sentinel or default parameter.
-         *
-         * @deprecated Use the [Modifier] companion object instead
-         */
-        @Deprecated(
-            "use the Modifier companion object instead",
-            replaceWith = ReplaceWith(
-                "Modifier",
-                "androidx.compose.ui.Modifier"
-            )
-        )
-        val None: Modifier
-            get() = this
     }
 }
 
