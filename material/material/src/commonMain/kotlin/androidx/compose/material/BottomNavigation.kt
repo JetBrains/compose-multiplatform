@@ -45,7 +45,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
@@ -247,9 +246,9 @@ private fun BottomNavigationItemBaselineLayout(
             ) { label() }
         }
     ) { measurables, constraints ->
-        val iconPlaceable = measurables.first { it.id == "icon" }.measure(constraints)
+        val iconPlaceable = measurables.first { it.layoutId == "icon" }.measure(constraints)
 
-        val labelPlaceable = measurables.first { it.id == "label" }.measure(
+        val labelPlaceable = measurables.first { it.layoutId == "label" }.measure(
             // Measure with loose constraints for height as we don't want the label to take up more
             // space than it needs
             constraints.copy(minHeight = 0)

@@ -126,8 +126,8 @@ class ParentDataModifierTest {
                 }
 
                 Layout({ header(); footer() }) { measurables, _ ->
-                    assertEquals(0, ((measurables[0]).parentData as? LayoutIdParentData)?.id)
-                    assertEquals(1, ((measurables[1]).parentData as? LayoutIdParentData)?.id)
+                    assertEquals(0, ((measurables[0]).parentData as? LayoutIdParentData)?.layoutId)
+                    assertEquals(1, ((measurables[1]).parentData as? LayoutIdParentData)?.layoutId)
                     layout(0, 0) { }
                 }
             }
