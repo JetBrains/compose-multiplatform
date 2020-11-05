@@ -1049,7 +1049,7 @@ package androidx.compose.ui.text.intl {
 package androidx.compose.ui.text.platform {
 
   public final class AndroidAccessibilitySpannableStringKt {
-    method @androidx.compose.ui.text.InternalTextApi public static android.text.SpannableString toAccessibilitySpannableString(androidx.compose.ui.text.AnnotatedString);
+    method @androidx.compose.ui.text.InternalTextApi public static android.text.SpannableString toAccessibilitySpannableString(androidx.compose.ui.text.AnnotatedString, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
   }
 
   public final class AndroidParagraphHelperKt {
