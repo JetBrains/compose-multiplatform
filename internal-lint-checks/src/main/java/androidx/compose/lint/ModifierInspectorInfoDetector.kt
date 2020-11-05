@@ -657,7 +657,7 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
     companion object {
         val ISSUE = Issue.create(
             id = "ModifierInspectorInfo",
-            briefDescription = "Modifiers should include inspectorInfo for the Layout Inspector",
+            briefDescription = "Modifier missing inspectorInfo",
             explanation =
                 """
                 The Layout Inspector will see an instance of the usually private modifier class \
