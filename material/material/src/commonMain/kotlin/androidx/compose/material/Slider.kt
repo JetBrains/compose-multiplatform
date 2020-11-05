@@ -31,8 +31,8 @@ import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeightIn
@@ -41,12 +41,11 @@ import androidx.compose.foundation.layout.preferredWidthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SliderConstants.InactiveTrackColorAlpha
 import androidx.compose.material.SliderConstants.TickColorAlpha
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
@@ -54,6 +53,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
@@ -259,9 +259,9 @@ private fun SliderImpl(
                 elevation = elevation,
                 modifier = Modifier.indication(
                     interactionState = interactionState,
-                    indication = RippleIndication(
-                        radius = ThumbRippleRadius,
-                        bounded = false
+                    indication = rememberRippleIndication(
+                        bounded = false,
+                        radius = ThumbRippleRadius
                     )
                 )
             ) {

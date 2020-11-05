@@ -772,7 +772,8 @@ package androidx.compose.material.ripple {
   }
 
   public final class RippleIndicationKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.material.ripple.RippleIndication RippleIndication-DudYJDg(optional boolean bounded, optional androidx.compose.ui.unit.Dp? radius, optional long color);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.material.ripple.RippleIndication RippleIndication-DudYJDg(optional boolean bounded, optional androidx.compose.ui.unit.Dp? radius, optional long color);
+    method @androidx.compose.runtime.Composable public static androidx.compose.material.ripple.RippleIndication rememberRippleIndication-DudYJDg(optional boolean bounded, optional androidx.compose.ui.unit.Dp? radius, optional long color);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public interface RippleOpacity {
