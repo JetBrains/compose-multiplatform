@@ -78,6 +78,7 @@ private const val ComposedMethodName = "composed"
 private const val RememberMethodName = "remember"
 private const val ComposedMethodPackage = "androidx.compose.ui"
 private const val RememberMethodPackage = "androidx.compose.runtime"
+private val DemosPackageRegEx = "androidx\\.compose\\..+\\.demos\\..+".toRegex()
 
 /**
  * Lint [Detector] to ensure that we are creating debug information for the layout inspector on
@@ -147,7 +148,8 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
             if (node.containingFile?.name == ModifierFile ||
                 node.containingFile?.name == ComposedModifierFile ||
                 firstParameterType(node) != ModifierClass ||
-                node.returnType?.canonicalText != ModifierClass
+                node.returnType?.canonicalText != ModifierClass ||
+                DemosPackageRegEx.matches(node.containingClass?.qualifiedName ?: "")
             ) {
                 // Ignore the method if it isn't a method on Modifier returning a Modifier,
                 // or if the method is defined in Modifier.kt or ComposedModifier.kt

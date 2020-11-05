@@ -639,6 +639,33 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     }
 
     @Test
+    fun acceptMissingInspectorInfoInSamples() {
+        lint().files(
+            modifierFile,
+            inspectableInfoFile,
+            kotlin(
+                """
+                package androidx.compose.ui.demos.whatever
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.preferredWidth2(width: Int) = this.then(SizeModifier2(width))
+
+                private data class SizeModifier2(
+                    val width: Int,
+                ): Modifier.Element
+
+                """
+            ).indented()
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
     fun missingInspectorInfo() {
         lint().files(
             modifierFile,

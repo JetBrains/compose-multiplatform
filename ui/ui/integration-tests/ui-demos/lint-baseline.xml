@@ -24,17 +24,6 @@
     </issue>
 
     <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="    composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/main/java/androidx/compose/ui/demos/gestures/PointerInputDuringSubCompDemo.kt"
-            line="92"
-            column="5"/>
-    </issue>
-
-    <issue
         id="SetTextI18n"
         message="String literal in `setText` can not be translated. Use Android resources instead."
         errorLine1="            text1.text = &quot;Text updated&quot;"
