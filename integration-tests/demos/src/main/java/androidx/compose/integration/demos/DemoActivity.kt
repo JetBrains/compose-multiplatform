@@ -117,7 +117,7 @@ private fun DemoTheme(
 ) {
     MaterialTheme(demoColors.colors) {
         val statusBarColor = with(MaterialTheme.colors) {
-            if (isLight) darkenedPrimary else surface.toArgb()
+            (if (isLight) primaryVariant else Color.Black).toArgb()
         }
         onCommit(statusBarColor) {
             window.statusBarColor = statusBarColor
@@ -125,15 +125,6 @@ private fun DemoTheme(
         children()
     }
 }
-
-private val Colors.darkenedPrimary: Int
-    get() = with(primary) {
-        copy(
-            red = red * 0.75f,
-            green = green * 0.75f,
-            blue = blue * 0.75f
-        )
-    }.toArgb()
 
 private class Navigator private constructor(
     private val backDispatcher: OnBackPressedDispatcher,
