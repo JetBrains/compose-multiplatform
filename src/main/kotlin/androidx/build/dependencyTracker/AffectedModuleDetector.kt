@@ -29,7 +29,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.Logger
-import java.io.File
 
 /**
  * The subsets we allow the projects to be partitioned into.
@@ -86,9 +85,10 @@ abstract class AffectedModuleDetector {
     companion object {
         private const val ROOT_PROP_NAME = "affectedModuleDetector"
         private const val LOG_FILE_NAME = "affected_module_detector_log.txt"
-        public const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
-        public const val DEPENDENT_PROJECTS_ARG = "androidx.dependentProjects"
-        public const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
+        const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
+        const val DEPENDENT_PROJECTS_ARG = "androidx.dependentProjects"
+        const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
+        const val BASE_COMMIT_ARG = "androidx.affectedModuleDetector.baseCommit"
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
             val enabled = rootProject.hasProperty(ENABLE_ARG)
@@ -110,6 +110,10 @@ abstract class AffectedModuleDetector {
                 }
             }
             logger.info("setup: enabled: $enabled")
+            val baseCommitOverride: String? = rootProject.findProperty(BASE_COMMIT_ARG) as String?
+            if (baseCommitOverride != null) {
+                logger.info("using base commit override $baseCommitOverride")
+            }
             gradle.addBuildListener(object : BuildAdapter() {
                 override fun projectsEvaluated(gradle: Gradle?) {
                     logger.lifecycle("projects evaluated")
@@ -117,7 +121,8 @@ abstract class AffectedModuleDetector {
                         rootProject = rootProject,
                         logger = logger,
                         ignoreUnknownProjects = false,
-                        projectSubset = subset
+                        projectSubset = subset,
+                        baseCommitOverride = baseCommitOverride
                     ).also {
                         if (!enabled) {
                             logger.info("swapping with accept all")
@@ -144,7 +149,7 @@ abstract class AffectedModuleDetector {
 
         private fun getInstance(project: Project): AffectedModuleDetector? {
             val extensions = project.rootProject.extensions
-            return extensions.getByName(ROOT_PROP_NAME) as? AffectedModuleDetector
+            return extensions.findByName(ROOT_PROP_NAME) as? AffectedModuleDetector
         }
 
         private fun getOrThrow(project: Project): AffectedModuleDetector {
@@ -168,6 +173,13 @@ abstract class AffectedModuleDetector {
             }
         }
 
+        /**
+         * Call this method to obtain the [@link ProjectSubset] that the project is
+         * determined to fall within for this particular build.
+         *
+         * Note that this will fail if accessed before all projects have been
+         * evaluated, since the AMD does not get registered until then.
+         */
         @Throws(GradleException::class)
         @JvmStatic
         internal fun getProjectSubset(project: Project): ProjectSubset {
@@ -209,7 +221,8 @@ class AffectedModuleDetectorImpl constructor(
     private val ignoreUnknownProjects: Boolean = false,
     private val projectSubset: ProjectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
-    private val injectedGitClient: GitClient? = null
+    private val injectedGitClient: GitClient? = null,
+    private val baseCommitOverride: String? = null
 ) : AffectedModuleDetector() {
     private val git by lazy {
         injectedGitClient ?: GitClientImpl(rootProject.projectDir, logger)
@@ -280,7 +293,7 @@ class AffectedModuleDetectorImpl constructor(
      * Returns allProjects if there are no previous merge CLs, which shouldn't happen.
      */
     private fun findChangedProjects(): Set<Project> {
-        val lastMergeSha = git.findPreviousMergeCL() ?: return allProjects
+        val lastMergeSha = baseCommitOverride ?: git.findPreviousMergeCL() ?: return allProjects
         val changedFiles = git.findChangedFilesSince(
             sha = lastMergeSha,
             includeUncommitted = true
@@ -348,12 +361,10 @@ class AffectedModuleDetectorImpl constructor(
         var buildAll = false
 
         // Should only trigger if there are no changedFiles
-        if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) buildAll =
-            true
-        unknownFiles.forEach {
-            if (affectsAllOfThisBuild(it) || affectsAllOfBothBuilds(it)) {
-                buildAll = true
-            }
+        if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) {
+            buildAll = true
+        } else if (unknownFiles.isNotEmpty()) {
+            buildAll = true
         }
         logger?.info(
             "unknownFiles: $unknownFiles, changedProjects: $changedProjects, buildAll: " +
@@ -388,23 +399,6 @@ class AffectedModuleDetectorImpl constructor(
             else -> dependentProjects
         }
     }
-
-    // TODO: simplify when resolving b/132901339 when there are no longer two builds
-    private val ROOT_FILES_OR_FOLDERS_AFFECTING_ALL_OF_BOTH_BUILDS = listOf(
-        "buildSrc", "busytown", "development", "frameworks", "gradlew" // paths from root
-    ) // there are no non-root objects affecting both builds that aren't projects (benchmark)
-    private val NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD = listOf(
-        "gradle/wrapper"
-    )
-    private fun affectsAllOfThisBuild(file: String): Boolean {
-        return !file.contains(File.separatorChar) ||
-            NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD.any { file.startsWith(it) }
-    } // objects in root are assumed to affect all projects in the build
-    private fun affectsAllOfBothBuilds(file: String): Boolean {
-        return ROOT_FILES_OR_FOLDERS_AFFECTING_ALL_OF_BOTH_BUILDS.any {
-            file.startsWith("../$it") || file.startsWith(it)
-        }
-    } // if you are in the ui build, the path is e.g. ../busytown
 
     private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<Project>> {
         return allSets.map { setPaths ->

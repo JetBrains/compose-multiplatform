@@ -110,6 +110,7 @@ object ResourceTasks {
             // Since apiLocation isn't a File, we have to manually set up the dependency.
             task.dependsOn(generateResourceApi)
             task.outputApiLocations.set(outputApiLocations)
+            task.forceUpdate.set(project.hasProperty("force"))
             checkResourceApiRelease?.let {
                 // If a developer (accidentally) makes a non-backwards compatible change to an
                 // API, the developer will want to be informed of it as soon as possible.

@@ -26,7 +26,7 @@ import org.gradle.api.tasks.options.Option
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
-        val dependency = dependencies.create("com.pinterest:ktlint:0.36.0")
+        val dependency = dependencies.create("com.pinterest:ktlint:0.39.0")
         it.dependencies.add(dependency)
     }
 }

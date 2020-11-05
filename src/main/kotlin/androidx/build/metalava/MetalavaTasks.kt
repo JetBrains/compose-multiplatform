@@ -22,6 +22,7 @@ import androidx.build.addToCheckTask
 import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
+import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.java.JavaCompileInputs
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.api.LibraryVariant
@@ -47,7 +48,7 @@ object MetalavaTasks {
         builtApiLocation: ApiLocation,
         outputApiLocations: List<ApiLocation>
     ) {
-        val metalavaConfiguration = project.getMetalavaConfiguration()
+        val metalavaClasspath = project.getMetalavaClasspath()
 
         // Policy: If the artifact belongs to an atomic (e.g. same-version) group, we don't enforce
         // binary compatibility for APIs annotated with @RestrictTo(LIBRARY_GROUP). This is
@@ -59,14 +60,15 @@ object MetalavaTasks {
             task.group = "API"
             task.description = "Generates API files from source"
             task.apiLocation.set(builtApiLocation)
-            task.configuration = metalavaConfiguration
+            task.metalavaClasspath.from(metalavaClasspath)
             task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
             task.baselines.set(baselinesApiLocation)
-            task.dependsOn(metalavaConfiguration)
+            task.targetsJavaConsumers = extension.targetsJavaConsumers
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
             applyInputs(javaCompileInputs, task)
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         // Policy: If the artifact has previously been released, e.g. has a beta or later API file
@@ -79,22 +81,22 @@ object MetalavaTasks {
                 "checkApiRelease",
                 CheckApiCompatibilityTask::class.java
             ) { task ->
-                task.configuration = metalavaConfiguration
+                task.metalavaClasspath.from(metalavaClasspath)
                 task.referenceApi.set(lastReleasedApiFile)
                 task.baselines.set(baselinesApiLocation)
-                task.dependsOn(metalavaConfiguration)
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
                 task.cacheEvenIfNoOutputs()
                 task.dependsOn(generateApi)
+                AffectedModuleDetector.configureTaskGuard(task)
             }
 
             ignoreApiChanges = project.tasks.register(
                 "ignoreApiChanges",
                 IgnoreApiChangesTask::class.java
             ) { task ->
-                task.configuration = metalavaConfiguration
+                task.metalavaClasspath.from(metalavaClasspath)
                 task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
                 task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
                 task.api.set(builtApiLocation)
@@ -108,8 +110,9 @@ object MetalavaTasks {
             "updateApiLintBaseline",
             UpdateApiLintBaselineTask::class.java
         ) { task ->
-            task.configuration = metalavaConfiguration
+            task.metalavaClasspath.from(metalavaClasspath)
             task.baselines.set(baselinesApiLocation)
+            task.targetsJavaConsumers.set(extension.targetsJavaConsumers)
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
@@ -134,6 +137,7 @@ object MetalavaTasks {
                 checkApiRelease?.let {
                     task.dependsOn(checkApiRelease)
                 }
+                AffectedModuleDetector.configureTaskGuard(task)
             }
 
         val regenerateOldApis = project.tasks.register(
@@ -159,6 +163,7 @@ object MetalavaTasks {
             task.description = "Updates the checked in API files to match source code API"
             task.inputApiLocation.set(generateApi.flatMap { it.apiLocation })
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
+            task.forceUpdate = project.hasProperty("force")
             task.dependsOn(generateApi)
 
             // If a developer (accidentally) makes a non-backwards compatible change to an API,
@@ -166,6 +171,7 @@ object MetalavaTasks {
             // developer updates an API, if backwards compatibility checks are enabled in the
             // library, then we want to check that the changes are backwards compatible.
             checkApiRelease?.let { task.dependsOn(it) }
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         // ignoreApiChanges depends on the output of this task for the "current" API surface.
@@ -208,7 +214,7 @@ object MetalavaTasks {
         ) { task ->
             task.apiStubsDirectory.set(apiStubsDirectory)
             task.docStubsDirectory.set(docsStubsDirectory)
-            task.configuration = project.getMetalavaConfiguration()
+            task.metalavaClasspath.from(project.getMetalavaClasspath())
             applyInputs(javaCompileInputs, task)
         }
 

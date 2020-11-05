@@ -38,6 +38,11 @@ const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
 const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
 
 /**
+ * Setting this property enables multiplatform builds of Compose
+ */
+const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
+
+/**
  * Setting this property enables calculating the fraction of code covered by tests
  */
 const val COVERAGE_ENABLED = "androidx.coverageEnabled"
@@ -87,6 +92,7 @@ const val EXPERIMENTAL_KOTLIN_BACKEND_ENABLED = "androidx.experimentalKotlinBack
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
+    COMPOSE_MPP_ENABLED,
     COVERAGE_ENABLED,
     DISPLAY_TEST_OUTPUT,
     ENABLE_DOCUMENTATION,
@@ -99,6 +105,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     AffectedModuleDetector.ENABLE_ARG,
     AffectedModuleDetector.DEPENDENT_PROJECTS_ARG,
     AffectedModuleDetector.CHANGED_PROJECTS_ARG,
+    AffectedModuleDetector.BASE_COMMIT_ARG,
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
     PLAYGROUND_DOKKA_BUILD_ID,
@@ -126,7 +133,10 @@ fun Project.validateAllAndroidxArgumentsAreRecognized() {
 }
 
 /**
- * Returns whether tests in the project should display output
+ * Returns whether tests in the project should display output.
+ * Build server scripts generally set displayTestOutput to false so that their failing test
+ * results aren't considered build failures, and instead pass their test failures on via build
+ * artifacts to be tracked and displayed on test dashboards in a different format
  */
 fun Project.isDisplayTestOutput(): Boolean =
     (project.findProperty(DISPLAY_TEST_OUTPUT) as? String)?.toBoolean() ?: true
@@ -144,8 +154,13 @@ fun Project.isWriteVersionedApiFilesEnabled(): Boolean =
 /**
  * Returns whether the project should generate documentation.
  */
-fun Project.isDocumentationEnabled(): Boolean =
-    (project.findProperty(ENABLE_DOCUMENTATION) as? String)?.toBoolean() ?: true
+fun Project.isDocumentationEnabled(): Boolean {
+    if (System.getenv().containsKey("ANDROIDX_PROJECTS")) {
+        val projects = System.getenv()["ANDROIDX_PROJECTS"] as String
+        if (projects != "ALL") return false
+    }
+    return (project.findProperty(ENABLE_DOCUMENTATION) as? String)?.toBoolean() ?: true
+}
 
 /**
  * Returns whether the project has coverage enabled.
@@ -162,13 +177,11 @@ fun Project.studioType() = StudioType.findType(
 
 enum class StudioType {
     ANDROIDX,
-    PLAYGROUND,
-    COMPOSE;
+    PLAYGROUND;
 
     companion object {
         fun findType(value: String?) = when (value) {
             "playground" -> PLAYGROUND
-            "compose" -> COMPOSE
             null, "androidx" -> ANDROIDX
             else -> error("Invalid project type $value")
         }

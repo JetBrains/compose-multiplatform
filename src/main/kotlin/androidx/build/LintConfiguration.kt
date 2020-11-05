@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.getByType
 import com.android.build.gradle.internal.dsl.LintOptions
 import org.gradle.api.Project
@@ -37,6 +38,9 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 
     // Create fake variant tasks since that is what is invoked by developers.
     val lintTask = tasks.named("lint")
+    lintTask.configure { task ->
+        AffectedModuleDetector.configureTaskGuard(task)
+    }
     tasks.register("lintDebug") {
         it.dependsOn(lintTask)
         it.enabled = false
@@ -53,10 +57,15 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 
 fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: AndroidXExtension) {
     configureLint(lintOptions, extension)
-    tasks.named("lint").configure({ task ->
+    tasks.named("lint").configure { task ->
         // We already run lintDebug, we don't need to run lint which lints the release variant
         task.enabled = false
-    })
+    }
+    afterEvaluate {
+        tasks.named("lintDebug").configure { task ->
+            AffectedModuleDetector.configureTaskGuard(task)
+        }
+    }
 }
 
 fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
@@ -93,13 +102,12 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             fatal("VisibleForTests")
 
-            // Workaround for integration branch using a newer AGP with a check that we don't want.
-            // This will be removed when we update to that AGP (b/160261355).
-            if (com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.startsWith("4.2.")) {
-                disable("KtxExtensionAvailable")
-            }
+            // Disable dependency checks that suggest to change them. We want libraries to be
+            // intentional with their dependency version bumps.
+            disable("KtxExtensionAvailable")
+            disable("GradleDependency")
 
-            if (extension.compilationTarget != CompilationTarget.HOST) {
+            if (extension.type.compilationTarget != CompilationTarget.HOST) {
                 fatal("Assert")
                 fatal("NewApi")
                 fatal("ObsoleteSdkInt")
@@ -118,7 +126,10 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
                 // Only override if not set explicitly.
                 // Some Kotlin projects may wish to disable this.
-                if (severityOverrides!!["SyntheticAccessor"] == null) {
+                if (
+                    severityOverrides!!["SyntheticAccessor"] == null &&
+                    extension.type != LibraryType.SAMPLES
+                ) {
                     fatal("SyntheticAccessor")
                 }
 

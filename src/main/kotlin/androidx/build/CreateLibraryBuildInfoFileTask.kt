@@ -19,15 +19,14 @@ package androidx.build
 import androidx.build.gitclient.Commit
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gitclient.GitCommitRange
-import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.jetpad.LibraryBuildInfoFile
+import com.google.gson.GsonBuilder
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.provider.Property
-import com.google.gson.GsonBuilder
 import java.io.File
 import java.util.ArrayList
 
@@ -124,10 +123,11 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
         libraryBuildInfoFile.checks = checks
         val publishedProjects = project.getProjectsMap()
-        val versionChecker = project.property("versionChecker") as GMavenVersionChecker
         project.configurations.filter {
             /* Ignore test configuration dependencies */
             !it.name.contains("test", ignoreCase = true) &&
+                /* Ignore annotation processors */
+                !it.name.contains("annotationProcessor", ignoreCase = true) &&
                 /* Ignore compile configuration dependencies */
                 !it.name.contains("compileClasspath", ignoreCase = true) &&
                 !it.name.contains("compileOnly", ignoreCase = true)
@@ -149,17 +149,6 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
                         androidXPublishedDependency.groupId = dep.group.toString()
                         androidXPublishedDependency.version = dep.version.toString()
                         androidXPublishedDependency.isTipOfTree = dep is ProjectDependency
-                        // Check GMaven to confirm that the pinned dependency is not an unreleased
-                        // version
-                        if (!androidXPublishedDependency.isTipOfTree &&
-                            !versionChecker.isReleased(
-                                    androidXPublishedDependency.groupId,
-                                    androidXPublishedDependency.artifactId,
-                                    androidXPublishedDependency.version
-                                )
-                        ) {
-                            androidXPublishedDependency.isTipOfTree = true
-                        }
                         addDependencyToListIfNotAlreadyAdded(
                             libraryDependencies,
                             androidXPublishedDependency

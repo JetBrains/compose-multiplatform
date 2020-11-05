@@ -25,8 +25,6 @@ import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.dependencyTracker.AffectedModuleDetector
-import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
-import androidx.build.dokka.Dokka.configureJavaProjectForDokka
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
@@ -36,6 +34,7 @@ import androidx.build.checkapi.LibraryApiTaskConfig
 import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.studio.StudioTask
 import com.android.build.api.artifact.ArtifactType
+import com.android.build.api.artifact.Artifacts
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.AppExtension
@@ -85,33 +84,15 @@ import java.util.concurrent.ConcurrentHashMap
 class AndroidXPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         if (project.isRoot) throw Exception("Root project should use AndroidXRootPlugin instead")
-        // This has to be first due to bad behavior by DiffAndDocs which is triggered on the root
-        // project. It calls evaluationDependsOn on each subproject. This eagerly causes evaluation
-        // *during* the root build.gradle evaluation. The subproject then applies this plugin (while
-        // we're still halfway through applying it on the root). The check licenses code runs on the
-        // subproject which then looks for the root project task to add itself as a dependency of.
-        // Without the root project having created the task prior to DiffAndDocs running this fails.
-        // TODO(alanv): do not use evaluationDependsOn in DiffAndDocs to break this cycle!
-        project.configureExternalDependencyLicenseCheck()
-
         val extension = project.extensions.create<AndroidXExtension>(EXTENSION_NAME, project)
-
-        // This has to be first due to bad behavior by DiffAndDocs. It fails if this configuration
-        // is called after DiffAndDocs.configureDiffAndDocs. b/129762955
-        project.configureMavenArtifactUpload(extension)
-
-        if (project.isCoverageEnabled()) {
-            project.configureJacoco()
-        }
-
         // Perform different actions based on which plugins have been applied to the project.
-        // Many of the actions overlap, ex. API tracking and documentation.
+        // Many of the actions overlap, ex. API tracking.
         project.plugins.all { plugin ->
             when (plugin) {
                 is JavaPlugin -> configureWithJavaPlugin(project, extension)
                 is LibraryPlugin -> configureWithLibraryPlugin(project, extension)
                 is AppPlugin -> configureWithAppPlugin(project, extension)
-                is KotlinBasePluginWrapper -> configureWithKotlinPlugin(project, plugin)
+                is KotlinBasePluginWrapper -> configureWithKotlinPlugin(project, extension, plugin)
             }
         }
 
@@ -119,13 +100,17 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Configure all Jar-packing tasks for hermetic builds.
         project.tasks.withType(Jar::class.java).configureEach { it.configureForHermeticBuild() }
-
         project.tasks.withType(Copy::class.java).configureEach { it.configureForHermeticBuild() }
 
         // copy host side test results to DIST
         project.tasks.withType(Test::class.java) { task -> configureTestTask(project, task) }
 
         project.configureTaskTimeouts()
+        project.configureMavenArtifactUpload(extension)
+        project.configureExternalDependencyLicenseCheck()
+        if (project.isCoverageEnabled()) {
+            project.configureJacoco()
+        }
     }
 
     /**
@@ -145,7 +130,7 @@ class AndroidXPlugin : Plugin<Project> {
         AffectedModuleDetector.configureTaskGuard(task)
 
         val xmlReportDestDir = project.getHostTestResultDirectory()
-        val archiveName = "${project.asFilenamePrefix()}_${task.name}.zip"
+        val archiveName = "${project.path.asFilenamePrefix()}_${task.name}.zip"
         if (project.isDisplayTestOutput()) {
             // Enable tracing to see results in command line
             task.testLogging.apply {
@@ -159,6 +144,13 @@ class AndroidXPlugin : Plugin<Project> {
                 exceptionFormat = TestExceptionFormat.FULL
             }
         } else {
+            task.testLogging.apply {
+                showExceptions = false
+                // Disable all output, including the names of the failing tests, by specifying
+                // that the minimum granularity we're interested in is this very high number
+                // (which is higher than the current maximum granularity that Gradle offers (3))
+                minGranularity = 1000
+            }
             val htmlReport = task.reports.html
 
             val zipHtmlTask = project.tasks.register(
@@ -214,6 +206,7 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun configureWithKotlinPlugin(
         project: Project,
+        extension: AndroidXExtension,
         plugin: KotlinBasePluginWrapper
     ) {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
@@ -221,6 +214,15 @@ class AndroidXPlugin : Plugin<Project> {
             project.configureCompilationWarnings(task)
             if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
                 task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
+            }
+        }
+        project.afterEvaluate {
+            if (extension.shouldEnforceKotlinStrictApiMode()) {
+                project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
+                    // Workaround for https://youtrack.jetbrains.com/issue/KT-37652
+                    if (task.name.endsWith("TestKotlin")) return@configureEach
+                    task.kotlinOptions.freeCompilerArgs += listOf("-Xexplicit-api=strict")
+                }
             }
         }
         if (plugin is KotlinMultiplatformPluginWrapper) {
@@ -259,13 +261,67 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
-        libraryExtension.onVariants.withBuildType("release") {
-            // Disable unit test for release build type
-            unitTest {
-                @Suppress("UnstableApiUsage")
-                enabled = false
-            }
+
+        try {
+            val libraryAndroidComponentsExtensionType =
+                Class.forName("com.android.build.api.extension.LibraryAndroidComponentsExtension")
+            val androidComponentsExtension =
+                project.extensions.getByType(libraryAndroidComponentsExtensionType)
+            val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
+            val selector = libraryAndroidComponentsExtensionType.getMethod("selector")
+                .invoke(androidComponentsExtension)
+            libraryAndroidComponentsExtensionType
+                .getMethod("beforeUnitTest", selectorType, Function1::class.java)
+                .invoke(
+                    androidComponentsExtension,
+                    selectorType.getMethod("withBuildType", String::class.java)
+                        .invoke(selector, "release"),
+                    { unitTest: Any ->
+                        unitTest.javaClass.getMethod("setEnabled", Boolean::class.java)
+                            .invoke(unitTest, false)
+                    }
+                )
+        } catch (cnfe: ClassNotFoundException) {
+            // old iteration of the new API.
+            val allVariants = libraryExtension.javaClass.getMethod("getOnVariants")
+                .invoke(libraryExtension)
+
+            allVariants.javaClass.getMethod(
+                "withBuildType",
+                String::class.java,
+                Function1::class.java
+            ).invoke(
+                allVariants,
+                "release",
+                { variant: Any ->
+                    variant.javaClass.getMethod(
+                        "unitTest",
+                        Function1::class.java
+                    ).invoke(
+                        variant,
+                        { unitTest: Any ->
+                            unitTest.javaClass.getMethod(
+                                "setEnabled",
+                                Boolean::class.java
+                            ).invoke(
+                                unitTest,
+                                false
+                            )
+                        }
+                    )
+                }
+            )
         }
+
+        // switch to this code once 4.2.0-beta1 can be used.
+
+        // project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
+        //   beforeUnitTest(selector().withBuildType("release")) {
+        //     // Disable unit test for release build type
+        //     @Suppress("UnstableApiUsage")
+        //     enabled = false
+        //   }
+        // }
         libraryExtension.packagingOptions {
             // TODO: Replace this with a per-variant packagingOption for androidTest specifically
             //  once b/69953968 is resolved.
@@ -307,9 +363,7 @@ class AndroidXPlugin : Plugin<Project> {
             project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
         }
 
-        val reportLibraryMetrics = project.tasks.register<ReportLibraryMetricsTask>(
-            REPORT_LIBRARY_METRICS_TASK, ReportLibraryMetricsTask::class.java
-        )
+        val reportLibraryMetrics = project.configureReportLibraryMetricsTask()
         project.addToBuildOnServer(reportLibraryMetrics)
         libraryExtension.defaultPublishVariant { libraryVariant ->
             reportLibraryMetrics.configure {
@@ -331,10 +385,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Standard lint, docs, resource API, and Metalava configuration for AndroidX projects.
         project.configureAndroidProjectForLint(libraryExtension.lintOptions, androidXExtension)
-        if (project.isDocumentationEnabled()) {
-            project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
-        }
-
         project.configureProjectForApiTasks(
             LibraryApiTaskConfig(libraryExtension),
             androidXExtension
@@ -372,10 +422,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
-        if (project.isDocumentationEnabled()) {
-            project.configureJavaProjectForDokka(extension)
-        }
-
         project.configureProjectForApiTasks(
             JavaApiTaskConfig,
             extension
@@ -440,9 +486,10 @@ class AndroidXPlugin : Plugin<Project> {
                 }
             }
 
-            if (androidXExtension.compilationTarget != CompilationTarget.DEVICE) {
+            if (androidXExtension.type.compilationTarget != CompilationTarget.DEVICE) {
                 throw IllegalStateException(
-                    "Android libraries must use a compilation target of DEVICE"
+                    "${androidXExtension.type.name} libraries cannot apply the android plugin, as" +
+                        " they do not target android devices"
                 )
             }
         }
@@ -475,7 +522,40 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         val commonExtension = project.extensions.getByType(CommonExtension::class.java)
-        if (hasAndroidTestSourceCode(project, this)) {
+        try {
+            val androidComponentsExtensionType =
+                Class.forName("com.android.build.api.extension.AndroidComponentsExtension")
+            val androidComponentsExtension =
+                project.extensions.getByType(androidComponentsExtensionType)
+            val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
+            val selector = androidComponentsExtensionType.getMethod("selector")
+                .invoke(androidComponentsExtension)
+            androidComponentsExtension.javaClass.getMethod(
+                "androidTest",
+                selectorType,
+                Function1::class.java
+            ).invoke(
+                androidComponentsExtension,
+                selector.javaClass.getMethod("all").invoke(selector),
+                { androidTest: Any ->
+                    createTestConfigurationGenerationTask(
+                        project,
+                        androidTest.javaClass.getMethod(
+                            "getName"
+                        ).invoke(
+                            androidTest
+                        ) as String,
+                        androidTest.javaClass.getMethod(
+                            "getArtifacts"
+                        ).invoke(
+                            androidTest
+                        ) as Artifacts,
+                        defaultConfig.minSdk!!,
+                        defaultConfig.testInstrumentationRunner!!
+                    )
+                }
+            )
+        } catch (cnfe: ClassNotFoundException) {
             commonExtension.configureTestConfigGeneration(project)
         }
 
@@ -484,50 +564,105 @@ class AndroidXPlugin : Plugin<Project> {
             buildTestApksTask.configure {
                 it.dependsOn(variant.assembleProvider)
             }
-            variant.configureApkCopy(project, this, true)
+            variant.configureApkCopy(project, true)
         }
     }
 
     private fun CommonExtension<*, *, *, *, *, *, *, *>
     .configureTestConfigGeneration(project: Project) {
-        onVariants {
-            val variant = this
-            androidTestProperties {
-                val generateTestConfigurationTask = project.tasks.register(
-                    "${project.name}${GENERATE_TEST_CONFIGURATION_TASK}${variant.name}",
-                    GenerateTestConfigurationTask::class.java
-                ) {
-                    it.testFolder.set(artifacts.get(ArtifactType.APK))
-                    it.testLoader.set(artifacts.getBuiltArtifactsLoader())
-                    it.outputXml.fileValue(
-                        File(
-                            project.getTestConfigDirectory(),
-                            "${project.asFilenamePrefix()}${variant.name}AndroidTest.xml"
-                        )
+        // old iteration of the new API.
+        javaClass.getMethod("onVariants", Function1::class.java)
+            .invoke(
+                this,
+                { variant: Any ->
+                    variant.javaClass.getMethod(
+                        "androidTestProperties",
+                        Function1::class.java
+                    ).invoke(
+                        variant,
+                        { androidTest: Any ->
+                            createTestConfigurationGenerationTask(
+                                project,
+                                androidTest.javaClass.getMethod(
+                                    "getName"
+                                ).invoke(androidTest) as String,
+                                androidTest.javaClass.getMethod(
+                                    "getArtifacts"
+                                ).invoke(androidTest) as Artifacts,
+                                defaultConfig.minSdk!!,
+                                defaultConfig.testInstrumentationRunner!!
+                            )
+                        }
                     )
-                }
-                project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
-                    .dependsOn(generateTestConfigurationTask)
+                } as Function1<Any, Any>
+            )
+    }
+
+    private fun createTestConfigurationGenerationTask(
+        project: Project,
+        variantName: String,
+        artifacts: Artifacts,
+        minSdk: Int,
+        testRunner: String
+    ) {
+        val generateTestConfigurationTask = project.tasks.register(
+            "${GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+            GenerateTestConfigurationTask::class.java
+        ) {
+            it.testFolder.set(artifacts.get(ArtifactType.APK))
+            it.testLoader.set(artifacts.getBuiltArtifactsLoader())
+            it.outputXml.fileValue(
+                File(
+                    project.getTestConfigDirectory(),
+                    "${project.path.asFilenamePrefix()}$variantName.xml"
+                )
+            )
+            it.minSdk.set(minSdk)
+            it.hasBenchmarkPlugin.set(project.hasBenchmarkPlugin())
+            it.testRunner.set(testRunner)
+            it.projectPath.set(project.path)
+            AffectedModuleDetector.configureTaskGuard(it)
+        }
+        // Disable xml generation for projects that have no test sources
+        project.afterEvaluate {
+            generateTestConfigurationTask.configure {
+                it.enabled = hasAndroidTestSourceCode(project)
             }
         }
+        project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+            .dependsOn(generateTestConfigurationTask)
     }
 
     private fun ApplicationExtension<*, *, *, *, *>
     .addAppApkToTestConfigGeneration(project: Project) {
-        onVariantProperties.withBuildType("debug") {
-            project.tasks.withType(GenerateTestConfigurationTask::class.java) {
-                it.appFolder.set(artifacts.get(ArtifactType.APK))
-                it.appLoader.set(artifacts.getBuiltArtifactsLoader())
-            }
-        }
+        val allVariants = javaClass.getMethod("getOnVariantProperties")
+            .invoke(this)
+
+        allVariants.javaClass.getMethod("withBuildType", String::class.java, Function1::class.java)
+            .invoke(
+                allVariants,
+                "debug",
+                { debugVariant: Any ->
+                    val artifacts = debugVariant.javaClass.getMethod("getArtifacts")
+                        .invoke(debugVariant) as Artifacts
+                    project.tasks.withType(GenerateTestConfigurationTask::class.java) {
+                        it.appFolder.set(artifacts.get(ArtifactType.APK))
+                        it.appLoader.set(artifacts.getBuiltArtifactsLoader())
+                    }
+                }
+            )
     }
 
-    private fun hasAndroidTestSourceCode(project: Project, extension: TestedExtension): Boolean {
+    /**
+     * Expected to be called in afterEvaluate when all extensions are available
+     */
+    private fun hasAndroidTestSourceCode(project: Project): Boolean {
         // check Java androidTest source set
-        extension.sourceSets.findByName("androidTest")?.let { sourceSet ->
-            // using getSourceFiles() instead of sourceFiles due to b/150800094
-            if (!sourceSet.java.getSourceFiles().isEmpty) return true
-        }
+        project.extensions.findByType(TestedExtension::class.java)?.sourceSets
+            ?.findByName("androidTest")?.let { sourceSet ->
+                // using getSourceFiles() instead of sourceFiles due to b/150800094
+                if (!sourceSet.java.getSourceFiles().isEmpty) return true
+            }
 
         // check kotlin-android androidTest source set
         project.extensions.findByType(KotlinAndroidProjectExtension::class.java)
@@ -547,20 +682,25 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun ApkVariant.configureApkCopy(
         project: Project,
-        extension: TestedExtension,
         testApk: Boolean
     ) {
         packageApplicationProvider.get().let { packageTask ->
             AffectedModuleDetector.configureTaskGuard(packageTask)
             // Skip copying AndroidTest apks if they have no source code (no tests to run).
-            if (testApk && !hasAndroidTestSourceCode(project, extension)) {
+            if (testApk && !hasAndroidTestSourceCode(project)) {
                 return
             }
 
             project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK)
                 .configure { task ->
                     task as Zip
-                    task.from(packageTask.outputDirectory)
+                    task.from(packageTask.outputDirectory) {
+                        it.include("*.apk")
+                        it.duplicatesStrategy = DuplicatesStrategy.FAIL
+                        it.rename { fileName ->
+                            fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
+                        }
+                    }
                     task.dependsOn(packageTask)
                 }
 
@@ -570,27 +710,10 @@ class AndroidXPlugin : Plugin<Project> {
                     it.include("*.apk")
                     it.into(File(project.getDistributionDirectory(), "apks"))
                     it.rename { fileName ->
-                        renameApkForTesting(fileName, project)
+                        fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
-     * to determine what gets run by our test runner
-     */
-    private fun renameApkForTesting(fileName: String, project: Project): String {
-        return if (fileName.contains("media-test") || fileName.contains("media2-test")) {
-            // Exclude media-test-* and media2-test-* modules from
-            // existing support library presubmit tests.
-            fileName.replace("-debug-androidTest", "")
-        } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
-            val name = fileName.replace("-androidTest", "-androidBenchmark")
-            "${project.asFilenamePrefix()}_$name"
-        } else {
-            "${project.asFilenamePrefix()}_$fileName"
         }
     }
 
@@ -654,8 +777,38 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        val applicationExtension = project.extensions.getByType(ApplicationExtension::class.java)
-        applicationExtension.addAppApkToTestConfigGeneration(project)
+        try {
+            val androidComponentsExtensionType = Class.forName(
+                "com.android.build.api.extension.ApplicationAndroidComponentsExtension"
+            )
+            val androidComponentsExtension =
+                project.extensions.getByType(androidComponentsExtensionType)
+            val selectorType = Class.forName(
+                "com.android.build.api.extension.VariantSelector"
+            )
+            val selector = androidComponentsExtensionType.getMethod("selector")
+                .invoke(androidComponentsExtension)
+            androidComponentsExtensionType
+                .getMethod("onVariants", selectorType, Function1::class.java)
+                .invoke(
+                    androidComponentsExtension,
+                    selectorType.getMethod("withBuildType", String::class.java)
+                        .invoke(selector, "debug"),
+                    { debugVariant: Any ->
+                        val artifacts = debugVariant.javaClass.getMethod("getArtifacts")
+                            .invoke(debugVariant) as Artifacts
+                        project.tasks.withType(GenerateTestConfigurationTask::class.java) {
+                            it.appFolder.set(artifacts.get(ArtifactType.APK))
+                            it.appLoader.set(artifacts.getBuiltArtifactsLoader())
+                        }
+                    }
+                )
+        } catch (cnfe: ClassNotFoundException) {
+            val applicationExtension = project.extensions.getByType(
+                ApplicationExtension::class.java
+            )
+            applicationExtension.addAppApkToTestConfigGeneration(project)
+        }
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
@@ -665,27 +818,27 @@ class AndroidXPlugin : Plugin<Project> {
                     it.dependsOn(variant.assembleProvider)
                 }
             }
-            variant.configureApkCopy(project, this, false)
+            variant.configureApkCopy(project, false)
         }
     }
 
-    private fun Project.createVerifyDependencyVersionsTask():
-        TaskProvider<VerifyDependencyVersionsTask>? {
-            /**
-             * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
-             * hypothetical build which is only intended to check for forward compatibility.
-             */
-            if (hasProperty(USE_MAX_DEP_VERSIONS)) {
-                return null
-            }
-
-            val taskProvider = tasks.register(
-                "verifyDependencyVersions",
-                VerifyDependencyVersionsTask::class.java
-            )
-            addToBuildOnServer(taskProvider)
-            return taskProvider
+    private fun Project.createVerifyDependencyVersionsTask(
+    ): TaskProvider<VerifyDependencyVersionsTask>? {
+        /**
+         * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
+         * hypothetical build which is only intended to check for forward compatibility.
+         */
+        if (hasProperty(USE_MAX_DEP_VERSIONS)) {
+            return null
         }
+
+        val taskProvider = tasks.register(
+            "verifyDependencyVersions",
+            VerifyDependencyVersionsTask::class.java
+        )
+        addToBuildOnServer(taskProvider)
+        return taskProvider
+    }
 
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
@@ -741,7 +894,7 @@ class AndroidXPlugin : Plugin<Project> {
 
                 it.xml.destination = File(
                     getHostTestCoverageDirectory(),
-                    "${project.asFilenamePrefix()}.xml"
+                    "${project.path.asFilenamePrefix()}.xml"
                 )
             }
         }
@@ -797,6 +950,7 @@ private fun Project.addToProjectMap(extension: AndroidXExtension) {
             val group = extension.mavenGroup?.group
             if (group != null) {
                 val module = "$group:$name"
+
                 @Suppress("UNCHECKED_CAST")
                 val projectModules = getProjectsMap()
                 projectModules[module] = path
@@ -857,11 +1011,32 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
 }
 
 /**
+ * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
+ * to determine what gets run by our test runner
+ */
+fun String.renameApkForTesting(projectPath: String, hasBenchmarkPlugin: Boolean): String {
+    return if (this.contains("media-test") || this.contains("media2-test")) {
+        // Exclude media-test-* and media2-test-* modules from
+        // existing support library presubmit tests.
+        this.replace("-debug-androidTest", "")
+    } else if (hasBenchmarkPlugin) {
+        val name = this.replace("-androidTest", "-androidBenchmark")
+        "${projectPath.asFilenamePrefix()}_$name"
+    } else {
+        "${projectPath.asFilenamePrefix()}_$this"
+    }
+}
+
+fun Project.hasBenchmarkPlugin(): Boolean {
+    return this.plugins.hasPlugin(BenchmarkPlugin::class.java)
+}
+
+/**
  * Returns a string that is a valid filename and loosely based on the project name
  * The value returned for each project will be distinct
  */
-fun Project.asFilenamePrefix(): String {
-    return project.path.substring(1).replace(':', '-')
+fun String.asFilenamePrefix(): String {
+    return this.substring(1).replace(':', '-')
 }
 
 /**

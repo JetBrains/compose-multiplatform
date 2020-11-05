@@ -43,6 +43,9 @@ abstract class UpdateApiTask : DefaultTask() {
     @get:Internal // outputs are declared in getTaskOutputs()
     abstract val outputApiLocations: ListProperty<ApiLocation>
 
+    @get:Input
+    var forceUpdate: Boolean = false
+
     @InputFiles
     fun getTaskInputs(): List<File>? {
         val inputApi = inputApiLocation.get()
@@ -73,7 +76,7 @@ abstract class UpdateApiTask : DefaultTask() {
             val version = outputApi.version()
             if (version != null && version.isFinalApi() &&
                 outputApi.publicApiFile.exists() &&
-                !project.hasProperty("force")
+                !forceUpdate
             ) {
                 permitOverwriting = false
             }
@@ -84,13 +87,13 @@ abstract class UpdateApiTask : DefaultTask() {
                 source = inputApi.publicApiFile,
                 dest = outputApi.publicApiFile,
                 permitOverwriting = permitOverwriting,
-                logger = project.logger
+                logger = logger
             )
             copy(
                 source = inputApi.removedApiFile,
                 dest = outputApi.removedApiFile,
                 permitOverwriting = permitOverwriting,
-                logger = project.logger
+                logger = logger
             )
             copy(
                 source = inputApi.experimentalApiFile,
@@ -98,13 +101,13 @@ abstract class UpdateApiTask : DefaultTask() {
                 // Experimental APIs are never locked down,
                 // so it's always okay to overwrite them.
                 permitOverwriting = true,
-                logger = project.logger
+                logger = logger
             )
             copy(
                 source = inputApi.restrictedApiFile,
                 dest = outputApi.restrictedApiFile,
                 permitOverwriting = permitOverwriting,
-                logger = project.logger
+                logger = logger
             )
         }
     }

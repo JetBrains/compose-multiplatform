@@ -41,6 +41,9 @@ abstract class GenerateApiTask @Inject constructor(
     abstract val baselines: Property<ApiBaselinesLocation>
 
     @get:Input
+    var targetsJavaConsumers: Boolean = true
+
+    @get:Input
     var generateRestrictToLibraryGroupAPIs = true
 
     @Optional
@@ -71,10 +74,11 @@ abstract class GenerateApiTask @Inject constructor(
             dependencyClasspath,
             project
         )
-        project.generateApi(
+        generateApi(
+            metalavaClasspath,
             inputs,
             apiLocation.get(),
-            ApiLintMode.CheckBaseline(baselines.get().apiLintFile),
+            ApiLintMode.CheckBaseline(baselines.get().apiLintFile, targetsJavaConsumers),
             generateRestrictToLibraryGroupAPIs,
             workerExecutor,
             manifestPath.orNull?.asFile?.absolutePath

@@ -113,6 +113,7 @@ fun Project.configureExternalDependencyLicenseCheck() {
         CheckExternalDependencyLicensesTask::class.java
     )
     configurations.create(CheckExternalDependencyLicensesTask.CONFIGURATION_NAME) {
+        it.isCanBeConsumed = false
         it.attributes {
             it.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
         }

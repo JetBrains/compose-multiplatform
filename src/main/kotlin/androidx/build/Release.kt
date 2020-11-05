@@ -156,6 +156,13 @@ object Release {
             )
             return
         }
+        if (extension.publish == Publish.UNSET) {
+            project.logger.info(
+                "project ${project.name} isn't part of release, because" +
+                    " it does not set the \"publish\" property or the \"type\" property"
+            )
+            return
+        }
         if (extension.publish == Publish.SNAPSHOT_ONLY && !isSnapshotBuild()) {
             project.logger.info(
                 "project ${project.name} isn't part of release, because its" +
@@ -174,15 +181,10 @@ object Release {
         }
         val version = project.version
 
-        var zipTasks: MutableList<TaskProvider<GMavenZipTask>> = mutableListOf()
-        if (!extension.mavenGroup!!.requireSameVersion) {
-            zipTasks.add(getProjectZipTask(project))
-        }
-        zipTasks.addAll(
-            listOf(
-                getGroupReleaseZipTask(project, mavenGroup),
-                getGlobalFullZipTask(project)
-            )
+        var zipTasks = listOf(
+            getProjectZipTask(project),
+            getGroupReleaseZipTask(project, mavenGroup),
+            getGlobalFullZipTask(project)
         )
         val artifact = Artifact(
             mavenGroup = mavenGroup,
