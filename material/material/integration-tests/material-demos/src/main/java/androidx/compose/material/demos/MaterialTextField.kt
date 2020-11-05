@@ -16,10 +16,8 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,10 +30,12 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
-import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.RadioButton
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -218,7 +218,7 @@ private fun TextFieldWithMessage(
     val typography = MaterialTheme.typography.caption
     val color = when (helperMessageOption) {
         Option.Helper -> {
-            AmbientEmphasisLevels.current.medium.applyEmphasis(MaterialTheme.colors.onSurface)
+            MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
         }
         Option.Error -> MaterialTheme.colors.error
         else -> Color.Unspecified
@@ -228,7 +228,8 @@ private fun TextFieldWithMessage(
         Box(modifier = Modifier.weight(1f, fill = false)) { textField() }
         Text(
             text = "Helper message",
-            style = typography.copy(color = color),
+            color = color,
+            style = typography,
             modifier = Modifier.padding(start = 16.dp)
         )
     }

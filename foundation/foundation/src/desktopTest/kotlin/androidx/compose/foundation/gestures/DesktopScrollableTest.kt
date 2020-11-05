@@ -18,8 +18,8 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.animation.defaultFlingConfig
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,9 +30,8 @@ import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.TestComposeWindow
+import androidx.compose.ui.test.TestComposeWindow
 import com.google.common.truth.Truth.assertThat
-import androidx.ui.test.TestComposeWindow
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

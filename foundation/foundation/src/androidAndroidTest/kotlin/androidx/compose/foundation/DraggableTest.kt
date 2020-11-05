@@ -27,33 +27,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.moveBy
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
-import androidx.ui.test.center
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.down
-import androidx.ui.test.moveBy
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
-import androidx.ui.test.swipe
-import androidx.ui.test.swipeWithVelocity
-import androidx.ui.test.up
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class DraggableTest {
 
     @get:Rule
     val rule = createComposeRule()
 
     private val draggableBoxTag = "dragTag"
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun draggable_horizontalDrag() {
@@ -383,6 +397,26 @@ class DraggableTest {
 
         rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+    }
+
+    @Test
+    fun testInspectableValue() {
+        rule.setContent {
+            val modifier = Modifier.draggable(Orientation.Horizontal) {} as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("draggable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "orientation",
+                "enabled",
+                "reverseDirection",
+                "interactionState",
+                "startDragImmediately",
+                "canDrag",
+                "onDragStarted",
+                "onDragStopped",
+                "onDrag",
+            )
         }
     }
 

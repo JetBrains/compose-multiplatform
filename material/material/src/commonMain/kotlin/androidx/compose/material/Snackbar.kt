@@ -17,22 +17,21 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.relativePaddingFrom
-import androidx.compose.foundation.text.FirstBaseline
-import androidx.compose.foundation.text.LastBaseline
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.Dp
@@ -93,7 +92,7 @@ fun Snackbar(
         color = backgroundColor,
         contentColor = contentColor
     ) {
-        ProvideEmphasis(AmbientEmphasisLevels.current.high) {
+        Providers(AmbientContentAlpha provides ContentAlpha.high) {
             val textStyle = MaterialTheme.typography.body2
             ProvideTextStyle(value = textStyle) {
                 when {
@@ -158,7 +157,7 @@ fun Snackbar(
     val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
         {
             TextButton(
-                contentColor = actionColor,
+                colors = ButtonConstants.defaultTextButtonColors(contentColor = actionColor),
                 onClick = { snackbarData.performAction() },
                 content = { Text(actionLabel) }
             )
@@ -275,9 +274,7 @@ private fun NewLineButtonSnackbar(
             )
     ) {
         Box(
-            Modifier
-                .relativePaddingFrom(LastBaseline, after = LongButtonVerticalOffset)
-                .relativePaddingFrom(FirstBaseline, before = HeightToFirstLine)
+            Modifier.paddingFromBaseline(HeightToFirstLine, LongButtonVerticalOffset)
                 .padding(end = HorizontalSpacingButtonSide)
         ) { text() }
         Box(Modifier.align(Alignment.End)) { action() }

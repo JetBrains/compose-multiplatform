@@ -18,9 +18,9 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.DrawCacheModifier
 import androidx.compose.ui.DrawModifier
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.toSize
 
 @OptIn(ExperimentalLayoutNodeApi::class)
@@ -46,7 +46,7 @@ internal class ModifiedDrawNode(
         invalidateCache = false
     }
 
-    override var measureResult: MeasureScope.MeasureResult
+    override var measureResult: MeasureResult
         get() = super.measureResult
         set(value) {
             if (super.measuredSize.width != value.width ||
@@ -86,10 +86,12 @@ internal class ModifiedDrawNode(
         // invalidates the current layer.
         private val onCommitAffectingModifiedDrawNode: (ModifiedDrawNode) -> Unit =
             { modifiedDrawNode ->
-                // Note this intentionally does not invalidate the layer as Owner implementations
-                // already observe and invalidate the layer on state changes. Instead just
-                // mark the cache dirty so that it will be re-created on the next draw
-                modifiedDrawNode.invalidateCache = true
+                if (modifiedDrawNode.isValid) {
+                    // Note this intentionally does not invalidate the layer as Owner implementations
+                    // already observe and invalidate the layer on state changes. Instead just
+                    // mark the cache dirty so that it will be re-created on the next draw
+                    modifiedDrawNode.invalidateCache = true
+                }
             }
     }
 

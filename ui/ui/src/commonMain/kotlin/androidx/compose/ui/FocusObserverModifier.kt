@@ -39,6 +39,6 @@ internal class FocusObserverModifierImpl(
  * Add this modifier to a component to observe focus state changes.
  */
 @ExperimentalFocus
-fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier = composed {
-    FocusObserverModifierImpl(onFocusChange)
+fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier {
+    return this.then(FocusObserverModifierImpl(onFocusChange))
 }

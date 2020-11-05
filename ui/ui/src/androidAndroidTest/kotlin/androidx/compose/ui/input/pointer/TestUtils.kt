@@ -23,26 +23,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime
-
-/**
- * This class enables Mockito to spy.
- *
- * It also allows the setting of a [modifyBlock] which is also a [PointerInputHandler] and enables
- * the processing of incoming [PointerInputChange]s.
- */
-open class StubPointerInputHandler(
-    private var modifyBlock: PointerInputHandler? = null
-) : PointerInputHandler {
-    override fun invoke(
-        p1: PointerEvent,
-        p2: PointerEventPass,
-        p3: IntSize
-    ): List<PointerInputChange> {
-        return modifyBlock?.invoke(p1, p2, p3) ?: p1.changes
-    }
-}
+import com.google.common.truth.FailureMetadata
+import com.google.common.truth.Subject
+import com.google.common.truth.Subject.Factory
+import com.google.common.truth.Truth
 
 internal fun PointerInputEventData(
     id: Int,
@@ -117,9 +104,8 @@ internal class SpyGestureModifier : PointerInputModifier {
                 pointerEvent: PointerEvent,
                 pass: PointerEventPass,
                 bounds: IntSize
-            ): List<PointerInputChange> {
+            ) {
                 callback.invoke(pass)
-                return pointerEvent.changes
             }
 
             override fun onCancel() {
@@ -211,15 +197,183 @@ internal fun PointerEvent.deepCopy() =
         motionEvent = motionEvent
     )
 
+internal fun pointerEventOf(
+    vararg changes: PointerInputChange,
+    motionEvent: MotionEvent = MotionEventDouble
+) = PointerEvent(changes.toList(), motionEvent)
+
+internal class PointerInputFilterMock(
+    val log: MutableList<LogEntry> = mutableListOf(),
+    val initHandler: ((CustomEventDispatcher) -> Unit)? = null,
+    val pointerEventHandler: PointerEventHandler? = null,
+    val onCustomEvent: ((CustomEvent, PointerEventPass) -> Unit)? = null,
+    layoutCoordinates: LayoutCoordinates? = null
+) :
+    PointerInputFilter() {
+
+    init {
+        this.layoutCoordinates = layoutCoordinates ?: LayoutCoordinatesStub(true)
+    }
+
+    override fun onInit(customEventDispatcher: CustomEventDispatcher) {
+        log.add(OnInitEntry())
+        initHandler?.invoke(customEventDispatcher)
+    }
+
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
+        pass: PointerEventPass,
+        bounds: IntSize
+    ) {
+        log.add(
+            OnPointerEventEntry(
+                this,
+                pointerEvent.deepCopy(),
+                pass,
+                bounds
+            )
+        )
+        pointerEventHandler?.invokeOverPass(pointerEvent, pass, bounds)
+    }
+
+    override fun onCancel() {
+        log.add(OnCancelEntry(this))
+    }
+
+    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
+        log.add(
+            OnCustomEventEntry(
+                this,
+                customEvent,
+                pass
+            )
+        )
+        onCustomEvent?.invoke(customEvent, pass)
+    }
+}
+
+internal fun List<LogEntry>.getOnInitLog() = filterIsInstance<OnInitEntry>()
+
+internal fun List<LogEntry>.getOnPointerEventLog() = filterIsInstance<OnPointerEventEntry>()
+
+internal fun List<LogEntry>.getOnCancelLog() = filterIsInstance<OnCancelEntry>()
+
+internal fun List<LogEntry>.getOnCustomEventLog() = filterIsInstance<OnCustomEventEntry>()
+
+internal sealed class LogEntry
+
+internal class OnInitEntry : LogEntry()
+
+internal data class OnPointerEventEntry (
+    val pointerInputFilter: PointerInputFilter,
+    val pointerEvent: PointerEvent,
+    val pass: PointerEventPass,
+    val bounds: IntSize
+) : LogEntry()
+
+internal class OnCancelEntry (
+    val pointerInputFilter: PointerInputFilter
+) : LogEntry()
+
+internal data class OnCustomEventEntry (
+    val pointerInputFilter: PointerInputFilter,
+    val customEvent: CustomEvent,
+    val pass: PointerEventPass
+) : LogEntry()
+
+internal fun internalPointerEventOf(vararg changes: PointerInputChange) =
+    InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), MotionEventDouble)
+
+internal class PointerEventSubject(
+    metaData: FailureMetadata,
+    val actual: PointerEvent
+) : Subject(metaData, actual) {
+    companion object {
+        private val Factory =
+            Factory<PointerEventSubject, PointerEvent> { metadata, actual ->
+                PointerEventSubject(metadata, actual)
+            }
+
+        fun assertThat(actual: PointerEvent): PointerEventSubject {
+            return Truth.assertAbout(Factory).that(actual)
+        }
+    }
+
+    fun isStructurallyEqualTo(expected: PointerEvent) {
+        check("motionEvent").that(actual.motionEvent).isEqualTo(expected.motionEvent)
+        val actualChanges = actual.changes
+        val expectedChanges = expected.changes
+        check("changes.size").that(actualChanges.size).isEqualTo(expectedChanges.size)
+        actualChanges.forEachIndexed { i, _ ->
+            check("id").that(actualChanges[i].id).isEqualTo(expectedChanges[i].id)
+            check("current").that(actualChanges[i].current).isEqualTo(expectedChanges[i].current)
+            check("previous").that(actualChanges[i].previous).isEqualTo(expectedChanges[i].previous)
+            check("consumed.downChange")
+                .that(actualChanges[i].consumed.downChange)
+                .isEqualTo(expectedChanges[i].consumed.downChange)
+            check("consumed.positionChange")
+                .that(actualChanges[i].consumed.positionChange)
+                .isEqualTo(expectedChanges[i].consumed.positionChange)
+        }
+    }
+}
+
+internal class PointerInputChangeSubject(
+    metaData: FailureMetadata,
+    val actual: PointerInputChange
+) : Subject(metaData, actual) {
+
+    companion object {
+
+        private val Factory =
+            Factory<PointerInputChangeSubject, PointerInputChange> { metadata, actual ->
+                PointerInputChangeSubject(metadata, actual)
+            }
+
+        fun assertThat(actual: PointerInputChange?): PointerInputChangeSubject {
+            return Truth.assertAbout(Factory).that(actual)
+        }
+    }
+
+    fun nothingConsumed() {
+        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
+        check("consumed.positionChange").that(actual.consumed.positionChange).isEqualTo(Offset.Zero)
+    }
+
+    fun downConsumed() {
+        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(true)
+    }
+
+    fun downNotConsumed() {
+        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
+    }
+
+    fun positionChangeConsumed(expected: Offset) {
+        check("consumed.positionChangeConsumed")
+            .that(actual.consumed.positionChange).isEqualTo(expected)
+    }
+
+    fun positionChangeNotConsumed() {
+        positionChangeConsumed(Offset.Zero)
+    }
+
+    fun isStructurallyEqualTo(expected: PointerInputChange) {
+        check("id").that(actual.id).isEqualTo(expected.id)
+        check("current").that(actual.current).isEqualTo(expected.current)
+        check("previous").that(actual.previous).isEqualTo(expected.previous)
+        check("consumed.downChange")
+            .that(actual.consumed.downChange)
+            .isEqualTo(expected.consumed.downChange)
+        check("consumed.positionChange")
+            .that(actual.consumed.positionChange)
+            .isEqualTo(expected.consumed.positionChange)
+    }
+}
+
 internal fun PointerInputChange.deepCopy() =
     PointerInputChange(
         id,
         current.copy(),
         previous.copy(),
-        consumed.copy()
+        ConsumedData(consumed.positionChange, consumed.downChange)
     )
-
-internal fun pointerEventOf(
-    vararg changes: PointerInputChange,
-    motionEvent: MotionEvent = MotionEventDouble
-) = PointerEvent(changes.toList(), motionEvent)

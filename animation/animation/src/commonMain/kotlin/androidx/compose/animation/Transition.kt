@@ -81,7 +81,7 @@ fun <T> transition(
     label: String? = null,
     onStateChangeFinished: ((T) -> Unit)? = null
 ): TransitionState {
-    if (transitionsEnabled) {
+    if (@Suppress("DEPRECATION_ERROR") transitionsEnabled) {
         val disposableClock = clock.asDisposableClock()
         val model = remember(definition, disposableClock) {
             TransitionModel(definition, initState, disposableClock, label)
@@ -106,6 +106,11 @@ fun <T> transition(
  * @suppress
  */
 @InternalAnimationApi
+@Deprecated(
+    level = DeprecationLevel.ERROR,
+    message = "Transitions should not be disabled. Instead, " +
+        "pause the animation clock and advance it manually"
+)
 var transitionsEnabled = true
     @VisibleForTesting
     set

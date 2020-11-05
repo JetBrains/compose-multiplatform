@@ -20,12 +20,15 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -33,20 +36,18 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.assertTextEquals
-import androidx.ui.test.onNodeWithTag
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class ComposeViewTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
@@ -57,7 +58,7 @@ class ComposeViewTest {
             val composeView = ComposeView(activity)
             activity.setContentView(composeView)
             composeView.setContent {
-                Text("Hello, World!", Modifier.testTag("text"))
+                BasicText("Hello, World!", Modifier.testTag("text"))
             }
         }
         Espresso.onView(instanceOf(ComposeView::class.java))
@@ -77,7 +78,7 @@ class ComposeViewTest {
             val composeView = ComposeView(activity).also { it.id = id }
             activity.setContentView(composeView)
             composeView.setContent {
-                Text("Hello", Modifier.testTag("text"))
+                BasicText("Hello", Modifier.testTag("text"))
             }
         }
 
@@ -86,7 +87,7 @@ class ComposeViewTest {
         rule.activityRule.scenario.onActivity { activity ->
             val composeView: ComposeView = activity.findViewById(id)
             composeView.setContent {
-                Text("World", Modifier.testTag("text"))
+                BasicText("World", Modifier.testTag("text"))
             }
         }
 
@@ -115,7 +116,7 @@ class ComposeViewTest {
             }
             activity.setContentView(composeView)
             composeView.setContent {
-                Text("Hello", Modifier.testTag("text"))
+                BasicText("Hello", Modifier.testTag("text"))
             }
         }
 
@@ -130,6 +131,7 @@ class ComposeViewTest {
     }
 
     @Test
+    @SmallTest
     fun throwsOnAddView() {
         rule.activityRule.scenario.onActivity { activity ->
             with(TestComposeView(activity)) {

@@ -16,6 +16,7 @@
 
 package androidx.compose.compiler.plugins.kotlin
 
+import androidx.compose.compiler.plugins.kotlin.lower.ClassStabilityFieldSerializationPlugin
 import com.intellij.mock.MockProject
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.compiler.plugin.CliOption
@@ -28,12 +29,15 @@ import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.extensions.internal.TypeResolutionInterceptor
+import org.jetbrains.kotlin.serialization.DescriptorSerializer
 
 object ComposeConfiguration {
     val LIVE_LITERALS_ENABLED_KEY =
         CompilerConfigurationKey<Boolean>("Enable Live Literals code generation")
     val SOURCE_INFORMATION_ENABLED_KEY =
         CompilerConfigurationKey<Boolean>("Include source information in generated code")
+    val INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY =
+        CompilerConfigurationKey<Boolean>("Enable optimization to treat remember as an intrinsic")
 }
 
 class ComposeCommandLineProcessor : CommandLineProcessor {
@@ -53,12 +57,20 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
             required = false,
             allowMultipleOccurrences = false
         )
+        val INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_OPTION = CliOption(
+            "intrinsicRemember",
+            "<true|false>",
+            "Include source information in generated code",
+            required = false,
+            allowMultipleOccurrences = false
+        )
     }
 
     override val pluginId = PLUGIN_ID
     override val pluginOptions = listOf(
         LIVE_LITERALS_ENABLED_OPTION,
-        SOURCE_INFORMATION_ENABLED_OPTION
+        SOURCE_INFORMATION_ENABLED_OPTION,
+        INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_OPTION
     )
 
     override fun processOption(
@@ -72,6 +84,10 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
         )
         SOURCE_INFORMATION_ENABLED_OPTION -> configuration.put(
             ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY,
+            value == "true"
+        )
+        INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_OPTION -> configuration.put(
+            ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY,
             value == "true"
         )
         else -> throw CliOptionProcessingException("Unknown option: ${option.optionName}")
@@ -104,6 +120,10 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                 ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY,
                 false
             )
+            val intrinsicRememberEnabled = configuration.get(
+                ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY,
+                false
+            )
             StorageComponentContainerContributor.registerExtension(
                 project,
                 ComposableCallChecker()
@@ -111,14 +131,6 @@ class ComposeComponentRegistrar : ComponentRegistrar {
             StorageComponentContainerContributor.registerExtension(
                 project,
                 ComposableDeclarationChecker()
-            )
-            StorageComponentContainerContributor.registerExtension(
-                project,
-                UnionAnnotationCheckerProvider()
-            )
-            StorageComponentContainerContributor.registerExtension(
-                project,
-                TryCatchComposableChecker()
             )
             ComposeDiagnosticSuppressor.registerExtension(
                 project,
@@ -132,8 +144,12 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                 project,
                 ComposeIrGenerationExtension(
                     liveLiteralsEnabled = liveLiteralsEnabled,
-                    sourceInformationEnabled = sourceInformationEnabled
+                    sourceInformationEnabled = sourceInformationEnabled,
+                    intrinsicRememberEnabled = intrinsicRememberEnabled
                 )
+            )
+            DescriptorSerializer.registerSerializerPlugin(
+                ClassStabilityFieldSerializationPlugin()
             )
         }
     }

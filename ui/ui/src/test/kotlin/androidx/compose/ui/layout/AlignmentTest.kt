@@ -18,6 +18,8 @@ package androidx.compose.ui.layout
 
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAbsoluteAlignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -200,6 +202,35 @@ class AlignmentTest {
     }
 
     @Test
+    fun testAlign_custom2D() {
+        val alignment = BiasAlignment(-0.5f, 0.5f)
+        assertEquals(
+            IntOffset(25, 75),
+            alignment.align(space)
+        )
+        assertEquals(
+            IntOffset(75, 75),
+            alignment.align(space, LayoutDirection.Rtl)
+        )
+    }
+
+    @Test
+    fun testAlign_custom1D() {
+        assertEquals(
+            75,
+            BiasAlignment.Horizontal(0.5f).align(space1D)
+        )
+        assertEquals(
+            25,
+            BiasAlignment.Horizontal(0.5f).align(space1D, LayoutDirection.Rtl)
+        )
+        assertEquals(
+            25,
+            BiasAlignment.Vertical(-0.5f).align(space1D)
+        )
+    }
+
+    @Test
     fun testAbsoluteAlign_left() {
         assertEquals(
             0,
@@ -292,6 +323,31 @@ class AlignmentTest {
         assertEquals(
             IntOffset(100, 100),
             AbsoluteAlignment.BottomRight.align(space, LayoutDirection.Rtl)
+        )
+    }
+
+    @Test
+    fun testAbsoluteAlign_custom2D() {
+        val alignment = BiasAbsoluteAlignment(-0.5f, 0.5f)
+        assertEquals(
+            IntOffset(25, 75),
+            alignment.align(space)
+        )
+        assertEquals(
+            IntOffset(25, 75),
+            alignment.align(space, LayoutDirection.Rtl)
+        )
+    }
+
+    @Test
+    fun testAbsoluteAlign_custom1D() {
+        assertEquals(
+            75,
+            BiasAbsoluteAlignment.Horizontal(0.5f).align(space1D)
+        )
+        assertEquals(
+            75,
+            BiasAbsoluteAlignment.Horizontal(0.5f).align(space1D, LayoutDirection.Rtl)
         )
     }
 }

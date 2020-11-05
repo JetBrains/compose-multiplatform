@@ -17,12 +17,12 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -42,7 +42,7 @@ fun stateListSample() {
 
         Column {
             Row {
-                BaseTextField(
+                BasicTextField(
                     value = name,
                     onValueChange = { name = it }
                 )

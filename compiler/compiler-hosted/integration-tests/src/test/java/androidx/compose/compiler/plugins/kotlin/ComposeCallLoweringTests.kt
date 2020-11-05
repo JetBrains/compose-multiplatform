@@ -58,6 +58,26 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
     }
 
     @Test
+    fun testReturnInsideKey(): Unit = ensureSetup {
+        compose(
+            """
+            @Composable fun ShowMessage(text: String): Int = key(text) {
+                TextView(id=123, text=text)
+                return text.length
+            }
+
+            @Composable fun App() {
+                val length = ShowMessage("hello")
+            }
+        """,
+            "App()"
+        ).then { activity ->
+            val tv = activity.findViewById<TextView>(123)
+            assertEquals("hello", tv.text)
+        }
+    }
+
+    @Test
     fun testMoveFromIssue(): Unit = ensureSetup {
         compose(
             """
@@ -2325,7 +2345,7 @@ fun <T> B(foo: T, bar: String) { }
 
             var output = ArrayList<String>()
 
-            class NotStable { val value = 10 }
+            class NotStable { var value = 10 }
 
             @Stable
             class StableClass {

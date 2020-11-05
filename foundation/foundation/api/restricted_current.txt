@@ -7,7 +7,7 @@ package androidx.compose.foundation {
   }
 
   public final class BaseTextFieldKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void BaseTextField-ngE-tqQ(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional long textColor, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
+    method @Deprecated @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void BaseTextField-ngE-tqQ(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional long textColor, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
   }
 
   @Deprecated @androidx.compose.runtime.Immutable public final class Border {
@@ -62,7 +62,7 @@ package androidx.compose.foundation {
 
   public final class ContentColorKt {
     method @Deprecated @androidx.compose.runtime.Composable public static long contentColor();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getAmbientContentColor();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getAmbientContentColor();
   }
 
   public final class DarkThemeKt {
@@ -73,9 +73,9 @@ package androidx.compose.foundation {
   }
 
   public final class IconKt {
-    method @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.ui.Modifier modifier, optional long tint);
-    method @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
-    method @androidx.compose.runtime.Composable public static void Icon-uUQrhdE(androidx.compose.ui.graphics.ImageAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-uUQrhdE(androidx.compose.ui.graphics.ImageAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
   }
 
   public final class ImageKt {
@@ -143,12 +143,12 @@ package androidx.compose.foundation {
     method @androidx.compose.runtime.Composable public static void ScrollableColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.ScrollState scrollState, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional boolean reverseScrollDirection, optional boolean isScrollEnabled, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> children);
     method @androidx.compose.runtime.Composable public static void ScrollableRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.ScrollState scrollState, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, optional boolean reverseScrollDirection, optional boolean isScrollEnabled, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> children);
     method public static androidx.compose.ui.Modifier horizontalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional boolean reverseScrolling);
-    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.ScrollState rememberScrollState(optional float initial);
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.ScrollState rememberScrollState(optional float initial, optional androidx.compose.foundation.InteractionState? interactionState);
     method public static androidx.compose.ui.Modifier verticalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional boolean reverseScrolling);
   }
 
   @androidx.compose.runtime.Stable public final class ScrollState {
-    ctor public ScrollState(float initial, internal androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
+    ctor public ScrollState(float initial, internal androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
     method public float getMaxValue();
     method public float getValue();
     method public boolean isAnimationRunning();
@@ -164,7 +164,7 @@ package androidx.compose.foundation {
   }
 
   public static final class ScrollState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.ScrollState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
+    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.ScrollState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
   }
 
   public final class Strings {
@@ -186,11 +186,11 @@ package androidx.compose.foundation {
   }
 
   public final class TextKt {
-    method @androidx.compose.runtime.Composable public static void ProvideTextStyle(androidx.compose.ui.text.TextStyle value, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method @androidx.compose.runtime.Composable public static void Text-TPAwlIA(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional long letterSpacing, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional long lineHeight, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.TextStyle style);
-    method @androidx.compose.runtime.Composable public static void Text-Vh6c2nE(String text, optional androidx.compose.ui.Modifier modifier, optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional long letterSpacing, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional long lineHeight, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.TextStyle style);
+    method @Deprecated @androidx.compose.runtime.Composable public static void ProvideTextStyle(androidx.compose.ui.text.TextStyle value, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Text-TPAwlIA(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional long letterSpacing, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional long lineHeight, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.TextStyle style);
+    method @Deprecated @androidx.compose.runtime.Composable public static void Text-Vh6c2nE(String text, optional androidx.compose.ui.Modifier modifier, optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional long letterSpacing, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional long lineHeight, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.TextStyle style);
     method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static androidx.compose.ui.text.TextStyle currentTextStyle();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.TextStyle> getAmbientTextStyle();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.TextStyle> getAmbientTextStyle();
   }
 
 }
@@ -245,19 +245,15 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class ScrollableController {
-    ctor public ScrollableController(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
-    method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getConsumeScrollDelta();
-    method public androidx.compose.foundation.animation.FlingConfig getFlingConfig();
+    ctor public ScrollableController(internal kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta, internal androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, internal androidx.compose.foundation.InteractionState? interactionState);
     method public boolean isAnimationRunning();
     method public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
     method public void stopAnimation();
-    property public final kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> consumeScrollDelta;
-    property public final androidx.compose.foundation.animation.FlingConfig flingConfig;
     property public final boolean isAnimationRunning;
   }
 
   public final class ScrollableKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.ScrollableController rememberScrollableController(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta);
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.ScrollableController rememberScrollableController(optional androidx.compose.foundation.InteractionState? interactionState, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta);
     method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, androidx.compose.foundation.gestures.ScrollableController controller, optional boolean enabled, optional boolean reverseDirection, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean> canScroll, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onScrollStarted, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onScrollStopped);
   }
 
@@ -282,30 +278,28 @@ package androidx.compose.foundation.lazy {
   public final class CachingItemContentFactoryKt {
   }
 
-  @kotlin.RequiresOptIn(message="This is an experimental API for demonstrating how LazyColumn / LazyRow should work" + "using a DSL implementation. This is a prototype and its implementation is not suited" + " for PagedList or large lists.") public @interface ExperimentalLazyDsl {
-  }
-
   public final class LazyDslKt {
-    method @androidx.compose.foundation.lazy.ExperimentalLazyDsl @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
-    method @androidx.compose.foundation.lazy.ExperimentalLazyDsl @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
   }
 
   public final class LazyForKt {
     method @androidx.compose.runtime.Composable public static <T> void LazyColumnFor(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
     method @androidx.compose.runtime.Composable public static <T> void LazyColumnForIndexed(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
-    method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyColumnItems(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalGravity, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> itemContent);
     method @androidx.compose.runtime.Composable public static <T> void LazyRowFor(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
     method @androidx.compose.runtime.Composable public static <T> void LazyRowForIndexed(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
-    method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyRowItems(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalGravity, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> itemContent);
   }
 
   public final class LazyGridKt {
   }
 
   @androidx.compose.runtime.Stable public interface LazyItemScope {
-    method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier);
-    method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier);
-    method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier);
+    method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
+    method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
+    method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
+  }
+
+  public final class LazyListKt {
   }
 
   public interface LazyListScope {
@@ -315,20 +309,22 @@ package androidx.compose.foundation.lazy {
   }
 
   @androidx.compose.runtime.Stable public final class LazyListState {
-    ctor public LazyListState(int firstVisibleItemIndex, int firstVisibleItemScrollOffset, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
+    ctor public LazyListState(int firstVisibleItemIndex, int firstVisibleItemScrollOffset, androidx.compose.foundation.InteractionState? interactionState, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
     method public int getFirstVisibleItemIndex();
     method public int getFirstVisibleItemScrollOffset();
+    method public boolean isAnimationRunning();
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
+    property public final boolean isAnimationRunning;
     field public static final androidx.compose.foundation.lazy.LazyListState.Companion Companion;
   }
 
   public static final class LazyListState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.lazy.LazyListState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
+    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.lazy.LazyListState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
   }
 
   public final class LazyListStateKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.lazy.LazyListState rememberLazyListState(optional int initialFirstVisibleItemIndex, optional int initialFirstVisibleItemScrollOffset);
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.lazy.LazyListState rememberLazyListState(optional int initialFirstVisibleItemIndex, optional int initialFirstVisibleItemScrollOffset, optional androidx.compose.foundation.InteractionState? interactionState);
   }
 
 }
@@ -442,6 +438,44 @@ package androidx.compose.foundation.shape {
     method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape-0680j_4(float size);
     method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape-ZmiikuI(optional float topLeft, optional float topRight, optional float bottomRight, optional float bottomLeft);
     method public static androidx.compose.foundation.shape.RoundedCornerShape getCircleShape();
+  }
+
+}
+
+package androidx.compose.foundation.text {
+
+  public final class BasicTextFieldKt {
+    method @androidx.compose.runtime.Composable public static void BasicTextField-JE9QWFY(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
+    method @androidx.compose.runtime.Composable public static void BasicTextField-qe0dKCw(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
+  }
+
+  public final class BasicTextKt {
+    method @androidx.compose.runtime.Composable public static void BasicText(String text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines);
+    method @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent);
+  }
+
+  @androidx.compose.runtime.Immutable public final class KeyboardOptions {
+    ctor public KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
+    ctor public KeyboardOptions();
+    method public androidx.compose.ui.text.input.KeyboardCapitalization component1();
+    method public boolean component2();
+    method public androidx.compose.ui.text.input.KeyboardType component3();
+    method public androidx.compose.ui.text.input.ImeAction component4();
+    method @androidx.compose.runtime.Immutable public androidx.compose.foundation.text.KeyboardOptions copy(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
+    method public boolean getAutoCorrect();
+    method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
+    method public androidx.compose.ui.text.input.ImeAction getImeAction();
+    method public androidx.compose.ui.text.input.KeyboardType getKeyboardType();
+    property public final boolean autoCorrect;
+    property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
+    property public final androidx.compose.ui.text.input.ImeAction imeAction;
+    property public final androidx.compose.ui.text.input.KeyboardType keyboardType;
+    field public static final androidx.compose.foundation.text.KeyboardOptions.Companion Companion;
+  }
+
+  public static final class KeyboardOptions.Companion {
+    method public androidx.compose.foundation.text.KeyboardOptions getDefault();
+    property public final androidx.compose.foundation.text.KeyboardOptions Default;
   }
 
 }

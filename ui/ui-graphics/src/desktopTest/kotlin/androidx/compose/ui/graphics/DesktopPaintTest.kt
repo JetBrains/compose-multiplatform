@@ -17,9 +17,11 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import org.junit.Assert.assertEquals
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 class DesktopPaintTest : DesktopGraphicsTest() {
@@ -37,7 +39,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
         assertEquals(0f, paint.strokeMiterLimit)
         assertEquals(StrokeJoin.Round, paint.strokeJoin)
         assertEquals(true, paint.isAntiAlias)
-        assertEquals(FilterQuality.None, paint.filterQuality)
+        assertEquals(FilterQuality.Medium, paint.filterQuality)
         assertEquals(BlendMode.SrcOver, paint.blendMode)
         assertEquals(null, paint.colorFilter)
         assertEquals(null, paint.shader)
@@ -88,13 +90,17 @@ class DesktopPaintTest : DesktopGraphicsTest() {
 
     @Test
     fun filterQuality() {
+        assumeTrue(DesktopPlatform.Current == DesktopPlatform.MacOS)
+
         canvas.drawImageRect(
             image = imageFromResource("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(0, 4),
             dstSize = IntSize(4, 12),
-            paint = redPaint
+            paint = redPaint.apply {
+                filterQuality = FilterQuality.None
+            }
         )
         canvas.drawImageRect(
             image = imageFromResource("androidx/compose/desktop/test.png"),
@@ -182,13 +188,16 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     fun imageShader() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
 
-        canvas.drawRect(left = 2f, top = 2f, right = 14f, bottom = 14f, paint = Paint().apply {
-            shader = ImageShader(
-                imageFromResource("androidx/compose/desktop/test.png"),
-                tileModeX = TileMode.Clamp,
-                tileModeY = TileMode.Repeated
-            )
-        })
+        canvas.drawRect(
+            left = 2f, top = 2f, right = 14f, bottom = 14f,
+            paint = Paint().apply {
+                shader = ImageShader(
+                    imageFromResource("androidx/compose/desktop/test.png"),
+                    tileModeX = TileMode.Clamp,
+                    tileModeY = TileMode.Repeated
+                )
+            }
+        )
 
         screenshotRule.snap(surface)
     }

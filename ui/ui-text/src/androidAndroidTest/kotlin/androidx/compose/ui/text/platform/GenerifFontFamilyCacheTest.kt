@@ -24,9 +24,9 @@ import androidx.compose.ui.text.matchers.assertThat
 import androidx.test.filters.SmallTest
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(AndroidJUnit4::class)
 @SmallTest
 class GenerifFontFamilyCacheTest {
 

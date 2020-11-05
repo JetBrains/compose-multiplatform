@@ -19,12 +19,15 @@ package androidx.compose.foundation.text
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -36,7 +39,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -46,12 +50,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(JUnit4::class)
-@SmallTest
+@RunWith(AndroidJUnit4::class)
+@MediumTest
 class TextLayoutTest {
     @Suppress("DEPRECATION")
     @get:Rule
@@ -228,6 +231,7 @@ class TextLayoutTest {
     }
 }
 
+@OptIn(InternalTextApi::class)
 @Composable
 private fun TestingText(
     text: String,

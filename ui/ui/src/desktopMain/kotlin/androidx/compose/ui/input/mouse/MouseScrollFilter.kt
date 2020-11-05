@@ -106,7 +106,7 @@ internal class MouseScrollEventFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = pointerEvent.changes
+    ) = Unit
 
     override fun onCancel() = Unit
 

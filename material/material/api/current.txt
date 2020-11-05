@@ -126,15 +126,17 @@ package androidx.compose.material {
     enum_constant public static final androidx.compose.material.BottomSheetValue Expanded;
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonColors {
+    method public long backgroundColor-0d7_KjU(boolean enabled);
+    method public long contentColor-0d7_KjU(boolean enabled);
+  }
+
   public final class ButtonConstants {
-    method @androidx.compose.runtime.Composable public float animateDefaultElevation-qDazgog(androidx.compose.foundation.InteractionState interactionState, boolean enabled, optional float defaultElevation, optional float pressedElevation, optional float disabledElevation);
-    method @androidx.compose.runtime.Composable public long defaultButtonBackgroundColor-Q31_wr0(boolean enabled, optional long defaultColor, optional long disabledColor);
-    method @androidx.compose.runtime.Composable public long defaultButtonContentColor-Q31_wr0(boolean enabled, long defaultColor, optional long disabledColor);
-    method @androidx.compose.runtime.Composable public long defaultOutlinedButtonContentColor-Q31_wr0(boolean enabled, optional long defaultColor, optional long disabledColor);
-    method @androidx.compose.runtime.Composable public long defaultTextButtonContentColor-Q31_wr0(boolean enabled, optional long defaultColor, optional long disabledColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonColors defaultButtonColors-nlx5xbs(optional long backgroundColor, optional long disabledBackgroundColor, optional long contentColor, optional long disabledContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonElevation defaultElevation-qYQSm_w(optional float defaultElevation, optional float pressedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonColors defaultOutlinedButtonColors-xS_xkl8(optional long backgroundColor, optional long contentColor, optional long disabledContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonColors defaultTextButtonColors-xS_xkl8(optional long backgroundColor, optional long contentColor, optional long disabledContentColor);
     method public androidx.compose.foundation.layout.PaddingValues getDefaultContentPadding();
-    method public long getDefaultDisabledBackgroundColor-0d7_KjU();
-    method public long getDefaultDisabledContentColor-0d7_KjU();
     method public float getDefaultIconSize-D9Ej5fM();
     method public float getDefaultIconSpacing-D9Ej5fM();
     method public float getDefaultMinHeight-D9Ej5fM();
@@ -149,38 +151,39 @@ package androidx.compose.material {
     property public final float DefaultMinWidth;
     property public final androidx.compose.foundation.layout.PaddingValues DefaultTextContentPadding;
     property public final float OutlinedBorderSize;
-    property public final long defaultDisabledBackgroundColor;
-    property public final long defaultDisabledContentColor;
     property public final androidx.compose.foundation.BorderStroke defaultOutlinedBorder;
     field public static final androidx.compose.material.ButtonConstants INSTANCE;
     field public static final float OutlinedBorderOpacity = 0.12f;
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonElevation {
+    method public float elevation-D9Ej5fM(boolean enabled, androidx.compose.foundation.InteractionState interactionState);
+  }
+
   public final class ButtonKt {
-    method @androidx.compose.runtime.Composable public static void Button-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional float elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static inline void OutlinedButton-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional float elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static inline void TextButton-M91Patw(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional float elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void Button(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline void OutlinedButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline void TextButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
   public final class CardKt {
     method @androidx.compose.runtime.Composable public static void Card-IHU7g64(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface CheckboxColors {
+    method public long borderColor-0d7_KjU(boolean enabled, androidx.compose.foundation.selection.ToggleableState state);
+    method public long boxColor-0d7_KjU(boolean enabled, androidx.compose.foundation.selection.ToggleableState state);
+    method public long checkmarkColor-0d7_KjU(androidx.compose.foundation.selection.ToggleableState state);
+  }
+
   public final class CheckboxConstants {
-    method @androidx.compose.runtime.Composable public long animateDefaultBorderColor-xAuy4YE(androidx.compose.foundation.selection.ToggleableState state, boolean enabled, optional long checkedColor, optional long uncheckedColor, optional long disabledColor, optional long disabledIndeterminateColor);
-    method @androidx.compose.runtime.Composable public long animateDefaultBoxColor-4eRnVYk(androidx.compose.foundation.selection.ToggleableState state, boolean enabled, optional long checkedColor, optional long uncheckedColor, optional long disabledCheckedColor, optional long disabledUncheckedColor, optional long disabledIndeterminateColor);
-    method @androidx.compose.runtime.Composable public long animateDefaultCheckmarkColor-9THJUkw(androidx.compose.foundation.selection.ToggleableState state, optional long checkedColor, optional long uncheckedColor);
-    method @androidx.compose.runtime.Composable public long defaultDisabledIndeterminateColor-8_81llA(long checkedColor);
-    method public long getDefaultDisabledColor-0d7_KjU();
-    method public long getDefaultUncheckedColor-0d7_KjU();
-    property public final long defaultDisabledColor;
-    property public final long defaultUncheckedColor;
+    method @androidx.compose.runtime.Composable public androidx.compose.material.CheckboxColors defaultColors-QGkLkJU(optional long checkedColor, optional long uncheckedColor, optional long checkmarkColor, optional long disabledColor, optional long disabledIndeterminateColor);
     field public static final androidx.compose.material.CheckboxConstants INSTANCE;
   }
 
   public final class CheckboxKt {
-    method @androidx.compose.runtime.Composable public static void Checkbox-JW8VE8g(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional long checkedColor, optional long uncheckedColor);
-    method @androidx.compose.runtime.Composable public static void TriStateCheckbox-yIvEug4(androidx.compose.foundation.selection.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional long checkMarkColor, optional long boxColor, optional long borderColor);
+    method @androidx.compose.runtime.Composable public static void Checkbox(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.CheckboxColors colors);
+    method @androidx.compose.runtime.Composable public static void TriStateCheckbox(androidx.compose.foundation.selection.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.CheckboxColors colors);
   }
 
   @androidx.compose.runtime.Stable public final class Colors {
@@ -218,6 +221,24 @@ package androidx.compose.material {
     method public static long contentColorFor-pz-ABmo(androidx.compose.material.Colors, long color);
     method public static androidx.compose.material.Colors darkColors-T8B3sC8(optional long primary, optional long primaryVariant, optional long secondary, optional long background, optional long surface, optional long error, optional long onPrimary, optional long onSecondary, optional long onBackground, optional long onSurface, optional long onError);
     method public static androidx.compose.material.Colors lightColors-hW7iGhc(optional long primary, optional long primaryVariant, optional long secondary, optional long secondaryVariant, optional long background, optional long surface, optional long error, optional long onPrimary, optional long onSecondary, optional long onBackground, optional long onSurface, optional long onError);
+  }
+
+  public final class ContentAlpha {
+    method public float getDisabled();
+    method public float getHigh();
+    method public float getMedium();
+    property public final float disabled;
+    property public final float high;
+    property public final float medium;
+    field public static final androidx.compose.material.ContentAlpha INSTANCE;
+  }
+
+  public final class ContentAlphaKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<java.lang.Float> getAmbientContentAlpha();
+  }
+
+  public final class ContentColorKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getAmbientContentColor();
   }
 
   public enum DismissDirection {
@@ -293,6 +314,7 @@ package androidx.compose.material {
 
   public final class ElevationKt {
     method public static void animateElevation-K5VTZl0(androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,?>, optional androidx.compose.foundation.Interaction? from, optional androidx.compose.foundation.Interaction? to, float target);
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Dp> getAmbientAbsoluteElevation();
   }
 
   public interface ElevationOverlay {
@@ -303,19 +325,19 @@ package androidx.compose.material {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ElevationOverlay> getAmbientElevationOverlay();
   }
 
-  @androidx.compose.runtime.Immutable public interface Emphasis {
-    method public long applyEmphasis-8_81llA(long color);
+  @Deprecated @androidx.compose.runtime.Immutable public interface Emphasis {
+    method @Deprecated public long applyEmphasis-8_81llA(long color);
   }
 
   public final class EmphasisKt {
-    method @androidx.compose.runtime.Composable public static void ProvideEmphasis(androidx.compose.material.Emphasis emphasis, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static androidx.compose.runtime.Ambient<androidx.compose.material.EmphasisLevels> getAmbientEmphasisLevels();
+    method @Deprecated @androidx.compose.runtime.Composable public static void ProvideEmphasis(androidx.compose.material.Emphasis emphasis, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static androidx.compose.runtime.Ambient<androidx.compose.material.EmphasisLevels> getAmbientEmphasisLevels();
   }
 
-  public interface EmphasisLevels {
-    method public androidx.compose.material.Emphasis getDisabled();
-    method public androidx.compose.material.Emphasis getHigh();
-    method public androidx.compose.material.Emphasis getMedium();
+  @Deprecated public interface EmphasisLevels {
+    method @Deprecated public androidx.compose.material.Emphasis getDisabled();
+    method @Deprecated public androidx.compose.material.Emphasis getHigh();
+    method @Deprecated public androidx.compose.material.Emphasis getMedium();
     property public abstract androidx.compose.material.Emphasis disabled;
     property public abstract androidx.compose.material.Emphasis high;
     property public abstract androidx.compose.material.Emphasis medium;
@@ -335,13 +357,17 @@ package androidx.compose.material {
   }
 
   public final class FloatingActionButtonConstants {
-    method @androidx.compose.runtime.Composable public float animateDefaultElevation-PzTOHyI(androidx.compose.foundation.InteractionState interactionState, optional float defaultElevation, optional float pressedElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.FloatingActionButtonElevation defaultElevation-ioHfwGI(optional float defaultElevation, optional float pressedElevation);
     field public static final androidx.compose.material.FloatingActionButtonConstants INSTANCE;
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface FloatingActionButtonElevation {
+    method public float elevation-D9Ej5fM(androidx.compose.foundation.InteractionState interactionState);
+  }
+
   public final class FloatingActionButtonKt {
-    method @androidx.compose.runtime.Composable public static void ExtendedFloatingActionButton-SrDf79w(kotlin.jvm.functions.Function0<kotlin.Unit> text, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional float elevation);
-    method @androidx.compose.runtime.Composable public static void FloatingActionButton-pvsAfIA(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> icon);
+    method @androidx.compose.runtime.Composable public static void ExtendedFloatingActionButton-i36UMrA(kotlin.jvm.functions.Function0<kotlin.Unit> text, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.material.FloatingActionButtonElevation elevation);
+    method @androidx.compose.runtime.Composable public static void FloatingActionButton-lf3tHAI(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.material.FloatingActionButtonElevation elevation, kotlin.jvm.functions.Function0<kotlin.Unit> icon);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public final class FractionalThreshold implements androidx.compose.material.ThresholdConfig {
@@ -353,6 +379,12 @@ package androidx.compose.material {
   public final class IconButtonKt {
     method @androidx.compose.runtime.Composable public static void IconButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, kotlin.jvm.functions.Function0<kotlin.Unit> icon);
     method @androidx.compose.runtime.Composable public static void IconToggleButton(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, kotlin.jvm.functions.Function0<kotlin.Unit> icon);
+  }
+
+  public final class IconKt {
+    method @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @androidx.compose.runtime.Composable public static void Icon-QSAJrGw(androidx.compose.ui.graphics.vector.VectorAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @androidx.compose.runtime.Composable public static void Icon-uUQrhdE(androidx.compose.ui.graphics.ImageAsset asset, optional androidx.compose.ui.Modifier modifier, optional long tint);
   }
 
   public final class ListItemKt {
@@ -411,8 +443,8 @@ package androidx.compose.material {
   }
 
   public final class OutlinedTextFieldKt {
-    method @androidx.compose.runtime.Composable public static void OutlinedTextField-NT1NBPE(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor);
-    method @androidx.compose.runtime.Composable public static void OutlinedTextField-OHK2xX0(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor);
+    method @androidx.compose.runtime.Composable public static void OutlinedTextField-e2fVWbI(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional int maxLines, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor);
+    method @androidx.compose.runtime.Composable public static void OutlinedTextField-e7v_IgY(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional int maxLines, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor);
   }
 
   public final class ProgressIndicatorConstants {
@@ -431,17 +463,17 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void LinearProgressIndicator-kLDug40(@FloatRange(from=0.0, to=1.0) float progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional long backgroundColor);
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface RadioButtonColors {
+    method public long radioColor-0d7_KjU(boolean enabled, boolean selected);
+  }
+
   public final class RadioButtonConstants {
-    method @androidx.compose.runtime.Composable public long animateDefaultColor-tRWe6DU(boolean selected, boolean enabled, optional long selectedColor, optional long unselectedColor, optional long disabledColor);
-    method public long getDefaultDisabledColor-0d7_KjU();
-    method public long getDefaultUnselectedColor-0d7_KjU();
-    property public final long defaultDisabledColor;
-    property public final long defaultUnselectedColor;
+    method @androidx.compose.runtime.Composable public androidx.compose.material.RadioButtonColors defaultColors-xS_xkl8(optional long selectedColor, optional long unselectedColor, optional long disabledColor);
     field public static final androidx.compose.material.RadioButtonConstants INSTANCE;
   }
 
   public final class RadioButtonKt {
-    method @androidx.compose.runtime.Composable public static void RadioButton-BNs5H-w(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional long color);
+    method @androidx.compose.runtime.Composable public static void RadioButton(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.RadioButtonColors colors);
   }
 
   @androidx.compose.runtime.Immutable public final class ResistanceConfig {
@@ -611,8 +643,18 @@ package androidx.compose.material {
     method public <T> androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.SwipeableState<T>,T> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface SwitchColors {
+    method public long thumbColor-0d7_KjU(boolean enabled, boolean checked);
+    method public long trackColor-0d7_KjU(boolean enabled, boolean checked);
+  }
+
+  public final class SwitchConstants {
+    method @androidx.compose.runtime.Composable public androidx.compose.material.SwitchColors defaultColors-R8aI8sA(optional long checkedThumbColor, optional long checkedTrackColor, optional float checkedTrackAlpha, optional long uncheckedThumbColor, optional long uncheckedTrackColor, optional float uncheckedTrackAlpha, optional long disabledCheckedThumbColor, optional long disabledCheckedTrackColor, optional long disabledUncheckedThumbColor, optional long disabledUncheckedTrackColor);
+    field public static final androidx.compose.material.SwitchConstants INSTANCE;
+  }
+
   public final class SwitchKt {
-    method @androidx.compose.runtime.Composable public static void Switch-vndggBo(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional long color);
+    method @androidx.compose.runtime.Composable public static void Switch(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.SwitchColors colors);
   }
 
   public final class TabConstants {
@@ -655,9 +697,16 @@ package androidx.compose.material {
   }
 
   public final class TextFieldKt {
-    method @androidx.compose.runtime.Composable public static void TextField-LTmrouY(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor, optional long backgroundColor, optional androidx.compose.ui.graphics.Shape shape);
-    method @androidx.compose.runtime.Composable public static void TextField-WI3iwFk(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor, optional long backgroundColor, optional androidx.compose.ui.graphics.Shape shape);
+    method @androidx.compose.runtime.Composable public static void TextField-OgL1fuU(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional int maxLines, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor, optional long backgroundColor, optional androidx.compose.ui.graphics.Shape shape);
+    method @androidx.compose.runtime.Composable public static void TextField-zKTYdF8(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional boolean isErrorValue, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional int maxLines, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.ImeAction,? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onImeActionPerformed, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long activeColor, optional long inactiveColor, optional long errorColor, optional long backgroundColor, optional androidx.compose.ui.graphics.Shape shape);
     field public static final float ContainerAlpha = 0.12f;
+  }
+
+  public final class TextKt {
+    method @androidx.compose.runtime.Composable public static void ProvideTextStyle(androidx.compose.ui.text.TextStyle value, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method @androidx.compose.runtime.Composable public static void Text-TPAwlIA(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional long letterSpacing, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional long lineHeight, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.TextStyle style);
+    method @androidx.compose.runtime.Composable public static void Text-Vh6c2nE(String text, optional androidx.compose.ui.Modifier modifier, optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional long letterSpacing, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional long lineHeight, optional androidx.compose.ui.text.style.TextOverflow overflow, optional boolean softWrap, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional androidx.compose.ui.text.TextStyle style);
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.TextStyle> getAmbientTextStyle();
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ThresholdConfig {

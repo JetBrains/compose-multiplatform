@@ -26,15 +26,17 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
 }
 
 kotlin {
-    jvm()
+    jvm() {
+        withJava()
+    }
 
     sourceSets {
         commonMain.dependencies {
-            api(KOTLIN_STDLIB_COMMON)
+            implementation(KOTLIN_STDLIB_COMMON)
             api project(":compose:foundation:foundation")
             api project(":compose:material:material")
             api project(":compose:runtime:runtime")
@@ -42,11 +44,9 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            api(KOTLIN_STDLIB)
-            api(KOTLIN_STDLIB_JDK8)
-            api(KOTLIN_COROUTINES_CORE)
-
-            api(SKIKO)
+            implementation(KOTLIN_STDLIB)
+            implementation(KOTLIN_STDLIB_JDK8)
+            implementation(KOTLIN_COROUTINES_CORE)
         }
 
         jvmTest {
@@ -64,17 +64,13 @@ kotlin {
 }
 
 tasks.findByName("jvmTest").configure {
-    systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../../golden"
+    systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../golden"
 }
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         useIR = true
     }
-}
-project.tasks.register("jar", Jar).configure {
-    baseName = "desktop"
-    from { kotlin.jvm().compilations["main"].output.allOutputs }
 }
 
 rootProject.tasks.getByName("buildOnServer").configure {

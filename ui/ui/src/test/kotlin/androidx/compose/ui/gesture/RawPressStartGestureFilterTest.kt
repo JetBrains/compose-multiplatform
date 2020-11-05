@@ -151,9 +151,8 @@ class RawPressStartGestureFilterTest {
     @Test
     fun onPointerEvent_disabledDown_noDownChangeConsumed() {
         filter.setEnabled(false)
-        var pointer = down(0)
-        pointer =
-            filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer)).changes.first()
+        val pointer = down(0)
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         assertThat(pointer.consumed.downChange, `is`(false))
     }
 
@@ -183,56 +182,61 @@ class RawPressStartGestureFilterTest {
     fun onPointerEvent_initial_behaviorOccursAtCorrectTime() {
         filter.setExecutionPass(PointerEventPass.Initial)
 
-        val pointer = filter::onPointerEvent.invokeOverPasses(
-            pointerEventOf(down(0)),
+        val down = down(0)
+        filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down),
             PointerEventPass.Initial
         )
 
         verify(filter.onPressStart).invoke(any())
-        assertThat(pointer.changes.first().consumed.downChange, `is`(true))
+        assertThat(down.consumed.downChange, `is`(true))
     }
 
     @Test
     fun onPointerEvent_Main_behaviorOccursAtCorrectTime() {
         filter.setExecutionPass(PointerEventPass.Main)
 
-        var pointer = filter::onPointerEvent.invokeOverPasses(
-            pointerEventOf(down(0)),
+        val down = down(0)
+        filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down),
             PointerEventPass.Initial
         )
 
         verify(filter.onPressStart, never()).invoke(any())
-        assertThat(pointer.changes.first().consumed.downChange, `is`(false))
+        assertThat(down.consumed.downChange, `is`(false))
 
-        pointer = filter::onPointerEvent.invokeOverPasses(
-            pointerEventOf(down(1)),
+        val down2 = down(1)
+        filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down2),
             PointerEventPass.Main
         )
 
         verify(filter.onPressStart).invoke(any())
-        assertThat(pointer.changes.first().consumed.downChange, `is`(true))
+        assertThat(down2.consumed.downChange, `is`(true))
     }
 
     @Test
     fun onPointerEvent_final_behaviorOccursAtCorrectTime() {
         filter.setExecutionPass(PointerEventPass.Final)
 
-        var pointer = filter::onPointerEvent.invokeOverPasses(
-            pointerEventOf(down(0)),
+        val down = down(0)
+        filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down),
             PointerEventPass.Initial,
             PointerEventPass.Main
         )
 
         verify(filter.onPressStart, never()).invoke(any())
-        assertThat(pointer.changes.first().consumed.downChange, `is`(false))
+        assertThat(down.consumed.downChange, `is`(false))
 
-        pointer = filter::onPointerEvent.invokeOverPasses(
-            pointerEventOf(down(1)),
+        val down2 = down(1)
+        filter::onPointerEvent.invokeOverPasses(
+            pointerEventOf(down2),
             PointerEventPass.Final
         )
 
         verify(filter.onPressStart).invoke(any())
-        assertThat(pointer.changes.first().consumed.downChange, `is`(true))
+        assertThat(down2.consumed.downChange, `is`(true))
     }
 
     // Verification of correct cancellation behavior.
@@ -249,9 +253,9 @@ class RawPressStartGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
         pointer1 = pointer1.moveTo(20.milliseconds, 0f, 0f)
         val pointer2 = down(id = 2, duration = 20.milliseconds)
-        val results = filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
-        assertThat(results.changes[0].consumed.downChange, `is`(false))
-        assertThat(results.changes[1].consumed.downChange, `is`(false))
+        assertThat(pointer1.consumed.downChange, `is`(false))
+        assertThat(pointer2.consumed.downChange, `is`(false))
     }
 }

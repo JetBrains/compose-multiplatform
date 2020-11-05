@@ -16,16 +16,15 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
@@ -53,10 +52,7 @@ fun TextFieldFocusTransition() {
     }
 }
 
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalFocus::class)
 @Composable
 private fun TextFieldWithFocusRequesters(
     focusRequester: FocusRequester,
@@ -67,14 +63,14 @@ private fun TextFieldWithFocusRequesters(
     }
     var color by remember { mutableStateOf(Black) }
 
-    BaseTextField(
+    BasicTextField(
         value = state.value,
-        modifier = Modifier
+        modifier = demoTextFieldModifiers
             .focusObserver { color = if (it.isFocused) Red else Black }
             .focusRequester(focusRequester),
         textStyle = TextStyle(color = color, fontSize = 32.sp),
         onValueChange = { state.value = it },
-        imeAction = ImeAction.Next,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         onImeActionPerformed = { if (it == ImeAction.Next) nextFocusRequester.requestFocus() }
     )
 }

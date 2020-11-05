@@ -17,25 +17,41 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class LayoutAspectRatioTest : LayoutTest() {
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testAspectRatioModifier_intrinsicDimensions() = with(density) {
         testIntrinsics(
@@ -85,9 +101,51 @@ class LayoutAspectRatioTest : LayoutTest() {
             IntSize(20, 10),
             getSize(2f, Constraints(minWidth = 5, minHeight = 10))
         )
+        assertEquals(
+            IntSize(20, 10),
+            getSize(2f, Constraints.fixed(20, 20))
+        )
+        assertEquals(
+            IntSize(50, 25),
+            getSize(2f, Constraints(minWidth = 50, minHeight = 20))
+        )
     }
 
-    private fun getSize(aspectRatio: Float, childContraints: Constraints): IntSize {
+    @Test
+    fun testAspectRatio_sizesCorrectly_forHeightFirst() {
+        assertEquals(IntSize(30, 30), getSize(1f, Constraints(maxHeight = 30), true))
+        assertEquals(IntSize(15, 30), getSize(0.5f, Constraints(maxHeight = 30), true))
+        assertEquals(
+            IntSize(10, 10),
+            getSize(1f, Constraints(maxWidth = 10, maxHeight = 30), true)
+        )
+        assertEquals(
+            IntSize(10, 20),
+            getSize(0.5f, Constraints(maxWidth = 10, maxHeight = 30), true)
+        )
+        assertEquals(
+            IntSize(5, 10),
+            getSize(0.5f, Constraints(minWidth = 5, minHeight = 10), true)
+        )
+        assertEquals(
+            IntSize(10, 20),
+            getSize(0.5f, Constraints(minWidth = 10, minHeight = 5), true)
+        )
+        assertEquals(
+            IntSize(10, 20),
+            getSize(0.5f, Constraints.fixed(20, 20), true)
+        )
+        assertEquals(
+            IntSize(25, 50),
+            getSize(0.5f, Constraints(minWidth = 20, minHeight = 50), true)
+        )
+    }
+
+    private fun getSize(
+        aspectRatio: Float,
+        childContraints: Constraints,
+        matchHeightConstraintsFirst: Boolean = false
+    ): IntSize {
         val positionedLatch = CountDownLatch(1)
         val size = Ref<IntSize>()
         val position = Ref<Offset>()
@@ -96,7 +154,7 @@ class LayoutAspectRatioTest : LayoutTest() {
                 @Composable {
                     Container(
                         Modifier
-                            .aspectRatio(aspectRatio)
+                            .aspectRatio(aspectRatio, matchHeightConstraintsFirst)
                             .then(Modifier.saveLayoutInfo(size, position, positionedLatch))
                     ) {
                     }
@@ -111,5 +169,15 @@ class LayoutAspectRatioTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
         return size.value!!
+    }
+
+    @Test
+    fun testInspectableValue() {
+        val modifier = Modifier.aspectRatio(2.0f) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("aspectRatio")
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("ratio", 2.0f),
+            ValueElement("matchHeightConstraintsFirst", false)
+        )
     }
 }

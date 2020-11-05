@@ -31,6 +31,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.ScaleObserver
 import androidx.compose.ui.gesture.scaleGestureFilter
 import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Create and remember [ZoomableController] with default [AnimationClockObservable].
@@ -113,40 +114,49 @@ fun Modifier.zoomable(
     enabled: Boolean = true,
     onZoomStarted: (() -> Unit)? = null,
     onZoomStopped: (() -> Unit)? = null
-) = composed {
-    onDispose {
-        controller.stopAnimation()
-    }
-    scaleGestureFilter(
-        scaleObserver = object : ScaleObserver {
-            override fun onScale(scaleFactor: Float) {
-                if (enabled) {
-                    controller.stopAnimation()
-                    controller.onScale(scaleFactor)
-                }
-            }
-
-            override fun onStop() {
-                if (enabled) {
-                    onZoomStopped?.invoke()
-                }
-            }
-
-            override fun onCancel() {
-                if (enabled) {
-                    onZoomStopped?.invoke()
-                }
-            }
-
-            override fun onStart() {
-                if (enabled) {
-                    controller.stopAnimation()
-                    onZoomStarted?.invoke()
-                }
-            }
+) = composed(
+    factory = {
+        onDispose {
+            controller.stopAnimation()
         }
-    )
-}
+        scaleGestureFilter(
+            scaleObserver = object : ScaleObserver {
+                override fun onScale(scaleFactor: Float) {
+                    if (enabled) {
+                        controller.stopAnimation()
+                        controller.onScale(scaleFactor)
+                    }
+                }
+
+                override fun onStop() {
+                    if (enabled) {
+                        onZoomStopped?.invoke()
+                    }
+                }
+
+                override fun onCancel() {
+                    if (enabled) {
+                        onZoomStopped?.invoke()
+                    }
+                }
+
+                override fun onStart() {
+                    if (enabled) {
+                        controller.stopAnimation()
+                        onZoomStarted?.invoke()
+                    }
+                }
+            }
+        )
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "zoomable"
+        properties["controller"] = controller
+        properties["enabled"] = enabled
+        properties["onZoomStarted"] = onZoomStarted
+        properties["onZoomStopped"] = onZoomStopped
+    }
+)
 
 /**
  * Enable zooming of the modified UI element.
@@ -169,14 +179,23 @@ fun Modifier.zoomable(
     onZoomStarted: (() -> Unit)? = null,
     onZoomStopped: (() -> Unit)? = null,
     onZoomDelta: (Float) -> Unit
-) = composed {
-    Modifier.zoomable(
-        controller = rememberZoomableController(onZoomDelta),
-        enabled = enabled,
-        onZoomStarted = onZoomStarted,
-        onZoomStopped = onZoomStopped
-    )
-}
+) = composed(
+    factory = {
+        Modifier.zoomable(
+            controller = rememberZoomableController(onZoomDelta),
+            enabled = enabled,
+            onZoomStarted = onZoomStarted,
+            onZoomStopped = onZoomStopped
+        )
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "zoomable"
+        properties["enabled"] = enabled
+        properties["onZoomStarted"] = onZoomStarted
+        properties["onZoomStopped"] = onZoomStopped
+        properties["onZoomDelta"] = onZoomDelta
+    }
+)
 
 private class DeltaAnimatedScale(
     initial: Float,

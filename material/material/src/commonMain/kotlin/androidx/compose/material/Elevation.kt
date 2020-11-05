@@ -22,7 +22,9 @@ import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Interaction
+import androidx.compose.runtime.ambientOf
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * Animates the [Dp] value of [this] between [from] and [to] [Interaction]s, to [target]. The
@@ -60,8 +62,8 @@ fun AnimatedValue<Dp, *>.animateElevation(
  *
  * Typically you should use [animateElevation] instead, which uses these [AnimationSpec]s
  * internally. [animateElevation] in turn is used by the defaults for [Button] and
- * [FloatingActionButton] - inside [ButtonConstants.animateDefaultElevation] and
- * [FloatingActionButtonConstants.animateDefaultElevation] respectively.
+ * [FloatingActionButton] - inside [ButtonConstants.defaultElevation] and
+ * [FloatingActionButtonConstants.defaultElevation] respectively.
  *
  * @see animateElevation
  */
@@ -112,3 +114,13 @@ private val HoveredOutgoingSpec = TweenSpec<Dp>(
     durationMillis = 120,
     easing = CubicBezierEasing(0.40f, 0.00f, 0.60f, 1.00f)
 )
+
+/**
+ * Ambient containing the current absolute elevation provided by [Surface] components. This
+ * absolute elevation is a sum of all the previous elevations. Absolute elevation is only
+ * used for calculating elevation overlays in dark theme, and is *not* used for drawing the
+ * shadow in a [Surface]. See [ElevationOverlay] for more information on elevation overlays.
+ *
+ * @sample androidx.compose.material.samples.AbsoluteElevationSample
+ */
+val AmbientAbsoluteElevation = ambientOf { 0.dp }

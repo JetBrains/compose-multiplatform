@@ -30,14 +30,12 @@ import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.Continuation
@@ -45,23 +43,36 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 
+// TODO: Can we use rootKey for this since all compositions will have an eventual Recomposer parent?
+private const val RecomposerCompoundHashKey = 1000
+
 /**
  * Runs [block] with a new, active [Recomposer] applying changes in the calling [CoroutineContext].
  */
-suspend fun withRunningRecomposer(
-    block: suspend CoroutineScope.(recomposer: Recomposer) -> Unit
-): Unit = coroutineScope {
-    val recomposer = Recomposer()
-    val recompositionJob = launch { recomposer.runRecomposeAndApplyChanges() }
-    block(recomposer)
-    recompositionJob.cancel()
+suspend fun <R> withRunningRecomposer(
+    block: suspend CoroutineScope.(recomposer: Recomposer) -> R
+): R = coroutineScope {
+    val recomposerJob = Job(coroutineContext[Job])
+    val recomposer = Recomposer(coroutineContext + recomposerJob)
+    // Will be cancelled when recomposerJob cancels
+    launch { recomposer.runRecomposeAndApplyChanges() }
+    try {
+        block(recomposer)
+    } finally {
+        recomposerJob.cancel()
+    }
 }
 
 /**
  * The scheduler for performing recomposition and applying updates to one or more [Composition]s.
- * [frameClock] is used to align changes with display frames.
  */
-class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
+// RedundantVisibilityModifier suppressed because metalava picks up internal function overrides
+// if 'internal' is not explicitly specified - b/171342041
+@Suppress("RedundantVisibilityModifier")
+class Recomposer(
+    effectCoroutineContext: CoroutineContext,
+    val embeddingContext: EmbeddingContext = EmbeddingContext(),
+) : CompositionReference() {
 
     /**
      * This collection is its own lock, shared with [invalidComposersAwaiter]
@@ -80,13 +91,6 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
      */
     private val idlingLatch = Latch()
 
-    /**
-     * Enforces that only one caller of [runRecomposeAndApplyChanges] is active at a time
-     * while carrying its calling scope. Used to [launchEffect] on the apply dispatcher.
-     */
-    // TODO(adamp) convert to atomicfu once ready
-    private val applyingScope = AtomicReference<CoroutineScope?>(null)
-
     private val broadcastFrameClock = BroadcastFrameClock {
         synchronized(invalidComposers) {
             invalidComposersAwaiter?.let {
@@ -96,7 +100,30 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
             }
         }
     }
-    val frameClock: MonotonicFrameClock get() = broadcastFrameClock
+
+    private val runningRecomposeJobOrException = AtomicReference<Any?>(null)
+
+    /**
+     * A [Job] used as a parent of any effects created by this [Recomposer]'s compositions.
+     *
+     */
+    private val effectJob = Job(effectCoroutineContext[Job]).apply {
+        invokeOnCompletion { throwable ->
+            // Since the running recompose job is operating in a disjoint job if present,
+            // kick it out and make sure no new ones start.
+            val cancellation = throwable ?: CancellationException("Recomposer completed")
+            val old = runningRecomposeJobOrException.getAndSet(cancellation)
+            if (old is Job) {
+                old.cancel(CancellationException("Recomposer cancelled", cancellation))
+            }
+        }
+    }
+
+    /**
+     * The [effectCoroutineContext] is derived from [effectCoroutineContext]
+     */
+    internal override val effectCoroutineContext: CoroutineContext =
+        effectCoroutineContext + broadcastFrameClock + effectJob
 
     /**
      * Await the invalidation of any associated [Composer]s, recompose them, and apply their
@@ -108,34 +135,36 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
      * This method never returns. Cancel the calling [CoroutineScope] to stop.
      */
     suspend fun runRecomposeAndApplyChanges(): Nothing {
-        coroutineScope {
-            recomposeAndApplyChanges(Long.MAX_VALUE)
-        }
+        recomposeAndApplyChanges(Long.MAX_VALUE)
         error("this function never returns")
     }
 
     /**
      * Await the invalidation of any associated [Composer]s, recompose them, and apply their
-     * changes to their associated [Composition]s if recomposition is successful. Any launched
-     * effects of composition will be launched into the receiver [CoroutineScope].
+     * changes to their associated [Composition]s if recomposition is successful.
      *
      * While [runRecomposeAndApplyChanges] is running, [awaitIdle] will suspend until there are no
      * more invalid composers awaiting recomposition.
      *
-     * This method returns after recomposing [frameCount] times.
+     * This method returns after recomposing [frameCount] times, or throws [CancellationException]
+     * if the [Recomposer] is [shutDown] or if the [effectCoroutineContext] used to construct the
+     * [Recomposer] is cancelled.
      */
     suspend fun recomposeAndApplyChanges(frameCount: Long) {
-        var framesRemaining = frameCount
-        val toRecompose = mutableListOf<Composer<*>>()
-
-        // Cache this so we don't go looking for it each time through the loop.
-        val frameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
-
-        // Install the broadcastFrameClock so that all composition-launched coroutines use it
+        val parentFrameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
         withContext(broadcastFrameClock) {
-            if (!applyingScope.compareAndSet(null, this)) {
-                error("already recomposing and applying changes")
+            // Enforce mutual exclusion of callers
+            val myJob = coroutineContext[Job]
+            while (true) {
+                when (val old = runningRecomposeJobOrException.get()) {
+                    is Exception -> throw CancellationException("Recomposer cancelled", old)
+                    is Job -> error("Recomposition is already running")
+                    null -> if (runningRecomposeJobOrException.compareAndSet(null, myJob)) break
+                }
             }
+
+            var framesRemaining = frameCount
+            val toRecompose = mutableListOf<Composer<*>>()
 
             try {
                 idlingLatch.closeLatch()
@@ -174,7 +203,7 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
                     // We use the cached frame clock from above not just so that we don't locate it
                     // each time, but because we've installed the broadcastFrameClock as the scope
                     // clock above for user code to locate.
-                    frameClock.withFrameNanos { frameTime ->
+                    parentFrameClock.withFrameNanos { frameTime ->
                         trace("recomposeFrame") {
                             // Propagate the frame time to anyone who is awaiting from the
                             // recomposer clock.
@@ -204,33 +233,37 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
                     }
                 }
             } finally {
-                applyingScope.set(null)
+                // Only replace the value if it currently matches; a new caller may have already
+                // set its own job as a replacement before we resume to cancel.
+                runningRecomposeJobOrException.compareAndSet(myJob, null)
                 // If we're not still running frames, we're effectively idle.
                 idlingLatch.openLatch()
             }
         }
     }
 
-    @Suppress("DEPRECATION")
-    private class CompositionCoroutineScopeImpl(
-        override val coroutineContext: CoroutineContext
-    ) : CompositionCoroutineScope
+    /**
+     * Permanently shut down this [Recomposer] for future use. All ongoing recompositions will stop,
+     * new composer invalidations with this [Recomposer] at the root will no longer occur,
+     * and any [LaunchedEffect]s currently running in compositions managed by this [Recomposer]
+     * will be cancelled. Any [rememberCoroutineScope] scopes from compositions managed by this
+     * [Recomposer] will also be cancelled. See [join] to await the completion of all of these
+     * outstanding tasks.
+     */
+    fun shutDown() {
+        effectJob.cancel()
+    }
 
-    @Suppress("DEPRECATION")
-    @OptIn(ExperimentalCoroutinesApi::class)
-    internal fun launchEffect(
-        block: suspend CompositionCoroutineScope.() -> Unit
-    ): Job = applyingScope.get()?.launch {
-        CompositionCoroutineScopeImpl(coroutineContext).block()
-    } ?: error("apply scope missing; runRecomposeAndApplyChanges must be running")
+    /**
+     * Await the completion of a [shutDown] operation.
+     */
+    suspend fun join() {
+        effectJob.join()
+    }
 
-    // TODO this is temporary until more of this logic moves to Composition
-    internal val applyingCoroutineContext: CoroutineContext?
-        get() = applyingScope.get()?.coroutineContext
-
-    internal fun composeInitial(
-        composable: @Composable () -> Unit,
-        composer: Composer<*>
+    internal override fun composeInitial(
+        composer: Composer<*>,
+        composable: @Composable () -> Unit
     ) {
         if (composer.disposeHook == null) {
             // This will eventually move to the recomposer once it tracks active compositions.
@@ -313,17 +346,6 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
     fun hasInvalidations(): Boolean =
         !idlingLatch.isOpen || synchronized(invalidComposers) { invalidComposers.isNotEmpty() }
 
-    internal fun scheduleRecompose(composer: Composer<*>) {
-        synchronized(invalidComposers) {
-            invalidComposers.add(composer)
-            invalidComposersAwaiter?.let {
-                invalidComposersAwaiter = null
-                idlingLatch.closeLatch()
-                it.resume(Unit)
-            }
-        }
-    }
-
     /**
      * Suspends until the currently pending recomposition frame is complete.
      * Any recomposition for this recomposer triggered by actions before this call begins
@@ -334,29 +356,43 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
      */
     suspend fun awaitIdle(): Unit = idlingLatch.await()
 
-    companion object {
-        private val embeddingContext by lazy { EmbeddingContext() }
-        /**
-         * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
-         */
-        @TestOnly
-        fun current(): Recomposer {
-            return mainRecomposer ?: run {
-                val mainScope = CoroutineScope(
-                    NonCancellable +
-                        embeddingContext.mainThreadCompositionContext()
-                )
+    // Recomposer always starts with a constant compound hash
+    internal override val compoundHashKey: Int
+        get() = RecomposerCompoundHashKey
 
-                Recomposer(embeddingContext).also {
-                    mainRecomposer = it
-                    @OptIn(ExperimentalCoroutinesApi::class)
-                    mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                        it.runRecomposeAndApplyChanges()
-                    }
+    // Collecting key sources happens at the level of a composer; starts as false
+    internal override val collectingKeySources: Boolean
+        get() = false
+
+    internal override fun invalidate(composer: Composer<*>) {
+        synchronized(invalidComposers) {
+            invalidComposers.add(composer)
+            invalidComposersAwaiter?.let {
+                invalidComposersAwaiter = null
+                idlingLatch.closeLatch()
+                it.resume(Unit)
+            }
+        }
+    }
+
+    companion object {
+        private val mainRecomposer: Recomposer by lazy {
+            val embeddingContext = EmbeddingContext()
+            val mainScope = CoroutineScope(
+                NonCancellable + embeddingContext.mainThreadCompositionContext()
+            )
+
+            Recomposer(mainScope.coroutineContext, embeddingContext).also {
+                mainScope.launch {
+                    it.runRecomposeAndApplyChanges()
                 }
             }
         }
 
-        private var mainRecomposer: Recomposer? = null
+        /**
+         * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
+         */
+        @TestOnly
+        fun current(): Recomposer = mainRecomposer
     }
 }

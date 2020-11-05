@@ -16,8 +16,9 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
@@ -25,8 +26,8 @@ import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.DesktopScreenshotTestRule
-import androidx.ui.test.TestComposeWindow
+import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
+import androidx.compose.ui.test.TestComposeWindow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,6 +89,70 @@ class DrawLayerTest {
                     )
                     .size(10f.dp, 10f.dp).background(Color.Blue)
             )
+        }
+        screenshotRule.snap(window.surface)
+    }
+
+    @Test
+    fun rotationX() {
+        val window = TestComposeWindow(width = 40, height = 40)
+
+        window.setContent {
+            Box(
+                Modifier
+                    .drawLayer(rotationX = 45f)
+                    .size(10f.dp, 10f.dp).background(Color.Blue)
+            )
+            Box(
+                Modifier
+                    .drawLayer(
+                        translationX = 20f,
+                        transformOrigin = TransformOrigin(0f, 0f),
+                        rotationX = 45f
+                    )
+                    .size(10f.dp, 10f.dp).background(Color.Blue)
+            )
+        }
+        screenshotRule.snap(window.surface)
+    }
+
+    @Test
+    fun rotationY() {
+        val window = TestComposeWindow(width = 40, height = 40)
+        window.setContent {
+            Box(
+                Modifier
+                    .drawLayer(rotationY = 45f)
+                    .size(10f.dp, 10f.dp).background(Color.Blue)
+            )
+            Box(
+                Modifier
+                    .drawLayer(
+                        translationX = 20f,
+                        transformOrigin = TransformOrigin(0f, 0f),
+                        rotationY = 45f
+                    )
+                    .size(10f.dp, 10f.dp).background(Color.Blue)
+            )
+        }
+        screenshotRule.snap(window.surface)
+    }
+
+    @Test
+    fun `nested layer transformations`() {
+        val window = TestComposeWindow(width = 40, height = 40)
+        window.setContent {
+            Box(
+                Modifier
+                    .drawLayer(rotationZ = 45f, translationX = 10f)
+                    .size(20f.dp, 20f.dp).background(Color.Green)
+            ) {
+                Box(
+                    Modifier
+                        .drawLayer(rotationZ = 45f)
+                        .size(20f.dp, 20f.dp).background(Color.Blue)
+                )
+            }
         }
         screenshotRule.snap(window.surface)
     }
@@ -159,6 +224,103 @@ class DrawLayerTest {
                         .background(Color.Blue)
                 )
             }
+        }
+        screenshotRule.snap(window.surface)
+    }
+
+    @Test
+    fun alpha() {
+        val window = TestComposeWindow(width = 40, height = 40)
+        window.setContent {
+            Box(
+                Modifier
+                    .padding(start = 5.dp)
+                    .drawLayer(
+                        translationX = -5f,
+                        translationY = 5f,
+                        transformOrigin = TransformOrigin(0f, 0f),
+                        alpha = 0.5f
+                    )
+                    .size(10f.dp, 10f.dp)
+                    .background(Color.Green)
+            ) {
+                // This box will be clipped (because if we use alpha, we draw into
+                // intermediate buffer)
+                Box(
+                    Modifier
+                        .size(30f.dp, 30f.dp)
+                        .background(Color.Blue)
+                )
+            }
+
+            Box(
+                Modifier
+                    .padding(start = 15.dp)
+                    .drawLayer(alpha = 0.5f)
+                    .size(15f.dp, 15f.dp)
+                    .background(Color.Red)
+            ) {
+                Box(
+                    Modifier
+                        .drawLayer(alpha = 0.5f)
+                        .size(10f.dp, 10f.dp)
+                        .background(Color.Blue)
+                )
+            }
+
+            Box(
+                Modifier
+                    .drawLayer(
+                        alpha = 0f
+                    )
+                    .size(10f.dp, 10f.dp)
+                    .background(Color.Blue)
+            )
+        }
+        screenshotRule.snap(window.surface)
+    }
+
+    @Test
+    fun elevation() {
+        val window = TestComposeWindow(width = 40, height = 40)
+        window.setContent {
+            Box(
+                Modifier
+                    .drawLayer(shadowElevation = 5f)
+                    .size(20f.dp, 20f.dp)
+            )
+            Box(
+                Modifier
+                    .drawLayer(translationX = 20f, shadowElevation = 5f)
+                    .size(20f.dp, 20f.dp)
+            ) {
+                Box(
+                    Modifier
+                        .size(20f.dp, 20f.dp)
+                        .background(Color.Blue)
+                )
+            }
+            Box(
+                Modifier
+                    .drawLayer(translationY = 20f, alpha = 0.8f, shadowElevation = 5f)
+                    .size(20f.dp, 20f.dp)
+            ) {
+                Box(
+                    Modifier
+                        .size(20f.dp, 20f.dp)
+                        .background(Color.Red)
+                )
+            }
+            Box(
+                Modifier
+                    .drawLayer(
+                        translationX = 20f,
+                        translationY = 20f,
+                        shadowElevation = 5f,
+                        alpha = 0.8f
+                    )
+                    .size(20f.dp, 20f.dp)
+            )
         }
         screenshotRule.snap(window.surface)
     }

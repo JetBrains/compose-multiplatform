@@ -49,8 +49,8 @@ import androidx.compose.ui.unit.dp
  *
  * Note: Icons that start with a number, such as `360`, are prefixed with a '_', becoming '_360'.
  *
- * To draw an icon, you can use [androidx.compose.foundation.Icon]. This component applies tint and
- * provides layout size matching the icon.
+ * To draw an icon, you can use an [androidx.compose.material.Icon]. This component applies tint
+ * and provides layout size matching the icon.
  *
  * @sample androidx.compose.material.icons.samples.DrawIcon
  */

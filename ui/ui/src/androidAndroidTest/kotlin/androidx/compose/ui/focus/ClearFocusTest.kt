@@ -23,8 +23,8 @@ import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.SmallTest
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -84,7 +84,6 @@ class ClearFocusTest(val forcedClear: Boolean) {
         // Assert.
         rule.runOnIdle {
             assertThat(cleared).isTrue()
-            assertThat(parent.focusedChild).isNull()
             assertThat(modifier.focusState).isEqualTo(Inactive)
         }
     }
@@ -220,12 +219,10 @@ class ClearFocusTest(val forcedClear: Boolean) {
             when (forcedClear) {
                 true -> {
                     assertThat(cleared).isTrue()
-                    assertThat(parent.focusedChild).isNull()
                     assertThat(modifier.focusState).isEqualTo(Inactive)
                 }
                 false -> {
                     assertThat(cleared).isFalse()
-                    assertThat(parent.focusedChild).isEqualTo(modifier.focusNode)
                     assertThat(modifier.focusState).isEqualTo(Captured)
                 }
             }

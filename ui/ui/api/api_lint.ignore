@@ -1,5 +1,5 @@
 // Baseline format: 1.0
-AutoBoxing: androidx.compose.ui.node.LayoutNode#getAlignmentLine(androidx.compose.ui.AlignmentLine):
+AutoBoxing: androidx.compose.ui.node.LayoutNode#getAlignmentLine(androidx.compose.ui.layout.AlignmentLine):
     Must avoid boxed primitives (`java.lang.Integer`)
 
 
@@ -47,23 +47,27 @@ ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFil
     Listeners should always be at end of argument list (method `scrollGestureFilter`)
 
 
+MissingGetterMatchingBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>, androidx.compose.ui.graphics.PathFillType, String, androidx.compose.ui.graphics.Brush, float, androidx.compose.ui.graphics.Brush, float, float, androidx.compose.ui.graphics.StrokeCap, androidx.compose.ui.graphics.StrokeJoin, float, float, float, float):
+    androidx.compose.ui.graphics.vector.VectorAsset does not declare a `getPaths()` method matching method androidx.compose.ui.graphics.vector.VectorAssetBuilder.addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>,androidx.compose.ui.graphics.PathFillType,String,androidx.compose.ui.graphics.Brush,float,androidx.compose.ui.graphics.Brush,float,float,androidx.compose.ui.graphics.StrokeCap,androidx.compose.ui.graphics.StrokeJoin,float,float,float,float)
+
+
 MissingNullability: androidx.compose.ui.TransformOrigin#toString-impl(long):
     Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.input.pointer.PointerId#toString-impl(long):
     Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.layout.Measured#constructor-impl(androidx.compose.ui.Placeable):
+MissingNullability: androidx.compose.ui.layout.Measured#constructor-impl(androidx.compose.ui.layout.Placeable):
     Missing nullability on method `constructor-impl` return
-MissingNullability: androidx.compose.ui.layout.Measured#equals-impl(androidx.compose.ui.Placeable, Object) parameter #0:
+MissingNullability: androidx.compose.ui.layout.Measured#equals-impl(androidx.compose.ui.layout.Placeable, Object) parameter #0:
     Missing nullability on parameter `p` in method `equals-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#getHeight-impl(androidx.compose.ui.Placeable) parameter #0:
+MissingNullability: androidx.compose.ui.layout.Measured#getHeight-impl(androidx.compose.ui.layout.Placeable) parameter #0:
     Missing nullability on parameter `$this` in method `getHeight-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#getWidth-impl(androidx.compose.ui.Placeable) parameter #0:
+MissingNullability: androidx.compose.ui.layout.Measured#getWidth-impl(androidx.compose.ui.layout.Placeable) parameter #0:
     Missing nullability on parameter `$this` in method `getWidth-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#hashCode-impl(androidx.compose.ui.Placeable) parameter #0:
+MissingNullability: androidx.compose.ui.layout.Measured#hashCode-impl(androidx.compose.ui.layout.Placeable) parameter #0:
     Missing nullability on parameter `p` in method `hashCode-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.Placeable):
+MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.layout.Placeable):
     Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.Placeable) parameter #0:
+MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.layout.Placeable) parameter #0:
     Missing nullability on parameter `p` in method `toString-impl`
 
 

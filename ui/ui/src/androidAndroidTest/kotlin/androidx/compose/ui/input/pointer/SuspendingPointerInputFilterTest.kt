@@ -20,7 +20,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.map
@@ -33,17 +35,16 @@ import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalPointerInput::class)
 class SuspendingPointerInputFilterTest {
     @Test
     fun testAwaitSingleEvent(): Unit = runBlocking {
         val filter = SuspendingPointerInputFilter()
 
-        val result = CompletableDeferred<MutablePointerEvent>()
+        val result = CompletableDeferred<PointerEvent>()
         launch {
             with(filter) {
                 handlePointerInput {
@@ -72,7 +73,7 @@ class SuspendingPointerInputFilterTest {
     @Test
     fun testAwaitSeveralEvents(): Unit = runBlocking {
         val filter = SuspendingPointerInputFilter()
-        val results = Channel<MutablePointerEvent>(Channel.UNLIMITED)
+        val results = Channel<PointerEvent>(Channel.UNLIMITED)
         val reader = launch {
             with(filter) {
                 handlePointerInput {
@@ -110,7 +111,7 @@ class SuspendingPointerInputFilterTest {
     @Test
     fun testSyntheticCancelEvent(): Unit = runBlocking {
         val filter = SuspendingPointerInputFilter()
-        val results = Channel<MutablePointerEvent>(Channel.UNLIMITED)
+        val results = Channel<PointerEvent>(Channel.UNLIMITED)
         val reader = launch {
             with(filter) {
                 handlePointerInput {
@@ -126,47 +127,56 @@ class SuspendingPointerInputFilterTest {
         val bounds = IntSize(50, 50)
         val emitter1 = PointerInputChangeEmitter(0)
         val emitter2 = PointerInputChangeEmitter(1)
-        val expectedChanges = listOf(
-            listOf(
-                emitter1.nextChange(Offset(5f, 5f)),
-                emitter2.nextChange(Offset(10f, 10f))
+        val expectedEvents = listOf(
+            PointerEvent(
+                listOf(
+                    emitter1.nextChange(Offset(5f, 5f)),
+                    emitter2.nextChange(Offset(10f, 10f))
+                )
             ),
-            listOf(
-                emitter1.nextChange(Offset(6f, 6f)),
-                emitter2.nextChange(Offset(10f, 10f), down = false)
+            PointerEvent(
+                listOf(
+                    emitter1.nextChange(Offset(6f, 6f)),
+                    emitter2.nextChange(Offset(10f, 10f), down = false)
+                )
             ),
             // Synthetic cancel should look like this;
             // only one pointer since the previous event's second pointer changed to up,
             // the old position unchanged, 'down' changed from true to false, and the downChange
             // marked as consumed.
-            listOf(
-                PointerInputChange(
-                    PointerId(0),
-                    current = PointerInputData(
-                        position = Offset(6f, 6f),
-                        down = false
-                    ),
-                    previous = PointerInputData(
-                        position = Offset(6f, 6f),
-                        down = true
-                    ),
-                    consumed = ConsumedData(downChange = true)
+            PointerEvent(
+                listOf(
+                    PointerInputChange(
+                        PointerId(0),
+                        current = PointerInputData(
+                            position = Offset(6f, 6f),
+                            down = false
+                        ),
+                        previous = PointerInputData(
+                            position = Offset(6f, 6f),
+                            down = true
+                        ),
+                        consumed = ConsumedData(downChange = true)
+                    )
                 )
             )
         )
 
-        expectedChanges.take(expectedChanges.size - 1).forEach {
-            filter.onPointerEvent(PointerEvent(changes = it), PointerEventPass.Main, bounds)
+        expectedEvents.take(expectedEvents.size - 1).forEach {
+            filter.onPointerEvent(it, PointerEventPass.Main, bounds)
         }
         filter.onCancel()
 
         val received = withTimeout(200) {
-            results.receiveAsFlow()
-                .map { it.changes }
-                .toList()
+            results.receiveAsFlow().toList()
         }
 
-        assertEquals(expectedChanges, received)
+        assertThat(expectedEvents).hasSize(received.size)
+
+        expectedEvents.forEachIndexed { index, expectedEvent ->
+            val actualEvent = received[index]
+            PointerEventSubject.assertThat(actualEvent).isStructurallyEqualTo(expectedEvent)
+        }
 
         reader.cancel()
     }
@@ -175,7 +185,7 @@ class SuspendingPointerInputFilterTest {
 private fun PointerInputChange.toPointerEvent() = PointerEvent(listOf(this))
 
 @ExperimentalPointerInput
-private val MutablePointerEvent.firstChange get() = changes.first()
+private val PointerEvent.firstChange get() = changes.first()
 
 private class PointerInputChangeEmitter(id: Int = 0) {
     val pointerId = PointerId(id.toLong())

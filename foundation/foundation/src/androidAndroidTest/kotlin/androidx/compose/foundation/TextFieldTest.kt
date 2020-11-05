@@ -23,9 +23,9 @@ import android.os.Build
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Providers
@@ -34,13 +34,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarAmbient
@@ -48,10 +49,27 @@ import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasImeAction
+import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.isFocused
+import androidx.compose.ui.test.isNotFocused
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.EditOperation
@@ -61,25 +79,9 @@ import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.length
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.ui.test.SemanticsMatcher
-import androidx.ui.test.StateRestorationTester
-import androidx.ui.test.assert
-import androidx.ui.test.assertHasClickAction
-import androidx.ui.test.assertShape
-import androidx.ui.test.assertTextEquals
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.hasImeAction
-import androidx.ui.test.hasInputMethodsSupport
-import androidx.ui.test.isFocused
-import androidx.ui.test.isNotFocused
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
-import androidx.ui.test.performSemanticsAction
-import androidx.ui.test.performTextClearance
-import androidx.ui.test.performTextInput
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -92,10 +94,9 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 @OptIn(
     ExperimentalFocus::class,
     ExperimentalFoundationApi::class
@@ -104,7 +105,6 @@ class TextFieldTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val DefaultTextFieldWidth = 280.dp
     private val Tag = "textField"
 
     @Test
@@ -117,7 +117,7 @@ class TextFieldTest {
             Providers(
                 TextInputServiceAmbient provides inputService
             ) {
-                BaseTextField(
+                BasicTextField(
                     value = state.value,
                     modifier = Modifier.fillMaxSize().focusObserver { isFocused = it.isFocused },
                     onValueChange = { state.value = it }
@@ -135,7 +135,7 @@ class TextFieldTest {
     @Composable
     private fun TextFieldApp() {
         val state = remember { mutableStateOf(TextFieldValue("")) }
-        BaseTextField(
+        BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
             onValueChange = {
@@ -149,7 +149,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         rule.setContent {
@@ -168,8 +168,7 @@ class TextFieldTest {
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
-                keyboardType = any(),
-                imeAction = any(),
+                imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
@@ -205,7 +204,7 @@ class TextFieldTest {
     @Composable
     private fun OnlyDigitsApp() {
         val state = remember { mutableStateOf(TextFieldValue("")) }
-        BaseTextField(
+        BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
             onValueChange = {
@@ -221,7 +220,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         rule.setContent {
@@ -240,8 +239,7 @@ class TextFieldTest {
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
-                keyboardType = any(),
-                imeAction = any(),
+                imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
@@ -280,7 +278,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
@@ -289,7 +287,7 @@ class TextFieldTest {
                 TextInputServiceAmbient provides textInputService
             ) {
                 val state = remember { mutableStateOf(TextFieldValue("")) }
-                BaseTextField(
+                BasicTextField(
                     value = state.value,
                     modifier = Modifier.fillMaxSize(),
                     onValueChange = {
@@ -308,8 +306,7 @@ class TextFieldTest {
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
-                keyboardType = any(),
-                imeAction = any(),
+                imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )
@@ -340,49 +337,6 @@ class TextFieldTest {
     }
 
     @Test
-    fun textField_hasDefaultWidth() {
-        var size: Int? = null
-        rule.setContent {
-            Box {
-                BaseTextField(
-                    value = TextFieldValue(),
-                    onValueChange = {},
-                    modifier = Modifier.onGloballyPositioned {
-                        size = it.size.width
-                    }
-                )
-            }
-        }
-
-        with(rule.density) {
-            assertThat(size).isEqualTo(DefaultTextFieldWidth.toIntPx())
-        }
-    }
-
-    @Test
-    fun textField_respectsWidthSetByModifier() {
-        val textFieldWidth = 100.dp
-        var size: Int? = null
-        rule.setContent {
-            Box {
-                BaseTextField(
-                    value = TextFieldValue(),
-                    onValueChange = {},
-                    modifier = Modifier
-                        .preferredWidth(textFieldWidth)
-                        .onGloballyPositioned {
-                            size = it.size.width
-                        }
-                )
-            }
-        }
-
-        with(rule.density) {
-            assertThat(size).isEqualTo(textFieldWidth.toIntPx())
-        }
-    }
-
-    @Test
     fun textFieldInRow_fixedElementIsVisible() {
         val parentSize = 300.dp
         val boxSize = 50.dp
@@ -390,7 +344,7 @@ class TextFieldTest {
         rule.setContent {
             Box(Modifier.preferredSize(parentSize)) {
                 Row {
-                    BaseTextField(
+                    BasicTextField(
                         value = TextFieldValue(),
                         onValueChange = {},
                         modifier = Modifier
@@ -440,17 +394,17 @@ class TextFieldTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun textFieldNotFocused_cursorNotRendered() {
         rule.setContent {
-            BaseTextField(
+            BasicTextField(
                 value = TextFieldValue(),
                 onValueChange = {},
-                textColor = Color.White,
+                textStyle = TextStyle(color = Color.White),
                 modifier = Modifier.preferredSize(10.dp, 20.dp).background(color = Color.White),
                 cursorColor = Color.Blue
             )
         }
 
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -463,7 +417,7 @@ class TextFieldTest {
     @Test
     fun defaultSemantics() {
         rule.setContent {
-            BaseTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = TextFieldValue(),
                 onValueChange = {}
@@ -496,7 +450,7 @@ class TextFieldTest {
     fun semantics_clickAction() {
         rule.setContent {
             var value by remember { mutableStateOf(TextFieldValue()) }
-            BaseTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -514,7 +468,7 @@ class TextFieldTest {
     fun semantics_setTextSetSelectionActions() {
         rule.setContent {
             var value by remember { mutableStateOf(TextFieldValue()) }
-            BaseTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -548,9 +502,9 @@ class TextFieldTest {
     @Test
     fun setImeAction_isReflectedInSemantics() {
         rule.setContent {
-            BaseTextField(
+            BasicTextField(
                 value = TextFieldValue(),
-                imeAction = ImeAction.Search,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 onValueChange = {}
             )
         }
@@ -565,7 +519,7 @@ class TextFieldTest {
         var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
 
         rule.setContent {
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -586,7 +540,7 @@ class TextFieldTest {
         var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
 
         rule.setContent {
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -609,7 +563,7 @@ class TextFieldTest {
         var value by mutableStateOf(TextFieldValue(text, TextRange(0, 6)))
 
         rule.setContent {
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
                 onValueChange = { value = it }
@@ -633,7 +587,7 @@ class TextFieldTest {
 
         rule.setContent {
             toolbar = TextToolbarAmbient.current
-            CoreTextField(
+            BasicTextField(
                 modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
@@ -698,7 +652,7 @@ private fun TextFieldStringOverride(
         composition = composition?.constrain(0, value.length)
     )
 
-    CoreTextField(
+    BasicTextField(
         value = textFieldValue,
         onValueChange = {
             selection = it.selection

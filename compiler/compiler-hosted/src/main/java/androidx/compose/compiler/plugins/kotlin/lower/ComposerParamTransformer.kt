@@ -376,7 +376,10 @@ class ComposerParamTransformer(
                 fn.correspondingPropertySymbol = correspondingPropertySymbol
             }
             fn.parent = parent
-            fn.copyTypeParametersFrom(this)
+            fn.typeParameters = this.typeParameters.map {
+                it.parent = fn
+                it
+            }
             fn.dispatchReceiverParameter = dispatchReceiverParameter?.copyTo(fn)
             fn.extensionReceiverParameter = extensionReceiverParameter?.copyTo(fn)
             fn.valueParameters = valueParameters.map { p ->
@@ -500,7 +503,10 @@ class ComposerParamTransformer(
                     type = newType, varargElementType = param.varargElementType,
                     isCrossinline = param.isCrossinline,
                     isNoinline = param.isNoinline
-                ).also { it.defaultValue = param.defaultValue }
+                ).also {
+                    it.defaultValue = param.defaultValue
+                    it.parent = param.parent
+                }
             }
 
             val valueParametersMapping = explicitParameters

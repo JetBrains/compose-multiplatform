@@ -22,30 +22,30 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.MotionEvent
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class ClipPointerInputTest {
 
     @Suppress("DEPRECATION")
@@ -329,15 +329,13 @@ class ClipPointerInputTest {
                 pointerEvent: PointerEvent,
                 pass: PointerEventPass,
                 bounds: IntSize
-            ): List<PointerInputChange> {
-                val changes = pointerEvent.changes
+            ) {
                 if (pass == PointerEventPass.Initial) {
-                    changes.forEach {
+                    pointerEvent.changes.forEach {
                         println("testtest, bounds: $bounds")
                         log.add(it.current.position!!)
                     }
                 }
-                return changes
             }
 
             override fun onCancel() {

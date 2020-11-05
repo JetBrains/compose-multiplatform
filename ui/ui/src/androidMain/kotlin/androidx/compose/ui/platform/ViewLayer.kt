@@ -30,7 +30,6 @@ import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.setFrom
-import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.node.OwnedLayer
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -44,7 +43,7 @@ internal class ViewLayer(
     drawLayerModifier: DrawLayerModifier,
     val drawBlock: (Canvas) -> Unit,
     val invalidateParentLayer: () -> Unit
-) : View(ownerView.context), OwnedLayer, OwnerScope {
+) : View(ownerView.context), OwnedLayer {
     private val outlineResolver = OutlineResolver(ownerView.density)
     // Value of the layerModifier's clipToBounds property
     private var clipToBounds = false
@@ -82,6 +81,22 @@ internal class ViewLayer(
     override val layerId: Long
         get() = id.toLong()
 
+    /**
+     * Configure the camera distance on the View in pixels. View already has a get/setCameraDistance
+     * API however, that operates in Dp values.
+     */
+    var cameraDistancePx: Float
+        get() {
+            // View internally converts distance to dp so divide by density here to have
+            // consistent usage of pixels with RenderNode that is backing the View
+            return cameraDistance / resources.displayMetrics.densityDpi
+        }
+        set(value) {
+            // View internally converts distance to dp so multiply by density here to have
+            // consistent usage of pixels with RenderNode that is backing the View
+            cameraDistance = value * resources.displayMetrics.densityDpi
+        }
+
     override fun updateLayerProperties() {
         this.mTransformOrigin = modifier.transformOrigin
         this.scaleX = modifier.scaleX
@@ -95,6 +110,7 @@ internal class ViewLayer(
         this.rotationY = modifier.rotationY
         this.pivotX = mTransformOrigin.pivotFractionX * width
         this.pivotY = mTransformOrigin.pivotFractionY * height
+        this.cameraDistancePx = modifier.cameraDistance
         val shape = modifier.shape
         val clip = modifier.clip
         this.clipToBounds = clip && shape === RectangleShape

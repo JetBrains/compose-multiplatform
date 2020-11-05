@@ -15,6 +15,7 @@
  */
 package androidx.compose.foundation
 
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +29,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 
 /**
- * A continent version of [Text] component to be able to handle click event on the text.
+ * A continent version of [BasicText] component to be able to handle click event on the text.
  *
- * This is a shorthand of [Text] with [pressIndicatorGestureFilter] to be able to handle click
+ * This is a shorthand of [BasicText] with [pressIndicatorGestureFilter] to be able to handle click
  * event easily.
  *
  * @sample androidx.compose.foundation.samples.ClickableText
@@ -39,7 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
  *
  * @sample androidx.compose.foundation.samples.LongClickableText
  *
- * @see Text
+ * @see BasicText
  * @see androidx.compose.ui.gesture.pressIndicatorGestureFilter
  *
  * @param text The text to be displayed.
@@ -74,7 +75,7 @@ fun ClickableText(
         }
     }
 
-    Text(
+    BasicText(
         text = text,
         modifier = modifier.then(pressIndicator),
         style = style,

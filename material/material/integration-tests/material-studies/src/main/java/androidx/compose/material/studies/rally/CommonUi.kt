@@ -16,10 +16,9 @@
 
 package androidx.compose.material.studies.rally
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +26,9 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -99,9 +100,8 @@ private fun BaseRow(
         Spacer(Modifier.preferredWidth(16.dp))
         Icon(
             Icons.Filled.ArrowForwardIos,
-            tintColor = Color.White.copy(alpha = 0.6f),
-            modifier = Modifier.align(Alignment.CenterVertically),
-            size = 12.dp
+            tint = Color.White.copy(alpha = 0.6f),
+            modifier = Modifier.preferredSize(12.dp).align(Alignment.CenterVertically),
         )
     }
     RallyDivider()

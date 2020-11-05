@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 @file:Suppress("DEPRECATION_ERROR")
 
 package androidx.compose.foundation.text
@@ -25,7 +24,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.repeatable
-import androidx.compose.foundation.text.selection.SelectionHandle
+import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -37,9 +36,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.drawBehind
@@ -59,8 +56,13 @@ import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.input.pointer.MouseTemporaryApi
+import androidx.compose.ui.input.pointer.isMouseInput
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.DensityAmbient
@@ -68,7 +70,7 @@ import androidx.compose.ui.platform.FontLoaderAmbient
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.TextToolbarAmbient
-import androidx.compose.ui.selection.SelectionLayout
+import androidx.compose.ui.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.focused
@@ -82,6 +84,7 @@ import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextDelegate
@@ -91,14 +94,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.annotation.VisibleForTesting
-import androidx.compose.ui.unit.Density
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -127,13 +130,6 @@ import kotlin.math.roundToInt
  * @param onValueChange Called when the input service updates the values in [TextFieldValue].
  * @param modifier optional [Modifier] for this text field.
  * @param textStyle Style configuration that applies at character level such as color, font etc.
- * @param keyboardType The keyboard type to be used in this text field. Note that this input type
- * is honored by IME and shows corresponding keyboard but this is not guaranteed. For example,
- * some IME may send non-ASCII character even if you set [KeyboardType.Ascii].
- * @param imeAction The IME action. This IME action is honored by IME and may show specific icons
- * on the keyboard. For example, search icon may be shown if [ImeAction.Search] is specified.
- * Then, when user tap that key, the [onImeActionPerformed] callback is called with specified
- * ImeAction.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
  * that this IME action may be different from what you specified in [imeAction].
@@ -145,25 +141,36 @@ import kotlin.math.roundToInt
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
+ * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
+ * text will be positioned as if there was unlimited horizontal space.
+ * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
+ * equal or greater than 1.
  */
 @Composable
 @OptIn(
     ExperimentalFocus::class,
-    InternalTextApi::class
+    ExperimentalTextApi::class,
+    MouseTemporaryApi::class
 )
+@InternalTextApi
 fun CoreTextField(
     value: TextFieldValue,
     modifier: Modifier = Modifier,
     onValueChange: (TextFieldValue) -> Unit,
     textStyle: TextStyle = TextStyle.Default,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    cursorColor: Color = Color.Unspecified
+    cursorColor: Color = Color.Unspecified,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    imeOptions: ImeOptions = ImeOptions.Default
 ) {
+    require(maxLines > 0) {
+        "maxLines should be greater than 0"
+    }
+
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
     val recompose = invalidate
@@ -186,6 +193,7 @@ fun CoreTextField(
             TextDelegate(
                 text = visualText,
                 style = textStyle,
+                softWrap = softWrap,
                 density = density,
                 resourceLoader = resourceLoader
             )
@@ -194,6 +202,7 @@ fun CoreTextField(
     state.update(
         visualText,
         textStyle,
+        softWrap,
         density,
         resourceLoader,
         onValueChange,
@@ -231,8 +240,7 @@ fun CoreTextField(
                 textInputService,
                 value,
                 state.processor,
-                keyboardType,
-                imeAction,
+                imeOptions,
                 onValueChangeWrapper,
                 onImeActionPerformedWrapper
             )
@@ -303,9 +311,19 @@ fun CoreTextField(
         }
     )
 
-    val selectionLongPressModifier = Modifier.longPressDragGestureFilter(
-        manager.longPressDragObserver
-    )
+    val pointerModifier = if (isMouseInput) {
+        Modifier.dragGestureFilter(
+            manager.mouseSelectionObserver(onStart = { focusRequester.requestFocus() }),
+            startDragImmediately = true
+        )
+    } else {
+        val selectionModifier = Modifier.longPressDragGestureFilter(
+            manager.touchSelectionObserver
+        )
+        dragPositionGestureModifier
+            .then(selectionModifier)
+            .then(focusRequestTapModifier)
+    }
 
     val drawModifier = Modifier.drawBehind {
         state.layoutResult?.let { layoutResult ->
@@ -344,7 +362,7 @@ fun CoreTextField(
     }
 
     val semanticsModifier = Modifier.semantics {
-        this.imeAction = imeAction
+        this.imeAction = imeOptions.imeAction
         this.supportsInputMethods()
         this.text = AnnotatedString(value.text)
         this.textSelectionRange = value.selection
@@ -411,28 +429,27 @@ fun CoreTextField(
         }
     }
 
-    val cursorModifier =
-        Modifier.cursor(state, value, offsetMap, cursorColor)
+    val cursorModifier = Modifier.cursor(state, value, offsetMap, cursorColor)
 
     onDispose { manager.hideSelectionToolbar() }
 
     val modifiers = modifier.focusRequester(focusRequester)
         .then(focusObserver)
         .then(cursorModifier)
-        .then(dragPositionGestureModifier)
-        .then(if (state.hasFocus) selectionLongPressModifier else Modifier)
-        .then(focusRequestTapModifier)
+        .then(pointerModifier)
         .then(drawModifier)
         .then(onPositionedModifier)
         .then(semanticsModifier)
+        .then(textFieldKeyboardModifier(manager))
         .focus()
 
-    SelectionLayout(modifiers) {
+    SimpleLayout(modifiers) {
         Layout(emptyContent()) { _, constraints ->
             TextFieldDelegate.layout(
                 state.textDelegate,
                 constraints,
                 layoutDirection,
+                maxLines,
                 state.layoutResult
             ).let { (width, height, result) ->
                 if (state.layoutResult != result) {
@@ -450,19 +467,20 @@ fun CoreTextField(
             }
         }
 
-        if (state.hasFocus && state.selectionIsOn) {
+        if (state.hasFocus && state.selectionIsOn && !isMouseInput) {
             manager.state?.layoutResult?.let {
                 if (!value.selection.collapsed) {
-                    val startDirection = it.getBidiRunDirection(value.selection.start)
-                    val endDirection =
-                        it.getBidiRunDirection(max(value.selection.end - 1, 0))
+                    val startOffset = offsetMap.originalToTransformed(value.selection.start)
+                    val endOffset = offsetMap.originalToTransformed(value.selection.end)
+                    val startDirection = it.getBidiRunDirection(startOffset)
+                    val endDirection = it.getBidiRunDirection(max(endOffset - 1, 0))
                     val directions = Pair(startDirection, endDirection)
-                    SelectionHandle(
+                    TextFieldSelectionHandle(
                         isStartHandle = true,
                         directions = directions,
                         manager = manager
                     )
-                    SelectionHandle(
+                    TextFieldSelectionHandle(
                         isStartHandle = false,
                         directions = directions,
                         manager = manager
@@ -483,6 +501,9 @@ fun CoreTextField(
         } else manager.hideSelectionToolbar()
     }
 }
+
+@Composable
+internal expect fun textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
 
 @OptIn(InternalTextApi::class)
 internal class TextFieldState(
@@ -537,6 +558,7 @@ internal class TextFieldState(
     fun update(
         visualText: AnnotatedString,
         textStyle: TextStyle,
+        softWrap: Boolean,
         density: Density,
         resourceLoader: Font.ResourceLoader,
         onValueChange: (TextFieldValue) -> Unit,
@@ -549,6 +571,7 @@ internal class TextFieldState(
             current = textDelegate,
             text = visualText,
             style = textStyle,
+            softWrap = softWrap,
             density = density,
             resourceLoader = resourceLoader,
             placeholders = emptyList()
@@ -653,7 +676,7 @@ private fun Modifier.cursor(
 
     if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unspecified) {
         onCommit(cursorColor, value.text) {
-            if (blinkingCursorEnabled) {
+            if (@Suppress("DEPRECATION_ERROR") blinkingCursorEnabled) {
                 cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
             } else {
                 cursorAlpha.snapTo(1f)
@@ -698,8 +721,9 @@ private class AnimatedFloatModel(
 }
 
 // TODO(b/151940543): Remove this variable when we have a solution for idling animations
+/** @suppress */
 @InternalTextApi
-    /** @suppress */
+@Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API and should not be used")
 var blinkingCursorEnabled: Boolean = true
     @VisibleForTesting
     set

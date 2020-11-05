@@ -16,13 +16,13 @@
 
 package androidx.ui.integration.test.core.text
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InternalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -31,11 +31,12 @@ import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
@@ -64,7 +65,7 @@ class TextFieldToggleTextTestCase(
     @Composable
     override fun emitMeasuredContent() {
         for (text in texts.value) {
-            BaseTextField(
+            BasicTextField(
                 value = TextFieldValue(text),
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.Black, fontSize = fontSize),
@@ -83,6 +84,7 @@ class TextFieldToggleTextTestCase(
         textInputServiceFactory = {
             textInputService
         }
+        @Suppress("DEPRECATION_ERROR")
         @OptIn(InternalTextApi::class)
         blinkingCursorEnabled = false
         Column(
@@ -98,11 +100,11 @@ class TextFieldToggleTextTestCase(
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
     private class TestPlatformTextInputService : PlatformTextInputService {
         override fun startInput(
             value: TextFieldValue,
-            keyboardType: KeyboardType,
-            imeAction: ImeAction,
+            imeOptions: ImeOptions,
             onEditCommand: (List<EditOperation>) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ) { /*do nothing*/ }

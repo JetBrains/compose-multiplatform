@@ -20,6 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 
 /**
@@ -55,11 +58,20 @@ interface DrawCacheModifier : DrawModifier {
  */
 fun Modifier.drawBehind(
     onDraw: DrawScope.() -> Unit
-) = this.then(DrawBackgroundModifier(onDraw))
+) = this.then(
+    DrawBackgroundModifier(
+        onDraw = onDraw,
+        inspectorInfo = debugInspectorInfo {
+            name = "drawBehind"
+            properties["onDraw"] = onDraw
+        }
+    )
+)
 
 private class DrawBackgroundModifier(
-    val onDraw: DrawScope.() -> Unit
-) : DrawModifier {
+    val onDraw: DrawScope.() -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : DrawModifier, InspectorValueInfo(inspectorInfo) {
     override fun ContentDrawScope.draw() {
         onDraw()
         drawContent()
@@ -79,18 +91,27 @@ private class DrawBackgroundModifier(
  *
  * @sample androidx.compose.ui.samples.DrawWithCacheModifierSample
  * @sample androidx.compose.ui.samples.DrawWithCacheModifierStateParameterSample
+ * @sample androidx.compose.ui.samples.DrawWithCacheContentSample
  */
 fun Modifier.drawWithCache(
     onBuildDrawCache: CacheDrawScope.() -> DrawResult
-) = composed {
+) = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "drawWithCache"
+        properties["onBuildDrawCache"] = onBuildDrawCache
+    }
+) {
     val cacheDrawScope = remember { CacheDrawScope() }
-    this.then(DrawBackgroundCacheModifier(cacheDrawScope, onBuildDrawCache))
+    this.then(DrawContentCacheModifier(cacheDrawScope, onBuildDrawCache))
 }
 
 /**
  * Handle to a drawing environment that enables caching of content based on the resolved size.
  * Consumers define parameters and refer to them in the captured draw callback provided in
- * [onDraw]
+ * [onDraw] or [onDrawWithContent].
+ *
+ * [onDraw] will draw behind the layout's drawing contents however, [onDrawWithContent] will
+ * provide the ability to draw before or after the layout's contents
  */
 class CacheDrawScope internal constructor(
     internal var cachedDrawDensity: Density? = null
@@ -104,9 +125,29 @@ class CacheDrawScope internal constructor(
         internal set
 
     /**
-     * Specify the callback to be invoked to issue drawing commands
+     * Issue drawing commands to be executed before the layout content is drawn
      */
-    fun onDraw(block: DrawScope.() -> Unit): DrawResult {
+    fun onDrawBehind(block: DrawScope.() -> Unit): DrawResult = onDrawWithContent {
+        block()
+        drawContent()
+    }
+
+    /**
+     * Issue drawing commands to be executed before the layout content is drawn
+     */
+    @Deprecated(
+        "Use onDrawBehind instead",
+        ReplaceWith("onDrawBehind(block)", "androidx.compose.ui")
+    )
+    fun onDraw(block: DrawScope.() -> Unit): DrawResult = onDrawWithContent {
+        block()
+        drawContent()
+    }
+
+    /**
+     * Issue drawing commands before or after the layout's drawing contents
+     */
+    fun onDrawWithContent(block: ContentDrawScope.() -> Unit): DrawResult {
         return DrawResult(block).also { drawResult = it }
     }
 
@@ -117,7 +158,11 @@ class CacheDrawScope internal constructor(
         get() = cachedDrawDensity!!.density
 }
 
-private data class DrawBackgroundCacheModifier(
+/**
+ * DrawCacheModifier implementation that is used to construct objects that are dependent on
+ * the drawing area and re-used across draw calls
+ */
+private data class DrawContentCacheModifier(
     val cacheDrawScope: CacheDrawScope,
     val onBuildDrawCache: CacheDrawScope.() -> DrawResult
 ) : DrawCacheModifier {
@@ -135,16 +180,14 @@ private data class DrawBackgroundCacheModifier(
     }
 
     override fun ContentDrawScope.draw() {
-        cacheDrawScope.drawResult?.block?.invoke(this)
-        drawContent()
+        cacheDrawScope.drawResult!!.block(this)
     }
 }
-
 /**
  * Holder to a callback to be invoked during draw operations. This lambda
  * captures and reuses parameters defined within the CacheDrawScope receiver scope lambda.
  */
-class DrawResult internal constructor(internal var block: DrawScope.() -> Unit)
+class DrawResult internal constructor(internal var block: ContentDrawScope.() -> Unit)
 
 /**
  * Creates a [DrawModifier] that allows the developer to draw before or after the layout's
@@ -153,8 +196,15 @@ class DrawResult internal constructor(internal var block: DrawScope.() -> Unit)
 // TODO: Inline this function -- it breaks with current compiler
 /*inline*/ fun Modifier.drawWithContent(
     onDraw: ContentDrawScope.() -> Unit
-): Modifier = this.then(object : DrawModifier {
-    override fun ContentDrawScope.draw() {
-        onDraw()
+): Modifier = this.then(
+    object : DrawModifier, InspectorValueInfo(
+        debugInspectorInfo {
+            name = "drawWithContent"
+            properties["onDraw"] = onDraw
+        }
+    ) {
+        override fun ContentDrawScope.draw() {
+            onDraw()
+        }
     }
-})
+)

@@ -19,10 +19,9 @@ package androidx.compose.material.demos
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,6 +35,7 @@ import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.FabPosition
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable

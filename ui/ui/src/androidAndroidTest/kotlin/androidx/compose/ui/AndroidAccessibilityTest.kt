@@ -29,12 +29,12 @@ import android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_SELECTION
 import android.view.accessibility.AccessibilityNodeProvider
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +47,17 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.textSelectionRange
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -54,17 +65,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.os.BuildCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
-import androidx.test.filters.MediumTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.ui.test.SemanticsMatcher
-import androidx.ui.test.assert
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.assertIsOff
-import androidx.ui.test.assertIsOn
-import androidx.ui.test.assertTextEquals
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
-import androidx.ui.test.performSemanticsAction
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.atLeast
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -80,19 +84,22 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.any
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
-@MediumTest
-@RunWith(JUnit4::class)
-@OptIn(ExperimentalFoundationApi::class)
-@ExperimentalLayoutNodeApi
+@LargeTest
+@RunWith(AndroidJUnit4::class)
+@OptIn(
+    ExperimentalFoundationApi::class,
+    ExperimentalLayoutNodeApi::class
+)
 class AndroidAccessibilityTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>(false, true)
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var androidComposeView: AndroidComposeView
     private lateinit var container: ViewGroup
@@ -102,6 +109,7 @@ class AndroidAccessibilityTest {
 
     private val argument = ArgumentCaptor.forClass(AccessibilityEvent::class.java)
     private var isTextFieldVisible by mutableStateOf(true)
+    private var textFieldSelectionOneLatch = CountDownLatch(1)
 
     companion object {
         private const val ToggleableTag = "toggleable"
@@ -135,12 +143,20 @@ class AndroidAccessibilityTest {
                             .toggleable(value = checked, onValueChange = { checked = it })
                             .testTag(ToggleableTag),
                         children = {
-                            Text("ToggleableText")
+                            BasicText("ToggleableText")
                         }
                     )
                     if (isTextFieldVisible) {
-                        BaseTextField(
-                            modifier = Modifier.testTag(TextFieldTag),
+                        BasicTextField(
+                            modifier = Modifier
+                                .semantics {
+                                    // Make sure this block will be executed when selection changes.
+                                    this.textSelectionRange = value.selection
+                                    if (value.selection == TextRange(1)) {
+                                        textFieldSelectionOneLatch.countDown()
+                                    }
+                                }
+                                .testTag(TextFieldTag),
                             value = value,
                             onValueChange = { value = it },
                             onTextLayout = { textLayoutResult = it }
@@ -248,11 +264,15 @@ class AndroidAccessibilityTest {
         }
         rule.onNodeWithTag(TextFieldTag)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
-        var argument = Bundle()
+        val argument = Bundle()
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 1)
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 1)
         rule.runOnUiThread {
+            textFieldSelectionOneLatch = CountDownLatch(1)
             provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument)
+        }
+        if (!textFieldSelectionOneLatch.await(5, TimeUnit.SECONDS)) {
+            throw AssertionError("Failed to wait for text selection change.")
         }
         rule.onNodeWithTag(TextFieldTag)
             .assert(
@@ -261,32 +281,10 @@ class AndroidAccessibilityTest {
                     TextRange(1)
                 )
             )
-        argument = Bundle()
-        argument.putInt(
-            AccessibilityNodeInfo.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
-            AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
-        )
-        argument.putBoolean(
-            AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN,
-            false
-        )
-        rule.runOnUiThread {
-            provider.performAction(
-                textFieldNode.id,
-                ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY,
-                argument
-            )
-        }
-        rule.onNodeWithTag(TextFieldTag)
-            .assert(
-                SemanticsMatcher.expectValue(
-                    SemanticsProperties.TextSelectionRange,
-                    TextRange(0)
-                )
-            )
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testAddExtraDataToAccessibilityNodeInfo() {
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")

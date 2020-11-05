@@ -31,7 +31,8 @@ class DesktopTextToolbar : TextToolbar {
         rect: Rect,
         onCopyRequested: ActionCallback?,
         onPasteRequested: ActionCallback?,
-        onCutRequested: ActionCallback?
+        onCutRequested: ActionCallback?,
+        onSelectAllRequested: ActionCallback?
     ) {
         println("TextToolbar.showMenu not implemented yet")
     }

@@ -20,23 +20,29 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class DrawScopeTest {
 
     private val width: Int = 100
@@ -59,7 +65,7 @@ class DrawScopeTest {
     @Test
     fun testDrawRectColor() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the overload that consumes a color parameter
             // fills the canvas with red color
             drawRect(color = Color.Red)
@@ -76,7 +82,7 @@ class DrawScopeTest {
     @Test
     fun testDrawRectBrushColor() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the overload that consumes a brush parameter
             // fills the canvas with red color
             drawRect(brush = SolidColor(Color.Red))
@@ -93,7 +99,7 @@ class DrawScopeTest {
     @Test
     fun testDrawRectColorAlpha() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the overload that consumes a color parameter
             // fills the canvas with red color
             drawRect(color = Color.Red, alpha = 0.5f)
@@ -121,7 +127,7 @@ class DrawScopeTest {
     @Test
     fun testDrawRectBrushColorAlpha() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the overload that consumes a brush parameter
             // fills the canvas with red color
             drawRect(brush = SolidColor(Color.Red), alpha = 0.5f)
@@ -149,7 +155,7 @@ class DrawScopeTest {
     @Test
     fun testDrawRectColorIntrinsicAlpha() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the overload that consumes a color parameter
             // fills the canvas with red color
             drawRect(
@@ -185,7 +191,7 @@ class DrawScopeTest {
     @Test
     fun testDrawRectBrushColorIntrinsicAlpha() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the overload that consumes a brush parameter
             // fills the canvas with red color
             drawRect(
@@ -225,7 +231,7 @@ class DrawScopeTest {
         val img = createTestDstImage()
         val insetLeft = 10.0f
         val insetTop = 12.0f
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             translate(insetLeft, insetTop) {
                 drawRect(color = Color.Red)
             }
@@ -252,7 +258,7 @@ class DrawScopeTest {
         val insetTop = 12.0f
         val insetRight = 11.0f
         val insetBottom = 13.0f
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             inset(insetLeft, insetTop, insetRight, insetBottom) {
                 drawRect(color = Color.Red)
             }
@@ -279,7 +285,7 @@ class DrawScopeTest {
         val img = createTestDstImage()
         val insetHorizontal = 10.0f
         val insetVertical = 12.0f
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             inset(insetHorizontal, insetVertical, insetHorizontal, insetVertical) {
                 drawRect(color = Color.Red)
             }
@@ -305,7 +311,7 @@ class DrawScopeTest {
     fun testDrawInsetAll() {
         val img = createTestDstImage()
         val insetAll = 10.0f
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             inset(insetAll) {
                 drawRect(color = Color.Red)
             }
@@ -330,7 +336,7 @@ class DrawScopeTest {
     @Test
     fun testInsetRestoredAfterScopedInsetDraw() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the overload that consumes a color parameter
             // fills the canvas with red color
             val left = 10.0f
@@ -351,7 +357,7 @@ class DrawScopeTest {
     @Test
     fun testFillOverwritesOldAlpha() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the alpha parameter used in the first draw call is overridden
             // in the subsequent call that does not specify an alpha value
             drawRect(color = Color.Blue, alpha = 0.5f)
@@ -369,7 +375,7 @@ class DrawScopeTest {
     @Test
     fun testFillOverwritesOldPaintBrushAlpha() {
         val img = createTestDstImage()
-        TestDrawScope().drawInto(Canvas(img), dstSize) {
+        CanvasDrawScope().draw(Canvas(img), dstSize) {
             // Verify that the alpha parameter used in the first draw call is overridden
             // in the subsequent call that does not specify an alpha value that goes through
             // a different code path for configuration of the underlying paint
@@ -387,14 +393,14 @@ class DrawScopeTest {
 
     @Test
     fun testScaleTopLeftPivot() {
-        val canvasScope = TestDrawScope()
+        val canvasScope = CanvasDrawScope()
 
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
         val imageAsset = ImageAsset(width, height)
 
-        canvasScope.drawInto(Canvas(imageAsset), size) {
+        canvasScope.draw(Canvas(imageAsset), size) {
             drawRect(color = Color.Red)
             scale(0.5f, pivot = Offset.Zero) {
                 drawRect(color = Color.Blue)
@@ -416,14 +422,14 @@ class DrawScopeTest {
 
     @Test
     fun testScaleCenterDefaultPivot() {
-        val canvasScope = TestDrawScope()
+        val canvasScope = CanvasDrawScope()
 
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
         val imageAsset = ImageAsset(width, height)
 
-        canvasScope.drawInto(Canvas(imageAsset), size) {
+        canvasScope.draw(Canvas(imageAsset), size) {
             drawRect(color = Color.Red)
             scale(0.5f) {
                 drawRect(color = Color.Blue)
@@ -459,7 +465,7 @@ class DrawScopeTest {
 
     @Test
     fun testInsetNegativeWidthThrows() {
-        val canvasScope = TestDrawScope()
+        val canvasScope = CanvasDrawScope()
 
         val width = 200
         val height = 200
@@ -467,7 +473,7 @@ class DrawScopeTest {
         val imageAsset = ImageAsset(width, height)
 
         try {
-            canvasScope.drawInto(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageAsset), size) {
                 inset(100.0f, 0.0f, 101.0f, 0.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -480,7 +486,7 @@ class DrawScopeTest {
 
     @Test
     fun testInsetNegativeHeightThrows() {
-        val canvasScope = TestDrawScope()
+        val canvasScope = CanvasDrawScope()
 
         val width = 200
         val height = 200
@@ -488,7 +494,7 @@ class DrawScopeTest {
         val imageAsset = ImageAsset(width, height)
 
         try {
-            canvasScope.drawInto(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageAsset), size) {
                 inset(0.0f, 100.0f, 0.0f, 101.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -506,7 +512,7 @@ class DrawScopeTest {
         // dimensions.
         // This is useful for animations that slowly reveal the drawing bounds of the area.
         // Alternatively this could happen if the a sibling UI element
-        val canvasScope = TestDrawScope()
+        val canvasScope = CanvasDrawScope()
 
         val width = 200
         val height = 200
@@ -514,7 +520,7 @@ class DrawScopeTest {
         val imageAsset = ImageAsset(width, height)
 
         try {
-            canvasScope.drawInto(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageAsset), size) {
                 inset(0.0f, 100.0f, 0.0f, 100.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -531,7 +537,7 @@ class DrawScopeTest {
         // dimensions.
         // This is useful for animations that slowly reveal the drawing bounds of the area.
         // Alternatively this could happen if the a sibling UI element
-        val canvasScope = TestDrawScope()
+        val canvasScope = CanvasDrawScope()
 
         val width = 200
         val height = 200
@@ -539,7 +545,7 @@ class DrawScopeTest {
         val imageAsset = ImageAsset(width, height)
 
         try {
-            canvasScope.drawInto(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageAsset), size) {
                 inset(100.0f, 0.0f, 100.0f, 0.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -551,14 +557,14 @@ class DrawScopeTest {
 
     @Test
     fun testScaleBottomRightPivot() {
-        val canvasScope = TestDrawScope()
+        val canvasScope = CanvasDrawScope()
 
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
         val imageAsset = ImageAsset(width, height)
 
-        canvasScope.drawInto(Canvas(imageAsset), size) {
+        canvasScope.draw(Canvas(imageAsset), size) {
             drawRect(color = Color.Red)
             scale(0.5f, 0.5f, Offset(width.toFloat(), height.toFloat())) {
                 drawRect(color = Color.Blue)
@@ -590,9 +596,39 @@ class DrawScopeTest {
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
         val imageAsset = ImageAsset(width, height)
-        TestDrawScope().drawInto(Canvas(imageAsset), size) {
+        CanvasDrawScope().draw(Canvas(imageAsset), size) {
             drawRect(color = Color.Red)
             rotate(180.0f) {
+                drawRect(
+                    topLeft = Offset(100.0f, 100.0f),
+                    size = Size(100.0f, 100.0f),
+                    color = Color.Blue
+                )
+            }
+        }
+
+        val pixelMap = imageAsset.toPixelMap()
+        assertEquals(Color.Blue, pixelMap[0, 0])
+        assertEquals(Color.Blue, pixelMap[99, 0])
+        assertEquals(Color.Blue, pixelMap[0, 99])
+        assertEquals(Color.Blue, pixelMap[99, 99])
+
+        assertEquals(Color.Red, pixelMap[0, 100])
+        assertEquals(Color.Red, pixelMap[100, 0])
+        assertEquals(Color.Red, pixelMap[100, 100])
+        assertEquals(Color.Red, pixelMap[100, 99])
+        assertEquals(Color.Red, pixelMap[99, 100])
+    }
+
+    @Test
+    fun testRotationCenterPivotRad() {
+        val width = 200
+        val height = 200
+        val size = Size(width.toFloat(), height.toFloat())
+        val imageAsset = ImageAsset(width, height)
+        CanvasDrawScope().draw(Canvas(imageAsset), size) {
+            drawRect(color = Color.Red)
+            rotateRad(kotlin.math.PI.toFloat()) {
                 drawRect(
                     topLeft = Offset(100.0f, 100.0f),
                     size = Size(100.0f, 100.0f),
@@ -620,7 +656,7 @@ class DrawScopeTest {
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
         val imageAsset = ImageAsset(width, height)
-        TestDrawScope().drawInto(Canvas(imageAsset), size) {
+        CanvasDrawScope().draw(Canvas(imageAsset), size) {
             drawRect(color = Color.Red)
             rotate(-45.0f, Offset.Zero) {
                 drawRect(
@@ -641,12 +677,13 @@ class DrawScopeTest {
     }
 
     @Test
+    @LargeTest
     fun testBatchTransformEquivalent() {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
         val imageAsset1 = ImageAsset(width, height)
-        TestDrawScope().drawInto(Canvas(imageAsset1), size) {
+        CanvasDrawScope().draw(Canvas(imageAsset1), size) {
             drawRect(color = Color.Red)
             inset(20.0f, 12.0f, 10.0f, 8.0f) {
                 scale(2.0f, 0.5f) {
@@ -664,7 +701,7 @@ class DrawScopeTest {
 
         val imageAsset2 = ImageAsset(width, height)
         val saveCountCanvas = SaveCountCanvas(Canvas(imageAsset2))
-        TestDrawScope().drawInto(saveCountCanvas, size) {
+        CanvasDrawScope().draw(saveCountCanvas, size) {
             drawRect(color = Color.Red)
             withTransform({
                 inset(20.0f, 12.0f, 10.0f, 8.0f)
@@ -704,6 +741,7 @@ class DrawScopeTest {
     }
 
     @Test
+    @LargeTest
     fun testDrawLineStrokeParametersAreApplied() {
         val width = 200
         val height = 200
@@ -762,6 +800,7 @@ class DrawScopeTest {
     }
 
     @Test
+    @LargeTest
     fun testDrawPointStrokeParametersAreApplied() {
         val width = 200
         val height = 200
@@ -827,6 +866,125 @@ class DrawScopeTest {
         )
     }
 
+    @Test
+    fun testDensityAndLayoutDirectionConfigured() {
+        val canvas = Canvas(ImageAsset(1, 1))
+        CanvasDrawScope().draw(
+            Density(density = 2.0f, fontScale = 3.0f),
+            LayoutDirection.Rtl,
+            canvas,
+            Size(1f, 1f)
+        ) {
+            assertEquals(2.0f, density)
+            assertEquals(3.0f, fontScale)
+            assertEquals(LayoutDirection.Rtl, layoutDirection)
+            assertEquals(Size(1.0f, 1.0f), size)
+        }
+    }
+
+    @Test
+    fun testParametersRestoredAfterDraw() {
+        val canvas1 = Canvas(ImageAsset(200, 300))
+        val canvas2 = Canvas(ImageAsset(100, 200))
+
+        val size1 = Size(200f, 300f)
+        val size2 = Size(100f, 200f)
+
+        val layoutDirection1 = LayoutDirection.Ltr
+        val layoutDirection2 = LayoutDirection.Rtl
+
+        val density1 = Density(2.0f, 3.0f)
+        val density2 = Density(5.0f, 7.0f)
+
+        val canvasDrawScope = CanvasDrawScope()
+        canvasDrawScope.draw(
+            density1,
+            layoutDirection1,
+            canvas1,
+            size1
+        ) {
+            assertEquals(size1, size)
+            assertEquals(density1, Density(density, fontScale))
+            assertTrue(canvas1 === drawContext.canvas)
+            assertEquals(LayoutDirection.Ltr, layoutDirection)
+
+            canvasDrawScope.draw(
+                density2,
+                layoutDirection2,
+                canvas2,
+                size2
+            ) {
+                assertEquals(size2, size)
+                assertTrue(canvas2 === drawContext.canvas)
+                assertEquals(density2, Density(density, fontScale))
+                assertEquals(layoutDirection2, layoutDirection)
+            }
+
+            assertEquals(size1, size)
+            assertEquals(density1, Density(density, fontScale))
+            assertTrue(canvas1 === drawContext.canvas)
+            assertEquals(LayoutDirection.Ltr, layoutDirection)
+        }
+    }
+
+    @Test
+    fun testDefaultClipIntersectParams() {
+        testDrawTransformDefault {
+            clipPath(Path())
+            assertEquals(ClipOp.Intersect, this.clipOp)
+        }
+    }
+
+    @Test
+    fun testDefaultClipRectParams() {
+        testDrawTransformDefault {
+            clipRect()
+            assertEquals(0f, clipLeft)
+            assertEquals(0f, clipTop)
+            assertEquals(size.width, clipRight)
+            assertEquals(size.height, clipBottom)
+            assertEquals(ClipOp.Intersect, clipOp)
+        }
+    }
+
+    @Test
+    fun testDefaultTranslateParams() {
+        testDrawTransformDefault {
+            translate()
+            assertEquals(0f, left)
+            assertEquals(0f, top)
+        }
+    }
+
+    @Test
+    fun testDefaultRotationPivotParam() {
+        testDrawTransformDefault {
+            rotate(7f)
+            assertEquals(center, this.pivot)
+        }
+    }
+
+    @Test
+    fun testDefaultScalePivotParam() {
+        testDrawTransformDefault {
+            scale(0.5f, 0.5f)
+            assertEquals(center, this.pivot)
+        }
+    }
+
+    private inline fun testDrawTransformDefault(block: WrappedDrawTransform.() -> Unit) {
+        val width = 100
+        val height = 150
+        TestDrawScopeTransform().draw(
+            Canvas(ImageAsset(width, height)),
+            Size(width.toFloat(), height.toFloat())
+        ) {
+            withWrappedTransform({
+                block(this)
+            }) { /* no-op */ }
+        }
+    }
+
     /**
      * Helper method used  to confirm both DrawScope rendered content and Canvas drawn
      * content are identical
@@ -839,7 +997,7 @@ class DrawScopeTest {
     ) {
         val size = Size(width.toFloat(), height.toFloat())
         val imageAsset1 = ImageAsset(width, height)
-        TestDrawScope().drawInto(Canvas(imageAsset1), size) {
+        CanvasDrawScope().draw(Canvas(imageAsset1), size) {
             drawScopeBlock()
         }
 
@@ -874,6 +1032,107 @@ class DrawScopeTest {
 
         override fun restore() {
             saveCount--
+        }
+    }
+
+    /**
+     * Helper test method with defaults for density and layout direction
+     */
+    private inline fun CanvasDrawScope.draw(
+        canvas: Canvas,
+        size: Size,
+        block: DrawScope.() -> Unit
+    ) = this.draw(Density(1.0f, 1.0f), LayoutDirection.Ltr, canvas, size, block)
+
+    private inline fun DrawScope.withWrappedTransform(
+        transformBlock: WrappedDrawTransform.() -> Unit,
+        drawBlock: DrawScope.() -> Unit
+    ) {
+        withTransform(
+            { transformBlock((this as WrappedDrawTransform)) },
+            drawBlock
+        )
+    }
+
+    private class TestDrawScopeTransform(
+        val drawScope: CanvasDrawScope = CanvasDrawScope()
+    ) : DrawScope by drawScope {
+
+        override val drawContext = object : DrawContext {
+            override var size: Size
+                get() = drawScope.drawContext.size
+                set(value) {
+                    drawScope.drawContext.size = value
+                }
+            override val canvas: Canvas
+                get() = drawScope.drawContext.canvas
+            override val transform: DrawTransform =
+                WrappedDrawTransform(drawScope.drawContext.transform)
+        }
+
+        inline fun draw(canvas: Canvas, size: Size, block: DrawScope.() -> Unit) {
+            drawScope.draw(
+                Density(1.0f, 1.0f),
+                LayoutDirection.Ltr,
+                canvas,
+                size
+            ) {
+                this@TestDrawScopeTransform.block()
+            }
+        }
+    }
+
+    /**
+     * DrawTransform implementation that caches its parameter values to ensure proper defaults
+     * are being provided.
+     */
+    class WrappedDrawTransform(val drawTransform: DrawTransform) : DrawTransform by drawTransform {
+
+        var clipLeft: Float = -1f
+        var clipTop: Float = -1f
+        var clipRight: Float = -1f
+        var clipBottom: Float = -1f
+        var clipOp: ClipOp? = null
+
+        var left: Float = -1f
+        var top: Float = -1f
+
+        var pivot: Offset = Offset(-1f, -1f)
+
+        override fun clipRect(
+            left: Float,
+            top: Float,
+            right: Float,
+            bottom: Float,
+            clipOp: ClipOp
+        ) {
+            clipLeft = left
+            clipTop = top
+            clipRight = right
+            clipBottom = bottom
+            this.clipOp = clipOp
+            drawTransform.clipRect(left, top, right, bottom, clipOp)
+        }
+
+        override fun clipPath(path: Path, clipOp: ClipOp) {
+            this.clipOp = clipOp
+            drawTransform.clipPath(path, clipOp)
+        }
+
+        override fun translate(left: Float, top: Float) {
+            this.left = left
+            this.top = top
+            drawTransform.translate(left, top)
+        }
+
+        override fun rotate(degrees: Float, pivot: Offset) {
+            this.pivot = pivot
+            drawTransform.rotate(degrees, pivot)
+        }
+
+        override fun scale(scaleX: Float, scaleY: Float, pivot: Offset) {
+            this.pivot = pivot
+            drawTransform.scale(scaleX, scaleY, pivot)
         }
     }
 }

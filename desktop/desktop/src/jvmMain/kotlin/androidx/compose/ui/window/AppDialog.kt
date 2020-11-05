@@ -16,6 +16,7 @@
 package androidx.compose.ui.window
 
 import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.WindowEvents
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
@@ -24,25 +25,38 @@ import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import java.awt.image.BufferedImage
 
 @Composable
 fun Dialog(
     title: String = "JetpackDesktopDialog",
-    size: IntSize = IntSize(1024, 768),
-    position: IntOffset = IntOffset(0, 0),
-    isCentered: Boolean = true,
+    size: IntSize = IntSize(400, 250),
+    location: IntOffset = IntOffset.Zero,
+    centered: Boolean = true,
+    icon: BufferedImage? = null,
+    menuBar: MenuBar? = null,
+    undecorated: Boolean = false,
+    events: WindowEvents = WindowEvents(),
     onDismissEvent: (() -> Unit)? = null,
     content: @Composable () -> Unit = emptyContent()
 ) {
     val attached = AppWindowAmbient.current
+    if (attached?.pair != null) {
+        return
+    }
+
     val dialog = remember {
         AppWindow(
             attached = attached,
             title = title,
             size = size,
-            position = position,
-            onDismissEvent = onDismissEvent,
-            centered = isCentered
+            location = location,
+            centered = centered,
+            icon = icon,
+            menuBar = menuBar,
+            undecorated = undecorated,
+            events = events,
+            onDismissEvent = onDismissEvent
         )
     }
 

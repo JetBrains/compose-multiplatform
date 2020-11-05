@@ -20,12 +20,18 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
+
+/**
+ * Default camera distance for all layers
+ */
+const val DefaultCameraDistance = 8.0f
 
 /**
  * Constructs a [TransformOrigin] from the given fractional values from the Layer's
@@ -153,6 +159,30 @@ interface DrawLayerModifier : Modifier.Element {
         get() = 0f
 
     /**
+     * Sets the distance along the Z axis (orthogonal to the X/Y plane on which
+     * layers are drawn) from the camera to this layer. The camera's distance
+     * affects 3D transformations, for instance rotations around the X and Y
+     * axis. If the rotationX or rotationY properties are changed and this view is
+     * large (more than half the size of the screen), it is recommended to always
+     * use a camera distance that's greater than the height (X axis rotation) or
+     * the width (Y axis rotation) of this view.
+     *
+     * The distance of the camera from the drawing plane can have an affect on the
+     * perspective distortion of the layer when it is rotated around the x or y axis.
+     * For example, a large distance will result in a large viewing angle, and there
+     * will not be much perspective distortion of the view as it rotates. A short
+     * distance may cause much more perspective distortion upon rotation, and can
+     * also result in some drawing artifacts if the rotated view ends up partially
+     * behind the camera (which is why the recommendation is to use a distance at
+     * least as far as the size of the view, if the view is to be rotated.)
+     *
+     * The distance is expressed in pixels and must always be positive
+     */
+    @get:FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */)
+    val cameraDistance: Float
+        get() = DefaultCameraDistance
+
+    /**
      * Offset percentage along the x and y axis for which contents are rotated and scaled.
      * The default value of 0.5f, 0.5f indicates the pivot point will be at the midpoint of the
      * left and right as well as the top and bottom bounds of the layer
@@ -172,7 +202,7 @@ interface DrawLayerModifier : Modifier.Element {
     val clip: Boolean get() = false
 }
 
-private data class SimpleDrawLayerModifier(
+private class SimpleDrawLayerModifier(
     override val scaleX: Float,
     override val scaleY: Float,
     override val alpha: Float,
@@ -182,26 +212,62 @@ private data class SimpleDrawLayerModifier(
     override val rotationX: Float,
     override val rotationY: Float,
     override val rotationZ: Float,
+    override val cameraDistance: Float,
     override val transformOrigin: TransformOrigin,
     override val shape: Shape,
-    override val clip: Boolean
-) : DrawLayerModifier, InspectableValue {
-    override val nameFallback: String = "drawLayer"
-    override val inspectableElements: Sequence<ValueElement>
-        get() = sequenceOf(
-            ValueElement("scaleX", scaleX),
-            ValueElement("scaleY", scaleY),
-            ValueElement("alpha", alpha),
-            ValueElement("translationX", translationX),
-            ValueElement("translationY", translationY),
-            ValueElement("shadowElevation", shadowElevation),
-            ValueElement("rotationX", rotationX),
-            ValueElement("rotationY", rotationY),
-            ValueElement("rotationZ", rotationZ),
-            ValueElement("transformOrigin", transformOrigin),
-            ValueElement("shape", shape),
-            ValueElement("clip", clip)
-        )
+    override val clip: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : DrawLayerModifier, InspectorValueInfo(inspectorInfo) {
+
+    override fun hashCode(): Int {
+        var result = scaleX.hashCode()
+        result = 31 * result + scaleY.hashCode()
+        result = 31 * result + alpha.hashCode()
+        result = 31 * result + translationX.hashCode()
+        result = 31 * result + translationY.hashCode()
+        result = 31 * result + shadowElevation.hashCode()
+        result = 31 * result + rotationX.hashCode()
+        result = 31 * result + rotationY.hashCode()
+        result = 31 * result + rotationZ.hashCode()
+        result = 31 * result + cameraDistance.hashCode()
+        result = 31 * result + transformOrigin.hashCode()
+        result = 31 * result + shape.hashCode()
+        result = 31 * result + clip.hashCode()
+        return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        val otherModifier = other as? SimpleDrawLayerModifier ?: return false
+        return scaleX == otherModifier.scaleX &&
+            scaleY == otherModifier.scaleY &&
+            alpha == otherModifier.alpha &&
+            translationX == otherModifier.translationX &&
+            translationY == otherModifier.translationY &&
+            shadowElevation == otherModifier.shadowElevation &&
+            rotationX == otherModifier.rotationX &&
+            rotationY == otherModifier.rotationY &&
+            rotationZ == otherModifier.rotationZ &&
+            cameraDistance == otherModifier.cameraDistance &&
+            transformOrigin == otherModifier.transformOrigin &&
+            shape == otherModifier.shape &&
+            clip == otherModifier.clip
+    }
+
+    override fun toString(): String =
+        "SimpleDrawLayerModifier(" +
+            "scaleX=$scaleX, " +
+            "scaleY=$scaleY, " +
+            "alpha = $alpha, " +
+            "translationX=$translationX, " +
+            "translationY=$translationY, " +
+            "shadowElevation=$shadowElevation, " +
+            "rotationX=$rotationX, " +
+            "rotationY=$rotationY, " +
+            "rotationZ=$rotationZ, " +
+            "cameraDistance=$cameraDistance, " +
+            "transformOrigin=$transformOrigin, " +
+            "shape=$shape, " +
+            "clip=$clip)"
 }
 
 /**
@@ -236,6 +302,7 @@ fun Modifier.drawLayer(
     rotationX: Float = 0f,
     rotationY: Float = 0f,
     rotationZ: Float = 0f,
+    cameraDistance: Float = DefaultCameraDistance,
     transformOrigin: TransformOrigin = TransformOrigin.Center,
     shape: Shape = RectangleShape,
     clip: Boolean = false
@@ -250,8 +317,25 @@ fun Modifier.drawLayer(
         rotationX = rotationX,
         rotationY = rotationY,
         rotationZ = rotationZ,
+        cameraDistance = cameraDistance,
         transformOrigin = transformOrigin,
         shape = shape,
-        clip = clip
+        clip = clip,
+        inspectorInfo = debugInspectorInfo {
+            name = "drawLayer"
+            properties["scaleX"] = scaleX
+            properties["scaleY"] = scaleY
+            properties["alpha"] = alpha
+            properties["translationX"] = translationX
+            properties["translationY"] = translationY
+            properties["shadowElevation"] = shadowElevation
+            properties["rotationX"] = rotationX
+            properties["rotationY"] = rotationY
+            properties["rotationZ"] = rotationZ
+            properties["cameraDistance"] = cameraDistance
+            properties["transformOrigin"] = transformOrigin
+            properties["shape"] = shape
+            properties["clip"] = clip
+        }
     )
 )

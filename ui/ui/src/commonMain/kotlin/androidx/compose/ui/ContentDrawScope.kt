@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
  *
  * @see DrawModifier
  */
-abstract class ContentDrawScope : DrawScope() {
+interface ContentDrawScope : DrawScope {
     /**
      * Causes child drawing operations to run during the `onPaint` lambda.
      */
-    abstract fun drawContent()
+    fun drawContent()
 }

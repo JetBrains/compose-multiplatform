@@ -16,23 +16,27 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.text.FirstBaseline
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.HorizontalAlignmentLine
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.VerticalAlignmentLine
-import androidx.compose.ui.WithConstraints
+import androidx.compose.ui.layout.VerticalAlignmentLine
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -45,7 +49,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
+import org.junit.After
+import org.junit.Before
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -53,8 +60,18 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class RowColumnTest : LayoutTest() {
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     // region Size and position tests for Row and Column
     @Test
     fun testRow() = with(density) {
@@ -763,24 +780,26 @@ class RowColumnTest : LayoutTest() {
     }
 
     @Test
-    fun testRow_withRelativeToSiblingsModifier() = with(density) {
+    fun testRow_withAlignByModifier() = with(density) {
         val baseline1Dp = 30.toDp()
         val baseline1 = baseline1Dp.toIntPx()
         val baseline2Dp = 25.toDp()
         val baseline2 = baseline2Dp.toIntPx()
+        val baseline3Dp = 20.toDp()
+        val baseline3 = baseline3Dp.toIntPx()
         val sizeDp = 40.toDp()
         val size = sizeDp.toIntPx()
 
-        val drawLatch = CountDownLatch(4)
-        val childSize = arrayOfNulls<IntSize>(4)
-        val childPosition = arrayOfNulls<Offset>(4)
+        val drawLatch = CountDownLatch(5)
+        val childSize = arrayOfNulls<IntSize>(5)
+        val childPosition = arrayOfNulls<Offset>(5)
         show {
             Row(Modifier.fillMaxHeight()) {
                 BaselineTestLayout(
                     baseline = baseline1Dp,
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings(TestHorizontalLine)
+                    modifier = Modifier.alignBy(TestHorizontalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
                             childPosition[0] = coordinates.positionInRoot
@@ -791,7 +810,7 @@ class RowColumnTest : LayoutTest() {
                 Container(
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings { it.height / 2 }
+                    modifier = Modifier.alignBy { it.height / 2 }
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
                             childPosition[1] = coordinates.positionInRoot
@@ -803,7 +822,7 @@ class RowColumnTest : LayoutTest() {
                     baseline = baseline2Dp,
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings(TestHorizontalLine)
+                    modifier = Modifier.alignBy(TestHorizontalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
                             childPosition[2] = coordinates.positionInRoot
@@ -814,10 +833,23 @@ class RowColumnTest : LayoutTest() {
                 Container(
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings { it.height * 3 / 4 }
+                    modifier = Modifier.alignBy { it.height * 3 / 4 }
                         .onGloballyPositioned { coordinates ->
                             childSize[3] = coordinates.size
                             childPosition[3] = coordinates.positionInRoot
+                            drawLatch.countDown()
+                        }
+                ) {
+                }
+                BaselineTestLayout(
+                    baseline = baseline3Dp,
+                    width = sizeDp,
+                    height = sizeDp,
+                    horizontalLine = FirstBaseline,
+                    modifier = Modifier.alignByBaseline()
+                        .onGloballyPositioned { coordinates ->
+                            childSize[4] = coordinates.size
+                            childPosition[4] = coordinates.positionInRoot
                             drawLatch.countDown()
                         }
                 ) {
@@ -849,10 +881,16 @@ class RowColumnTest : LayoutTest() {
             Offset((size.toFloat() * 3), 0f),
             childPosition[3]
         )
+
+        assertEquals(IntSize(size, size), childSize[4])
+        assertEquals(
+            Offset((size.toFloat() * 4), (baseline1 - baseline3).toFloat()),
+            childPosition[4]
+        )
     }
 
     @Test
-    fun testRow_withRelativeToSiblingsModifier_andWeight() = with(density) {
+    fun testRow_withAlignByModifier_andWeight() = with(density) {
         val baselineDp = 30.toDp()
         val baseline = baselineDp.toIntPx()
         val sizeDp = 40.toDp()
@@ -867,7 +905,7 @@ class RowColumnTest : LayoutTest() {
                     baseline = baselineDp,
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings(TestHorizontalLine)
+                    modifier = Modifier.alignBy(TestHorizontalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
                             childPosition[0] = coordinates.positionInRoot
@@ -877,7 +915,7 @@ class RowColumnTest : LayoutTest() {
                 }
                 Container(
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings { it.height / 2 }
+                    modifier = Modifier.alignBy { it.height / 2 }
                         .weight(1f)
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
@@ -1091,7 +1129,7 @@ class RowColumnTest : LayoutTest() {
     }
 
     @Test
-    fun testColumn_withRelativeToSiblingsModifier() = with(density) {
+    fun testColumn_withAlignByModifier() = with(density) {
         val sizeDp = 40.toDp()
         val size = sizeDp.toIntPx()
         val firstBaseline1Dp = 20.toDp()
@@ -1105,7 +1143,7 @@ class RowColumnTest : LayoutTest() {
                 Container(
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings { it.width }
+                    modifier = Modifier.alignBy { it.width }
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
                             childPosition[0] = coordinates.positionInRoot
@@ -1116,7 +1154,7 @@ class RowColumnTest : LayoutTest() {
                 Container(
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings { 0 }
+                    modifier = Modifier.alignBy { 0 }
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
                             childPosition[1] = coordinates.positionInRoot
@@ -1128,7 +1166,7 @@ class RowColumnTest : LayoutTest() {
                     width = sizeDp,
                     height = sizeDp,
                     baseline = firstBaseline1Dp,
-                    modifier = Modifier.alignWithSiblings(TestVerticalLine)
+                    modifier = Modifier.alignBy(TestVerticalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
                             childPosition[2] = coordinates.positionInRoot
@@ -1140,7 +1178,7 @@ class RowColumnTest : LayoutTest() {
                     width = sizeDp,
                     height = sizeDp,
                     baseline = firstBaseline2Dp,
-                    modifier = Modifier.alignWithSiblings(TestVerticalLine)
+                    modifier = Modifier.alignBy(TestVerticalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[3] = coordinates.size
                             childPosition[3] = coordinates.positionInRoot
@@ -1178,7 +1216,7 @@ class RowColumnTest : LayoutTest() {
     }
 
     @Test
-    fun testColumn_withRelativeToSiblingsModifier_andWeight() = with(density) {
+    fun testColumn_withAlignByModifier_andWeight() = with(density) {
         val baselineDp = 30.toDp()
         val baseline = baselineDp.toIntPx()
         val sizeDp = 40.toDp()
@@ -1193,7 +1231,7 @@ class RowColumnTest : LayoutTest() {
                     baseline = baselineDp,
                     width = sizeDp,
                     height = sizeDp,
-                    modifier = Modifier.alignWithSiblings(TestVerticalLine)
+                    modifier = Modifier.alignBy(TestVerticalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
                             childPosition[0] = coordinates.positionInRoot
@@ -1203,7 +1241,7 @@ class RowColumnTest : LayoutTest() {
                 }
                 Container(
                     width = sizeDp,
-                    modifier = Modifier.alignWithSiblings { it.width / 2 }
+                    modifier = Modifier.alignBy { it.width / 2 }
                         .weight(1f)
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
@@ -3203,12 +3241,12 @@ class RowColumnTest : LayoutTest() {
             @Composable {
                 Row {
                     Container(
-                        Modifier.aspectRatio(2f).alignWithSiblings(FirstBaseline),
+                        Modifier.aspectRatio(2f).alignBy(FirstBaseline),
                         children = emptyContent()
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        Modifier.alignWithSiblings { it.width },
+                        Modifier.alignBy { it.width },
                         children = emptyContent()
                     )
                 }
@@ -3546,12 +3584,12 @@ class RowColumnTest : LayoutTest() {
             @Composable {
                 Column {
                     Container(
-                        Modifier.aspectRatio(2f).alignWithSiblings { 0 },
+                        Modifier.aspectRatio(2f).alignBy { 0 },
                         children = emptyContent()
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        Modifier.alignWithSiblings(TestVerticalLine),
+                        Modifier.alignBy(TestVerticalLine),
                         children = emptyContent()
                     )
                 }
@@ -3942,7 +3980,7 @@ class RowColumnTest : LayoutTest() {
     }
 
     @Test
-    fun testRelativeToSiblingsModifiersChain_leftMostWins() = with(density) {
+    fun testAlignByModifiersChain_leftMostWins() = with(density) {
         val positionedLatch = CountDownLatch(1)
         val containerSize = Ref<IntSize>()
         val containerPosition = Ref<Offset>()
@@ -3951,14 +3989,14 @@ class RowColumnTest : LayoutTest() {
         show {
             Row {
                 Container(
-                    modifier = Modifier.alignWithSiblings { it.height },
+                    modifier = Modifier.alignBy { it.height },
                     width = size,
                     height = size,
                     children = emptyContent()
                 )
                 Container(
-                    modifier = Modifier.alignWithSiblings { 0 }
-                        .alignWithSiblings { it.height / 2 }
+                    modifier = Modifier.alignBy { 0 }
+                        .alignBy { it.height / 2 }
                         .onGloballyPositioned { coordinates ->
                             containerSize.value = coordinates.size
                             containerPosition.value = coordinates.positionInRoot
@@ -4405,7 +4443,7 @@ class RowColumnTest : LayoutTest() {
     }
 
     @Test
-    fun testColumn_Rtl_gravityRelativeToSiblings() = with(density) {
+    fun testColumn_Rtl_gravityAlignBy() = with(density) {
         val sizeDp = 50.toDp()
         val size = sizeDp.toIntPx()
 
@@ -4416,7 +4454,7 @@ class RowColumnTest : LayoutTest() {
                 Column(Modifier.fillMaxWidth()) {
                     Container(
                         Modifier.preferredSize(sizeDp)
-                            .alignWithSiblings { it.width }
+                            .alignBy { it.width }
                             .onGloballyPositioned { coordinates ->
                                 childPosition[0] = coordinates.positionInRoot
                                 drawLatch.countDown()
@@ -4426,7 +4464,7 @@ class RowColumnTest : LayoutTest() {
 
                     Container(
                         Modifier.preferredSize(sizeDp)
-                            .alignWithSiblings { it.width / 2 }
+                            .alignBy { it.width / 2 }
                             .onGloballyPositioned { coordinates ->
                                 childPosition[1] = coordinates.positionInRoot
                                 drawLatch.countDown()
@@ -5261,6 +5299,67 @@ class RowColumnTest : LayoutTest() {
         assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
     // endregion
+
+    // region InspectableValue tests for Row and Column
+    @Test
+    fun testRow_AlignInspectableValue() {
+        val modifier = with(object : RowScope {}) { Modifier.align(Alignment.Bottom) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("align")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(Alignment.Bottom)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testRow_AlignByInspectableValue() {
+        val modifier = with(object : RowScope {}) { Modifier.alignBy(FirstBaseline) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("alignBy")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(FirstBaseline)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testRow_WeightInspectableValue() {
+        val modifier = with(object : RowScope {}) { Modifier.weight(2.0f, false) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("weight")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(2.0f)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("weight", 2.0f),
+            ValueElement("fill", false)
+        )
+    }
+    @Test
+    fun testColumn_AlignInspectableValue() {
+        val modifier = with(object : ColumnScope {}) { Modifier.align(Alignment.Start) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("align")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(Alignment.Start)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testColumn_AlignByInspectableValue() {
+        val modifier = with(object : ColumnScope {}) { Modifier.alignBy(TestVerticalLine) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("alignBy")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(TestVerticalLine)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+    }
+
+    @Test
+    fun testColumn_WeightInspectableValue() {
+        val modifier = with(object : ColumnScope {}) { Modifier.weight(2.0f, false) }
+            as InspectableValue
+        Truth.assertThat(modifier.nameFallback).isEqualTo("weight")
+        Truth.assertThat(modifier.valueOverride).isEqualTo(2.0f)
+        Truth.assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("weight", 2.0f),
+            ValueElement("fill", false)
+        )
+    }
+    // endregion
 }
 
 private val TestHorizontalLine = HorizontalAlignmentLine(::min)
@@ -5272,6 +5371,7 @@ private fun BaselineTestLayout(
     height: Dp,
     baseline: Dp,
     modifier: Modifier,
+    horizontalLine: HorizontalAlignmentLine = TestHorizontalLine,
     children: @Composable () -> Unit
 ) {
     Layout(
@@ -5284,7 +5384,7 @@ private fun BaselineTestLayout(
             layout(
                 widthPx, heightPx,
                 mapOf(
-                    TestHorizontalLine to baseline.toIntPx(),
+                    horizontalLine to baseline.toIntPx(),
                     TestVerticalLine to baseline.toIntPx()
                 )
             ) {}

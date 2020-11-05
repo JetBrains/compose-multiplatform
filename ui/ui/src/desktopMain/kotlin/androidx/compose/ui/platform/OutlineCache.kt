@@ -28,10 +28,18 @@ import androidx.compose.ui.unit.toSize
  * (it can be expensive to create outline every frame).
  */
 internal class OutlineCache(
-    private val density: Density,
+    density: Density,
     size: IntSize,
     shape: Shape
 ) {
+    var density = density
+        set(value) {
+            if (value != field) {
+                field = value
+                update()
+            }
+        }
+
     var size = size
         set(value) {
             if (value != field) {
@@ -39,6 +47,7 @@ internal class OutlineCache(
                 update()
             }
         }
+
     var shape = shape
         set(value) {
             if (value != field) {

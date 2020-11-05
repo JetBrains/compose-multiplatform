@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.Density
 @OptIn(ExperimentalComposeApi::class)
 @InternalInteropApi
 abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
+    init {
+        clipChildren = false
+    }
+
     /**
      * The view hosted by this holder.
      */

@@ -21,31 +21,31 @@ import androidx.compose.material.samples.IconButtonSample
 import androidx.compose.material.samples.IconToggleButtonSample
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.isToggleable
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsOff
-import androidx.ui.test.assertIsOn
-import androidx.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.ui.test.assertWidthIsEqualTo
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.isToggleable
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 /**
  * Test for [IconButton] and [IconToggleButton].
  */
 class IconButtonTest {
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun iconButton_size() {

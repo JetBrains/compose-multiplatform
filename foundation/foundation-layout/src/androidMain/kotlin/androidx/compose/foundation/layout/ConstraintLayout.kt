@@ -18,20 +18,21 @@ package androidx.compose.foundation.layout
 
 import android.util.Log
 import androidx.annotation.FloatRange
-import androidx.compose.foundation.text.FirstBaseline
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.MultiMeasureLayout
-import androidx.compose.ui.ParentDataModifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.MultiMeasureLayout
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -99,7 +100,7 @@ fun ConstraintLayout(
             this
         )
         layout(layoutSize.width, layoutSize.height) {
-            with(measurer) { performLayout() }
+            with(measurer) { performLayout(measurables) }
         }
     }
 }
@@ -118,7 +119,10 @@ fun ConstraintLayout(
 ) {
     val measurer = remember { Measurer() }
     @Suppress("Deprecation")
-    MultiMeasureLayout(modifier, children) { measurables, constraints ->
+    MultiMeasureLayout(
+        modifier,
+        children
+    ) { measurables, constraints ->
         val layoutSize = measurer.performMeasure(
             constraints,
             layoutDirection,
@@ -127,7 +131,7 @@ fun ConstraintLayout(
             this
         )
         layout(layoutSize.width, layoutSize.height) {
-            with(measurer) { performLayout() }
+            with(measurer) { performLayout(measurables) }
         }
     }
 }
@@ -1119,6 +1123,7 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
     private val placeables = mutableMapOf<Measurable, Placeable>()
     private val lastMeasures = mutableMapOf<Measurable, Array<Int>>()
     private val lastMeasureDefaultsHolder = arrayOf(0, 0, 0)
+    private val positionsCache = mutableMapOf<Measurable, IntOffset>()
     private lateinit var density: Density
     private lateinit var measureScope: MeasureScope
     private val state by lazy(LazyThreadSafetyMode.NONE) { State(density) }
@@ -1129,6 +1134,7 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
     fun reset() {
         placeables.clear()
         lastMeasures.clear()
+        positionsCache.clear()
         state.reset()
     }
 
@@ -1369,12 +1375,16 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
         return IntSize(root.width, root.height)
     }
 
-    fun Placeable.PlacementScope.performLayout() {
-        for (child in root.children) {
-            val measurable = child.companionWidget
-            if (measurable !is Measurable) continue
-            // TODO(popam, b/157886946): check if measurer's rtl support should be used instead
-            placeables[measurable]?.place(child.x, child.y)
+    fun Placeable.PlacementScope.performLayout(measurables: List<Measurable>) {
+        if (positionsCache.isEmpty()) {
+            for (child in root.children) {
+                val measurable = child.companionWidget
+                if (measurable !is Measurable) continue
+                positionsCache[measurable] = IntOffset(child.x, child.y)
+            }
+        }
+        measurables.fastForEach { measurable ->
+            placeables[measurable]?.place(positionsCache[measurable]!!)
         }
     }
 

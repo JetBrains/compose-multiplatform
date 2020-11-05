@@ -16,22 +16,22 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class HitPathTrackerTest {
 
     private lateinit var hitPathTracker: HitPathTracker
@@ -237,7 +237,9 @@ class HitPathTrackerTest {
         assertThat(log).hasSize(3)
         // Verify call values
         PointerEventPass.values().forEachIndexed { index, value ->
-            assertThat(log[index].pointerEvent).isEqualTo(pointerEventOf(down(13)))
+            PointerEventSubject
+                .assertThat(log[index].pointerEvent)
+                .isStructurallyEqualTo(pointerEventOf(down(13)))
             assertThat(log[index].pass).isEqualTo(value)
         }
     }
@@ -259,7 +261,9 @@ class HitPathTrackerTest {
         assertThat(onPointerEventLog[1].pointerInputFilter).isEqualTo(pif2)
         assertThat(onPointerEventLog[2].pointerInputFilter).isEqualTo(pif3)
         onPointerEventLog.forEach {
-            assertThat(it.pointerEvent).isEqualTo(pointerEventOf(down(13)))
+            PointerEventSubject
+                .assertThat(it.pointerEvent)
+                .isStructurallyEqualTo(pointerEventOf(down(13)))
         }
     }
 
@@ -284,7 +288,9 @@ class HitPathTrackerTest {
         assertThat(onPointerEventLog[4].pointerInputFilter).isEqualTo(pif2)
         assertThat(onPointerEventLog[5].pointerInputFilter).isEqualTo(pif1)
         onPointerEventLog.forEach {
-            assertThat(it.pointerEvent).isEqualTo(pointerEventOf(down(13)))
+            PointerEventSubject
+                .assertThat(it.pointerEvent)
+                .isStructurallyEqualTo(pointerEventOf(down(13)))
         }
     }
 
@@ -317,7 +323,9 @@ class HitPathTrackerTest {
         assertThat(log2).hasSize(4)
 
         log1.forEach {
-            assertThat(it.pointerEvent).isEqualTo(pointerEventOf(event1))
+            PointerEventSubject
+                .assertThat(it.pointerEvent)
+                .isStructurallyEqualTo(pointerEventOf(event1))
         }
 
         assertThat(log1[0].pointerInputFilter).isEqualTo(pif1)
@@ -368,36 +376,52 @@ class HitPathTrackerTest {
 
         // Verifies that the events traverse between parent and child1 in the correct order.
         assertThat(log1[0].pointerInputFilter).isEqualTo(parent)
-        assertThat(log1[0].pointerEvent).isEqualTo(pointerEventOf(event1, event2))
+        PointerEventSubject
+            .assertThat(log1[0].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1, event2))
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(event1))
+        PointerEventSubject
+            .assertThat(log1[1].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1))
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(event1))
+        PointerEventSubject
+            .assertThat(log1[2].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1))
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(parent)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(event1, event2))
+        PointerEventSubject
+            .assertThat(log1[3].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1, event2))
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
         // Verifies that the events traverse between parent and child2 in the correct order.
         assertThat(log1[0].pointerInputFilter).isEqualTo(parent)
-        assertThat(log1[0].pointerEvent).isEqualTo(pointerEventOf(event1, event2))
+        PointerEventSubject
+            .assertThat(log1[0].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1, event2))
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(event1))
+        PointerEventSubject
+            .assertThat(log1[1].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1))
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(event1))
+        PointerEventSubject
+            .assertThat(log1[2].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1))
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(parent)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(event1, event2))
+        PointerEventSubject
+            .assertThat(log1[3].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(event1, event2))
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
     }
 
@@ -424,7 +448,9 @@ class HitPathTrackerTest {
 
         // Verify PointerEvent
         log1.forEach {
-            assertThat(it.pointerEvent).isEqualTo(pointerEventOf(event1, event2))
+            PointerEventSubject
+                .assertThat(it.pointerEvent)
+                .isStructurallyEqualTo(pointerEventOf(event1, event2))
         }
 
         // Verify dispatch order
@@ -442,7 +468,9 @@ class HitPathTrackerTest {
     fun dispatchChanges_noNodes_nothingChanges() {
         val (result, _) = hitPathTracker.dispatchChanges(internalPointerEventOf(down(5)))
 
-        assertThat(result.changes.values.first()).isEqualTo(down(5))
+        PointerInputChangeSubject
+            .assertThat(result.changes.values.first())
+            .isStructurallyEqualTo(down(5))
     }
 
     @Test
@@ -460,8 +488,9 @@ class HitPathTrackerTest {
 
         val (result, _) = hitPathTracker.dispatchChanges(internalPointerEventOf(down(13)))
 
-        assertThat(result.changes.values.first())
-            .isEqualTo(down(13).apply { consumeDownChange() })
+        PointerInputChangeSubject
+            .assertThat(result.changes.values.first())
+            .isStructurallyEqualTo(down(13).apply { consumeDownChange() })
     }
 
     @Test
@@ -525,41 +554,66 @@ class HitPathTrackerTest {
             .filter { it.pass == PointerEventPass.Initial || it.pass == PointerEventPass.Main }
 
         assertThat(log1[0].pointerInputFilter).isEqualTo(pif1)
-        assertThat(log1[0].pointerEvent).isEqualTo(pointerEventOf(expectedChange))
+        PointerEventSubject
+            .assertThat(log1[0].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(expectedChange))
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 1f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[1].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedChange.apply { consumePositionChange(0f, 1f) }
+                )
+            )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(pif3)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 2f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[2].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedChange.apply { consumePositionChange(0f, 2f) }
+                )
+            )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(pif3)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 3f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[3].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedChange.apply { consumePositionChange(0f, 3f) }
+                )
+            )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[4].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[4].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 4f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[4].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedChange.apply { consumePositionChange(0f, 4f) }
+                )
+            )
         assertThat(log1[4].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[5].pointerInputFilter).isEqualTo(pif1)
-        assertThat(log1[5].pointerEvent).isEqualTo(pointerEventOf(
-            expectedChange.apply { consumePositionChange(0f, 5f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[5].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedChange.apply { consumePositionChange(0f, 5f) }
+                )
+            )
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
 
-        assertThat(result.changes.values.first())
-            .isEqualTo(expectedChange.apply { consumePositionChange(0f, 6f) })
+        PointerInputChangeSubject
+            .assertThat(result.changes.values.first())
+            .isStructurallyEqualTo(
+                expectedChange.apply { consumePositionChange(0f, 6f) }
+            )
     }
 
     @Test
@@ -649,56 +703,88 @@ class HitPathTrackerTest {
             .filter { it.pointerInputFilter == pif3 || it.pointerInputFilter == pif4 }
 
         assertThat(log1[0].pointerInputFilter).isEqualTo(pif1)
-        assertThat(log1[0].pointerEvent).isEqualTo(pointerEventOf(expectedEvent1))
+        PointerEventSubject
+            .assertThat(log1[0].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(expectedEvent1))
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 1f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[1].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 1f) }
+                )
+            )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(pif2)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 2f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[2].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 2f) }
+                )
+            )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(pif1)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 3f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[3].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 3f) }
+                )
+            )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log2[0].pointerInputFilter).isEqualTo(pif3)
-        assertThat(log2[0].pointerEvent).isEqualTo(pointerEventOf(expectedEvent2))
+        PointerEventSubject
+            .assertThat(log2[0].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(expectedEvent2))
         assertThat(log2[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log2[1].pointerInputFilter).isEqualTo(pif4)
-        assertThat(log2[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, -1f) }
-        ))
+        PointerEventSubject
+            .assertThat(log2[1].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent2.apply { consumePositionChange(0f, -1f) }
+                )
+            )
         assertThat(log2[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log2[2].pointerInputFilter).isEqualTo(pif4)
-        assertThat(log2[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, -2f) }
-        ))
+        PointerEventSubject
+            .assertThat(log2[2].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent2.apply { consumePositionChange(0f, -2f) }
+                )
+            )
         assertThat(log2[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log2[3].pointerInputFilter).isEqualTo(pif3)
-        assertThat(log2[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, -3f) }
-        ))
+        PointerEventSubject
+            .assertThat(log2[3].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent2.apply { consumePositionChange(0f, -3f) }
+                )
+            )
         assertThat(log2[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes).hasSize(2)
-        assertThat(result.changes[actualEvent1.id]).isEqualTo(
-            expectedEvent1.apply { consumePositionChange(0f, 4f) }
-        )
-        assertThat(result.changes[actualEvent2.id]).isEqualTo(
-            expectedEvent2.apply { consumePositionChange(0f, -4f) }
-        )
+        PointerInputChangeSubject
+            .assertThat(result.changes[actualEvent1.id])
+            .isStructurallyEqualTo(
+                expectedEvent1.apply { consumePositionChange(0f, 4f) }
+            )
+        PointerInputChangeSubject
+            .assertThat(result.changes[actualEvent2.id])
+            .isStructurallyEqualTo(
+                expectedEvent2.apply { consumePositionChange(0f, -4f) }
+            )
     }
 
     @Test
@@ -779,47 +865,73 @@ class HitPathTrackerTest {
             .filter { it.pass == PointerEventPass.Initial || it.pass == PointerEventPass.Main }
 
         assertThat(log1[0].pointerInputFilter).isEqualTo(parent)
-        assertThat(log1[0].pointerEvent).isEqualTo(pointerEventOf(expectedEvent1, expectedEvent2))
+        PointerEventSubject
+            .assertThat(log1[0].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(expectedEvent1, expectedEvent2))
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 1f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[1].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 1f) }
+                )
+            )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 2f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[2].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 2f) }
+                )
+            )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, 1f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[3].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent2.apply { consumePositionChange(0f, 1f) }
+                )
+            )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[4].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[4].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent2.apply { consumePositionChange(0f, 4f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[4].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent2.apply { consumePositionChange(0f, 4f) }
+                )
+            )
         assertThat(log1[4].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[5].pointerInputFilter).isEqualTo(parent)
-        assertThat(log1[5].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 20f) },
-            expectedEvent2.apply { consumePositionChange(0f, 40f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[5].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 20f) },
+                    expectedEvent2.apply { consumePositionChange(0f, 40f) }
+                )
+            )
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes).hasSize(2)
-        assertThat(result.changes[actualEvent1.id]).isEqualTo(
-            expectedEvent1.apply { consumePositionChange(0f, 10f) }
-        )
-        assertThat(result.changes[actualEvent2.id]).isEqualTo(
-            expectedEvent2.apply { consumePositionChange(0f, 10f) }
-        )
+        PointerInputChangeSubject
+            .assertThat(result.changes[actualEvent1.id])
+            .isStructurallyEqualTo(
+                expectedEvent1.apply { consumePositionChange(0f, 10f) }
+            )
+        PointerInputChangeSubject
+            .assertThat(result.changes[actualEvent2.id])
+            .isStructurallyEqualTo(
+                expectedEvent2.apply { consumePositionChange(0f, 10f) }
+            )
     }
 
     @Test
@@ -879,37 +991,55 @@ class HitPathTrackerTest {
             .filter { it.pass == PointerEventPass.Initial || it.pass == PointerEventPass.Main }
 
         assertThat(log1[0].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[0].pointerEvent).isEqualTo(pointerEventOf(expectedEvent1, expectedEvent2))
+        PointerEventSubject
+            .assertThat(log1[0].pointerEvent)
+            .isStructurallyEqualTo(pointerEventOf(expectedEvent1, expectedEvent2))
         assertThat(log1[0].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[1].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[1].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 1f) },
-            expectedEvent2.apply { consumePositionChange(0f, 1f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[1].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 1f) },
+                    expectedEvent2.apply { consumePositionChange(0f, 1f) }
+                )
+            )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
         assertThat(log1[2].pointerInputFilter).isEqualTo(child2)
-        assertThat(log1[2].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 2f) },
-            expectedEvent2.apply { consumePositionChange(0f, 2f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[2].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 2f) },
+                    expectedEvent2.apply { consumePositionChange(0f, 2f) }
+                )
+            )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(log1[3].pointerInputFilter).isEqualTo(child1)
-        assertThat(log1[3].pointerEvent).isEqualTo(pointerEventOf(
-            expectedEvent1.apply { consumePositionChange(0f, 3f) },
-            expectedEvent2.apply { consumePositionChange(0f, 3f) }
-        ))
+        PointerEventSubject
+            .assertThat(log1[3].pointerEvent)
+            .isStructurallyEqualTo(
+                pointerEventOf(
+                    expectedEvent1.apply { consumePositionChange(0f, 3f) },
+                    expectedEvent2.apply { consumePositionChange(0f, 3f) }
+                )
+            )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes).hasSize(2)
-        assertThat(result.changes[actualEvent1.id]).isEqualTo(
-            expectedEvent1.apply { consumePositionChange(0f, 4f) }
-        )
-        assertThat(result.changes[actualEvent2.id]).isEqualTo(
-            expectedEvent2.apply { consumePositionChange(0f, 4f) }
-        )
+        PointerInputChangeSubject
+            .assertThat(result.changes[actualEvent1.id])
+            .isStructurallyEqualTo(
+                expectedEvent1.apply { consumePositionChange(0f, 4f) }
+            )
+        PointerInputChangeSubject
+            .assertThat(result.changes[actualEvent2.id])
+            .isStructurallyEqualTo(
+                expectedEvent2.apply { consumePositionChange(0f, 4f) }
+            )
     }
 
     @Test
@@ -1957,17 +2087,20 @@ class HitPathTrackerTest {
 
         assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
 
-        val log1 = log.getOnCancelLog().filter { it.pointerInputFilter == leaf1 ||
-                    it.pointerInputFilter == middle1 ||
-                    it.pointerInputFilter == root
+        val log1 = log.getOnCancelLog().filter {
+            it.pointerInputFilter == leaf1 ||
+                it.pointerInputFilter == middle1 ||
+                it.pointerInputFilter == root
         }
 
-        val log2 = log.getOnCancelLog().filter { it.pointerInputFilter == leaf2 ||
+        val log2 = log.getOnCancelLog().filter {
+            it.pointerInputFilter == leaf2 ||
                 it.pointerInputFilter == middle2 ||
                 it.pointerInputFilter == root
         }
 
-        val log3 = log.getOnCancelLog().filter { it.pointerInputFilter == leaf3 ||
+        val log3 = log.getOnCancelLog().filter {
+            it.pointerInputFilter == leaf3 ||
                 it.pointerInputFilter == middle3 ||
                 it.pointerInputFilter == root
         }
@@ -3537,7 +3670,9 @@ class HitPathTrackerTest {
 
         assertThat(log1).hasSize(6)
         log1.forEach {
-            assertThat(it.pointerEvent).isEqualTo(expected)
+            PointerEventSubject
+                .assertThat(it.pointerEvent)
+                .isStructurallyEqualTo(expected)
         }
     }
 
@@ -3639,7 +3774,8 @@ class HitPathTrackerTest {
 
         val dispatchingPif = PointerInputFilterMock(
             log,
-            initHandler = { dispatcher = it })
+            initHandler = { dispatcher = it }
+        )
         val parentPif = PointerInputFilterMock(
             log,
             onCustomEvent = { _, pointerEventPass ->
@@ -3824,86 +3960,3 @@ class LayoutCoordinatesStub(
         TODO("not implemented")
     }
 }
-
-private class PointerInputFilterMock(
-    val log: MutableList<LogEntry> = mutableListOf(),
-    val initHandler: ((CustomEventDispatcher) -> Unit)? = null,
-    val pointerEventHandler: PointerEventHandler? = null,
-    val onCustomEvent: ((CustomEvent, PointerEventPass) -> Unit)? = null,
-    layoutCoordinates: LayoutCoordinates? = null
-) :
-    PointerInputFilter() {
-
-    init {
-        this.layoutCoordinates = layoutCoordinates ?: LayoutCoordinatesStub(true)
-    }
-
-    override fun onInit(customEventDispatcher: CustomEventDispatcher) {
-        log.add(OnInitEntry())
-        initHandler?.invoke(customEventDispatcher)
-    }
-
-    override fun onPointerEvent(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ): List<PointerInputChange> {
-        log.add(
-            OnPointerEventEntry(
-                this,
-                pointerEvent.deepCopy(),
-                pass,
-                bounds
-            )
-        )
-        return pointerEventHandler?.invokeOverPass(pointerEvent, pass, bounds)?.changes
-            ?: pointerEvent.changes
-    }
-
-    override fun onCancel() {
-        log.add(OnCancelEntry(this))
-    }
-
-    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-        log.add(
-            OnCustomEventEntry(
-                this,
-                customEvent,
-                pass
-            )
-        )
-        onCustomEvent?.invoke(customEvent, pass)
-    }
-}
-
-private fun List<LogEntry>.getOnInitLog() = filterIsInstance<OnInitEntry>()
-
-private fun List<LogEntry>.getOnPointerEventLog() = filterIsInstance<OnPointerEventEntry>()
-
-private fun List<LogEntry>.getOnCancelLog() = filterIsInstance<OnCancelEntry>()
-
-private fun List<LogEntry>.getOnCustomEventLog() = filterIsInstance<OnCustomEventEntry>()
-
-private sealed class LogEntry
-
-private class OnInitEntry : LogEntry()
-
-private data class OnPointerEventEntry (
-    val pointerInputFilter: PointerInputFilter,
-    val pointerEvent: PointerEvent,
-    val pass: PointerEventPass,
-    val bounds: IntSize
-) : LogEntry()
-
-private class OnCancelEntry (
-    val pointerInputFilter: PointerInputFilter
-) : LogEntry()
-
-private data class OnCustomEventEntry (
-    val pointerInputFilter: PointerInputFilter,
-    val customEvent: CustomEvent,
-    val pass: PointerEventPass
-) : LogEntry()
-
-private fun internalPointerEventOf(vararg changes: PointerInputChange) =
-    InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), MotionEventDouble)

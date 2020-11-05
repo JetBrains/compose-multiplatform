@@ -17,12 +17,12 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -44,7 +44,7 @@ internal class DrawCache {
     private var scopeDensity: Density? = null
     private var layoutDirection: LayoutDirection = LayoutDirection.Ltr
 
-    private val cacheScope = CacheDrawScope()
+    private val cacheScope = CanvasDrawScope()
 
     /**
      * Draw the contents of the lambda with receiver scope into an [ImageAsset] with the provided
@@ -72,8 +72,8 @@ internal class DrawCache {
             cachedImage = targetImage
             cachedCanvas = targetCanvas
         }
-        cacheScope.drawInto(targetCanvas, size.toSize()) {
-            cacheScope.clear()
+        cacheScope.draw(density, layoutDirection, targetCanvas, size.toSize()) {
+            clear()
             block()
         }
         targetImage.prepareToDraw()
@@ -96,31 +96,10 @@ internal class DrawCache {
     }
 
     /**
-     * Inner class to avoid exposing DrawScope drawing commands on the DrawCache directly
+     * Helper method to clear contents of the draw environment from the given bounds of the
+     * DrawScope
      */
-    private inner class CacheDrawScope : DrawScope() {
-
-        fun drawInto(
-            canvas: Canvas,
-            size: Size,
-            block: DrawScope.() -> Unit
-        ) = draw(canvas, size, block)
-
-        override val layoutDirection: LayoutDirection
-            get() = this@DrawCache.layoutDirection
-
-        override val density: Float
-            get() = this@DrawCache.scopeDensity!!.density
-
-        override val fontScale: Float
-            get() = this@DrawCache.scopeDensity!!.fontScale
-
-        /**
-         * Helper method to clear contents of the draw environment from the given bounds of the
-         * DrawScope
-         */
-        fun clear() {
-            drawRect(color = Color.Black, blendMode = BlendMode.Clear)
-        }
+    private fun DrawScope.clear() {
+        drawRect(color = Color.Black, blendMode = BlendMode.Clear)
     }
 }

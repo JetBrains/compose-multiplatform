@@ -18,27 +18,25 @@ package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
-import androidx.test.filters.SmallTest
-import androidx.ui.test.AndroidComposeTestRule
-import androidx.ui.test.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class AndroidComposeTestCaseRunnerTest {
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>(
-        disableTransitions = true
-    )
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     internal fun <T : ComponentActivity> AndroidComposeTestRule<T>.forGivenContent(
         composable: @Composable () -> Unit
@@ -52,7 +50,7 @@ class AndroidComposeTestCaseRunnerTest {
     }
 
     @Test
-    fun foreverRecomposing_viaModel_shouldFai2l() {
+    fun foreverRecomposing_viaModel_shouldFail() {
         val count = mutableStateOf(0)
         composeTestRule.forGivenContent {
             Text("Hello ${count.value}")

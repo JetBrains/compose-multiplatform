@@ -17,26 +17,21 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 
 /**
  * Material surface is the central metaphor in material design. Each surface exists at a given
@@ -48,13 +43,16 @@ import androidx.compose.ui.zIndex
  * 1) Clipping: Surface clips its children to the shape specified by [shape]
  *
  * 2) Elevation: Surface elevates its children on the Z axis by [elevation] pixels,
- *   and draws the appropriate shadow.
+ * and draws the appropriate shadow.
  *
  * 3) Borders: If [shape] has a border, then it will also be drawn.
  *
  * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
  * [Colors.surface], the [ElevationOverlay] from [AmbientElevationOverlay] will be used to apply
- * an overlay - by default this will only occur in dark theme.
+ * an overlay - by default this will only occur in dark theme. The color of the overlay depends
+ * on the [elevation] of this Surface, and the [AmbientAbsoluteElevation] set by any parent
+ * surfaces. This ensures that a Surface never appears to have a lower elevation overlay than its
+ * ancestors, by summing the elevation of all previous Surfaces.
  *
  * 5) Content color: Surface uses [contentColor] to specify a preferred color for the content of
  * this surface - this is used by the [Text] and [Icon] components as a default color.
@@ -80,8 +78,8 @@ import androidx.compose.ui.zIndex
  * Defaults to either the matching `onFoo` color for [color], or if [color] is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param border Optional border to draw on top of the surface
- * @param elevation The z-coordinate at which to place this surface. This controls
- * the size of the shadow below the surface.
+ * @param elevation The size of the shadow below the surface. Note that It will not affect z index
+ * of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
  */
 @Composable
 fun Surface(
@@ -95,14 +93,14 @@ fun Surface(
 ) {
     val elevationPx = with(DensityAmbient.current) { elevation.toPx() }
     val elevationOverlay = AmbientElevationOverlay.current
+    val absoluteElevation = AmbientAbsoluteElevation.current + elevation
     val backgroundColor = if (color == MaterialTheme.colors.surface && elevationOverlay != null) {
-        elevationOverlay.apply(color, elevation)
+        elevationOverlay.apply(color, absoluteElevation)
     } else {
         color
     }
     SurfaceLayout(
         modifier.drawLayer(shadowElevation = elevationPx, shape = shape)
-            .zIndex(elevation.value)
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .background(
                 color = backgroundColor,
@@ -110,7 +108,11 @@ fun Surface(
             )
             .clip(shape)
     ) {
-        Providers(AmbientContentColor provides contentColor, children = content)
+        Providers(
+            AmbientContentColor provides contentColor,
+            AmbientAbsoluteElevation provides absoluteElevation,
+            children = content
+        )
     }
 }
 

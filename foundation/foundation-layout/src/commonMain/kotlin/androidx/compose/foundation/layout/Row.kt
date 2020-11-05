@@ -16,16 +16,18 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.HorizontalAlignmentLine
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.annotation.FloatRange
 
 /**
@@ -131,33 +133,71 @@ interface RowScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleAlignInRow
      */
     @Stable
-    fun Modifier.align(alignment: Alignment.Vertical) = this.then(VerticalAlignModifier(alignment))
+    fun Modifier.align(alignment: Alignment.Vertical) = this.then(
+        VerticalAlignModifier(
+            vertical = alignment,
+            inspectorInfo = debugInspectorInfo {
+                name = "align"
+                value = alignment
+            }
+        )
+    )
 
     @Stable
     @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment.Vertical) = this.then(VerticalAlignModifier(align))
+    fun Modifier.gravity(align: Alignment.Vertical) = align(align)
 
     /**
      * Position the element vertically such that its [alignmentLine] aligns with sibling elements
-     * also configured to [alignWithSiblings]. [alignWithSiblings] is a form of [align],
+     * also configured to [alignBy]. [alignBy] is a form of [align],
      * so both modifiers will not work together if specified for the same layout.
-     * [alignWithSiblings] can be used to align two layouts by baseline inside a [Row],
-     * using `alignWithSiblings(FirstBaseline)`.
-     * Within a [Row], all components with [alignWithSiblings] will align vertically using
+     * [alignBy] can be used to align two layouts by baseline inside a [Row],
+     * using `alignBy(FirstBaseline)`.
+     * Within a [Row], all components with [alignBy] will align vertically using
      * the specified [HorizontalAlignmentLine]s or values provided using the other
-     * [alignWithSiblings] overload, forming a sibling group.
+     * [alignBy] overload, forming a sibling group.
      * At least one element of the sibling group will be placed as it had [Alignment.Top] align
      * in [Row], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Row] has the
-     * [alignWithSiblings] modifier specified the element will be positioned
+     * [alignBy] modifier specified the element will be positioned
      * as if it had [Alignment.Top] align.
      *
+     * @see alignByBaseline
+     *
      * Example usage:
-     * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblingsInRow
+     * @sample androidx.compose.foundation.layout.samples.SimpleAlignByInRow
      */
     @Stable
-    fun Modifier.alignWithSiblings(alignmentLine: HorizontalAlignmentLine) =
-        this.then(SiblingsAlignedModifier.WithAlignmentLine(alignmentLine))
+    fun Modifier.alignBy(alignmentLine: HorizontalAlignmentLine) = this.then(
+        SiblingsAlignedModifier.WithAlignmentLine(
+            line = alignmentLine,
+            inspectorInfo = debugInspectorInfo {
+                name = "alignBy"
+                value = alignmentLine
+            }
+        )
+    )
+
+    @Deprecated(
+        "alignWithSiblings was renamed to alignBy.",
+        ReplaceWith("alignBy(alignmentLine)")
+    )
+    fun Modifier.alignWithSiblings(alignmentLine: HorizontalAlignmentLine) = alignBy(alignmentLine)
+
+    /**
+     * Position the element vertically such that its first baseline aligns with sibling elements
+     * also configured to [alignByBaseline] or [alignBy]. This modifier is a form
+     * of [align], so both modifiers will not work together if specified for the same layout.
+     * [alignByBaseline] is a particular case of [alignBy]. See [alignBy] for
+     * more details.
+     *
+     * @see alignBy
+     *
+     * Example usage:
+     * @sample androidx.compose.foundation.layout.samples.SimpleAlignByInRow
+     */
+    @Stable
+    fun Modifier.alignByBaseline() = alignBy(FirstBaseline)
 
     /**
      * Size the element's width proportional to its [weight] relative to other weighted sibling
@@ -174,30 +214,54 @@ interface RowScope {
         fill: Boolean = true
     ): Modifier {
         require(weight > 0.0) { "invalid weight $weight; must be greater than zero" }
-        return this.then(LayoutWeightImpl(weight, fill))
+        return this.then(
+            LayoutWeightImpl(
+                weight = weight,
+                fill = fill,
+                inspectorInfo = debugInspectorInfo {
+                    name = "weight"
+                    value = weight
+                    properties["weight"] = weight
+                    properties["fill"] = fill
+                }
+            )
+        )
     }
 
     /**
      * Position the element vertically such that the alignment line for the content as
      * determined by [alignmentLineBlock] aligns with sibling elements also configured to
-     * [alignWithSiblings]. [alignWithSiblings] is a form of [align], so both modifiers
+     * [alignBy]. [alignBy] is a form of [align], so both modifiers
      * will not work together if specified for the same layout.
-     * Within a [Row], all components with [alignWithSiblings] will align vertically using
+     * Within a [Row], all components with [alignBy] will align vertically using
      * the specified [HorizontalAlignmentLine]s or values obtained from [alignmentLineBlock],
      * forming a sibling group.
      * At least one element of the sibling group will be placed as it had [Alignment.Top] align
      * in [Row], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Row] has the
-     * [alignWithSiblings] modifier specified the element will be positioned
+     * [alignBy] modifier specified the element will be positioned
      * as if it had [Alignment.Top] align.
      *
      * Example usage:
-     * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblings
+     * @sample androidx.compose.foundation.layout.samples.SimpleAlignByInRow
      */
     @Stable
-    fun Modifier.alignWithSiblings(
-        alignmentLineBlock: (Measured) -> Int
-    ) = this.then(SiblingsAlignedModifier.WithAlignmentLineBlock(alignmentLineBlock))
+    fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int) = this.then(
+        SiblingsAlignedModifier.WithAlignmentLineBlock(
+            block = alignmentLineBlock,
+            inspectorInfo = debugInspectorInfo {
+                name = "alignBy"
+                value = alignmentLineBlock
+            }
+        )
+    )
+
+    @Deprecated(
+        "alignWithSiblings was renamed to alignBy.",
+        ReplaceWith("alignBy(alignmentLineBlock)")
+    )
+    fun Modifier.alignWithSiblings(alignmentLineBlock: (Measured) -> Int) =
+        alignBy(alignmentLineBlock)
 
     companion object : RowScope
 }

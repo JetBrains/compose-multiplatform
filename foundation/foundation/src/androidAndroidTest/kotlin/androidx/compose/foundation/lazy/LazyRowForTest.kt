@@ -16,10 +16,10 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
@@ -34,30 +34,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.SemanticsNodeInteraction
-import androidx.ui.test.StateRestorationTester
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.assertIsEqualTo
-import androidx.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.ui.test.assertPositionInRootIsEqualTo
-import androidx.ui.test.assertWidthIsEqualTo
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.getUnclippedBoundsInRoot
-import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class LazyRowForTest {
     private val LazyRowForTag = "LazyRowForTag"
 
@@ -383,6 +384,54 @@ class LazyRowForTest {
     }
 
     @Test
+    fun itemFillingParentWidthFraction() {
+        rule.setContent {
+            LazyRowFor(
+                items = listOf(0),
+                modifier = Modifier.size(width = 100.dp, height = 150.dp)
+            ) {
+                Spacer(Modifier.fillParentMaxWidth(0.7f).height(50.dp).testTag(firstItemTag))
+            }
+        }
+
+        rule.onNodeWithTag(firstItemTag)
+            .assertWidthIsEqualTo(70.dp)
+            .assertHeightIsEqualTo(50.dp)
+    }
+
+    @Test
+    fun itemFillingParentHeightFraction() {
+        rule.setContent {
+            LazyRowFor(
+                items = listOf(0),
+                modifier = Modifier.size(width = 100.dp, height = 150.dp)
+            ) {
+                Spacer(Modifier.width(50.dp).fillParentMaxHeight(0.3f).testTag(firstItemTag))
+            }
+        }
+
+        rule.onNodeWithTag(firstItemTag)
+            .assertWidthIsEqualTo(50.dp)
+            .assertHeightIsEqualTo(45.dp)
+    }
+
+    @Test
+    fun itemFillingParentSizeFraction() {
+        rule.setContent {
+            LazyRowFor(
+                items = listOf(0),
+                modifier = Modifier.size(width = 100.dp, height = 150.dp)
+            ) {
+                Spacer(Modifier.fillParentMaxSize(0.5f).testTag(firstItemTag))
+            }
+        }
+
+        rule.onNodeWithTag(firstItemTag)
+            .assertWidthIsEqualTo(50.dp)
+            .assertHeightIsEqualTo(75.dp)
+    }
+
+    @Test
     fun itemFillingParentSizeParentResized() {
         var parentSize by mutableStateOf(100.dp)
         rule.setContent {
@@ -611,7 +660,7 @@ class LazyRowForTest {
 
         rule.runOnIdle {
             with(rule.density) {
-                state.onScroll(110.dp.toPx())
+                state.onScroll(-110.dp.toPx())
             }
         }
 
@@ -740,6 +789,30 @@ class LazyRowForTest {
         rule.runOnIdle {
             assertThat(state!!.firstVisibleItemIndex).isEqualTo(index)
             assertThat(state!!.firstVisibleItemScrollOffset).isEqualTo(scrollOffset)
+        }
+    }
+
+    @Test
+    fun snapToItemIndex() {
+        val items by mutableStateOf((1..20).toList())
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.snapToItemIndex(3, 10)
+            }
+            assertThat(state.firstVisibleItemIndex).isEqualTo(3)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
         }
     }
 }

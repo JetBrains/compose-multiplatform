@@ -18,8 +18,8 @@ package androidx.compose.ui.node
 import androidx.compose.ui.ContentDrawScope
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.DrawModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -35,6 +35,7 @@ import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -47,7 +48,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.zIndex
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.doReturn
@@ -66,7 +66,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.Mockito.times
 
-@SmallTest
 @RunWith(JUnit4::class)
 @OptIn(ExperimentalLayoutNodeApi::class)
 class LayoutNodeTest {
@@ -1785,6 +1784,9 @@ private class MockOwner(
 
             override fun getMatrix(matrix: Matrix) {
             }
+
+            override val isValid: Boolean
+                get() = true
         }
     }
 
@@ -1803,7 +1805,7 @@ internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = M
                 measureScope: MeasureScope,
                 measurables: List<Measurable>,
                 constraints: Constraints
-            ): MeasureScope.MeasureResult =
+            ): MeasureResult =
                 measureScope.layout(x2 - x, y2 - y) {}
         }
         attach(MockOwner())

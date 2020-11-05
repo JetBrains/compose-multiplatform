@@ -16,15 +16,16 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.nativeClass
@@ -102,7 +103,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override fun performMeasure(constraints: Constraints): Placeable {
         val placeable = wrapped.measure(constraints)
-        measureResult = object : MeasureScope.MeasureResult {
+        measureResult = object : MeasureResult {
             override val width: Int = wrapped.measureResult.width
             override val height: Int = wrapped.measureResult.height
             override val alignmentLines: Map<AlignmentLine, Int> = emptyMap()

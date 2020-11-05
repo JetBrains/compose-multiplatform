@@ -21,15 +21,17 @@ import androidx.compose.foundation.layout.LayoutOrientation.Vertical
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.ParentDataModifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureBlock
 import androidx.compose.ui.layout.Measured
-import androidx.compose.ui.measureBlocksOf
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.measureBlocksOf
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -69,7 +71,7 @@ internal fun rowColumnMeasureBlocks(
         var crossAxisSpace = 0
         var weightChildrenCount = 0
 
-        var anyAlignWithSiblings = false
+        var anyAlignBy = false
         val placeables = arrayOfNulls<Placeable>(measurables.size)
         val rowColumnParentData = Array(measurables.size) { measurables[it].data }
 
@@ -103,7 +105,7 @@ internal fun rowColumnMeasureBlocks(
                 )
                 fixedSpace += placeable.mainAxisSize() + spaceAfterLastNoWeight
                 crossAxisSpace = max(crossAxisSpace, placeable.crossAxisSize())
-                anyAlignWithSiblings = anyAlignWithSiblings || parentData.isRelative
+                anyAlignBy = anyAlignBy || parentData.isRelative
                 placeables[i] = placeable
             }
         }
@@ -157,7 +159,7 @@ internal fun rowColumnMeasureBlocks(
                     )
                     weightedSpace += placeable.mainAxisSize()
                     crossAxisSpace = max(crossAxisSpace, placeable.crossAxisSize())
-                    anyAlignWithSiblings = anyAlignWithSiblings || parentData.isRelative
+                    anyAlignBy = anyAlignBy || parentData.isRelative
                     placeables[i] = placeable
                 }
             }
@@ -165,7 +167,7 @@ internal fun rowColumnMeasureBlocks(
 
         var beforeCrossAxisAlignmentLine = 0
         var afterCrossAxisAlignmentLine = 0
-        if (anyAlignWithSiblings) {
+        if (anyAlignBy) {
             for (i in placeables.indices) {
                 val placeable = placeables[i]!!
                 val parentData = rowColumnParentData[i]
@@ -213,12 +215,12 @@ internal fun rowColumnMeasureBlocks(
                 )
             )
         }
-        val layoutWidth = if (orientation == LayoutOrientation.Horizontal) {
+        val layoutWidth = if (orientation == Horizontal) {
             mainAxisLayoutSize
         } else {
             crossAxisLayoutSize
         }
-        val layoutHeight = if (orientation == LayoutOrientation.Horizontal) {
+        val layoutHeight = if (orientation == Horizontal) {
             crossAxisLayoutSize
         } else {
             mainAxisLayoutSize
@@ -244,7 +246,7 @@ internal fun rowColumnMeasureBlocks(
 
                 val crossAxis = childCrossAlignment.align(
                     size = crossAxisLayoutSize - placeable.crossAxisSize(),
-                    layoutDirection = if (orientation == LayoutOrientation.Horizontal) {
+                    layoutDirection = if (orientation == Horizontal) {
                         LayoutDirection.Ltr
                     } else {
                         layoutDirection
@@ -253,7 +255,7 @@ internal fun rowColumnMeasureBlocks(
                     beforeCrossAxisAlignmentLine = beforeCrossAxisAlignmentLine
                 )
 
-                if (orientation == LayoutOrientation.Horizontal) {
+                if (orientation == Horizontal) {
                     placeable.place(mainAxisPositions[index], crossAxis)
                 } else {
                     placeable.place(crossAxis, mainAxisPositions[index])
@@ -699,56 +701,125 @@ private fun intrinsicCrossAxisSize(
     return crossAxisMax
 }
 
-internal data class LayoutWeightImpl(val weight: Float, val fill: Boolean) : ParentDataModifier {
+internal class LayoutWeightImpl(
+    val weight: Float,
+    val fill: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?) =
         ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
             it.weight = weight
             it.fill = fill
         }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? LayoutWeightImpl ?: return false
+        return weight != otherModifier.weight &&
+            fill != otherModifier.fill
+    }
+
+    override fun hashCode(): Int {
+        var result = weight.hashCode()
+        result = 31 * result + fill.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "LayoutWeightImpl(weight=$weight, fill=$fill)"
 }
 
-internal sealed class SiblingsAlignedModifier : ParentDataModifier {
+internal sealed class SiblingsAlignedModifier(
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     abstract override fun Density.modifyParentData(parentData: Any?): Any?
 
-    internal data class WithAlignmentLineBlock(val block: (Measured) -> Int) :
-        SiblingsAlignedModifier() {
+    internal class WithAlignmentLineBlock(
+        val block: (Measured) -> Int,
+        inspectorInfo: InspectorInfo.() -> Unit
+    ) : SiblingsAlignedModifier(inspectorInfo) {
         override fun Density.modifyParentData(parentData: Any?): Any? {
             return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
                 it.crossAxisAlignment =
                     CrossAxisAlignment.Relative(AlignmentLineProvider.Block(block))
             }
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            val otherModifier = other as? WithAlignmentLineBlock ?: return false
+            return block == otherModifier.block
+        }
+
+        override fun hashCode(): Int = block.hashCode()
+
+        override fun toString(): String = "WithAlignmentLineBlock(block=$block)"
     }
 
-    internal data class WithAlignmentLine(val line: AlignmentLine) :
-        SiblingsAlignedModifier() {
+    internal class WithAlignmentLine(
+        val line: AlignmentLine,
+        inspectorInfo: InspectorInfo.() -> Unit
+    ) : SiblingsAlignedModifier(inspectorInfo) {
         override fun Density.modifyParentData(parentData: Any?): Any? {
             return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
                 it.crossAxisAlignment =
                     CrossAxisAlignment.Relative(AlignmentLineProvider.Value(line))
             }
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            val otherModifier = other as? WithAlignmentLine ?: return false
+            return line == otherModifier.line
+        }
+
+        override fun hashCode(): Int = line.hashCode()
+
+        override fun toString(): String = "WithAlignmentLine(line=$line)"
     }
 }
 
-internal data class HorizontalAlignModifier(
-    val horizontal: Alignment.Horizontal
-) : ParentDataModifier {
+internal class HorizontalAlignModifier(
+    val horizontal: Alignment.Horizontal,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?): RowColumnParentData {
         return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
             it.crossAxisAlignment = CrossAxisAlignment.horizontal(horizontal)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? HorizontalAlignModifier ?: return false
+        return horizontal == otherModifier.horizontal
+    }
+
+    override fun hashCode(): Int = horizontal.hashCode()
+
+    override fun toString(): String =
+        "HorizontalAlignModifier(horizontal=$horizontal)"
 }
 
-internal data class VerticalAlignModifier(
-    val vertical: Alignment.Vertical
-) : ParentDataModifier {
+internal class VerticalAlignModifier(
+    val vertical: Alignment.Vertical,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?): RowColumnParentData {
         return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
             it.crossAxisAlignment = CrossAxisAlignment.vertical(vertical)
         }
     }
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? VerticalAlignModifier ?: return false
+        return vertical == otherModifier.vertical
+    }
+
+    override fun hashCode(): Int = vertical.hashCode()
+
+    override fun toString(): String =
+        "VerticalAlignModifier(vertical=$vertical)"
 }
 
 /**

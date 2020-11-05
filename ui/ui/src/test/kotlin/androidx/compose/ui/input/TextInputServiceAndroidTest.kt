@@ -21,21 +21,24 @@ import android.text.InputType
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
-import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@SmallTest
+@OptIn(ExperimentalTextApi::class)
 @RunWith(JUnit4::class)
 class TextInputServiceAndroidTest {
 
@@ -55,9 +58,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_text() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Text,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -75,9 +80,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_ascii() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -96,9 +103,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_number() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Number,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -116,9 +125,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_phone() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Phone,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Phone,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -136,9 +147,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_uri() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Uri,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Uri,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -157,9 +170,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_email() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Email,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -178,9 +193,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_password() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Password,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -199,9 +216,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_number_password() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.NumberPassword,
-            ImeAction.Unspecified,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.NumberPassword,
+                imeAction = ImeAction.Unspecified
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -220,9 +239,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_action_none() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.NoAction,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.NoAction
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -241,9 +262,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_action_go() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.Go,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Go
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -262,9 +285,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_action_next() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.Next,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Next
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -283,9 +308,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_action_previous() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.Previous,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Previous
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -304,9 +331,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_action_search() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.Search,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Search,
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -325,9 +354,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_action_send() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.Send,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Send
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -346,9 +377,11 @@ class TextInputServiceAndroidTest {
     @Test
     fun test_fill_editor_info_action_done() {
         textInputService.startInput(
-            TextFieldValue(""),
-            KeyboardType.Ascii,
-            ImeAction.Done,
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
             onEditCommand = {},
             onImeActionPerformed = {}
         )
@@ -361,6 +394,248 @@ class TextInputServiceAndroidTest {
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_DONE
             )
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_multi_line() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                singleLine = false,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertFalse((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
+            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_single_line() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                singleLine = true,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
+            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_single_line_changes_ime_from_unspecified_to_done() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                singleLine = true,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Unspecified,
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertFalse((EditorInfo.IME_ACTION_DONE and info.imeOptions) == 0)
+            assertTrue((EditorInfo.IME_ACTION_UNSPECIFIED and info.imeOptions) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_multi_line_not_set_when_input_type_is_not_text() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                singleLine = false,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
+            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_none() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                capitalization = KeyboardCapitalization.None,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_characters() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                capitalization = KeyboardCapitalization.Characters,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_words() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                capitalization = KeyboardCapitalization.Words,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_sentences() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done,
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_capitalization_not_added_when_input_type_is_not_text() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
+            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_auto_correct_on() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                autoCorrect = true,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertFalse((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun test_fill_editor_info_auto_correct_off() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                autoCorrect = false,
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun autocorrect_not_added_when_input_type_is_not_text() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                autoCorrect = true,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertTrue((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
         }
     }
 }

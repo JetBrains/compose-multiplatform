@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.TextUnit
  *
  * @param width the width of the placeholder, it must be specified in sp or em.
  * [TextUnit.Inherit] is not allowed.
- * @param height the height of the iplaceholder, it must be specified in sp or em.
+ * @param height the height of the placeholder, it must be specified in sp or em.
  * [TextUnit.Inherit] is not allowed.
  * @param placeholderVerticalAlign the vertical alignment of the placeholder within the text line.
  * Check [PlaceholderVerticalAlign] for more information.

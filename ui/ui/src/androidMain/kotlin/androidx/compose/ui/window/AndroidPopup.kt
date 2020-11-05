@@ -29,18 +29,16 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionReference
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.setContent
@@ -123,12 +121,9 @@ internal actual fun ActualPopup(
         layout(0, 0) {}
     }
 
-    // TODO(lmr): refactor these APIs so that recomposer isn't necessary
-    @OptIn(ExperimentalComposeApi::class)
-    val recomposer = currentComposer.recomposer
     val parentComposition = compositionReference()
     onCommit {
-        composition = popupLayout.setContent(recomposer, parentComposition) {
+        composition = popupLayout.setContent(parentComposition) {
             SimpleStack(
                 Modifier.semantics { this.popup() }.onGloballyPositioned {
                     // Get the size of the content
@@ -268,8 +263,10 @@ private class PopupLayout(
 
     fun setProperties(properties: PopupProperties?) {
         if (properties != null && properties is AndroidPopupProperties) {
-            setSecureFlagEnabled(properties.securePolicy
-                .shouldApplySecureFlag(composeView.isFlagSecureEnabled()))
+            setSecureFlagEnabled(
+                properties.securePolicy
+                    .shouldApplySecureFlag(composeView.isFlagSecureEnabled())
+            )
         } else {
             setSecureFlagEnabled(composeView.isFlagSecureEnabled())
         }

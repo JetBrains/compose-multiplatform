@@ -19,6 +19,9 @@ package androidx.compose.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.NoInspectorInfo
 
 /**
  * Declare a just-in-time composition of a [Modifier] that will be composed for each element it
@@ -26,16 +29,25 @@ import androidx.compose.runtime.Composer
  * instance-specific state for each modified element, allowing the same [Modifier] instance to be
  * safely reused for multiple elements while maintaining element-specific state.
  *
+ * If [inspectorInfo] is specified this modifier will be visible to tools during development.
+ * Specify the name and arguments of the original modifier.
+ *
+ * Example usage:
+ * @sample androidx.compose.ui.samples.InspectorInfoInComposedModifierSample
+ * @sample androidx.compose.ui.samples.InspectorInfoInComposedModifierWithArgumentsSample
+ *
  * [materialize] must be called to create instance-specific modifiers if you are directly
  * applying a [Modifier] to an element tree node.
  */
 fun Modifier.composed(
+    inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo,
     factory: @Composable Modifier.() -> Modifier
-): Modifier = this.then(ComposedModifier(factory))
+): Modifier = this.then(ComposedModifier(inspectorInfo, factory))
 
-private data class ComposedModifier(
+private class ComposedModifier(
+    inspectorInfo: InspectorInfo.() -> Unit,
     val factory: @Composable Modifier.() -> Modifier
-) : Modifier.Element
+) : Modifier.Element, InspectorValueInfo(inspectorInfo)
 
 /**
  * Materialize any instance-specific [composed modifiers][composed] for applying to a raw tree node.

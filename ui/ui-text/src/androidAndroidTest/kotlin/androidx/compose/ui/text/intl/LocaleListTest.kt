@@ -20,9 +20,9 @@ import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @SmallTest
 class LocaleListTest {
 
@@ -53,5 +53,21 @@ class LocaleListTest {
             .isEqualTo(LocaleList("en-US,ja-JP"))
         assertThat(LocaleList("en-US,ja-JP"))
             .isNotEqualTo(LocaleList("en-US,es-ES"))
+    }
+
+    @Test
+    fun getCurrent_afterJavaLocaleSetDefault() {
+        val javaLocales = listOf(
+            java.util.Locale("ar"),
+            java.util.Locale("ja"),
+            java.util.Locale("en")
+        )
+        for (javaLocale in javaLocales) {
+            java.util.Locale.setDefault(javaLocale)
+
+            assertThat(LocaleList.current.first()).isEqualTo(
+                Locale(AndroidLocale(javaLocale))
+            )
+        }
     }
 }

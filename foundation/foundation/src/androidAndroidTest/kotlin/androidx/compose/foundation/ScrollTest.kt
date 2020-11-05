@@ -24,50 +24,56 @@ import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.GestureScope
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.ui.test.GestureScope
-import androidx.ui.test.SemanticsNodeInteraction
-import androidx.ui.test.StateRestorationTester
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.assertIsNotDisplayed
-import androidx.ui.test.assertPixels
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.click
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onNodeWithText
-import androidx.ui.test.performGesture
-import androidx.ui.test.performScrollTo
-import androidx.ui.test.swipeDown
-import androidx.ui.test.swipeLeft
-import androidx.ui.test.swipeRight
-import androidx.ui.test.swipeUp
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class ScrollTest {
 
     @get:Rule
@@ -89,6 +95,16 @@ class ScrollTest {
         Color(red = 0, green = 0, blue = 0xFF, alpha = 0xFF),
         Color(red = 0xA5, green = 0, blue = 0xFF, alpha = 0xFF)
     )
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @SdkSuppress(minSdkVersion = 26)
     @Test
@@ -459,16 +475,19 @@ class ScrollTest {
     }
 
     @Test
+    @LargeTest
     fun verticalScroller_swipeUp_swipeDown() {
         swipeScrollerAndBack(true, GestureScope::swipeUp, GestureScope::swipeDown)
     }
 
     @Test
+    @LargeTest
     fun horizontalScroller_swipeLeft_swipeRight() {
         swipeScrollerAndBack(false, GestureScope::swipeLeft, GestureScope::swipeRight)
     }
 
     @Test
+    @LargeTest
     fun horizontalScroller_rtl_swipeLeft_swipeRight() {
         swipeScrollerAndBack(
             false,
@@ -541,7 +560,7 @@ class ScrollTest {
                     modifier = Modifier.preferredSize(100.dp).testTag(scrollerTag)
                 ) {
                     for (i in 0..itemCount.value) {
-                        Text(i.toString())
+                        BasicText(i.toString())
                     }
                 }
             }
@@ -811,7 +830,7 @@ class ScrollTest {
         rowHeight: Int = 5
     ) {
         rule.onNodeWithTag(scrollerTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(width, height)) { pos ->
                 val colorIndex = (offset + pos.y) / rowHeight
                 colors[colorIndex]
@@ -828,7 +847,7 @@ class ScrollTest {
         val scrollerWidth = colors.size * defaultCellSize
         val absoluteOffset = if (checkInRtl) scrollerWidth - width - offset else offset
         rule.onNodeWithTag(scrollerTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(width, height)) { pos ->
                 val colorIndex = (absoluteOffset + pos.x) / defaultCellSize
                 if (checkInRtl) colors[colors.size - 1 - colorIndex] else colors[colorIndex]
@@ -851,7 +870,7 @@ class ScrollTest {
         rule.setContent {
             val content = @Composable {
                 repeat(itemCount) {
-                    Text(text = "$it")
+                    BasicText(text = "$it")
                 }
             }
             Box {
@@ -901,5 +920,25 @@ class ScrollTest {
         assertWithMessage("Scroll didn't finish after 20 seconds")
             .that(latch.await(20, TimeUnit.SECONDS)).isTrue()
         return this
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val state = ScrollState(
+            initial = 0f,
+            flingConfig = FlingConfig(ExponentialDecay()),
+            animationClock = ManualAnimationClock(0)
+        )
+        rule.setContent {
+            val modifier = Modifier.verticalScroll(state) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("scroll")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "state",
+                "reverseScrolling",
+                "isScrollable",
+                "isVertical"
+            )
+        }
     }
 }

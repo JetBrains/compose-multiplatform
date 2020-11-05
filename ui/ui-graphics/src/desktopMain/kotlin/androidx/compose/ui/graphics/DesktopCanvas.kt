@@ -22,8 +22,9 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
+import org.jetbrains.skija.Matrix44
+import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.ClipMode as SkijaClipMode
-import org.jetbrains.skija.Matrix33 as SkijaMatrix33
 import org.jetbrains.skija.RRect as SkijaRRect
 import org.jetbrains.skija.Rect as SkijaRect
 
@@ -76,47 +77,25 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
         skija.skew(sx, sy)
     }
 
-    /**
-     * @throws IllegalStateException if an arbitrary transform is provided
-     */
     override fun concat(matrix: Matrix) {
         if (!matrix.isIdentity()) {
-            if (matrix[2, 0] != 0f ||
-                matrix[2, 1] != 0f ||
-                matrix[2, 0] != 0f ||
-                matrix[2, 1] != 0f ||
-                matrix[2, 2] != 1f ||
-                matrix[2, 3] != 0f ||
-                matrix[3, 2] != 0f
-            ) {
-                throw IllegalStateException("Desktop does not support arbitrary transforms")
-            }
-            skija.concat(
-                SkijaMatrix33(
-                    matrix[0, 0],
-                    matrix[1, 0],
-                    matrix[3, 0],
-                    matrix[0, 1],
-                    matrix[1, 1],
-                    matrix[3, 1],
-                    matrix[0, 3],
-                    matrix[1, 3],
-                    matrix[3, 3]
-                )
-            )
+            skija.concat(Matrix44(*matrix.values))
         }
     }
 
     override fun clipRect(left: Float, top: Float, right: Float, bottom: Float, clipOp: ClipOp) {
-        skija.clipRect(SkijaRect.makeLTRB(left, top, right, bottom), clipOp.toSkija())
+        val antiAlias = true
+        skija.clipRect(SkijaRect.makeLTRB(left, top, right, bottom), clipOp.toSkija(), antiAlias)
     }
 
     fun clipRoundRect(rect: RoundRect, clipOp: ClipOp = ClipOp.Intersect) {
-        skija.clipRRect(rect.toSkijaRRect(), clipOp.toSkija())
+        val antiAlias = true
+        skija.clipRRect(rect.toSkijaRRect(), clipOp.toSkija(), antiAlias)
     }
 
     override fun clipPath(path: Path, clipOp: ClipOp) {
-        skija.clipPath(path.asDesktopPath(), clipOp.toSkija())
+        val antiAlias = true
+        skija.clipPath(path.asDesktopPath(), clipOp.toSkija(), antiAlias)
     }
 
     override fun drawLine(p1: Offset, p2: Offset, paint: Paint) {
@@ -342,8 +321,22 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
     }
 
     override fun drawVertices(vertices: Vertices, blendMode: BlendMode, paint: Paint) {
-        // TODO(demin): implement drawVertices
-        println("Canvas.drawVertices not implemented yet")
+        org.jetbrains.skija.Canvas._nDrawVertices(
+            skija._ptr,
+            vertices.vertexMode.toSkijaMode(),
+            vertices.positions,
+            vertices.colors,
+            vertices.textureCoordinates,
+            vertices.indices,
+            blendMode.toSkija().ordinal,
+            Native.getPtr(paint.asFrameworkPaint())
+        )
+    }
+
+    private fun VertexMode.toSkijaMode() = when (this) {
+        VertexMode.Triangles -> 0
+        VertexMode.TriangleStrip -> 1
+        VertexMode.TriangleFan -> 2
     }
 
     private fun ClipOp.toSkija() = when (this) {

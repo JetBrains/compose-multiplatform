@@ -44,15 +44,17 @@ import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
@@ -71,19 +73,26 @@ import kotlin.math.roundToInt
  * @sample androidx.compose.foundation.samples.ControlledScrollableRowSample
  *
  * @param initial initial scroller position to start with
+ * @param interactionState [InteractionState] that will be updated when the element with this
+ * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
+ * the fling (or smooth scroll) is in progress, use [ScrollState.isAnimationRunning].
  */
 @Composable
-fun rememberScrollState(initial: Float = 0f): ScrollState {
+fun rememberScrollState(
+    initial: Float = 0f,
+    interactionState: InteractionState? = null
+): ScrollState {
     val clock = AnimationClockAmbient.current.asDisposableClock()
     val config = defaultFlingConfig()
     return rememberSavedInstanceState(
-        clock, config,
-        saver = ScrollState.Saver(config, clock)
+        clock, config, interactionState,
+        saver = ScrollState.Saver(config, clock, interactionState)
     ) {
         ScrollState(
             flingConfig = config,
             initial = initial,
-            animationClock = clock
+            animationClock = clock,
+            interactionState = interactionState
         )
     }
 }
@@ -102,12 +111,16 @@ fun rememberScrollState(initial: Float = 0f): ScrollState {
  * @param initial value of the scroll
  * @param flingConfig fling configuration to use for flinging
  * @param animationClock animation clock to run flinging and smooth scrolling on
+ * @param interactionState [InteractionState] that will be updated when the element with this
+ * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
+ * the fling (or smooth scroll) is in progress, use [ScrollState.isAnimationRunning].
  */
 @Stable
 class ScrollState(
     initial: Float,
     internal val flingConfig: FlingConfig,
-    animationClock: AnimationClockObservable
+    animationClock: AnimationClockObservable,
+    interactionState: InteractionState? = null
 ) {
 
     /**
@@ -141,7 +154,8 @@ class ScrollState(
                 val consumed = newValue - value
                 value += consumed
                 consumed
-            }
+            },
+            interactionState = interactionState
         )
 
     /**
@@ -212,10 +226,11 @@ class ScrollState(
          */
         fun Saver(
             flingConfig: FlingConfig,
-            animationClock: AnimationClockObservable
+            animationClock: AnimationClockObservable,
+            interactionState: InteractionState?
         ): Saver<ScrollState, *> = Saver<ScrollState, Float>(
             save = { it.value },
-            restore = { ScrollState(it, flingConfig, animationClock) }
+            restore = { ScrollState(it, flingConfig, animationClock, interactionState) }
         )
     }
 }
@@ -365,44 +380,53 @@ private fun Modifier.scroll(
     reverseScrolling: Boolean,
     isScrollable: Boolean,
     isVertical: Boolean
-) = composed {
-    val semantics = Modifier.semantics {
-        if (isScrollable) {
-            val accessibilityScrollState = AccessibilityScrollState(
-                value = state.value,
-                maxValue = state.maxValue,
-                reverseScrolling = reverseScrolling
-            )
-            if (isVertical) {
-                this.verticalAccessibilityScrollState = accessibilityScrollState
-            } else {
-                this.horizontalAccessibilityScrollState = accessibilityScrollState
-            }
-            // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
-            scrollBy(
-                action = { x: Float, y: Float ->
-                    if (isVertical) {
-                        state.scrollBy(y)
-                    } else {
-                        state.scrollBy(x)
-                    }
-                    return@scrollBy true
+) = composed(
+    factory = {
+        val semantics = Modifier.semantics {
+            if (isScrollable) {
+                val accessibilityScrollState = AccessibilityScrollState(
+                    value = state.value,
+                    maxValue = state.maxValue,
+                    reverseScrolling = reverseScrolling
+                )
+                if (isVertical) {
+                    this.verticalAccessibilityScrollState = accessibilityScrollState
+                } else {
+                    this.horizontalAccessibilityScrollState = accessibilityScrollState
                 }
-            )
+                // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
+                scrollBy(
+                    action = { x: Float, y: Float ->
+                        if (isVertical) {
+                            state.scrollBy(y)
+                        } else {
+                            state.scrollBy(x)
+                        }
+                        return@scrollBy true
+                    }
+                )
+            }
         }
+        val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val scrolling = Modifier.scrollable(
+            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+            // reverse scroll by default, to have "natural" gesture that goes reversed to layout
+            // if rtl and horizontal, do not reverse to make it right-to-left
+            reverseDirection = if (!isVertical && isRtl) reverseScrolling else !reverseScrolling,
+            enabled = isScrollable,
+            controller = state.scrollableController
+        )
+        val layout = ScrollingLayoutModifier(state, reverseScrolling, isVertical)
+        semantics.then(scrolling).clipToBounds().then(layout)
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "scroll"
+        properties["state"] = state
+        properties["reverseScrolling"] = reverseScrolling
+        properties["isScrollable"] = isScrollable
+        properties["isVertical"] = isVertical
     }
-    val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
-    val scrolling = Modifier.scrollable(
-        orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-        // reverse scroll by default, to have "natural" gesture that goes reversed to layout
-        // if rtl and horizontal, do not reverse to make it right-to-left
-        reverseDirection = if (!isVertical && isRtl) reverseScrolling else !reverseScrolling,
-        enabled = isScrollable,
-        controller = state.scrollableController
-    )
-    val layout = ScrollingLayoutModifier(state, reverseScrolling, isVertical)
-    semantics.then(scrolling).clipToBounds().then(layout)
-}
+)
 
 private data class ScrollingLayoutModifier(
     val scrollerState: ScrollState,
@@ -412,7 +436,7 @@ private data class ScrollingLayoutModifier(
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         constraints.assertNotNestingScrollableContainers(isVertical)
         val childConstraints = constraints.copy(
             maxHeight = if (isVertical) Constraints.Infinity else constraints.maxHeight,

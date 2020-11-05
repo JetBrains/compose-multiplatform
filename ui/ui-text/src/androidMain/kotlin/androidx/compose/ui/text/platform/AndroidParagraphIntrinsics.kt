@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.platform
 
 import android.graphics.Paint
-import android.text.TextPaint
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
@@ -46,7 +45,7 @@ internal class AndroidParagraphIntrinsics(
     val density: Density
 ) : ParagraphIntrinsics {
 
-    internal val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+    internal val textPaint = AndroidTextPaint(Paint.ANTI_ALIAS_FLAG)
 
     internal val charSequence: CharSequence
 

@@ -17,39 +17,45 @@
 package androidx.compose.material.textfield
 
 import android.os.Build
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.TextFieldScroller
 import androidx.compose.material.TextFieldScrollerPosition
+import androidx.compose.material.iconPadding
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.StateRestorationTester
-import androidx.ui.test.assertPixels
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
-import androidx.ui.test.swipeDown
-import androidx.ui.test.swipeUp
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalFoundationApi::class)
 class TextFieldImplTest {
 
@@ -64,6 +70,16 @@ class TextFieldImplTest {
     @get:Rule
     val rule = createComposeRule()
 
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testTextField_scrollable_withLongInput() {
         val scrollerPosition = TextFieldScrollerPosition()
@@ -73,7 +89,7 @@ class TextFieldImplTest {
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp)
                 ) {
-                    BaseTextField(
+                    BasicTextField(
                         value = TextFieldValue(LONG_TEXT),
                         onValueChange = {}
                     )
@@ -97,7 +113,7 @@ class TextFieldImplTest {
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp)
                 ) {
-                    BaseTextField(
+                    BasicTextField(
                         value = TextFieldValue(text),
                         onValueChange = {}
                     )
@@ -130,7 +146,7 @@ class TextFieldImplTest {
                         remember { scrollerPosition },
                         Modifier.preferredSize(textFieldSize.toDp())
                     ) {
-                        BaseTextField(
+                        BasicTextField(
                             value = TextFieldValue(LONG_TEXT),
                             onValueChange = {}
                         )
@@ -142,7 +158,7 @@ class TextFieldImplTest {
         rule.runOnIdle {}
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedSize = IntSize(parentSize, parentSize)) { position ->
                 if (position.x > textFieldSize && position.y > textFieldSize) Color.White else null
             }
@@ -158,7 +174,7 @@ class TextFieldImplTest {
                     remember { scrollerPosition },
                     Modifier.preferredSize(width = 300.dp, height = 50.dp).testTag(TextfieldTag)
                 ) {
-                    BaseTextField(
+                    BasicTextField(
                         value = TextFieldValue(LONG_TEXT),
                         onValueChange = {}
                     )
@@ -200,7 +216,7 @@ class TextFieldImplTest {
                 scrollerPosition,
                 Modifier.preferredSize(width = 300.dp, height = 50.dp).testTag(TextfieldTag)
             ) {
-                BaseTextField(
+                BasicTextField(
                     value = TextFieldValue(LONG_TEXT),
                     onValueChange = {}
                 )
@@ -225,5 +241,16 @@ class TextFieldImplTest {
         rule.runOnIdle {
             assertThat(scrollerPosition.current).isEqualTo(swipePosition)
         }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val modifier = Modifier.iconPadding(10.0.dp, 200.0.dp) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("iconPadding")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("start", 10.0.dp),
+            ValueElement("end", 200.0.dp)
+        )
     }
 }

@@ -17,12 +17,64 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.WindowEvents
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.Menu
+import androidx.compose.ui.window.MenuBar
+import javax.swing.SwingUtilities
 
-fun main() {
-    AppManager.onWindowsEmptyAction = onCloseAppEvent
+fun main() = SwingUtilities.invokeLater {
+    AppManager.apply {
+        setEvents(
+            onAppStart = { println("onAppStart") },
+            onAppExit = { println("onAppExit") },
+            onWindowsEmpty = onCloseAppEvent
+        )
+        setMenu(
+            MenuBar(
+                Menu(
+                    "Shared actions",
+                    MenuItems.Exit
+                )
+            )
+        )
+    }
 
-    AppWindow("Desktop Compose Popup", IntSize(800, 600)).show {
+    AppWindow(
+        title = AppState.wndTitle.value,
+        events = WindowEvents(
+            onOpen = { println("onOpen") },
+            onClose = { println("onClose") },
+            onMinimize = { println("onMinimize") },
+            onMaximize = { println("onMaximize") },
+            onRestore = { println("onRestore") },
+            onFocusGet = { println("onFocusGet") },
+            onFocusLost = { println("onFocusLost") },
+            onResize = { size ->
+                AppState.wndSize.value = size
+            },
+            onRelocate = { location ->
+                AppState.wndPos.value = location
+            }
+        ),
+        size = IntSize(800, 600),
+        location = IntOffset(200, 200),
+        icon = AppState.image(),
+        menuBar = MenuBar(
+            Menu(
+                "Actions",
+                MenuItems.Notify,
+                MenuItems.Increment,
+                MenuItems.Exit
+            ),
+            Menu(
+                "About",
+                MenuItems.About,
+                MenuItems.Update
+            )
+        )
+    ).show {
         content()
     }
 }

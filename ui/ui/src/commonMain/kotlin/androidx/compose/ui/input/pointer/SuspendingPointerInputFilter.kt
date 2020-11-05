@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
@@ -26,7 +26,6 @@ import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.util.fastAll
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
@@ -35,30 +34,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
-
-/**
- * A mutable variant of [PointerEvent] that can have its [changes] list replaced.
- * This class is a placeholder until deeper parts of [PointerEvent] become mutable
- * for representing event consumption.
- */
-@ExperimentalPointerInput
-class MutablePointerEvent(
-    /**
-     * Changes reported by this event. Consume by [mapping][Iterable.map] a new list
-     * and assigning it to this property.
-     */
-    var changes: List<PointerInputChange>,
-    /**
-     * The time this event occurred, if known.
-     */
-    // TODO: we should try to make this non-null in the future
-    val inputTime: Uptime?
-) {
-    constructor(originalEvent: PointerEvent) : this(
-        changes = originalEvent.changes,
-        inputTime = originalEvent.changes.firstOrNull()?.current?.uptime
-    )
-}
 
 /**
  * Receiver scope for awaiting pointer events in a call to [PointerInputScope.handlePointerInput].
@@ -72,18 +47,18 @@ class MutablePointerEvent(
 @RestrictsSuspension
 interface HandlePointerInputScope {
     /**
-     * Suspend until a [MutablePointerEvent] is reported to the specified input [pass].
+     * Suspend until a [PointerEvent] is reported to the specified input [pass].
      * [pass] defaults to [PointerEventPass.Main].
      *
      * [awaitPointerEvent] resumes **synchronously** in the restricted suspension scope. This
      * means that callers can react immediately to input after [awaitPointerEvent] returns
      * and affect both the current frame and the next handler or phase of the input processing
-     * pipeline. Callers should mutate the returned [MutablePointerEvent] before awaiting
+     * pipeline. Callers should mutate the returned [PointerEvent] before awaiting
      * another event to consume aspects of the event before the next stage of input processing runs.
      */
     suspend fun awaitPointerEvent(
         pass: PointerEventPass = PointerEventPass.Main
-    ): MutablePointerEvent
+    ): PointerEvent
 
     /**
      * Suspend until a [CustomEvent] is reported to the specified input [pass].
@@ -154,7 +129,7 @@ fun Modifier.pointerInput(
 ) = composed {
     val density = DensityAmbient.current
     remember(density) { SuspendingPointerInputFilter(density) }.apply {
-        LaunchedTask(this) {
+        LaunchedEffect(this) {
             block()
         }
     }
@@ -173,7 +148,7 @@ private val DownChangeConsumed = ConsumedData(downChange = true)
  * [Modifier.pointerInput] DSL and carries the [Density] from [DensityAmbient] at the point of
  * the modifier's materialization. Even if this value were returned to the [PointerInputFilter]
  * callbacks, we would still need the value at composition time in order for [Modifier.pointerInput]
- * to begin its internal [LaunchedTask] for the provided code block.
+ * to begin its internal [LaunchedEffect] for the provided code block.
  */
 // TODO: Suppressing deprecation for synchronized; need to move to atomicfu wrapper
 @Suppress("DEPRECATION_ERROR")
@@ -194,7 +169,7 @@ internal class SuspendingPointerInputFilter(
     /**
      * TODO: work out whether this is actually a race or not.
      * It shouldn't be, as we will have attached the [PointerInputModifier] during
-     * composition-apply by the time the [LaunchedTask] that would access this property
+     * composition-apply by the time the [LaunchedEffect] that would access this property
      * is dispatched and begins running.
      */
     override val customEventDispatcher: CustomEventDispatcher
@@ -224,7 +199,7 @@ internal class SuspendingPointerInputFilter(
      * event for propagating cancellation. This synthetic event corresponds to Android's
      * `MotionEvent.ACTION_CANCEL`.
      */
-    private var lastPointerEvent: MutablePointerEvent? = null
+    private var lastPointerEvent: PointerEvent? = null
 
     /**
      * Snapshot the current [pointerHandlers] and run [block] on each one.
@@ -260,15 +235,15 @@ internal class SuspendingPointerInputFilter(
     }
 
     /**
-     * Dispatch [mutableEvent] for [pass] to all [pointerHandlers] currently registered when
+     * Dispatch [pointerEvent] for [pass] to all [pointerHandlers] currently registered when
      * the call begins.
      */
     private fun dispatchPointerEvent(
-        mutableEvent: MutablePointerEvent,
+        pointerEvent: PointerEvent,
         pass: PointerEventPass
     ) {
         forEachCurrentPointerHandler(pass) {
-            it.offerPointerEvent(mutableEvent, pass)
+            it.offerPointerEvent(pointerEvent, pass)
         }
     }
 
@@ -276,16 +251,12 @@ internal class SuspendingPointerInputFilter(
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-        val mutableEvent = MutablePointerEvent(pointerEvent)
+    ) {
+        dispatchPointerEvent(pointerEvent, pass)
 
-        dispatchPointerEvent(mutableEvent, pass)
-
-        lastPointerEvent = mutableEvent.takeIf { event ->
+        lastPointerEvent = pointerEvent.takeIf { event ->
             !event.changes.fastAll { it.changedToUpIgnoreConsumed() }
         }
-
-        return mutableEvent.changes
     }
 
     override fun onCancel() {
@@ -305,7 +276,7 @@ internal class SuspendingPointerInputFilter(
             } else null
         }
 
-        val cancelEvent = MutablePointerEvent(newChanges, null)
+        val cancelEvent = PointerEvent(newChanges)
 
         // Dispatch the synthetic cancel for all three passes
         dispatchPointerEvent(cancelEvent, PointerEventPass.Initial)
@@ -356,11 +327,11 @@ internal class SuspendingPointerInputFilter(
     private inner class PointerEventHandlerCoroutine<R>(
         private val completion: Continuation<R>
     ) : HandlePointerInputScope, Continuation<R> {
-        private var pointerAwaiter: Continuation<MutablePointerEvent>? = null
+        private var pointerAwaiter: Continuation<PointerEvent>? = null
         private var customAwaiter: Continuation<CustomEvent>? = null
         private var awaitPass: PointerEventPass = PointerEventPass.Main
 
-        fun offerPointerEvent(event: MutablePointerEvent, pass: PointerEventPass) {
+        fun offerPointerEvent(event: PointerEvent, pass: PointerEventPass) {
             if (pass == awaitPass) {
                 pointerAwaiter?.run {
                     pointerAwaiter = null
@@ -391,7 +362,7 @@ internal class SuspendingPointerInputFilter(
 
         override suspend fun awaitPointerEvent(
             pass: PointerEventPass
-        ): MutablePointerEvent = suspendCancellableCoroutine { continuation ->
+        ): PointerEvent = suspendCancellableCoroutine { continuation ->
             awaitPass = pass
             pointerAwaiter = continuation
         }

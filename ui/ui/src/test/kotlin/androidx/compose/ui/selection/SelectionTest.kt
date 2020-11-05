@@ -18,7 +18,6 @@ package androidx.compose.ui.selection
 
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Test
@@ -26,7 +25,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-@SmallTest
 class SelectionTest {
     @Test
     fun anchorInfo_constructor() {

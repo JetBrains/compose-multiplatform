@@ -18,20 +18,15 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLifecycleObserver
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
@@ -46,12 +41,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastForEach
 
-@RequiresOptIn(
-    "This is an experimental API for being able to perform subcomposition during the " +
-        "measuring. API is likely to change before becoming stable."
-)
-annotation class ExperimentalSubcomposeLayoutApi
-
 /**
  * Analogue of [Layout] which allows to subcompose the actual content during the measuring stage
  * for example to use the values calculated during the measurement as params for the composition
@@ -60,8 +49,7 @@ annotation class ExperimentalSubcomposeLayoutApi
  * Possible use cases:
  * * You need to know the constraints passed by the parent during the composition and can't solve
  * your use case with just custom [Layout] or [LayoutModifier]. See [WithConstraints].
- * * You want to use the size of one child during the composition of the second child. Example is
- * using the sizes of the tabs in TabRow as a input in tabs indicator composable
+ * * You want to use the size of one child during the composition of the second child.
  * * You want to compose your items lazily based on the available size. For example you have a
  * list of 100 items and instead of composing all of them you only compose the ones which are
  * currently visible(say 5 of them) and compose next items when the component is scrolled.
@@ -72,15 +60,12 @@ annotation class ExperimentalSubcomposeLayoutApi
  * @param measureBlock Measure block which provides ability to subcompose during the measuring.
  */
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class, ComposeCompilerApi::class)
-@ExperimentalSubcomposeLayoutApi
+@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
 fun <T> SubcomposeLayout(
     modifier: Modifier = Modifier,
-    measureBlock: SubcomposeMeasureScope<T>.(Constraints) -> MeasureScope.MeasureResult
+    measureBlock: SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult
 ) {
     val state = remember { SubcomposeLayoutState<T>() }
-    // TODO(lelandr): refactor these APIs so that recomposer isn't necessary
-    state.recomposer = currentComposer.recomposer
     state.compositionRef = compositionReference()
 
     val materialized = currentComposer.materialize(modifier)
@@ -102,8 +87,7 @@ fun <T> SubcomposeLayout(
  * The receiver scope of a [SubcomposeLayout]'s measure lambda which adds ability to dynamically
  * subcompose a content during the measuring on top of the features provided by [MeasureScope].
  */
-@ExperimentalSubcomposeLayoutApi
-abstract class SubcomposeMeasureScope<T> : MeasureScope() {
+interface SubcomposeMeasureScope<T> : MeasureScope {
     /**
      * Performs subcomposition of the provided [content] with given [slotId].
      *
@@ -115,15 +99,13 @@ abstract class SubcomposeMeasureScope<T> : MeasureScope() {
      * @param content the composable content which defines the slot. It could emit multiple
      * layouts, in this case the returned list of [Measurable]s will have multiple elements.
      */
-    abstract fun subcompose(slotId: T, content: @Composable () -> Unit): List<Measurable>
+    fun subcompose(slotId: T, content: @Composable () -> Unit): List<Measurable>
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalSubcomposeLayoutApi::class)
+@OptIn(ExperimentalLayoutNodeApi::class)
 private class SubcomposeLayoutState<T> :
-    SubcomposeMeasureScope<T>(),
+    SubcomposeMeasureScope<T>,
     CompositionLifecycleObserver {
-    // Values set during the composition
-    var recomposer: Recomposer? = null
     var compositionRef: CompositionReference? = null
 
     // MeasureScope delegation
@@ -190,9 +172,14 @@ private class SubcomposeLayoutState<T> :
     private fun subcompose(node: LayoutNode, nodeState: NodeState<T>) {
         node.ignoreModelReads {
             val content = nodeState.content
-            nodeState.composition = subcomposeInto(node, recomposer!!, compositionRef!!) {
-                content()
-            }
+            nodeState.composition = subcomposeInto(
+                container = node,
+                parent = compositionRef ?: error("parent composition reference not set"),
+                // Do not optimize this by passing nodeState.content directly; the additional
+                // composable function call from the lambda expression affects the scope of
+                // recomposition and recomposition of siblings.
+                composable = { content() }
+            )
         }
     }
 

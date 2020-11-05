@@ -21,10 +21,10 @@ import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -37,18 +37,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Layout
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import kotlin.math.roundToInt
 
 /**
@@ -340,12 +339,12 @@ fun BottomSheetScaffold(
                     )
                 },
                 floatingActionButton = {
-                    Box(Modifier.zIndex(FabZIndex)) {
+                    Box {
                         floatingActionButton?.invoke()
                     }
                 },
                 snackbarHost = {
-                    Box(Modifier.zIndex(SnackbarZIndex)) {
+                    Box {
                         snackbarHost(scaffoldState.snackbarHostState)
                     }
                 },
@@ -419,8 +418,6 @@ private fun BottomSheetScaffoldStack(
 }
 
 private val FabEndSpacing = 16.dp
-private val FabZIndex = 8f
-private val SnackbarZIndex = Float.POSITIVE_INFINITY
 
 /**
  * Contains useful constants for [BottomSheetScaffold].

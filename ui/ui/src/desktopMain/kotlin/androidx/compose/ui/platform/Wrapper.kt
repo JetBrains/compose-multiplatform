@@ -31,14 +31,14 @@ import androidx.compose.ui.node.LayoutNode
 fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
     FrameManager.ensureStarted()
 
-    val composition = compositionFor(root, DesktopUiApplier(root), Recomposer.current(), null)
+    val composition = compositionFor(root, DesktopUiApplier(root), Recomposer.current())
     composition.setContent {
         ProvideDesktopAmbients(this) {
             DesktopSelectionContainer(content)
         }
     }
 
-    keyboard?.shortcut(copyToClipboardKeySet) {
+    keyboard?.setShortcut(copyToClipboardKeySet) {
         selectionManager.recentManager?.let { selector ->
             selector.getSelectedText()?.let {
                 clipboardManager.setText(it)
@@ -68,13 +68,11 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
 @OptIn(ExperimentalComposeApi::class, ExperimentalLayoutNodeApi::class)
 internal actual fun actualSubcomposeInto(
     container: LayoutNode,
-    recomposer: Recomposer,
-    parent: CompositionReference?,
+    parent: CompositionReference,
     composable: @Composable () -> Unit
 ): Composition = compositionFor(
     container,
     DesktopUiApplier(container),
-    recomposer,
     parent
 ).apply {
     setContent(composable)

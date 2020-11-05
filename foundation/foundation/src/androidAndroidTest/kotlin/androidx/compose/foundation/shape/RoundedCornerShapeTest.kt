@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.shape
 
-import androidx.compose.ui.geometry.Radius
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
@@ -24,15 +24,15 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class RoundedCornerShapeTest {
 
     private val density = Density(2f)
@@ -42,7 +42,7 @@ class RoundedCornerShapeTest {
     fun roundedUniformCorners() {
         val rounded = RoundedCornerShape(25)
 
-        val expectedRadius = Radius(25f)
+        val expectedRadius = CornerRadius(25f)
         val outline = rounded.toOutline() as Outline.Rounded
         assertThat(outline.roundRect).isEqualTo(
             RoundRect(size.toRect(), expectedRadius)
@@ -66,10 +66,10 @@ class RoundedCornerShapeTest {
         assertThat(outline.roundRect).isEqualTo(
             RoundRect(
                 size.toRect(),
-                Radius(radius1),
-                Radius(radius2),
-                Radius(radius3),
-                Radius(radius4)
+                CornerRadius(radius1),
+                CornerRadius(radius2),
+                CornerRadius(radius3),
+                CornerRadius(radius4)
             )
         )
     }

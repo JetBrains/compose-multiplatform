@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.isNull
@@ -52,7 +51,6 @@ import org.junit.runners.JUnit4
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-@SmallTest
 @RunWith(JUnit4::class)
 @OptIn(InternalTextApi::class)
 class TextFieldSelectionManagerTest {
@@ -126,8 +124,9 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
-    fun TextFieldSelectionManager_longPressDragObserver_onLongPress() {
-        manager.longPressDragObserver.onLongPress(dragBeginPosition)
+    fun TextFieldSelectionManager_touchSelectionObserver_onLongPress() {
+
+        manager.touchSelectionObserver.onLongPress(dragBeginPosition)
 
         assertThat(state.selectionIsOn).isTrue()
         assertThat(state.showFloatingToolbar).isTrue()
@@ -139,7 +138,7 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
-    fun TextFieldSelectionManager_longPressDragObserver_onLongPress_blank() {
+    fun TextFieldSelectionManager_touchSelectionObserver_onLongPress_blank() {
         // Setup
         val fakeLineNumber = 0
         val fakeLineEnd = text.length
@@ -150,7 +149,7 @@ class TextFieldSelectionManagerTest {
         whenever(state.layoutResult!!.getLineEnd(fakeLineNumber)).thenReturn(fakeLineEnd)
 
         // Act
-        manager.longPressDragObserver.onLongPress(dragBeginPosition)
+        manager.touchSelectionObserver.onLongPress(dragBeginPosition)
 
         // Assert
         assertThat(state.selectionIsOn).isTrue()
@@ -163,9 +162,9 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
-    fun TextFieldSelectionManager_longPressDragObserver_onDrag() {
-        manager.longPressDragObserver.onLongPress(dragBeginPosition)
-        manager.longPressDragObserver.onDrag(dragDistance)
+    fun TextFieldSelectionManager_touchSelectionObserver_onDrag() {
+        manager.touchSelectionObserver.onLongPress(dragBeginPosition)
+        manager.touchSelectionObserver.onDrag(dragDistance)
 
         assertThat(value.selection).isEqualTo(TextRange(0, text.length))
         assertThat(state.showFloatingToolbar).isFalse()
@@ -176,11 +175,11 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
-    fun TextFieldSelectionManager_longPressDragObserver_onStop() {
-        manager.longPressDragObserver.onLongPress(dragBeginPosition)
-        manager.longPressDragObserver.onDrag(dragDistance)
+    fun TextFieldSelectionManager_touchSelectionObserver_onStop() {
+        manager.touchSelectionObserver.onLongPress(dragBeginPosition)
+        manager.touchSelectionObserver.onDrag(dragDistance)
 
-        manager.longPressDragObserver.onStop(Offset.Zero)
+        manager.touchSelectionObserver.onStop(Offset.Zero)
 
         assertThat(state.showFloatingToolbar).isTrue()
     }
@@ -390,6 +389,30 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
+    fun selectAll() {
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange(0)
+        )
+
+        manager.selectAll()
+
+        assertThat(value.selection).isEqualTo(TextRange(0, text.length))
+    }
+
+    @Test
+    fun selectAll_whenPartiallySelected() {
+        manager.value = TextFieldValue(
+            text = text,
+            selection = TextRange(0, 5)
+        )
+
+        manager.selectAll()
+
+        assertThat(value.selection).isEqualTo(TextRange(0, text.length))
+    }
+
+    @Test
     fun showSelectionToolbar_trigger_textToolbar_showMenu_Clipboard_empty_not_show_paste() {
         manager.value = TextFieldValue(
             text = text + text,
@@ -398,7 +421,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), any())
+        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), any(), any())
     }
 
     @Test
@@ -411,12 +434,32 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull())
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), any())
+    }
+
+    @Test
+    fun showSelectionToolbar_trigger_textToolbar_showMenu_no_text_show_paste_only() {
+        whenever(clipboardManager.getText()).thenReturn(AnnotatedString(text))
+        manager.value = TextFieldValue()
+
+        manager.showSelectionToolbar()
+
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), isNull())
+    }
+
+    @Test
+    fun showSelectionToolbar_trigger_textToolbar_no_menu() {
+        whenever(clipboardManager.getText()).thenReturn(null)
+        manager.value = TextFieldValue()
+
+        manager.showSelectionToolbar()
+
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), isNull(), isNull(), isNull())
     }
 
     @Test
     fun isTextChanged_text_changed_return_true() {
-        manager.longPressDragObserver.onLongPress(dragBeginPosition)
+        manager.touchSelectionObserver.onLongPress(dragBeginPosition)
         manager.value = TextFieldValue(text + text)
 
         assertThat(manager.isTextChanged()).isTrue()
@@ -424,7 +467,7 @@ class TextFieldSelectionManagerTest {
 
     @Test
     fun isTextChanged_text_unchange_return_false() {
-        manager.longPressDragObserver.onLongPress(dragBeginPosition)
+        manager.touchSelectionObserver.onLongPress(dragBeginPosition)
 
         assertThat(manager.isTextChanged()).isFalse()
     }

@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
  * This component is typically used inside an App Bar for the navigation icon / actions. See App
  * Bar documentation for samples of this.
  *
- * [icon] should typically be an [androidx.compose.foundation.Icon], using an icon from
+ * [icon] should typically be an [Icon], using an icon from
  * [androidx.compose.material.icons.Icons]. If using a custom icon, note that the typical size for the
  * internal icon is 24 x 24 dp.
  *
@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this IconButton in different [Interaction]s.
  * @param icon the content (icon) to be drawn inside the IconButton. This is typically an
- * [androidx.compose.foundation.Icon].
+ * [Icon].
  */
 @Composable
 fun IconButton(
@@ -91,7 +91,7 @@ fun IconButton(
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this IconToggleButton in different [Interaction]s.
  * @param icon the content (icon) to be drawn inside the IconToggleButton. This is typically an
- * [androidx.compose.foundation.Icon].
+ * [Icon].
  */
 @Composable
 fun IconToggleButton(

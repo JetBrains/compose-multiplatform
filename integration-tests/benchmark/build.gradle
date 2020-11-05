@@ -30,9 +30,10 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
 
     implementation project(":benchmark:benchmark-junit4")
+    implementation project(":benchmark:benchmark-perfetto")
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:integration-tests")
     implementation project(":compose:runtime:runtime")

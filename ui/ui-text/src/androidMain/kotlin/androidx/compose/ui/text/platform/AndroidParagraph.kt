@@ -16,7 +16,6 @@
 package androidx.compose.ui.text.platform
 
 import android.text.Spanned
-import android.text.TextPaint
 import android.text.TextUtils
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -47,7 +46,6 @@ import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.selection.WordBoundary
 import androidx.compose.ui.text.android.style.PlaceholderSpan
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.platform.extensions.applySpanStyle
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -209,7 +207,7 @@ internal class AndroidParagraph constructor(
         get() = paragraphIntrinsics.charSequence
 
     @VisibleForTesting
-    internal val textPaint: TextPaint
+    internal val textPaint: AndroidTextPaint
         get() = paragraphIntrinsics.textPaint
 
     override fun getLineForVerticalPosition(vertical: Float): Int {
@@ -329,17 +327,10 @@ internal class AndroidParagraph constructor(
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
-        if (color != Color.Unspecified || shadow != null || textDecoration != null) {
-            textPaint.applySpanStyle(
-                style = SpanStyle(
-                    color = color,
-                    shadow = shadow,
-                    textDecoration = textDecoration
-                ),
-                typefaceAdapter = paragraphIntrinsics.typefaceAdapter,
-                density = paragraphIntrinsics.density
-            )
-        }
+        textPaint.setColor(color)
+        textPaint.setShadow(shadow)
+        textPaint.setTextDecoration(textDecoration)
+
         val nativeCanvas = canvas.nativeCanvas
         if (didExceedMaxLines) {
             nativeCanvas.save()

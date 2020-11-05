@@ -68,6 +68,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
      *
      * @sample androidx.compose.runtime.samples.consumeAmbient
      */
+    @OptIn(ComposeCompilerApi::class)
     @ComposableContract(readonly = true)
     @Composable
     inline val current: T get() = currentComposer.consume(this)
@@ -91,7 +92,17 @@ abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> 
      * @see ProvidableAmbient
      */
     @Suppress("UNCHECKED_CAST")
-    infix fun provides(value: T) = ProvidedValue(this, value)
+    infix fun provides(value: T) = ProvidedValue(this, value, true)
+
+    /**
+     * Associates an ambient key to a value in a call to [Providers] if the key does not
+     * already have an associated value.
+     *
+     * @see Ambient
+     * @see ProvidableAmbient
+     */
+    @Suppress("UNCHECKED_CAST")
+    infix fun providesDefault(value: T) = ProvidedValue(this, value, false)
 }
 
 /**
@@ -170,6 +181,7 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T>
  * @see staticAmbientOf
  */
 @Composable
+@OptIn(ComposeCompilerApi::class)
 fun Providers(vararg values: ProvidedValue<*>, children: @Composable () -> Unit) {
     currentComposer.startProviders(values)
     children()

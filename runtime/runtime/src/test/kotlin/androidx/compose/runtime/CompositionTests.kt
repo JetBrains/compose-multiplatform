@@ -2386,6 +2386,58 @@ class CompositionTests {
             result.expectNoChanges()
         }
     }
+
+    @OptIn(ComposeCompilerApi::class)
+    @Test
+    fun testApplierBeginEndCallbacks() {
+        val checks = mutableListOf<String>()
+        compose {
+            val myComposer = currentComposer
+            val myApplier = myComposer.applier as ViewApplier
+            assertEquals(0, myApplier.onBeginChangesCalled, "onBeginChanges during composition")
+            assertEquals(0, myApplier.onEndChangesCalled, "onEndChanges during composition")
+            checks += "composition"
+
+            SideEffect {
+                assertEquals(1, myApplier.onBeginChangesCalled, "onBeginChanges during side effect")
+                assertEquals(1, myApplier.onEndChangesCalled, "onEndChanges during side effect")
+                checks += "SideEffect"
+            }
+
+            // Memo to future self:
+            // Without the explicit generic definition of CompositionLifecycleObserver here,
+            // the type of this remember call is inferred to be `Unit` thanks to the call's position
+            // as the last expression in a unit lambda (the argument to `compose {}`). The remember
+            // lambda is in turn interpreted as returning Unit, the object expression is dropped
+            // on the floor for the gc, and Unit is written into the slot table.
+            remember<CompositionLifecycleObserver> {
+                object : CompositionLifecycleObserver {
+                    override fun onEnter() {
+                        assertEquals(
+                            1,
+                            myApplier.onBeginChangesCalled,
+                            "onBeginChanges during lifecycle observer"
+                        )
+                        assertEquals(
+                            1,
+                            myApplier.onEndChangesCalled,
+                            "onEndChanges during lifecycle observer"
+                        )
+                        checks += "CompositionLifecycleObserver"
+                    }
+                }
+            }
+        }
+        assertEquals(
+            listOf(
+                "composition",
+                "CompositionLifecycleObserver",
+                "SideEffect"
+            ),
+            checks,
+            "expected order of calls"
+        )
+    }
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {
@@ -2424,6 +2476,7 @@ private class CompositionResult(
         composer.applyChanges()
         Snapshot.notifyObjectsInitialized()
         composer.slotTable.verifyWellFormed()
+        composer.insertTable.verifyWellFormed()
     }
 
     fun recompose(): Boolean = doCompose(composer) { composer.recompose() }
@@ -2474,7 +2527,7 @@ private fun compose(
                 return onFrame(0)
             }
         }
-        val recomposer = Recomposer().apply {
+        val recomposer = Recomposer(scope.coroutineContext).apply {
             scope.launch(clock) { runRecomposeAndApplyChanges() }
         }
         Composer(
@@ -2493,8 +2546,23 @@ private fun compose(
         composer.applyChanges()
     }
     composer.slotTable.verifyWellFormed()
+    validateRecomposeScopeAnchors(composer.slotTable)
 
     return CompositionResult(composer, root)
+}
+
+@OptIn(InternalComposeApi::class)
+fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
+    val scopes = slotTable.slots.map { it as? RecomposeScope }.filterNotNull()
+    for (scope in scopes) {
+        scope.anchor?.let { anchor ->
+            check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
+                val dataIndex = slotTable.slots.indexOf(scope)
+                "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
+                    "$dataIndex"
+            }
+        }
+    }
 }
 
 // Contact test data

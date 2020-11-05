@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation
 
-import androidx.compose.foundation.text.CoreText
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
@@ -27,8 +29,6 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.useOrElse
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.TextLayoutResult
@@ -60,13 +60,6 @@ import androidx.compose.ui.unit.TextUnit
  * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
  * adapt to different background colors and still maintain contrast and accessibility.
  *
- * During the measurement, CoreText tends to shrink its size and reports the minimal needed size
- * to its parent. It will ignore the minWidth and minHeight except when [TextAlign] is
- * [TextAlign.Justify]. When [TextAlign.Justify] is specified and [text] is short enough that
- * doesn't exceed minWidth, CoreText will justify the [text] to fill the given minWidth.
- * When input [text] is too long and exceeds the maxWidth/maxHeight constrains, it will determine
- * its size based on the [overflow] option.
- *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param color [Color] to apply to the text. If [Color.Unspecified], and [style] has no color set,
@@ -94,6 +87,17 @@ import androidx.compose.ui.unit.TextUnit
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  * @param style Style configuration for the text such as color, font, line height etc.
  */
+@Deprecated(
+    message = "Use androidx.compose.material.Text for a high level Text component that " +
+        "consumes theming information, or androidx.compose.foundation.text.BasicText for a basic " +
+        "unopinionated component that does not have default theming",
+    replaceWith = ReplaceWith(
+        "Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
+            "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, " +
+            "onTextLayout, style)",
+        "androidx.compose.material.Text"
+    )
+)
 @Composable
 fun Text(
     text: String,
@@ -153,13 +157,6 @@ fun Text(
  * [AmbientContentColor] will be used - this allows this [Text] or element containing this [Text] to
  * adapt to different background colors and still maintain contrast and accessibility.
  *
- * During the measurement, CoreText tends to shrink its size and reports the minimal needed size
- * to its parent. It will ignore the minWidth and minHeight except when [TextAlign] is
- * [TextAlign.Justify]. When [TextAlign.Justify] is specified and [text] is short enough that
- * doesn't exceed minWidth, CoreText will justify the [text] to fill the given minWidth.
- * When input [text] is too long and exceeds the maxWidth/maxHeight constrains, it will determine
- * its size based on the [overflow] option.
- *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param color [Color] to apply to the text. If [Color.Unspecified], and [style] has no color set,
@@ -189,6 +186,17 @@ fun Text(
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  * @param style Style configuration for the text such as color, font, line height etc.
  */
+@Deprecated(
+    message = "Use androidx.compose.material.Text for a high level Text component that " +
+        "consumes theming information, or androidx.compose.foundation.text.BasicText for a basic " +
+        "unopinionated component that does not have default theming",
+    replaceWith = ReplaceWith(
+        "Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
+            "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, " +
+            "inlineContent, onTextLayout, style)",
+        "androidx.compose.material.Text"
+    )
+)
 @Composable
 fun Text(
     text: AnnotatedString,
@@ -223,16 +231,15 @@ fun Text(
             letterSpacing = letterSpacing
         )
     )
-    // TODO: text could contain composables, should be the final text
-    CoreText(
+    BasicText(
         text,
-        modifier.semantics { this.text = text },
+        modifier,
         mergedStyle,
-        softWrap,
+        onTextLayout,
         overflow,
+        softWrap,
         maxLines,
-        inlineContent,
-        onTextLayout
+        inlineContent
     )
 }
 
@@ -243,6 +250,13 @@ fun Text(
  *
  * @see ProvideTextStyle
  */
+@Deprecated(
+    message = "AmbientTextStyle has moved to the Material library. For non-Material applications," +
+        " create your own design system specific theming ambients.",
+    replaceWith = ReplaceWith(
+        "AmbientTextStyle", "androidx.compose.material.AmbientTextStyle"
+    )
+)
 val AmbientTextStyle = ambientOf(
     @OptIn(ExperimentalComposeApi::class) structuralEqualityPolicy()
 ) { TextStyle() }
@@ -255,6 +269,14 @@ val AmbientTextStyle = ambientOf(
  *
  * @see AmbientTextStyle
  */
+@Deprecated(
+    message = "ProvideTextStyle has moved to the Material library. For non-Material applications," +
+        " create your own design system specific theming ambients.",
+    replaceWith = ReplaceWith(
+        "ProvideTextStyle(value, children)",
+        "androidx.compose.material.ProvideTextStyle"
+    )
+)
 @Composable
 fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
     val mergedStyle = AmbientTextStyle.current.merge(value)

@@ -37,6 +37,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
 
 /**
  * This gesture detector fires a callback when a traditional press is being released.  This is
@@ -110,8 +111,7 @@ internal class TapGestureFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-
+    ) {
         val changes = pointerEvent.changes
 
         if (pass == PointerEventPass.Main) {
@@ -125,14 +125,12 @@ internal class TapGestureFilter : PointerInputFilter() {
                     // not blocked, we can fire, reset, and consume all of the up events.
                     reset()
                     onTap.invoke(pointerPxPosition)
-                    return if (consumeChanges) {
-                        changes.map {
+                    if (consumeChanges) {
+                        changes.fastForEach {
                             it.consumeDownChange()
-                            it
                         }
-                    } else {
-                        changes
                     }
+                    return
                 } else {
                     lastPxPosition = pointerPxPosition
                 }
@@ -170,8 +168,6 @@ internal class TapGestureFilter : PointerInputFilter() {
                 reset()
             }
         }
-
-        return changes
     }
 
     override fun onCancel() {

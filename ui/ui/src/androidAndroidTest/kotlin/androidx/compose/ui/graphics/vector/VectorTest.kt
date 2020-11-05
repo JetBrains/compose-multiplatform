@@ -18,15 +18,16 @@ package androidx.compose.ui.graphics.vector
 
 import android.graphics.Bitmap
 import android.os.Build
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
@@ -35,28 +36,29 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onRoot
-import androidx.ui.test.performClick
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class VectorTest {
 
     @get:Rule
@@ -229,7 +231,7 @@ class VectorTest {
         }
 
         rule.onNodeWithTag(testTag).apply {
-            captureToBitmap().apply {
+            captureToImage().asAndroidBitmap().apply {
                 assertEquals(Color.Red.toArgb(), getPixel(width - 2, 0))
                 assertEquals(Color.Red.toArgb(), getPixel(2, 0))
                 assertEquals(Color.Red.toArgb(), getPixel(width - 1, height - 2))
@@ -243,7 +245,7 @@ class VectorTest {
 
         rule.waitForIdle()
 
-        rule.onNodeWithTag(testTag).captureToBitmap().apply {
+        rule.onNodeWithTag(testTag).captureToImage().asAndroidBitmap().apply {
             assertEquals(Color.Black.toArgb(), getPixel(width - 2, 0))
             assertEquals(Color.Black.toArgb(), getPixel(2, 0))
             assertEquals(Color.Black.toArgb(), getPixel(width - 1, height - 2))
@@ -252,6 +254,40 @@ class VectorTest {
             assertEquals(Color.Red.toArgb(), getPixel(0, height - 2))
             assertEquals(Color.Red.toArgb(), getPixel(width - 2, height - 1))
         }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testVectorScaleNonUniformly() {
+        val defaultWidth = 24.dp
+        val defaultHeight = 24.dp
+        val testTag = "testTag"
+        rule.setContent {
+            val vectorPainter = rememberVectorPainter(
+                defaultWidth = defaultWidth,
+                defaultHeight = defaultHeight
+            ) { viewportWidth, viewportHeight ->
+                Path(
+                    fill = SolidColor(Color.Blue),
+                    pathData = PathData {
+                        lineTo(viewportWidth, 0f)
+                        lineTo(viewportWidth, viewportHeight)
+                        lineTo(0f, viewportHeight)
+                        close()
+                    }
+                )
+            }
+            Image(
+                painter = vectorPainter,
+                modifier = Modifier
+                    .testTag(testTag)
+                    .preferredSize(defaultWidth * 7, defaultHeight * 3)
+                    .background(Color.Red),
+                contentScale = ContentScale.FillBounds
+            )
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Blue }
     }
 
     @Composable
@@ -274,20 +310,21 @@ class VectorTest {
     private fun createTestVectorPainter(size: Int = 200): VectorPainter {
         val sizePx = size.toFloat()
         val sizeDp = (size / DensityAmbient.current.density).dp
-        return VectorPainter(
+        return rememberVectorPainter(
             defaultWidth = sizeDp,
-            defaultHeight = sizeDp
-        ) { _, _ ->
-            Path(
-                pathData = PathData {
-                    lineTo(sizePx, 0.0f)
-                    lineTo(sizePx, sizePx)
-                    lineTo(0.0f, sizePx)
-                    close()
-                },
-                fill = SolidColor(Color.Black)
-            )
-        }
+            defaultHeight = sizeDp,
+            children = { _, _ ->
+                Path(
+                    pathData = PathData {
+                        lineTo(sizePx, 0.0f)
+                        lineTo(sizePx, sizePx)
+                        lineTo(0.0f, sizePx)
+                        close()
+                    },
+                    fill = SolidColor(Color.Black)
+                )
+            }
+        )
     }
 
     @Composable
@@ -299,7 +336,7 @@ class VectorTest {
         val sizePx = size.toFloat()
         val sizeDp = (size / DensityAmbient.current.density).dp
         val background = Modifier.paint(
-            VectorPainter(
+            rememberVectorPainter(
                 defaultWidth = sizeDp,
                 defaultHeight = sizeDp
             ) { _, _ ->
@@ -352,7 +389,7 @@ class VectorTest {
         val sizePx = size.toFloat()
         val sizeDp = (size / DensityAmbient.current.density).dp
         val background = Modifier.paint(
-            VectorPainter(
+            rememberVectorPainter(
                 defaultWidth = sizeDp,
                 defaultHeight = sizeDp
             ) { _, _ ->
@@ -385,7 +422,7 @@ class VectorTest {
     }
 
     private fun takeScreenShot(width: Int, height: Int = width): Bitmap {
-        val bitmap = rule.onRoot().captureToBitmap()
+        val bitmap = rule.onRoot().captureToImage().asAndroidBitmap()
         Assert.assertEquals(width, bitmap.width)
         Assert.assertEquals(height, bitmap.height)
         return bitmap

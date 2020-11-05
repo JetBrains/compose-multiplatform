@@ -18,7 +18,9 @@ package androidx.compose.compiler.plugins.kotlin
 
 import org.junit.Test
 
+@Suppress("unused")
 class ComposeMultiPlatformTests : AbstractMultiPlatformIntegrationTest() {
+
     @Test
     fun testBasicMpp() = ensureSetup {
         multiplatform(

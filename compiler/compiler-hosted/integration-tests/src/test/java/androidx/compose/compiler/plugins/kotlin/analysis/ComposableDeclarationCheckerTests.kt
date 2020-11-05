@@ -34,6 +34,44 @@ class ComposableDeclarationCheckerTests : AbstractComposeDiagnosticsTest() {
         )
     }
 
+    fun testComposableFunctionReferences() {
+        doTest(
+            """
+            import androidx.compose.runtime.Composable
+
+            @Composable fun A() {}
+            val aCallable: () -> Unit = <!COMPOSABLE_FUNCTION_REFERENCE!>::A<!>
+            val bCallable: @Composable () -> Unit = <!COMPOSABLE_FUNCTION_REFERENCE,TYPE_MISMATCH!>::A<!>
+            val cCallable = <!COMPOSABLE_FUNCTION_REFERENCE!>::A<!>
+            fun doSomething(fn: () -> Unit) { print(fn) }
+            @Composable fun B(content: @Composable () -> Unit) {
+                content()
+                doSomething(<!COMPOSABLE_FUNCTION_REFERENCE!>::A<!>)
+                B(<!COMPOSABLE_FUNCTION_REFERENCE,TYPE_MISMATCH!>::A<!>)
+            }
+        """
+        )
+    }
+
+    fun testNonComposableFunctionReferences() {
+        doTest(
+            """
+            import androidx.compose.runtime.Composable
+
+            fun A() {}
+            val aCallable: () -> Unit = ::A
+            val bCallable: @Composable () -> Unit = <!TYPE_MISMATCH!>::A<!>
+            val cCallable = ::A
+            fun doSomething(fn: () -> Unit) { print(fn) }
+            @Composable fun B(content: @Composable () -> Unit) {
+                content()
+                doSomething(::A)
+                B(<!TYPE_MISMATCH!>::A<!>)
+            }
+        """
+        )
+    }
+
     fun testPropertyWithJustGetter() {
         doTest(
             """
@@ -66,7 +104,7 @@ class ComposableDeclarationCheckerTests : AbstractComposeDiagnosticsTest() {
             @Composable suspend fun <!COMPOSABLE_SUSPEND_FUN!>Foo<!>() {}
 
             fun acceptSuspend(fn: suspend () -> Unit) { print(fn) }
-            fun acceptComposableSuspend(fn: @Composable suspend () -> Unit) { print(fn.hashCode()) }
+            fun acceptComposableSuspend(fn: <!COMPOSABLE_SUSPEND_FUN!>@Composable suspend () -> Unit<!>) { print(fn.hashCode()) }
 
             val foo: suspend () -> Unit = <!TYPE_MISMATCH!>@Composable {}<!>
             val bar: suspend () -> Unit = {}
@@ -76,6 +114,30 @@ class ComposableDeclarationCheckerTests : AbstractComposeDiagnosticsTest() {
                 acceptComposableSuspend @Composable {}
                 acceptComposableSuspend(<!UNSUPPORTED_FEATURE!>composableLambda<!>)
                 acceptSuspend(<!COMPOSABLE_SUSPEND_FUN, TYPE_MISMATCH!>@Composable suspend fun() { }<!>)
+            }
+        """
+        )
+    }
+
+    fun testMissingComposableOnOverride() {
+        doTest(
+            """
+            import androidx.compose.runtime.Composable
+
+            interface Foo {
+                @Composable
+                fun composableFunction(param: Boolean): Boolean
+                @Composable
+                val composableProperty: Boolean
+                fun nonComposableFunction(param: Boolean): Boolean
+                val nonComposableProperty: Boolean
+            }
+
+            object FakeFoo : Foo {
+                <!CONFLICTING_OVERLOADS!>override fun composableFunction(param: Boolean)<!> = true
+                <!CONFLICTING_OVERLOADS!>override val composableProperty: Boolean<!> get() = true
+                <!CONFLICTING_OVERLOADS!>@Composable override fun nonComposableFunction(param: Boolean)<!> = true
+                <!CONFLICTING_OVERLOADS!>@Composable override val nonComposableProperty: Boolean<!> get() = true
             }
         """
         )

@@ -25,17 +25,17 @@ import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.FocusManagerAmbient
-import androidx.test.filters.SmallTest
-import androidx.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
+@MediumTest
 @OptIn(ExperimentalFocus::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class FocusManagerAmbientTest {
     @get:Rule
     val rule = createComposeRule()
@@ -49,10 +49,11 @@ class FocusManagerAmbientTest {
         rule.setFocusableContent {
             focusManager = FocusManagerAmbient.current
             focusRequester = FocusRequester()
-            Box(modifier = Modifier
-                .focusRequester(focusRequester)
-                .focusObserver { focusState = it }
-                .focus()
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusObserver { focusState = it }
+                    .focus()
             )
         }
         rule.runOnIdle {
@@ -78,16 +79,21 @@ class FocusManagerAmbientTest {
         rule.setFocusableContent {
             focusManager = FocusManagerAmbient.current
             focusRequester = FocusRequester()
-            Box(modifier = Modifier
-                .focusObserver { grandparentFocusState = it }
-                .focus()) {
-                Box(modifier = Modifier
-                    .focusObserver { parentFocusState = it }
-                    .focus()) {
-                    Box(modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .focusObserver { focusState = it }
+            Box(
+                modifier = Modifier
+                    .focusObserver { grandparentFocusState = it }
+                    .focus()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .focusObserver { parentFocusState = it }
                         .focus()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .focusObserver { focusState = it }
+                            .focus()
                     )
                 }
             }

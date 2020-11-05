@@ -23,11 +23,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.onSizeChanged
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -36,12 +37,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class OnSizeChangedTest {
 
     @Suppress("DEPRECATION")
@@ -56,6 +56,7 @@ class OnSizeChangedTest {
     }
 
     @Test
+    @SmallTest
     fun normalSizeChange() {
         var latch = CountDownLatch(1)
         var changedSize = IntSize.Zero
@@ -64,10 +65,12 @@ class OnSizeChangedTest {
         rule.runOnUiThread {
             activity.setContent {
                 with (DensityAmbient.current) {
-                    Box(Modifier.padding(10.toDp()).onSizeChanged {
-                        changedSize = it
-                        latch.countDown()
-                    }) {
+                    Box(
+                        Modifier.padding(10.toDp()).onSizeChanged {
+                            changedSize = it
+                            latch.countDown()
+                        }
+                    ) {
                         Box(Modifier.size(sizePx.toDp()))
                     }
                 }
@@ -97,10 +100,12 @@ class OnSizeChangedTest {
         rule.runOnUiThread {
             activity.setContent {
                 with (DensityAmbient.current) {
-                    Box(Modifier.padding(sizePx.toDp()).onSizeChanged {
-                        changedSize = it
-                        latch.countDown()
-                    }) {
+                    Box(
+                        Modifier.padding(sizePx.toDp()).onSizeChanged {
+                            changedSize = it
+                            latch.countDown()
+                        }
+                    ) {
                         Box(Modifier.size(10.toDp()))
                     }
                 }
@@ -128,10 +133,12 @@ class OnSizeChangedTest {
         rule.runOnUiThread {
             activity.setContent {
                 with (DensityAmbient.current) {
-                    Box(Modifier.padding(10.toDp()).onSizeChanged {
-                        changedSize = it
-                        latch.countDown()
-                    }) {
+                    Box(
+                        Modifier.padding(10.toDp()).onSizeChanged {
+                            changedSize = it
+                            latch.countDown()
+                        }
+                    ) {
                         Box(Modifier.size(sizePx.toDp()))
                     }
                 }
@@ -154,6 +161,7 @@ class OnSizeChangedTest {
     }
 
     @Test
+    @SmallTest
     fun addedModifier() {
         var latch1 = CountDownLatch(1)
         var latch2 = CountDownLatch(1)
@@ -168,10 +176,12 @@ class OnSizeChangedTest {
                         changedSize2 = it
                         latch2.countDown()
                     } else Modifier
-                    Box(Modifier.padding(10.toDp()).onSizeChanged {
-                        changedSize1 = it
-                        latch1.countDown()
-                    }.then(mod)) {
+                    Box(
+                        Modifier.padding(10.toDp()).onSizeChanged {
+                            changedSize1 = it
+                            latch1.countDown()
+                        }.then(mod)
+                    ) {
                         Box(Modifier.size(10.toDp()))
                     }
                 }

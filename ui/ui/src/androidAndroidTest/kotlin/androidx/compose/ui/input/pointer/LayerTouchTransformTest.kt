@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.drawBehind
@@ -33,29 +32,31 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.unit.dp
-import androidx.test.filters.MediumTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.down
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-@MediumTest
+@LargeTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class LayerTouchTransformTest {
 
     @get:Rule
@@ -129,7 +130,7 @@ class LayerTouchTransformTest {
             await(5, TimeUnit.SECONDS)
         }
 
-        node.captureToBitmap().apply {
+        node.captureToImage().asAndroidBitmap().apply {
             Assert.assertEquals(
                 Color.Red.toArgb(),
                 getPixel(

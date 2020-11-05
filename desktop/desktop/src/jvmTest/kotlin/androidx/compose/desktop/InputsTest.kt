@@ -20,21 +20,21 @@ import androidx.compose.material.Slider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.ui.test.assertValueEquals
-import androidx.ui.test.onNodeWithTag
+import androidx.compose.ui.test.assertValueEquals
+import androidx.compose.ui.test.onNodeWithTag
 
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import androidx.ui.test.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 
 @RunWith(JUnit4::class)
 class InputsTest {
     private val tag = "slider"
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun sliderPosition_valueCoercion() {

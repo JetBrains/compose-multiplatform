@@ -21,8 +21,8 @@ import androidx.compose.ui.ContentDrawScope
 import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.boundingRect
@@ -39,8 +39,7 @@ import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.nativeClass
@@ -80,9 +79,20 @@ fun Modifier.border(width: Dp, color: Color, shape: Shape = RectangleShape) =
  * @param brush brush to paint the border with
  * @param shape shape of the border
  */
-fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed {
-    BorderModifier(remember { BorderModifierCache() }, shape, width, brush)
-}
+fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed(
+    factory = { BorderModifier(remember { BorderModifierCache() }, shape, width, brush) },
+    inspectorInfo = debugInspectorInfo {
+        name = "border"
+        properties["width"] = width
+        if (brush is SolidColor) {
+            properties["color"] = brush.value
+            value = brush.value
+        } else {
+            properties["brush"] = brush
+        }
+        properties["shape"] = shape
+    }
+)
 
 /**
  * Returns a [Modifier] that adds border with appearance specified with a [border] and a [shape]
@@ -141,16 +151,22 @@ fun Modifier.drawBorder(size: Dp, color: Color, shape: Shape = RectangleShape) =
         "androidx.ui.foundation.border"
     )
 )
-fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed {
-    BorderModifier(remember { BorderModifierCache() }, shape, size, brush)
-}
+fun Modifier.drawBorder(size: Dp, brush: Brush, shape: Shape): Modifier = composed(
+    factory = { BorderModifier(remember { BorderModifierCache() }, shape, size, brush) },
+    inspectorInfo = debugInspectorInfo {
+        name = "drawBorder"
+        properties["size"] = size
+        properties["brush"] = brush
+        properties["shape"] = shape
+    }
+)
 
 private class BorderModifier(
     private val cache: BorderModifierCache,
     private val shape: Shape,
     private val borderWidth: Dp,
     private val brush: Brush
-) : DrawModifier, InspectableValue {
+) : DrawModifier {
 
     // put params to constructor to ensure proper equals and update cache after construction
     init {
@@ -173,7 +189,7 @@ private class BorderModifier(
                 drawRoundRectBorder(borderSize, outline.rect, 0f, brush)
             } else if (outline is Outline.Rounded && outline.roundRect.isSimple) {
                 // shortcut to make rounded rectangles draw faster
-                val radius = outline.roundRect.bottomLeftRadius.y
+                val radius = outline.roundRect.bottomLeftCornerRadius.y
                 drawRoundRectBorder(
                     borderSize,
                     outline.roundRect.boundingRect,
@@ -201,7 +217,7 @@ private class BorderModifier(
             brush,
             topLeft = Offset(rect.left + delta, rect.top + delta),
             size = Size(rect.width - 2 * delta, rect.height - 2 * delta),
-            radius = Radius(radius),
+            cornerRadius = CornerRadius(radius),
             style = style
         )
     }
@@ -226,23 +242,6 @@ private class BorderModifier(
         result = 31 * result + brush.hashCode()
         return result
     }
-
-    override val inspectableElements: Sequence<ValueElement>
-        get() {
-            val brushParam = if (brush is SolidColor) {
-                ValueElement("color", brush.value)
-            } else {
-                ValueElement("brush", brush)
-            }
-            return sequenceOf(
-                brushParam,
-                ValueElement("shape", shape),
-                ValueElement("width", borderWidth)
-            )
-        }
-    override val nameFallback = "border"
-    override val valueOverride: Any?
-        get() = (brush as? SolidColor)?.value ?: brush
 }
 
 private class BorderModifierCache {

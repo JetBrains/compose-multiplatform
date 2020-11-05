@@ -28,8 +28,8 @@ import androidx.compose.ui.assertColorsEqual
 import androidx.compose.ui.assertRect
 import androidx.compose.ui.background
 import androidx.compose.ui.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
@@ -45,19 +45,19 @@ import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.waitAndScreenShot
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class ClipDrawTest {
 
     @Suppress("DEPRECATION")
@@ -169,7 +169,7 @@ class ClipDrawTest {
     fun roundedUniformRectClip() {
         val shape = object : Shape {
             override fun createOutline(size: Size, density: Density): Outline =
-                Outline.Rounded(RoundRect(size.toRect(), Radius(12f)))
+                Outline.Rounded(RoundRect(size.toRect(), CornerRadius(12f)))
         }
         rule.runOnUiThreadIR {
             activity.setContent {
@@ -207,10 +207,10 @@ class ClipDrawTest {
                 Outline.Rounded(
                     RoundRect(
                         size.toRect(),
-                        Radius.Zero,
-                        Radius(12f),
-                        Radius(12f),
-                        Radius(12f)
+                        CornerRadius.Zero,
+                        CornerRadius(12f),
+                        CornerRadius(12f),
+                        CornerRadius(12f)
                     )
                 )
         }
@@ -314,7 +314,7 @@ class ClipDrawTest {
         rule.runOnUiThreadIR {
             model.value = object : Shape {
                 override fun createOutline(size: Size, density: Density): Outline =
-                    Outline.Rounded(RoundRect(size.toRect(), Radius(12f)))
+                    Outline.Rounded(RoundRect(size.toRect(), CornerRadius(12f)))
             }
         }
 

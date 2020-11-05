@@ -19,15 +19,16 @@ package androidx.compose.ui.node
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RestrictTo
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastFirstOrNull
@@ -104,7 +105,10 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
     val coreModifier = Modifier
         .pointerInteropFilter(this)
         .drawBehind {
-            drawIntoCanvas { canvas -> draw(canvas.nativeCanvas) }
+            drawIntoCanvas { canvas ->
+                (layoutNode.owner as? AndroidOwner)
+                    ?.drawAndroidView(this@toLayoutNode, canvas.nativeCanvas)
+            }
         }.onGloballyPositioned {
             // The global position of this LayoutNode can change with it being replaced. For these
             // cases, we need to inform the View.
@@ -134,7 +138,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
             measureScope: MeasureScope,
             measurables: List<Measurable>,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
+        ): MeasureResult {
             if (constraints.minWidth != 0) {
                 getChildAt(0).minimumWidth = constraints.minWidth
             }

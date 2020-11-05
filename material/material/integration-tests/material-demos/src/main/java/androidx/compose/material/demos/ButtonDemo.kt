@@ -18,7 +18,6 @@ package androidx.compose.material.demos
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,8 +28,10 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonConstants
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.samples.ButtonSample
 import androidx.compose.material.samples.ButtonWithIconSample
@@ -75,7 +76,12 @@ private fun Buttons() {
     Spacer(Modifier.preferredHeight(DefaultSpace))
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        Button(onClick = {}, backgroundColor = MaterialTheme.colors.secondary) {
+        Button(
+            onClick = {},
+            colors = ButtonConstants.defaultButtonColors(
+                backgroundColor = MaterialTheme.colors.secondary
+            )
+        ) {
             Text("Secondary Color")
         }
         ButtonWithIconSample()
@@ -129,7 +135,9 @@ private fun CustomShapeButton() {
         onClick = {},
         modifier = Modifier.preferredSize(110.dp),
         shape = TriangleShape,
-        backgroundColor = Color.Yellow,
+        colors = ButtonConstants.defaultOutlinedButtonColors(
+            backgroundColor = Color.Yellow
+        ),
         border = BorderStroke(width = 2.dp, color = Color.Black)
     ) {
         Column {

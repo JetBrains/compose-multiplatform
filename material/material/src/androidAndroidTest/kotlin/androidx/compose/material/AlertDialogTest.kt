@@ -17,32 +17,32 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.border
+import androidx.compose.testutils.assertContainsColor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.isDialog
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
-import androidx.test.filters.MediumTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertContainsColor
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.isDialog
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@MediumTest
-@RunWith(JUnit4::class)
+@LargeTest
+@RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P) // Should be O: b/163023027
 class AlertDialogTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
+    @FlakyTest(bugId = 170333139)
     @Test
     fun customStyleProperties_shouldApply() {
         var contentColor = Color.Unspecified
@@ -62,7 +62,7 @@ class AlertDialogTest {
 
         // Assert background
         rule.onNode(isDialog())
-            .captureToBitmap()
+            .captureToImage()
             .assertContainsColor(Color.Yellow) // Background
             .assertContainsColor(Color.Blue) // Modifier border
 

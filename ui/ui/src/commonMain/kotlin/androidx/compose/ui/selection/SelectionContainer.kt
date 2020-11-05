@@ -18,16 +18,53 @@ package androidx.compose.ui.selection
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.HapticFeedBackAmbient
 import androidx.compose.ui.platform.TextToolbarAmbient
 import androidx.compose.ui.text.InternalTextApi
+
+/**
+ * Enables text selection for it's direct or indirection children.
+ *
+ * @sample androidx.compose.ui.samples.SelectionSample
+ */
+@Suppress("DEPRECATION")
+@OptIn(InternalTextApi::class)
+@Composable
+fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
+    var selection by remember { mutableStateOf<Selection?>(null) }
+    SelectionContainer(
+        modifier = modifier,
+        selection = selection,
+        onSelectionChange = {
+            selection = it
+        },
+        children = children
+    )
+}
+
+/**
+ * Disables text selection for it's direct or indirection children. To use this, simply add this
+ * to wrap one or more text composables.
+ *
+ * @sample androidx.compose.ui.samples.DisableSelectionSample
+ */
+@Composable
+fun DisableSelection(content: @Composable () -> Unit) {
+    Providers(
+        SelectionRegistrarAmbient provides null,
+        children = content
+    )
+}
 
 /**
  * Selection Composable.
@@ -36,6 +73,8 @@ import androidx.compose.ui.text.InternalTextApi
  * area with start and end handles.
  */
 @OptIn(InternalTextApi::class)
+@Deprecated("Please use SelectionContainer with no callback")
+@InternalTextApi
 @Composable
 fun SelectionContainer(
     /** A [Modifier] for SelectionContainer. */
@@ -74,47 +113,30 @@ fun SelectionContainer(
     Providers(SelectionRegistrarAmbient provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
-        SelectionLayout(
+        SimpleLayout(
             modifier = modifier.then(selectionContainerModifier)
         ) {
             children()
             manager.selection?.let {
                 for (isStartHandle in listOf(true, false)) {
-                    SelectionHandleLayout(
+                    SelectionHandle(
                         startHandlePosition = manager.startHandlePosition,
                         endHandlePosition = manager.endHandlePosition,
                         isStartHandle = isStartHandle,
                         directions = Pair(it.start.direction, it.end.direction),
-                        handlesCrossed = it.handlesCrossed
-                    ) {
-                        SelectionHandle(
-                            modifier =
-                                Modifier.dragGestureFilter(
-                                    manager.handleDragObserver(isStartHandle)
-                                ),
-                            isStartHandle = isStartHandle,
-                            directions = Pair(it.start.direction, it.end.direction),
-                            handlesCrossed = it.handlesCrossed
-                        )
-                    }
+                        handlesCrossed = it.handlesCrossed,
+                        modifier = Modifier.dragGestureFilter(
+                            manager.handleDragObserver(
+                                isStartHandle
+                            )
+                        ),
+                        handle = null
+                    )
                 }
                 SelectionFloatingToolBar(manager = manager)
             }
         }
     }
-}
-
-/**
- * This is for disabling selection for text when the text is inside a SelectionContainer.
- *
- * To use this, simply add this to wrap one or more text composables.
- */
-@Composable
-fun DisableSelection(content: @Composable () -> Unit) {
-    Providers(
-        SelectionRegistrarAmbient provides null,
-        children = content
-    )
 }
 
 @Composable

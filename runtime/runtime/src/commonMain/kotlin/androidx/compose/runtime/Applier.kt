@@ -39,6 +39,18 @@ interface Applier<N> {
     val current: N
 
     /**
+     * Called when the [Composer] is about to begin applying changes using this applier.
+     * [onEndChanges] will be called when changes are complete.
+     */
+    fun onBeginChanges() {}
+
+    /**
+     * Called when the [Composer] is finished applying changes using this applier.
+     * A call to [onBeginChanges] will always precede a call to [onEndChanges].
+     */
+    fun onEndChanges() {}
+
+    /**
      * Indicates that the applier is getting traversed "down" the tree. When this gets called,
      * [node] is expected to be a child of [current], and after this operation, [node] is
      * expected to be the new [current].
@@ -102,6 +114,7 @@ abstract class AbstractApplier<T>(val root: T) : Applier<T> {
     }
 
     override fun up() {
+        check(stack.isNotEmpty())
         current = stack.removeAt(stack.size - 1)
     }
 
@@ -125,14 +138,20 @@ abstract class AbstractApplier<T>(val root: T) : Applier<T> {
     }
 
     protected fun MutableList<T>.move(from: Int, to: Int, count: Int) {
+        val dest = if (from > to) to else to - count
         if (count == 1) {
-            val fromEl = get(from)
-            val toEl = set(to, fromEl)
-            set(from, toEl)
+            if (from == to + 1 || from == to - 1) {
+                // Adjacent elements, perform swap to avoid backing array manipulations.
+                val fromEl = get(from)
+                val toEl = set(to, fromEl)
+                set(from, toEl)
+            } else {
+                val fromEl = removeAt(from)
+                insert(dest, fromEl)
+            }
         } else {
             val subView = subList(from, from + count)
             val subCopy = subView.toMutableList()
-            val dest = if (from > to) to else (to - count)
             subView.clear()
             addAll(dest, subCopy)
         }

@@ -16,11 +16,15 @@
 
 package androidx.compose.ui
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.node.ModifiedFocusNode
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.NoInspectorInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [Modifier.Element] that wraps makes the modifiers on the right into a Focusable. Use a
@@ -28,8 +32,12 @@ import androidx.compose.ui.node.ModifiedFocusNode
  */
 @OptIn(ExperimentalFocus::class)
 internal class FocusModifier(
-    initialFocus: FocusState
-) : Modifier.Element {
+    initialFocus: FocusState,
+    // TODO(b/172265016): Make this a required parameter and remove the default value.
+    //  Set this value in AndroidComposeView, and other places where we create a focus modifier
+    //  using this internal constructor.
+    inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
+) : Modifier.Element, InspectorValueInfo(inspectorInfo) {
 
     var focusState: FocusState = initialFocus
         set(value) {
@@ -46,5 +54,6 @@ internal class FocusModifier(
  * Add this modifier to a component to make it focusable.
  */
 @ExperimentalFocus
-@Composable
-fun Modifier.focus(): Modifier = this.then(remember { FocusModifier(FocusState.Inactive) })
+fun Modifier.focus(): Modifier = composed(inspectorInfo = debugInspectorInfo { name = "focus" }) {
+    remember { FocusModifier(Inactive) }
+}

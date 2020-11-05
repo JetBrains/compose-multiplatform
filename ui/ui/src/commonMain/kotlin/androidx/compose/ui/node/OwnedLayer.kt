@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.IntSize
  * A layer returned by [Owner.createLayer] to separate drawn content. An `OwnedLayer` has
  * the implementation to make [DrawLayerModifier]s work.
  */
-interface OwnedLayer {
+interface OwnedLayer : OwnerScope {
     /**
      * The ID of the layer. This is used by tooling to match a layer to the associated
      * LayoutNode.

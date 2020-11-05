@@ -17,36 +17,61 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.AtLeastSize
+import androidx.compose.ui.CacheDrawScope
+import androidx.compose.ui.DrawResult
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawWithCache
+import androidx.compose.ui.drawWithContent
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.test.filters.MediumTest
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@MediumTest
-@RunWith(JUnit4::class)
+@LargeTest
+@RunWith(AndroidJUnit4::class)
 class DrawModifierTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
@@ -69,7 +94,7 @@ class DrawModifierTest {
                         close()
                     }
                     cacheBuildCount++
-                    onDraw {
+                    onDrawBehind {
                         drawRect(rectColor)
                         drawPath(path, Color.Red)
                     }
@@ -141,7 +166,7 @@ class DrawModifierTest {
                         close()
                     }
                     cacheBuildCount++
-                    onDraw {
+                    onDrawBehind {
                         drawRect(Color.Red)
                         drawPath(path, Color.Blue)
                     }
@@ -207,7 +232,7 @@ class DrawModifierTest {
                         close()
                     }
                     cacheBuildCount++
-                    onDraw {
+                    onDrawBehind {
                         drawPath(path, Color.Red)
                     }
                 }.clickable {
@@ -245,4 +270,135 @@ class DrawModifierTest {
             }
         }
     }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testDrawWithCacheContentDrawnImplicitly() {
+        // Verify that drawContent is invoked even if it is not explicitly called within
+        // the implementation of the callback provided in the onDraw method
+        // in Modifier.drawWithCache
+        val testTag = "testTag"
+        val testSize = 200
+        rule.setContent {
+            AtLeastSize(
+                size = testSize,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    onDrawBehind {
+                        drawRect(Color.Red, size = Size(size.width / 2, size.height))
+                    }
+                }.background(Color.Blue)
+            )
+        }
+
+        rule.onNodeWithTag(testTag).apply {
+            captureToBitmap().apply {
+                assertEquals(Color.Blue.toArgb(), getPixel(0, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, height - 1))
+                assertEquals(Color.Blue.toArgb(), getPixel(0, height - 1))
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testDrawWithCacheOverContent() {
+        // Verify that drawContent is not invoked implicitly if it is explicitly called within
+        // the implementation of the callback provided in the onDraw method
+        // in Modifier.drawWithCache. That is the red rectangle is drawn above the contents
+        val testTag = "testTag"
+        val testSize = 200
+        rule.setContent {
+            AtLeastSize(
+                size = testSize,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(Color.Red, size = Size(size.width / 2, size.height))
+                    }
+                }.background(Color.Blue)
+            )
+        }
+
+        rule.onNodeWithTag(testTag).apply {
+            captureToBitmap().apply {
+                assertEquals(Color.Blue.toArgb(), getPixel(width / 2 + 1, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, 0))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 1, height - 1))
+                assertEquals(Color.Blue.toArgb(), getPixel(width / 2 + 1, height - 1))
+
+                assertEquals(Color.Red.toArgb(), getPixel(0, 0))
+                assertEquals(Color.Red.toArgb(), getPixel(width / 2 - 1, 0))
+                assertEquals(Color.Red.toArgb(), getPixel(width / 2 - 1, height - 1))
+                assertEquals(Color.Red.toArgb(), getPixel(0, height - 1))
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testDrawWithCacheBlendsContent() {
+        // Verify that the drawing commands of drawContent are blended against the green
+        // rectangle with the specified BlendMode
+        val testTag = "testTag"
+        val testSize = 200
+        rule.setContent {
+            AtLeastSize(
+                size = testSize,
+                modifier = Modifier.testTag(testTag).drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(Color.Green, blendMode = BlendMode.Plus)
+                    }
+                }.background(Color.Blue)
+            )
+        }
+
+        rule.onNodeWithTag(testTag).apply {
+            captureToBitmap().apply {
+                assertEquals(Color.Cyan.toArgb(), getPixel(0, 0))
+                assertEquals(Color.Cyan.toArgb(), getPixel(width - 1, 0))
+                assertEquals(Color.Cyan.toArgb(), getPixel(width - 1, height - 1))
+                assertEquals(Color.Cyan.toArgb(), getPixel(0, height - 1))
+            }
+        }
+    }
+
+    @Test
+    fun testInspectorValueForDrawBehind() {
+        val onDraw: DrawScope.() -> Unit = {}
+        rule.setContent {
+            val modifier = Modifier.drawBehind(onDraw) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("drawBehind")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("onDraw")
+        }
+    }
+
+    @Test
+    fun testInspectorValueForDrawWithCache() {
+        val onBuildDrawCache: CacheDrawScope.() -> DrawResult = { DrawResult {} }
+        rule.setContent {
+            val modifier = Modifier.drawWithCache(onBuildDrawCache) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("drawWithCache")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("onBuildDrawCache")
+        }
+    }
+
+    @Test
+    fun testInspectorValueForDrawWithContent() {
+        val onDraw: DrawScope.() -> Unit = {}
+        rule.setContent {
+            val modifier = Modifier.drawWithContent(onDraw) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("drawWithContent")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("onDraw")
+        }
+    }
+
+    fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()
 }

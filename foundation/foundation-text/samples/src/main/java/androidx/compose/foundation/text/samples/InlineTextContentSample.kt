@@ -17,10 +17,10 @@
 package androidx.compose.foundation.text.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.runtime.Composable
@@ -63,5 +63,5 @@ fun InlineTextContentSample() {
         )
     )
 
-    Text(text = text, inlineContent = inlineContent)
+    BasicText(text = text, inlineContent = inlineContent)
 }

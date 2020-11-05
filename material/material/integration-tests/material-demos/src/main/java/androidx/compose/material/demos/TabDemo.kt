@@ -17,11 +17,12 @@
 package androidx.compose.material.demos
 
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonConstants
+import androidx.compose.material.Text
 import androidx.compose.material.samples.FancyIndicatorContainerTabs
 import androidx.compose.material.samples.FancyIndicatorTabs
 import androidx.compose.material.samples.FancyTabs
@@ -68,7 +69,7 @@ fun TabDemo() {
             onClick = {
                 showingSimple.value = !showingSimple.value
             },
-            backgroundColor = Color.Cyan
+            colors = ButtonConstants.defaultButtonColors(backgroundColor = Color.Cyan)
         ) {
             Text(buttonText)
         }

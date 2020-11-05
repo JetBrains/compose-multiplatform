@@ -21,19 +21,20 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
-import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
+import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
@@ -44,6 +45,7 @@ import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtPsiUtil
+import org.jetbrains.kotlin.psi.KtTryExpression
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.calls.callUtil.getValueArgumentForExpression
@@ -58,6 +60,7 @@ import org.jetbrains.kotlin.resolve.inline.InlineUtil.canBeInlineArgument
 import org.jetbrains.kotlin.resolve.inline.InlineUtil.isInline
 import org.jetbrains.kotlin.resolve.inline.InlineUtil.isInlineParameter
 import org.jetbrains.kotlin.resolve.inline.InlineUtil.isInlinedArgument
+import org.jetbrains.kotlin.resolve.sam.getSingleAbstractMethodOrNull
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.lowerIfFlexible
@@ -116,6 +119,17 @@ open class ComposableCallChecker :
                         )
                         return
                     }
+                    val argTypeDescriptor = arg
+                        ?.type
+                        ?.constructor
+                        ?.declarationDescriptor as? ClassDescriptor
+                    if (argTypeDescriptor != null) {
+                        val sam = getSingleAbstractMethodOrNull(argTypeDescriptor)
+                        if (sam != null && sam.hasComposableAnnotation()) {
+                            return
+                        }
+                    }
+
                     // TODO(lmr): in future, we should check for CALLS_IN_PLACE contract
                     val inlined = arg != null &&
                         canBeInlineArgument(node.functionLiteral) &&
@@ -131,6 +145,17 @@ open class ComposableCallChecker :
                             ComposeWritableSlices.LAMBDA_CAPABLE_OF_COMPOSER_CAPTURE,
                             descriptor,
                             true
+                        )
+                    }
+                }
+                is KtTryExpression -> {
+                    val tryKeyword = node.tryKeyword
+                    if (
+                        node.tryBlock.textRange.contains(reportOn.textRange) &&
+                        tryKeyword != null
+                    ) {
+                        context.trace.report(
+                            ComposeErrors.ILLEGAL_TRY_CATCH_AROUND_COMPOSABLE.on(tryKeyword)
                         )
                     }
                 }
@@ -167,6 +192,10 @@ open class ComposableCallChecker :
                     }
                     return
                 }
+                is KtCallableReferenceExpression -> {
+                    illegalComposableFunctionReference(context, node)
+                    return
+                }
                 is KtFile -> {
                     // if we've made it this far, the call was made in a non-composable context.
                     illegalCall(context, reportOn)
@@ -193,6 +222,13 @@ open class ComposableCallChecker :
         }
     }
 
+    private fun illegalComposableFunctionReference(
+        context: CallCheckerContext,
+        refExpr: KtCallableReferenceExpression
+    ) {
+        context.trace.report(ComposeErrors.COMPOSABLE_FUNCTION_REFERENCE.on(refExpr))
+    }
+
     override fun checkType(
         expression: KtExpression,
         expressionType: KotlinType,
@@ -216,12 +252,22 @@ open class ComposableCallChecker :
                 )
                 if (isInlineable) return
 
+                if (!expectedComposable && isComposable) {
+                    val inferred = c.trace.bindingContext[
+                        ComposeWritableSlices.INFERRED_COMPOSABLE_DESCRIPTOR,
+                        descriptor
+                    ] == true
+                    if (inferred) {
+                        return
+                    }
+                }
+
                 val reportOn =
                     if (expression.parent is KtAnnotatedExpression)
                         expression.parent as KtExpression
                     else expression
                 c.trace.report(
-                    Errors.TYPE_MISMATCH.on(
+                    ComposeErrors.TYPE_MISMATCH.on(
                         reportOn,
                         expectedType,
                         expressionTypeWithSmartCast
@@ -251,7 +297,7 @@ open class ComposableCallChecker :
                         expression.parent as KtExpression
                     else expression
                 c.trace.report(
-                    Errors.TYPE_MISMATCH.on(
+                    ComposeErrors.TYPE_MISMATCH.on(
                         reportOn,
                         expectedType,
                         expressionTypeWithSmartCast
@@ -349,7 +395,7 @@ fun FunctionDescriptor.allowsComposableCalls(bindingContext: BindingContext): Bo
     ] == true
 }
 
-private fun getArgumentDescriptor(
+internal fun getArgumentDescriptor(
     argument: KtFunction,
     bindingContext: BindingContext
 ): ValueParameterDescriptor? {

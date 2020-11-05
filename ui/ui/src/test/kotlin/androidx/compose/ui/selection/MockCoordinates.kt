@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.selection
 
-import androidx.compose.ui.AlignmentLine
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates

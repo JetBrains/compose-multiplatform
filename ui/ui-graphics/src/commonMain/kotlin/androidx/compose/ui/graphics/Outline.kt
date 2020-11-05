@@ -17,8 +17,8 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
@@ -97,25 +97,25 @@ fun DrawScope.drawOutline(
     colorFilter: ColorFilter? = null,
     blendMode: BlendMode = DrawScope.DefaultBlendMode
 ) = drawOutlineHelper(
-        outline,
-        { rect ->
-            drawRect(color, rect.topLeft(), rect.size(), alpha, style, colorFilter, blendMode)
-        },
-        { rrect ->
-            val radius = rrect.bottomLeftRadius.x
-            drawRoundRect(
-                color = color,
-                topLeft = rrect.topLeft(),
-                size = rrect.size(),
-                radius = Radius(radius),
-                alpha = alpha,
-                style = style,
-                colorFilter = colorFilter,
-                blendMode = blendMode
-            )
-        },
-        { path -> drawPath(path, color, alpha, style, colorFilter, blendMode) }
-    )
+    outline,
+    { rect ->
+        drawRect(color, rect.topLeft(), rect.size(), alpha, style, colorFilter, blendMode)
+    },
+    { rrect ->
+        val radius = rrect.bottomLeftCornerRadius.x
+        drawRoundRect(
+            color = color,
+            topLeft = rrect.topLeft(),
+            size = rrect.size(),
+            cornerRadius = CornerRadius(radius),
+            alpha = alpha,
+            style = style,
+            colorFilter = colorFilter,
+            blendMode = blendMode
+        )
+    },
+    { path -> drawPath(path, color, alpha, style, colorFilter, blendMode) }
+)
 
 /**
  * Draws the [Outline] on a [DrawScope].
@@ -136,25 +136,25 @@ fun DrawScope.drawOutline(
     colorFilter: ColorFilter? = null,
     blendMode: BlendMode = DrawScope.DefaultBlendMode
 ) = drawOutlineHelper(
-        outline,
-        { rect ->
-            drawRect(brush, rect.topLeft(), rect.size(), alpha, style, colorFilter, blendMode)
-        },
-        { rrect ->
-            val radius = rrect.bottomLeftRadius.x
-            drawRoundRect(
-                brush = brush,
-                topLeft = rrect.topLeft(),
-                size = rrect.size(),
-                radius = Radius(radius),
-                alpha = alpha,
-                style = style,
-                colorFilter = colorFilter,
-                blendMode = blendMode
-            )
-        },
-        { path -> drawPath(path, brush, alpha, style, colorFilter, blendMode) }
-    )
+    outline,
+    { rect ->
+        drawRect(brush, rect.topLeft(), rect.size(), alpha, style, colorFilter, blendMode)
+    },
+    { rrect ->
+        val radius = rrect.bottomLeftCornerRadius.x
+        drawRoundRect(
+            brush = brush,
+            topLeft = rrect.topLeft(),
+            size = rrect.size(),
+            cornerRadius = CornerRadius(radius),
+            alpha = alpha,
+            style = style,
+            colorFilter = colorFilter,
+            blendMode = blendMode
+        )
+    },
+    { path -> drawPath(path, brush, alpha, style, colorFilter, blendMode) }
+)
 
 /**
  * Convenience method to obtain an Offset from the Rect's top and left parameters
@@ -224,8 +224,8 @@ fun Canvas.drawOutline(outline: Outline, paint: Paint) = when (outline) {
                 top = outline.roundRect.top,
                 right = outline.roundRect.right,
                 bottom = outline.roundRect.bottom,
-                radiusX = outline.roundRect.bottomLeftRadius.x,
-                radiusY = outline.roundRect.bottomLeftRadius.y,
+                radiusX = outline.roundRect.bottomLeftCornerRadius.x,
+                radiusY = outline.roundRect.bottomLeftCornerRadius.y,
                 paint = paint
             )
         }
@@ -239,11 +239,11 @@ fun Canvas.drawOutline(outline: Outline, paint: Paint) = when (outline) {
  * however, the x and y can be different
  */
 private fun RoundRect.hasSameCornerRadius(): Boolean {
-    val sameRadiusX = bottomLeftRadius.x == bottomRightRadius.x &&
-            bottomRightRadius.x == topRightRadius.x &&
-            topRightRadius.x == topLeftRadius.x
-    val sameRadiusY = bottomLeftRadius.y == bottomRightRadius.y &&
-            bottomRightRadius.y == topRightRadius.y &&
-            topRightRadius.y == topLeftRadius.y
+    val sameRadiusX = bottomLeftCornerRadius.x == bottomRightCornerRadius.x &&
+        bottomRightCornerRadius.x == topRightCornerRadius.x &&
+        topRightCornerRadius.x == topLeftCornerRadius.x
+    val sameRadiusY = bottomLeftCornerRadius.y == bottomRightCornerRadius.y &&
+        bottomRightCornerRadius.y == topRightCornerRadius.y &&
+        topRightCornerRadius.y == topLeftCornerRadius.y
     return sameRadiusX && sameRadiusY
 }

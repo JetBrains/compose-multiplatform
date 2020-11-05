@@ -4,23 +4,34 @@
     <issue
         id="BanTargetApiAnnotation"
         message="Uses @TargetApi annotation"
-        errorLine1="@TargetApi(Build.VERSION_CODES.LOLLIPOP)"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="122"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="BanTargetApiAnnotation"
-        message="Uses @TargetApi annotation"
         errorLine1="@TargetApi(Build.VERSION_CODES.M)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/actionmodecallback/FloatingTextActionModeCallback.kt"
             line="27"
             column="1"/>
+    </issue>
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling Method.invoke without an SDK check"
+        errorLine1="            getBooleanMethod?.invoke(null, &quot;debug.layout&quot;, false) as? Boolean ?: false"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
+            line="729"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling Method.invoke without an SDK check"
+        errorLine1="            updateDisplayListIfDirtyMethod?.invoke(view)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.kt"
+            line="287"
+            column="13"/>
     </issue>
 
     <issue
@@ -103,7 +114,7 @@
     <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
-        errorLine1="                setDimens(left, top, 0, 0, width(), height()) }"
+        errorLine1="                setDimens(left, top, 0, 0, width(), height())"
         errorLine2="                ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
@@ -118,7 +129,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="104"
+            line="105"
             column="19"/>
     </issue>
 
@@ -129,7 +140,7 @@
         errorLine2="                                                                       ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="104"
+            line="105"
             column="72"/>
     </issue>
 
@@ -140,7 +151,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="105"
+            line="106"
             column="19"/>
     </issue>
 
@@ -151,7 +162,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="106"
+            line="107"
             column="19"/>
     </issue>
 
@@ -162,7 +173,7 @@
         errorLine2="                  ~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="107"
+            line="108"
             column="19"/>
     </issue>
 
@@ -195,7 +206,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="238"
+            line="304"
             column="13"/>
     </issue>
 
@@ -206,7 +217,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="240"
+            line="306"
             column="13"/>
     </issue>
 
@@ -217,7 +228,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.kt"
-            line="278"
+            line="351"
             column="27"/>
     </issue>
 
@@ -228,7 +239,7 @@
         errorLine2="                              ~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.kt"
-            line="52"
+            line="53"
             column="31"/>
     </issue>
 
@@ -261,19 +272,250 @@
         errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
-            line="160"
+            line="164"
             column="31"/>
     </issue>
 
     <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.WrapperKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
-        errorLine1="            owner.view.attributeSourceResourceMap.isNotEmpty()"
-        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        owner.view.attributeSourceResourceMap.isNotEmpty()"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.kt"
-            line="355"
-            column="24"/>
+            line="291"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = if (elevation > 0.dp || clip) {"
+        errorLine2="    ^">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/draw/DrawShadow.kt"
+            line="50"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="    return this.then(FocusObserverModifierImpl(onFocusChange))"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/FocusObserverModifier.kt"
+            line="43"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="    return this.then(FocusRequesterModifierImpl(focusRequester))"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/FocusRequesterModifier.kt"
+            line="46"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
+        errorLine2="                                                                           ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/input/key/KeyInputModifier.kt"
+            line="32"
+            column="76"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
+        errorLine2="                                                                                         ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/input/key/KeyInputModifier.kt"
+            line="47"
+            column="90"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/LongPressDragGestureFilter.kt"
+            line="121"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/LongPressGestureFilter.kt"
+            line="58"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = this.then(object : OnGloballyPositionedModifier {"
+        errorLine2="              ^">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/layout/OnGloballyPositionedModifier.kt"
+            line="31"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/layout/OnRemeasuredModifier.kt"
+            line="40"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/PointerInteropFilter.kt"
+            line="62"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/PressIndicatorGestureFilter.kt"
+            line="57"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawDragGestureFilter.kt"
+            line="153"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawPressStartGestureFilter.kt"
+            line="57"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawScaleGestureFilter.kt"
+            line="122"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/ScaleGestureFilter.kt"
+            line="106"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/ScaleSlopExceededGestureFilter.kt"
+            line="51"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/ScrollGestureFilter.kt"
+            line="120"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/semantics/SemanticsModifier.kt"
+            line="85"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1=") = composed {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/input/pointer/SuspendingPointerInputFilter.kt"
+            line="129"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
+            line="68"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ModifierInspectorInfo"
+        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        errorLine1="): Modifier = composed {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
+            line="81"
+            column="15"/>
     </issue>
 
 </issues>

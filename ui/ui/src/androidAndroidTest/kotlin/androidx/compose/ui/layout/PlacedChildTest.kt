@@ -16,19 +16,17 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.unit.Constraints
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class PlacedChildTest {
 
     @Test
@@ -67,7 +65,7 @@ private val UseChildSizeButNotPlace = object : LayoutNode.NoIntrinsicsMeasureBlo
         measureScope: MeasureScope,
         measurables: List<Measurable>,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurables.first().measure(constraints)
         return measureScope.layout(placeable.width, placeable.height) {
             // do not place

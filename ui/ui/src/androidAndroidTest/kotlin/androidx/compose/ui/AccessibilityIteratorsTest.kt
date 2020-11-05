@@ -16,16 +16,18 @@
 
 package androidx.compose.ui
 
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.AccessibilityIterators
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -36,22 +38,20 @@ import androidx.compose.ui.text.font.font
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.Locale
 import kotlin.math.abs
 
-@MediumTest
-@RunWith(JUnit4::class)
+@LargeTest
+@RunWith(AndroidJUnit4::class)
 class AccessibilityIteratorsTest {
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val InputText = List(500) { "Line: $it" }.joinToString("\n")
     private val TextFieldTag = "textFieldTag"
@@ -427,7 +427,7 @@ class AccessibilityIteratorsTest {
         rule.setContent {
             // TODO(yingleiw): use predefined DensityAmbient.current when b/163142237 is fixed.
             with(DensityAmbient.current) {
-                Text(
+                BasicText(
                     style = TextStyle(
                         fontSize = fontSize,
                         fontFamily = font(
@@ -451,7 +451,7 @@ class AccessibilityIteratorsTest {
         rule.setContent {
             ScrollableColumn {
                 val state = remember { mutableStateOf(TextFieldValue(text = InputText)) }
-                BaseTextField(
+                BasicTextField(
                     value = state.value,
                     onValueChange = { state.value = it },
                     modifier = Modifier.testTag(TextFieldTag),

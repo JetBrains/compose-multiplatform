@@ -20,9 +20,11 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.RootMeasureBlocks
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.drawLayer
@@ -41,6 +43,7 @@ import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
+import androidx.compose.ui.layout.RootMeasureBlocks
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
@@ -68,10 +71,11 @@ import androidx.compose.ui.unit.LayoutDirection
 )
 class DesktopOwner(
     val container: DesktopOwners,
-    // TODO(demin): pass density here instead of scale canvas (SkiaWindow.kt#initSkija)
-    override val density: Density = Density(1f, 1f)
+    density: Density = Density(1f, 1f)
 ) : Owner {
     private var size: IntSize = IntSize(0, 0)
+
+    override var density by mutableStateOf(density)
 
     // TODO(demin): support RTL
     override val layoutDirection: LayoutDirection = LayoutDirection.Ltr
@@ -137,8 +141,8 @@ class DesktopOwner(
         get() = container.keyboard
 
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
-        return keyboard?.processKeyInput(keyEvent) ?: false ||
-            keyInputModifier.processKeyInput(keyEvent)
+        return keyInputModifier.processKeyInput(keyEvent) ||
+            keyboard?.processKeyInput(keyEvent) ?: false
     }
 
     override var showLayoutBounds = false
@@ -158,19 +162,22 @@ class DesktopOwner(
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
 
     override fun measureAndLayout() {
-        measureAndLayoutDelegate.measureAndLayout()
+        if (measureAndLayoutDelegate.measureAndLayout()) {
+            container.invalidate()
+        }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
-        container.invalidate()
     }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
-        measureAndLayoutDelegate.requestRemeasure(layoutNode)
-        container.invalidate()
+        if (measureAndLayoutDelegate.requestRemeasure(layoutNode)) {
+            container.invalidate()
+        }
     }
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
-        measureAndLayoutDelegate.requestRelayout(layoutNode)
-        container.invalidate()
+        if (measureAndLayoutDelegate.requestRelayout(layoutNode)) {
+            container.invalidate()
+        }
     }
 
     override val hasPendingMeasureOrLayout
@@ -208,9 +215,12 @@ class DesktopOwner(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ) = SkijaLayer(
-        density,
+        this,
         drawLayerModifier,
-        invalidateParentLayer
+        invalidateParentLayer = {
+            invalidateParentLayer()
+            container.invalidate()
+        }
     ) { canvas ->
         observeDrawModelReads(this) {
             drawBlock(canvas)
@@ -228,8 +238,6 @@ class DesktopOwner(
     }
 
     fun draw(canvas: org.jetbrains.skija.Canvas) {
-        measureAndLayoutDelegate.measureAndLayout()
-        measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
         root.draw(DesktopCanvas(canvas))
     }
 

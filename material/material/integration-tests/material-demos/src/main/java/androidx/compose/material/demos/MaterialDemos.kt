@@ -23,10 +23,10 @@ import androidx.compose.material.samples.AlertDialogSample
 import androidx.compose.material.samples.BackdropScaffoldSample
 import androidx.compose.material.samples.BottomDrawerSample
 import androidx.compose.material.samples.CustomAlertDialogSample
-import androidx.compose.material.samples.EmphasisSample
 import androidx.compose.material.samples.ModalBottomSheetSample
 import androidx.compose.material.samples.ModalDrawerSample
 import androidx.compose.material.samples.BottomSheetScaffoldSample
+import androidx.compose.material.samples.ContentAlphaSample
 import androidx.compose.material.samples.ScaffoldWithBottomBarAndCutout
 import androidx.compose.material.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material.samples.ScaffoldWithSimpleSnackbar
@@ -55,7 +55,7 @@ val MaterialDemos = DemoCategory(
             )
         ),
         ComposableDemo("Elevation") { ElevationDemo() },
-        ComposableDemo("Emphasis") { EmphasisSample() },
+        ComposableDemo("Content alpha") { ContentAlphaSample() },
         DemoCategory(
             "ListItems",
             listOf(

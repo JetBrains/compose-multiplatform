@@ -45,13 +45,14 @@ import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.semantics.verticalAccessibilityScrollState
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.core.os.BuildCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.ui.test.createAndroidComposeRule
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
@@ -65,19 +66,15 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers
 
 @OptIn(ExperimentalLayoutNodeApi::class)
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class AndroidComposeViewAccessibilityDelegateCompatTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>(
-        disableTransitions = false,
-        disableBlinkingCursor = true
-    )
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var accessibilityDelegate: AndroidComposeViewAccessibilityDelegateCompat
     private lateinit var container: ViewGroup
@@ -134,7 +131,8 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             }
             Build.VERSION.SDK_INT >= 19 -> {
                 info.extras.getCharSequence(
-                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY")
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY"
+                )
             }
             else -> {
                 null
@@ -231,10 +229,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         )
         assertEquals(
             AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PARAGRAPH or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_LINE or
-                    AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE,
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PARAGRAPH or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_LINE or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE,
             info.movementGranularities
         )
         if (Build.VERSION.SDK_INT >= 26) {
@@ -272,7 +270,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             argThat(
                 ArgumentMatcher {
                     it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
                 }
             )
         )
@@ -297,7 +295,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             argThat(
                 ArgumentMatcher {
                     it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
                 }
             )
         )
@@ -306,12 +304,12 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             argThat(
                 ArgumentMatcher {
                     it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED && it.scrollY == 2 &&
-                            it.maxScrollY == 5 &&
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                it.scrollDeltaY == 2
-                            } else {
-                                true
-                            }
+                        it.maxScrollY == 5 &&
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            it.scrollDeltaY == 2
+                        } else {
+                            true
+                        }
                 }
             )
         )

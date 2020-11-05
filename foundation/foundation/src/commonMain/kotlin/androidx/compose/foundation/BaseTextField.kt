@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation
 
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -30,7 +31,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 
 /**
  * Composable that enables users to edit text via hardware or software keyboard.
@@ -91,9 +91,20 @@ import androidx.compose.ui.unit.dp
  * @see KeyboardType
  * @see VisualTransformation
  */
+@Deprecated(
+    "Use BasicTextField instead.",
+    replaceWith = ReplaceWith(
+        "BasicTextField(value, onValueChange, modifier, textStyle.merge(TextStyle(color = " +
+            "textColor)), keyboardType, imeAction, onImeActionPerformed, visualTransformation, " +
+            "onTextLayout, onTextInputStarted, cursorColor)",
+        "androidx.compose.foundation.text.BasicTextField",
+        "androidx.compose.foundation.AmbientContentColor",
+        "androidx.compose.foundation.AmbientTextStyle",
+        "androidx.compose.ui.text.TextStyle",
+    )
+)
 @Composable
 @ExperimentalFoundationApi
-@OptIn(ExperimentalFocus::class)
 fun BaseTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -111,24 +122,19 @@ fun BaseTextField(
     val color = textColor.useOrElse { textStyle.color.useOrElse { AmbientContentColor.current } }
     val mergedStyle = textStyle.merge(TextStyle(color = color))
 
-    CoreTextField(
+    BasicTextField(
         value = value,
-        modifier = modifier
-            .defaultMinSizeConstraints(minWidth = DefaultTextFieldWidth),
-        onValueChange = {
-            onValueChange(it)
-        },
+        modifier = modifier,
+        onValueChange = onValueChange,
         textStyle = mergedStyle,
-        keyboardType = keyboardType,
-        imeAction = imeAction,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        ),
         onImeActionPerformed = onImeActionPerformed,
         visualTransformation = visualTransformation,
-        onTextLayout = {
-            onTextLayout(it)
-        },
+        onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor
     )
 }
-
-private val DefaultTextFieldWidth = 280.dp

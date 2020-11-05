@@ -16,9 +16,6 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Placeable
-
 /**
  * Read-only wrapper over [Placeable] that exposes the measurement result with no placing ability.
  */

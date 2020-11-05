@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.setFrom
-import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -41,7 +40,7 @@ internal class RenderNodeLayer(
     drawLayerModifier: DrawLayerModifier,
     val drawBlock: (Canvas) -> Unit,
     val invalidateParentLayer: () -> Unit
-) : OwnedLayer, OwnerScope {
+) : OwnedLayer {
     /**
      * True when the RenderNodeLayer has been invalidated and not yet drawn.
      */
@@ -91,6 +90,7 @@ internal class RenderNodeLayer(
         renderNode.rotationZ = modifier.rotationZ
         renderNode.rotationX = modifier.rotationX
         renderNode.rotationY = modifier.rotationY
+        renderNode.cameraDistance = modifier.cameraDistance
         renderNode.pivotX = transformOrigin.pivotFractionX * renderNode.width
         renderNode.pivotY = transformOrigin.pivotFractionY * renderNode.height
         val shape = modifier.shape

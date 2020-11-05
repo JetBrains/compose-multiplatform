@@ -21,12 +21,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.AtLeastSize
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -35,12 +37,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class ModelReadsTest {
 
     @Suppress("DEPRECATION")
@@ -104,6 +105,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun useDifferentModelsInDrawAndPosition() {
         val drawModel = mutableStateOf(5)
         val positionModel = mutableStateOf(5)
@@ -300,6 +302,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun drawStopsReactingOnModelsAfterDetaching() {
         val enabled = mutableStateOf(true)
         val model = mutableStateOf(0)
@@ -321,6 +324,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun measureStopsReactingOnModelsAfterDetaching() {
         val enabled = mutableStateOf(true)
         val model = mutableStateOf(0)
@@ -342,6 +346,7 @@ class ModelReadsTest {
     }
 
     @Test
+    @MediumTest
     fun layoutStopsReactingOnModelsAfterDetaching() {
         val enabled = mutableStateOf(true)
         val model = mutableStateOf(0)

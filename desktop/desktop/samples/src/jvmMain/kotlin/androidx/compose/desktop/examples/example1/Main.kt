@@ -18,34 +18,48 @@ package androidx.compose.desktop.examples.example1
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
-import androidx.compose.foundation.Icon
+import androidx.compose.desktop.DesktopMaterialTheme
+import androidx.compose.desktop.Window
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonConstants
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,9 +74,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.ShortcutHandler
-import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.input.key.plus
+import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.Placeholder
@@ -80,7 +93,14 @@ import androidx.compose.ui.unit.sp
 private const val title = "Desktop Compose Elements"
 
 fun main() {
-    AppWindow(title, IntSize(1024, 850)).show {
+    Window(title, IntSize(1024, 850)) {
+        App()
+    }
+}
+
+@Composable
+private fun App() {
+    DesktopMaterialTheme {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -100,8 +120,18 @@ fun main() {
                     }
                 )
             },
+            isFloatingActionButtonDocked = true,
+            bottomBar = {
+                BottomAppBar(cutoutShape = CircleShape) {
+                    IconButton(
+                        onClick = {}
+                    ) {
+                        Icon(Icons.Filled.Menu, Modifier.size(ButtonConstants.DefaultIconSize))
+                    }
+                }
+            },
             bodyContent = {
-                Row {
+                Row(Modifier.padding(bottom = 56.dp)) {
                     LeftColumn(Modifier.weight(1f))
                     RightColumn(Modifier.width(200.dp))
                 }
@@ -110,15 +140,26 @@ fun main() {
     }
 }
 
+@Composable
+private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
+    val state = rememberScrollState(0f)
+    ScrollableContent(state)
+
+    VerticalScrollbar(
+        rememberScrollbarAdapter(state),
+        Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+    )
+}
+
 @OptIn(ExperimentalKeyInput::class)
 @Composable
-private fun LeftColumn(modifier: Modifier) = Column(modifier) {
+private fun ScrollableContent(scrollState: ScrollState) {
     val amount = remember { mutableStateOf(0) }
     val animation = remember { mutableStateOf(true) }
     val text = remember {
         mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0\nПривет")
     }
-    Column(Modifier.fillMaxSize(), Arrangement.SpaceEvenly) {
+    ScrollableColumn(Modifier.fillMaxSize(), scrollState) {
         Text(
             text = "Привет! 你好! Desktop Compose ${amount.value}",
             color = Color.Black,
@@ -256,20 +297,21 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row {
-                Button(
-                    modifier = Modifier.padding(4.dp),
-                    onClick = {
-                        animation.value = !animation.value
-                    }
-                ) {
-                    Text("Toggle")
+                Row(modifier = Modifier.padding(4.dp)) {
+                    Checkbox(
+                        animation.value,
+                        onCheckedChange = {
+                            animation.value = it
+                        }
+                    )
+                    Text("Animation")
                 }
 
                 Button(
                     modifier = Modifier.padding(4.dp),
                     onClick = {
                         AppWindow(size = IntSize(400, 200)).also {
-                            it.keyboard.shortcut(Key.Escape) {
+                            it.keyboard.setShortcut(Key.Escape) {
                                 it.close()
                             }
                         }.show {
@@ -298,12 +340,20 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
             value = text.value,
             onValueChange = { text.value = it },
             label = { Text(text = "Input2") },
-            modifier = Modifier.keyInputFilter(ShortcutHandler(Key.MetaLeft + Key.Enter) {
-                text.value = "Cleared!"
-            })
+            placeholder = {
+                Text(text = "Important input" )
+            },
+            modifier = Modifier.shortcuts {
+                on(Key.MetaLeft + Key.ShiftLeft + Key.Enter) {
+                    text.value = "Cleared with shift!"
+                }
+                on(Key.MetaLeft + Key.Enter) {
+                    text.value = "Cleared!"
+                }
+            }
         )
 
-        Image(imageResource("androidx/compose/desktop/example/circus.jpg"))
+        Image(imageResource("androidx/compose/desktop/example/circus.jpg"), Modifier.size(200.dp))
     }
 }
 
@@ -329,10 +379,21 @@ fun Animations(isCircularEnabled: Boolean) = Row {
     }
 }
 
-@OptIn(ExperimentalLazyDsl::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RightColumn(modifier: Modifier) = LazyColumn(modifier.drawLayer(alpha = 0.5f)) {
-    items((1..10000).toList()) { x ->
-        Text(x.toString(), Modifier.drawLayer(alpha = 0.5f))
+private fun RightColumn(modifier: Modifier) = Box {
+    val state = rememberLazyListState()
+    val itemCount = 100000
+    val itemHeight = 20.dp
+
+    LazyColumn(modifier.drawLayer(alpha = 0.5f), state = state) {
+        items((1..itemCount).toList()) { x ->
+            Text(x.toString(), Modifier.drawLayer(alpha = 0.5f).height(itemHeight))
+        }
     }
+
+    VerticalScrollbar(
+        rememberScrollbarAdapter(state, itemCount, itemHeight),
+        Modifier.align(Alignment.CenterEnd)
+    )
 }

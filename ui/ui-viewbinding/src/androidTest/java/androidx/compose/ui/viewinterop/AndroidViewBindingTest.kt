@@ -20,30 +20,31 @@ import android.os.Build
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.databinding.TestLayoutBinding
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertPixels
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 class AndroidViewBindingTest {
 
@@ -58,12 +59,13 @@ class AndroidViewBindingTest {
 
         val size = 50.dp
         val sizePx = with(rule.density) { size.toIntPx() }
-        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
+        rule.onNodeWithTag("layout").captureToImage().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else Color.Black
         }
     }
 
     @Test
+    @LargeTest
     fun update() {
         val color = mutableStateOf(Color.Gray)
         rule.setContent {
@@ -74,14 +76,16 @@ class AndroidViewBindingTest {
 
         val size = 50.dp
         val sizePx = with(rule.density) { size.toIntPx() }
-        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
-            if (it.y < sizePx) Color.Blue else color.value
-        }
+        rule.onNodeWithTag("layout").captureToImage()
+            .assertPixels(IntSize(sizePx, sizePx * 2)) {
+                if (it.y < sizePx) Color.Blue else color.value
+            }
 
         rule.runOnIdle { color.value = Color.DarkGray }
-        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
-            if (it.y < sizePx) Color.Blue else color.value
-        }
+        rule.onNodeWithTag("layout").captureToImage()
+            .assertPixels(IntSize(sizePx, sizePx * 2)) {
+                if (it.y < sizePx) Color.Blue else color.value
+            }
     }
 
     @Test

@@ -31,10 +31,10 @@ internal class AndroidStringDelegate : PlatformStringDelegate {
         string.toLowerCase((locale as AndroidLocale).javaLocale)
 
     override fun capitalize(string: String, locale: PlatformLocale): String =
-        string.capitalize()
+        string.capitalize((locale as AndroidLocale).javaLocale)
 
     override fun decapitalize(string: String, locale: PlatformLocale): String =
-        string.decapitalize()
+        string.decapitalize((locale as AndroidLocale).javaLocale)
 }
 
 internal actual fun ActualStringDelegate(): PlatformStringDelegate =

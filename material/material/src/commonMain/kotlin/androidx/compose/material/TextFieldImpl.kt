@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-// TODO(b/160821157): Replace FocusDetailedState with FocusState2 DEPRECATION
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.material
 
 import androidx.compose.animation.ColorPropKey
@@ -27,17 +24,17 @@ import androidx.compose.animation.core.TransitionSpec
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
@@ -48,12 +45,7 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.Layout
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Placeable
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -64,11 +56,18 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.lerp
@@ -105,8 +104,8 @@ internal fun TextFieldImpl(
     trailing: @Composable (() -> Unit)?,
     isErrorValue: Boolean,
     visualTransformation: VisualTransformation,
-    keyboardType: KeyboardType,
-    imeAction: ImeAction,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
     interactionState: InteractionState,
@@ -129,7 +128,7 @@ internal fun TextFieldImpl(
         Decoration(
             contentColor = inactiveColor,
             typography = MaterialTheme.typography.subtitle1,
-            emphasis = AmbientEmphasisLevels.current.high
+            contentAlpha = ContentAlpha.high
         ) {
             TextFieldScroller(
                 scrollerPosition = rememberSavedInstanceState(
@@ -139,14 +138,15 @@ internal fun TextFieldImpl(
                 },
                 modifier = tagModifier
             ) {
-                BaseTextField(
+                BasicTextField(
                     value = value,
+                    modifier = Modifier.defaultMinSizeConstraints(minWidth = TextFieldMinWidth),
                     textStyle = textStyle,
                     onValueChange = onValueChange,
                     cursorColor = if (isErrorValue) errorColor else activeColor,
                     visualTransformation = visualTransformation,
-                    keyboardType = keyboardType,
-                    imeAction = imeAction,
+                    keyboardOptions = keyboardOptions,
+                    maxLines = maxLines,
                     onImeActionPerformed = {
                         onImeActionPerformed(it, keyboardController.value)
                     },
@@ -163,17 +163,17 @@ internal fun TextFieldImpl(
     val textFieldModifier = modifier
         .focusRequester(focusRequester)
         .focusObserver { isFocused = it.isFocused }
-        .clickable(interactionState = interactionState, indication = null) {
-            focusRequester.requestFocus()
-            // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
-            //  The requestFocus() call here should be enough to trigger the software keyboard.
-            //  Investiate why this is needed here. If it is really needed, instead of doing
-            //  this in the onClick callback, we should move this logic to the focusObserver
-            //  so that it can show or hide the keyboard based on the focus state.
-            keyboardController.value?.showSoftwareKeyboard()
+        .let {
+            it.clickable(interactionState = interactionState, indication = null) {
+                focusRequester.requestFocus()
+                // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
+                //  The requestFocus() call here should be enough to trigger the software keyboard.
+                //  Investiate why this is needed here. If it is really needed, instead of doing
+                //  this in the onClick callback, we should move this logic to the focusObserver
+                //  so that it can show or hide the keyboard based on the focus state.
+                keyboardController.value?.showSoftwareKeyboard()
+            }
         }
-
-    val emphasisLevels = AmbientEmphasisLevels.current
 
     TextFieldTransitionScope.transition(
         inputState = inputState,
@@ -181,17 +181,17 @@ internal fun TextFieldImpl(
         activeColor = if (isErrorValue) {
             errorColor
         } else {
-            emphasisLevels.high.applyEmphasis(activeColor)
+            activeColor.applyAlpha(alpha = ContentAlpha.high)
         },
         labelInactiveColor = if (isErrorValue) {
             errorColor
         } else {
-            emphasisLevels.medium.applyEmphasis(inactiveColor)
+            inactiveColor.applyAlpha(alpha = ContentAlpha.medium)
         },
         indicatorInactiveColor = when {
             isErrorValue -> errorColor
             type == TextFieldType.Filled -> inactiveColor.applyAlpha(alpha = IndicatorInactiveAlpha)
-            else -> emphasisLevels.disabled.applyEmphasis(inactiveColor)
+            else -> inactiveColor.applyAlpha(alpha = ContentAlpha.disabled)
         }
 
     ) { labelProgress, animatedLabelColor, indicatorWidth, indicatorColor, placeholderOpacity ->
@@ -222,7 +222,7 @@ internal fun TextFieldImpl(
                         Decoration(
                             contentColor = inactiveColor,
                             typography = MaterialTheme.typography.subtitle1,
-                            emphasis = AmbientEmphasisLevels.current.medium,
+                            contentAlpha = ContentAlpha.medium,
                             children = placeholder
                         )
                     }
@@ -355,14 +355,14 @@ internal fun Color.applyAlpha(alpha: Float): Color {
 internal fun Decoration(
     contentColor: Color,
     typography: TextStyle? = null,
-    emphasis: Emphasis? = null,
+    contentAlpha: Float? = null,
     children: @Composable () -> Unit
 ) {
     val colorAndEmphasis = @Composable {
         Providers(AmbientContentColor provides contentColor) {
-            if (emphasis != null) ProvideEmphasis(
-                emphasis,
-                children
+            if (contentAlpha != null) Providers(
+                AmbientContentAlpha provides contentAlpha,
+                children = children
             ) else children()
         }
     }
@@ -377,23 +377,31 @@ internal fun heightOrZero(placeable: Placeable?) = placeable?.height ?: 0
  * A modifier that applies padding only if the size of the element is not zero
  */
 internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
-    this.then(object : LayoutModifier {
-        override fun MeasureScope.measure(
-            measurable: Measurable,
-            constraints: Constraints
-        ): MeasureScope.MeasureResult {
-            val horizontal = start.toIntPx() + end.toIntPx()
-            val placeable = measurable.measure(constraints.offset(-horizontal))
-            val width = if (placeable.nonZero) {
-                constraints.constrainWidth(placeable.width + horizontal)
-            } else {
-                0
+    this.then(
+        object : LayoutModifier, InspectorValueInfo(
+            debugInspectorInfo {
+                name = "iconPadding"
+                properties["start"] = start
+                properties["end"] = end
             }
-            return layout(width, placeable.height) {
-                placeable.placeRelative(start.toIntPx(), 0)
+        ) {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val horizontal = start.toIntPx() + end.toIntPx()
+                val placeable = measurable.measure(constraints.offset(-horizontal))
+                val width = if (placeable.nonZero) {
+                    constraints.constrainWidth(placeable.width + horizontal)
+                } else {
+                    0
+                }
+                return layout(width, placeable.height) {
+                    placeable.placeRelative(start.toIntPx(), 0)
+                }
             }
         }
-    })
+    )
 
 private object TextFieldTransitionScope {
     private val LabelColorProp = ColorPropKey()

@@ -16,8 +16,8 @@
 
 package androidx.ui.desktop
 
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.Text
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,8 +36,8 @@ import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.ui.test.DesktopScreenshotTestRule
-import androidx.ui.test.TestComposeWindow
+import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
+import androidx.compose.ui.test.TestComposeWindow
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test

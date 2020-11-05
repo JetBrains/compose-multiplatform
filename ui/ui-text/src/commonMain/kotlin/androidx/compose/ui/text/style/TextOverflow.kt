@@ -18,9 +18,6 @@ package androidx.compose.ui.text.style
 
 /** How overflowing text should be handled. */
 enum class TextOverflow {
-    /** Won't handle overflow, and report the needed size to the parent. **/
-    None,
-
     /** Clip the overflowing text to fix its container. */
     Clip,
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.platform.debugInspectorInfo
 
 // TODO(b/146133703): Likely rename to PanGestureDetector as per b/146133703
 /**
@@ -58,7 +59,14 @@ fun Modifier.dragGestureFilter(
     dragObserver: DragObserver,
     canDrag: ((Direction) -> Boolean)? = null,
     startDragImmediately: Boolean = false
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "dragGestureFilter"
+        properties["dragObserver"] = dragObserver
+        properties["canDrag"] = canDrag
+        properties["startDragImmediately"] = startDragImmediately
+    }
+) {
     val glue = remember { TouchSlopDragGestureDetectorGlue() }
     glue.touchSlopDragObserver = dragObserver
 

@@ -18,9 +18,8 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.MutableRect
@@ -31,6 +30,8 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -60,8 +61,8 @@ internal abstract class LayoutNodeWrapper(
 
     open val invalidateLayerOnBoundsChange = true
 
-    private var _measureResult: MeasureScope.MeasureResult? = null
-    open var measureResult: MeasureScope.MeasureResult
+    private var _measureResult: MeasureResult? = null
+    open var measureResult: MeasureResult
         get() = _measureResult ?: error(UnmeasuredError)
         internal set(value) {
             if (invalidateLayerOnBoundsChange &&

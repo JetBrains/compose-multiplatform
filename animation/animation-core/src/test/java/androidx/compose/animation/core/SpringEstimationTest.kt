@@ -16,7 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.test.filters.LargeTest
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +24,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
-@LargeTest
 @RunWith(Parameterized::class)
 class SpringEstimationTest(private val m: Double, private val k: Double) {
     companion object {

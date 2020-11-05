@@ -16,9 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.AmbientIndication
-import androidx.compose.foundation.ProvideTextStyle
+import androidx.compose.foundation.Indication
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
@@ -67,7 +66,8 @@ fun MaterialTheme(
         AmbientColors provides rememberedColors,
         AmbientIndication provides indicationFactory,
         AmbientTypography provides typography,
-        AmbientShapes provides shapes
+        AmbientShapes provides shapes,
+        AmbientContentAlpha provides ContentAlpha.high
     ) {
         ProvideTextStyle(value = typography.body1, children = content)
     }

@@ -24,6 +24,8 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
@@ -38,23 +40,28 @@ import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Create and remember [ScrollableController] for [scrollable] with default [FlingConfig] and
  * [AnimationClockObservable]
  *
+ * @param interactionState [InteractionState] that will be updated when this scrollable is
+ * being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether the fling
+ * (or smooth scroll) is in progress, use [ScrollableController.isAnimationRunning].
  * @param consumeScrollDelta callback invoked when scrollable drag/fling/smooth scrolling occurs.
  * The callback receives the delta in pixels. Callers should update their state in this lambda
  * and return amount of delta consumed
  */
 @Composable
 fun rememberScrollableController(
+    interactionState: InteractionState? = null,
     consumeScrollDelta: (Float) -> Float
 ): ScrollableController {
     val clocks = AnimationClockAmbient.current.asDisposableClock()
     val flingConfig = defaultFlingConfig()
-    return remember(clocks, flingConfig) {
-        ScrollableController(consumeScrollDelta, flingConfig, clocks)
+    return remember(clocks, flingConfig, interactionState) {
+        ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)
     }
 }
 
@@ -67,11 +74,15 @@ fun rememberScrollableController(
  * return the amount of delta consumed
  * @param flingConfig fling configuration to use for flinging
  * @param animationClock animation clock to run flinging and smooth scrolling on
+ * @param interactionState [InteractionState] that will be updated when this scrollable is
+ * being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether the fling
+ * (or smooth scroll) is in progress, use [ScrollableController.isAnimationRunning].
  */
 class ScrollableController(
-    val consumeScrollDelta: (Float) -> Float,
-    val flingConfig: FlingConfig,
-    animationClock: AnimationClockObservable
+    internal val consumeScrollDelta: (Float) -> Float,
+    internal val flingConfig: FlingConfig,
+    animationClock: AnimationClockObservable,
+    internal val interactionState: InteractionState? = null
 ) {
     /**
      * Smooth scroll by [value] amount of pixels
@@ -174,53 +185,71 @@ fun Modifier.scrollable(
     canScroll: (Direction) -> Boolean = { enabled },
     onScrollStarted: (startedPosition: Offset) -> Unit = {},
     onScrollStopped: (velocity: Float) -> Unit = {}
-): Modifier = composed {
-    onDispose {
-        controller.stopAnimation()
-    }
-
-    val scrollCallback = object : ScrollCallback {
-
-        override fun onStart(downPosition: Offset) {
-            if (enabled) {
-                controller.stopAnimation()
-                onScrollStarted(downPosition)
-            }
-        }
-
-        override fun onScroll(scrollDistance: Float): Float {
-            if (!enabled) return 0f
+): Modifier = composed(
+    factory = {
+        onDispose {
             controller.stopAnimation()
-            val toConsume = if (reverseDirection) scrollDistance * -1 else scrollDistance
-            val consumed = controller.consumeScrollDelta(toConsume)
-            controller.value = controller.value + consumed
-            return if (reverseDirection) consumed * -1 else consumed
+            controller.interactionState?.removeInteraction(Interaction.Dragged)
         }
 
-        override fun onCancel() {
-            if (enabled) onScrollStopped(0f)
-        }
+        val scrollCallback = object : ScrollCallback {
 
-        override fun onStop(velocity: Float) {
-            if (enabled) {
-                controller.fling(
-                    velocity = if (reverseDirection) velocity * -1 else velocity,
-                    onScrollEnd = onScrollStopped
-                )
+            override fun onStart(downPosition: Offset) {
+                if (enabled) {
+                    controller.stopAnimation()
+                    controller.interactionState?.addInteraction(Interaction.Dragged)
+                    onScrollStarted(downPosition)
+                }
+            }
+
+            override fun onScroll(scrollDistance: Float): Float {
+                if (!enabled) return 0f
+                controller.stopAnimation()
+                val toConsume = if (reverseDirection) scrollDistance * -1 else scrollDistance
+                val consumed = controller.consumeScrollDelta(toConsume)
+                controller.value = controller.value + consumed
+                return if (reverseDirection) consumed * -1 else consumed
+            }
+
+            override fun onCancel() {
+                controller.interactionState?.removeInteraction(Interaction.Dragged)
+                if (enabled) {
+                    onScrollStopped(0f)
+                }
+            }
+
+            override fun onStop(velocity: Float) {
+                controller.interactionState?.removeInteraction(Interaction.Dragged)
+                if (enabled) {
+                    controller.fling(
+                        velocity = if (reverseDirection) velocity * -1 else velocity,
+                        onScrollEnd = onScrollStopped
+                    )
+                }
             }
         }
-    }
 
-    touchScrollable(
-        scrollCallback = scrollCallback,
-        orientation = orientation,
-        canScroll = canScroll,
-        startScrollImmediately = controller.isAnimationRunning
-    ).mouseScrollable(
-        scrollCallback,
-        orientation
-    )
-}
+        touchScrollable(
+            scrollCallback = scrollCallback,
+            orientation = orientation,
+            canScroll = canScroll,
+            startScrollImmediately = controller.isAnimationRunning
+        ).mouseScrollable(
+            scrollCallback,
+            orientation
+        )
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "scrollable"
+        properties["orientation"] = orientation
+        properties["controller"] = controller
+        properties["enabled"] = enabled
+        properties["reverseDirection"] = reverseDirection
+        properties["canScroll"] = canScroll
+        properties["onScrollStarted"] = onScrollStarted
+        properties["onScrollStopped"] = onScrollStopped
+    }
+)
 
 internal expect fun Modifier.touchScrollable(
     scrollCallback: ScrollCallback,

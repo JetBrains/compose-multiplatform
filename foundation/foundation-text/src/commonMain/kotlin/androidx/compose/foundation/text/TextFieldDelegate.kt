@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.SpanStyle
@@ -39,7 +40,7 @@ import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
@@ -47,17 +48,23 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import kotlin.jvm.JvmStatic
+import androidx.compose.ui.unit.constrainWidth
 import kotlin.math.ceil
+import kotlin.math.max
 import kotlin.math.roundToInt
 
+// visible for testing
+internal const val DefaultWidthCharCount = 10 // min width for TextField is 10 chars long
+private val EmptyTextReplacement = "H".repeat(DefaultWidthCharCount) // just a reference character.
+
 /**
- * Computed the line height for the empty TextField.
+ * Computed the default width and height for TextField.
  *
  * The bounding box or x-advance of the empty text is empty, i.e. 0x0 box or 0px advance. However
  * this is not useful for TextField since text field want to reserve some amount of height for
@@ -67,13 +74,13 @@ import kotlin.math.roundToInt
  *
  * Until we have font metrics APIs, use the height of reference text as a workaround.
  */
-private fun computeLineHeightForEmptyText(
+private fun computeSizeForEmptyText(
     style: TextStyle,
     density: Density,
     resourceLoader: Font.ResourceLoader
-): Int {
-    return Paragraph(
-        text = "H", // No meaning: just a reference character.
+): IntSize {
+    val paragraph = Paragraph(
+        text = EmptyTextReplacement,
         style = style,
         spanStyles = listOf(),
         maxLines = 1,
@@ -81,13 +88,17 @@ private fun computeLineHeightForEmptyText(
         density = density,
         resourceLoader = resourceLoader,
         width = Float.POSITIVE_INFINITY
-    ).height.toIntPx()
+    )
+    return IntSize(paragraph.minIntrinsicWidth.toIntPx(), paragraph.height.toIntPx())
 }
 
 private fun Float.toIntPx(): Int = ceil(this).roundToInt()
 
 /** @suppress **/
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 @InternalTextApi
 class TextFieldDelegate {
     companion object {
@@ -103,33 +114,77 @@ class TextFieldDelegate {
             textDelegate: TextDelegate,
             constraints: Constraints,
             layoutDirection: LayoutDirection,
+            maxLines: Int = Int.MAX_VALUE,
             prevResultText: TextLayoutResult? = null
         ): Triple<Int, Int, TextLayoutResult> {
-            val layoutResult = textDelegate.layout(
-                constraints = constraints,
-                layoutDirection = layoutDirection,
-                prevResult = prevResultText,
-                respectMinConstraints = true
+            val layoutResult = textDelegate.layout(constraints, layoutDirection, prevResultText)
+
+            var height = layoutResult.size.height
+            var width = layoutResult.size.width
+
+            val constrainedWithDefaultSize = constrainWithDefaultSize(
+                textDelegate,
+                layoutResult,
+                constraints,
+                layoutDirection,
+                width,
+                height
             )
 
+            height = constrainedWithDefaultSize.height
+            width = constrainedWithDefaultSize.width
+
+            height = constrainWithMaxLines(maxLines, height, layoutResult)
+
+            return Triple(width, height, layoutResult)
+        }
+
+        private fun constrainWithMaxLines(
+            maxLines: Int,
+            height: Int,
+            layoutResult: TextLayoutResult
+        ): Int {
+            return if (maxLines == Int.MAX_VALUE || layoutResult.lineCount <= maxLines) {
+                height
+            } else {
+                ceil(layoutResult.getLineBottom(maxLines - 1)).toInt()
+            }
+        }
+
+        private fun constrainWithDefaultSize(
+            textDelegate: TextDelegate,
+            layoutResult: TextLayoutResult,
+            constraints: Constraints,
+            layoutDirection: LayoutDirection,
+            width: Int,
+            height: Int
+        ): IntSize {
             val isEmptyText = textDelegate.text.text.isEmpty()
-            val height = if (isEmptyText) {
-                val singleLineHeight = computeLineHeightForEmptyText(
+            val needDefaultWidth = layoutResult.size.width < constraints.maxWidth
+
+            val defaultSize = if (isEmptyText || needDefaultWidth) {
+                computeSizeForEmptyText(
                     style = resolveDefaults(textDelegate.style, layoutDirection),
                     density = textDelegate.density,
                     resourceLoader = textDelegate.resourceLoader
                 )
-                when (textDelegate.overflow) {
-                    TextOverflow.None ->
-                        singleLineHeight.coerceAtLeast(constraints.minHeight)
-                    TextOverflow.Clip, TextOverflow.Ellipsis ->
-                        constraints.constrainHeight(singleLineHeight)
-                }
             } else {
-                layoutResult.size.height
+                IntSize.Zero
             }
-            val width = layoutResult.size.width
-            return Triple(width, height, layoutResult)
+
+            val newHeight = if (isEmptyText) {
+                constraints.constrainHeight(defaultSize.height)
+            } else {
+                height
+            }
+
+            val newWidth = if (needDefaultWidth) {
+                constraints.constrainWidth(max(defaultSize.width, layoutResult.size.width))
+            } else {
+                width
+            }
+
+            return IntSize(newWidth, newHeight)
         }
 
         /**
@@ -196,12 +251,12 @@ class TextFieldDelegate {
                     offsetMap.originalToTransformed(value.selection.max) - 1
                 )
             } else {
-                val lineHeightForEmptyText = computeLineHeightForEmptyText(
+                val defaultSize = computeSizeForEmptyText(
                     textDelegate.style,
                     textDelegate.density,
                     textDelegate.resourceLoader
                 )
-                Rect(0f, 0f, 1.0f, lineHeightForEmptyText.toFloat())
+                Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
             }
             val globalLT = layoutCoordinates.localToRoot(Offset(bbox.left, bbox.top))
 
@@ -260,24 +315,22 @@ class TextFieldDelegate {
          * @param textInputService The text input service
          * @param value The editor state
          * @param editProcessor The edit processor
-         * @param keyboardType The keyboard type
          * @param onValueChange The callback called when the new editor state arrives.
          * @param onImeActionPerformed The callback called when the editor action arrives.
+         * @param imeOptions Keyboard configuration such as single line, auto correct etc.
          */
         @JvmStatic
         internal fun onFocus(
             textInputService: TextInputService?,
             value: TextFieldValue,
             editProcessor: EditProcessor,
-            keyboardType: KeyboardType,
-            imeAction: ImeAction,
+            imeOptions: ImeOptions,
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): InputSessionToken {
             val inputSessionToken = textInputService?.startInput(
                 value = TextFieldValue(value.text, value.selection, value.composition),
-                keyboardType = keyboardType,
-                imeAction = imeAction,
+                imeOptions = imeOptions,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
             ) ?: INVALID_SESSION

@@ -78,7 +78,7 @@ fun <T> produceState(
     @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
-    LaunchedTask {
+    LaunchedEffect(Unit) {
         ProduceStateScopeImpl(result, coroutineContext).producer()
     }
     return result
@@ -86,10 +86,10 @@ fun <T> produceState(
 
 /**
  * Return an observable [snapshot][androidx.compose.runtime.snapshots.Snapshot] [State] that
- * produces values over time from [source].
+ * produces values over time from [subject].
  *
  * [producer] is launched when [produceState] enters the composition and is cancelled when
- * [produceState] leaves the composition. If [source] changes, a running [producer] will be
+ * [produceState] leaves the composition. If [subject] changes, a running [producer] will be
  * cancelled and re-launched for the new source. [producer] should use [ProduceStateScope.value]
  * to set new values on the returned [State].
  *
@@ -107,11 +107,11 @@ fun <T> produceState(
 @Composable
 fun <T> produceState(
     initialValue: T,
-    source: Any?,
+    subject: Any?,
     @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
-    LaunchedTask(source) {
+    LaunchedEffect(subject) {
         ProduceStateScopeImpl(result, coroutineContext).producer()
     }
     return result
@@ -119,10 +119,10 @@ fun <T> produceState(
 
 /**
  * Return an observable [snapshot][androidx.compose.runtime.snapshots.Snapshot] [State] that
- * produces values over time from [source1] and [source2].
+ * produces values over time from [subject1] and [subject2].
  *
  * [producer] is launched when [produceState] enters the composition and is cancelled when
- * [produceState] leaves the composition. If [source1] or [source2] change, a running [producer]
+ * [produceState] leaves the composition. If [subject1] or [subject2] change, a running [producer]
  * will be cancelled and re-launched for the new source. [producer] should use
  * [ProduceStateScope.value] to set new values on the returned [State].
  *
@@ -140,12 +140,12 @@ fun <T> produceState(
 @Composable
 fun <T> produceState(
     initialValue: T,
-    source1: Any?,
-    source2: Any?,
+    subject1: Any?,
+    subject2: Any?,
     @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
-    LaunchedTask(source1, source2) {
+    LaunchedEffect(subject1, subject2) {
         ProduceStateScopeImpl(result, coroutineContext).producer()
     }
     return result
@@ -153,10 +153,10 @@ fun <T> produceState(
 
 /**
  * Return an observable [snapshot][androidx.compose.runtime.snapshots.Snapshot] [State] that
- * produces values over time from [source1], [source2] and [source3].
+ * produces values over time from [subject1], [subject2] and [subject3].
  *
  * [producer] is launched when [produceState] enters the composition and is cancelled when
- * [produceState] leaves the composition. If [source1], [source2] or [source3] change, a running
+ * [produceState] leaves the composition. If [subject1], [subject2] or [subject3] change, a running
  * [producer] will be cancelled and re-launched for the new source. [producer should use
  * [ProduceStateScope.value] to set new values on the returned [State].
  *
@@ -174,13 +174,13 @@ fun <T> produceState(
 @Composable
 fun <T> produceState(
     initialValue: T,
-    source1: Any?,
-    source2: Any?,
-    source3: Any?,
+    subject1: Any?,
+    subject2: Any?,
+    subject3: Any?,
     @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
-    LaunchedTask(source1, source2, source3) {
+    LaunchedEffect(subject1, subject2, subject3) {
         ProduceStateScopeImpl(result, coroutineContext).producer()
     }
     return result
@@ -188,10 +188,10 @@ fun <T> produceState(
 
 /**
  * Return an observable [snapshot][androidx.compose.runtime.snapshots.Snapshot] [State] that
- * produces values over time from [sources].
+ * produces values over time from [subjects].
  *
  * [producer] is launched when [produceState] enters the composition and is cancelled when
- * [produceState] leaves the composition. If [sources] change, a running [producer] will be
+ * [produceState] leaves the composition. If [subjects] change, a running [producer] will be
  * cancelled and re-launched for the new source. [producer] should use [ProduceStateScope.value]
  * to set new values on the returned [State].
  *
@@ -209,11 +209,11 @@ fun <T> produceState(
 @Composable
 fun <T> produceState(
     initialValue: T,
-    vararg sources: Any?,
+    vararg subjects: Any?,
     @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
-    LaunchedTask(*sources) {
+    LaunchedEffect(subjects = subjects) {
         ProduceStateScopeImpl(result, coroutineContext).producer()
     }
     return result

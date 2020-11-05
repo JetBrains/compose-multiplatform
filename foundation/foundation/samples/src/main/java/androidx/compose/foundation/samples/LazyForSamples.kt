@@ -17,11 +17,11 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.LazyRowFor
 import androidx.compose.foundation.lazy.LazyRowForIndexed
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Sampled

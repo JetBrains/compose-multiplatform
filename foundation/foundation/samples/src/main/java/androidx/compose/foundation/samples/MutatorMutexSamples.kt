@@ -18,9 +18,8 @@ package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.MutatorMutex
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable

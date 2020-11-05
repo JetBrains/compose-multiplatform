@@ -43,7 +43,6 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.DensityAmbient
@@ -350,7 +349,6 @@ fun BackdropScaffold(
             // Snackbar host
             Box(
                 Modifier
-                    .zIndex(Float.POSITIVE_INFINITY)
                     .padding(
                         bottom = if (scaffoldState.isRevealed &&
                             revealedHeight == fullHeight - headerHeightPx
@@ -426,7 +424,6 @@ private fun BackLayerTransition(
 }
 
 @Composable
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 private fun BackdropStack(
     modifier: Modifier,
     backLayer: @Composable () -> Unit,

@@ -27,32 +27,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
-import androidx.ui.test.StateRestorationTester
-import androidx.ui.test.center
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
-import androidx.ui.test.swipe
-import androidx.ui.test.swipeWithVelocity
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import kotlin.math.sign
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterialApi::class)
 class SwipeableTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val swipeableTag = "swipeableTag"
 
@@ -61,6 +65,12 @@ class SwipeableTest {
     @Before
     fun init() {
         clock = ManualAnimationClock(initTimeMillis = 0L)
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     /**
@@ -368,6 +378,7 @@ class SwipeableTest {
      * Tests that fixed thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fixed_small() {
         val state = SwipeableState("A", clock)
         val offsetDp = with(rule.density) { 35.toDp() }
@@ -421,6 +432,7 @@ class SwipeableTest {
      * Tests that fixed thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fixed_large() {
         val state = SwipeableState("A", clock)
         val offsetDp = with(rule.density) { 65.toDp() }
@@ -474,6 +486,7 @@ class SwipeableTest {
      * Tests that fractional thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fractional_half() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -526,6 +539,7 @@ class SwipeableTest {
      * Tests that fractional thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fractional_quarter() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -578,6 +592,7 @@ class SwipeableTest {
      * Tests that fractional thresholds work correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_fractional_threeQuarters() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -630,6 +645,7 @@ class SwipeableTest {
      * Tests that mixing fixed and fractional thresholds works correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_mixed() {
         val state = SwipeableState("A", clock)
         val offsetDp = with(rule.density) { 35.toDp() }
@@ -689,6 +705,7 @@ class SwipeableTest {
      * Tests that a custom implementation of [ThresholdConfig] works correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_thresholds_custom() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -941,6 +958,7 @@ class SwipeableTest {
      * Tests that the target works correctly.
      */
     @Test
+    @LargeTest
     fun swipeable_targetValue() {
         val state = SwipeableState("A", clock)
         setSwipeableContent {
@@ -1474,6 +1492,32 @@ class SwipeableTest {
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")
             assertThat(swipeableState.offset.value).isEqualTo(50f)
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val state = SwipeableState("A", clock)
+        val anchors = mapOf(0f to "A", 100f to "B")
+        rule.setContent {
+            val modifier = Modifier.swipeable(
+                state = state,
+                anchors = anchors,
+                orientation = Orientation.Horizontal
+            ) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("swipeable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "state",
+                "anchors",
+                "orientation",
+                "enabled",
+                "reverseDirection",
+                "interactionState",
+                "thresholds",
+                "resistance",
+                "velocityThreshold"
+            )
         }
     }
 

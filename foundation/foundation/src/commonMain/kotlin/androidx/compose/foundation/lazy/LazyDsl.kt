@@ -22,13 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@RequiresOptIn(
-    "This is an experimental API for demonstrating how LazyColumn / LazyRow should work" +
-        "using a DSL implementation. This is a prototype and its implementation is not suited" +
-        " for PagedList or large lists."
-)
-annotation class ExperimentalLazyDsl
-
 /**
  * Receiver scope which is used by [LazyColumn] and [LazyRow].
  */
@@ -167,19 +160,23 @@ internal class LazyListScopeImpl : LazyListScope {
 }
 
 /**
- * The DSL implementation of a horizontally scrolling list that only composes and lays out the
- * currently visible items.
- * This API is not stable yet, please consider using [LazyRowFor] instead.
+ * The horizontally scrolling list that only composes and lays out the currently visible items.
+ * The [content] block defines a DSL which allows you to emit items of different types. For
+ * example you can use [LazyListScope.item] to add a single item and [LazyListScope.items] to add
+ * a list of items.
  *
  * @sample androidx.compose.foundation.samples.LazyRowSample
  *
  * @param modifier the modifier to apply to this layout
- * @param contentPadding specify a padding around the whole content
+ * @param state the state object to be used to control or observe the list's state
+ * @param contentPadding a padding around the whole content. This will add padding for the
+ * content after it has been clipped, which is not possible via [modifier] param. Note that it is
+ * **not** a padding applied for each item's content
  * @param verticalAlignment the vertical alignment applied to the items
- * @param content the [LazyListScope] which describes the content
+ * @param content a block which describes the content. Inside this block you can use methods like
+ * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
 @Composable
-@ExperimentalLazyDsl
 fun LazyRow(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
@@ -190,7 +187,7 @@ fun LazyRow(
     val scope = LazyListScopeImpl()
     scope.apply(content)
 
-    LazyFor(
+    LazyList(
         itemsCount = scope.totalSize,
         modifier = modifier,
         state = state,
@@ -204,19 +201,23 @@ fun LazyRow(
 }
 
 /**
- * The DSL implementation of a vertically scrolling list that only composes and lays out the
- * currently visible items.
- * This API is not stable yet, please consider using [LazyColumnFor] instead.
+ * The vertically scrolling list that only composes and lays out the currently visible items.
+ * The [content] block defines a DSL which allows you to emit items of different types. For
+ * example you can use [LazyListScope.item] to add a single item and [LazyListScope.items] to add
+ * a list of items.
  *
  * @sample androidx.compose.foundation.samples.LazyColumnSample
  *
  * @param modifier the modifier to apply to this layout
- * @param contentPadding specify a padding around the whole content
+ * @param state the state object to be used to control or observe the list's state
+ * @param contentPadding a padding around the whole content. This will add padding for the
+ * content after it has been clipped, which is not possible via [modifier] param. Note that it is
+ * **not** a padding applied for each item's content
  * @param horizontalAlignment the horizontal alignment applied to the items
- * @param content the [LazyListScope] which describes the content
+ * @param content a block which describes the content. Inside this block you can use methods like
+ * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
 @Composable
-@ExperimentalLazyDsl
 fun LazyColumn(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
@@ -227,7 +228,7 @@ fun LazyColumn(
     val scope = LazyListScopeImpl()
     scope.apply(content)
 
-    LazyFor(
+    LazyList(
         itemsCount = scope.totalSize,
         modifier = modifier,
         state = state,

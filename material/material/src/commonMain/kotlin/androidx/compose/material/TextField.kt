@@ -18,27 +18,26 @@ package androidx.compose.material
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.foundation.text.LastBaseline
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Placeable
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.InternalTextApi
@@ -115,17 +114,14 @@ import kotlin.math.roundToInt
  * @param visualTransformation transforms the visual representation of the input [value].
  * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
  * text field. By default no visual transformation is applied
- * @param keyboardType the keyboard type to be used with the text field.
- * Note that the input type is not guaranteed. For example, an IME may send a non-ASCII character
- * even if you set the keyboard type to [KeyboardType.Ascii]
- * @param imeAction the IME action honored by the IME. The 'enter' key on the soft keyboard input
- * will show a corresponding icon. For example, search icon may be shown if [ImeAction.Search] is
- * selected. When a user taps on that 'enter' key, the [onImeActionPerformed] callback is called
- * with the specified [ImeAction]
+ * @param keyboardOptions software keyboard options that contains configuration such as
+ * [KeyboardType] and [ImeAction].
+ * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
+ * equal or greater than 1.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
- * [imeAction] field. The callback also exposes a [SoftwareKeyboardController] instance as a
- * parameter that can be used to request to hide the software keyboard
+ * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
+ * instance as a parameter that can be used to request to hide the software keyboard
  * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
@@ -155,8 +151,8 @@ fun TextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
@@ -194,8 +190,8 @@ fun TextField(
         trailing = trailingIcon,
         isErrorValue = isErrorValue,
         visualTransformation = visualTransformation,
-        keyboardType = keyboardType,
-        imeAction = imeAction,
+        keyboardOptions = keyboardOptions,
+        maxLines = maxLines,
         onImeActionPerformed = onImeActionPerformed,
         onTextInputStarted = onTextInputStarted,
         interactionState = interactionState,
@@ -240,17 +236,14 @@ fun TextField(
  * @param visualTransformation transforms the visual representation of the input [value].
  * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
  * text field. By default no visual transformation is applied
- * @param keyboardType the keyboard type to be used with the text field.
- * Note that the input type is not guaranteed. For example, an IME may send a non-ASCII character
- * even if you set the keyboard type to [KeyboardType.Ascii]
- * @param imeAction the IME action honored by the IME. The 'enter' key on the soft keyboard input
- * will show a corresponding icon. For example, search icon may be shown if [ImeAction.Search] is
- * selected. When a user taps on that 'enter' key, the [onImeActionPerformed] callback is called
- * with the specified [ImeAction]
+ * @param keyboardOptions software keyboard options that contains configuration such as
+ * [KeyboardType] and [ImeAction].
+ * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
+ * equal or greater than 1.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
- * [imeAction] field. The callback also exposes a [SoftwareKeyboardController] instance as a
- * parameter that can be used to request to hide the software keyboard
+ * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
+ * instance as a parameter that can be used to request to hide the software keyboard
  * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
@@ -280,8 +273,8 @@ fun TextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
@@ -304,8 +297,8 @@ fun TextField(
         trailing = trailingIcon,
         isErrorValue = isErrorValue,
         visualTransformation = visualTransformation,
-        keyboardType = keyboardType,
-        imeAction = imeAction,
+        keyboardOptions = keyboardOptions,
+        maxLines = maxLines,
         onImeActionPerformed = onImeActionPerformed,
         onTextInputStarted = onTextInputStarted,
         interactionState = interactionState,

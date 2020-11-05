@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
@@ -29,7 +31,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 
 /**
@@ -37,16 +39,22 @@ import androidx.compose.ui.unit.dp
  *
  * @param asset [VectorAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [asset]
+ * @param tint tint to be applied to [asset]. If [Color.Unspecified] is provided, then no
+ *  tint is applied
  */
+@Deprecated(
+    "Icon has been moved into the Material library: androidx.compose.material.Icon",
+    replaceWith = ReplaceWith("Icon(asset)", "androidx.compose.material.Icon")
+)
 @Composable
 fun Icon(
     asset: VectorAsset,
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current
 ) {
+    @Suppress("DEPRECATION")
     Icon(
-        painter = VectorPainter(asset),
+        painter = rememberVectorPainter(asset),
         modifier = modifier,
         tint = tint
     )
@@ -57,8 +65,13 @@ fun Icon(
  *
  * @param asset [ImageAsset] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [asset]
+ * @param tint tint to be applied to [asset]. If [Color.Unspecified] is provided, then no
+ *  tint is applied
  */
+@Deprecated(
+    "Icon has been moved into the Material library: androidx.compose.material.Icon",
+    replaceWith = ReplaceWith("Icon(asset)", "androidx.compose.material.Icon")
+)
 @Composable
 fun Icon(
     asset: ImageAsset,
@@ -66,6 +79,7 @@ fun Icon(
     tint: Color = AmbientContentColor.current
 ) {
     val painter = remember(asset) { ImagePainter(asset) }
+    @Suppress("DEPRECATION")
     Icon(
         painter = painter,
         modifier = modifier,
@@ -78,8 +92,13 @@ fun Icon(
  *
  * @param painter Painter to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [painter]
+ * @param tint tint to be applied to [painter]. If [Color.Unspecified] is provided, then no
+ *  tint is applied
  */
+@Deprecated(
+    "Icon has been moved into the Material library: androidx.compose.material.Icon",
+    replaceWith = ReplaceWith("Icon(asset)", "androidx.compose.material.Icon")
+)
 @Composable
 fun Icon(
     painter: Painter,
@@ -89,7 +108,8 @@ fun Icon(
     // TODO: consider allowing developers to override the intrinsic size, and specify their own
     // size that this icon will be forced to take up.
     // TODO: b/149735981 semantics for content description
-    Box(modifier.defaultSizeFor(painter).paint(painter, colorFilter = ColorFilter.tint(tint)))
+    val colorFilter = if (tint == Color.Unspecified) null else ColorFilter.tint(tint)
+    Box(modifier.defaultSizeFor(painter).paint(painter, colorFilter = colorFilter))
 }
 
 private fun Modifier.defaultSizeFor(painter: Painter) =

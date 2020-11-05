@@ -17,86 +17,212 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonConstants
+import androidx.compose.material.Checkbox
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onActive
+import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.Tray
+import androidx.compose.ui.window.WindowDraggableArea
+import java.awt.Toolkit
 
 @Composable
 fun content() {
+    onActive {
+        val tray = Tray().apply {
+            icon(AppState.image())
+            menu(
+                MenuItems.Notify,
+                MenuItems.Increment,
+                MenuItems.Exit
+            )
+        }
+        onDispose {
+            tray.remove()
+        }
+    }
 
-    val popupState = remember { mutableStateOf(false) }
     val dialogState = remember { mutableStateOf(false) }
-    val amount = remember { mutableStateOf(0) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.White
+        color = Color(55, 55, 55)
     ) {
         Column {
-            Spacer(modifier = Modifier.height(50.dp))
-            Row(modifier = Modifier.preferredHeight(40.dp)) {
-                Button("Popup", { popupState.value = true })
-                Spacer(modifier = Modifier.width(50.dp))
-                Button("Dialog window", { dialogState.value = true })
-                Spacer(modifier = Modifier.width(50.dp))
-                Button(
-                    text = "Second window: ${amount.value}",
-                    onClick = {
-                        AppWindow(
-                            title = "Second window",
-                            size = IntSize(500, 300),
-                            onDismissEvent = {
-                                println("Second window is dismissed.")
-                            }
-                        ).show {
-                            WindowContent(
-                                amount,
-                                onClose = {
-                                    AppManager.getCurrentFocusedWindow()?.close()
+            Row(
+                modifier = Modifier.background(color = Color(75, 75, 75))
+                    .fillMaxWidth()
+                    .preferredHeight(30.dp)
+                    .padding(start = 20.dp, end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                WindowDraggableArea(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    TextBox(text = AppState.wndTitle.value)
+                }
+                Row {
+                    Button(color = Color(232, 182, 109), size = IntSize(16, 16))
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Button(color = Color(150, 232, 150), size = IntSize(16, 16))
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Button(
+                        onClick = { AppManager.exit() },
+                        color = Color(232, 100, 100),
+                        size = IntSize(16, 16)
+                    )
+                }
+            }
+            Row {
+                Column(modifier = Modifier.padding(start = 30.dp, top = 50.dp)) {
+                    Button("Show Popup", { AppState.popupState.value = true }, Color(232, 182, 109))
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Button("Open dialog", { dialogState.value = true })
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Button(
+                        text = "New window...",
+                        onClick = {
+                            AppWindow(
+                                title = "Second window",
+                                size = IntSize(400, 200),
+                                undecorated = AppState.undecorated.value,
+                                onDismissEvent = {
+                                    println("Second window is dismissed.")
                                 }
-                            )
-                        }
+                            ).show {
+                                WindowContent(
+                                    amount = AppState.amount,
+                                    onClose = {
+                                        AppManager.focusedWindow?.close()
+                                    }
+                                )
+                            }
+                        },
+                        color = Color(26, 198, 188)
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Button(
+                        text = "Send notification",
+                        onClick = {
+                            val message = "There should be your message."
+                            if (AppState.notify.value) {
+                                Notifier().notify("Notification.", message)
+                            } else if (AppState.warn.value) {
+                                Notifier().warn("Warning.", message)
+                            } else {
+                                Notifier().error("Error.", message)
+                            }
+                        },
+                        color = Color(196, 136, 255)
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Button("Increment amount", { AppState.amount.value++ }, Color(150, 232, 150))
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Button("Exit app", { AppManager.exit() }, Color(232, 100, 100))
+                }
+                Column(
+                    modifier = Modifier.padding(start = 30.dp, top = 50.dp, end = 30.dp)
+                        .background(color = Color(255, 255, 255, 10))
+                        .fillMaxWidth()
+                ) {
+                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(60.dp))
+                    Row {
+                        Checkbox(
+                            checked = AppState.undecorated.value,
+                            onCheckedChange = {
+                                AppState.undecorated.value = !AppState.undecorated.value
+                            },
+                            modifier = Modifier.height(30.dp).padding(start = 20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        TextBox(text = "- undecorated")
                     }
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Row(modifier = Modifier.padding(start = 20.dp)) {
+                        RadioButton(
+                            text = "- notify",
+                            state = AppState.notify
+                        )
+                        Spacer(modifier = Modifier.width(30.dp))
+                        RadioButton(
+                            text = "- warn",
+                            state = AppState.warn
+                        )
+                        Spacer(modifier = Modifier.width(30.dp))
+                        RadioButton(
+                            text = "- error",
+                            state = AppState.error
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Row(modifier = Modifier.padding(start = 20.dp)) {
+                        TextBox(text = "Amount: ${AppState.amount.value}")
+                    }
+                    Spacer(modifier = Modifier.height(60.dp))
+                }
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        alignment = Alignment.BottomCenter
+    ) {
+        Box(
+            modifier = Modifier.background(color = Color(32, 32, 32))
+                .fillMaxWidth()
+                .preferredHeight(30.dp)
+        ) {
+            Row(modifier = Modifier.padding(start = 20.dp)) {
+                TextBox(
+                    text = "Size: ${AppState.wndSize.value}   Location: ${AppState.wndPos.value}"
                 )
             }
         }
     }
 
     PopupSample(
-        displayed = popupState.value,
+        displayed = AppState.popupState.value,
         onDismiss = {
-            popupState.value = false
+            AppState.popupState.value = false
             println("Popup is dismissed.")
         }
     )
-    if (popupState.value) {
+    if (AppState.popupState.value) {
         // To make sure the popup is displayed on the top.
         Box(
-            Modifier.fillMaxSize().background(Color(10, 162, 232, 200))
+            Modifier.fillMaxSize().background(color = Color(0, 0, 0, 200))
         )
     }
 
@@ -107,10 +233,10 @@ fun content() {
         }
         Dialog(
             title = "Dialog window",
-            size = IntSize(500 + amount.value * 10, 300 + amount.value * 10),
+            size = IntSize(400, 200),
             onDismissEvent = dismiss
         ) {
-            WindowContent(amount, onClose = dismiss)
+            WindowContent(AppState.amount, onClose = dismiss)
         }
     }
 }
@@ -118,12 +244,12 @@ fun content() {
 @Composable
 fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
     Box(
-        Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         if (displayed) {
             Popup(
-                alignment = Alignment.Center,
-                offset = IntOffset(100, 100),
+                alignment = Alignment.TopCenter,
+                offset = IntOffset(0, 50),
                 isFocusable = true,
                 onDismissRequest = onDismiss
             ) {
@@ -136,18 +262,13 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
 @Composable
 fun PopupContent(onDismiss: () -> Unit) {
     Box(
-        Modifier.preferredSize(300.dp, 150.dp).background(Color.Gray, RoundedCornerShape(4.dp)),
+        Modifier.preferredSize(300.dp, 150.dp).background(color = Color(65, 65, 65)),
         alignment = Alignment.Center
     ) {
         Column {
-            Text(text = "Are you sure?")
-            Spacer(modifier = Modifier.height(50.dp))
-            Button(
-                onClick = { onDismiss.invoke() },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(text = "Yes")
-            }
+            TextBox(text = "Popup demo.")
+            Spacer(modifier = Modifier.height(30.dp))
+            Button("Dismiss", { onDismiss.invoke() })
         }
     }
 }
@@ -155,30 +276,16 @@ fun PopupContent(onDismiss: () -> Unit) {
 @Composable
 fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
     Box(
-        Modifier.fillMaxSize().background(Color.White),
+        Modifier.fillMaxSize().background(color = Color(55, 55, 55)),
         alignment = Alignment.Center
     ) {
-        Box(
-            Modifier.preferredSize(300.dp, 150.dp)
-                .background(Color.Gray, RoundedCornerShape(4.dp)),
-            alignment = Alignment.Center
-        ) {
-            Column() {
-                Text(text = "Increment value?")
-                Spacer(modifier = Modifier.height(50.dp))
-                Row() {
-                    Button(
-                        onClick = { amount.value++ }
-                    ) {
-                        Text(text = "Yes")
-                    }
-                    Spacer(modifier = Modifier.width(30.dp))
-                    Button(
-                        onClick = { onClose.invoke() }
-                    ) {
-                        Text(text = "Close")
-                    }
-                }
+        Column {
+            TextBox(text = "Increment amount?")
+            Spacer(modifier = Modifier.height(30.dp))
+            Row {
+                Button(text = "Yes", onClick = { amount.value++ })
+                Spacer(modifier = Modifier.width(30.dp))
+                Button(text = "Close", onClick = { onClose.invoke() })
             }
         }
     }
@@ -186,15 +293,82 @@ fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
 
 @Composable
 fun Button(
-    text: String = "Button",
-    onClick: () -> Unit
+    text: String = "",
+    onClick: () -> Unit = {},
+    color: Color = Color(10, 162, 232),
+    size: IntSize = IntSize(150, 30)
 ) {
+    val buttonHover = remember { mutableStateOf(false) }
     Button(
         onClick = onClick,
-        backgroundColor = Color(10, 162, 232),
-        modifier = Modifier.preferredHeight(40.dp)
-            .preferredWidth(200.dp)
+        colors = ButtonConstants.defaultButtonColors(
+            backgroundColor =
+                if (buttonHover.value)
+                    Color(color.red / 1.3f, color.green / 1.3f, color.blue / 1.3f)
+                else
+                    color
+        ),
+        modifier = Modifier
+            .preferredSize(size.width.dp, size.height.dp)
+            .hover(
+                onEnter = {
+                    buttonHover.value = true
+                    false
+                },
+                onExit = {
+                    buttonHover.value = false
+                    false
+                },
+                onMove = { false }
+            )
     ) {
         Text(text = text)
     }
+}
+
+@Composable
+fun TextBox(text: String = "") {
+    Box(
+        modifier = Modifier.height(30.dp),
+        alignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = Color(200, 200, 200)
+        )
+    }
+}
+
+@Composable
+fun RadioButton(text: String, state: MutableState<Boolean>) {
+    Box(
+        modifier = Modifier.height(30.dp),
+        alignment = Alignment.Center
+    ) {
+        RadioButton(
+            selected = state.value,
+            onClick = {
+                state.value = !state.value
+                AppState.diselectOthers(state)
+            }
+        )
+    }
+    Spacer(modifier = Modifier.width(5.dp))
+    TextBox(text = text)
+}
+
+expect fun Modifier.hover(
+    onEnter: () -> Boolean = { true },
+    onExit: () -> Boolean = { true },
+    onMove: (Offset) -> Boolean = { true }
+): Modifier
+
+actual fun Modifier.hover(
+    onEnter: () -> Boolean,
+    onExit: () -> Boolean,
+    onMove: (Offset) -> Boolean
+): Modifier = this.pointerMoveFilter(onEnter = onEnter, onExit = onExit, onMove = onMove)
+
+private fun image(url: String): java.awt.Image {
+    return Toolkit.getDefaultToolkit().getImage(url)
 }

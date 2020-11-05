@@ -15,34 +15,34 @@
  */
 package androidx.compose.ui.window
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithText
-import androidx.ui.test.performClick
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class DialogUiTest {
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val defaultText = "dialogText"
 
@@ -53,7 +53,7 @@ class DialogUiTest {
 
             if (showDialog.value) {
                 Dialog(onDismissRequest = {}) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -77,7 +77,7 @@ class DialogUiTest {
                         showDialog.value = false
                     }
                 ) {
-                    Text(
+                    BasicText(
                         text = text.value,
                         modifier = Modifier.clickable {
                             text.value = textAfterClick
@@ -109,7 +109,7 @@ class DialogUiTest {
                         showDialog.value = false
                     }
                 ) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -131,7 +131,7 @@ class DialogUiTest {
 
             if (showDialog.value) {
                 Dialog(onDismissRequest = {}) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -158,7 +158,7 @@ class DialogUiTest {
                         showDialog.value = false
                     }
                 ) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }
@@ -181,7 +181,7 @@ class DialogUiTest {
 
             if (showDialog.value) {
                 Dialog(onDismissRequest = {}) {
-                    Text(defaultText)
+                    BasicText(defaultText)
                 }
             }
         }

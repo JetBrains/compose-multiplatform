@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.layout
 
-import android.graphics.Bitmap
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
@@ -33,38 +32,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.assertPositionInRootIsEqualTo
-import androidx.ui.test.assertWidthIsEqualTo
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.onNodeWithTag
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
-@RunWith(JUnit4::class)
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class SubcomposeLayoutTest {
 
     @get:Rule
@@ -162,7 +161,7 @@ class SubcomposeLayoutTest {
                 measuresCount++
                 val placeable = subcompose(Unit) {
                     recompositionsCount1++
-                    Box(Modifier.size(20.dp)) {
+                    NonInlineBox(Modifier.size(20.dp)) {
                         model.value // model read
                         recompositionsCount2++
                     }
@@ -181,6 +180,11 @@ class SubcomposeLayoutTest {
             assertEquals(1, recompositionsCount1)
             assertEquals(2, recompositionsCount2)
         }
+    }
+
+    @Composable
+    private fun NonInlineBox(modifier: Modifier, children: @Composable () -> Unit) {
+        Box(modifier = modifier) { children() }
     }
 
     @Test
@@ -344,7 +348,7 @@ class SubcomposeLayoutTest {
         rule.waitForIdle()
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Green)
     }
 
@@ -372,7 +376,7 @@ class SubcomposeLayoutTest {
         }
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Green)
 
         rule.runOnIdle {
@@ -380,7 +384,7 @@ class SubcomposeLayoutTest {
         }
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 
@@ -405,7 +409,7 @@ class SubcomposeLayoutTest {
         }
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 
@@ -489,11 +493,12 @@ class SubcomposeLayoutTest {
         rule.waitForIdle()
 
         rule.onNodeWithTag(layoutTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
 
     @Test
+    @LargeTest
     fun viewWithSubcomposeLayoutCanBeDetached() {
         // verifies that the View with composed SubcomposeLayout can be detached at any point of
         // time without runtime crashes and once the view will be attached again the change will
@@ -524,7 +529,7 @@ class SubcomposeLayoutTest {
             }
         }
 
-        assertTrue(stateUsedLatch.await(1, TimeUnit.SECONDS))
+        assertTrue("state was used in setup", stateUsedLatch.await(1, TimeUnit.SECONDS))
 
         stateUsedLatch = CountDownLatch(1)
         scenario.onActivity {
@@ -532,16 +537,21 @@ class SubcomposeLayoutTest {
             container1.removeView(container2)
         }
 
-        assertFalse(stateUsedLatch.await(200, TimeUnit.MILLISECONDS))
+        // The subcomposition is allowed to be active while the View is detached,
+        // but it isn't required
+        rule.waitForIdle()
 
         scenario.onActivity {
             container1.addView(container2)
         }
 
-        assertTrue(stateUsedLatch.await(1, TimeUnit.SECONDS))
+        assertTrue(
+            "state was used after reattaching view",
+            stateUsedLatch.await(1, TimeUnit.SECONDS)
+        )
     }
 }
 
-fun Bitmap.assertCenterPixelColor(expectedColor: Color) {
-    assertColor(expectedColor, width / 2, height / 2)
+fun ImageAsset.assertCenterPixelColor(expectedColor: Color) {
+    asAndroidBitmap().assertColor(expectedColor, width / 2, height / 2)
 }

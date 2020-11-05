@@ -16,11 +16,16 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.DeleteSurroundingTextEditOp
@@ -30,11 +35,8 @@ import androidx.compose.ui.text.input.SetComposingRegionEditOp
 import androidx.compose.ui.text.input.SetComposingTextEditOp
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextInputService
-import androidx.test.filters.SmallTest
-import androidx.ui.test.click
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.hasInputMethodsSupport
-import androidx.ui.test.performGesture
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -48,10 +50,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalFoundationApi::class)
 class TextFieldOnValueChangeTextFieldValueTest {
     @get:Rule
@@ -66,7 +67,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         val textInputService = mock<TextInputService>()
         val inputSessionToken = 10 // any positive number is fine.
 
-        whenever(textInputService.startInput(any(), any(), any(), any(), any()))
+        whenever(textInputService.startInput(any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
         rule.setContent {
@@ -81,7 +82,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
                         )
                     )
                 }
-                BaseTextField(
+                BasicTextField(
                     value = state.value,
                     onValueChange = {
                         state.value = it
@@ -100,8 +101,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
-                keyboardType = any(),
-                imeAction = any(),
+                imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
                 onImeActionPerformed = any()
             )

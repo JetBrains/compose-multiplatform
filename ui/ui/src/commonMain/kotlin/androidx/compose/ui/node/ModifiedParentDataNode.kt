@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.ParentDataModifier
+import androidx.compose.ui.layout.ParentDataModifier
 
 @OptIn(ExperimentalLayoutNodeApi::class)
 internal class ModifiedParentDataNode(

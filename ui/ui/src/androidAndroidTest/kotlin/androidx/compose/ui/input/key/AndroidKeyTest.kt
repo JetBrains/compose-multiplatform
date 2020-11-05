@@ -17,14 +17,14 @@
 package androidx.compose.ui.input.key
 
 import android.view.KeyEvent
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class AndroidKeyTest {
     @Test
     fun androidKeyCode_to_composeKey() {

@@ -15,40 +15,87 @@
  */
 package androidx.compose.desktop
 
+import androidx.compose.ui.window.MenuBar
+
 object AppManager {
+
+    init {
+        Runtime.getRuntime().addShutdownHook(object : Thread() {
+            public override fun run() {
+                onAppExit?.invoke()
+            }
+        })
+    }
+
+    internal var sharedMenuBar: MenuBar? = null
 
     val defaultActionOnWindowsEmpty: () -> Unit = { System.exit(0) }
 
-    var onWindowsEmptyAction = defaultActionOnWindowsEmpty
+    private var onWindowsEmptyAction: (() -> Unit)? = defaultActionOnWindowsEmpty
 
-    private val windows = mutableSetOf<AppFrame>()
+    private var onAppStart: (() -> Unit)? = null
 
-    internal fun addWindow(window: AppFrame): Boolean {
-        if (windows.contains(window)) {
-            return false
-        }
-        windows.add(window)
-        return true
-    }
+    private var onAppExit: (() -> Unit)? = null
 
-    internal fun removeWindow(window: AppFrame) {
-        windows.remove(window)
-        window.dispose()
-        if (windows.isEmpty()) {
-            onWindowsEmptyAction.invoke()
-        }
-    }
+    private val windowsList = mutableSetOf<AppFrame>()
 
-    fun getWindows(): Collection<AppFrame> {
-        return windows.toList()
-    }
+    val windows: List<AppFrame>
+        get() = windowsList.toList()
 
-    fun getCurrentFocusedWindow(): AppFrame? {
-        for (current in windows) {
+    val focusedWindow: AppFrame?
+        get() = currentFocusedWindow()
+
+    private fun currentFocusedWindow(): AppFrame? {
+        for (current in windowsList) {
             if (current.window.isFocused) {
                 return current
             }
         }
         return null
+    }
+
+    internal fun addWindow(window: AppFrame): Boolean {
+        if (windowsList.isEmpty()) {
+            onAppStart?.invoke()
+        }
+        if (windowsList.contains(window)) {
+            return false
+        }
+        windowsList.add(window)
+        return true
+    }
+
+    internal fun removeWindow(window: AppFrame) {
+        windowsList.remove(window)
+        window.dispose()
+        if (windowsList.isEmpty()) {
+            onWindowsEmptyAction?.invoke()
+        }
+    }
+
+    fun setEvents(
+        onAppStart: (() -> Unit)? = null,
+        onAppExit: (() -> Unit)? = null,
+        onWindowsEmpty: (() -> Unit)? = null
+    ) {
+        this.onAppStart = onAppStart
+        this.onAppExit = onAppExit
+        this.onWindowsEmptyAction = onWindowsEmpty
+    }
+
+    fun setMenu(menuBar: MenuBar?) {
+        sharedMenuBar = menuBar
+    }
+
+    fun exit() {
+        val dialogOrderedWindowsList = mutableListOf<AppFrame>()
+        for (frame in windowsList) {
+            if (frame.invoker != null) {
+                dialogOrderedWindowsList.add(frame)
+            }
+        }
+        for (frame in dialogOrderedWindowsList.union(windowsList)) {
+            frame.close()
+        }
     }
 }

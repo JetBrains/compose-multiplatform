@@ -28,24 +28,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Layout
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureBlock
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
 import androidx.compose.ui.Scroller
 import androidx.compose.ui.SquareModel
-import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.assertRect
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
@@ -55,20 +48,20 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.waitAndScreenShot
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class WithConstraintsTest {
 
     @Suppress("DEPRECATION")
@@ -241,7 +234,7 @@ class WithConstraintsTest {
                     // wasn't possible to survide Frames swicth previously so the model read
                     // within the child Layout wasn't recorded
                     val background = Modifier.paint(
-                        VectorPainter(
+                        rememberVectorPainter(
                             name = "testPainter",
                             defaultWidth = 10.dp,
                             defaultHeight = 10.dp
@@ -826,7 +819,7 @@ val infiniteConstraints = object : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurable.measure(Constraints())
         return layout(constraints.maxWidth, constraints.maxHeight) {
             placeable.place(0, 0)

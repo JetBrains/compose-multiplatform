@@ -16,15 +16,14 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.Layout
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.enforce
@@ -145,7 +144,7 @@ private interface PreferredIntrinsicSizeModifier : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
+    ): MeasureResult {
         val placeable = measurable.measure(
             calculateContentConstraints(
                 measurable,
@@ -176,148 +175,4 @@ private interface PreferredIntrinsicSizeModifier : LayoutModifier {
         measurable: IntrinsicMeasurable,
         width: Int
     ) = measurable.maxIntrinsicHeight(width)
-}
-
-/**
- * Layout composable that forces its child to be as wide as its min intrinsic width.
- * If incoming constraints do not allow this, the closest possible width will be used.
- */
-@Deprecated(
-    "This component is deprecated. " +
-        "Please use the preferredWidth(IntrinsicSize.Min) modifier instead."
-)
-@Composable
-fun MinIntrinsicWidth(children: @Composable () -> Unit) {
-    Layout(
-        children,
-        minIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.minIntrinsicWidth(h) ?: 0
-        },
-        minIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.minIntrinsicHeight(w) ?: 0
-        },
-        maxIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.minIntrinsicWidth(h) ?: 0
-        },
-        maxIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.maxIntrinsicHeight(w) ?: 0
-        }
-    ) { measurables, constraints ->
-        val measurable = measurables.firstOrNull()
-        val width = measurable?.minIntrinsicWidth(constraints.maxHeight) ?: 0
-        val placeable = measurable?.measure(
-            Constraints.fixedWidth(width).enforce(constraints)
-        )
-        layout(placeable?.width ?: 0, placeable?.height ?: 0) {
-            placeable?.place(0, 0)
-        }
-    }
-}
-
-/**
- * Layout composable that forces its child to be as tall as its min intrinsic height.
- * If incoming constraints do not allow this, the closest possible height will be used.
- */
-@Deprecated(
-    "This component is deprecated. " +
-        "Please use the preferredHeight(IntrinsicSize.Min) modifier instead."
-)
-@Composable
-fun MinIntrinsicHeight(children: @Composable () -> Unit) {
-    Layout(
-        children,
-        minIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.minIntrinsicWidth(h) ?: 0
-        },
-        minIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.minIntrinsicHeight(w) ?: 0
-        },
-        maxIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.maxIntrinsicWidth(h) ?: 0
-        },
-        maxIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.minIntrinsicHeight(w) ?: 0
-        }
-    ) { measurables, constraints ->
-        val measurable = measurables.firstOrNull()
-        val height = measurable?.minIntrinsicHeight(constraints.maxWidth) ?: 0
-        val placeable = measurable?.measure(
-            Constraints.fixedHeight(height).enforce(constraints)
-        )
-        layout(placeable?.width ?: 0, placeable?.height ?: 0) {
-            placeable?.place(0, 0)
-        }
-    }
-}
-
-/**
- * Layout composable that forces its child to be as wide as its max intrinsic width.
- * If incoming constraints do not allow this, the closest possible width will be used.
- */
-@Deprecated(
-    "This component is deprecated. " +
-        "Please use the preferredWidth(IntrinsicSize.Max) modifier instead."
-)
-@Composable
-fun MaxIntrinsicWidth(children: @Composable () -> Unit) {
-    Layout(
-        children,
-        minIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.maxIntrinsicWidth(h) ?: 0
-        },
-        minIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.minIntrinsicHeight(w) ?: 0
-        },
-        maxIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.maxIntrinsicWidth(h) ?: 0
-        },
-        maxIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.maxIntrinsicHeight(w) ?: 0
-        }
-    ) { measurables, constraints ->
-        val measurable = measurables.firstOrNull()
-        val width = measurable?.maxIntrinsicWidth(constraints.maxHeight) ?: 0
-        val placeable = measurable?.measure(
-            Constraints.fixedWidth(width).enforce(constraints)
-        )
-        layout(placeable?.width ?: 0, placeable?.height ?: 0) {
-            placeable?.place(0, 0)
-        }
-    }
-}
-
-/**
- * Layout composable that forces its child to be as tall as its max intrinsic height.
- * If incoming constraints do not allow this, the closest possible height will be used.
- */
-@Deprecated(
-    "This component is deprecated. " +
-        "Please use the preferredHeight(IntrinsicSize.Max) modifier instead."
-)
-@Composable
-fun MaxIntrinsicHeight(children: @Composable () -> Unit) {
-    Layout(
-        children,
-        minIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.minIntrinsicWidth(h) ?: 0
-        },
-        minIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.maxIntrinsicHeight(w) ?: 0
-        },
-        maxIntrinsicWidthMeasureBlock = { measurables, h ->
-            measurables.firstOrNull()?.maxIntrinsicWidth(h) ?: 0
-        },
-        maxIntrinsicHeightMeasureBlock = { measurables, w ->
-            measurables.firstOrNull()?.maxIntrinsicHeight(w) ?: 0
-        }
-    ) { measurables, constraints ->
-        val measurable = measurables.firstOrNull()
-        val height = measurable?.maxIntrinsicHeight(constraints.maxWidth) ?: 0
-        val placeable = measurable?.measure(
-            Constraints.fixedHeight(height).enforce(constraints)
-        )
-        layout(placeable?.width ?: 0, placeable?.height ?: 0) {
-            placeable?.place(0, 0)
-        }
-    }
 }

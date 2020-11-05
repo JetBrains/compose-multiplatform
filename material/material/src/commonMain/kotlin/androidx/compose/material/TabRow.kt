@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -104,7 +103,6 @@ import androidx.compose.ui.util.fastMaxBy
  * inside this lambda will be measured and placed evenly across the TabRow, each taking up equal
  * space.
  */
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 @Composable
 fun TabRow(
     selectedTabIndex: Int,
@@ -185,7 +183,6 @@ fun TabRow(
  * element inside this lambda will be measured and placed evenly across the TabRow, each taking
  * up equal space.
  */
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 @Composable
 fun ScrollableTabRow(
     selectedTabIndex: Int,

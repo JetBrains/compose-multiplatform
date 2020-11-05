@@ -16,24 +16,24 @@
 
 package androidx.compose.foundation.layout.demos
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -137,13 +137,13 @@ private fun testText() {
 private fun testSiblings() {
     Column {
         Box(
-            boxSize.background(color = Color.Red).alignWithSiblings { p -> p.width }
+            boxSize.background(color = Color.Red).alignBy { p -> p.width }
         ) {}
         Box(
-            boxSize.background(color = Color.Green).alignWithSiblings { p -> p.width / 2 }
+            boxSize.background(color = Color.Green).alignBy { p -> p.width / 2 }
         ) {}
         Box(
-            boxSize.background(color = Color.Blue).alignWithSiblings { p -> p.width / 4 }
+            boxSize.background(color = Color.Blue).alignBy { p -> p.width / 4 }
         ) {}
     }
 }

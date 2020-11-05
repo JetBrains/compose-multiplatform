@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.text.CoreText
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.text.AnnotatedString
@@ -25,15 +25,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @SmallTest
 class TextLayoutDirectionModifierTest : LayoutTest() {
 
@@ -44,7 +44,7 @@ class TextLayoutDirectionModifierTest : LayoutTest() {
 
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                CoreTextField(
+                BasicTextField(
                     value = TextFieldValue("..."),
                     onValueChange = {},
                     onTextLayout = { result ->
@@ -66,17 +66,18 @@ class TextLayoutDirectionModifierTest : LayoutTest() {
         var layoutDirection: LayoutDirection? = null
         show {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                CoreText(
+                BasicText(
                     text = AnnotatedString("..."),
                     style = TextStyle.Default,
+                    onTextLayout = { result ->
+                        layoutDirection = result.layoutInput.layoutDirection
+                        latch.countDown()
+                    },
                     softWrap = true,
                     overflow = TextOverflow.Clip,
                     maxLines = 1,
                     inlineContent = mapOf()
-                ) { result ->
-                    layoutDirection = result.layoutInput.layoutDirection
-                    latch.countDown()
-                }
+                )
             }
         }
 

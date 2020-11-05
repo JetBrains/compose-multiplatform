@@ -16,15 +16,13 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.AmbientTextStyle
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -32,7 +30,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
@@ -42,6 +39,9 @@ import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.material.AmbientContentColor
+import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
@@ -55,8 +55,8 @@ import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.demos.PagingDemos
 import kotlin.random.Random
-import androidx.compose.paging.demos.PagingDemos
 
 val LazyListDemos = listOf(
     ComposableDemo("Simple column") { LazyColumnDemo() },
@@ -111,14 +111,15 @@ private fun ListAddRemoveItemsDemo() {
 @OptIn(ExperimentalLayout::class)
 @Composable
 private fun ListHoistedStateDemo() {
-    val state = rememberLazyListState()
+    val interactionState = remember { InteractionState() }
+    val state = rememberLazyListState(interactionState = interactionState)
     Column {
-        FlowRow {
-            Text(
-                "First item: ${state.firstVisibleItemIndex}",
-                style = AmbientTextStyle.current.copy(fontSize = 30.sp)
-            )
-        }
+        Text(
+            "First item: ${state.firstVisibleItemIndex}",
+            fontSize = 30.sp
+        )
+        Text("Dragging: ${interactionState.contains(Interaction.Dragged)}", fontSize = 30.sp)
+        Text("Flinging: ${state.isAnimationRunning}", fontSize = 30.sp)
         LazyColumnFor(
             (0..1000).toList(),
             Modifier.fillMaxWidth(),
@@ -206,7 +207,6 @@ private val colors = listOf(
 )
 
 @Composable
-@OptIn(ExperimentalLazyDsl::class)
 private fun LazyColumnScope() {
     LazyColumn {
         items((1..10).toList()) {
@@ -225,7 +225,6 @@ private fun LazyColumnScope() {
 }
 
 @Composable
-@OptIn(ExperimentalLazyDsl::class)
 private fun LazyRowScope() {
     LazyRow {
         items((1..10).toList()) {

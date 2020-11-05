@@ -16,18 +16,18 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.ProvideTextStyle
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.MainAxisAlignment
 import androidx.compose.foundation.layout.SizeMode
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -151,11 +151,10 @@ fun AlertDialog(
             color = backgroundColor,
             contentColor = contentColor
         ) {
-            val emphasisLevels = AmbientEmphasisLevels.current
             Column {
                 if (title != null) {
                     Box(TitlePadding.align(Alignment.Start)) {
-                        ProvideEmphasis(emphasisLevels.high) {
+                        Providers(AmbientContentAlpha provides ContentAlpha.high) {
                             val textStyle = MaterialTheme.typography.subtitle1
                             ProvideTextStyle(textStyle, title)
                         }
@@ -168,7 +167,7 @@ fun AlertDialog(
 
                 if (text != null) {
                     Box(TextPadding.align(Alignment.Start)) {
-                        ProvideEmphasis(emphasisLevels.medium) {
+                        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                             val textStyle = MaterialTheme.typography.body2
                             ProvideTextStyle(textStyle, text)
                         }

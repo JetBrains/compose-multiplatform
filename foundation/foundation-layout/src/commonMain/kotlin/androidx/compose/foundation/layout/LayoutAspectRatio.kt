@@ -17,12 +17,16 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.satisfiedBy
@@ -31,9 +35,16 @@ import kotlin.math.roundToInt
 
 /**
  * Attempts to size the content to match a specified aspect ratio by trying to match one of the
- * incoming constraints in the following order:
- * [Constraints.maxWidth], [Constraints.maxHeight], [Constraints.minWidth], [Constraints.minHeight].
- * The size in the other dimension is determined by the aspect ratio.
+ * incoming constraints in the following order: [Constraints.maxWidth], [Constraints.maxHeight],
+ * [Constraints.minWidth], [Constraints.minHeight] if [matchHeightConstraintsFirst] is `false`
+ * (which is the default), or [Constraints.maxHeight], [Constraints.maxWidth],
+ * [Constraints.minHeight], [Constraints.minWidth] if [matchHeightConstraintsFirst] is `true`.
+ * The size in the other dimension is determined by the aspect ratio. The combinations will be
+ * tried in this order until one non-empty is found to satisfy the constraints. If no valid
+ * size is obtained this way, it means that there is no non-empty size satisfying both
+ * the constraints and the aspect ratio, so the constraints will not be respected
+ * and the content will be sized such that the [Constraints.maxWidth] or [Constraints.maxHeight]
+ * is matched (depending on [matchHeightConstraintsFirst]).
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleAspectRatio
@@ -43,10 +54,25 @@ import kotlin.math.roundToInt
 @Stable
 fun Modifier.aspectRatio(
     @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */, fromInclusive = false)
-    ratio: Float
-) = this.then(AspectRatioModifier(ratio))
+    ratio: Float,
+    matchHeightConstraintsFirst: Boolean = false
+) = this.then(
+    AspectRatioModifier(
+        ratio,
+        matchHeightConstraintsFirst,
+        debugInspectorInfo {
+            name = "aspectRatio"
+            properties["ratio"] = ratio
+            properties["matchHeightConstraintsFirst"] = matchHeightConstraintsFirst
+        }
+    )
+)
 
-private data class AspectRatioModifier(val aspectRatio: Float) : LayoutModifier {
+private class AspectRatioModifier(
+    val aspectRatio: Float,
+    val matchHeightConstraintsFirst: Boolean,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     init {
         require(aspectRatio > 0) { "aspectRatio $aspectRatio must be > 0" }
     }
@@ -54,9 +80,9 @@ private data class AspectRatioModifier(val aspectRatio: Float) : LayoutModifier 
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
-    ): MeasureScope.MeasureResult {
-        val size = constraints.findSizeWith(aspectRatio)
-        val wrappedConstraints = if (size != null) {
+    ): MeasureResult {
+        val size = constraints.findSize()
+        val wrappedConstraints = if (size != IntSize.Zero) {
             Constraints.fixed(size.width, size.height)
         } else {
             constraints
@@ -103,43 +129,90 @@ private data class AspectRatioModifier(val aspectRatio: Float) : LayoutModifier 
         measurable.maxIntrinsicHeight(width)
     }
 
-    private fun Constraints.findSizeWith(aspectRatio: Float): IntSize? {
+    private fun Constraints.findSize(): IntSize {
+        if (!matchHeightConstraintsFirst) {
+            tryMaxWidth().also { if (it != IntSize.Zero) return it }
+            tryMaxHeight().also { if (it != IntSize.Zero) return it }
+            tryMinWidth().also { if (it != IntSize.Zero) return it }
+            tryMinHeight().also { if (it != IntSize.Zero) return it }
+            tryMaxWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMaxHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+        } else {
+            tryMaxHeight().also { if (it != IntSize.Zero) return it }
+            tryMaxWidth().also { if (it != IntSize.Zero) return it }
+            tryMinHeight().also { if (it != IntSize.Zero) return it }
+            tryMinWidth().also { if (it != IntSize.Zero) return it }
+            tryMaxHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMaxWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinHeight(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+            tryMinWidth(enforceConstraints = false).also { if (it != IntSize.Zero) return it }
+        }
+        return IntSize.Zero
+    }
+
+    private fun Constraints.tryMaxWidth(enforceConstraints: Boolean = true): IntSize {
         val maxWidth = this.maxWidth
         if (maxWidth != Constraints.Infinity) {
             val height = (maxWidth / aspectRatio).roundToInt()
             if (height > 0) {
                 val size = IntSize(maxWidth, height)
-                if (satisfiedBy(size)) {
+                if (!enforceConstraints || satisfiedBy(size)) {
                     return size
                 }
             }
         }
+        return IntSize.Zero
+    }
+
+    private fun Constraints.tryMaxHeight(enforceConstraints: Boolean = true): IntSize {
         val maxHeight = this.maxHeight
         if (maxHeight != Constraints.Infinity) {
             val width = (maxHeight * aspectRatio).roundToInt()
             if (width > 0) {
                 val size = IntSize(width, maxHeight)
-                if (satisfiedBy(size)) {
+                if (!enforceConstraints || satisfiedBy(size)) {
                     return size
                 }
             }
         }
+        return IntSize.Zero
+    }
+
+    private fun Constraints.tryMinWidth(enforceConstraints: Boolean = true): IntSize {
         val minWidth = this.minWidth
         val height = (minWidth / aspectRatio).roundToInt()
         if (height > 0) {
             val size = IntSize(minWidth, height)
-            if (satisfiedBy(size)) {
+            if (!enforceConstraints || satisfiedBy(size)) {
                 return size
             }
         }
+        return IntSize.Zero
+    }
+
+    private fun Constraints.tryMinHeight(enforceConstraints: Boolean = true): IntSize {
         val minHeight = this.minHeight
         val width = (minHeight * aspectRatio).roundToInt()
         if (width > 0) {
             val size = IntSize(width, minHeight)
-            if (satisfiedBy(size)) {
+            if (!enforceConstraints || satisfiedBy(size)) {
                 return size
             }
         }
-        return null
+        return IntSize.Zero
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? AspectRatioModifier ?: return false
+        return aspectRatio == otherModifier.aspectRatio &&
+            matchHeightConstraintsFirst == other.matchHeightConstraintsFirst
+    }
+
+    override fun hashCode(): Int =
+        aspectRatio.hashCode() * 31 + matchHeightConstraintsFirst.hashCode()
+
+    override fun toString(): String = "AspectRatioModifier(aspectRatio=$aspectRatio)"
 }

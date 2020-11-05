@@ -26,7 +26,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
 
     implementation(KOTLIN_STDLIB)
 
@@ -35,10 +35,11 @@ dependencies {
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:foundation:foundation:foundation-samples")
     implementation project(":compose:integration-tests:demos:common")
+    implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-text")
-    implementation project(":compose:paging:paging:integration-tests:paging-demos")
+    implementation project(":paging:paging-compose:integration-tests:paging-demos")
 }
 
 android {

@@ -31,10 +31,10 @@ internal class DesktopStringDelegate : PlatformStringDelegate {
         string.toLowerCase((locale as DesktopLocale).locale)
 
     override fun capitalize(string: String, locale: PlatformLocale): String =
-        string.capitalize()
+        string.capitalize((locale as DesktopLocale).locale)
 
     override fun decapitalize(string: String, locale: PlatformLocale): String =
-        string.decapitalize()
+        string.decapitalize((locale as DesktopLocale).locale)
 }
 
 internal actual fun ActualStringDelegate(): PlatformStringDelegate =

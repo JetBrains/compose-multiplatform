@@ -17,15 +17,28 @@
 package androidx.compose.ui
 
 import androidx.compose.ui.platform.InspectableValue
-import com.google.common.truth.Truth
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class ZIndexModifierTest {
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testInspectable() {
         val modifier = Modifier.zIndex(3f) as InspectableValue
-        Truth.assertThat(modifier.nameFallback).isEqualTo("zIndex")
-        Truth.assertThat(modifier.valueOverride).isEqualTo(3.0f)
-        Truth.assertThat(modifier.inspectableElements.toList()).isEmpty()
+        assertThat(modifier.nameFallback).isEqualTo("zIndex")
+        assertThat(modifier.valueOverride).isEqualTo(3.0f)
+        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
 }

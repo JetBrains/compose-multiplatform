@@ -19,15 +19,25 @@ package androidx.compose.foundation.layout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Layout
-import androidx.compose.ui.Measurable
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.ParentDataModifier
-import androidx.compose.ui.Placeable
+import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.NoInspectorInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.max
 
 /**
@@ -40,61 +50,130 @@ import kotlin.math.max
  *
  * Example usage:
  *
- * @sample androidx.compose.foundation.layout.samples.SimpleBox
+ * @2sample androidx.compose.foundation.layout.samples.SimpleBox
  *
  * @param modifier The modifier to be applied to the layout.
  * @param alignment The default alignment inside the Box.
  */
 @Composable
-fun Box(
+@OptIn(ExperimentalLayoutNodeApi::class)
+inline fun Box(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.TopStart,
-    children: @Composable BoxScope.() -> Unit
+    crossinline children: @Composable BoxScope.() -> Unit
 ) {
-    val boxChildren: @Composable () -> Unit = { BoxScope.children() }
+    val measureBlocks = rememberMeasureBlocks(alignment)
+    Layout(
+        children = { BoxScope.children() },
+        measureBlocks = measureBlocks,
+        modifier = modifier
+    )
+}
 
-    Layout(boxChildren, modifier = modifier) { measurables, constraints ->
-        val placeables = arrayOfNulls<Placeable>(measurables.size)
-        // First measure aligned children to get the size of the layout.
-        val childConstraints = constraints.copy(minWidth = 0, minHeight = 0)
-        (0 until measurables.size).filter { i -> !measurables[i].stretch }.forEach { i ->
-            placeables[i] = measurables[i].measure(childConstraints)
+@PublishedApi
+@Composable
+internal fun rememberMeasureBlocks(
+    alignment: Alignment
+) = remember(alignment) {
+    if (alignment == Alignment.TopStart) {
+        DefaultBoxMeasureBlocks
+    } else {
+        boxMeasureBlocks(alignment)
+    }
+}
+
+@OptIn(ExperimentalLayoutNodeApi::class)
+internal val DefaultBoxMeasureBlocks: LayoutNode.MeasureBlocks =
+    boxMeasureBlocks(Alignment.TopStart)
+
+internal fun boxMeasureBlocks(alignment: Alignment) =
+    MeasuringIntrinsicsMeasureBlocks { measurables, constraints ->
+        if (measurables.isEmpty()) {
+            return@MeasuringIntrinsicsMeasureBlocks layout(
+                constraints.minWidth,
+                constraints.minHeight
+            ) {}
         }
-        val (boxWidth, boxHeight) = with(placeables.filterNotNull()) {
-            Pair(
-                max(maxByOrNull { it.width }?.width ?: 0, constraints.minWidth),
-                max(maxByOrNull { it.height }?.height ?: 0, constraints.minHeight)
-            )
-        }
 
-        // Now measure stretch children.
-        (0 until measurables.size).filter { i -> measurables[i].stretch }.forEach { i ->
-            // infinity check is needed for intrinsic measurements
-            val minWidth = if (boxWidth != Constraints.Infinity) boxWidth else 0
-            val minHeight = if (boxHeight != Constraints.Infinity) boxHeight else 0
-            placeables[i] = measurables[i].measure(
-                Constraints(minWidth, boxWidth, minHeight, boxHeight)
-            )
-        }
+        val minRelaxedConstraints = constraints.copy(minWidth = 0, minHeight = 0)
 
-        // Position the children.
-        layout(boxWidth, boxHeight) {
-            (0 until measurables.size).forEach { i ->
-                val measurable = measurables[i]
-                val childAlignment = measurable.boxChildData?.alignment ?: alignment
-                val placeable = placeables[i]!!
-
-                val position = childAlignment.align(
-                    IntSize(
-                        boxWidth - placeable.width,
-                        boxHeight - placeable.height
-                    ),
-                    layoutDirection
+        if (measurables.size == 1) {
+            val measurable = measurables[0]
+            val boxWidth: Int
+            val boxHeight: Int
+            val placeable: Placeable
+            if (!measurable.matchesParentSize) {
+                placeable = measurable.measure(minRelaxedConstraints)
+                boxWidth = max(constraints.minWidth, placeable.width)
+                boxHeight = max(constraints.minHeight, placeable.height)
+            } else {
+                boxWidth = constraints.minWidth
+                boxHeight = constraints.minHeight
+                placeable = measurable.measure(
+                    Constraints.fixed(constraints.minWidth, constraints.minHeight)
                 )
-                placeable.place(position.x, position.y)
+            }
+            return@MeasuringIntrinsicsMeasureBlocks layout(boxWidth, boxHeight) {
+                placeInBox(placeable, measurable, layoutDirection, boxWidth, boxHeight, alignment)
+            }
+        }
+
+        val placeables = arrayOfNulls<Placeable>(measurables.size)
+        // First measure non match parent size children to get the size of the Box.
+        var hasMatchParentSizeChildren = false
+        var boxWidth = constraints.minWidth
+        var boxHeight = constraints.minHeight
+        measurables.fastForEachIndexed { index, measurable ->
+            if (!measurable.matchesParentSize) {
+                val placeable = measurable.measure(minRelaxedConstraints)
+                placeables[index] = placeable
+                boxWidth = max(boxWidth, placeable.width)
+                boxHeight = max(boxHeight, placeable.height)
+            } else {
+                hasMatchParentSizeChildren = true
+            }
+        }
+
+        // Now measure match parent size children, if any.
+        if (hasMatchParentSizeChildren) {
+            // The infinity check is needed for default intrinsic measurements.
+            val matchParentSizeConstraints = Constraints(
+                minWidth = if (boxWidth != Constraints.Infinity) boxWidth else 0,
+                minHeight = if (boxHeight != Constraints.Infinity) boxHeight else 0,
+                maxWidth = boxWidth,
+                maxHeight = boxHeight
+            )
+            measurables.fastForEachIndexed { index, measurable ->
+                if (measurable.matchesParentSize) {
+                    placeables[index] = measurable.measure(matchParentSizeConstraints)
+                }
+            }
+        }
+
+        // Specify the size of the Box and position its children.
+        layout(boxWidth, boxHeight) {
+            placeables.forEachIndexed { index, placeable ->
+                placeable as Placeable
+                val measurable = measurables[index]
+                placeInBox(placeable, measurable, layoutDirection, boxWidth, boxHeight, alignment)
             }
         }
     }
+
+private fun Placeable.PlacementScope.placeInBox(
+    placeable: Placeable,
+    measurable: Measurable,
+    layoutDirection: LayoutDirection,
+    boxWidth: Int,
+    boxHeight: Int,
+    alignment: Alignment
+) {
+    val childAlignment = measurable.boxChildData?.alignment ?: alignment
+    val position = childAlignment.align(
+        IntSize(boxWidth - placeable.width, boxHeight - placeable.height),
+        layoutDirection
+    )
+    placeable.place(position)
 }
 
 /**
@@ -108,10 +187,14 @@ fun Box(
  * @param modifier The modifier to be applied to the layout.
  */
 @Composable
+@OptIn(ExperimentalLayoutNodeApi::class)
 fun Box(modifier: Modifier) {
-    Layout({}, modifier = modifier) { _, constraints ->
-        layout(constraints.minWidth, constraints.minHeight) {}
-    }
+    Layout({}, measureBlocks = EmptyBoxMeasureBlocks, modifier = modifier)
+}
+
+@OptIn(ExperimentalLayoutNodeApi::class)
+internal val EmptyBoxMeasureBlocks = MeasuringIntrinsicsMeasureBlocks { _, constraints ->
+    layout(constraints.minWidth, constraints.minHeight) {}
 }
 
 @Composable
@@ -136,11 +219,20 @@ interface BoxScope {
      * have priority over the [Box]'s `alignment` parameter.
      */
     @Stable
-    fun Modifier.align(alignment: Alignment) = this.then(BoxChildData(alignment, false))
+    fun Modifier.align(alignment: Alignment) = this.then(
+        BoxChildData(
+            alignment = alignment,
+            matchParentSize = false,
+            inspectorInfo = debugInspectorInfo {
+                name = "align"
+                value = alignment
+            }
+        )
+    )
 
     @Stable
     @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment) = this.then(BoxChildData(align, false))
+    fun Modifier.gravity(align: Alignment) = align(align)
 
     /**
      * Size the element to match the size of the [Box] after all other content elements have
@@ -155,7 +247,13 @@ interface BoxScope {
      * available space.
      */
     @Stable
-    fun Modifier.matchParentSize() = this.then(StretchAlignModifier)
+    fun Modifier.matchParentSize() = this.then(
+        BoxChildData(
+            alignment = Alignment.Center,
+            matchParentSize = true,
+            inspectorInfo = debugInspectorInfo { name = "matchParentSize" }
+        )
+    )
 
     companion object : BoxScope
 }
@@ -166,15 +264,30 @@ interface BoxScope {
 )
 typealias StackScope = BoxScope
 
-@Stable
-private val StretchAlignModifier: ParentDataModifier = BoxChildData(Alignment.Center, true)
-
 private val Measurable.boxChildData: BoxChildData? get() = parentData as? BoxChildData
-private val Measurable.stretch: Boolean get() = boxChildData?.stretch ?: false
+private val Measurable.matchesParentSize: Boolean get() = boxChildData?.matchParentSize ?: false
 
-private data class BoxChildData(
+private class BoxChildData(
     var alignment: Alignment,
-    var stretch: Boolean = false
-) : ParentDataModifier {
+    var matchParentSize: Boolean = false,
+    inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
     override fun Density.modifyParentData(parentData: Any?) = this@BoxChildData
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        val otherModifier = other as? BoxChildData ?: return false
+
+        return alignment == otherModifier.alignment &&
+            matchParentSize == otherModifier.matchParentSize
+    }
+
+    override fun hashCode(): Int {
+        var result = alignment.hashCode()
+        result = 31 * result + matchParentSize.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "BoxChildData(alignment=$alignment, matchParentSize=$matchParentSize)"
 }

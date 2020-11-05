@@ -32,20 +32,19 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.ResourceFont
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.content.res.ResourcesCompat
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @OptIn(InternalTextApi::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @SmallTest
 class TextFieldDelegateIntegrationTest {
     private val density = Density(density = 1f)
@@ -97,49 +96,6 @@ class TextFieldDelegateIntegrationTest {
         )
 
         assertThat(actualBitmap.sameAs(expectedBitmap)).isTrue()
-    }
-
-    @Test
-    fun layout_width_constraint_min_width() {
-        val textDelegate = TextDelegate(
-            text = AnnotatedString("Hello, World"),
-            style = TextStyle.Default,
-            maxLines = 2,
-            density = density,
-            resourceLoader = resourceLoader
-        )
-        val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
-        val requestWidth = layoutResult.size.width / 2
-
-        val (width, _, _) = TextFieldDelegate.layout(
-            textDelegate,
-            Constraints.fixedWidth(requestWidth),
-            layoutDirection
-        )
-
-        assertThat(width).isEqualTo(requestWidth)
-    }
-
-    @Test
-    fun layout_width_constraint_max_width() {
-        val textDelegate = TextDelegate(
-            text = AnnotatedString("Hello, World"),
-            style = TextStyle.Default,
-            overflow = TextOverflow.Clip,
-            softWrap = false,
-            density = density,
-            resourceLoader = resourceLoader
-        )
-        val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
-        val requestWidth = layoutResult.size.width / 2
-
-        val (width, _, _) = TextFieldDelegate.layout(
-            textDelegate,
-            Constraints.fixedWidth(requestWidth),
-            layoutDirection
-        )
-
-        assertThat(width).isEqualTo(requestWidth)
     }
 
     @Test
@@ -225,74 +181,35 @@ class TextFieldDelegateIntegrationTest {
     }
 
     @Test
-    fun overflow_none_width_overflow() {
+    fun layout_maxConstraint_greaterThanTextWidth_returnsTextWidth() {
+        // choose a text that is wider than default min width
+        val text = AnnotatedString("H".repeat(DefaultWidthCharCount * 2))
+
         val textDelegate = TextDelegate(
-            text = AnnotatedString("Hello, World"),
+            text = text,
             style = TextStyle.Default,
-            overflow = TextOverflow.None,
-            softWrap = false,
-            density = density,
-            resourceLoader = resourceLoader
-        )
-        val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
-        val requestWidth = layoutResult.size.width / 2
-
-        val (width, height, _) = TextFieldDelegate.layout(
-            textDelegate,
-            Constraints.fixedWidth(requestWidth),
-            layoutDirection
-        )
-
-        // When overflow is None, TextFieldDelegate will report its actual size.
-        assertThat(width).isEqualTo(layoutResult.size.width)
-        assertThat(height).isEqualTo(layoutResult.size.height)
-    }
-
-    @Test
-    fun overflow_none_height_overflow() {
-        val textDelegate = TextDelegate(
-            text = AnnotatedString("Hello, World"),
-            style = TextStyle.Default,
-            overflow = TextOverflow.None,
-            density = density,
-            resourceLoader = resourceLoader
-        )
-        val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
-        val requestHeight = layoutResult.size.height / 2
-
-        val (width, height, _) = TextFieldDelegate.layout(
-            textDelegate,
-            Constraints.fixedHeight(requestHeight),
-            layoutDirection
-        )
-
-        // When overflow is None, TextFieldDelegate will report its actual size.
-        assertThat(width).isEqualTo(layoutResult.size.width)
-        assertThat(height).isEqualTo(layoutResult.size.height)
-    }
-
-    @Test
-    fun overflow_none_empty_text_height_overflow() {
-        val textDelegate = TextDelegate(
-            text = AnnotatedString(""),
-            style = TextStyle.Default,
-            overflow = TextOverflow.None,
             density = density,
             resourceLoader = resourceLoader
         )
 
-        val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
-        val requestHeight = layoutResult.size.height / 2
+        val layoutResult = textDelegate.layout(Constraints(), layoutDirection)
 
-        val (width, height, _) = TextFieldDelegate.layout(
+        // choose constraints to be larger than layout width and height
+        val constraints = Constraints(
+            minWidth = 0,
+            maxWidth = layoutResult.size.width * 2,
+            minHeight = 0,
+            maxHeight = layoutResult.size.height * 2
+        )
+
+        val (width, height) = TextFieldDelegate.layout(
             textDelegate,
-            Constraints.fixedHeight(requestHeight),
+            constraints,
             layoutDirection
         )
 
-        // When overflow is None, TextFieldDelegate will report its actual size.
-        assertThat(width).isEqualTo(layoutResult.size.width)
-        assertThat(height).isEqualTo(layoutResult.size.height)
+        assertThat(width.toFloat()).isEqualTo(layoutResult.size.width)
+        assertThat(height.toFloat()).isEqualTo(layoutResult.size.height)
     }
 }
 

@@ -23,7 +23,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -37,6 +36,7 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -188,14 +188,10 @@ fun DropdownMenuItem(
             .padding(horizontal = DropdownMenuHorizontalPadding),
         alignment = Alignment.CenterStart
     ) {
-        // TODO(popam, b/156912039): update emphasis if the menu item is disabled
         val typography = MaterialTheme.typography
-        val emphasisLevels = AmbientEmphasisLevels.current
         ProvideTextStyle(typography.subtitle1) {
-            ProvideEmphasis(
-                if (enabled) emphasisLevels.high else emphasisLevels.disabled,
-                content
-            )
+            val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
+            Providers(AmbientContentAlpha provides contentAlpha, children = content)
         }
     }
 }

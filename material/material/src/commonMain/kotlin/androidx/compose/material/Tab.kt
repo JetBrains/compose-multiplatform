@@ -25,8 +25,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,21 +37,22 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.text.FirstBaseline
-import androidx.compose.foundation.text.LastBaseline
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Placeable
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -93,9 +92,7 @@ fun Tab(
     icon: @Composable () -> Unit = emptyContent(),
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
-    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        selectedContentColor
-    )
+    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
     val styledText = @Composable {
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
@@ -141,9 +138,7 @@ fun Tab(
     modifier: Modifier = Modifier,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
-    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        selectedContentColor
-    ),
+    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium),
     content: @Composable ColumnScope.() -> Unit
 ) {
     // The color of the Ripple should always the selected color, as we want to show the color
@@ -220,7 +215,12 @@ object TabConstants {
      */
     fun Modifier.defaultTabIndicatorOffset(
         currentTabPosition: TabPosition
-    ): Modifier = composed {
+    ): Modifier = composed(
+        inspectorInfo = debugInspectorInfo {
+            name = "defaultTabIndicatorOffset"
+            value = currentTabPosition
+        }
+    ) {
         // TODO: should we animate the width of the indicator as it moves between tabs of different
         // sizes inside a scrollable tab row?
         val currentTabWidth = currentTabPosition.width
@@ -296,7 +296,12 @@ private fun TabTransition(
         }
     }
     val state = transition(transitionDefinition, selected)
-    Providers(AmbientContentColor provides state[TabTintColor], children = content)
+    val color = state[TabTintColor]
+    Providers(
+        AmbientContentColor provides color.copy(alpha = 1f),
+        AmbientContentAlpha provides color.alpha,
+        children = content
+    )
 }
 
 /**

@@ -27,9 +27,6 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.HorizontalAlignmentLine
-import androidx.compose.ui.Layout
-import androidx.compose.ui.MeasureBlock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
@@ -39,10 +36,14 @@ import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.IntrinsicMeasureBlock
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.MeasureBlock
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.FontLoaderAmbient
 import androidx.compose.ui.selection.Selectable
@@ -67,27 +68,18 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 /** The default selection color if none is specified. */
 internal val DefaultSelectionColor = Color(0x6633B5E5)
-internal typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
-internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (String) -> Unit>
+private typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
+private typealias InlineContentRange = AnnotatedString.Range<@Composable (String) -> Unit>
 
 /**
  * CoreText is a low level element that displays text with multiple different styles. The text to
  * display is described using a [AnnotatedString]. Typically you will instead want to use
  * [androidx.compose.foundation.Text], which is a higher level Text element that contains semantics and
  * consumes style information from a theme.
- *
- * During the measurement, CoreText tends to shrink its size and reports the minimal needed size
- * to its parent. It will ignore the minWidth and minHeight except when [TextAlign] is
- * [TextAlign.Justify]. When [TextAlign.Justify] is specified and [text] is short enough that
- * doesn't exceed minWidth, CoreText will justify the [text] to fill the given minWidth.
- * When input [text] is too long and exceeds the maxWidth/maxHeight constrains, it will determine
- * its size based on the [overflow] option.
  *
  * @param text AnnotatedString encoding a styled text.
  * @param modifier Modifier to apply to this layout node.
@@ -104,7 +96,7 @@ internal typealias InlineContentRange = AnnotatedString.Range<@Composable() (Str
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  */
 @Composable
-@OptIn(InternalTextApi::class)
+@InternalTextApi
 fun CoreText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
@@ -343,16 +335,6 @@ private class TextController(val state: TextState) {
     }
 }
 
-/**
- * [AlignmentLine] defined by the baseline of a first line of a [CoreText].
- */
-val FirstBaseline = HorizontalAlignmentLine(::min)
-
-/**
- * [AlignmentLine] defined by the baseline of the last line of a [CoreText].
- */
-val LastBaseline = HorizontalAlignmentLine(::max)
-
 @OptIn(InternalTextApi::class)
 @VisibleForTesting
 internal class TextState(
@@ -418,12 +400,15 @@ internal fun updateTextDelegate(
     }
 }
 
-internal fun resolveInlineContent(
+private val EmptyInlineContent: Pair<List<PlaceholderRange>, List<InlineContentRange>> =
+    Pair(emptyList(), emptyList())
+
+private fun resolveInlineContent(
     text: AnnotatedString,
     inlineContent: Map<String, InlineTextContent>
 ): Pair<List<PlaceholderRange>, List<InlineContentRange>> {
     if (inlineContent.isEmpty()) {
-        return Pair(listOf(), listOf())
+        return EmptyInlineContent
     }
     val inlineContentAnnotations = text.getStringAnnotations(INLINE_CONTENT_TAG, 0, text.length)
 

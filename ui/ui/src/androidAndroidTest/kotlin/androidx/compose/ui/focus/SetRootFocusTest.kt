@@ -16,28 +16,27 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @MediumTest
 @OptIn(ExperimentalFocus::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class SetRootFocusTest {
     @get:Rule
     val rule = createComposeRule()
@@ -46,7 +45,6 @@ class SetRootFocusTest {
     private val nonFocusable = "NotFocusable"
 
     @Test
-    @Ignore("Test broke while presubmit wasn't running tests, TODO: Fix!")
     fun clearFocus_byClickingOutsideFocusableComponent() {
         // Arrange.
         var isFocused = false
@@ -54,7 +52,7 @@ class SetRootFocusTest {
             Column {
                 // TODO(b/163725615): Remove this after clickable is made focusable.
                 val focusRequester = FocusRequester()
-                Text(
+                BasicText(
                     text = "ClickableText",
                     modifier = Modifier
                         .testTag(focusable)
@@ -65,7 +63,7 @@ class SetRootFocusTest {
                         .focusObserver { isFocused = it.isFocused }
                         .focus()
                 )
-                Text(
+                BasicText(
                     text = "Non Clickable Text",
                     modifier = Modifier.testTag(nonFocusable)
                 )

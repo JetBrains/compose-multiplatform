@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * Creates a [DrawLayerModifier] that draws the shadow. The [elevation] defines the visual
@@ -42,18 +41,15 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @param elevation The elevation for the shadow in pixels
  * @param shape Defines a shape of the physical object
  * @param clip When active, the content drawing clips to the shape.
- * @param opacity The opacity of the layer, including the shadow.
  */
 @Stable
 fun Modifier.drawShadow(
     elevation: Dp,
     shape: Shape = RectangleShape,
-    clip: Boolean = elevation > 0.dp,
-    @FloatRange(from = 0.0, to = 1.0) opacity: Float = 1f
-) = if (elevation > 0.dp || clip || opacity != 1f) {
+    clip: Boolean = elevation > 0.dp
+) = if (elevation > 0.dp || clip) {
     composed {
         drawLayer(
-            alpha = opacity,
             shadowElevation = with(DensityAmbient.current) { elevation.toPx() },
             shape = shape,
             clip = clip

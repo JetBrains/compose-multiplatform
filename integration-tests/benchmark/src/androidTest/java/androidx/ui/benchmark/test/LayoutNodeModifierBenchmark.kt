@@ -31,17 +31,19 @@ import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
+import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.test.filters.LargeTest
-import androidx.ui.test.DisableTransitions
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runner.RunWith
@@ -128,17 +130,17 @@ class LayoutNodeModifierBenchmark(
     class SimpleAndroidBenchmarkRule() : TestRule {
         @Suppress("DEPRECATION")
         val activityTestRule =
-            androidx.test.rule.ActivityTestRule<ComponentActivity>(ComponentActivity::class.java)
+            androidx.test.rule.ActivityTestRule(ComponentActivity::class.java)
 
         val benchmarkRule = BenchmarkRule()
 
-        private val disableTransitionsRule = DisableTransitions()
-
         override fun apply(base: Statement, description: Description?): Statement {
-            val statement = benchmarkRule.apply(
-                activityTestRule.apply(base, description), description!!
-            )
-            return disableTransitionsRule.apply(statement, description)
+            @OptIn(InternalTestingApi::class)
+            return RuleChain
+                .outerRule(DisableTransitionsTestRule())
+                .around(benchmarkRule)
+                .around(activityTestRule)
+                .apply(base, description)
         }
 
         fun findAndroidOwner(): AndroidOwner {

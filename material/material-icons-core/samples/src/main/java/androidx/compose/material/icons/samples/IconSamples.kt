@@ -18,14 +18,14 @@ package androidx.compose.material.icons.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Icon
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 
 @Sampled
 @Composable
@@ -43,5 +43,5 @@ fun DrawIcon() {
 
 @Composable
 private fun SomeComposable(icon: VectorAsset) {
-    Box(Modifier.paint(VectorPainter(icon)))
+    Box(Modifier.paint(rememberVectorPainter(icon)))
 }

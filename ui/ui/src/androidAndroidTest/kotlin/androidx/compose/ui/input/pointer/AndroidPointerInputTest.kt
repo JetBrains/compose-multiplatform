@@ -30,35 +30,37 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.milliseconds
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class AndroidPointerInputTest {
     @Suppress("DEPRECATION")
     @get:Rule
@@ -236,7 +238,7 @@ class AndroidPointerInputTest {
     //  when run from Android Studio.  This seems to be caused by b/158099918.  Once that is
     //  fixed, @Ignore can be removed.
     @Ignore
-    fun dispatchTouchEvent_throughLayersOfAndroidAndCompose_hitsChildPointerInputFilter() {
+    fun dispatchTouchEvent_throughLayersOfAndroidAndCompose_hitsChildWithCorrectCoords() {
 
         // Arrange
 
@@ -294,7 +296,8 @@ class AndroidPointerInputTest {
 
             // Assert
             assertThat(log).hasSize(1)
-            assertThat(log[0]).isEqualTo(listOf(down(0, 0.milliseconds, 0f, 0f)))
+            assertThat(log[0]).hasSize(1)
+            assertThat(log[0][0].current.position).isEqualTo(Offset(0f, 0f))
         }
     }
 
@@ -414,9 +417,106 @@ class AndroidPointerInputTest {
 
             // Assert
             assertThat(log).hasSize(1)
-            assertThat(log[0]).isEqualTo(listOf(down(0, 0.milliseconds, 0f, 0f)))
+            assertThat(log[0]).hasSize(1)
+            assertThat(log[0][0].current.position).isEqualTo(Offset(0f, 0f))
         }
     }
+
+    /**
+     * When a modifier is added, it should work, even when it takes the position of a previous
+     * modifier.
+     */
+    @Test
+    fun recomposeWithNewModifier() {
+        var tap2Enabled by mutableStateOf(false)
+        var tapLatch = CountDownLatch(1)
+        val tapLatch2 = CountDownLatch(1)
+        var positionedLatch = CountDownLatch(1)
+
+        rule.runOnUiThread {
+            container.setContent(Recomposer.current()) {
+                FillLayout(
+                    Modifier
+                        .tapGestureFilter {
+                            tapLatch.countDown()
+                        }.then(
+                            if (tap2Enabled) Modifier.tapGestureFilter {
+                                tapLatch2.countDown()
+                            } else Modifier
+                        ).onGloballyPositioned { positionedLatch.countDown() }
+                )
+            }
+        }
+
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        val locationInWindow = IntArray(2)
+        rule.runOnUiThread {
+            androidComposeView = container.getChildAt(0) as AndroidComposeView
+
+            // Get the current location in window.
+            androidComposeView.getLocationInWindow(locationInWindow)
+
+            val downEvent = createPointerEventAt(0, MotionEvent.ACTION_DOWN, locationInWindow)
+            androidComposeView.dispatchTouchEvent(downEvent)
+        }
+
+        rule.runOnUiThread {
+            val upEvent = createPointerEventAt(200, MotionEvent.ACTION_UP, locationInWindow)
+            androidComposeView.dispatchTouchEvent(upEvent)
+        }
+
+        assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
+        tapLatch = CountDownLatch(1)
+
+        positionedLatch = CountDownLatch(1)
+        tap2Enabled = true
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        rule.runOnUiThread {
+            val downEvent = createPointerEventAt(1000, MotionEvent.ACTION_DOWN, locationInWindow)
+            androidComposeView.dispatchTouchEvent(downEvent)
+        }
+        // Need to wait for long press timeout (at least)
+        rule.runOnUiThread {
+            val upEvent = createPointerEventAt(
+                1030,
+                MotionEvent.ACTION_UP,
+                locationInWindow
+            )
+            androidComposeView.dispatchTouchEvent(upEvent)
+        }
+        assertTrue(tapLatch2.await(1, TimeUnit.SECONDS))
+
+        positionedLatch = CountDownLatch(1)
+        tap2Enabled = false
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        rule.runOnUiThread {
+            val downEvent = createPointerEventAt(2000, MotionEvent.ACTION_DOWN, locationInWindow)
+            androidComposeView.dispatchTouchEvent(downEvent)
+        }
+        rule.runOnUiThread {
+            val upEvent = createPointerEventAt(2200, MotionEvent.ACTION_UP, locationInWindow)
+            androidComposeView.dispatchTouchEvent(upEvent)
+        }
+        assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    private fun createPointerEventAt(eventTime: Int, action: Int, locationInWindow: IntArray) =
+        MotionEvent(
+            eventTime,
+            action,
+            1,
+            0,
+            arrayOf(PointerProperties(0)),
+            arrayOf(
+                PointerCoords(
+                    locationInWindow[0].toFloat(),
+                    locationInWindow[1].toFloat()
+                )
+            )
+        )
 }
 
 @Suppress("TestFunctionName")
@@ -456,18 +556,16 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) =
+    ) {
         if (consumeMovement) {
-            pointerEvent.changes.map {
+            pointerEvent.changes.fastForEach {
                 it.consumePositionChange(
                     it.positionChange().x,
                     it.positionChange().y
                 )
             }
-            pointerEvent.changes
-        } else {
-            pointerEvent.changes
         }
+    }
 
     override fun onCancel() {}
 }
@@ -478,13 +576,12 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ) = pointerEvent.changes.map {
-        if (it.changedToDown()) {
-            onDown(it.current.position!!)
-            it.consumeDownChange()
-            it
-        } else {
-            it
+    ) {
+        pointerEvent.changes.fastForEach {
+            if (it.changedToDown()) {
+                onDown(it.current.position!!)
+                it.consumeDownChange()
+            }
         }
     }
 
@@ -498,12 +595,10 @@ private class LogEventsGestureFilter(val log: MutableList<List<PointerInputChang
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
         bounds: IntSize
-    ): List<PointerInputChange> {
-        val changes = pointerEvent.changes
+    ) {
         if (pass == PointerEventPass.Initial) {
-            log.add(changes.map { it.copy() })
+            log.add(pointerEvent.changes.map { it.copy() })
         }
-        return changes
     }
 
     override fun onCancel() {}

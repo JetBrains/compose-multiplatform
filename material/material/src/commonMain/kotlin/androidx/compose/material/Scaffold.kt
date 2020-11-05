@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -29,7 +28,6 @@ import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -37,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
-import androidx.compose.ui.zIndex
 
 /**
  * State for [Scaffold] composable component.
@@ -218,7 +215,6 @@ fun Scaffold(
  * @param bottomBar the content to place at the bottom of the [Scaffold], on top of the
  * [bodyContent], typically a [BottomAppBar].
  */
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 @Composable
 private fun ScaffoldLayout(
     isFabDocked: Boolean,
@@ -248,14 +244,7 @@ private fun ScaffoldLayout(
 
             val snackbarHeight = snackbarPlaceables.fastMaxBy { it.height }?.height ?: 0
 
-            val fabPlaceables = subcompose(ScaffoldLayoutContent.Fab) {
-                // TODO: b/169257866 - remove box and zIndex modifier
-                // Currently we need an extra box here with a high zIndex to ensure that the FAB is
-                // always placed above the bottom bar - although we control the natural drawing
-                // order below, currently the FAB has a default elevation lower than the bottom
-                // app bar, so without this box it will be placed below the bottom bar.
-                Box(Modifier.zIndex(Float.POSITIVE_INFINITY)) { fab() }
-            }.fastMap {
+            val fabPlaceables = subcompose(ScaffoldLayoutContent.Fab, fab).fastMap {
                 it.measure(looseConstraints)
             }
 

@@ -22,8 +22,6 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,20 +30,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.text.LastBaseline
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Layout
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Placeable
 import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.style.TextAlign
@@ -121,7 +120,7 @@ fun BottomNavigation(
  * A BottomNavigationItem always shows text labels (if it exists) when selected. Showing text
  * labels if not selected is controlled by [alwaysShowLabels].
  *
- * @param icon icon for this item, typically this will be a [androidx.compose.foundation.Icon]
+ * @param icon icon for this item, typically this will be a [Icon]
  * @param selected whether this item is selected
  * @param onClick the callback to be invoked when this item is selected
  * @param modifier optional [Modifier] for this item
@@ -146,9 +145,7 @@ fun BottomNavigationItem(
     alwaysShowLabels: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
-    unselectedContentColor: Color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        selectedContentColor
-    )
+    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
     val styledLabel = @Composable {
         val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
@@ -215,7 +212,10 @@ private fun BottomNavigationTransition(
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
 
-    Providers(AmbientContentColor provides color) {
+    Providers(
+        AmbientContentColor provides color.copy(alpha = 1f),
+        AmbientContentAlpha provides color.alpha,
+    ) {
         content(animationProgress)
     }
 }
@@ -277,7 +277,7 @@ private fun BottomNavigationItemBaselineLayout(
 private fun MeasureScope.placeIcon(
     iconPlaceable: Placeable,
     constraints: Constraints
-): MeasureScope.MeasureResult {
+): MeasureResult {
     val height = constraints.maxHeight
     val iconY = (height - iconPlaceable.height) / 2
     return layout(iconPlaceable.width, height) {
@@ -310,7 +310,7 @@ private fun MeasureScope.placeLabelAndIcon(
     iconPlaceable: Placeable,
     constraints: Constraints,
     @FloatRange(from = 0.0, to = 1.0) iconPositionAnimationProgress: Float
-): MeasureScope.MeasureResult {
+): MeasureResult {
     val height = constraints.maxHeight
 
     // TODO: consider multiple lines of text here, not really supported by spec but we should

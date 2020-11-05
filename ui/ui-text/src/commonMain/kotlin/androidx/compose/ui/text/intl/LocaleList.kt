@@ -32,7 +32,8 @@ data class LocaleList constructor(val localeList: List<Locale>) : Collection<Loc
         /**
          * Returns Locale object which represents current locale
          */
-        val current = LocaleList(platformLocaleDelegate.current.map { Locale(it) })
+        val current: LocaleList
+            get() = LocaleList(platformLocaleDelegate.current.map { Locale(it) })
     }
 
     /**

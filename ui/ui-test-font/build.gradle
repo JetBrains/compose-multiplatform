@@ -33,4 +33,5 @@ androidx {
     inceptionYear = "2020"
     description = "Fonts designed for testing text capabilities"
     runApiTasks = new RunApiTasks.Yes()
+    legacyDisableKotlinStrictApiMode = true
 }

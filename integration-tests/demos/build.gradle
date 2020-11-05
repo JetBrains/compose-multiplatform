@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compiler:compiler")
+    kotlinPlugin project(":compose:compiler:compiler")
 
     implementation project(":compose:androidview:androidview:integration-tests:androidview-demos")
     implementation project(":compose:animation:animation:integration-tests:animation-demos")
@@ -19,7 +19,7 @@ dependencies {
     implementation project(":compose:foundation:foundation:integration-tests:foundation-demos")
     implementation project(":compose:material:material:integration-tests:material-demos")
     implementation project(":compose:material:material:integration-tests:material-studies")
-    implementation project(":compose:navigation:navigation:integration-tests:navigation-demos")
+    implementation project(":navigation:navigation-compose:integration-tests:navigation-demos")
     implementation project(":compose:ui:ui:integration-tests:ui-demos")
 
     implementation(KOTLIN_REFLECT)

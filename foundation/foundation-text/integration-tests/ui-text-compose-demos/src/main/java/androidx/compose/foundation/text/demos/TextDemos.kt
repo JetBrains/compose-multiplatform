@@ -31,11 +31,17 @@ val TextDemos = DemoCategory(
             "Input fields",
             listOf(
                 ComposableDemo("Basic input fields") { InputFieldDemo() },
+                ComposableDemo("Keyboard Types") { KeyboardTypeDemo() },
+                ComposableDemo("Ime Action") { ImeActionDemo() },
                 ComposableDemo("Various input fields") { VariousInputFieldDemo() },
                 ComposableDemo("Tricky input field") { InputFieldTrickyUseCase() },
                 ComposableDemo("Focus transition") { TextFieldFocusTransition() },
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
-                ComposableDemo("TextField in Scroller") { TextFieldWithScrollerDemo() }
+                ComposableDemo("TextField in Scroller") { TextFieldWithScrollerDemo() },
+                ComposableDemo("Soft Wrap") { SoftWrapDemo() },
+                ComposableDemo("Min/Max Lines") { CoreTextFieldMinMaxDemo() },
+                ComposableDemo("Ime SingleLine") { ImeSingleLineDemo() },
+                ComposableDemo("Capitalization/AutoCorrect") { CapitalizationAutoCorrectDemo() }
             )
         ),
         ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }

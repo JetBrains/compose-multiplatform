@@ -28,24 +28,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@RunWith(JUnit4::class)
-@MediumTest
+@RunWith(AndroidJUnit4::class)
+@LargeTest
 class AnimatedVisibilityTest {
 
     @get:Rule
@@ -74,9 +74,11 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
-                Box(Modifier.onGloballyPositioned {
-                    offset = it.localToRoot(Offset.Zero)
-                }.size(100.dp, 100.dp)) {
+                Box(
+                    Modifier.onGloballyPositioned {
+                        offset = it.localToRoot(Offset.Zero)
+                    }.size(100.dp, 100.dp)
+                ) {
                     onDispose {
                         disposed = true
                     }
@@ -176,9 +178,11 @@ class AnimatedVisibilityTest {
                     tween(100, easing = FastOutSlowInEasing)
                 )
             ) {
-                Box(Modifier.onGloballyPositioned {
-                    offset = it.localToRoot(Offset.Zero)
-                }.size(100.dp, 100.dp)) {
+                Box(
+                    Modifier.onGloballyPositioned {
+                        offset = it.localToRoot(Offset.Zero)
+                    }.size(100.dp, 100.dp)
+                ) {
                     onDispose {
                         disposed = true
                     }

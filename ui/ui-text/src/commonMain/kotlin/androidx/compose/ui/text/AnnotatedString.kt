@@ -365,9 +365,9 @@ data class AnnotatedString internal constructor(
         fun toAnnotatedString(): AnnotatedString {
             return AnnotatedString(
                 text = text.toString(),
-                spanStyles = spanStyles.map { it.toRange(text.length) }.toList(),
-                paragraphStyles = paragraphStyles.map { it.toRange(text.length) }.toList(),
-                annotations = annotations.map { it.toRange(text.length) }.toList()
+                spanStyles = spanStyles.map { it.toRange(text.length) },
+                paragraphStyles = paragraphStyles.map { it.toRange(text.length) },
+                annotations = annotations.map { it.toRange(text.length) }
             )
         }
     }

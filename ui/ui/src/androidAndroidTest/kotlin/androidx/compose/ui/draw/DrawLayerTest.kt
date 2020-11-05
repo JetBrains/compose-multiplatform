@@ -16,36 +16,50 @@
 
 package androidx.compose.ui.draw
 
+import android.os.Build
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
 import androidx.compose.ui.PaddingModifier
 import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.background
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.layout.globalPosition
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.onGloballyPositioned
-import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.runOnUiThreadIR
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
-import androidx.test.filters.SmallTest
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class DrawLayerTest {
     @Suppress("DEPRECATION")
     @get:Rule
@@ -53,33 +67,23 @@ class DrawLayerTest {
         TestActivity::class.java
     )
 
-    private lateinit var activity: TestActivity
-    private lateinit var positionLatch: CountDownLatch
-    private lateinit var layoutCoordinates: LayoutCoordinates
-
-    private val positioner = Modifier.onGloballyPositioned {
-        layoutCoordinates = it
-        positionLatch.countDown()
-    }
-
-    @Before
-    fun setup() {
-        activity = activityTestRule.activity
-        activity.hasFocusLatch.await(5, TimeUnit.SECONDS)
-        positionLatch = CountDownLatch(1)
-    }
+    @get:Rule
+    val rule = createComposeRule()
 
     @Test
     fun testLayerBoundsPosition() {
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                FixedSize(30, PaddingModifier(10).drawLayer().then(positioner)) {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            FixedSize(
+                30,
+                PaddingModifier(10).drawLayer().onGloballyPositioned {
+                    coords = it
                 }
-            }
+            ) { /* no-op */ }
         }
 
-        assertTrue(positionLatch.await(1, TimeUnit.SECONDS))
-        activity.runOnUiThread {
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
             assertEquals(Offset(10f, 10f), layoutCoordinates.positionInRoot)
             val bounds = layoutCoordinates.boundsInRoot
             assertEquals(Rect(10f, 10f, 40f, 40f), bounds)
@@ -94,20 +98,21 @@ class DrawLayerTest {
 
     @Test
     fun testScale() {
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                Padding(10) {
-                    FixedSize(
-                        10,
-                        Modifier.drawLayer(scaleX = 2f, scaleY = 3f).then(positioner)
-                    ) {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(
+                    10,
+                    Modifier.drawLayer(scaleX = 2f, scaleY = 3f).onGloballyPositioned {
+                        coords = it
                     }
+                ) {
                 }
             }
         }
 
-        assertTrue(positionLatch.await(1, TimeUnit.SECONDS))
-        activity.runOnUiThread {
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
             val bounds = layoutCoordinates.boundsInRoot
             assertEquals(Rect(5f, 0f, 25f, 30f), bounds)
             assertEquals(Offset(5f, 0f), layoutCoordinates.positionInRoot)
@@ -116,20 +121,21 @@ class DrawLayerTest {
 
     @Test
     fun testRotation() {
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                Padding(10) {
-                    FixedSize(
-                        10,
-                        Modifier.drawLayer(scaleY = 3f, rotationZ = 90f).then(positioner)
-                    ) {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(
+                    10,
+                    Modifier.drawLayer(scaleY = 3f, rotationZ = 90f).onGloballyPositioned {
+                        coords = it
                     }
+                ) {
                 }
             }
         }
 
-        assertTrue(positionLatch.await(1, TimeUnit.SECONDS))
-        activity.runOnUiThread {
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
             val bounds = layoutCoordinates.boundsInRoot
             assertEquals(Rect(0f, 10f, 30f, 20f), bounds)
             assertEquals(Offset(30f, 10f), layoutCoordinates.positionInRoot)
@@ -138,22 +144,23 @@ class DrawLayerTest {
 
     @Test
     fun testRotationPivot() {
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                Padding(10) {
-                    FixedSize(
-                        10,
-                        Modifier.drawLayer(
-                            rotationZ = 90f,
-                            transformOrigin = TransformOrigin(1.0f, 1.0f)
-                        ).then(positioner)
-                    )
-                }
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(
+                    10,
+                    Modifier.drawLayer(
+                        rotationZ = 90f,
+                        transformOrigin = TransformOrigin(1.0f, 1.0f)
+                    ).onGloballyPositioned {
+                        coords = it
+                    }
+                )
             }
         }
 
-        assertTrue(positionLatch.await(1, TimeUnit.SECONDS))
-        activity.runOnUiThread {
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
             val bounds = layoutCoordinates.boundsInRoot
             assertEquals(Rect(20f, 10f, 30f, 20f), bounds)
             assertEquals(Offset(30f, 10f), layoutCoordinates.positionInRoot)
@@ -162,22 +169,23 @@ class DrawLayerTest {
 
     @Test
     fun testTranslationXY() {
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                Padding(10) {
-                    FixedSize(
-                        10,
-                        Modifier.drawLayer(
-                            translationX = 5.0f,
-                            translationY = 8.0f
-                        ).then(positioner)
-                    )
-                }
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(
+                    10,
+                    Modifier.drawLayer(
+                        translationX = 5.0f,
+                        translationY = 8.0f
+                    ).onGloballyPositioned {
+                        coords = it
+                    }
+                )
             }
         }
 
-        assertTrue(positionLatch.await(1, TimeUnit.SECONDS))
-        activity.runOnUiThread {
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
             val bounds = layoutCoordinates.boundsInRoot
             assertEquals(Rect(15f, 18f, 25f, 28f), bounds)
             assertEquals(Offset(15f, 18f), layoutCoordinates.positionInRoot)
@@ -186,22 +194,23 @@ class DrawLayerTest {
 
     @Test
     fun testClip() {
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                Padding(10) {
-                    FixedSize(10, Modifier.drawLayer(clip = true)) {
-                        FixedSize(
-                            10,
-                            Modifier.drawLayer(scaleX = 2f).then(positioner)
-                        ) {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(10, Modifier.drawLayer(clip = true)) {
+                    FixedSize(
+                        10,
+                        Modifier.drawLayer(scaleX = 2f).onGloballyPositioned {
+                            coords = it
                         }
+                    ) {
                     }
                 }
             }
         }
 
-        assertTrue(positionLatch.await(1, TimeUnit.SECONDS))
-        activity.runOnUiThread {
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
             val bounds = layoutCoordinates.boundsInRoot
             assertEquals(Rect(10f, 10f, 20f, 20f), bounds)
             // Positions aren't clipped
@@ -209,24 +218,79 @@ class DrawLayerTest {
         }
     }
 
+    @MediumTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testCameraDistanceWithRotationY() {
+        val testTag = "parent"
+        rule.setContent {
+            Box(modifier = Modifier.testTag(testTag).wrapContentSize()) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Gray)
+                        .drawLayer(rotationY = 25f, cameraDistance = 1.0f)
+                        .background(Color.Red)
+                ) {
+                    Box(modifier = Modifier.size(100.dp))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().asAndroidBitmap().apply {
+            assertEquals(Color.Red.toArgb(), getPixel(0, 0))
+            assertEquals(Color.Red.toArgb(), getPixel(0, height - 1))
+            assertEquals(Color.Red.toArgb(), getPixel(width / 2 - 10, height / 2))
+            assertEquals(Color.Gray.toArgb(), getPixel(width - 1 - 10, height / 2))
+            assertEquals(Color.Gray.toArgb(), getPixel(width - 1, 0))
+            assertEquals(Color.Gray.toArgb(), getPixel(width - 1, height - 1))
+        }
+    }
+
+    @MediumTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testEmptyClip() {
+        val EmptyRectangle = object : Shape {
+            override fun createOutline(size: Size, density: Density): Outline =
+                Outline.Rectangle(Rect.Zero)
+        }
+        val tag = "testTag"
+        rule.setContent {
+            Box(modifier = Modifier.testTag(tag).size(100.dp).background(Color.Blue)) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .drawLayer(clip = true, shape = EmptyRectangle)
+                        .background(Color.Red)
+                )
+            }
+        }
+
+        // Results should match background color of parent. Because the child Box is clipped to
+        // an empty rectangle, no red pixels from its background should be visible
+        rule.onNodeWithTag(tag).captureToImage().assertPixels { Color.Blue }
+    }
+
     @Test
     fun testTotalClip() {
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                Padding(10) {
-                    FixedSize(10, Modifier.drawLayer(clip = true)) {
-                        FixedSize(
-                            10,
-                            PaddingModifier(20).then(positioner)
-                        ) {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(10, Modifier.drawLayer(clip = true)) {
+                    FixedSize(
+                        10,
+                        PaddingModifier(20).onGloballyPositioned {
+                            coords = it
                         }
+                    ) {
                     }
                 }
             }
         }
 
-        assertTrue(positionLatch.await(1, TimeUnit.SECONDS))
-        activity.runOnUiThread {
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
             val bounds = layoutCoordinates.boundsInRoot
             // should be completely clipped out
             assertEquals(0f, bounds.width)

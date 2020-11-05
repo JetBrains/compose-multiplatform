@@ -21,19 +21,18 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @MediumTest
-@OptIn(ExperimentalLazyDsl::class)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class LazyColumnTest {
     private val LazyColumnTag = "LazyColumnTag"
 
@@ -185,7 +184,7 @@ class LazyColumnTest {
 
     @Test
     fun lazyColumnScrollHidesItem() {
-        val items = (1..3).map { it.toString() }
+        val items = (1..4).map { it.toString() }
 
         rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp).testTag(LazyColumnTag)) {
@@ -196,7 +195,7 @@ class LazyColumnTest {
         }
 
         rule.onNodeWithTag(LazyColumnTag)
-            .scrollBy(y = 102.dp, density = rule.density)
+            .scrollBy(y = 103.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
             .assertDoesNotExist()
@@ -236,8 +235,10 @@ class LazyColumnTest {
                     if (it != null) {
                         Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
                     } else {
-                        Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
-                            .testTag(nullTestTag))
+                        Spacer(
+                            Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                                .testTag(nullTestTag)
+                        )
                     }
                 }
             }

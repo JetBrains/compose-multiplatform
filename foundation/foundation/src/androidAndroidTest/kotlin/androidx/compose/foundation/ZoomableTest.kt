@@ -24,35 +24,49 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.junit4.createAnimationClockRule
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.pinch
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.test.filters.SmallTest
-import androidx.ui.test.center
-import androidx.ui.test.createAnimationClockRule
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
-import androidx.ui.test.pinch
-import com.google.common.truth.Truth
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 private const val TEST_TAG = "zoomableTestTag"
 
 private const val EDGE_FUZZ_FACTOR = 0.2f
 
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class ZoomableTest {
     @get:Rule
     val rule = createComposeRule()
 
     @get:Rule
     val clockRule = createAnimationClockRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun zoomable_zoomIn() {
@@ -138,8 +152,8 @@ class ZoomableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(startTriggered).isEqualTo(0)
-            Truth.assertThat(stopTriggered).isEqualTo(0)
+            assertThat(startTriggered).isEqualTo(0)
+            assertThat(stopTriggered).isEqualTo(0)
         }
 
         rule.onNodeWithTag(TEST_TAG).performGesture {
@@ -159,8 +173,8 @@ class ZoomableTest {
         clockRule.advanceClock(milliseconds = 1000)
 
         rule.runOnIdle {
-            Truth.assertThat(startTriggered).isEqualTo(1)
-            Truth.assertThat(stopTriggered).isEqualTo(1)
+            assertThat(startTriggered).isEqualTo(1)
+            assertThat(stopTriggered).isEqualTo(1)
         }
     }
 
@@ -243,7 +257,7 @@ class ZoomableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(stopTriggered).isEqualTo(0)
+            assertThat(stopTriggered).isEqualTo(0)
         }
 
         rule.onNodeWithTag(TEST_TAG).performGesture {
@@ -263,8 +277,8 @@ class ZoomableTest {
         clockRule.advanceClock(milliseconds = 1000)
 
         rule.runOnIdle {
-            Truth.assertThat(cumulativeScale).isAtLeast(2f)
-            Truth.assertThat(stopTriggered).isEqualTo(1f)
+            assertThat(cumulativeScale).isAtLeast(2f)
+            assertThat(stopTriggered).isEqualTo(1f)
         }
     }
 
@@ -300,7 +314,42 @@ class ZoomableTest {
 
         rule.runOnIdle {
             assertWithMessage("Scrolling should have been smooth").that(callbackCount).isAtLeast(3)
-            assertWithMessage("Should have scaled at least 4x").that(cumulativeScale).isAtLeast(4f)
+            // Include a bit of tolerance for floating point discrepancies.
+            assertWithMessage("Should have scaled ~4x").that(cumulativeScale).isAtLeast(3.9f)
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val controller = ZoomableController(
+            onZoomDelta = {},
+            animationClock = clockRule.clock
+        )
+        rule.setContent {
+            val modifier = Modifier.zoomable(controller) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("zoomable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "controller",
+                "enabled",
+                "onZoomStarted",
+                "onZoomStopped"
+            )
+        }
+    }
+
+    @Test
+    fun testInspectorValueWithoutController() {
+        rule.setContent {
+            val modifier = Modifier.zoomable {} as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("zoomable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "enabled",
+                "onZoomStarted",
+                "onZoomStopped",
+                "onZoomDelta"
+            )
         }
     }
 

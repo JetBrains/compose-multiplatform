@@ -18,6 +18,7 @@ package androidx.compose.ui.res
 
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.Typeface
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -25,17 +26,16 @@ import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.font
 import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.font.test.R
-import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@RunWith(JUnit4::class)
-@SmallTest
+@RunWith(AndroidJUnit4::class)
+@MediumTest
 class FontResourcesTest {
 
     @get:Rule

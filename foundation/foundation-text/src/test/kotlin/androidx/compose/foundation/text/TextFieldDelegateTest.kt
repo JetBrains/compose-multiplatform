@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.ui.AlignmentLine
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
@@ -24,19 +24,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.createTextLayoutResult
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
@@ -44,8 +45,6 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
@@ -58,14 +57,15 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.ArgumentMatchers.anyLong
 
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 @RunWith(JUnit4::class)
 class TextFieldDelegateTest {
 
@@ -141,9 +141,9 @@ class TextFieldDelegateTest {
             onValueChange
         )
 
-        assertEquals(1, captor.allValues.size)
-        assertEquals(1, captor.firstValue.size)
-        assertTrue(captor.firstValue[0] is SetSelectionEditOp)
+        assertThat(captor.allValues.size).isEqualTo(1)
+        assertThat(captor.firstValue.size).isEqualTo(1)
+        assertThat(captor.firstValue[0] is SetSelectionEditOp).isTrue()
         verify(onValueChange, times(1)).invoke(
             eq(
                 TextFieldValue(
@@ -157,10 +157,20 @@ class TextFieldDelegateTest {
     @Test
     fun on_focus() {
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
+        val imeOptions = ImeOptions(
+            singleLine = true,
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Phone,
+            imeAction = ImeAction.Search
+        )
 
         TextFieldDelegate.onFocus(
-            textInputService, editorState, processor,
-            KeyboardType.Text, ImeAction.Unspecified, onValueChange, onEditorActionPerformed
+            textInputService = textInputService,
+            value = editorState,
+            editProcessor = processor,
+            imeOptions = imeOptions,
+            onValueChange = onValueChange,
+            onImeActionPerformed = onEditorActionPerformed
         )
         verify(textInputService).startInput(
             eq(
@@ -169,8 +179,7 @@ class TextFieldDelegateTest {
                     selection = editorState.selection
                 )
             ),
-            eq(KeyboardType.Text),
-            eq(ImeAction.Unspecified),
+            eq(imeOptions),
             any(),
             eq(onEditorActionPerformed)
         )
@@ -193,9 +202,9 @@ class TextFieldDelegateTest {
             onValueChange
         )
 
-        assertEquals(1, captor.allValues.size)
-        assertEquals(1, captor.firstValue.size)
-        assertTrue(captor.firstValue[0] is FinishComposingTextEditOp)
+        assertThat(captor.allValues.size).isEqualTo(1)
+        assertThat(captor.firstValue.size).isEqualTo(1)
+        assertThat(captor.firstValue[0] is FinishComposingTextEditOp).isTrue()
         verify(textInputService).stopInput(eq(inputSessionToken))
         verify(textInputService, never()).hideSoftwareKeyboard(any())
     }
@@ -215,9 +224,9 @@ class TextFieldDelegateTest {
             onValueChange
         )
 
-        assertEquals(1, captor.allValues.size)
-        assertEquals(1, captor.firstValue.size)
-        assertTrue(captor.firstValue[0] is FinishComposingTextEditOp)
+        assertThat(captor.allValues.size).isEqualTo(1)
+        assertThat(captor.firstValue.size).isEqualTo(1)
+        assertThat(captor.firstValue[0] is FinishComposingTextEditOp).isTrue()
         verify(textInputService).stopInput(eq(inputSessionToken))
         verify(textInputService).hideSoftwareKeyboard(eq(inputSessionToken))
     }
@@ -286,37 +295,6 @@ class TextFieldDelegateTest {
     }
 
     @Test
-    fun layout() {
-        val constraints = Constraints(
-            minWidth = 0,
-            maxWidth = 1280,
-            minHeight = 0,
-            maxHeight = 2048
-        )
-
-        val text = AnnotatedString(text = "Hello, World")
-        textLayoutResult = createTextLayoutResult(
-            multiParagraph = mock(),
-            size = IntSize(1024, 512)
-        )
-        whenever(mDelegate.text).thenReturn(text)
-        whenever(mDelegate.style).thenReturn(TextStyle())
-        whenever(mDelegate.density).thenReturn(Density(1.0f))
-        whenever(mDelegate.resourceLoader).thenReturn(mock())
-        whenever(mDelegate.layout(Constraints(anyLong()), any(), eq(null), eq(true)))
-            .thenReturn(textLayoutResult)
-
-        val (width, height, layoutResult) = TextFieldDelegate.layout(
-            mDelegate,
-            constraints,
-            layoutDirection
-        )
-        assertEquals(1024f, width.toFloat())
-        assertEquals(512f, height.toFloat())
-        assertEquals(layoutResult, textLayoutResult)
-    }
-
-    @Test
     fun check_notify_rect_uses_offset_map() {
         val rect = Rect(0f, 1f, 2f, 3f)
         val point = Offset(5f, 6f)
@@ -362,12 +340,12 @@ class TextFieldDelegateTest {
         )
 
         val cursorOffsetInTransformedText = offset / 2
-        assertEquals(1, captor.allValues.size)
-        assertEquals(1, captor.firstValue.size)
-        assertTrue(captor.firstValue[0] is SetSelectionEditOp)
+        assertThat(captor.allValues.size).isEqualTo(1)
+        assertThat(captor.firstValue.size).isEqualTo(1)
+        assertThat(captor.firstValue[0] is SetSelectionEditOp).isTrue()
         val setSelectionEditOp = captor.firstValue[0] as SetSelectionEditOp
-        assertEquals(cursorOffsetInTransformedText, setSelectionEditOp.start)
-        assertEquals(cursorOffsetInTransformedText, setSelectionEditOp.end)
+        assertThat(setSelectionEditOp.start).isEqualTo(cursorOffsetInTransformedText)
+        assertThat(setSelectionEditOp.end).isEqualTo(cursorOffsetInTransformedText)
         verify(onValueChange, times(1)).invoke(
             eq(
                 TextFieldValue(
@@ -386,8 +364,8 @@ class TextFieldDelegateTest {
         assertEquals("Hello, World", visualText.text)
         for (i in 0..visualText.text.length) {
             // Identity mapping returns if no visual filter is provided.
-            assertEquals(i, offsetMap.originalToTransformed(i))
-            assertEquals(i, offsetMap.transformedToOriginal(i))
+            assertThat(offsetMap.originalToTransformed(i)).isEqualTo(i)
+            assertThat(offsetMap.transformedToOriginal(i)).isEqualTo(i)
         }
     }
 

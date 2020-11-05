@@ -17,48 +17,48 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.foundation.text.FirstBaseline
-import androidx.compose.foundation.text.LastBaseline
 import androidx.compose.runtime.Providers
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertIsNotEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.getAlignmentLinePosition
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.width
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsEqualTo
-import androidx.ui.test.assertIsNotEqualTo
-import androidx.ui.test.assertShape
-import androidx.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.ui.test.assertWidthIsEqualTo
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.getAlignmentLinePosition
-import androidx.ui.test.getUnclippedBoundsInRoot
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onNodeWithText
-import androidx.ui.test.performClick
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class SnackbarTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val longText = "Message is very long and long and long and long and long " +
         "and long and long and long and long and long and long"
@@ -330,6 +330,7 @@ class SnackbarTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    @LargeTest
     fun shapeAndColorFromThemeIsUsed() {
         val shape = CutCornerShape(8.dp)
         var background = Color.Yellow
@@ -353,7 +354,7 @@ class SnackbarTest {
         }
 
         rule.onNodeWithTag("snackbar")
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = shape,

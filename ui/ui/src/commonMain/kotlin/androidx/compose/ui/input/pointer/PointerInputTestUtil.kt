@@ -73,20 +73,10 @@ internal fun PointerInputChange.up(duration: Duration) =
         consumed = ConsumedData()
     )
 
-internal fun PointerInputChange.consume(
-    dx: Float = 0f,
-    dy: Float = 0f,
-    downChange: Boolean = false
-) =
-    copy(
-        consumed = consumed.copy(
-            positionChange = Offset(
-                consumed.positionChange.x + dx,
-                consumed.positionChange.y + dy
-            ),
-            downChange = consumed.downChange || downChange
-        )
-    )
+/**
+ * A function used to react to and modify [PointerInputChange]s.
+ */
+internal typealias PointerInputHandler = (PointerEvent, PointerEventPass, IntSize) -> Unit
 
 /**
  * Accepts:
@@ -137,15 +127,12 @@ internal fun PointerInputHandler.invokeOverPasses(
     pointerEvent: PointerEvent,
     pointerEventPasses: List<PointerEventPass>,
     size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE)
-): PointerEvent {
+) {
     require(pointerEvent.changes.isNotEmpty())
     require(pointerEventPasses.isNotEmpty())
-    var localPointerEvent = pointerEvent
     pointerEventPasses.forEach {
-        val changes = this.invoke(localPointerEvent, it, size)
-        localPointerEvent = PointerEvent(changes)
+        this.invoke(pointerEvent, it, size)
     }
-    return localPointerEvent
 }
 
 /**

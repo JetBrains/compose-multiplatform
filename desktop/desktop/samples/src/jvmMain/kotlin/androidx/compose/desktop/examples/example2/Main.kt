@@ -15,7 +15,7 @@
  */
 package androidx.compose.desktop.examples.example2
 
-import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.Window
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.IntSize
 private const val title = "Desktop Compose Canvas"
 
 fun main() {
-    AppWindow(title, IntSize(1024, 768)).show {
+    Window(title, IntSize(1024, 768)) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawRect(Color.Magenta)
             inset(10.0f) {

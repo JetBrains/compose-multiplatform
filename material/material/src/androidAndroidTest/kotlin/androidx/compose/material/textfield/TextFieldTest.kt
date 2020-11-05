@@ -20,17 +20,18 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.text.FirstBaseline
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.AmbientContentColor
+import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
@@ -38,6 +39,7 @@ import androidx.compose.material.setMaterialContentForSizeAssertions
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -48,14 +50,25 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -63,17 +76,10 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertShape
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.click
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
-import androidx.ui.test.performGesture
-import androidx.ui.test.performImeAction
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -83,13 +89,12 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalFocus::class)
 class TextFieldTest {
 
@@ -549,10 +554,14 @@ class TextFieldTest {
                 label = {},
                 placeholder = {
                     Text("placeholder")
-                    assertThat(AmbientContentColor.current)
+                    assertThat(
+                        AmbientContentColor.current.copy(
+                            alpha = AmbientContentAlpha.current
+                        )
+                    )
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
-                                0.6f
+                                alpha = 0.6f
                             )
                         )
                     assertThat(AmbientTextStyle.current)
@@ -737,6 +746,7 @@ class TextFieldTest {
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun testTextField_imeActionAndKeyboardTypePropagatedDownstream() {
         val textInputService = mock<TextInputService>()
@@ -750,8 +760,10 @@ class TextFieldTest {
                     value = text.value,
                     onValueChange = { text.value = it },
                     label = {},
-                    imeAction = ImeAction.Go,
-                    keyboardType = KeyboardType.Email
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Go,
+                        keyboardType = KeyboardType.Email
+                    )
                 )
             }
         }
@@ -761,8 +773,12 @@ class TextFieldTest {
         rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
                 value = any(),
-                keyboardType = eq(KeyboardType.Email),
-                imeAction = eq(ImeAction.Go),
+                imeOptions = eq(
+                    ImeOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Go
+                    )
+                ),
                 onEditCommand = any(),
                 onImeActionPerformed = any()
             )
@@ -770,6 +786,7 @@ class TextFieldTest {
     }
 
     @Test
+    @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_visualTransformationPropagated() {
         rule.setMaterialContent {
@@ -785,7 +802,7 @@ class TextFieldTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,
@@ -797,6 +814,7 @@ class TextFieldTest {
     }
 
     @Test
+    @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_alphaNotApplied_toCustomBackgroundColorAndTransparentColors() {
         val latch = CountDownLatch(1)
@@ -819,7 +837,7 @@ class TextFieldTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,
@@ -833,7 +851,7 @@ class TextFieldTest {
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.onNodeWithTag(TextfieldTag)
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 backgroundColor = Color.White,
@@ -879,7 +897,7 @@ class TextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                imeAction = ImeAction.Go,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
                 onImeActionPerformed = { _, softwareKeyboardController ->
                     controller = softwareKeyboardController
                 }

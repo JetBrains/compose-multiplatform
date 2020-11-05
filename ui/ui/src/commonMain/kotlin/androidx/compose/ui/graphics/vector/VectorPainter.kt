@@ -17,9 +17,7 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.compositionReference
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onDispose
@@ -53,7 +51,7 @@ const val RootGroupName = "VectorRootGroup"
  * @param [children] Composable used to define the structure and contents of the vector graphic
  */
 @Composable
-fun VectorPainter(
+fun rememberVectorPainter(
     defaultWidth: Dp,
     defaultHeight: Dp,
     viewportWidth: Float = Float.NaN,
@@ -77,24 +75,88 @@ fun VectorPainter(
 }
 
 /**
+ * Create a [VectorPainter] with the Vector defined by the provided
+ * sub-composition
+ *
+ * @param [defaultWidth] Intrinsic width of the Vector in [Dp]
+ * @param [defaultHeight] Intrinsic height of the Vector in [Dp]
+ * @param [viewportWidth] Width of the viewport space. The viewport is the virtual canvas where
+ * paths are drawn on.
+ *  This parameter is optional. Not providing it will use the [defaultWidth] converted to pixels
+ * @param [viewportHeight] Height of the viewport space. The viewport is the virtual canvas where
+ * paths are drawn on.
+ *  This parameter is optional. Not providing it will use the [defaultHeight] converted to pixels
+ * @param [name] optional identifier used to identify the root of this vector graphic
+ * @param [children] Composable used to define the structure and contents of the vector graphic
+ */
+@Deprecated(
+    "Use rememberVectorPainter instead as the composable implementation already invokes " +
+        "remember to persist data across compositions and callers do not need to do so themselves",
+    ReplaceWith(
+        "rememberVectorPainter(defaultWidth, defaultHeight, viewportWidth, " +
+            "viewportHeight, name, children)",
+        "androidx.compose.ui.graphics.vector"
+    )
+)
+@Composable
+fun VectorPainter(
+    defaultWidth: Dp,
+    defaultHeight: Dp,
+    viewportWidth: Float = Float.NaN,
+    viewportHeight: Float = Float.NaN,
+    name: String = RootGroupName,
+    children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+): VectorPainter =
+    rememberVectorPainter(
+        defaultWidth,
+        defaultHeight,
+        viewportWidth,
+        viewportHeight,
+        name,
+        children
+    )
+
+/**
+ * Create a [VectorPainter] with the given [VectorAsset]. This will create a
+ * sub-composition of the vector hierarchy given the tree structure in [VectorAsset]
+ *
+ * @param [asset] VectorAsset used to create a vector graphic sub-composition
+ */
+@Deprecated(
+    "Use rememberVectorPainter instead as the composable implementation already invokes " +
+        "remember to persist data across compositions and callers do not need to do so themselves",
+    ReplaceWith(
+        "rememberVectorPainter(asset)",
+        "androidx.compose.ui.graphics.vector"
+    )
+)
+@Composable
+fun VectorPainter(asset: VectorAsset): VectorPainter =
+    rememberVectorPainter(
+        defaultWidth = asset.defaultWidth,
+        defaultHeight = asset.defaultHeight,
+        viewportWidth = asset.viewportWidth,
+        viewportHeight = asset.viewportHeight,
+        name = asset.name,
+        children = { _, _ -> RenderVectorGroup(group = asset.root) }
+    )
+
+/**
  * Create a [VectorPainter] with the given [VectorAsset]. This will create a
  * sub-composition of the vector hierarchy given the tree structure in [VectorAsset]
  *
  * @param [asset] VectorAsset used to create a vector graphic sub-composition
  */
 @Composable
-fun VectorPainter(asset: VectorAsset): VectorPainter {
-    // TODO: Get rid of this temporary `vp` variable.
-    val vp = VectorPainter(
-        name = asset.name,
+fun rememberVectorPainter(asset: VectorAsset) =
+    rememberVectorPainter(
         defaultWidth = asset.defaultWidth,
         defaultHeight = asset.defaultHeight,
         viewportWidth = asset.viewportWidth,
         viewportHeight = asset.viewportHeight,
+        name = asset.name,
         children = { _, _ -> RenderVectorGroup(group = asset.root) }
     )
-    return vp
-}
 
 /**
  * [Painter] implementation that abstracts the drawing of a Vector graphic.
@@ -127,8 +189,6 @@ class VectorPainter internal constructor() : Painter() {
         }
         val composition = composeVector(
             vector,
-            @OptIn(ExperimentalComposeApi::class)
-            currentComposer.recomposer,
             compositionReference(),
             children
         )

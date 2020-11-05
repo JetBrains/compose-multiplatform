@@ -19,9 +19,12 @@ package androidx.compose.compiler.plugins.kotlin
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory0
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory1
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory2
 import org.jetbrains.kotlin.diagnostics.Errors
+import org.jetbrains.kotlin.diagnostics.PositioningStrategies.DECLARATION_SIGNATURE_OR_DEFAULT
 import org.jetbrains.kotlin.diagnostics.Severity
+import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -38,6 +41,12 @@ object ComposeErrors {
     @JvmField
     val COMPOSABLE_EXPECTED =
         DiagnosticFactory0.create<PsiElement>(
+            Severity.ERROR
+        )
+
+    @JvmField
+    val COMPOSABLE_FUNCTION_REFERENCE =
+        DiagnosticFactory0.create<KtCallableReferenceExpression>(
             Severity.ERROR
         )
 
@@ -65,6 +74,16 @@ object ComposeErrors {
             Severity.ERROR
         )
 
+    // This error matches Kotlin's CONFLICTING_OVERLOADS error, except that it renders the
+    // annotations with the descriptor. This is important to use for errors where the
+    // only difference is whether or not it is annotated with @Composable or not.
+    @JvmField
+    var CONFLICTING_OVERLOADS: DiagnosticFactory1<PsiElement, Collection<DeclarationDescriptor>> =
+        DiagnosticFactory1.create(
+            Severity.ERROR,
+            DECLARATION_SIGNATURE_OR_DEFAULT
+        )
+
     @JvmField
     val ILLEGAL_ASSIGN_TO_UNIONTYPE =
         DiagnosticFactory2.create<KtExpression, Collection<KotlinType>, Collection<KotlinType>>(
@@ -74,6 +93,15 @@ object ComposeErrors {
     @JvmField
     val ILLEGAL_TRY_CATCH_AROUND_COMPOSABLE =
         DiagnosticFactory0.create<PsiElement>(
+            Severity.ERROR
+        )
+
+    // This error matches Kotlin's TYPE_MISMATCH error, except that it renders the annotations
+    // with the types. This is important to use for type mismatch errors where the only
+    // difference is whether or not it is annotated with @Composable or not.
+    @JvmField
+    val TYPE_MISMATCH =
+        DiagnosticFactory2.create<KtExpression, KotlinType, KotlinType>(
             Severity.ERROR
         )
 

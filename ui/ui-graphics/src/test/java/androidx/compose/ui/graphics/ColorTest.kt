@@ -19,7 +19,6 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.util.toHexString
-import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -28,7 +27,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@SmallTest
 @RunWith(JUnit4::class)
 class ColorTest {
     private val adobeColorSpace = ColorSpaces.AdobeRgb

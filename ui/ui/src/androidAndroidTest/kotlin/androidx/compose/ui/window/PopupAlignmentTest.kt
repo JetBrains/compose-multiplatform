@@ -21,12 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.ViewAmbient
-import androidx.compose.ui.selection.SimpleContainer
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -34,22 +34,21 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.test.createComposeRule
 import org.hamcrest.Description
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class PopupAlignmentTest {
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     private val testTag = "testedPopup"
     private val offset = IntOffset(10, 10)

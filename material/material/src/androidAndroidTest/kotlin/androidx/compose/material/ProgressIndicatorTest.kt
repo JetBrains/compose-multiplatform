@@ -20,29 +20,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertRangeInfoEquals
+import androidx.compose.ui.test.assertValueEquals
+import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.assertRangeInfoEquals
-import androidx.ui.test.assertValueEquals
-import androidx.ui.test.assertWidthIsEqualTo
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class ProgressIndicatorTest {
 
     private val ExpectedLinearWidth = 240.dp
     private val ExpectedLinearHeight = 4.dp
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun determinateLinearProgressIndicator_Progress() {
@@ -82,6 +82,7 @@ class ProgressIndicatorTest {
     fun indeterminateLinearProgressIndicator_progress() {
         val tag = "linear"
 
+        rule.clockTestRule.pauseClock()
         rule.setMaterialContent {
             LinearProgressIndicator(modifier = Modifier.testTag(tag))
         }
@@ -92,6 +93,7 @@ class ProgressIndicatorTest {
 
     @Test
     fun indeterminateLinearProgressIndicator_Size() {
+        rule.clockTestRule.pauseClock()
         rule
             .setMaterialContentForSizeAssertions {
                 LinearProgressIndicator()
@@ -140,6 +142,7 @@ class ProgressIndicatorTest {
     fun indeterminateCircularProgressIndicator_progress() {
         val tag = "circular"
 
+        rule.clockTestRule.pauseClock()
         rule.setMaterialContent {
             CircularProgressIndicator(modifier = Modifier.testTag(tag))
         }
@@ -150,6 +153,7 @@ class ProgressIndicatorTest {
 
     @Test
     fun indeterminateCircularProgressIndicator_Size() {
+        rule.clockTestRule.pauseClock()
         rule
             .setMaterialContentForSizeAssertions {
                 CircularProgressIndicator()

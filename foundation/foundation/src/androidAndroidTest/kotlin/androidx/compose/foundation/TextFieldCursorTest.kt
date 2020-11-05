@@ -16,20 +16,29 @@
 
 package androidx.compose.foundation
 
-import android.graphics.Bitmap
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixels
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
@@ -38,13 +47,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertPixels
-import androidx.ui.test.assertShape
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.hasInputMethodsSupport
-import androidx.ui.test.performClick
-import androidx.ui.test.performTextReplacement
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -55,8 +58,15 @@ import java.util.concurrent.TimeUnit
 class TextFieldCursorTest {
 
     @get:Rule
-    val rule = createComposeRule(disableBlinkingCursor = false).also {
+    val rule = createComposeRule().also {
         it.clockTestRule.pauseClock()
+    }
+
+    @Before
+    fun enableBlinkingCursor() {
+        @Suppress("DEPRECATION_ERROR")
+        @OptIn(InternalTextApi::class)
+        blinkingCursorEnabled = true
     }
 
     @Test
@@ -66,7 +76,7 @@ class TextFieldCursorTest {
         val height = 20.dp
         val latch = CountDownLatch(1)
         rule.setContent {
-            CoreTextField(
+            BasicTextField(
                 value = TextFieldValue(),
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White, background = Color.White),
@@ -85,7 +95,7 @@ class TextFieldCursorTest {
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
             rule.onNode(hasInputMethodsSupport())
-                .captureToBitmap()
+                .captureToImage()
                 .assertCursor(2.dp, this)
         }
     }
@@ -101,7 +111,7 @@ class TextFieldCursorTest {
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
-                CoreTextField(
+                BasicTextField(
                     value = TextFieldValue(),
                     onValueChange = {},
                     textStyle = TextStyle(color = Color.White, background = Color.White),
@@ -123,14 +133,14 @@ class TextFieldCursorTest {
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
             rule.onNode(hasInputMethodsSupport())
-                .captureToBitmap()
+                .captureToImage()
                 .assertCursor(2.dp, this)
         }
 
         // cursor invisible during next 500 ms
         rule.clockTestRule.advanceClock(700)
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -151,7 +161,7 @@ class TextFieldCursorTest {
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
-                CoreTextField(
+                BasicTextField(
                     value = TextFieldValue(),
                     onValueChange = {},
                     textStyle = TextStyle(color = Color.White, background = Color.White),
@@ -172,7 +182,7 @@ class TextFieldCursorTest {
         // no cursor when usually shown
         rule.clockTestRule.advanceClock(100)
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -184,7 +194,7 @@ class TextFieldCursorTest {
         // no cursor when should be no cursor
         rule.clockTestRule.advanceClock(700)
         rule.onNode(hasInputMethodsSupport())
-            .captureToBitmap()
+            .captureToImage()
             .assertShape(
                 density = rule.density,
                 shape = RectangleShape,
@@ -206,7 +216,7 @@ class TextFieldCursorTest {
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
                 val text = remember { mutableStateOf(TextFieldValue("test")) }
-                CoreTextField(
+                BasicTextField(
                     value = text.value,
                     onValueChange = { text.value = it },
                     textStyle = TextStyle(color = Color.White, background = Color.White),
@@ -214,6 +224,7 @@ class TextFieldCursorTest {
                         .preferredSize(width, height)
                         .background(Color.White)
                         .focusObserver { if (it.isFocused) latch.countDown() },
+
                     cursorColor = Color.Red
                 )
             }
@@ -238,12 +249,12 @@ class TextFieldCursorTest {
         rule.clockTestRule.advanceClock(400)
         with(rule.density) {
             rule.onNode(hasInputMethodsSupport())
-                .captureToBitmap()
+                .captureToImage()
                 .assertCursor(2.dp, this)
         }
     }
 
-    private fun Bitmap.assertCursor(cursorWidth: Dp, density: Density) {
+    private fun ImageAsset.assertCursor(cursorWidth: Dp, density: Density) {
         val cursorWidthPx = (with(density) { cursorWidth.toIntPx() })
         val width = width
         val height = height

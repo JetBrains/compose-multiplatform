@@ -18,10 +18,8 @@ package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.animation.animate
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumnFor
@@ -33,8 +31,10 @@ import androidx.compose.material.DismissValue.DismissedToEnd
 import androidx.compose.material.DismissValue.DismissedToStart
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.SwipeToDismiss
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -95,11 +95,13 @@ fun SwipeToDismissListItems() {
             },
             background = {
                 val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                val color = animate(when (dismissState.targetValue) {
-                    Default -> Color.LightGray
-                    DismissedToEnd -> Color.Green
-                    DismissedToStart -> Color.Red
-                })
+                val color = animate(
+                    when (dismissState.targetValue) {
+                        Default -> Color.LightGray
+                        DismissedToEnd -> Color.Green
+                        DismissedToStart -> Color.Red
+                    }
+                )
                 val alignment = when (direction) {
                     StartToEnd -> Alignment.CenterStart
                     EndToStart -> Alignment.CenterEnd

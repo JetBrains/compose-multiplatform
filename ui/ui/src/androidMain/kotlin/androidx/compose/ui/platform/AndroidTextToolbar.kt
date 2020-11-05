@@ -35,17 +35,18 @@ internal class AndroidTextToolbar(private val view: View) : TextToolbar {
         rect: Rect,
         onCopyRequested: ActionCallback?,
         onPasteRequested: ActionCallback?,
-        onCutRequested: ActionCallback?
+        onCutRequested: ActionCallback?,
+        onSelectAllRequested: ActionCallback?
     ) {
         textToolbarStatus = TextToolbarStatus.Shown
         if (Build.VERSION.SDK_INT >= 23) {
             val actionModeCallback =
                 FloatingTextActionModeCallback(
                     TextActionModeCallback(
-                        view = view,
                         onCopyRequested = onCopyRequested,
                         onCutRequested = onCutRequested,
-                        onPasteRequested = onPasteRequested
+                        onPasteRequested = onPasteRequested,
+                        onSelectAllRequested = onSelectAllRequested
                     )
                 )
             actionModeCallback.setRect(rect)
@@ -57,10 +58,10 @@ internal class AndroidTextToolbar(private val view: View) : TextToolbar {
             val actionModeCallback =
                 PrimaryTextActionModeCallback(
                     TextActionModeCallback(
-                        view = view,
                         onCopyRequested = onCopyRequested,
                         onPasteRequested = onPasteRequested,
-                        onCutRequested = onCutRequested
+                        onCutRequested = onCutRequested,
+                        onSelectAllRequested = onSelectAllRequested
                     )
                 )
             actionMode = view.startActionMode(actionModeCallback)

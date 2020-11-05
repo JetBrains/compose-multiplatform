@@ -34,32 +34,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.loadVectorResource
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.testutils.assertPixels
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onRoot
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class ImageTest {
 
     val contentTag = "ImageTest"
@@ -111,7 +115,7 @@ class ImageTest {
         val bgColorArgb = bgColor.toArgb()
         val pathArgb = pathColor.toArgb()
 
-        rule.onNodeWithTag(contentTag).captureToBitmap().apply {
+        rule.onNodeWithTag(contentTag).captureToImage().asAndroidBitmap().apply {
             val imageStartX = width / 2 - imageWidth / 2
             val imageStartY = height / 2 - imageHeight / 2
             Assert.assertEquals(bgColorArgb, getPixel(imageStartX + 2, imageStartY))
@@ -162,7 +166,7 @@ class ImageTest {
         val bgColorArgb = bgColor.toArgb()
         val pathArgb = pathColor.toArgb()
 
-        rule.onRoot().captureToBitmap().apply {
+        rule.onRoot().captureToImage().asAndroidBitmap().apply {
             val imageStartX = width / 2 - subsectionWidth / 2
             val imageStartY = height / 2 - subsectionHeight / 2
             Assert.assertEquals(bgColorArgb, getPixel(imageStartX + 2, imageStartY))
@@ -261,7 +265,7 @@ class ImageTest {
 
         val bgColorArgb = bgColor.toArgb()
         val pathArgb = pathColor.toArgb()
-        rule.onNodeWithTag(contentTag).captureToBitmap().apply {
+        rule.onNodeWithTag(contentTag).captureToImage().asAndroidBitmap().apply {
             val imageStartX = width / 2 - imageComposableWidth / 2
             val imageStartY = height / 2 - imageComposableHeight / 2
             Assert.assertEquals(bgColorArgb, getPixel(imageStartX + 5, imageStartY))
@@ -289,6 +293,46 @@ class ImageTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun testImageScalesNonuniformly() {
+        val imageComposableWidth = imageWidth * 3
+        val imageComposableHeight = imageHeight * 7
+
+        rule.setContent {
+            val density = DensityAmbient.current
+            val size = (containerSize * 2 / density.density).dp
+            val imageAsset = ImageAsset(imageWidth, imageHeight)
+            CanvasDrawScope().draw(
+                density,
+                LayoutDirection.Ltr,
+                Canvas(imageAsset),
+                Size(imageWidth.toFloat(), imageHeight.toFloat())
+            ) {
+                drawRect(color = Color.Blue)
+            }
+            Box(
+                Modifier.preferredSize(size)
+                    .background(color = Color.White)
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                Image(
+                    asset = imageAsset,
+                    modifier = Modifier
+                        .testTag(contentTag)
+                        .preferredSize(
+                            (imageComposableWidth / density.density).dp,
+                            (imageComposableHeight / density.density).dp
+                        ),
+                    // Scale the image non-uniformly within the bounds of the composable
+                    contentScale = ContentScale.FillBounds,
+                    alignment = Alignment.BottomEnd
+                )
+            }
+        }
+
+        rule.onNodeWithTag(contentTag).captureToImage().assertPixels { Color.Blue }
     }
 
     @Test
@@ -322,7 +366,7 @@ class ImageTest {
 
         val bgColorArgb = bgColor.toArgb()
         val pathArgb = pathColor.toArgb()
-        rule.onNodeWithTag(contentTag).captureToBitmap().apply {
+        rule.onNodeWithTag(contentTag).captureToImage().asAndroidBitmap().apply {
             val composableEndX = width / 2 + imageComposableWidth / 2
             val composableEndY = height / 2 + imageComposableHeight / 2
             val imageStartX = composableEndX - imageWidth
@@ -384,7 +428,7 @@ class ImageTest {
 
         val imageColor = Color.Red.toArgb()
         val containerBgColor = Color.White.toArgb()
-        rule.onRoot().captureToBitmap().apply {
+        rule.onRoot().captureToImage().asAndroidBitmap().apply {
             val imageStartX = width / 2 - boxWidth / 2
             val imageStartY = height / 2 - boxHeight / 2
             Assert.assertEquals(containerBgColor, getPixel(imageStartX - 1, imageStartY - 1))
@@ -463,7 +507,7 @@ class ImageTest {
             )
         }
 
-        rule.onNodeWithTag(testTag).captureToBitmap().apply {
+        rule.onNodeWithTag(testTag).captureToImage().asAndroidBitmap().apply {
             Assert.assertEquals(100, width)
             Assert.assertEquals(50, height)
             Assert.assertEquals(Color.Blue.toArgb(), getPixel(24, height / 2))

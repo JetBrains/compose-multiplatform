@@ -26,18 +26,18 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.AutofillAmbient
 import androidx.compose.ui.platform.AutofillTreeAmbient
 import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @SmallTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class AndroidAutoFillTest {
     @get:Rule
     val rule = createComposeRule()

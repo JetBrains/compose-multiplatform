@@ -15,10 +15,8 @@
  */
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
@@ -33,29 +31,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertPositionInRootIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.isInMutuallyExclusiveGroup
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.assertCountEquals
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.assertIsEqualTo
-import androidx.ui.test.assertIsNotSelected
-import androidx.ui.test.assertIsSelected
-import androidx.ui.test.assertPositionInRootIsEqualTo
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.getUnclippedBoundsInRoot
-import androidx.ui.test.isInMutuallyExclusiveGroup
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class TabTest {
 
     private val ExpectedSmallTabHeight = 48.dp
@@ -64,7 +67,17 @@ class TabTest {
     private val icon = Icons.Filled.Favorite
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun textTab_height() {
@@ -427,5 +440,16 @@ class TabTest {
                     get(it).assertIsNotSelected()
                 }
             }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val pos = TabPosition(10.0.dp, 200.0.dp)
+        rule.setContent {
+            val modifier = Modifier.defaultTabIndicatorOffset(pos) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("defaultTabIndicatorOffset")
+            assertThat(modifier.valueOverride).isEqualTo(pos)
+            assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+        }
     }
 }

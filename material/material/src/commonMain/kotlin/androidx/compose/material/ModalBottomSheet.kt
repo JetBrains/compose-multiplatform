@@ -38,7 +38,6 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ExperimentalSubcomposeLayoutApi
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Constraints
@@ -295,7 +294,6 @@ private fun Scrim(
 }
 
 @Composable
-@OptIn(ExperimentalSubcomposeLayoutApi::class)
 private fun BottomSheetStack(
     modifier: Modifier,
     sheetContent: @Composable () -> Unit,

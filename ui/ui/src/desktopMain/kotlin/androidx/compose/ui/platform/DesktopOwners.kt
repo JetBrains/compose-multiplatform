@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.platform
 
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.ExperimentalKeyInput
@@ -26,6 +27,7 @@ import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.Uptime
+import kotlinx.coroutines.yield
 import org.jetbrains.skija.Canvas
 import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
@@ -35,8 +37,17 @@ val DesktopOwnersAmbient = staticAmbientOf<DesktopOwners>()
 @OptIn(InternalCoreApi::class)
 class DesktopOwners(
     component: DesktopComponent = DummyDesktopComponent,
-    val invalidate: () -> Unit
+    invalidate: () -> Unit
 ) {
+    private val _invalidate = invalidate
+    private var willRenderInThisFrame = false
+
+    fun invalidate() {
+        if (!willRenderInThisFrame) {
+            _invalidate()
+        }
+    }
+
     val list = LinkedHashSet<DesktopOwner>()
     @ExperimentalKeyInput
     var keyboard: Keyboard? = null
@@ -44,7 +55,7 @@ class DesktopOwners(
     private var pointerId = 0L
     private var isMousePressed = false
 
-    internal val animationClock = DesktopAnimationClock(invalidate)
+    internal val animationClock = DesktopAnimationClock(::invalidate)
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
 
     fun register(desktopOwner: DesktopOwner) {
@@ -57,11 +68,44 @@ class DesktopOwners(
         invalidate()
     }
 
-    fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        animationClock.onFrame(nanoTime)
+    suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        willRenderInThisFrame = true
+
+        try {
+            animationClock.onFrame(nanoTime)
+
+            // We have to wait recomposition if we want to draw actual animation state
+            // (state can be changed in animationClock.onFrame).
+            // Otherwise there may be a situation when we draw multiple frames with the same
+            // animation state (for example, when FPS always below FPS limit).
+            awaitRecompose()
+
+            for (owner in list) {
+                owner.setSize(width, height)
+                owner.measureAndLayout()
+            }
+        } finally {
+            willRenderInThisFrame = false
+        }
+
         for (owner in list) {
-            owner.setSize(width, height)
             owner.draw(canvas)
+        }
+
+        if (animationClock.hasObservers) {
+            _invalidate()
+        }
+    }
+
+    private suspend fun awaitRecompose() {
+        // We should wait next dispatcher frame because Recomposer doesn't have
+        // pending changes yet, it will only schedule Recomposer.scheduleRecompose in
+        // FrameManager.schedule
+        yield()
+
+        // we can't stuck in infinite loop (because of double dispatching in FrameManager.schedule)
+        while (Recomposer.current().hasInvalidations()) {
+            yield()
         }
     }
 

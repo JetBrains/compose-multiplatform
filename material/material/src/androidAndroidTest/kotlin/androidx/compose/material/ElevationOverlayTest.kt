@@ -21,20 +21,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.ui.test.assertPixels
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,7 +65,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
     }
 
     @get:Rule
-    val rule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule()
 
     @Test
     fun correctElevationOverlayInDarkTheme() {
@@ -81,7 +81,29 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
         )
 
         rule.onNodeWithTag(Tag)
-            .captureToBitmap()
+            .captureToImage()
+            .assertPixels(SurfaceSize) {
+                expectedSurfaceColor
+            }
+    }
+
+    @Test
+    fun correctElevationOverlayInDarkTheme_withParentSurface() {
+        val colors = darkColors()
+
+        rule.setContent {
+            Surface(elevation = 2.dp) {
+                // The total overlay should be 2 + 2 = 4.dp
+                TestSurface(2.dp, colors)
+            }
+        }
+
+        val expectedSurfaceColor = colors.onSurface
+            .copy(alpha = 0.09f)
+            .compositeOver(colors.surface)
+
+        rule.onNodeWithTag(Tag)
+            .captureToImage()
             .assertPixels(SurfaceSize) {
                 expectedSurfaceColor
             }
@@ -106,7 +128,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
         )
 
         rule.onNodeWithTag(Tag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(SurfaceSize) {
                 expectedSurfaceColor
             }
@@ -124,7 +146,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
         val expectedSurfaceColor = colors.surface
 
         rule.onNodeWithTag(Tag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(SurfaceSize) {
                 expectedSurfaceColor
             }
@@ -145,37 +167,34 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
         val expectedSurfaceColor = colors.surface
 
         rule.onNodeWithTag(Tag)
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(SurfaceSize) {
                 expectedSurfaceColor
             }
     }
 
-    /**
-     * TODO: b/169071070 enable when cross-module @Composable interface functions with inline class
-     * parameters do not crash at compile time
-     @Test
-     fun customElevationOverlay() {
-     val customOverlayColor = Color.Red
+    @Test
+    fun customElevationOverlay() {
+        val customOverlayColor = Color.Red
 
-     val customOverlay = object : ElevationOverlay {
-     @Composable
-     override fun apply(color: Color, elevation: Dp): Color = Color.Red
-     }
+        val customOverlay = object : ElevationOverlay {
+            @Composable
+            override fun apply(color: Color, elevation: Dp): Color = Color.Red
+        }
 
-     rule.setContent {
-     Providers(AmbientElevationOverlay provides customOverlay) {
-     TestSurface(elevation!!, lightColors())
-     }
-     }
+        rule.setContent {
+            Providers(AmbientElevationOverlay provides customOverlay) {
+                TestSurface(elevation!!, lightColors())
+            }
+        }
 
-     rule.onNodeWithTag(Tag)
-     .captureToBitmap()
-     .assertPixels(SurfaceSize) {
-     customOverlayColor
-     }
-     }
-     */
+        rule
+            .onNodeWithTag(Tag)
+            .captureToImage()
+            .assertPixels(SurfaceSize) {
+                customOverlayColor
+            }
+    }
 
     /**
      * @return the resulting color from compositing [foregroundColor] with [expectedOverlayAlpha]

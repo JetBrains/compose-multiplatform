@@ -17,14 +17,15 @@
 package androidx.compose.ui.demos.autofill
 
 import android.graphics.Rect
-import androidx.compose.foundation.BaseTextField
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +38,7 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AutofillAmbient
 import androidx.compose.ui.platform.AutofillTreeAmbient
 import androidx.compose.ui.text.input.ImeAction
@@ -63,7 +64,7 @@ fun ExplicitAutofillTypesDemo() {
             autofillTypes = listOf(AutofillType.PersonFullName),
             onFill = { nameState.value = TextFieldValue(it) }
         ) { autofillNode ->
-            BaseTextField(
+            BasicTextField(
                 modifier = Modifier.focusObserver {
                     autofill?.apply {
                         if (it.isFocused) {
@@ -74,8 +75,10 @@ fun ExplicitAutofillTypesDemo() {
                     }
                 },
                 value = nameState.value,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Unspecified,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Unspecified
+                ),
                 onValueChange = { nameState.value = it },
                 textStyle = textStyle
             )
@@ -88,7 +91,7 @@ fun ExplicitAutofillTypesDemo() {
             autofillTypes = listOf(AutofillType.EmailAddress),
             onFill = { emailState.value = TextFieldValue(it) }
         ) { autofillNode ->
-            BaseTextField(
+            BasicTextField(
                 modifier = Modifier.focusObserver {
                     autofill?.run {
                         if (it.isFocused) {
@@ -99,8 +102,10 @@ fun ExplicitAutofillTypesDemo() {
                     }
                 },
                 value = emailState.value,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Unspecified,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Unspecified
+                ),
                 onValueChange = { emailState.value = it },
                 textStyle = textStyle
             )

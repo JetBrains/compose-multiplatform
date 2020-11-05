@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.ManualFrameClock
 import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.foundation.animation.FlingConfig
@@ -32,36 +33,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.TestUiDispatcher
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.monotonicFrameAnimationClockOf
+import androidx.compose.ui.test.moveBy
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.runBlockingWithManualClock
+import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.test.ExperimentalTesting
-import androidx.ui.test.TestUiDispatcher
-import androidx.ui.test.center
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.monotonicFrameAnimationClockOf
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performGesture
-import androidx.ui.test.runBlockingWithManualClock
-import androidx.ui.test.swipe
-import androidx.ui.test.swipeWithVelocity
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.withContext
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @LargeTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class ScrollableTest {
 
     @get:Rule
     val rule = createComposeRule()
 
     private val scrollableBoxTag = "scrollableBox"
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     @OptIn(ExperimentalTesting::class)
@@ -537,6 +555,131 @@ class ScrollableTest {
         // and nothing should change as we don't do nested fling
         rule.runOnIdle {
             assertThat(outerDrag).isEqualTo(lastEqualDrag)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_interactionState() = runBlockingWithManualClock { clock ->
+        val interactionState = InteractionState()
+        var total = 0f
+        val controller = ScrollableController(
+            consumeScrollDelta = {
+                total += it
+                it
+            },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock),
+            interactionState = interactionState
+        )
+
+        setScrollableContent {
+            Modifier.scrollable(
+                Orientation.Horizontal,
+                controller = controller
+            ) {}
+        }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag)
+            .performGesture {
+                down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
+                moveBy(Offset(visibleSize.width / 2f, 0f))
+            }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).contains(Interaction.Dragged)
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag)
+            .performGesture {
+                up()
+            }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_interactionState_resetWhenDisposed() = runBlockingWithManualClock { clock ->
+        val interactionState = InteractionState()
+        var emitScrollableBox by mutableStateOf(true)
+        var total = 0f
+        val controller = ScrollableController(
+            consumeScrollDelta = {
+                total += it
+                it
+            },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock),
+            interactionState = interactionState
+        )
+
+        rule.setContent {
+            Box {
+                if (emitScrollableBox) {
+                    Box(
+                        modifier = Modifier
+                            .testTag(scrollableBoxTag)
+                            .preferredSize(100.dp)
+                            .scrollable(
+                                orientation = Orientation.Horizontal,
+                                controller = controller
+                            ) {}
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag)
+            .performGesture {
+                down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
+                moveBy(Offset(visibleSize.width / 2f, 0f))
+            }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).contains(Interaction.Dragged)
+        }
+
+        // Dispose scrollable
+        rule.runOnIdle {
+            emitScrollableBox = false
+        }
+
+        rule.runOnIdle {
+            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val controller = ScrollableController(
+            consumeScrollDelta = { it },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = ManualAnimationClock(0)
+        )
+        rule.setContent {
+            val modifier = Modifier.scrollable(Orientation.Vertical, controller) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("scrollable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "orientation",
+                "controller",
+                "enabled",
+                "reverseDirection",
+                "canScroll",
+                "onScrollStarted",
+                "onScrollStopped",
+            )
         }
     }
 

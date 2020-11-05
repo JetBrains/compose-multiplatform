@@ -19,18 +19,18 @@ package androidx.compose.ui.platform.actionmodecallback
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.compose.ui.platform.ActionCallback
 
 internal const val MENU_ITEM_COPY = 0
 internal const val MENU_ITEM_PASTE = 1
 internal const val MENU_ITEM_CUT = 2
+internal const val MENU_ITEM_SELECT_ALL = 3
 
 internal class TextActionModeCallback(
-    private val view: View,
     private val onCopyRequested: ActionCallback? = null,
     private val onPasteRequested: ActionCallback? = null,
-    private val onCutRequested: ActionCallback? = null
+    private val onCutRequested: ActionCallback? = null,
+    private val onSelectAllRequested: ActionCallback? = null
 ) : ActionMode.Callback {
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         requireNotNull(menu)
@@ -50,6 +50,11 @@ internal class TextActionModeCallback(
             menu.add(0, MENU_ITEM_CUT, 2, android.R.string.cut)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         }
+
+        onSelectAllRequested?.let {
+            menu.add(0, MENU_ITEM_SELECT_ALL, 3, android.R.string.selectAll)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+        }
         return true
     }
 
@@ -62,6 +67,7 @@ internal class TextActionModeCallback(
             MENU_ITEM_COPY -> onCopyRequested?.invoke()
             MENU_ITEM_PASTE -> onPasteRequested?.invoke()
             MENU_ITEM_CUT -> onCutRequested?.invoke()
+            MENU_ITEM_SELECT_ALL -> onSelectAllRequested?.invoke()
             else -> return false
         }
         mode?.finish()

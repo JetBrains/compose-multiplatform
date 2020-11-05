@@ -16,10 +16,11 @@
 
 package androidx.compose.ui.graphics
 
-// TODO(demin): implement PathMeasure
 internal class DesktopPathMeasure : PathMeasure {
+    private val skija = org.jetbrains.skija.PathMeasure()
+
     override fun setPath(path: Path?, forceClosed: Boolean) {
-        println("PathMeasure.setPath not implemented yet")
+        skija.setPath(path?.asDesktopPath(), forceClosed)
     }
 
     override fun getSegment(
@@ -27,13 +28,15 @@ internal class DesktopPathMeasure : PathMeasure {
         stopDistance: Float,
         destination: Path,
         startWithMoveTo: Boolean
-    ): Boolean {
-        println("PathMeasure.getSegment not implemented yet")
-        return false
-    }
+    ) = skija.getSegment(
+        startDistance,
+        stopDistance,
+        destination.asDesktopPath(),
+        startWithMoveTo
+    )
 
     override val length: Float
-        get() = 0f
+        get() = skija.length
 }
 
 actual fun PathMeasure(): PathMeasure =

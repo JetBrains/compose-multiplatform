@@ -17,51 +17,70 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHasNoClickAction
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.doubleClick
+import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.onNodeWithSubstring
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.up
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
-import androidx.ui.test.SemanticsMatcher
-import androidx.ui.test.assert
-import androidx.ui.test.assertHasClickAction
-import androidx.ui.test.assertHasNoClickAction
-import androidx.ui.test.assertIsEnabled
-import androidx.ui.test.assertIsNotEnabled
-import androidx.ui.test.center
-import androidx.ui.test.click
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.doubleClick
-import androidx.ui.test.down
-import androidx.ui.test.longClick
-import androidx.ui.test.onNodeWithSubstring
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.performClick
-import androidx.ui.test.performGesture
-import androidx.ui.test.performSemanticsAction
-import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @MediumTest
-@RunWith(JUnit4::class)
+@RunWith(AndroidJUnit4::class)
 class ClickableTest {
 
     @get:Rule
     val rule = createComposeRule()
 
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun clickableTest_defaultSemantics() {
         rule.setContent {
             Box {
-                Text("ClickableText", modifier = Modifier.testTag("myClickable").clickable {})
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier.testTag("myClickable").clickable {}
+                )
             }
         }
 
@@ -74,7 +93,7 @@ class ClickableTest {
     fun clickableTest_disabledSemantics() {
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(enabled = false) {}
                 )
@@ -93,9 +112,11 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
-                    modifier = Modifier.testTag("myClickable").clickable(onLongClick = onClick) {}
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .clickable(onLongClick = onClick) {}
                 )
             }
         }
@@ -125,7 +146,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier.testTag("myClickable").clickable(onClick = onClick)
                 )
@@ -148,14 +169,14 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_clickOnChildText() {
+    fun clickableTest_clickOnChildBasicText() {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
 
         rule.setContent {
             Box(modifier = Modifier.clickable(onClick = onClick)) {
-                Text("Foo")
-                Text("Bar")
+                BasicText("Foo")
+                BasicText("Bar")
             }
         }
 
@@ -176,15 +197,18 @@ class ClickableTest {
     }
 
     @Test
+    @LargeTest
     fun clickableTest_longClick() {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
-                    modifier = Modifier.testTag("myClickable").clickable(onLongClick = onClick) {}
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .clickable(onLongClick = onClick) {}
                 )
             }
         }
@@ -217,7 +241,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -259,7 +283,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -292,6 +316,7 @@ class ClickableTest {
     }
 
     @Test
+    @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick() {
         val clickLatch = CountDownLatch(1)
         var doubleClickCounter = 0
@@ -302,7 +327,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -355,9 +380,11 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
-                    modifier = Modifier.testTag("myClickable").clickable(onDoubleClick = onClick) {}
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .clickable(onDoubleClick = onClick) {}
                 )
             }
         }
@@ -387,7 +414,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -423,7 +450,7 @@ class ClickableTest {
         rule.setContent {
             Box {
                 if (emitClickableText) {
-                    Text(
+                    BasicText(
                         "ClickableText",
                         modifier = Modifier
                             .testTag("myClickable")
@@ -455,6 +482,7 @@ class ClickableTest {
     }
 
     @Test
+    @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick_disabled() {
         val enabled = mutableStateOf(false)
         val clickLatch = CountDownLatch(1)
@@ -466,7 +494,7 @@ class ClickableTest {
 
         rule.setContent {
             Box {
-                Text(
+                BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
@@ -542,6 +570,26 @@ class ClickableTest {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
             assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val onClick: () -> Unit = { }
+        rule.setContent {
+            val modifier = Modifier.clickable(onClick = onClick) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("clickable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "enabled",
+                "onClickLabel",
+                "onClick",
+                "onDoubleClick",
+                "onLongClick",
+                "onLongClickLabel",
+                "indication",
+                "interactionState"
+            )
         }
     }
 }

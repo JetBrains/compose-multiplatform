@@ -17,6 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.util.annotation.VisibleForTesting
 
@@ -43,6 +44,7 @@ const val INVALID_SESSION: InputSessionToken = -1
  * Provide a communication with platform text input service.
  */
 // Open for testing purposes.
+@OptIn(ExperimentalTextApi::class)
 open class TextInputService(private val platformTextInputService: PlatformTextInputService) {
 
     private var nextSessionToken: Int = 1
@@ -59,15 +61,13 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
      */
     open fun startInput(
         value: TextFieldValue,
-        keyboardType: KeyboardType,
-        imeAction: ImeAction,
+        imeOptions: ImeOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ): InputSessionToken {
         platformTextInputService.startInput(
             value,
-            keyboardType,
-            imeAction,
+            imeOptions,
             onEditCommand,
             onImeActionPerformed
         )
@@ -120,14 +120,14 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
 /**
  * Platform specific text input service.
  */
+@OptIn(ExperimentalTextApi::class)
 interface PlatformTextInputService {
     /**
      * Start text input session for given client.
      */
     fun startInput(
         value: TextFieldValue,
-        keyboardType: KeyboardType,
-        imeAction: ImeAction,
+        imeOptions: ImeOptions,
         onEditCommand: (List<EditOperation>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     )

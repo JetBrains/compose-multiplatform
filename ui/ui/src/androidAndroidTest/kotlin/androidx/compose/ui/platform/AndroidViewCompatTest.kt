@@ -43,28 +43,34 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Align
-import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.Layout
-import androidx.compose.ui.LayoutModifier
-import androidx.compose.ui.Measurable
-import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.globalPosition
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.isAttached
-import androidx.compose.ui.onGloballyPositioned
 import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -75,13 +81,9 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.assertPixels
-import androidx.ui.test.captureToBitmap
-import androidx.ui.test.onNodeWithTag
 import junit.framework.TestCase.assertNotNull
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
@@ -94,14 +96,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import kotlin.math.roundToInt
 
 /**
  * Testing the support for Android Views in Compose UI.
  */
-@SmallTest
-@RunWith(JUnit4::class)
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class AndroidViewCompatTest {
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
@@ -197,7 +198,7 @@ class AndroidViewCompatTest {
         }
         rule.onNodeWithTag("content")
             .assertIsDisplayed()
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedColorProvider = expectedPixelColor)
 
         rule.runOnUiThread {
@@ -211,7 +212,7 @@ class AndroidViewCompatTest {
             .check(matches(`is`(squareView)))
         rule.onNodeWithTag("content")
             .assertIsDisplayed()
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedColorProvider = expectedPixelColor)
 
         rule.runOnUiThread {
@@ -225,7 +226,7 @@ class AndroidViewCompatTest {
             .check(matches(`is`(squareView)))
         rule.onNodeWithTag("content")
             .assertIsDisplayed()
-            .captureToBitmap()
+            .captureToImage()
             .assertPixels(expectedColorProvider = expectedPixelColor)
     }
 
@@ -417,15 +418,15 @@ class AndroidViewCompatTest {
                 view.setBackgroundColor(android.graphics.Color.BLUE)
             }
         }
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
     }
 
@@ -482,8 +483,9 @@ class AndroidViewCompatTest {
                     Box(Modifier.padding(paddingDp)) {
                         AndroidView(::FrameLayout) {
                             it.setContent {
-                                Box(Modifier.padding(paddingDp)
-                                    .onGloballyPositioned { coordinates = it }
+                                Box(
+                                    Modifier.padding(paddingDp)
+                                        .onGloballyPositioned { coordinates = it }
                                 )
                             }
                         }
@@ -556,7 +558,7 @@ class AndroidViewCompatTest {
             }
         }
 
-        rule.onNodeWithTag("box").captureToBitmap().assertPixels(
+        rule.onNodeWithTag("box").captureToImage().assertPixels(
             IntSize((padding * 2 + size * 2).roundToInt(), (padding * 2 + size).roundToInt())
         ) { offset ->
             if (offset.y < padding || offset.y >= padding + size || offset.x < padding ||
@@ -626,7 +628,8 @@ class AndroidViewCompatTest {
         // The composition has been disposed.
         rule.runOnIdle {
             assertFalse(innerAndroidComposeView!!.isAttachedToWindow)
-            assertFalse(node!!.isAttached())
+            // the node stays attached after the compose view is detached
+            assertTrue(node!!.isAttached())
         }
     }
 
@@ -651,12 +654,12 @@ class AndroidViewCompatTest {
         }
 
         rule.onNodeWithTag("view")
-            .captureToBitmap().assertPixels(IntSize(sizePx, sizePx)) { Color.Green }
+            .captureToImage().assertPixels(IntSize(sizePx, sizePx)) { Color.Green }
 
         rule.runOnIdle { first = false }
 
         rule.onNodeWithTag("view")
-            .captureToBitmap().assertPixels(IntSize(sizePx, sizePx)) { Color.Blue }
+            .captureToImage().assertPixels(IntSize(sizePx, sizePx)) { Color.Blue }
     }
 
     @Test
@@ -689,14 +692,14 @@ class AndroidViewCompatTest {
             }
         }
 
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(sizePx * 2, sizePx)) {
                 if (it.x < sizePx) Color.Green else Color.Blue
             }
 
         rule.runOnIdle { first = false }
 
-        rule.onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(sizePx * 2, sizePx)) {
                 if (it.x < sizePx) Color.Blue else Color.Green
             }
@@ -759,7 +762,7 @@ class AndroidViewCompatTest {
         override fun MeasureScope.measure(
             measurable: Measurable,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
+        ): MeasureResult {
             val placeable = measurable.measure(childConstraints)
             return layout(placeable.width, placeable.height) {
                 placeable.place(0, 0)
@@ -786,8 +789,8 @@ class AndroidViewCompatTest {
             measureScope: MeasureScope,
             measurables: List<Measurable>,
             constraints: Constraints
-        ): MeasureScope.MeasureResult {
-            return object : MeasureScope.MeasureResult {
+        ): MeasureResult {
+            return object : MeasureResult {
                 override val width = 0
                 override val height = 0
                 override val alignmentLines: Map<AlignmentLine, Int> get() = mapOf()

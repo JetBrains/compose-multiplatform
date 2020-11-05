@@ -52,13 +52,11 @@ import androidx.compose.ui.autofill.AutofillType.PostalCode
 import androidx.compose.ui.autofill.AutofillType.PostalCodeExtended
 import androidx.compose.ui.autofill.AutofillType.SmsOtpCode
 import androidx.compose.ui.autofill.AutofillType.Username
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@SmallTest
 @RunWith(JUnit4::class)
 class AndroidAutofillTypeTest {
 
