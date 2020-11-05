@@ -3,7 +3,7 @@ package example.imageviewer.style
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.res.imageResource
-import example.imageviewer.R
+import example.imageviewer.common.R
 
 @Composable
 fun icEmpty(): ImageAsset = imageResource(R.raw.empty)

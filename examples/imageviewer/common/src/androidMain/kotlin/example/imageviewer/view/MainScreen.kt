@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.preferredSize
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import example.imageviewer.common.R
 import example.imageviewer.model.AppState
 import example.imageviewer.model.Picture
 import example.imageviewer.model.ScreenType
@@ -44,7 +44,6 @@ import example.imageviewer.style.LightGray
 import example.imageviewer.style.icRefresh
 import example.imageviewer.style.icEmpty
 import example.imageviewer.style.icDots
-import example.imageviewer.R
 
 
 @Composable
@@ -193,7 +192,7 @@ fun setMiniatureUI(
                 modifier = Modifier.weight(1f).align(Alignment.CenterVertically).padding(start = 16.dp),
                 style = MaterialTheme.typography.body1
             )
-                
+
             Clickable(
                 modifier = Modifier.preferredHeight(70.dp)
                         .preferredWidth(30.dp),

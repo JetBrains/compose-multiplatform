@@ -4,17 +4,14 @@ import android.content.Context
 import android.graphics.*
 import android.os.Handler
 import android.os.Looper
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import example.imageviewer.common.R
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.filtration.FiltersManager
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.view.showPopUpMessage
-import example.imageviewer.R
-import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -29,7 +26,7 @@ object ContentState {
         if (this::uriRepository.isInitialized && this.uriRepository == uriRepository) {
             return this
         }
-        
+
         this.context = context
         this.uriRepository = uriRepository
         repository = ImageRepository(uriRepository)
@@ -196,7 +193,7 @@ object ContentState {
                     handler.post {
                         showPopUpMessage(
                             getString(R.string.no_internet),
-                                context
+                            context
                         )
                         isAppUIReady.value = true
                     }
@@ -364,7 +361,7 @@ private object MainImageWrapper {
         return filtersSet
     }
 
-    private fun copy(bitmap: Bitmap) : Bitmap {
+    private fun copy(bitmap: Bitmap): Bitmap {
         return bitmap.copy(bitmap.config, false)
     }
 }
