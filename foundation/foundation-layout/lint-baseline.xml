@@ -3,7 +3,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        message="Modifier missing inspectorInfo"
         errorLine1="        return this.then(object : ParentDataModifier {"
         errorLine2="                         ^">
         <location
@@ -14,7 +14,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        message="Modifier missing inspectorInfo"
         errorLine1="fun Modifier.preferredWidth(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {"
         errorLine2="                                                            ~~~~~~">
         <location
@@ -25,7 +25,7 @@
 
     <issue
         id="ModifierInspectorInfo"
-        message="Modifiers should include inspectorInfo for the Layout Inspector"
+        message="Modifier missing inspectorInfo"
         errorLine1="fun Modifier.preferredHeight(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {"
         errorLine2="                                                             ~~~~~~">
         <location

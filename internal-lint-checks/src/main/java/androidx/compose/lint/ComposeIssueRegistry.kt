@@ -28,7 +28,6 @@ class ComposeIssueRegistry : IssueRegistry() {
         return listOf(
             ModifierInspectorInfoDetector.ISSUE,
             UnnecessaryLambdaCreationDetector.ISSUE,
-            PackageNameMigrationDetector.ISSUE
         ) + AndroidXIssueRegistry.Issues
     }
 }

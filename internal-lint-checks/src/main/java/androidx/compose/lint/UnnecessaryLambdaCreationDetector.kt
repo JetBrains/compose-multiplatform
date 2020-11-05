@@ -25,16 +25,18 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 import org.jetbrains.uast.ULambdaExpression
-import org.jetbrains.uast.UReferenceExpression
 import org.jetbrains.uast.kotlin.KotlinUBlockExpression
 import org.jetbrains.uast.kotlin.KotlinUFunctionCallExpression
 import org.jetbrains.uast.kotlin.KotlinUImplicitReturnExpression
 import org.jetbrains.uast.resolveToUElement
+import org.jetbrains.uast.toUElement
+import org.jetbrains.uast.tryResolve
 
 /**
  * Lint [Detector] to ensure that we are not creating extra lambdas just to emit already captured
@@ -142,10 +144,13 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
             val expectedComposable =
                 parentDeclaration.valueParameters[parameterIndex]!!.isComposable
 
-            val receiver = (expression.receiver as? UReferenceExpression)
-                ?.resolveToUElement()?.sourcePsi as? KtCallableDeclaration ?: return
+            // Hack to get the psi of the lambda declaration / source. The !!s here probably
+            // aren't safe, but nothing fails with them currently - so it could be a useful
+            // indicator if something breaks in the future to let us know to update this lint check.
+            val resolvedLambda = expression.sourcePsi.calleeExpression!!.toUElement()!!.tryResolve()
+                .toUElement()!!.sourcePsi!!
 
-            val isComposable = receiver.isComposable
+            val isComposable = resolvedLambda.isComposable
 
             if (isComposable != expectedComposable) return
 
@@ -185,9 +190,9 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
 }
 
 /**
- * @return whether this [KtCallableDeclaration] is annotated with @Composable
+ * @return whether this [PsiElement] contains @Composable in its source
  */
-private val KtCallableDeclaration.isComposable: Boolean
+private val PsiElement.isComposable: Boolean
     // Unfortunately as Composability isn't carried through UAST, and there are many types of
     // declarations (types such as foo: @Composable () -> Unit, properties such as val
     // foo = @Composable {}) the best way to cover this is just check if we contain this annotation
