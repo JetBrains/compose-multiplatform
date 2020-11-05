@@ -31,6 +31,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 
@@ -59,7 +60,14 @@ fun Modifier.animateContentSize(
     animSpec: AnimationSpec<IntSize> = spring(),
     clip: Boolean = true,
     endListener: ((startSize: IntSize, endSize: IntSize) -> Unit)? = null
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "animateContentSize"
+        properties["animSpec"] = animSpec
+        properties["clip"] = clip
+        properties["endListener"] = endListener
+    }
+) {
     // TODO: Listener could be a fun interface after 1.4
     val clock = AnimationClockAmbient.current.asDisposableClock()
     val animModifier = remember {

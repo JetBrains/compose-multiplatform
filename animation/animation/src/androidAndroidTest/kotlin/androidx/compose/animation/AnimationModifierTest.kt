@@ -23,11 +23,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -37,6 +40,11 @@ import androidx.test.filters.LargeTest
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.nullValue
+import org.junit.After
+import org.junit.Assert.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,6 +55,16 @@ class AnimationModifierTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun animateContentSizeTest() {
@@ -114,6 +132,19 @@ class AnimationModifierTest {
 
             rule.clockTestRule.advanceClock(20)
             rule.waitForIdle()
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        rule.setContent {
+            val modifier = Modifier.animateContentSize() as InspectableValue
+            assertThat(modifier.nameFallback, `is`("animateContentSize"))
+            assertThat(modifier.valueOverride, nullValue())
+            assertThat(
+                modifier.inspectableElements.map { it.name }.toList(),
+                `is`(listOf("animSpec", "clip", "endListener"))
+            )
         }
     }
 }
