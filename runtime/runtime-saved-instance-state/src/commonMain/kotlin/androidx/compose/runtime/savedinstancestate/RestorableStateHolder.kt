@@ -37,8 +37,8 @@ annotation class ExperimentalRestorableStateHolder
  *
  * @sample androidx.compose.runtime.savedinstancestate.samples.SimpleNavigationWithRestorableStateSample
  *
- * The content should be composed using [withRestorableState] while providing a key representing
- * this content. Next time [withRestorableState] will be used with the same key its state will be
+ * The content should be composed using [RestorableStateProvider] while providing a key representing
+ * this content. Next time [RestorableStateProvider] will be used with the same key its state will be
  * restored.
  *
  * @param T type of the keys. Note that on Android you can only use types which can be stored
@@ -56,7 +56,7 @@ interface RestorableStateHolder<T : Any> {
      * Android you can only use types which can be stored inside the Bundle.
      */
     @Composable
-    fun withRestorableState(key: T, content: @Composable () -> Unit)
+    fun RestorableStateProvider(key: T, content: @Composable () -> Unit)
 
     /**
      * Removes the saved state associated with the passed [key].
@@ -90,7 +90,7 @@ private class RestorableStateHolderImpl<T : Any>(
 
     @OptIn(ExperimentalComposeApi::class)
     @Composable
-    override fun withRestorableState(key: T, content: @Composable () -> Unit) {
+    override fun RestorableStateProvider(key: T, content: @Composable () -> Unit) {
         key(key) {
             val registryHolder = remember {
                 require(parentSavedStateRegistry?.canBeSaved(key) ?: true) {
