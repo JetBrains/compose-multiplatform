@@ -706,28 +706,6 @@
     </issue>
 
     <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
-            line="68"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
-            line="81"
-            column="15"/>
-    </issue>
-
-    <issue
         id="ClickableViewAccessibility"
         message="Custom view `PopupLayout` overrides `onTouchEvent` but not `performClick`"
         errorLine1="    override fun onTouchEvent(event: MotionEvent?): Boolean {"
