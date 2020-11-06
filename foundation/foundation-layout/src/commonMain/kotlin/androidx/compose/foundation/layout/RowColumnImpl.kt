@@ -426,7 +426,7 @@ internal sealed class CrossAxisAlignment {
             placeable: Placeable,
             beforeCrossAxisAlignmentLine: Int
         ): Int {
-            return vertical.align(size)
+            return vertical.align(0, size)
         }
     }
 
@@ -439,7 +439,7 @@ internal sealed class CrossAxisAlignment {
             placeable: Placeable,
             beforeCrossAxisAlignmentLine: Int
         ): Int {
-            return horizontal.align(size, layoutDirection)
+            return horizontal.align(0, size, layoutDirection)
         }
     }
 }

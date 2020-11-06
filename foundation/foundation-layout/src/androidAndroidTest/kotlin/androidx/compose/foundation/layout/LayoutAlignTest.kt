@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.IntSize.Companion.Zero
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.enforce
@@ -342,30 +343,30 @@ class LayoutAlignTest : LayoutTest() {
     @Test
     fun testAlignmentCoordinates_evenSize() {
         val size = IntSize(2, 2)
-        assertEquals(IntOffset(0, 0), Alignment.TopStart.align(size))
-        assertEquals(IntOffset(1, 0), Alignment.TopCenter.align(size))
-        assertEquals(IntOffset(2, 0), Alignment.TopEnd.align(size))
-        assertEquals(IntOffset(0, 1), Alignment.CenterStart.align(size))
-        assertEquals(IntOffset(1, 1), Alignment.Center.align(size))
-        assertEquals(IntOffset(2, 1), Alignment.CenterEnd.align(size))
-        assertEquals(IntOffset(0, 2), Alignment.BottomStart.align(size))
-        assertEquals(IntOffset(1, 2), Alignment.BottomCenter.align(size))
-        assertEquals(IntOffset(2, 2), Alignment.BottomEnd.align(size))
+        assertEquals(IntOffset(0, 0), Alignment.TopStart.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(1, 0), Alignment.TopCenter.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(2, 0), Alignment.TopEnd.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(0, 1), Alignment.CenterStart.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(1, 1), Alignment.Center.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(2, 1), Alignment.CenterEnd.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(0, 2), Alignment.BottomStart.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(1, 2), Alignment.BottomCenter.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(2, 2), Alignment.BottomEnd.align(Zero, size, LayoutDirection.Ltr))
     }
 
     // TODO(popam): this should be unit test instead
     @Test
     fun testAlignmentCoordinates_oddSize() {
         val size = IntSize(3, 3)
-        assertEquals(IntOffset(0, 0), Alignment.TopStart.align(size))
-        assertEquals(IntOffset(2, 0), Alignment.TopCenter.align(size))
-        assertEquals(IntOffset(3, 0), Alignment.TopEnd.align(size))
-        assertEquals(IntOffset(0, 2), Alignment.CenterStart.align(size))
-        assertEquals(IntOffset(2, 2), Alignment.Center.align(size))
-        assertEquals(IntOffset(3, 2), Alignment.CenterEnd.align(size))
-        assertEquals(IntOffset(0, 3), Alignment.BottomStart.align(size))
-        assertEquals(IntOffset(2, 3), Alignment.BottomCenter.align(size))
-        assertEquals(IntOffset(3, 3), Alignment.BottomEnd.align(size))
+        assertEquals(IntOffset(0, 0), Alignment.TopStart.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(2, 0), Alignment.TopCenter.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(3, 0), Alignment.TopEnd.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(0, 2), Alignment.CenterStart.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(2, 2), Alignment.Center.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(3, 2), Alignment.CenterEnd.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(0, 3), Alignment.BottomStart.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(2, 3), Alignment.BottomCenter.align(Zero, size, LayoutDirection.Ltr))
+        assertEquals(IntOffset(3, 3), Alignment.BottomEnd.align(Zero, size, LayoutDirection.Ltr))
     }
 
     @Test

@@ -123,10 +123,9 @@ internal fun SimpleContainer(
             val p = placeable ?: measurables.firstOrNull()?.measure(childConstraints)
             p?.let {
                 val position = Alignment.Center.align(
-                    IntSize(
-                        containerWidth - it.width,
-                        containerHeight - it.height
-                    )
+                    IntSize(it.width, it.height),
+                    IntSize(containerWidth, containerHeight),
+                    layoutDirection
                 )
                 it.placeRelative(
                     position.x,

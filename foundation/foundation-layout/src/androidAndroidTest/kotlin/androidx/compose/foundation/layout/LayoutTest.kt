@@ -401,10 +401,9 @@ open class LayoutTest {
                 val p = placeable ?: measurables.firstOrNull()?.measure(childConstraints)
                 p?.let {
                     val position = alignment.align(
-                        IntSize(
-                            containerWidth - it.width - totalHorizontal,
-                            containerHeight - it.height - totalVertical
-                        )
+                        IntSize(it.width + totalHorizontal, it.height + totalVertical),
+                        IntSize(containerWidth, containerHeight),
+                        layoutDirection
                     )
                     it.placeRelative(
                         padding.start.toIntPx() + position.x,

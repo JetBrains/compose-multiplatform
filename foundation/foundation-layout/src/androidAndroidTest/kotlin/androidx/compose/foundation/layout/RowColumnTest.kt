@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
@@ -5421,10 +5420,9 @@ private fun Center(children: @Composable () -> Unit) {
         layout(layoutWidth, layoutHeight) {
             if (placeable != null) {
                 val position = Alignment.Center.align(
-                    IntSize(
-                        layoutWidth - placeable.width,
-                        layoutHeight - placeable.height
-                    )
+                    IntSize(placeable.width, placeable.height),
+                    IntSize(layoutWidth, layoutHeight),
+                    layoutDirection
                 )
                 placeable.placeRelative(position.x, position.y)
             }

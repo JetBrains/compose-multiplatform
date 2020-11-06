@@ -528,13 +528,13 @@ private fun Placeable.PlacementScope.place(
     // placed center vertically and to the start edge horizontally
     leadingPlaceable?.placeRelative(
         0,
-        Alignment.CenterVertically.align(height - leadingPlaceable.height)
+        Alignment.CenterVertically.align(leadingPlaceable.height, height)
     )
 
     // placed center vertically and to the end edge horizontally
     trailingPlaceable?.placeRelative(
         width - trailingPlaceable.width,
-        Alignment.CenterVertically.align(height - trailingPlaceable.height)
+        Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
 
     // if animation progress is 0, the label will be centered vertically
@@ -542,7 +542,7 @@ private fun Placeable.PlacementScope.place(
     // horizontally it is placed after the leading icon
     if (labelPlaceable != null) {
         val labelPositionY =
-            Alignment.CenterVertically.align(height - labelPlaceable.height) * (
+            Alignment.CenterVertically.align(labelPlaceable.height, height) * (
                 1 -
                     animationProgress
                 ) - (labelPlaceable.height / 2) * animationProgress
@@ -554,13 +554,13 @@ private fun Placeable.PlacementScope.place(
     // placed center vertically and after the leading icon horizontally
     textFieldPlaceable.placeRelative(
         widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(height - textFieldPlaceable.height)
+        Alignment.CenterVertically.align(textFieldPlaceable.height, height)
     )
 
     // placed center vertically and after the leading icon horizontally
     placeholderPlaceable?.placeRelative(
         widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(height - placeholderPlaceable.height)
+        Alignment.CenterVertically.align(placeholderPlaceable.height, height)
     )
 }
 

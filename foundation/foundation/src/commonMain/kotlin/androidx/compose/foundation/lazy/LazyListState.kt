@@ -412,13 +412,13 @@ class LazyListState constructor(
                 var currentMainAxis = -currentFirstItemScrollOffset
                 visibleItemsPlaceables.fastForEach {
                     if (isVertical) {
-                        val x = horizontalAlignment.align(layoutWidth - it.width, layoutDirection)
+                        val x = horizontalAlignment.align(it.width, layoutWidth, layoutDirection)
                         if (currentMainAxis + it.height > 0 && currentMainAxis < layoutHeight) {
                             it.place(x, currentMainAxis)
                         }
                         currentMainAxis += it.height
                     } else {
-                        val y = verticalAlignment.align(layoutHeight - it.height)
+                        val y = verticalAlignment.align(it.height, layoutHeight)
                         if (currentMainAxis + it.width > 0 && currentMainAxis < layoutWidth) {
                             it.placeRelative(currentMainAxis, y)
                         }
