@@ -26,7 +26,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 val FoundationDemos = DemoCategory(
     "Foundation",
     listOf(
-        ComposableDemo("Draggable, Scrollable, Zoomable") { HighLevelGesturesDemo() },
+        ComposableDemo("Draggable, Scrollable, Zoomable, Focusable") { HighLevelGesturesDemo() },
         ComposableDemo("Scrollable Column") { ScrollableColumnSample() },
         ComposableDemo("Controlled Scrollable Row") { ControlledScrollableRowSample() },
         ComposableDemo("Draw Modifiers") { DrawModifiersDemo() },

@@ -94,6 +94,22 @@ fun isNotSelected(): SemanticsMatcher =
     SemanticsMatcher.expectValue(FoundationSemanticsProperties.Selected, false)
 
 /**
+ * Return whether the node is able to receive focus
+ *
+ * @see SemanticsProperties.Focused
+ */
+fun isFocusable(): SemanticsMatcher =
+    SemanticsMatcher.keyIsDefined(SemanticsProperties.Focused)
+
+/**
+ * Return whether the node is not able to receive focus.
+ *
+ * @see SemanticsProperties.Focused
+ */
+fun isNotFocusable(): SemanticsMatcher =
+    SemanticsMatcher.keyNotDefined(SemanticsProperties.Focused)
+
+/**
  * Returns whether the node is focused.
  *
  * @see SemanticsProperties.Focused
