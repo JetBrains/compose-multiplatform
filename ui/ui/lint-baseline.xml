@@ -689,17 +689,6 @@
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/ui/gesture/LongPressDragGestureFilter.kt"
-            line="121"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
             file="src/commonMain/kotlin/androidx/compose/ui/gesture/LongPressGestureFilter.kt"
             line="58"
             column="15"/>
