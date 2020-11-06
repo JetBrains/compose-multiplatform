@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ContentAlpha
@@ -89,6 +90,7 @@ fun MaterialTextFieldDemo() {
         var leadingChecked by savedInstanceState { false }
         var trailingChecked by savedInstanceState { false }
         val characterCounterChecked by savedInstanceState { false }
+        var singleLineChecked by savedInstanceState { true }
         var selectedOption by savedInstanceState { Option.None }
         var selectedTextField by savedInstanceState { TextFieldType.Filled }
 
@@ -98,6 +100,7 @@ fun MaterialTextFieldDemo() {
                     TextField(
                         value = text,
                         onValueChange = { text = it },
+                        singleLine = singleLineChecked,
                         label = {
                             val label =
                                 "Label" + if (selectedOption == Option.Error) "*" else ""
@@ -105,12 +108,14 @@ fun MaterialTextFieldDemo() {
                         },
                         leadingIcon = { if (leadingChecked) Icon(Icons.Filled.Favorite) },
                         trailingIcon = { if (trailingChecked) Icon(Icons.Filled.Info) },
-                        isErrorValue = selectedOption == Option.Error
+                        isErrorValue = selectedOption == Option.Error,
+                        modifier = Modifier.widthIn(max = 300.dp)
                     )
                 TextFieldType.Outlined ->
                     OutlinedTextField(
                         value = text,
                         onValueChange = { text = it },
+                        singleLine = singleLineChecked,
                         label = {
                             val label =
                                 "Label" + if (selectedOption == Option.Error) "*" else ""
@@ -118,7 +123,8 @@ fun MaterialTextFieldDemo() {
                         },
                         leadingIcon = { if (leadingChecked) Icon(Icons.Filled.Favorite) },
                         trailingIcon = { if (trailingChecked) Icon(Icons.Filled.Info) },
-                        isErrorValue = selectedOption == Option.Error
+                        isErrorValue = selectedOption == Option.Error,
+                        modifier = Modifier.widthIn(max = 300.dp)
                     )
             }
         }
@@ -169,6 +175,11 @@ fun MaterialTextFieldDemo() {
                 title = "Trailing icon",
                 checked = trailingChecked,
                 onCheckedChange = { trailingChecked = it }
+            )
+            OptionRow(
+                title = "Single line",
+                checked = singleLineChecked,
+                onCheckedChange = { singleLineChecked = it }
             )
             OptionRow(
                 title = "Character counter (TODO)",

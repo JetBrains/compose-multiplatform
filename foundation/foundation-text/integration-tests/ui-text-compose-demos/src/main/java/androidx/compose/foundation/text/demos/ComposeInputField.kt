@@ -48,13 +48,15 @@ fun InputFieldDemo() {
 @Composable
 internal fun EditLine(
     keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified
+    imeAction: ImeAction = ImeAction.Unspecified,
+    singleLine: Boolean = true
 ) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
+        singleLine = singleLine,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
             imeAction = imeAction

@@ -247,6 +247,7 @@ private fun VariousEditLine(
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
+        singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
             imeAction = imeAction
