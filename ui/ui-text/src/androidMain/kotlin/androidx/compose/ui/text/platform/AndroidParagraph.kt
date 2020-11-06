@@ -158,11 +158,14 @@ internal class AndroidParagraph constructor(
             getSpans(0, length, PlaceholderSpan::class.java).map { span ->
                 val start = getSpanStart(span)
                 val end = getSpanEnd(span)
+                // The line index of the PlaceholderSpan. In the case where PlaceholderSpan is
+                // truncated due to maxLines limitation. It will return the index of last line.
                 val line = layout.getLineForOffset(start)
-                // This Placeholder is ellipsized, return null instead.
-                if (layout.getLineEllipsisCount(line) > 0 &&
+                val isPlaceholderSpanEllipsized = layout.getLineEllipsisCount(line) > 0 &&
                     end > layout.getLineEllipsisOffset(line)
-                ) {
+                val isPlaceholderSpanTruncated = end > layout.getLineEnd(line)
+                // This Placeholder is ellipsized or truncated, return null instead.
+                if (isPlaceholderSpanEllipsized || isPlaceholderSpanTruncated) {
                     return@map null
                 }
 
