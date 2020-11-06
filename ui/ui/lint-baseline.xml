@@ -711,17 +711,6 @@
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawPressStartGestureFilter.kt"
-            line="57"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
             file="src/commonMain/kotlin/androidx/compose/ui/gesture/RawScaleGestureFilter.kt"
             line="122"
             column="15"/>
