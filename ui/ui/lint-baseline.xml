@@ -686,17 +686,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifier missing inspectorInfo"
-        errorLine1="    return this.then(FocusRequesterModifierImpl(focusRequester))"
-        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/FocusRequesterModifier.kt"
-            line="46"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
         errorLine1="fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
         errorLine2="                                                                           ~~~~~~~~">
         <location
