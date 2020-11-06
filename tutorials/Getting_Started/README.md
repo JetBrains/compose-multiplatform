@@ -22,8 +22,8 @@ The recommended way of building Compose for Desktop projects is by using Gradle.
 JetBrains provides a simple way of building Compose for Desktop projects
 using a special Gradle plugin.
 
-One could clone an existing template [desktop](https://github.com/JetBrains/compose-jb/tree/master/templates/desktop-template) or
-[multiplatform](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template) application templates, or create it from scratch.
+One could clone an existing template for a [desktop](https://github.com/JetBrains/compose-jb/tree/master/templates/desktop-template) or
+[multiplatform](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template) application, or create it from scratch.
 
 First create a new directory, named `sample`.
 ```shell script
@@ -64,15 +64,15 @@ compose.desktop {
     }
 }
 ```
-Then create file `src/main/kotlin/main.kt` and put there:
+Then create `src/main/kotlin/main.kt` and put the following code in there:
 ```kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -81,7 +81,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
 fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
-    var count = remember { mutableStateOf(0) }
+    val count = remember { mutableStateOf(0) }
     MaterialTheme {
         Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
             Button(modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -107,10 +107,10 @@ Open `build.gradle.kts` as a project in IntelliJ IDEA.
 ![New project](screen1.png)
 
 After you download the Compose for Desktop dependencies from the Maven repositories your new project is ready
-to go. Open the Gradle toolbar on the right, and select `sample/Tasks/applications/run`.
-The first run may take some time, but afterwards following dialog will be shown:
+to go. Open the Gradle toolbar on the right, and select `sample/Tasks/compose desktop/run`.
+The first run may take some time, but afterwards the following dialog will be shown:
 
 ![Application running](screen2.gif)
 
-You can click on the button several times and see that application reacts and
+You can click on the button several times and see that the application reacts and
 updates the UI.
