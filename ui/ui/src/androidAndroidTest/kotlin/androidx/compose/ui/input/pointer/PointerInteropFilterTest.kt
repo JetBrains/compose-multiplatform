@@ -25,18 +25,23 @@ import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import android.view.MotionEvent.TOOL_TYPE_UNKNOWN
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,6 +68,16 @@ class PointerInteropFilterTest {
             retVal
         }
         pointerInteropFilter.requestDisallowInterceptTouchEvent = disallowInterceptRequester
+    }
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     // Verification of correct MotionEvents being dispatched (when no events are cancel)
@@ -4327,6 +4342,21 @@ class PointerInteropFilterTest {
         dispatchedMotionEvents.clear()
         pointerInteropFilter.pointerInputFilter.onCancel()
         assertThat(dispatchedMotionEvents).hasSize(1)
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val onTouchEvent: (MotionEvent) -> Boolean = { true }
+        rule.setContent {
+            val modifier = Modifier.pointerInteropFilter(disallowInterceptRequester, onTouchEvent)
+                as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("pointerInteropFilter")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                ValueElement("requestDisallowInterceptTouchEvent", disallowInterceptRequester),
+                ValueElement("onTouchEvent", onTouchEvent)
+            )
+        }
     }
 
     private class MockCoordinates : LayoutCoordinates {
