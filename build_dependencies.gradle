@@ -17,10 +17,10 @@
 def build_versions = [:]
 
 // NOTE: lint versions *must* be kept in sync with agp
-build_versions.agp = '4.2.0-alpha06'
+build_versions.agp = '4.2.0-alpha15'
 // NOTE: When updating the lint version we also need to update the `api` version supported
 //  by `IssueRegistry`'s.' For e.g. aosp/1331903
-build_versions.lint = '27.2.0-alpha06'
+build_versions.lint = '27.2.0-alpha15'
 
 build_versions.kotlin = "1.4.0"
 build_versions.kotlin_coroutines = "1.3.9"

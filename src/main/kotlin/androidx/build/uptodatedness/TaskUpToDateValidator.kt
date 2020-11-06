@@ -39,6 +39,7 @@ const val RECORD_FLAG_NAME = "verifyUpToDate"
 // Entries in this set may be task names (like assembleDebug) or task paths
 // (like :core:core:assembleDebug)
 val EXEMPT_TASKS = setOf(
+    "analyticsRecordingRelease",
     "buildOnServer",
     "checkExternalLicenses",
     "createArchive",

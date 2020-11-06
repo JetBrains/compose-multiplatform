@@ -107,6 +107,13 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             disable("KtxExtensionAvailable")
             disable("GradleDependency")
 
+            // Disable a check that's only relevant for real apps. For our test apps we're not
+            // concerned with drawables potentially being a little bit blurry
+            disable("IconMissingDensityFolder")
+
+            // Disable until it works for our projects, b/171986505
+            disable("JavaPluginLanguageLevel")
+
             if (extension.type.compilationTarget != CompilationTarget.HOST) {
                 fatal("Assert")
                 fatal("NewApi")
@@ -116,13 +123,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 fatal("KotlinPropertyAccess")
                 fatal("LambdaLast")
                 fatal("UnknownNullness")
-
-                // If the project has not overridden the lint config, set the default one.
-                if (lintConfig == null) {
-                    // suppress warnings more specifically than issue-wide severity (regexes)
-                    // Currently suppresses warnings from baseline files working as intended
-                    lintConfig = project.rootProject.file("buildSrc/lint.xml")
-                }
 
                 // Only override if not set explicitly.
                 // Some Kotlin projects may wish to disable this.
@@ -139,6 +139,13 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 } else {
                     disable("MissingTranslation")
                 }
+            }
+
+            // If the project has not overridden the lint config, set the default one.
+            if (lintConfig == null) {
+                // suppress warnings more specifically than issue-wide severity (regexes)
+                // Currently suppresses warnings from baseline files working as intended
+                lintConfig = project.rootProject.file("buildSrc/lint.xml")
             }
 
             // Teams shouldn't be able to generate new baseline files or add new violations to
