@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha06" client="gradle" variant="debug" version="4.2.0-alpha06">
+<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
+
+    <issue
+        id="SuspiciousImport"
+        message="Don&apos;t include `android.R` here; use a fully qualified name for each usage instead"
+        errorLine1="import android.R"
+        errorLine2="~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            line="19"
+            column="1"/>
+    </issue>
 
     <issue
         id="BanSynchronizedMethods"

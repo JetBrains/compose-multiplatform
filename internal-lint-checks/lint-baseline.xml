@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.2.0-alpha15" client="gradle" version="4.2.0-alpha15">
+
+    <issue
+        id="LintImplTextFormat"
+        message="The issue summary should be shorter; typically just a 3-6 words; it&apos;s used as a topic header in HTML reports and in the IDE inspections window"
+        errorLine1="            briefDescription = &quot;Modifiers should include inspectorInfo for the Layout Inspector&quot;,"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/compose/lint/ModifierInspectorInfoDetector.kt"
+            line="655"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="LintImplTextFormat"
+        message="Single sentence error messages should not end with a period"
+        errorLine1="                    &quot;The package name &apos;$packageName&apos; has been migrated to &apos;$newPackageName&apos;, &quot; +"
+        errorLine2="                    ^">
+        <location
+            file="src/main/java/androidx/compose/lint/PackageNameMigrationDetector.kt"
+            line="51"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="LintImplTextFormat"
+        message="The issue summary should be shorter; typically just a 3-6 words; it&apos;s used as a topic header in HTML reports and in the IDE inspections window"
+        errorLine1="            &quot;Using an old package name that has recently been migrated to androidx.compose&quot;,"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/compose/lint/PackageNameMigrationDetector.kt"
+            line="92"
+            column="14"/>
+    </issue>
+
+</issues>

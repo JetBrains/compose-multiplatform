@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="                    .inflate(R.layout.android_4_buttons_in_compose, null).let { view ->"
+        errorLine2="                                                                    ~~~~">
+        <location
+            file="src/main/java/androidx/compose/androidview/demos/PointerInputInteropAndroidInCompose.kt"
+            line="87"
+            column="69"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="                    .inflate(R.layout.android_tap_in_compose_tap, null).let { view ->"
+        errorLine2="                                                                  ~~~~">
+        <location
+            file="src/main/java/androidx/compose/androidview/demos/PointerInputInteropAndroidInCompose.kt"
+            line="137"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="                    .inflate(R.layout.android_tap_in_compose_scroll, null).let { view ->"
+        errorLine2="                                                                     ~~~~">
+        <location
+            file="src/main/java/androidx/compose/androidview/demos/PointerInputInteropAndroidInCompose.kt"
+            line="167"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="                        null"
+        errorLine2="                        ~~~~">
+        <location
+            file="src/main/java/androidx/compose/androidview/demos/PointerInputInteropAndroidInCompose.kt"
+            line="216"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="                        .inflate(R.layout.android_scroll_in_compose_scroll_same_orientation, null)"
+        errorLine2="                                                                                             ~~~~">
+        <location
+            file="src/main/java/androidx/compose/androidview/demos/PointerInputInteropAndroidInCompose.kt"
+            line="248"
+            column="94"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="                        .inflate(R.layout.android_scrollview, null)"
+        errorLine2="                                                              ~~~~">
+        <location
+            file="src/main/java/androidx/compose/androidview/demos/PointerInputInteropAndroidInCompose.kt"
+            line="267"
+            column="63"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="                        .inflate(R.layout.android_scrollview, null)"
+        errorLine2="                                                              ~~~~">
+        <location
+            file="src/main/java/androidx/compose/androidview/demos/PointerInputInteropAndroidInCompose.kt"
+            line="274"
+            column="63"/>
+    </issue>
+
+    <issue
+        id="RedundantNamespace"
+        message="This namespace declaration is redundant"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RedundantNamespace"
+        message="This namespace declaration is redundant"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="27"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RedundantNamespace"
+        message="This namespace declaration is redundant"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="32"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RedundantNamespace"
+        message="This namespace declaration is redundant"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="37"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RedundantNamespace"
+        message="This namespace declaration is redundant"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_tap.xml"
+            line="21"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedNamespace"
+        message="Unused namespace declaration xmlns:android; already declared on the root element"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedNamespace"
+        message="Unused namespace declaration xmlns:android; already declared on the root element"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="27"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedNamespace"
+        message="Unused namespace declaration xmlns:android; already declared on the root element"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="32"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedNamespace"
+        message="Unused namespace declaration xmlns:android; already declared on the root element"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="37"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedNamespace"
+        message="Unused namespace declaration xmlns:android; already declared on the root element"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_tap.xml"
+            line="21"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="     ~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="22"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="     ~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="27"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="     ~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="32"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="    &lt;Button xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="     ~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="37"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Red&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Red&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_4_buttons_in_compose.xml"
+            line="26"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Blue&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Blue&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_4_buttons_in_compose.xml"
+            line="34"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Green&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Green&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_4_buttons_in_compose.xml"
+            line="44"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Yellow&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Yellow&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_4_buttons_in_compose.xml"
+            line="52"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;1&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="29"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;2&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;2&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="34"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;3&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;3&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="39"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;4&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;4&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="44"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;5&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;5&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="49"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;6&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;6&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="54"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;7&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;7&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="59"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;8&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;8&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="64"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;9&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;9&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="69"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;10&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;10&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_different_orientation.xml"
+            line="74"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;1&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="29"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;2&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;2&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="34"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;3&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;3&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="39"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;4&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;4&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="44"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;5&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;5&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="49"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;6&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;6&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="54"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;7&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;7&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="59"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;8&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;8&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="64"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;9&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;9&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="69"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;10&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;10&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scroll_in_compose_scroll_same_orientation.xml"
+            line="74"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;1&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="30"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;2&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;2&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="35"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;3&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;3&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="40"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;4&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;4&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="45"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;5&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;5&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="50"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;6&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;6&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="55"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;7&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;7&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="60"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;8&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;8&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="65"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;9&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;9&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="70"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;10&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;10&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_scrollview.xml"
+            line="75"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Red&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Red&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="26"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Green&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Green&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="31"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Blue&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Blue&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="36"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Yellow&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Yellow&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_scroll.xml"
+            line="41"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Red&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Red&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/android_tap_in_compose_tap.xml"
+            line="29"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Show Dialog&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Show Dialog&quot;/>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/compose_in_android_dialog_dismiss_dialog_during_dispatch.xml"
+            line="33"
+            column="9"/>
+    </issue>
+
+</issues>
