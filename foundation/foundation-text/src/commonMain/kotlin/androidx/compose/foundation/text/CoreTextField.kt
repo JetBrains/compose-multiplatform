@@ -75,6 +75,7 @@ import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
+import androidx.compose.ui.semantics.imeAction
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
@@ -363,7 +364,6 @@ fun CoreTextField(
 
     val semanticsModifier = Modifier.semantics {
         this.imeAction = imeOptions.imeAction
-        this.supportsInputMethods()
         this.text = AnnotatedString(value.text)
         this.textSelectionRange = value.selection
         this.focused = state.hasFocus

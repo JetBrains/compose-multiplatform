@@ -27,12 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertIsInMutuallyExclusiveGroup
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
-import androidx.compose.ui.test.isInMutuallyExclusiveGroup
+import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
@@ -74,10 +73,9 @@ class SelectableTest {
             )
         }
 
-        rule.onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isSelectable())
             .assertCountEquals(1)
             .onFirst()
-            .assertIsInMutuallyExclusiveGroup()
             .assertIsSelected()
     }
 
@@ -94,7 +92,7 @@ class SelectableTest {
             )
         }
 
-        rule.onNode(isInMutuallyExclusiveGroup())
+        rule.onNode(isSelectable())
             .assertIsNotSelected()
             .performClick()
             .assertIsSelected()
@@ -115,7 +113,7 @@ class SelectableTest {
             )
         }
 
-        rule.onNode(isInMutuallyExclusiveGroup())
+        rule.onNode(isSelectable())
             .assertIsNotSelected()
             .performClick()
             .assertIsNotSelected()

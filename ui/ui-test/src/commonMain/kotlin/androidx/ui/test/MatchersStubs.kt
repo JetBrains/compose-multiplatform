@@ -207,6 +207,7 @@ fun hasTestTag(testTag: String) = androidx.compose.ui.test.hasTestTag(testTag)
 /**
  * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library",
     replaceWith = ReplaceWith("isInMutuallyExclusiveGroup()", "androidx.compose.ui.test")
@@ -261,6 +262,7 @@ fun hasImeAction(actionType: ImeAction) = androidx.compose.ui.test.hasImeAction(
 /**
  * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library",
     replaceWith = ReplaceWith("hasInputMethodsSupport()", "androidx.compose.ui.test")
