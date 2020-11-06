@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ZoomableSample() {
     Box(
-        Modifier.preferredSize(300.dp).clipToBounds().background(Color.LightGray)
+        Modifier.preferredSize(200.dp).clipToBounds().background(Color.LightGray)
     ) {
         var scale by remember { mutableStateOf(1f) }
         val zoomableController = rememberZoomableController { scale *= it }

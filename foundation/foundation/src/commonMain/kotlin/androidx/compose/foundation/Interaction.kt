@@ -43,8 +43,14 @@ interface Interaction {
      */
     object Pressed : Interaction
 
+    /**
+     * An interaction corresponding to a focused state on a component.
+     *
+     * See [focusable]
+     */
+    object Focused : Interaction
+
     /* TODO: b/152525426 add these states
     object Hovered : Interaction
-    object Focused : Interaction
-     */
+    */
 }
