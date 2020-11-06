@@ -26,14 +26,20 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,6 +53,16 @@ class ConstraintLayoutTest : LayoutTest() {
     val rule = createComposeRule()
 
     // region sizing tests
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     @Test
     fun dividerMatchTextHeight_spread() = with(density) {
@@ -1088,5 +1104,23 @@ class ConstraintLayoutTest : LayoutTest() {
             first.value = false
         }
         rule.waitForIdle()
+    }
+
+    @Test
+    fun testInspectorValue() {
+        rule.setContent {
+            ConstraintLayout(Modifier.width(10.dp)) {
+                val ref = createRef()
+                val block: ConstrainScope.() -> Unit = {}
+                val modifier = Modifier.constrainAs(ref, block) as InspectableValue
+
+                assertThat(modifier.nameFallback).isEqualTo("constrainAs")
+                assertThat(modifier.valueOverride).isNull()
+                assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                    ValueElement("ref", ref),
+                    ValueElement("constrainBlock", block)
+                )
+            }
+        }
     }
 }
