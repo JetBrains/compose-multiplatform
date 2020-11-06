@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.hasFixedHeight
 import androidx.compose.ui.unit.hasFixedWidth
-import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -253,10 +252,9 @@ private class PainterModifier(
         // and size to draw based on the ContentScale parameter
         val scaledSize = srcSize * scale
         val alignedPosition = alignment.align(
-            IntSize(
-                ceil(size.width - (scaledSize.width)).toInt(),
-                ceil(size.height - (scaledSize.height)).toInt()
-            )
+            IntSize(scaledSize.width.roundToInt(), scaledSize.height.roundToInt()),
+            IntSize(size.width.roundToInt(), size.height.roundToInt()),
+            layoutDirection
         )
 
         val dx = alignedPosition.x.toFloat()

@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.max
@@ -254,10 +255,12 @@ private fun Flow(
                             crossAxisSizes[i] - placeable.crossAxisSize()
                         FlowCrossAxisAlignment.Center ->
                             Alignment.Center.align(
+                                IntSize.Zero,
                                 IntSize(
                                     width = 0,
                                     height = crossAxisSizes[i] - placeable.crossAxisSize()
-                                )
+                                ),
+                                LayoutDirection.Ltr
                             ).y
                     }
                     if (orientation == LayoutOrientation.Horizontal) {

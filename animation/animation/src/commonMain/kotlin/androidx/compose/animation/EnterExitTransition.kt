@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 
@@ -685,7 +686,7 @@ private class AlignmentBasedSizeAnimation(
 
     override val offset: (IntSize) -> IntOffset
         get() = {
-            alignment.align(anim.value - it)
+            alignment.align(it, anim.value, LayoutDirection.Ltr)
         }
 
     override fun animateTo(
@@ -748,7 +749,7 @@ private class RectBasedSizeAnimation(
         spec: AnimationSpec<IntSize>,
         clock: AnimationClockObservable
     ): SizeAnimation {
-        val targetOffSet = alignment.align(target - fullSize)
+        val targetOffSet = alignment.align(fullSize, target, LayoutDirection.Ltr)
         if (offsetAnim.targetValue != targetOffSet) {
             offsetAnim.animateTo(targetOffSet, onEnd = listener)
         }

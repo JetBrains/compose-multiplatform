@@ -394,8 +394,11 @@ private fun OffsetToBaselineOrCenter(
             containerHeight = max(constraints.minHeight, y + placeable.height)
         } else {
             containerHeight = max(constraints.minHeight, placeable.height)
-            y = Alignment.Center
-                .align(IntSize(0, containerHeight - placeable.height)).y
+            y = Alignment.Center.align(
+                IntSize.Zero,
+                IntSize(0, containerHeight - placeable.height),
+                layoutDirection
+            ).y
         }
         layout(placeable.width, containerHeight) {
             placeable.placeRelative(0, y)

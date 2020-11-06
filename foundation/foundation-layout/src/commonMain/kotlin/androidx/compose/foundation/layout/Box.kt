@@ -170,7 +170,8 @@ private fun Placeable.PlacementScope.placeInBox(
 ) {
     val childAlignment = measurable.boxChildData?.alignment ?: alignment
     val position = childAlignment.align(
-        IntSize(boxWidth - placeable.width, boxHeight - placeable.height),
+        IntSize(placeable.width, placeable.height),
+        IntSize(boxWidth, boxHeight),
         layoutDirection
     )
     placeable.place(position)

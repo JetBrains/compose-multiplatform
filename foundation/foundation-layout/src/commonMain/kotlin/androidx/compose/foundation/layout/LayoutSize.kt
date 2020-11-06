@@ -514,7 +514,7 @@ fun Modifier.wrapContentWidth(
         direction = Direction.Horizontal,
         unbounded = unbounded,
         alignmentCallback = { size, layoutDirection ->
-            IntOffset(align.align(size.width, layoutDirection), 0)
+            IntOffset(align.align(0, size.width, layoutDirection), 0)
         },
         inspectorInfo = debugInspectorInfo {
             name = "wrapContentWidth"
@@ -545,7 +545,7 @@ fun Modifier.wrapContentHeight(
         direction = Direction.Vertical,
         unbounded = unbounded,
         alignmentCallback = { size, _ ->
-            IntOffset(0, align.align(size.height))
+            IntOffset(0, align.align(0, size.height))
         },
         inspectorInfo = debugInspectorInfo {
             name = "wrapContentHeight"
@@ -575,7 +575,7 @@ fun Modifier.wrapContentSize(
         direction = Direction.Both,
         unbounded = unbounded,
         alignmentCallback = { size, layoutDirection ->
-            align.align(size, layoutDirection)
+            align.align(IntSize.Zero, size, layoutDirection)
         },
         inspectorInfo = debugInspectorInfo {
             name = "wrapContentSize"
