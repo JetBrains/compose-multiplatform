@@ -216,7 +216,7 @@ object SemanticsActions {
         SemanticsPropertyKey<AccessibilityAction<(x: Float, y: Float) -> Boolean>>("ScrollBy")
 
     /**
-     * Action to set slider progress.
+     * Action to set progress.
      *
      * @see SemanticsPropertyReceiver.setProgress
      */
@@ -255,7 +255,9 @@ object SemanticsActions {
     val CutText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CutText")
 
     /**
-     * Action to paste the text from the clipboard.
+     * Action to paste the text from the clipboard. Add it to indicate that element is open for
+     * accepting paste data from the clipboard.
+     * The element setting this property should also set the [SemanticsProperties.Focused] property.
      *
      * @see SemanticsPropertyReceiver.pasteText
      */
@@ -599,9 +601,15 @@ fun SemanticsPropertyReceiver.cutText(
 
 /**
  * This function adds the [SemanticsActions.PasteText] to the [SemanticsPropertyReceiver].
+ * Use it to indicate that element is open for accepting paste data from the clipboard. There is
+ * no need to check if the clipboard data available as this is done by the framework.
+ * For this action to be triggered, the element must also have the [SemanticsProperties.Focused]
+ * property set.
  *
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.PasteText] is called.
+ *
+ * @see focused
  */
 fun SemanticsPropertyReceiver.pasteText(
     label: String? = null,

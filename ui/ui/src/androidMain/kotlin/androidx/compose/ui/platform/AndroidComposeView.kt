@@ -330,14 +330,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         return sendKeyEvent(KeyEventAndroid(event))
     }
 
-    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        super.onWindowFocusChanged(hasWindowFocus)
-
-        if (hasWindowFocus) {
-            accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
-        }
-    }
-
     override fun pauseModelReadObserveration(block: () -> Unit) =
         snapshotObserver.pauseObservingReads(block)
 
