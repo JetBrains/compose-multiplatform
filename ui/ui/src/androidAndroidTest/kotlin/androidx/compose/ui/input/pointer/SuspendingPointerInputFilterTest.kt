@@ -16,9 +16,13 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.ExperimentalPointerInput
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime
@@ -35,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,6 +48,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalPointerInput::class)
 class SuspendingPointerInputFilterTest {
+    @After
+    fun after() {
+        // some tests may set this
+        isDebugInspectorInfoEnabled = false
+    }
+
     @Test
     fun testAwaitSingleEvent(): Unit = runBlocking {
         val filter = SuspendingPointerInputFilter(DummyViewConfiguration())
@@ -182,6 +193,19 @@ class SuspendingPointerInputFilterTest {
         }
 
         reader.cancel()
+    }
+
+    @Test
+    fun testInspectorValue() = runBlocking<Unit> {
+        isDebugInspectorInfoEnabled = true
+        val block: suspend PointerInputScope.() -> Unit = {}
+        val modifier = Modifier.pointerInput(block) as InspectableValue
+
+        assertThat(modifier.nameFallback).isEqualTo("pointerInput")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("block", block)
+        )
     }
 }
 
