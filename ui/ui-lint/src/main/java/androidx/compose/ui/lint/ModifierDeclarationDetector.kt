@@ -28,9 +28,11 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.PsiType
+import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
+import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.uast.UMethod
 
@@ -47,9 +49,8 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             // Ignore functions that do not return
             val returnType = node.returnType ?: return
 
-            val allReturnSuperTypes = returnType.allSuperTypes()
             // Ignore functions that do not return Modifier or something implementing Modifier
-            if (allReturnSuperTypes.none { it.canonicalText == Modifier }) return
+            if (!InheritanceUtil.isInheritor(returnType, Modifier)) return
 
             fun report(lintFix: LintFix? = null) {
                 context.report(
@@ -63,6 +64,11 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
 
             if (returnType.canonicalText != Modifier) {
                 val source = node.sourcePsi
+                // If this node is a property that is a constructor parameter, ignore it.
+                if (source is KtParameter) return
+                // If this node is a var, then this isn't a Modifier factory API, so just
+                // ignore it.
+                if ((source as? KtProperty)?.isVar == true) return
                 if (source is KtCallableDeclaration && source.returnTypeString != null) {
                     // Function declaration with an explicit return type, such as
                     // `fun foo(): Modifier.element = Bar`. Replace the type with `Modifier`.
@@ -79,6 +85,10 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
                     return
                 }
                 if (source is KtPropertyAccessor) {
+                    // If the getter is on a var, then this isn't a Modifier factory API, so just
+                    // ignore it.
+                    if (source.property.isVar) return
+
                     // Getter declaration with an explicit return type on the getter, such as
                     // `val foo get(): Modifier.Element = Bar`. Replace the type with `Modifier`.
                     val getterReturnType = source.returnTypeReference?.text
@@ -96,7 +106,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
                         )
                         return
                     }
-                    // Getter declaration with an impicit return type from the property, such as
+                    // Getter declaration with an implicit return type from the property, such as
                     // `val foo: Modifier.Element get() = Bar`. Replace the type with `Modifier`.
                     val propertyType = source.property.returnTypeString
 
@@ -148,12 +158,6 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
         )
     }
 }
-
-/**
- * Recursive list of the super types of this [PsiType] and all the super types of its super types.
- */
-private fun PsiType.allSuperTypes(): List<PsiType> =
-    listOf(*superTypes + superTypes.flatMap { it.allSuperTypes() })
 
 private const val Modifier = "androidx.compose.ui.Modifier"
 
