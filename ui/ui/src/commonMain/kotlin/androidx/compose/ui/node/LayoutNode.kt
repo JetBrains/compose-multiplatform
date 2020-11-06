@@ -31,7 +31,6 @@ import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.ZIndexModifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -207,6 +206,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
 
         instance.parent = this
         _foldedChildren.add(index, instance)
+        zSortedChildrenInvalidated = true
 
         if (instance.isVirtual) {
             require(!isVirtual) { "Virtual LayoutNode can't be added into a virtual parent" }
@@ -232,6 +232,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         val attached = owner != null
         for (i in index + count - 1 downTo index) {
             val child = _foldedChildren.removeAt(i)
+            zSortedChildrenInvalidated = true
             if (DebugChanges) {
                 println("$child removed from $this at index $i")
             }
@@ -261,6 +262,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             child.parent = null
         }
         _foldedChildren.clear()
+        zSortedChildrenInvalidated = true
 
         virtualChildrenCount = 0
         invalidateUnfoldedVirtualChildren()
@@ -290,6 +292,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
 
             _foldedChildren.add(toIndex, child)
         }
+        zSortedChildrenInvalidated = true
 
         invalidateUnfoldedVirtualChildren()
         requestRemeasure()
@@ -363,6 +366,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     }
 
     private val _zSortedChildren = mutableVectorOf<LayoutNode>()
+    private var zSortedChildrenInvalidated = true
 
     /**
      * Returns the children list sorted by their [LayoutNode.zIndex] first (smaller first) and the
@@ -375,9 +379,11 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     @PublishedApi
     internal val zSortedChildren: MutableVector<LayoutNode>
         get() {
-            _zSortedChildren.clear()
-            _zSortedChildren.addAll(_children)
-            _zSortedChildren.sortWith(ZComparator)
+            if (zSortedChildrenInvalidated) {
+                _zSortedChildren.clear()
+                _zSortedChildren.addAll(_children)
+                _zSortedChildren.sortWith(ZComparator)
+            }
             return _zSortedChildren
         }
 
@@ -616,22 +622,11 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
 
     /**
      * zIndex defines the drawing order of the LayoutNode. Children with larger zIndex are drawn
-     * after others (the original order is used for the nodes with the same zIndex).
-     * Default zIndex is 0. We use sum of the values of all [ZIndexModifier] as a zIndex.
+     * on top of others (the original order is used for the nodes with the same zIndex).
+     * Default zIndex is 0. We use sum of the values passed as zIndex to place() by the
+     * parent layout and all the applied modifiers.
      */
-    private val zIndex: Float
-        get() = if (zIndexModifiers.isEmpty()) {
-            0f
-        } else {
-            zIndexModifiers.fold(0f) { acc, item ->
-                acc + item.zIndex
-            }
-        }
-
-    /**
-     * All [ZIndexModifier]s added to the node.
-     */
-    private val zIndexModifiers = mutableVectorOf<ZIndexModifier>()
+    private var zIndex: Float = 0f
 
     /**
      * The inner-most layer wrapper. Used for performance for LayoutNodeWrapper.findLayer().
@@ -665,7 +660,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             field = value
 
             val invalidateParentLayer = shouldInvalidateParentLayer()
-            val startZIndex = zIndex
 
             copyWrappersToCache()
 
@@ -677,7 +671,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             val addedCallback = hasNewPositioningCallback()
             onPositionedCallbacks.clear()
             onRemeasuredCallbacks.clear()
-            zIndexModifiers.clear()
             innerLayerWrapper = null
 
             // Create a new chain of LayoutNodeWrappers, reusing existing ones from wrappers
@@ -689,9 +682,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
                 }
                 if (mod is OnRemeasuredModifier) {
                     onRemeasuredCallbacks += mod
-                }
-                if (mod is ZIndexModifier) {
-                    zIndexModifiers += mod
                 }
                 if (mod is RemeasurementModifier) {
                     mod.onRemeasurementAvailable(this)
@@ -781,9 +771,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             if (oldParentData != parentData) {
                 parent?.requestRemeasure()
             }
-            if (invalidateParentLayer || startZIndex != zIndex ||
-                shouldInvalidateParentLayer()
-            ) {
+            if (invalidateParentLayer || shouldInvalidateParentLayer()) {
                 parent?.invalidateLayer()
             }
         }
@@ -895,6 +883,16 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      */
     internal fun onNodePlaced() {
         val parent = parent
+
+        var newZIndex = outerMeasurablePlaceable.lastZIndex + innerLayoutNodeWrapper.zIndex
+        forEachDelegate {
+            newZIndex += it.zIndex
+        }
+        if (newZIndex != zIndex) {
+            zIndex = newZIndex
+            zSortedChildrenInvalidated = true
+            parent?.invalidateLayer()
+        }
 
         if (!isPlaced) {
             isPlaced = true

@@ -1820,7 +1820,7 @@ package androidx.compose.ui.layout {
     method protected final long getMeasuredSize-YbymL2g();
     method protected final long getMeasurementConstraints-msEJaDk();
     method public final int getWidth();
-    method protected abstract void placeAt--gyyYBs(long position);
+    method protected abstract void placeAt-iGa6aRc(long position, float zIndex);
     method protected final void setMeasuredSize-ozmzZPI(long value);
     method protected final void setMeasurementConstraints-BRTryo0(long p);
     property protected final long apparentToRealOffset;
@@ -1834,12 +1834,12 @@ package androidx.compose.ui.layout {
     ctor public Placeable.PlacementScope();
     method protected abstract androidx.compose.ui.unit.LayoutDirection getParentLayoutDirection();
     method protected abstract int getParentWidth();
-    method public final void place(androidx.compose.ui.layout.Placeable, int x, int y);
+    method public final void place(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex);
     method @Deprecated public final void place-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
-    method public final void place-KmjayG8(androidx.compose.ui.layout.Placeable, long position);
-    method public final void placeRelative(androidx.compose.ui.layout.Placeable, int x, int y);
+    method public final void place-z2mxYZE(androidx.compose.ui.layout.Placeable, long position, optional float zIndex);
+    method public final void placeRelative(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex);
     method @Deprecated public final void placeRelative-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
-    method public final void placeRelative-KmjayG8(androidx.compose.ui.layout.Placeable, long position);
+    method public final void placeRelative-z2mxYZE(androidx.compose.ui.layout.Placeable, long position, optional float zIndex);
     property protected abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
     property protected abstract int parentWidth;
   }

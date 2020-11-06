@@ -82,6 +82,9 @@ internal abstract class LayoutNodeWrapper(
             field = value
         }
 
+    var zIndex: Float = 0f
+        protected set
+
     override val parentCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
@@ -127,7 +130,7 @@ internal abstract class LayoutNodeWrapper(
     /**
      * Places the modified child.
      */
-    abstract override fun placeAt(position: IntOffset)
+    abstract override fun placeAt(position: IntOffset, zIndex: Float)
 
     /**
      * Draws the content of the LayoutNode
