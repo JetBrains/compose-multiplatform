@@ -28,6 +28,7 @@ import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
+import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.SemanticsModifierCore
@@ -39,6 +40,7 @@ import androidx.compose.ui.semantics.accessibilityValueRange
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
@@ -61,6 +63,7 @@ import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -98,6 +101,9 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             accessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(
                 androidComposeView
             )
+        }
+        rule.setContent {
+            ClipboardManagerAmbient.current.setText(AnnotatedString("test"))
         }
     }
 
@@ -241,6 +247,51 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 info.unwrap().availableExtraData
             )
         }
+    }
+
+    @Test
+    fun test_PasteAction_ifFocused() {
+        val info = AccessibilityNodeInfoCompat.obtain()
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            focused = true
+            pasteText {
+                true
+            }
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertTrue(info.isFocused)
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_PASTE,
+                    null
+                )
+            )
+        )
+    }
+
+    @Test
+    fun test_noPasteAction_ifUnfocused() {
+        val info = AccessibilityNodeInfoCompat.obtain()
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            pasteText {
+                true
+            }
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertFalse(info.isFocused)
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_PASTE,
+                    null
+                )
+            )
+        )
     }
 
     @Test
