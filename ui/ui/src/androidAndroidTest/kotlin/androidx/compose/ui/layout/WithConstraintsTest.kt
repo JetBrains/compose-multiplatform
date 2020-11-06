@@ -35,7 +35,6 @@ import androidx.compose.ui.SquareModel
 import androidx.compose.ui.assertRect
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.node.Ref
@@ -45,6 +44,7 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.waitAndScreenShot
@@ -700,7 +700,7 @@ class WithConstraintsTest {
                                 minHeight = minHeightConstraint.toIntPx(),
                                 maxHeight = maxHeightConstraint.toIntPx()
                             )
-                        ).place(Offset.Zero)
+                        ).place(IntOffset.Zero)
                     }
                 }
             }
