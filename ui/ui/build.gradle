@@ -104,6 +104,8 @@ dependencies {
         androidTestImplementation project(":compose:ui:ui-test-font")
         androidTestImplementation project(":ui:ui-test")
         androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
+
+        lintPublish project(":compose:ui:ui-lint")
     }
 }
 
