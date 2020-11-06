@@ -708,17 +708,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/semantics/SemanticsModifier.kt"
-            line="85"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
         errorLine1=") = composed {"
         errorLine2="    ~~~~~~~~">
         <location
