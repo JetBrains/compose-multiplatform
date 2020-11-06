@@ -17,3 +17,4 @@ Following limitations apply to Milestone 1 (M1) release.
 
   * Only macOS 10.15 or later is supported
   * Only 64-bit Windows is supported
+  * Only JDK 11 or later is supported due to the memory management scheme used in Skia bindings
