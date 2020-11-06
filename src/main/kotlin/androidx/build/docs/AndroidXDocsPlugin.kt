@@ -301,9 +301,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
         doclavaConfiguration.dependencies.add(project.dependencies.create(DOCLAVA_DEPENDENCY))
         doclavaConfiguration.dependencies.add(
             project.dependencies.create(
-                project.files(
-                    SupportConfig.getJavaToolsJarPath()
-                )
+                project.files(System.getenv("JAVA_TOOLS_JAR"))
             )
         )
 

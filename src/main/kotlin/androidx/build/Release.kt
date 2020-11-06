@@ -353,7 +353,7 @@ private fun getZipName(fileNamePrefix: String, mavenGroup: String): String {
 }
 
 fun Project.getProjectZipPath(): String {
-    return distSubdir() + Release.PROJECT_ZIPS_FOLDER + "/" +
+    return Release.PROJECT_ZIPS_FOLDER + "/" +
         // We pass in a "" because that mimics not passing the group to getParams() inside
         // the getProjectZipTask function
         getZipName(projectZipPrefix(), "") + "-${project.version}.zip"
@@ -361,6 +361,6 @@ fun Project.getProjectZipPath(): String {
 
 fun Project.getGroupZipPath():
     String {
-        return distSubdir() + Release.GROUP_ZIPS_FOLDER + "/" +
+        return Release.GROUP_ZIPS_FOLDER + "/" +
             getZipName(Release.GROUP_ZIP_PREFIX, project.group.toString()) + ".zip"
     }
