@@ -686,28 +686,6 @@
     <issue
         id="ModifierInspectorInfo"
         message="Modifier missing inspectorInfo"
-        errorLine1="fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
-        errorLine2="                                                                           ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/input/key/KeyInputModifier.kt"
-            line="32"
-            column="76"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {"
-        errorLine2="                                                                                         ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/input/key/KeyInputModifier.kt"
-            line="47"
-            column="90"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
         errorLine1="): Modifier = composed {"
         errorLine2="              ~~~~~~~~">
         <location
