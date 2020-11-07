@@ -230,9 +230,9 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
   }
 
-  public final class FrameManager {
-    method public void ensureStarted();
-    field public static final androidx.compose.runtime.FrameManager INSTANCE;
+  @Deprecated public final class FrameManager {
+    method @Deprecated public void ensureStarted();
+    field @Deprecated public static final androidx.compose.runtime.FrameManager INSTANCE;
   }
 
   @androidx.compose.runtime.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface Immutable {
@@ -339,15 +339,13 @@ package androidx.compose.runtime {
   }
 
   public final class Recomposer extends androidx.compose.runtime.CompositionReference {
-    ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext, androidx.compose.runtime.EmbeddingContext embeddingContext);
+    ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext);
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public androidx.compose.runtime.EmbeddingContext getEmbeddingContext();
     method public boolean hasInvalidations();
     method public suspend Object? join(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @Deprecated public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
     method public void shutDown();
-    property public final androidx.compose.runtime.EmbeddingContext embeddingContext;
     field public static final androidx.compose.runtime.Recomposer.Companion Companion;
   }
 

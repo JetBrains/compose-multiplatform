@@ -16,9 +16,6 @@
 
 package androidx.compose.testutils
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-
 /**
  * Test scope accessible from execution controlled tests to test compose.
  */
@@ -69,8 +66,7 @@ interface ComposeExecutionControl {
     val didLastRecomposeHaveChanges: Boolean
 
     /**
-     * Performs the full frame. Cannot be used concurrently with recomposition launched by
-     * [launchRecomposeIn].
+     * Performs the full frame.
      *
      * This also sets up the content in case the content was not set up before.
      *
@@ -88,20 +84,11 @@ interface ComposeExecutionControl {
     fun hasPendingChanges(): Boolean
 
     /**
-     * Performs recomposition if needed. Cannot be used concurrently with recomposition launched
-     * by [launchRecomposeIn].
+     * Performs recomposition if needed.
      *
      * Note this is also called as part of [doFrame]
      */
     fun recompose()
-
-    /**
-     * Launch continuous recomposition in [coroutineScope]. Cannot be used concurrently with
-     * manual recomposition triggered by [recompose] or [doFrame].
-     *
-     * [Cancel][Job.cancel] the returned [Job] to return to manual recomposition.
-     */
-    fun launchRecomposeIn(coroutineScope: CoroutineScope): Job
 }
 
 /**

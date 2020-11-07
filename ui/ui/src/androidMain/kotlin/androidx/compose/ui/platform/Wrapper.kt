@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.FrameManager
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
@@ -98,6 +97,7 @@ fun Activity.setViewContent(composable: @Composable () -> Unit): Composition {
     // If there is already a FrameLayout in the root, we assume we want to compose
     // into it instead of create a new one. This allows for `setContent` to be
     // called multiple times.
+    GlobalSnapshotManager.ensureStarted()
     val root = window
         .decorView
         .findViewById<ViewGroup>(android.R.id.content)
@@ -139,7 +139,7 @@ fun ComponentActivity.setContent(
     parent: CompositionReference = Recomposer.current(),
     content: @Composable () -> Unit
 ): Composition {
-    FrameManager.ensureStarted()
+    GlobalSnapshotManager.ensureStarted()
     val composeView: AndroidOwner = window.decorView
         .findViewById<ViewGroup>(android.R.id.content)
         .getChildAt(0) as? AndroidOwner
@@ -166,7 +166,7 @@ fun ViewGroup.setContent(
     parent: CompositionReference = Recomposer.current(),
     content: @Composable () -> Unit
 ): Composition {
-    FrameManager.ensureStarted()
+    GlobalSnapshotManager.ensureStarted()
     val composeView =
         if (childCount > 0) {
             getChildAt(0) as? AndroidOwner

@@ -17,21 +17,29 @@
 package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
+import java.util.concurrent.CountDownLatch
 
 class AndroidComposeTestCaseSetup(
     private val testCase: ComposeTestCase,
     private val activity: ComponentActivity
 ) : ComposeTestCaseSetup {
     override fun performTestWithEventsControl(block: ComposeExecutionControl.() -> Unit) {
+        var error: Throwable? = null
+        val latch = CountDownLatch(1)
         activity.runOnUiThread {
             // TODO: Ensure that no composition exists at this stage!
             val runner = AndroidComposeTestCaseRunner({ testCase }, activity)
             try {
                 runner.setupContent()
                 block.invoke(runner)
+            } catch (t: Throwable) {
+                error = t
             } finally {
                 runner.disposeContent()
+                latch.countDown()
             }
         }
+        latch.await()
+        error?.let { throw it }
     }
 }
