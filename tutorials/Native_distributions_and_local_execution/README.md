@@ -122,7 +122,7 @@ compose.desktop {
             packageName = "ExampleApp"
             version = "0.1-SNAPSHOT"
             description = "Compose Example App"
-            copyright = project.file("LICENSE.txt").readText()
+            copyright = "© 2020 My Name. All rights reserved."
             vendor = "Example vendor"
         }
     }
@@ -197,14 +197,16 @@ The app icon needs to be provided in OS-specific formats:
 ```kotlin
 compose.desktop {
     application {
-        macOS {
-            iconFile.set(project.file("icon.icns"))
-        }
-        windows {
-            iconFile.set(project.file("icon.ico"))
-        }
-        linux {
-            iconFile.set(project.file("icon.png"))
+        nativeDistributions {
+            macOS {
+                iconFile.set(project.file("icon.icns"))
+            }
+            windows {
+                iconFile.set(project.file("icon.ico"))
+            }
+            linux {
+                iconFile.set(project.file("icon.png"))
+            }
         }
     }
 }
