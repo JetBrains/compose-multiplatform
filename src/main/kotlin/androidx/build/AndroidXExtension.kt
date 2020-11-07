@@ -75,7 +75,7 @@ open class AndroidXExtension(val project: Project) {
     private fun verifyVersionExtraFormat(version: Version) {
         val extra = version.extra
         if (extra != null) {
-            if (!version.isSnapshot()) {
+            if (!version.isSnapshot() && project.isVersionExtraCheckEnabled()) {
                 if (ALLOWED_EXTRA_PREFIXES.any { extra.startsWith(it) }) {
                     for (potentialPrefix in ALLOWED_EXTRA_PREFIXES) {
                         if (extra.startsWith(potentialPrefix)) {

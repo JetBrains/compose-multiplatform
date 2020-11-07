@@ -44,7 +44,7 @@ object LibraryVersions {
     val CAR_APP = Version("1.0.0-alpha01")
     val COLLECTION = Version("1.2.0-alpha01")
     val CONTENTPAGER = Version("1.1.0-alpha01")
-    val COMPOSE = Version("1.0.0-alpha08")
+    val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.0.0-alpha08")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
     val CORE = Version("1.5.0-alpha05")
     val CORE_ANIMATION = Version("1.0.0-alpha03")

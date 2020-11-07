@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.AndroidXUiPlugin.Companion.isMultiplatformEnabled
 import com.android.build.gradle.LibraryPlugin
 import groovy.util.Node
 import org.gradle.api.GradleException
@@ -30,7 +31,10 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByName
+import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import java.io.File
 
 fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
@@ -95,6 +99,44 @@ private fun Project.configureComponent(
                         "\"buildId:\": \"${getBuildId()}\""
                     )
                 )
+            }
+        }
+
+        if (isMultiplatformEnabled()) {
+            configureMultiplatformPublication(extension)
+        }
+    }
+}
+
+private fun Project.configureMultiplatformPublication(
+    extension: AndroidXExtension
+) {
+    val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>() ?: return
+
+    // publishMavenPublicationToMavenRepository will produce conflicting artifacts with the same
+    // name as the artifacts producing by publishKotlinMultiplatformPublicationToMavenRepository
+    project.tasks.findByName("publishMavenPublicationToMavenRepository")?.enabled = false
+
+    configure<PublishingExtension> {
+        publications {
+            it.named<MavenPublication>("kotlinMultiplatform") {
+                pom { pom ->
+                    addInformativeMetadata(pom, extension)
+                    tweakDependenciesMetadata(extension, pom)
+                }
+            }
+        }
+    }
+
+    multiplatformExtension.targets.all { target ->
+        if (target is KotlinAndroidTarget) {
+            target.publishAllLibraryVariants()
+        }
+
+        target.mavenPublication { publication ->
+            publication.pom { pom ->
+                addInformativeMetadata(pom, extension)
+                tweakDependenciesMetadata(extension, pom)
             }
         }
     }

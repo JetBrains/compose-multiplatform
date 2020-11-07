@@ -57,10 +57,6 @@ fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
                     sourceJarTask.from(kotlinExt.sourceSets.getByName("androidMain").kotlin.srcDirs)
                 }
             }
-            // Disable the builtin maven-publish for kotlin multiplatform, as it doesn't work
-            // and can't be feasibly modified. It may not be present in MPP samples.
-            project.tasks.findByName("publishKotlinMultiplatformPublicationToMavenRepository")
-                ?.enabled = false
         }
     }
 }
