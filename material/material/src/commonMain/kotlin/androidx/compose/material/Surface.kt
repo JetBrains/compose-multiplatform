@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
  * To modify these default style values used by text, use [ProvideTextStyle] or explicitly
  * pass a new [TextStyle] to your text.
  *
- * To manually retrieve the content color inside a surface, use [contentColor].
+ * To manually retrieve the content color inside a surface, use [AmbientContentColor].
  *
  * @param modifier Modifier to be applied to the layout corresponding to the surface
  * @param shape Defines the surface's shape as well its shadow. A shadow is only
