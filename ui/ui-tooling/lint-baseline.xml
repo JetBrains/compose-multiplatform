@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
+
+    <issue
+        id="InlinedApi"
+        message="Field requires API level 26 (current min is 21): `android.content.res.Configuration#UI_MODE_TYPE_VR_HEADSET`"
+        errorLine1="        UI_MODE_TYPE_VR_HEADSET,"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/ui/tooling/preview/UiMode.kt"
+            line="52"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling Method.invoke without an SDK check"
+        errorLine1="    return invoke(instance, *arguments)"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/compose/ui/tooling/preview/PreviewUtils.kt"
+            line="141"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.tooling.preview.LayoutlibFontResourceLoader is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            is ResourceFont -> context.resources.getFont(font.resId)"
+        errorLine2="                                                 ~~~~~~~">
+        <location
+            file="src/main/java/androidx/compose/ui/tooling/preview/LayoutlibFontResourceLoader.kt"
+            line="33"
+            column="50"/>
+    </issue>
+
+</issues>
