@@ -45,21 +45,10 @@ object SupportConfig {
      * set to a pre-release version, tests will only be able to run on pre-release devices.
      */
     const val TARGET_SDK_VERSION = 30
-
-    @JvmStatic
-    fun getJavaToolsJarPath() = System.getenv("JAVA_TOOLS_JAR")
 }
 
 fun Project.getExternalProjectPath(): File {
     return File(project.getCheckoutRoot(), "external")
-}
-
-fun distSubdir(): String {
-    val subdir = System.getenv("DIST_SUBDIR")
-    if (subdir != null && subdir.isNotEmpty()) {
-        return subdir.substring(1) + "/"
-    }
-    return ""
 }
 
 fun Project.getKeystore(): File {
