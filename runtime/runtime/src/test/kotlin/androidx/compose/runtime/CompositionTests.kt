@@ -2438,6 +2438,73 @@ class CompositionTests {
             "expected order of calls"
         )
     }
+
+    @Test // regression test for b/172660922
+    fun testInvalidationOfRemovedContent() {
+        var markS1Invalid: () -> Unit = {}
+        var viewS1 by mutableStateOf(true)
+        @Composable fun MockComposeScope.s1() {
+            markS1Invalid = invalidate
+            text("In s1")
+            markS1Invalid()
+        }
+
+        @Composable fun MockComposeScope.s2() {
+            text("In s2")
+        }
+
+        @Composable fun MockComposeScope.test() {
+            text("$viewS1")
+            Wrap {
+                if (viewS1) {
+                    s1()
+                }
+                s2()
+            }
+
+            // This forces the equivalent of a backwards write.
+            markS1Invalid()
+        }
+
+        fun MockViewValidator.s1() {
+            text("In s1")
+        }
+
+        fun MockViewValidator.s2() {
+            text("In s2")
+        }
+
+        fun MockViewValidator.test() {
+            text("$viewS1")
+            if (viewS1) {
+                s1()
+            }
+            s2()
+        }
+
+        val result = compose {
+            test()
+        }
+
+        fun validate() = result.validate { test() }
+
+        validate()
+
+        markS1Invalid()
+        result.expectNoChanges()
+
+        validate()
+
+        result.observe {
+            viewS1 = false
+            result.expectChanges()
+            validate()
+        }
+    }
+}
+
+@Composable fun Wrap(block: @Composable () -> Unit) {
+    block()
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {
