@@ -795,7 +795,11 @@ class Composer<N>(
             @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
             for (index in 0 until invalidationAnchors.size) {
                 val (anchor, invalidation) = invalidationAnchors[index]
-                invalidation.location = anchor.toIndexFor(slotTable)
+                if (anchor.valid) {
+                    invalidation.location = anchor.toIndexFor(slotTable)
+                } else {
+                    invalidations.remove(invalidation)
+                }
             }
 
             // Side effects run after lifecycle observers so that any remembered objects
@@ -1911,7 +1915,7 @@ class Composer<N>(
             scope.defaultsInvalid = true
         }
         val anchor = scope.anchor
-        if (anchor == null || insertTable.ownsAnchor(anchor))
+        if (anchor == null || insertTable.ownsAnchor(anchor) || !anchor.valid)
             return InvalidationResult.IGNORED // The scope has not yet entered the composition
         val location = anchor.toIndexFor(slotTable)
         if (location < 0)
