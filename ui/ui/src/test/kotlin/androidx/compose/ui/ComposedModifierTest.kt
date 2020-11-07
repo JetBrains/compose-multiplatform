@@ -108,7 +108,7 @@ class ComposedModifierTest {
     @Test
     fun recomposeComposedModifier() = runBlocking {
         // Manually invalidate the composition of the modifier instead of using mutableStateOf
-        // Frame-based recomposition requires the FrameManager be up and running.
+        // Snapshot-based recomposition requires explicit snapshot commits/global write observers.
         var value = 0
         lateinit var invalidator: () -> Unit
 

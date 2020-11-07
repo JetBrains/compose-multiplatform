@@ -95,12 +95,12 @@ class TestMonotonicFrameClock(
         if (!posted) {
             posted = true
             coroutineScope.launch {
-                delay(frameDelayNanos)
+                delay(frameDelayMillis)
                 synchronized(lock) {
                     posted = false
                     val toRun = awaiters.toList()
                     awaiters.clear()
-                    val frameTime = delayController.currentTime
+                    val frameTime = delayController.currentTime * 1_000_000
                     // In case of awaiters on an immediate dispatcher, run all frame callbacks
                     // before resuming any associated continuations with the results.
                     toRun.map { it.runFrame(frameTime) }.forEach { it() }
@@ -109,3 +109,10 @@ class TestMonotonicFrameClock(
         }
     }
 }
+
+/**
+ * The frame delay time for the [TestMonotonicFrameClock] in milliseconds.
+ */
+@ExperimentalCoroutinesApi
+val TestMonotonicFrameClock.frameDelayMillis: Long
+    get() = frameDelayNanos / 1_000_000

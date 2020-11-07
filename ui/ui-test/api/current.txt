@@ -292,6 +292,7 @@ package androidx.compose.ui.test {
 
   public final class TestMonotonicFrameClockKt {
     method @kotlinx.coroutines.ExperimentalCoroutinesApi public static androidx.compose.ui.test.TestMonotonicFrameClock TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, optional long frameDelayNanos);
+    method public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
   }
 
   @androidx.compose.ui.test.InternalTestingApi public interface TestOwner {

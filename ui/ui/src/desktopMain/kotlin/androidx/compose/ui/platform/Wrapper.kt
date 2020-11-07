@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.FrameManager
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
@@ -29,7 +28,7 @@ import androidx.compose.ui.node.LayoutNode
 
 @OptIn(ExperimentalComposeApi::class, ExperimentalKeyInput::class)
 fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
-    FrameManager.ensureStarted()
+    GlobalSnapshotManager.ensureStarted()
 
     val composition = compositionFor(root, DesktopUiApplier(root), Recomposer.current())
     composition.setContent {
