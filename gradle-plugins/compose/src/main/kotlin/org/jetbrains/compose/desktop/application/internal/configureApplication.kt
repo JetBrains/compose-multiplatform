@@ -155,7 +155,8 @@ private fun Project.configureRunTask(app: Application) {
         args = app.args
 
         val cp = objects.fileCollection()
-        cp.from(app.mainJar.orNull)
+        // adding a null value will cause future invocations of `from` to throw an NPE
+        app.mainJar.orNull?.let(cp::from)
         cp.from(app._fromFiles)
         dependsOn(*app._dependenciesTaskNames.toTypedArray())
 
