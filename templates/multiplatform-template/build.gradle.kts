@@ -1,5 +1,6 @@
 buildscript {
-    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.1.0-m1-build62"
+    // __UPDATE_COMPOSE_VERSION_MARKER__
+    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.1.0-build113"
 
     repositories {
         // TODO: remove after new build is published
