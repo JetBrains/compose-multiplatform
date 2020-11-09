@@ -25,10 +25,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
@@ -84,13 +83,13 @@ class PointerInteropFilterAndroidViewOffsetsTest {
                 addView(one)
             }
 
-            val four = FrameLayout(activity).apply {
+            val four = ComposeView(activity).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
                 setPadding(3, 13, 0, 0)
-                setContent(Recomposer.current()) {
+                setContent {
                     with(DensityAmbient.current) {
                         // Box is "three"
                         Box(

@@ -16,9 +16,8 @@
 
 package androidx.compose.ui.lifecycleowner
 
-import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.Recomposer
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LifecycleOwnerAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.LifecycleOwner
@@ -70,9 +69,9 @@ class LifecycleOwnerInAppCompatActivityTest {
         var owner: LifecycleOwner? = null
 
         activityTestRule.runOnUiThread {
-            val view = FrameLayout(activity)
+            val view = ComposeView(activity)
             activity.setContentView(view)
-            view.setContent(Recomposer.current()) {
+            view.setContent {
                 owner = LifecycleOwnerAmbient.current
                 latch.countDown()
             }

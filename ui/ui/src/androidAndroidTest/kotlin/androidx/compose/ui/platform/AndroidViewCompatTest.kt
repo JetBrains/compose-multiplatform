@@ -28,7 +28,6 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -441,7 +440,7 @@ class AndroidViewCompatTest {
             Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
                 val paddingDp = with(DensityAmbient.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
-                    AndroidView(::FrameLayout) {
+                    AndroidView(::ComposeView) {
                         it.setContent {
                             Box(
                                 Modifier.padding(paddingDp)
@@ -474,14 +473,14 @@ class AndroidViewCompatTest {
 
             topView = View(it)
             root.addView(topView, size, size)
-            val frameLayout = FrameLayout(it)
-            root.addView(frameLayout)
+            val view = ComposeView(it)
+            root.addView(view)
 
-            frameLayout.setContent {
+            view.setContent {
                 Box {
                     val paddingDp = with(DensityAmbient.current) { padding.toDp() }
                     Box(Modifier.padding(paddingDp)) {
-                        AndroidView(::FrameLayout) {
+                        AndroidView(::ComposeView) {
                             it.setContent {
                                 Box(
                                     Modifier.padding(paddingDp)
@@ -581,7 +580,7 @@ class AndroidViewCompatTest {
         rule.setContent {
             if (composeContent) {
                 Box {
-                    AndroidView(::LinearLayout) {
+                    AndroidView(::ComposeView) {
                         it.setContent {
                             emit<LayoutNode, Applier<Any>>(
                                 ctor = LayoutEmitHelper.constructor,

@@ -31,7 +31,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -41,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.captureToImage
@@ -290,8 +288,8 @@ class AndroidViewTest {
         // Should not crash.
         rule.setContent {
             Box {
-                AndroidView(::FrameLayout) {
-                    it.setContent(Recomposer.current()) {
+                AndroidView(::ComposeView) {
+                    it.setContent {
                         Box(Modifier)
                     }
                 }

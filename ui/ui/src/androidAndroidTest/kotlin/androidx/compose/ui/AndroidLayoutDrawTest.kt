@@ -38,7 +38,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
@@ -2838,7 +2837,7 @@ class AndroidLayoutDrawTest {
         activityTestRule.runOnUiThread {
             val linearLayout = LinearLayout(activity)
             linearLayout.orientation = LinearLayout.VERTICAL
-            val child = FrameLayout(activity)
+            val child = ComposeView(activity)
             activity.setContentView(linearLayout)
             linearLayout.addView(
                 child,
@@ -2940,15 +2939,15 @@ class AndroidLayoutDrawTest {
     @Test
     fun reattachingViewKeepsRootNodePlaced() {
         lateinit var container1: FrameLayout
-        lateinit var container2: FrameLayout
+        lateinit var container2: ComposeView
 
         activityTestRule.runOnUiThread {
             val activity = activityTestRule.activity
             container1 = FrameLayout(activity)
-            container2 = FrameLayout(activity)
+            container2 = ComposeView(activity)
             activity.setContentView(container1)
             container1.addView(container2)
-            container2.setContent(Recomposer.current()) {
+            container2.setContent {
                 FixedSize(10, Modifier.drawLatchModifier())
             }
         }
@@ -3015,10 +3014,10 @@ class AndroidLayoutDrawTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun drawDetachedLayoutNode() {
-        var frame: FrameLayout? = null
+        lateinit var view: ComposeView
         activityTestRule.runOnUiThread {
-            frame = FrameLayout(activity)
-            frame?.setContent(Recomposer.current()) {
+            view = ComposeView(activity)
+            view.setContent {
                 with(DensityAmbient.current) {
                     Box(
                         Modifier
@@ -3030,19 +3029,25 @@ class AndroidLayoutDrawTest {
                     )
                 }
             }
-            activity.setContentView(frame)
+            activity.setContentView(
+                view,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+            )
         }
 
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
         activityTestRule.runOnUiThread {
-            val parent = frame?.parent as ViewGroup
-            parent.removeView(frame)
+            val parent = view.parent as ViewGroup
+            parent.removeView(view)
         }
         activityTestRule.runOnUiThread {
             val bitmap = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888)
             val canvas = android.graphics.Canvas(bitmap)
-            frame?.draw(canvas)
+            view.draw(canvas)
             bitmap.assertRect(Color.Blue, holeSize = 10)
             bitmap.assertRect(Color.White, size = 10)
         }
@@ -3052,11 +3057,11 @@ class AndroidLayoutDrawTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun drawInvalidationInDetachedLayoutNode() {
-        var frame: FrameLayout? = null
+        lateinit var view: ComposeView
         var innerColor by mutableStateOf(Color.White)
         activityTestRule.runOnUiThread {
-            frame = FrameLayout(activity)
-            frame?.setContent(Recomposer.current()) {
+            view = ComposeView(activity)
+            view.setContent {
                 with(DensityAmbient.current) {
                     Box(
                         Modifier
@@ -3070,7 +3075,13 @@ class AndroidLayoutDrawTest {
                     )
                 }
             }
-            activity.setContentView(frame)
+            activity.setContentView(
+                view,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+            )
         }
 
         validateSquareColors(Color.Blue, Color.White, size = 10)
@@ -3078,8 +3089,8 @@ class AndroidLayoutDrawTest {
 
         var parent: ViewGroup? = null
         activityTestRule.runOnUiThread {
-            parent = frame?.parent as ViewGroup
-            parent!!.removeView(frame)
+            parent = view.parent as ViewGroup
+            parent!!.removeView(view)
         }
         activityTestRule.runOnUiThread {} // wait for detach
 
@@ -3087,7 +3098,7 @@ class AndroidLayoutDrawTest {
         innerColor = Color.Yellow
 
         activityTestRule.runOnUiThread {
-            parent!!.addView(frame)
+            parent!!.addView(view)
         }
 
         validateSquareColors(Color.Blue, Color.Yellow, size = 10)
@@ -3097,7 +3108,7 @@ class AndroidLayoutDrawTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun sizeInvalidationInDetachedLayoutNode() {
-        var frame: FrameLayout? = null
+        lateinit var view: ComposeView
         var size by mutableStateOf(10.dp)
         var layoutLatch = CountDownLatch(1)
         var measuredSize = 0.dp
@@ -3110,15 +3121,15 @@ class AndroidLayoutDrawTest {
             }
         }
         activityTestRule.runOnUiThread {
-            frame = FrameLayout(activity)
-            frame?.setContent(Recomposer.current()) {
+            view = ComposeView(activity)
+            view.setContent {
                 Box(
                     Modifier
                         .background(Color.Blue)
                         .then(sizeModifier)
                 )
             }
-            activity.setContentView(frame)
+            activity.setContentView(view)
         }
 
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
@@ -3127,8 +3138,8 @@ class AndroidLayoutDrawTest {
 
         var parent: ViewGroup? = null
         activityTestRule.runOnUiThread {
-            parent = frame?.parent as ViewGroup
-            parent!!.removeView(frame)
+            parent = view.parent as ViewGroup
+            parent!!.removeView(view)
         }
         activityTestRule.runOnUiThread {} // wait for detach
 
@@ -3136,7 +3147,7 @@ class AndroidLayoutDrawTest {
         size = 30.dp
 
         activityTestRule.runOnUiThread {
-            parent!!.addView(frame)
+            parent!!.addView(view)
         }
 
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
