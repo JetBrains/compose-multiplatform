@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 
 @Suppress("unused")
 @Sampled
-@Composable
 fun observeUserSample() {
     @Composable
     fun observeUser(userId: Int): User? {
@@ -51,7 +50,7 @@ fun observeUserSample() {
 
 @Sampled
 @Composable
-fun twoInputsKeySample() {
+fun TwoInputsKeySample() {
     for (element in elements) {
         val selected by key(element.id, parentId) { remember { mutableStateOf(false) } }
         ListItem(item = element, selected = selected)

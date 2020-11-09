@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 
-@Composable
 @OptIn(ExperimentalFoundationApi::class)
 @Sampled
 fun stateSample() {

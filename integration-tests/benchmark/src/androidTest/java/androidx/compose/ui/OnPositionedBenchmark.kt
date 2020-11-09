@@ -57,7 +57,7 @@ private class DeepHierarchyOnPositionedTestCase :
     private lateinit var state: MutableState<Dp>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         Box {

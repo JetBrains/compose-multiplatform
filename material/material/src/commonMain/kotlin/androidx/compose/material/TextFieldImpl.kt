@@ -156,7 +156,7 @@ internal fun TextFieldImpl(
             }
         }
 
-    TextFieldTransitionScope.transition(
+    TextFieldTransitionScope.Transition(
         inputState = inputState,
         showLabel = label != null,
         activeColor = if (isErrorValue) {
@@ -328,7 +328,7 @@ private object TextFieldTransitionScope {
     private val PlaceholderOpacityProp = FloatPropKey()
 
     @Composable
-    fun transition(
+    fun Transition(
         inputState: InputPhase,
         showLabel: Boolean,
         activeColor: Color,

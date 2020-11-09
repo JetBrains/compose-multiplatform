@@ -50,7 +50,7 @@ class MemoryLeakTest {
     fun disposeAndRemoveOwnerView_assertViewWasGarbageCollected() = runBlocking {
         class SimpleTestCase : ComposeTestCase {
             @Composable
-            override fun emitContent() {
+            override fun Content() {
                 Column {
                     repeat(3) {
                         Box {

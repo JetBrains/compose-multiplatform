@@ -49,7 +49,7 @@ private sealed class UiState<out T> {
 
 @Sampled
 @Composable
-fun produceStateSample(viewModel: ProduceStateSampleViewModel) {
+fun ProduceState(viewModel: ProduceStateSampleViewModel) {
     val uiState by produceState<UiState<List<Person>>>(UiState.Loading, viewModel) {
         viewModel.people
             .map { UiState.Data(it) }
@@ -69,7 +69,7 @@ fun produceStateSample(viewModel: ProduceStateSampleViewModel) {
 @Suppress("UNUSED_VARIABLE")
 @Sampled
 @Composable
-fun produceStateAwaitDisposeSample(viewModel: ProduceStateSampleViewModel) {
+fun ProduceStateAwaitDispose(viewModel: ProduceStateSampleViewModel) {
     val currentPerson by produceState<Person?>(null, viewModel) {
         val disposable = viewModel.registerPersonObserver { person ->
             value = person

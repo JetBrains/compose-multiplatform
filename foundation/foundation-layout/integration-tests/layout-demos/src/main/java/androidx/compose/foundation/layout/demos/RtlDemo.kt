@@ -43,13 +43,13 @@ import androidx.compose.ui.unit.dp
 fun RtlDemo() {
     Column(verticalArrangement = Arrangement.SpaceEvenly) {
         Text("TEXT", Modifier.align(Alignment.CenterHorizontally))
-        testText()
+        TestText()
         Text("ROW", Modifier.align(Alignment.CenterHorizontally))
-        testRow()
+        TestRow()
         Text("ROW WITH LTR ROW IN BETWEEN", Modifier.align(Alignment.CenterHorizontally))
-        testRow_modifier()
+        TestRowWithModifier()
         Text("RELATIVE TO SIBLINGS", Modifier.align(Alignment.CenterHorizontally))
-        testSiblings()
+        TestSiblings()
         Text(
             "PLACE WITH AUTO RTL SUPPORT IN CUSTOM LAYOUT",
             Modifier.align(Alignment.CenterHorizontally)
@@ -89,10 +89,9 @@ fun StackExample() {
 }
 
 private val boxSize = Modifier.preferredSize(50.dp, 20.dp)
-private val size = Modifier.preferredSize(10.dp, 10.dp)
 
 @Composable
-private fun testRow() {
+private fun TestRow() {
     Row {
         Box(boxSize.background(color = Color.Red)) {}
         Box(boxSize.background(color = Color.Green)) {}
@@ -106,7 +105,7 @@ private fun testRow() {
 }
 
 @Composable
-private fun testRow_modifier() {
+private fun TestRowWithModifier() {
     Row {
         Box(boxSize.background(Color.Red)) {}
         Box(boxSize.background(Color.Green)) {}
@@ -122,7 +121,7 @@ private fun testRow_modifier() {
 }
 
 @Composable
-private fun testText() {
+private fun TestText() {
     Column {
         Text("Text.")
         Text("Text filling max width.", Modifier.fillMaxWidth())
@@ -134,7 +133,7 @@ private fun testText() {
 }
 
 @Composable
-private fun testSiblings() {
+private fun TestSiblings() {
     Column {
         Box(
             boxSize.background(color = Color.Red).alignBy { p -> p.width }

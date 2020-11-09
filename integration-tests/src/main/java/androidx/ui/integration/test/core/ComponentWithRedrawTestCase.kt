@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 class ComponentWithRedrawTestCase : SimpleComponentImplenentationTestCase() {
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val innerSize = getInnerSize()
         val stroke = Stroke()
         Canvas(Modifier.preferredSize(48.dp)) {

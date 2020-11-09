@@ -37,7 +37,7 @@ class ScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     private lateinit var scrollState: ScrollState
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         scrollState = rememberScrollState()
         ScrollableColumn(scrollState = scrollState) {
             Column(Modifier.fillMaxHeight()) {

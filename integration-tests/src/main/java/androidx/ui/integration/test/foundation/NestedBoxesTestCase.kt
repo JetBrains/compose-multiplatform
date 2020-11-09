@@ -29,18 +29,18 @@ class NestedBoxesTestCase(
 ) : ComposeTestCase {
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         Box {
-            emitBoxes(depth - 1, children)
+            Boxes(depth - 1, children)
         }
     }
 
     @Composable
-    private fun emitBoxes(depth: Int, children: Int) {
+    private fun Boxes(depth: Int, children: Int) {
         if (depth == 0) return
         repeat(children) {
             Box {
-                emitBoxes(depth - 1, children)
+                Boxes(depth - 1, children)
             }
         }
     }

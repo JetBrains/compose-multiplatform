@@ -165,10 +165,10 @@ private class LayeredCaseAdapter(private val innerCase: LayeredComposeTestCase) 
     var isComposed by mutableStateOf(false)
 
     @Composable
-    override fun emitContent() {
-        innerCase.emitContentWrappers {
+    override fun Content() {
+        innerCase.ContentWrappers {
             if (isComposed) {
-                innerCase.emitMeasuredContent()
+                innerCase.MeasuredContent()
             }
         }
     }

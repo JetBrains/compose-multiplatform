@@ -73,6 +73,7 @@ internal class PreCommitScopeImpl(
  * @see [onCommit]
  * @see [onDispose]
  */
+@Suppress("ComposableNaming")
 @Composable
 fun onActive(callback: CommitScope.() -> Unit) {
     remember { PreCommitScopeImpl(callback) }
@@ -88,6 +89,7 @@ fun onActive(callback: CommitScope.() -> Unit) {
  * @see [onCommit]
  * @see [onActive]
  */
+@Suppress("ComposableNaming")
 @Composable
 fun onDispose(callback: () -> Unit) {
     remember { PreCommitScopeImpl(emptyCommit).also { it.disposeCallback = callback } }
@@ -104,7 +106,7 @@ fun onDispose(callback: () -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
-@Suppress("NOTHING_TO_INLINE")
+@Suppress("NOTHING_TO_INLINE", "ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
@@ -123,6 +125,7 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
+@Suppress("ComposableNaming")
 @Composable
 /*inline*/ fun </*reified*/ V1> onCommit(
     v1: V1,
@@ -145,6 +148,7 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
+@Suppress("ComposableNaming")
 @Composable
 /*inline*/ fun </*reified*/ V1, /*reified*/ V2> onCommit(
     v1: V1,
@@ -167,6 +171,7 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
+@Suppress("ComposableNaming")
 @Composable
 fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
     remember(*inputs) { PreCommitScopeImpl(callback) }

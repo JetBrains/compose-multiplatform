@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 sealed class VectorAssetTestCase : ComposeTestCase {
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         Box {
             Box(
                 Modifier.testTag(testTag)

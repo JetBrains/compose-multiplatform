@@ -59,6 +59,9 @@ dependencies {
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(JUNIT)
         androidTestImplementation(TRUTH)
+
+        lintChecks project(":compose:runtime:runtime-lint")
+        lintPublish project(":compose:runtime:runtime-lint")
     }
 }
 

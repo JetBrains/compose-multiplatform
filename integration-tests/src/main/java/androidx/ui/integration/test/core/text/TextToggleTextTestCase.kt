@@ -46,7 +46,7 @@ class TextToggleTextTestCase(
     )
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         Column(
             modifier = Modifier.wrapContentSize(Alignment.Center).preferredWidth(width)
         ) {

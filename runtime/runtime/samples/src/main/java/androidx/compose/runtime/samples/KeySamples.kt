@@ -24,7 +24,7 @@ import androidx.compose.runtime.key
 
 @Sampled
 @Composable
-fun locallyUniqueKeys() {
+fun LocallyUniqueKeys() {
     for (user in users) {
         key(user.id) { UserPreview(user = user) }
     }
@@ -36,7 +36,7 @@ fun locallyUniqueKeys() {
 
 @Sampled
 @Composable
-fun notAlwaysUniqueKeys() {
+fun NotAlwaysUniqueKeys() {
     for ((child, parent) in relationships) {
         key(parent.id) {
             User(user = child)
@@ -47,7 +47,7 @@ fun notAlwaysUniqueKeys() {
 
 @Sampled
 @Composable
-fun moreCorrectUniqueKeys() {
+fun MoreCorrectUniqueKeys() {
     for ((child, parent) in relationships) {
         key(parent.id to child.id) {
             User(user = child)

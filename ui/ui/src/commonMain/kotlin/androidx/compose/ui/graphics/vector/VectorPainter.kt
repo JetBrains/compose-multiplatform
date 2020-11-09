@@ -70,7 +70,7 @@ fun rememberVectorPainter(
         // This assignment is thread safe as the internal Size parameter is
         // backed by a mutableState object
         size = Size(widthPx, heightPx)
-        composeInto(name, vpWidth, vpHeight, children)
+        RenderVector(name, vpWidth, vpHeight, children)
     }
 }
 
@@ -89,6 +89,7 @@ fun rememberVectorPainter(
  * @param [name] optional identifier used to identify the root of this vector graphic
  * @param [children] Composable used to define the structure and contents of the vector graphic
  */
+@Suppress("ComposableNaming")
 @Deprecated(
     "Use rememberVectorPainter instead as the composable implementation already invokes " +
         "remember to persist data across compositions and callers do not need to do so themselves",
@@ -122,6 +123,7 @@ fun VectorPainter(
  *
  * @param [asset] VectorAsset used to create a vector graphic sub-composition
  */
+@Suppress("ComposableNaming")
 @Deprecated(
     "Use rememberVectorPainter instead as the composable implementation already invokes " +
         "remember to persist data across compositions and callers do not need to do so themselves",
@@ -176,7 +178,7 @@ class VectorPainter internal constructor() : Painter() {
     private var isDirty by mutableStateOf(true)
 
     @Composable
-    internal fun composeInto(
+    internal fun RenderVector(
         name: String,
         viewportWidth: Float,
         viewportHeight: Float,

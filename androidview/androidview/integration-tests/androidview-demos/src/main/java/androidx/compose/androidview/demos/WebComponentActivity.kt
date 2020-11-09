@@ -48,7 +48,7 @@ open class WebComponentActivity : ComponentActivity() {
                 Log.e("WebCompAct", "setContent")
             }
 
-            renderViews(webContext = webContext)
+            RenderViews(webContext = webContext)
         }
     }
 
@@ -62,7 +62,7 @@ open class WebComponentActivity : ComponentActivity() {
 }
 
 @Composable
-fun renderViews(webContext: WebContext) {
+private fun RenderViews(webContext: WebContext) {
     if (WebContext.debug) {
         Log.d("WebCompAct", "renderViews")
     }

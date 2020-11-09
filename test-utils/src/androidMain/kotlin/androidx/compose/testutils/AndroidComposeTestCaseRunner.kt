@@ -133,7 +133,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
             "Need to call onPreEmitContent before emitContent!"
         }
 
-        composition = activity.setContent(recomposer) { testCase!!.emitContent() }
+        composition = activity.setContent(recomposer) { testCase!!.Content() }
         view = findAndroidOwner(activity)!!.view
         @OptIn(ExperimentalComposeApi::class)
         Snapshot.notifyObjectsInitialized()

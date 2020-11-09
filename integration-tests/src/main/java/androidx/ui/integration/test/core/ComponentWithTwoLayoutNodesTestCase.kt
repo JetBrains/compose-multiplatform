@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 
 class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplenentationTestCase() {
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         Box(
             modifier = Modifier
                 .preferredSize(48.dp)

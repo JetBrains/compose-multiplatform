@@ -34,7 +34,7 @@ interface ProduceStateScope<T> : MutableState<T>, CoroutineScope {
      * This method is useful when configuring callback-based state producers that do not suspend,
      * for example:
      *
-     * @sample androidx.compose.runtime.samples.produceStateAwaitDisposeSample
+     * @sample androidx.compose.runtime.samples.ProduceStateAwaitDispose
      */
     suspend fun awaitDispose(onDispose: () -> Unit): Nothing
 }
@@ -68,9 +68,9 @@ private class ProduceStateScopeImpl<T>(
  * [produceState] may be used to observe either suspending or non-suspending sources of external
  * data, for example:
  *
- * @sample androidx.compose.runtime.samples.produceStateSample
+ * @sample androidx.compose.runtime.samples.ProduceState
  *
- * @sample androidx.compose.runtime.samples.produceStateAwaitDisposeSample
+ * @sample androidx.compose.runtime.samples.ProduceStateAwaitDispose
  */
 @Composable
 fun <T> produceState(
@@ -100,9 +100,9 @@ fun <T> produceState(
  * [produceState] may be used to observe either suspending or non-suspending sources of external
  * data, for example:
  *
- * @sample androidx.compose.runtime.samples.produceStateSample
+ * @sample androidx.compose.runtime.samples.ProduceState
  *
- * @sample androidx.compose.runtime.samples.produceStateAwaitDisposeSample
+ * @sample androidx.compose.runtime.samples.ProduceStateAwaitDispose
  */
 @Composable
 fun <T> produceState(
@@ -133,9 +133,9 @@ fun <T> produceState(
  * [produceState] may be used to observe either suspending or non-suspending sources of external
  * data, for example:
  *
- * @sample androidx.compose.runtime.samples.produceStateSample
+ * @sample androidx.compose.runtime.samples.ProduceState
  *
- * @sample androidx.compose.runtime.samples.produceStateAwaitDisposeSample
+ * @sample androidx.compose.runtime.samples.ProduceStateAwaitDispose
  */
 @Composable
 fun <T> produceState(
@@ -167,9 +167,9 @@ fun <T> produceState(
  * [produceState] may be used to observe either suspending or non-suspending sources of external
  * data, for example:
  *
- * @sample androidx.compose.runtime.samples.produceStateSample
+ * @sample androidx.compose.runtime.samples.ProduceState
  *
- * @sample androidx.compose.runtime.samples.produceStateAwaitDisposeSample
+ * @sample androidx.compose.runtime.samples.ProduceStateAwaitDispose
  */
 @Composable
 fun <T> produceState(
@@ -202,9 +202,9 @@ fun <T> produceState(
  * [produceState] may be used to observe either suspending or non-suspending sources of external
  * data, for example:
  *
- * @sample androidx.compose.runtime.samples.produceStateSample
+ * @sample androidx.compose.runtime.samples.ProduceState
  *
- * @sample androidx.compose.runtime.samples.produceStateAwaitDisposeSample
+ * @sample androidx.compose.runtime.samples.ProduceStateAwaitDispose
  */
 @Composable
 fun <T> produceState(

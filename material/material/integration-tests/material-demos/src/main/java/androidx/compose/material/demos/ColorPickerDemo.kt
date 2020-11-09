@@ -100,7 +100,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         val colorWheel = remember(diameter) { ColorWheel(diameter) }
 
         var isDragging by remember { mutableStateOf(false) }
-        val inputModifier = SimplePointerInput(
+        val inputModifier = Modifier.simplePointerInput(
             position = position,
             onPositionChange = { newPosition ->
                 // Work out if the new position is inside the circle we are drawing, and has a
@@ -134,7 +134,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
  * pointer moves, and [onDragStateChange] is called when dragging starts / stops.
  */
 @Composable
-private fun SimplePointerInput(
+private fun Modifier.simplePointerInput(
     position: Offset,
     onPositionChange: (Offset) -> Unit,
     onDragStateChange: (Boolean) -> Unit
@@ -159,7 +159,7 @@ private fun SimplePointerInput(
         }
     }
 
-    return Modifier.dragGestureFilter(observer, startDragImmediately = true)
+    return dragGestureFilter(observer, startDragImmediately = true)
 }
 
 /**

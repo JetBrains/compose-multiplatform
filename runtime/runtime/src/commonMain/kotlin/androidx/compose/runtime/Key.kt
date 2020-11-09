@@ -26,7 +26,7 @@ package androidx.compose.runtime
  *
  * For instance, consider the following example:
  *
- * @sample androidx.compose.runtime.samples.locallyUniqueKeys
+ * @sample androidx.compose.runtime.samples.LocallyUniqueKeys
  *
  * Even though there are users with the same id composed in both the top and the bottom loop,
  * because they are different calls to [key], there is no need to create compound keys.
@@ -36,17 +36,17 @@ package androidx.compose.runtime
  *
  * For instance, consider the following example:
  *
- * @sample androidx.compose.runtime.samples.notAlwaysUniqueKeys
+ * @sample androidx.compose.runtime.samples.NotAlwaysUniqueKeys
  *
  * This example assumes that `parent.id` is a unique key for each item in the collection,
  * but this is only true if it is fair to assume that a parent will only ever have a single child,
  * which may not be the case.  Instead, it may be more correct to do the following:
  *
- * @sample androidx.compose.runtime.samples.moreCorrectUniqueKeys
+ * @sample androidx.compose.runtime.samples.MoreCorrectUniqueKeys
  *
  * A compound key can be created by passing in multiple arguments:
  *
- * @sample androidx.compose.runtime.samples.twoInputsKeySample
+ * @sample androidx.compose.runtime.samples.TwoInputsKeySample
  *
  * @param inputs The set of values to be used to create a compound key. These will be compared to
  * their previous values using [equals] and [hashCode]
