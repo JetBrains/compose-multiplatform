@@ -28,7 +28,6 @@ package androidx.compose.ui.geometry {
 
   public final class CornerRadiusKt {
     method @androidx.compose.runtime.Stable public static inline long CornerRadius(float x, optional float y);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long Radius(float x, optional float y);
     method @androidx.compose.runtime.Stable public static long lerp-LCIZJP8(long start, long stop, float fraction);
   }
 
@@ -134,7 +133,6 @@ package androidx.compose.ui.geometry {
     method public boolean isFinite();
     method public boolean isInfinite();
     method public boolean overlaps(androidx.compose.ui.geometry.Rect other);
-    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect shift-k-4lQ0M(long offset);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate(float translateX, float translateY);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate-k-4lQ0M(long offset);
     property public final float bottom;
@@ -219,16 +217,11 @@ package androidx.compose.ui.geometry {
     method public static androidx.compose.ui.geometry.RoundRect RoundRect--YCCMLI(androidx.compose.ui.geometry.Rect rect, optional long topLeft, optional long topRight, optional long bottomRight, optional long bottomLeft);
     method public static androidx.compose.ui.geometry.RoundRect RoundRect-fCQrIv8(float left, float top, float right, float bottom, long cornerRadius);
     method public static androidx.compose.ui.geometry.RoundRect RoundRect-v2DAv8c(androidx.compose.ui.geometry.Rect rect, long cornerRadius);
-    method @Deprecated public static long bottomLeftRadius(androidx.compose.ui.geometry.RoundRect);
-    method @Deprecated public static long bottomRightRadius(androidx.compose.ui.geometry.RoundRect);
-    method @Deprecated public static long center(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.Rect getBoundingRect(androidx.compose.ui.geometry.RoundRect);
     method public static long getCenter(androidx.compose.ui.geometry.RoundRect);
-    method @Deprecated public static float getLongestSide(androidx.compose.ui.geometry.RoundRect);
     method public static float getMaxDimension(androidx.compose.ui.geometry.RoundRect);
     method public static float getMinDimension(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.Rect getSafeInnerRect(androidx.compose.ui.geometry.RoundRect);
-    method @Deprecated public static float getShortestSide(androidx.compose.ui.geometry.RoundRect);
     method public static boolean isCircle(androidx.compose.ui.geometry.RoundRect);
     method public static boolean isEllipse(androidx.compose.ui.geometry.RoundRect);
     method public static boolean isEmpty(androidx.compose.ui.geometry.RoundRect);
@@ -236,11 +229,6 @@ package androidx.compose.ui.geometry {
     method public static boolean isRect(androidx.compose.ui.geometry.RoundRect);
     method public static boolean isSimple(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.RoundRect lerp(androidx.compose.ui.geometry.RoundRect start, androidx.compose.ui.geometry.RoundRect stop, float fraction);
-    method @Deprecated public static androidx.compose.ui.geometry.Rect outerRect(androidx.compose.ui.geometry.RoundRect);
-    method @Deprecated public static androidx.compose.ui.geometry.Rect safeInnerRect(androidx.compose.ui.geometry.RoundRect);
-    method @Deprecated public static androidx.compose.ui.geometry.RoundRect shift-cBI5anY(androidx.compose.ui.geometry.RoundRect, long offset);
-    method @Deprecated public static long topLeftRadius(androidx.compose.ui.geometry.RoundRect);
-    method @Deprecated public static long topRightRadius(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.RoundRect translate-cBI5anY(androidx.compose.ui.geometry.RoundRect, long offset);
   }
 

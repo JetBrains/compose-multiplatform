@@ -112,21 +112,6 @@ data class Rect(
      * To translate a rectangle by separate x and y components rather than by an
      * [Offset], consider [translate].
      */
-    @Deprecated(
-        "Use translate(offset) instead",
-        ReplaceWith("translate(offset)", "androidx.compose.ui.geometry")
-    )
-    @Stable
-    fun shift(offset: Offset): Rect {
-        return Rect(left + offset.x, top + offset.y, right + offset.x, bottom + offset.y)
-    }
-
-    /**
-     * Returns a new rectangle translated by the given offset.
-     *
-     * To translate a rectangle by separate x and y components rather than by an
-     * [Offset], consider [translate].
-     */
     @Stable
     fun translate(offset: Offset): Rect {
         return Rect(left + offset.x, top + offset.y, right + offset.x, bottom + offset.y)

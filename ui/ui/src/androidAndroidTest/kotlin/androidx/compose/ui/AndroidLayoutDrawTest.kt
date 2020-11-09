@@ -3471,7 +3471,7 @@ fun FixedSize(
 }
 
 @Composable
-fun Align(modifier: Modifier = Modifier.None, children: @Composable () -> Unit) {
+fun Align(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
     Layout(
         modifier = modifier,
         measureBlock = { measurables, constraints ->

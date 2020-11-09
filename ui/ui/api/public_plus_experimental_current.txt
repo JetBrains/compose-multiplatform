@@ -110,7 +110,6 @@ package androidx.compose.ui {
     method public float getDensity();
     method public float getFontScale();
     method public long getSize-NH-jbRc();
-    method @Deprecated public androidx.compose.ui.DrawResult onDraw(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public androidx.compose.ui.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public androidx.compose.ui.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> block);
     property public float density;
@@ -214,7 +213,6 @@ package androidx.compose.ui {
     method public boolean any(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public <R> R! foldIn(R? initial, kotlin.jvm.functions.Function2<? super R,? super androidx.compose.ui.Modifier.Element,? extends R> operation);
     method public <R> R! foldOut(R? initial, kotlin.jvm.functions.Function2<? super androidx.compose.ui.Modifier.Element,? super R,? extends R> operation);
-    method @Deprecated public default operator androidx.compose.ui.Modifier plus(androidx.compose.ui.Modifier other);
     method public default infix androidx.compose.ui.Modifier then(androidx.compose.ui.Modifier other);
     field public static final androidx.compose.ui.Modifier.Companion Companion;
   }
@@ -224,8 +222,6 @@ package androidx.compose.ui {
     method public boolean any(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public <R> R! foldIn(R? initial, kotlin.jvm.functions.Function2<? super R,? super androidx.compose.ui.Modifier.Element,? extends R> operation);
     method public <R> R! foldOut(R? initial, kotlin.jvm.functions.Function2<? super androidx.compose.ui.Modifier.Element,? super R,? extends R> operation);
-    method @Deprecated public androidx.compose.ui.Modifier getNone();
-    property @Deprecated public final androidx.compose.ui.Modifier None;
   }
 
   public static interface Modifier.Element extends androidx.compose.ui.Modifier {
@@ -1755,12 +1751,6 @@ package androidx.compose.ui.layout {
 
   public final class OnGloballyPositionedModifierKt {
     method public static inline androidx.compose.ui.Modifier onGloballyPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onGloballyPositioned);
-    method @Deprecated public static androidx.compose.ui.Modifier onPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onPositioned);
-  }
-
-  @Deprecated public interface OnPositionedModifier extends androidx.compose.ui.layout.OnGloballyPositionedModifier {
-    method @Deprecated public default void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
-    method @Deprecated public void onPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
 
   public interface OnRemeasuredModifier extends androidx.compose.ui.Modifier.Element {

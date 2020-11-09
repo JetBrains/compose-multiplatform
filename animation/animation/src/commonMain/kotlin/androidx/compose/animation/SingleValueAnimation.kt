@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Position
-import androidx.compose.ui.unit.PxBounds
 import androidx.compose.ui.unit.dp
 
 internal const val DpVisibilityThreshold = 0.1f
@@ -311,48 +310,6 @@ fun animate(
 ): Rect {
     return animate(
         target, Rect.VectorConverter, animSpec, endListener = endListener
-    )
-}
-
-/**
- * Fire-and-forget animation [Composable] for [PxBounds]. Once such an animation is created, it will
- * be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
- * course of the animation, simply supply a different [target] to the [Composable].
- *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
- * see [animatedValue].
- *
- *    val bounds : PxBounds = animate(
- *        if (enabled) PxBounds(0.px, 0.px, 100.px, 100.px) else PxBounds(8.px, 8.px, 80.px, 80.px))
- *
- * @param target Target value of the animation
- * @param animSpec The animation that will be used to change the value through time. Physics
- *                    animation will be used by default.
- * @param endListener An optional end listener to get notified when the animation is finished.
- */
-@Deprecated(
-    "Consider usage of Rect instead",
-    ReplaceWith(
-        "animate(target: Rect, animSpec: AnimationSpec<Rect>, " +
-            "endListener: ((Rect) -> " +
-            "Unit)?",
-        "androidx.compose.animation.animation"
-    )
-)
-@Suppress("DEPRECATION")
-@Composable
-fun animate(
-    target: PxBounds,
-    animSpec: AnimationSpec<PxBounds> = remember {
-        SpringSpec(
-            visibilityThreshold =
-                PxBounds.VectorConverter.convertFromVector(PxVisibilityThreshold4D)
-        )
-    },
-    endListener: ((PxBounds) -> Unit)? = null
-): PxBounds {
-    return animate(
-        target, PxBounds.VectorConverter, animSpec, endListener = endListener
     )
 }
 
