@@ -35,7 +35,10 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
     override fun getDetector(): Detector = ModifierDeclarationDetector()
 
     override fun getIssues(): MutableList<Issue> =
-        mutableListOf(ModifierDeclarationDetector.ModifierFactoryReturnType)
+        mutableListOf(
+            ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
+            ModifierDeclarationDetector.ModifierFactoryReturnType,
+        )
 
     private val modifierStub = kotlin(
         """
@@ -44,8 +47,6 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
             interface Modifier {
                 interface Element : Modifier
             }
-
-            object TestModifier : Modifier
         """
     )
 
@@ -291,6 +292,177 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
     }
 
     @Test
+    fun modifierVals_noErrors() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.ui.foo
+
+                import androidx.compose.ui.Modifier
+
+                object TestModifier : Modifier.Element
+
+                val modifier1: TestModifier? = null
+                val modifier2: TestModifier = TestModifier
+
+                class Foo(
+                    val modifier1: TestModifier,
+                ) {
+                    val modifier2: TestModifier? = null
+                    val modifier3: TestModifier = TestModifier
+                    val modifier4: TestModifier? get() = null
+                    val modifier5: TestModifier get() = TestModifier
+                }
+
+                interface Bar {
+                    val modifier2: TestModifier
+                    val modifier3: TestModifier
+                }
+            """
+            ),
+            modifierStub
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun noModifierReceiver() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.ui.foo
+
+                import androidx.compose.ui.Modifier
+
+                object TestModifier : Modifier.Element
+
+                fun fooModifier(): Modifier {
+                    return TestModifier
+                }
+
+                val fooModifier get(): Modifier {
+                    return TestModifier
+                }
+
+                val fooModifier2: Modifier get() {
+                    return TestModifier
+                }
+
+                val fooModifier3: Modifier get() = TestModifier
+            """
+            ),
+            modifierStub
+        )
+            .run()
+            .expect(
+                """
+src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                fun fooModifier(): Modifier {
+                    ~~~~~~~~~~~
+src/androidx/compose/ui/foo/TestModifier.kt:12: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                val fooModifier get(): Modifier {
+                                ~~~
+src/androidx/compose/ui/foo/TestModifier.kt:16: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                val fooModifier2: Modifier get() {
+                                           ~~~
+src/androidx/compose/ui/foo/TestModifier.kt:20: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                val fooModifier3: Modifier get() = TestModifier
+                                           ~~~
+4 errors, 0 warnings
+            """
+            )
+            .expectFixDiffs(
+                """
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add Modifier receiver:
+@@ -8 +8
+-                 fun fooModifier(): Modifier {
++                 fun Modifier.fooModifier(): Modifier {
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 12: Add Modifier receiver:
+@@ -12 +12
+-                 val fooModifier get(): Modifier {
++                 val Modifier.fooModifier get(): Modifier {
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 16: Add Modifier receiver:
+@@ -16 +16
+-                 val fooModifier2: Modifier get() {
++                 val Modifier.fooModifier2: Modifier get() {
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Add Modifier receiver:
+@@ -20 +20
+-                 val fooModifier3: Modifier get() = TestModifier
++                 val Modifier.fooModifier3: Modifier get() = TestModifier
+            """
+            )
+    }
+
+    @Test
+    fun incorrectReceiver() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.ui.foo
+
+                import androidx.compose.ui.Modifier
+
+                object TestModifier : Modifier.Element
+
+                fun TestModifier.fooModifier(): Modifier {
+                    return TestModifier
+                }
+
+                val TestModifier.fooModifier get(): Modifier {
+                    return TestModifier
+                }
+
+                val TestModifier.fooModifier2: Modifier get() {
+                    return TestModifier
+                }
+
+                val TestModifier.fooModifier3: Modifier get() = TestModifier
+            """
+            ),
+            modifierStub
+        )
+            .run()
+            .expect(
+                """
+src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                fun TestModifier.fooModifier(): Modifier {
+                                 ~~~~~~~~~~~
+src/androidx/compose/ui/foo/TestModifier.kt:12: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                val TestModifier.fooModifier get(): Modifier {
+                                             ~~~
+src/androidx/compose/ui/foo/TestModifier.kt:16: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                val TestModifier.fooModifier2: Modifier get() {
+                                                        ~~~
+src/androidx/compose/ui/foo/TestModifier.kt:20: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+                val TestModifier.fooModifier3: Modifier get() = TestModifier
+                                                        ~~~
+4 errors, 0 warnings
+            """
+            )
+            .expectFixDiffs(
+                """
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change receiver to Modifier:
+@@ -8 +8
+-                 fun TestModifier.fooModifier(): Modifier {
++                 fun Modifier.fooModifier(): Modifier {
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 12: Change receiver to Modifier:
+@@ -12 +12
+-                 val TestModifier.fooModifier get(): Modifier {
++                 val Modifier.fooModifier get(): Modifier {
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 16: Change receiver to Modifier:
+@@ -16 +16
+-                 val TestModifier.fooModifier2: Modifier get() {
++                 val Modifier.fooModifier2: Modifier get() {
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Change receiver to Modifier:
+@@ -20 +20
+-                 val TestModifier.fooModifier3: Modifier get() = TestModifier
++                 val Modifier.fooModifier3: Modifier get() = TestModifier
+            """
+            )
+    }
+
+    @Test
     fun noErrors() {
         lint().files(
             kotlin(
@@ -298,6 +470,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 package androidx.compose.ui.foo
 
                 import androidx.compose.ui.Modifier
+
+                object TestModifier : Modifier.Element
 
                 fun Modifier.fooModifier(): Modifier {
                     return TestModifier

@@ -54,6 +54,7 @@ import androidx.compose.runtime.Stable
  *
  * @sample androidx.compose.ui.samples.SubcomponentModifierSample
  */
+@Suppress("ModifierFactoryExtensionFunction")
 @Stable
 interface Modifier {
 

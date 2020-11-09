@@ -123,8 +123,9 @@ fun Modifier.triStateToggleable(
     factory = { toggleableImpl(state, enabled, interactionState, indication, onClick) }
 )
 
+@Suppress("ModifierInspectorInfo")
 @Composable
-private fun toggleableImpl(
+private fun Modifier.toggleableImpl(
     state: ToggleableState,
     enabled: Boolean,
     interactionState: InteractionState,
@@ -164,7 +165,8 @@ private fun toggleableImpl(
             interactionState.removeInteraction(Interaction.Pressed)
         }
     }
-    return semantics
+    return this
+        .then(semantics)
         .indication(interactionState, indication)
         .then(interactionUpdate)
         .then(click)

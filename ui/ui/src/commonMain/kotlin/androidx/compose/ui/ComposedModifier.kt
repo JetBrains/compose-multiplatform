@@ -54,6 +54,7 @@ private class ComposedModifier(
  * Call right before setting the returned modifier on an emitted node.
  * You almost certainly do not need to call this function directly.
  */
+@Suppress("ModifierFactoryExtensionFunction")
 @OptIn(ComposeCompilerApi::class)
 fun Composer<*>.materialize(modifier: Modifier): Modifier {
     if (modifier.all { it !is ComposedModifier }) return modifier
