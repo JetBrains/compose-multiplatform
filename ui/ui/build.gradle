@@ -105,6 +105,7 @@ dependencies {
         androidTestImplementation project(":ui:ui-test")
         androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
 
+        lintChecks project(":compose:ui:ui-lint")
         lintPublish project(":compose:ui:ui-lint")
     }
 }

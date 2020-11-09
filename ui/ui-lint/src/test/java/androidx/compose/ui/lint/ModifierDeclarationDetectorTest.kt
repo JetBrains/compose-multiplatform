@@ -251,6 +251,46 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
     }
 
     @Test
+    fun modifierVariables_noErrors() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.ui.foo
+
+                import androidx.compose.ui.Modifier
+
+                object TestModifier : Modifier.Element
+
+                var modifier1: TestModifier? = null
+                var modifier2: TestModifier = TestModifier
+                lateinit var modifier3: TestModifier
+                var modifier4 = TestModifier
+                    set(value) { field = TestModifier }
+                var modifier5 = TestModifier
+                    get() = TestModifier
+                    set(value) { field = TestModifier }
+
+                class Foo(
+                    var modifier1: TestModifier,
+                ) {
+                    var modifier2: TestModifier? = null
+                    var modifier3: TestModifier = TestModifier
+                    lateinit var modifier4: TestModifier
+                    var modifier5 = TestModifier
+                        set(value) { field = TestModifier }
+                    var modifier6 = TestModifier
+                        get() = TestModifier
+                        set(value) { field = TestModifier }
+                }
+            """
+            ),
+            modifierStub
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
     fun noErrors() {
         lint().files(
             kotlin(
