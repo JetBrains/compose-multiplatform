@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.WindowManager
 import androidx.compose.ui.zIndex
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.anyOrNull
@@ -1707,6 +1708,8 @@ private class MockOwner(
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
+        get() = TODO("Not yet implemented")
+    override val windowManager: WindowManager
         get() = TODO("Not yet implemented")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")

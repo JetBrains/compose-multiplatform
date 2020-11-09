@@ -287,6 +287,11 @@ val ViewConfigurationAmbient get() = AmbientViewConfiguration
  */
 val AmbientViewConfiguration = staticAmbientOf<ViewConfiguration>()
 
+/**
+ * The ambient that provides information about the window that hosts the current [Owner].
+ */
+val AmbientWindowManager = staticAmbientOf<WindowManager>()
+
 @OptIn(ExperimentalFocus::class)
 @Composable
 internal fun ProvideCommonAmbients(
@@ -309,6 +314,7 @@ internal fun ProvideCommonAmbients(
         AmbientTextToolbar provides owner.textToolbar,
         AmbientUriHandler provides uriHandler,
         AmbientViewConfiguration provides owner.viewConfiguration,
+        AmbientWindowManager provides owner.windowManager,
         content = content
     )
 }

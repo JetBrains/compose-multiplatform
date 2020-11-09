@@ -87,6 +87,11 @@ class DesktopOwner(
     override val focusManager: FocusManager
         get() = _focusManager
 
+    // TODO: set/clear _windowManager.isWindowFocused when the window gains/loses focus.
+    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
+    override val windowManager: WindowManager
+        get() = _windowManager
+
     private val keyInputModifier = KeyInputModifier(null, null)
 
     override val root = LayoutNode().also {

@@ -114,6 +114,10 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     override val focusManager: FocusManager
         get() = _focusManager
 
+    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
+    override val windowManager: WindowManager
+        get() = _windowManager
+
     private val keyInputModifier = KeyInputModifier(null, null)
 
     private val canvasHolder = CanvasHolder()
@@ -292,6 +296,11 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         with(_focusManager) {
             if (gainFocus) takeFocus() else releaseFocus()
         }
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        _windowManager.isWindowFocused = hasWindowFocus
+        super.onWindowFocusChanged(hasWindowFocus)
     }
 
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
