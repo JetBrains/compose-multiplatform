@@ -23,15 +23,20 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -89,6 +94,16 @@ class ScaleGestureFilterTest {
             setupLatch.countDown()
         }
         assertTrue(setupLatch.await(1000, TimeUnit.SECONDS))
+    }
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     @Test
@@ -433,6 +448,21 @@ class ScaleGestureFilterTest {
         }
 
         verify(scaleObserver).onScale(.2f)
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val observer = MyScaleObserver()
+        activityTestRule.runOnUiThread {
+            val modifier = Modifier.scaleGestureFilter(observer)
+                as InspectableValue
+
+            assertThat(modifier.nameFallback).isEqualTo("scaleGestureFilter")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                ValueElement("scaleObserver", observer),
+            )
+        }
     }
 }
 

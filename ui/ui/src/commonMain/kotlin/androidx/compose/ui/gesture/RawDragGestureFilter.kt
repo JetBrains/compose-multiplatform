@@ -38,6 +38,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
@@ -150,7 +151,14 @@ fun Modifier.rawDragGestureFilter(
     dragObserver: DragObserver,
     canStartDragging: (() -> Boolean)? = null,
     orientation: Orientation? = null
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "rawDragGestureFilter"
+        properties["dragObserver"] = dragObserver
+        properties["canStartDragging"] = canStartDragging
+        properties["orientation"] = orientation
+    }
+) {
     val filter = remember { RawDragGestureFilter() }
     filter.dragObserver = dragObserver
     filter.canStartDragging = canStartDragging
