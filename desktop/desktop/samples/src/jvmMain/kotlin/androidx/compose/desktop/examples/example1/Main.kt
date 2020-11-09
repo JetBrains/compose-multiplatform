@@ -24,7 +24,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -81,7 +81,11 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.font.fontFamily
+import androidx.compose.ui.text.platform.font
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.style.TextOverflow
@@ -91,6 +95,8 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 private const val title = "Desktop Compose Elements"
+
+val italicFont = fontFamily(font("Noto Italic", "NotoSans-Italic.ttf"))
 
 fun main() {
     Window(title, IntSize(1024, 850)) {
@@ -233,6 +239,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
         Text(
             text = lorem,
             color = loremColors[loremColor],
+            textAlign = TextAlign.Center,
             textDecoration = loremDecorations[loremDecoration],
             modifier = Modifier.clickable {
                 if (loremColor < loremColors.size - 1) {
@@ -256,7 +263,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
         )
 
         var overText by remember { mutableStateOf("Move mouse over text:") }
-        Text(overText)
+        Text(overText, style = TextStyle(letterSpacing = 10.sp))
 
         Text(
             text = "fun <T : Comparable<T>> List<T>.quickSort(): List<T> = when {\n" +
@@ -267,6 +274,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
                 "    smaller.quickSort() + pivot + greater.quickSort()\n" +
                 "   }\n" +
                 "}",
+            fontFamily = italicFont,
             modifier = Modifier.padding(10.dp).pointerMoveFilter(
                 onMove = {
                     overText = "Move position: $it"
