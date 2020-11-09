@@ -140,6 +140,10 @@ abstract class Placeable {
          * automatic position mirroring will not happen and the [Placeable] will be placed at the
          * given [position], similar to the [place] method.
          */
+        @Deprecated(
+            "Use the overloads with IntOffset instead",
+            ReplaceWith("placeRelative(position.round())", "androidx.compose.ui.unit.round")
+        )
         fun Placeable.placeRelative(position: Offset) = placeAutoMirrored(position.round())
 
         /**
@@ -158,6 +162,10 @@ abstract class Placeable {
          * Unlike [placeRelative], the given [position] will not implicitly react in RTL layout direction
          * contexts.
          */
+        @Deprecated(
+            "Use the overloads with IntOffset instead",
+            ReplaceWith("place(position.round())", "androidx.compose.ui.unit.round")
+        )
         fun Placeable.place(position: Offset) = place(position.round())
 
         /**
