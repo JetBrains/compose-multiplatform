@@ -120,11 +120,6 @@ abstract class StudioTask : DefaultTask() {
         File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
     }
 
-    /**
-     * Allows for the patching of a Studio installation (including replacing plugins).
-     * TODO: Consider removing after Studio has switched to Kotlin 1.4
-     * b/162414740
-     */
     @get:Internal
     protected open val studioPatcher = NoopStudioPatcher
 
@@ -145,7 +140,7 @@ abstract class StudioTask : DefaultTask() {
             // Finish install process
             successfulInstallFile.createNewFile()
         }
-        val successfulStudioPatch = File("$studioInstallationDir/PATCH_SUCCESSFUL")
+        val successfulStudioPatch = File("$studioInstallationDir/PLUGIN_PATCH_SUCCESSFUL")
         if (!successfulStudioPatch.exists()) {
             studioPatcher(this, project, studioInstallationDir)
             // Finish patch process
@@ -240,7 +235,7 @@ abstract class StudioTask : DefaultTask() {
  */
 open class RootStudioTask : StudioTask() {
     override val studioArchiveCreator = UrlArchiveCreator
-    override val studioPatcher: StudioPatcher = KotlinStudioPatcher
+    override val studioPatcher: StudioPatcher = PerformancePluginStudioPatcher
     override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
 }
 
