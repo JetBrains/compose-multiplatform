@@ -19,7 +19,6 @@ package androidx.compose.ui.tooling.preview
 import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
-import androidx.compose.ui.tooling.ComposeViewAdapterTest
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.tooling.test.R
