@@ -25,6 +25,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Rule
@@ -38,9 +39,8 @@ class AndroidComposeTestCaseRunnerTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    internal fun <T : ComponentActivity> AndroidComposeTestRule<T>.forGivenContent(
-        composable: @Composable () -> Unit
-    ): ComposeTestCaseSetup {
+    internal fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>
+    .forGivenContent(composable: @Composable () -> Unit): ComposeTestCaseSetup {
         return forGivenTestCase(object : ComposeTestCase {
             @Composable
             override fun emitContent() {

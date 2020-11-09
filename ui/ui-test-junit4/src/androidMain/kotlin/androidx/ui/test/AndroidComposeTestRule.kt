@@ -26,7 +26,7 @@ import androidx.activity.ComponentActivity
     "Moved to androidx.compose.ui.test.junit4 in androidx.compose.ui:ui-test-junit4 library",
     replaceWith = ReplaceWith("AndroidComposeTestRule", "androidx.compose.ui.test.junit4")
 )
-typealias AndroidComposeTestRule = androidx.compose.ui.test.junit4.AndroidComposeTestRule<*>
+typealias AndroidComposeTestRule = androidx.compose.ui.test.junit4.AndroidComposeTestRule<*, *>
 
 /** @Deprecated Moved to androidx.compose.ui.test.junit4 */
 actual fun createComposeRule() = androidx.compose.ui.test.junit4.createComposeRule()

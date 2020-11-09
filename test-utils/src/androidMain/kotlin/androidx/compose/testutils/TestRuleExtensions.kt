@@ -18,26 +18,26 @@ package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 
 /**
  * Takes the given test case and prepares it for execution-controlled test via
  * [ComposeTestCaseSetup].
  */
-fun <T : ComponentActivity> AndroidComposeTestRule<T>.forGivenTestCase(testCase: ComposeTestCase):
-    ComposeTestCaseSetup {
-        fun getActivity(): T {
-            var activity: T? = null
-            if (activity == null) {
-                activityRule.scenario.onActivity { activity = it }
-                if (activity == null) {
-                    throw IllegalStateException("Activity was not set in the ActivityScenarioRule!")
-                }
-            }
-            return activity!!
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.forGivenTestCase(
+    testCase: ComposeTestCase
+): ComposeTestCaseSetup {
+    fun getActivity(): A {
+        var activity: A? = null
+        activityRule.scenario.onActivity { activity = it }
+        if (activity == null) {
+            throw IllegalStateException("Activity was not set in the ActivityScenarioRule!")
         }
-
-        return AndroidComposeTestCaseSetup(
-            testCase,
-            getActivity()
-        )
+        return activity!!
     }
+
+    return AndroidComposeTestCaseSetup(
+        testCase,
+        getActivity()
+    )
+}

@@ -5,11 +5,11 @@ package androidx.compose.ui.test.junit4 {
     method public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
   }
 
-  public final class AndroidComposeTestRule<T extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeTestRule {
-    ctor public AndroidComposeTestRule(androidx.test.ext.junit.rules.ActivityScenarioRule<T> activityRule);
+  public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeTestRule {
+    ctor public AndroidComposeTestRule(R activityRule, kotlin.jvm.functions.Function1<? super R,? extends A> activityProvider);
     method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description? description);
     method @androidx.compose.ui.test.ExperimentalTesting public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public androidx.test.ext.junit.rules.ActivityScenarioRule<T> getActivityRule();
+    method public R getActivityRule();
     method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
     method public androidx.compose.ui.unit.Density getDensity();
     method public long getDisplaySize-YbymL2g();
@@ -19,7 +19,7 @@ package androidx.compose.ui.test.junit4 {
     method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
     method public void waitForIdle();
-    property public final androidx.test.ext.junit.rules.ActivityScenarioRule<T> activityRule;
+    property public final R activityRule;
     property public androidx.compose.ui.test.junit4.AnimationClockTestRule clockTestRule;
     property public androidx.compose.ui.unit.Density density;
     property public long displaySize;
@@ -31,8 +31,8 @@ package androidx.compose.ui.test.junit4 {
   }
 
   public final class AndroidComposeTestRuleKt {
-    method public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T> createAndroidComposeRule(Class<T> activityClass);
-    method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T>! createAndroidComposeRule();
+    method public static <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A> createAndroidComposeRule(Class<A> activityClass);
+    method public static inline <reified A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A>! createAndroidComposeRule();
     method public static androidx.compose.ui.test.junit4.ComposeTestRule createComposeRule();
   }
 
@@ -98,8 +98,8 @@ package androidx.compose.ui.test.junit4.android {
 package androidx.ui.test {
 
   public final class AndroidComposeTestRuleKt {
-    method @Deprecated public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T> createAndroidComposeRule(Class<T> activityClass);
-    method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T>! createAndroidComposeRule();
+    method @Deprecated public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<T>,T> createAndroidComposeRule(Class<T> activityClass);
+    method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<T>,T>! createAndroidComposeRule();
     method public static androidx.compose.ui.test.junit4.ComposeTestRule createComposeRule();
   }
 
@@ -110,15 +110,6 @@ package androidx.ui.test {
   }
 
   public final class StateRestorationTesterKt {
-  }
-
-}
-
-package androidx.ui.test.android {
-
-  public final class AndroidComposeTestRuleKt {
-    method @Deprecated public static <T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T> createAndroidComposeRule(Class<T> activityClass, optional boolean disableTransitions, optional boolean disableBlinkingCursor);
-    method public static inline <reified T extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<T>! createAndroidComposeRule(optional boolean disableTransitions, optional boolean disableBlinkingCursor);
   }
 
 }
