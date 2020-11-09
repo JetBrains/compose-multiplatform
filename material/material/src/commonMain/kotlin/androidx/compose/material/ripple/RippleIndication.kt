@@ -70,9 +70,57 @@ import androidx.compose.ui.util.nativeClass
  * component. If [Color.Unspecified] is provided the color will be calculated by
  * [RippleTheme.defaultColor]. This color will then have [RippleTheme.rippleOpacity] applied
  */
+@Deprecated(
+    "Replaced with rememberRippleIndication",
+    ReplaceWith(
+        "rememberRippleIndication(bounded, radius, color)",
+        "androidx.compose.material.ripple.rememberRippleIndication"
+    )
+)
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun RippleIndication(
+    bounded: Boolean = true,
+    radius: Dp? = null,
+    color: Color = Color.Unspecified
+): RippleIndication {
+    val theme = AmbientRippleTheme.current
+    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val resolvedColor = color.useOrElse { theme.defaultColor() }
+    val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
+    colorState.value = resolvedColor
+    val interactionOpacity = theme.rippleOpacity()
+    return remember(bounded, radius, theme, clock) {
+        RippleIndication(bounded, radius, colorState, interactionOpacity, clock)
+    }
+}
+
+/**
+ * Material implementation of [IndicationInstance] that expresses indication via ripples. This
+ * [IndicationInstance] will be used by default in Modifier.indication() if you have a
+ * [MaterialTheme] set in your hierarchy.
+ *
+ * RippleIndication responds to [Interaction.Pressed] by starting a new [RippleAnimation], and
+ * responds to other interactions by showing a fixed state layer.
+ *
+ * By default this [Indication] with default parameters will be provided by [MaterialTheme]
+ * through [androidx.compose.foundation.AmbientIndication], and hence used in interactions such as
+ * [androidx.compose.foundation.clickable] out of the box. You can also manually create a
+ * [RippleIndication] and provide it to [androidx.compose.foundation.indication] in order to
+ * customize its appearance.
+ *
+ * @param bounded If true, ripples are clipped by the bounds of the target layout. Unbounded
+ * ripples always animate from the target layout center, bounded ripples animate from the touch
+ * position.
+ * @param radius Effects grow up to this size. If null is provided the size would be calculated
+ * based on the target layout size.
+ * @param color The Ripple color is usually the same color used by the text or iconography in the
+ * component. If [Color.Unspecified] is provided the color will be calculated by
+ * [RippleTheme.defaultColor]. This color will then have [RippleTheme.rippleOpacity] applied
+ */
+@Composable
+@OptIn(ExperimentalMaterialApi::class)
+fun rememberRippleIndication(
     bounded: Boolean = true,
     radius: Dp? = null,
     color: Color = Color.Unspecified
