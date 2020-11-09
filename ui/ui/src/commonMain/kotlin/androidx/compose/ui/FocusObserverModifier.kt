@@ -18,6 +18,9 @@ package androidx.compose.ui
 
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [modifier][Modifier.Element] that can be used to observe focus state changes.
@@ -32,13 +35,22 @@ interface FocusObserverModifier : Modifier.Element {
 
 @OptIn(ExperimentalFocus::class)
 internal class FocusObserverModifierImpl(
-    override val onFocusChange: (FocusState) -> Unit
-) : FocusObserverModifier
+    override val onFocusChange: (FocusState) -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : FocusObserverModifier, InspectorValueInfo(inspectorInfo)
 
 /**
  * Add this modifier to a component to observe focus state changes.
  */
 @ExperimentalFocus
 fun Modifier.focusObserver(onFocusChange: (FocusState) -> Unit): Modifier {
-    return this.then(FocusObserverModifierImpl(onFocusChange))
+    return this.then(
+        FocusObserverModifierImpl(
+            onFocusChange = onFocusChange,
+            inspectorInfo = debugInspectorInfo {
+                name = "focusObserver"
+                properties["onFocusChange"] = onFocusChange
+            }
+        )
+    )
 }
