@@ -47,7 +47,7 @@ class RestorableStateHolderTest {
         var restorableNumberOnScreen1 = -1
         restorationTester.setContent {
             val holder = rememberRestorableStateHolder<Screens>()
-            holder.withRestorableState(screen) {
+            holder.RestorableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     numberOnScreen1 = remember { increment++ }
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
@@ -85,7 +85,7 @@ class RestorableStateHolderTest {
         var restorableNumber = -1
         restorationTester.setContent {
             val holder = rememberRestorableStateHolder<Screens>()
-            holder.withRestorableState(Screens.Screen1) {
+            holder.RestorableStateProvider(Screens.Screen1) {
                 number = remember { increment++ }
                 restorableNumber = rememberSavedInstanceState { increment++ }
             }
@@ -114,7 +114,7 @@ class RestorableStateHolderTest {
         var restorableNumberOnScreen2 = -1
         restorationTester.setContent {
             val holder = rememberRestorableStateHolder<Screens>()
-            holder.withRestorableState(screen) {
+            holder.RestorableStateProvider(screen) {
                 if (screen == Screens.Screen2) {
                     numberOnScreen2 = remember { increment++ }
                     restorableNumberOnScreen2 = rememberSavedInstanceState { increment++ }
@@ -150,7 +150,7 @@ class RestorableStateHolderTest {
         var restorableNumberOnScreen1 = -1
         restorationTester.setContent {
             val holder = rememberRestorableStateHolder<Screens>()
-            holder.withRestorableState(screen) {
+            holder.RestorableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     numberOnScreen1 = remember { increment++ }
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
@@ -195,7 +195,7 @@ class RestorableStateHolderTest {
         restorationTester.setContent {
             val holder = rememberRestorableStateHolder<Screens>()
             restorableStateHolder = holder
-            holder.withRestorableState(screen) {
+            holder.RestorableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
                 } else {
@@ -231,7 +231,7 @@ class RestorableStateHolderTest {
         restorationTester.setContent {
             val holder = rememberRestorableStateHolder<Screens>()
             restorableStateHolder = holder
-            holder.withRestorableState(screen) {
+            holder.RestorableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
                 } else {

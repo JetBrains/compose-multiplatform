@@ -53,7 +53,7 @@ fun SimpleNavigationWithRestorableStateSample() {
         // you can add screen switch animations where during the animation multiple screens
         // will displayed at the same time.
         Box(modifier) {
-            restorableStateHolder.withRestorableState(currentScreen) {
+            restorableStateHolder.RestorableStateProvider(currentScreen) {
                 content(currentScreen)
             }
         }
