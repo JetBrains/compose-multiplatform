@@ -1788,10 +1788,10 @@ package androidx.compose.ui.layout {
     method protected abstract androidx.compose.ui.unit.LayoutDirection getParentLayoutDirection();
     method protected abstract int getParentWidth();
     method public final void place(androidx.compose.ui.layout.Placeable, int x, int y);
-    method public final void place-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
+    method @Deprecated public final void place-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
     method public final void place-KmjayG8(androidx.compose.ui.layout.Placeable, long position);
     method public final void placeRelative(androidx.compose.ui.layout.Placeable, int x, int y);
-    method public final void placeRelative-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
+    method @Deprecated public final void placeRelative-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
     method public final void placeRelative-KmjayG8(androidx.compose.ui.layout.Placeable, long position);
     property protected abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
     property protected abstract int parentWidth;

@@ -91,12 +91,14 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
+import androidx.compose.ui.unit.toOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -2200,7 +2202,7 @@ class AndroidLayoutDrawTest {
     @Test
     fun layoutModifier_convenienceApi() {
         val size = 100
-        val offset = 15f
+        val offset = 15
         val latch = CountDownLatch(1)
         var resultCoordinates: LayoutCoordinates? = null
 
@@ -2212,7 +2214,7 @@ class AndroidLayoutDrawTest {
                         .layout { measurable, constraints ->
                             val placeable = measurable.measure(constraints)
                             layout(placeable.width, placeable.height) {
-                                placeable.place(Offset(offset, offset))
+                                placeable.place(offset, offset)
                             }
                         }.onGloballyPositioned {
                             resultCoordinates = it
@@ -2227,14 +2229,14 @@ class AndroidLayoutDrawTest {
         activity.runOnUiThread {
             assertEquals(size, resultCoordinates?.size?.height)
             assertEquals(size, resultCoordinates?.size?.width)
-            assertEquals(Offset(offset, offset), resultCoordinates?.positionInRoot)
+            assertEquals(IntOffset(offset, offset).toOffset(), resultCoordinates?.positionInRoot)
         }
     }
 
     @Test
     fun layoutModifier_convenienceApi_equivalent() {
         val size = 100
-        val offset = 15f
+        val offset = 15
         val latch = CountDownLatch(2)
 
         var convenienceCoordinates: LayoutCoordinates? = null
@@ -2248,7 +2250,7 @@ class AndroidLayoutDrawTest {
                         .layout { measurable, constraints ->
                             val placeable = measurable.measure(constraints)
                             layout(placeable.width, placeable.height) {
-                                placeable.place(Offset(offset, offset))
+                                placeable.place(offset, offset)
                             }
                         }.onGloballyPositioned {
                             convenienceCoordinates = it
@@ -2263,7 +2265,7 @@ class AndroidLayoutDrawTest {
                     ): MeasureResult {
                         val placeable = measurable.measure(constraints)
                         return layout(placeable.width, placeable.height) {
-                            placeable.place(Offset(offset, offset))
+                            placeable.place(offset, offset)
                         }
                     }
                 }

@@ -274,7 +274,7 @@ class LayoutAlignTest : LayoutTest() {
                         ).enforce(incomingConstraints)
                         val placeable = measurable.measure(constraints)
                         layout(placeable.width, placeable.height) {
-                            placeable.placeRelative(Offset.Zero)
+                            placeable.placeRelative(IntOffset.Zero)
                         }
                     }
                 )

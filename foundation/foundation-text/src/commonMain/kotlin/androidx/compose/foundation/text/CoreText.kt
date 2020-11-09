@@ -65,6 +65,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.subSequence
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
@@ -286,7 +287,7 @@ private class TextController(val state: TextState) {
                             maxHeight = floor(it.height).toInt()
                         )
                     ),
-                    Offset(it.left, it.top)
+                    IntOffset(it.left.roundToInt(), it.top.roundToInt())
                 )
             }
         }

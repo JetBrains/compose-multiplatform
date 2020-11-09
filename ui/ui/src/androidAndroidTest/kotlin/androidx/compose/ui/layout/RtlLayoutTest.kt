@@ -212,16 +212,16 @@ class RtlLayoutTest {
                 val width = placeables.fold(0) { sum, p -> sum + p.width }
                 val height = placeables.fold(0) { sum, p -> sum + p.height }
                 layout(width, height) {
-                    var x = 0f
-                    var y = 0f
+                    var x = 0
+                    var y = 0
                     for (placeable in placeables) {
                         if (absolutePositioning) {
-                            placeable.place(Offset(x, y))
+                            placeable.place(x, y)
                         } else {
-                            placeable.placeRelative(Offset(x, y))
+                            placeable.placeRelative(x, y)
                         }
-                        x += placeable.width.toFloat()
-                        y += placeable.height.toFloat()
+                        x += placeable.width
+                        y += placeable.height
                     }
                 }
             }
