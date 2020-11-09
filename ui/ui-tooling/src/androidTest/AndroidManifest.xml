@@ -16,7 +16,7 @@
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.compose.ui.tooling.test">
+    package="androidx.compose.ui.tooling">
     <application
         android:debuggable="true"
         tools:ignore="HardcodedDebugMode"
