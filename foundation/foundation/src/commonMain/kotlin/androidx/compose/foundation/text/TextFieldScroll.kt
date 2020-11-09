@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.runtime.Stable
@@ -53,17 +54,15 @@ internal fun Modifier.textFieldScroll(
     scrollerPosition: TextFieldScrollerPosition,
     textFieldValue: TextFieldValue,
     visualTransformation: VisualTransformation,
+    interactionState: InteractionState,
     textLayoutResult: Ref<TextLayoutResult?>
 ) = composed(
     factory = {
         // do not reverse direction only in case of RTL in horizontal orientation
         val rtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val reverseDirection = orientation == Orientation.Vertical || !rtl
-        val scroll = Modifier.scrollable(
-            orientation = orientation,
-            canScroll = { scrollerPosition.maximum != 0f },
-            reverseDirection = reverseDirection,
-            controller = rememberScrollableController { delta ->
+        val controller =
+            rememberScrollableController(interactionState = interactionState) { delta ->
                 val newOffset = scrollerPosition.offset + delta
                 val consumedDelta = when {
                     newOffset > scrollerPosition.maximum ->
@@ -74,6 +73,11 @@ internal fun Modifier.textFieldScroll(
                 scrollerPosition.offset += consumedDelta
                 consumedDelta
             }
+        val scroll = Modifier.scrollable(
+            orientation = orientation,
+            canScroll = { scrollerPosition.maximum != 0f },
+            reverseDirection = reverseDirection,
+            controller = controller
         )
 
         val cursorOffset = scrollerPosition.getOffsetToFollow(textFieldValue.selection)
@@ -106,6 +110,7 @@ internal fun Modifier.textFieldScroll(
         properties["scrollerPosition"] = scrollerPosition
         properties["textFieldValue"] = textFieldValue
         properties["visualTransformation"] = visualTransformation
+        properties["interactionState"] = interactionState
         properties["textLayoutResult"] = textLayoutResult
     }
 )
