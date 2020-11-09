@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -89,7 +89,10 @@ fun RadioButton(
                 onClick = onClick,
                 enabled = enabled,
                 interactionState = interactionState,
-                indication = RippleIndication(bounded = false, radius = RadioButtonRippleRadius)
+                indication = rememberRippleIndication(
+                    bounded = false,
+                    radius = RadioButtonRippleRadius
+                )
             )
             .wrapContentSize(Alignment.Center)
             .padding(RadioButtonPadding)

@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Indication
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.Providers
@@ -61,7 +61,9 @@ fun MaterialTheme(
         // we don't skip the updateColorsFrom call
         colors.copy()
     }.apply { updateColorsFrom(colors) }
-    val indicationFactory: @Composable () -> Indication = remember { { RippleIndication() } }
+    val indicationFactory: @Composable () -> Indication = remember {
+        { rememberRippleIndication() }
+    }
     Providers(
         AmbientColors provides rememberedColors,
         AmbientIndication provides indicationFactory,

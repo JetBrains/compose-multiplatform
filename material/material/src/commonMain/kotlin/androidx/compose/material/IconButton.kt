@@ -22,7 +22,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -68,7 +68,7 @@ fun IconButton(
                 onClick = onClick,
                 enabled = enabled,
                 interactionState = interactionState,
-                indication = RippleIndication(bounded = false, radius = RippleRadius)
+                indication = rememberRippleIndication(bounded = false, radius = RippleRadius)
             )
             .then(IconButtonSizeModifier),
         alignment = Alignment.Center
@@ -108,7 +108,7 @@ fun IconToggleButton(
             onValueChange = onCheckedChange,
             enabled = enabled,
             interactionState = interactionState,
-            indication = RippleIndication(bounded = false, radius = RippleRadius)
+            indication = rememberRippleIndication(bounded = false, radius = RippleRadius)
         ).then(IconButtonSizeModifier),
         alignment = Alignment.Center
     ) { icon() }
