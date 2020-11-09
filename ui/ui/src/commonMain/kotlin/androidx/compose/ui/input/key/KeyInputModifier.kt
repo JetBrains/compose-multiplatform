@@ -19,6 +19,7 @@ package androidx.compose.ui.input.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.node.ModifiedKeyInputNode
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -29,7 +30,12 @@ import androidx.compose.ui.node.ModifiedKeyInputNode
  * false, the key event will be sent to this [keyInputFilter]'s parent.
  */
 @ExperimentalKeyInput
-fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {
+fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "keyInputFilter"
+        properties["onKeyEvent"] = onKeyEvent
+    }
+) {
     KeyInputModifier(onKeyEvent = onKeyEvent, onPreviewKeyEvent = null)
 }
 
@@ -44,7 +50,12 @@ fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = compo
  * sent back up to the root [keyInputFilter] using the onKeyEvent callback.
  */
 @ExperimentalKeyInput
-fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed {
+fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "previewKeyInputFilter"
+        properties["onPreviewKeyEvent"] = onPreviewKeyEvent
+    }
+) {
     KeyInputModifier(onKeyEvent = null, onPreviewKeyEvent = onPreviewKeyEvent)
 }
 

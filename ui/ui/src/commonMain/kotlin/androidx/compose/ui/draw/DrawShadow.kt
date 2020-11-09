@@ -23,6 +23,7 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -48,7 +49,14 @@ fun Modifier.drawShadow(
     shape: Shape = RectangleShape,
     clip: Boolean = elevation > 0.dp
 ) = if (elevation > 0.dp || clip) {
-    composed {
+    composed(
+        inspectorInfo = debugInspectorInfo {
+            name = "drawShadow"
+            properties["elevation"] = elevation
+            properties["shape"] = shape
+            properties["clip"] = clip
+        }
+    ) {
         drawLayer(
             shadowElevation = with(DensityAmbient.current) { elevation.toPx() },
             shape = shape,

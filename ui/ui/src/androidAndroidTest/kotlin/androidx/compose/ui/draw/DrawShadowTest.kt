@@ -29,9 +29,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -42,6 +46,8 @@ import androidx.compose.ui.waitAndScreenShot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -72,6 +78,12 @@ class DrawShadowTest {
         activity = rule.activity
         activity.hasFocusLatch.await(5, TimeUnit.SECONDS)
         drawLatch = CountDownLatch(1)
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun tearDown() {
+        isDebugInspectorInfoEnabled = false
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -204,6 +216,20 @@ class DrawShadowTest {
 
         takeScreenShot(12).apply {
             hasShadow()
+        }
+    }
+
+    @Test
+    fun testInspectorValue() {
+        rule.runOnUiThreadIR {
+            val modifier = Modifier.drawShadow(4.0.dp) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("drawShadow")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                ValueElement("elevation", 4.0.dp),
+                ValueElement("shape", RectangleShape),
+                ValueElement("clip", true)
+            )
         }
     }
 
