@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling
+package androidx.compose.ui.tooling.preview
 
 import android.app.Activity
 import android.os.Bundle
 import android.view.ViewTreeObserver
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.TransitionAnimation
-import androidx.compose.ui.tooling.preview.ComposeViewAdapter
-import androidx.compose.ui.tooling.preview.ViewInfo
+import androidx.compose.ui.tooling.compositionCount
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.test.R
 import org.junit.Assert.assertArrayEquals
