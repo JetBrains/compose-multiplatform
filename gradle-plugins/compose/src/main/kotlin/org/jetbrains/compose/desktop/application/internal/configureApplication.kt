@@ -150,13 +150,13 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
 private fun Project.configureRunTask(app: Application) {
     project.tasks.composeTask<JavaExec>(taskName("run", app)) {
         mainClass.set(provider { app.mainClass })
-        executable = javaExecutable(app.javaHomeOrDefault())
+        executable(javaExecutable(app.javaHomeOrDefault()))
         jvmArgs = app.jvmArgs
         args = app.args
 
         val cp = objects.fileCollection()
         // adding a null value will cause future invocations of `from` to throw an NPE
-        app.mainJar.orNull?.let(cp::from)
+        app.mainJar.orNull?.let { cp.from(it) }
         cp.from(app._fromFiles)
         dependsOn(*app._dependenciesTaskNames.toTypedArray())
 
