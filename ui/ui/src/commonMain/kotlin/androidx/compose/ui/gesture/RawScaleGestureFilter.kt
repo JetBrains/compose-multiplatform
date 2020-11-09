@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.consumePositionChange
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
@@ -119,7 +120,13 @@ interface RawScaleObserver {
 fun Modifier.rawScaleGestureFilter(
     scaleObserver: RawScaleObserver,
     canStartScaling: (() -> Boolean)? = null
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "rawScaleGestureFilter"
+        properties["scaleObserver"] = scaleObserver
+        properties["canStartScaling"] = canStartScaling
+    }
+) {
     val filter = remember { RawScaleGestureFilter() }
     // TODO(b/129784010): Consider also allowing onStart, onScale, and onEnd to be set individually.
     filter.scaleObserver = scaleObserver

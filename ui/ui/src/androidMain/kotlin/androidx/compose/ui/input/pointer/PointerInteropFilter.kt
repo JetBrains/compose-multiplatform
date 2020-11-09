@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
 import androidx.compose.ui.util.fastAny
@@ -59,7 +60,13 @@ import androidx.compose.ui.viewinterop.InternalInteropApi
 fun Modifier.pointerInteropFilter(
     requestDisallowInterceptTouchEvent: (RequestDisallowInterceptTouchEvent)? = null,
     onTouchEvent: (MotionEvent) -> Boolean
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "pointerInteropFilter"
+        properties["requestDisallowInterceptTouchEvent"] = requestDisallowInterceptTouchEvent
+        properties["onTouchEvent"] = onTouchEvent
+    }
+) {
     val filter = remember { PointerInteropFilter() }
     filter.onTouchEvent = onTouchEvent
     filter.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent

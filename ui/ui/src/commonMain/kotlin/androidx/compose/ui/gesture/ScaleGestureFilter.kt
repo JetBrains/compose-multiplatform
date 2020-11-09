@@ -19,6 +19,7 @@ package androidx.compose.ui.gesture
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Observes various events sent by [scaleGestureFilter].  Implement and pass into
@@ -103,7 +104,12 @@ interface ScaleObserver {
  */
 fun Modifier.scaleGestureFilter(
     scaleObserver: ScaleObserver
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "scaleGestureFilter"
+        properties["scaleObserver"] = scaleObserver
+    }
+) {
     val glue = remember { TouchSlopScaleGestureDetectorGlue() }
     glue.scaleObserver = scaleObserver
 

@@ -28,6 +28,7 @@ import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
@@ -54,7 +55,15 @@ fun Modifier.pressIndicatorGestureFilter(
     onStop: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
     enabled: Boolean = true
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "pressIndicatorGestureFilter"
+        properties["onStart"] = onStart
+        properties["onStop"] = onStop
+        properties["onCancel"] = onCancel
+        properties["enabled"] = enabled
+    }
+) {
     val filter = remember { PressIndicatorGestureFilter() }
     filter.onStart = onStart
     filter.onStop = onStop
