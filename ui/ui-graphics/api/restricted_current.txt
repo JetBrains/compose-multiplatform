@@ -296,7 +296,6 @@ package androidx.compose.ui.graphics {
     method public long getMagenta-0d7_KjU();
     method public long getRed-0d7_KjU();
     method public long getTransparent-0d7_KjU();
-    method @Deprecated public long getUnset-0d7_KjU();
     method public long getUnspecified-0d7_KjU();
     method public long getWhite-0d7_KjU();
     method public long getYellow-0d7_KjU();
@@ -310,7 +309,6 @@ package androidx.compose.ui.graphics {
     property public final long Magenta;
     property public final long Red;
     property public final long Transparent;
-    property @Deprecated public final long Unset;
     property public final long Unspecified;
     property public final long White;
     property public final long Yellow;
@@ -337,9 +335,7 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static long Color(long color);
     method @androidx.compose.runtime.Stable public static long Color(@IntRange(from=0, to=255) int red, @IntRange(from=0, to=255) int green, @IntRange(from=0, to=255) int blue, optional @IntRange(from=0, to=255) int alpha);
     method @androidx.compose.runtime.Stable public static long compositeOver-6xK2E-Q(long, long background);
-    method @Deprecated public static inline boolean isSet-8_81llA(long);
     method public static inline boolean isSpecified-8_81llA(long);
-    method @Deprecated public static inline boolean isUnset-8_81llA(long);
     method public static inline boolean isUnspecified-8_81llA(long);
     method @androidx.compose.runtime.Stable public static long lerp-m18UwgE(long start, long stop, @FloatRange(from=0.0, to=1.0) float fraction);
     method @androidx.compose.runtime.Stable public static float luminance-8_81llA(long);
@@ -513,7 +509,6 @@ package androidx.compose.ui.graphics {
     method public void addArcRad(androidx.compose.ui.geometry.Rect oval, float startAngleRadians, float sweepAngleRadians);
     method public void addOval(androidx.compose.ui.geometry.Rect oval);
     method public void addPath-ej0GBII(androidx.compose.ui.graphics.Path path, optional long offset);
-    method @Deprecated public default void addRRect(androidx.compose.ui.geometry.RoundRect rrect);
     method public void addRect(androidx.compose.ui.geometry.Rect rect);
     method public void addRoundRect(androidx.compose.ui.geometry.RoundRect roundRect);
     method public void arcTo(androidx.compose.ui.geometry.Rect rect, float startAngleDegrees, float sweepAngleDegrees, boolean forceMoveTo);
@@ -534,7 +529,6 @@ package androidx.compose.ui.graphics {
     method public void relativeQuadraticBezierTo(float dx1, float dy1, float dx2, float dy2);
     method public void reset();
     method public void setFillType(androidx.compose.ui.graphics.PathFillType p);
-    method @Deprecated public default void shift-k-4lQ0M(long offset);
     method public void translate-k-4lQ0M(long offset);
     property public abstract androidx.compose.ui.graphics.PathFillType fillType;
     property public abstract boolean isConvex;
@@ -997,7 +991,6 @@ package androidx.compose.ui.graphics.drawscope {
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float inset, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, optional float horizontal, optional float vertical, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void rotate-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float degrees, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method @Deprecated public static inline void rotateRad(androidx.compose.ui.graphics.drawscope.DrawScope, float radians, optional float pivotX, optional float pivotY, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void rotateRad-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float radians, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void scale-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float scale, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void scale-LCqtnZ0(androidx.compose.ui.graphics.drawscope.DrawScope, float scaleX, float scaleY, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);

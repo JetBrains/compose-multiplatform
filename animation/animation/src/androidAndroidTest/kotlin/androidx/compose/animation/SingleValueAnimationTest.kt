@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Position
-import androidx.compose.ui.unit.PxBounds
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -236,7 +235,6 @@ class SingleValueAnimationTest {
 
         var vectorValue = startVal
         var boundsValue = Bounds.VectorConverter.convertFromVector(startVal)
-        var pxBoundsValue = PxBounds.VectorConverter.convertFromVector(startVal)
 
         fun <V> tween(): TweenSpec<V> =
             TweenSpec(
@@ -257,14 +255,6 @@ class SingleValueAnimationTest {
                     Bounds.VectorConverter.convertFromVector(startVal),
                 tween()
             )
-
-            pxBoundsValue = animate(
-                if (enabled)
-                    PxBounds.VectorConverter.convertFromVector(endVal)
-                else
-                    PxBounds.VectorConverter.convertFromVector(startVal),
-                tween()
-            )
         }
 
         val verify: () -> Unit = {
@@ -279,7 +269,6 @@ class SingleValueAnimationTest {
 
                 assertEquals(expect, vectorValue)
                 assertEquals(Bounds.VectorConverter.convertFromVector(expect), boundsValue)
-                assertEquals(PxBounds.VectorConverter.convertFromVector(expect), pxBoundsValue)
                 rule.clockTestRule.advanceClock(50)
                 rule.waitForIdle()
             }

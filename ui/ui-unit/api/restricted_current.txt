@@ -312,9 +312,7 @@ package androidx.compose.ui.unit {
   }
 
   public static final class IntOffset.Companion {
-    method @Deprecated public long getOrigin-nOcc-ac();
     method public long getZero-nOcc-ac();
-    property @Deprecated public final long Origin;
     property public final long Zero;
   }
 
@@ -379,27 +377,6 @@ package androidx.compose.ui.unit {
   public static final class Position.Companion {
   }
 
-  @Deprecated @androidx.compose.runtime.Immutable public final class PxBounds {
-    ctor @Deprecated public PxBounds(float left, float top, float right, float bottom);
-    method @Deprecated public float component1();
-    method @Deprecated public float component2();
-    method @Deprecated public float component3();
-    method @Deprecated public float component4();
-    method @Deprecated @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.PxBounds copy(float left, float top, float right, float bottom);
-    method @Deprecated public float getBottom();
-    method @Deprecated public float getLeft();
-    method @Deprecated public float getRight();
-    method @Deprecated public float getTop();
-    property public final float bottom;
-    property public final float left;
-    property public final float right;
-    property public final float top;
-    field @Deprecated public static final androidx.compose.ui.unit.PxBounds.Companion Companion;
-  }
-
-  @Deprecated public static final class PxBounds.Companion {
-  }
-
   @androidx.compose.runtime.Immutable public final inline class PxCubed implements java.lang.Comparable<androidx.compose.ui.unit.PxCubed> {
     ctor public PxCubed();
     method @androidx.compose.runtime.Stable public operator int compareTo-830ceAw(float p);
@@ -437,15 +414,8 @@ package androidx.compose.ui.unit {
   }
 
   public final class PxKt {
-    method @Deprecated @androidx.compose.runtime.Stable public static inline androidx.compose.ui.unit.PxBounds PxBounds-MrV732k(long topLeft, long size);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long center(androidx.compose.ui.unit.PxBounds);
     method @androidx.compose.runtime.Stable public static long center-uvyYCjk(long);
-    method @Deprecated public static inline float getHeight(androidx.compose.ui.unit.PxBounds);
-    method @Deprecated public static inline float getWidth(androidx.compose.ui.unit.PxBounds);
     method @androidx.compose.runtime.Stable public static inline long round-k-4lQ0M(long);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.PxBounds toBounds-uvyYCjk(long);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.PxBounds);
-    method @Deprecated @androidx.compose.runtime.Stable public static long toSize(androidx.compose.ui.unit.PxBounds);
   }
 
   @androidx.compose.runtime.Immutable public final inline class PxSquared implements java.lang.Comparable<androidx.compose.ui.unit.PxSquared> {

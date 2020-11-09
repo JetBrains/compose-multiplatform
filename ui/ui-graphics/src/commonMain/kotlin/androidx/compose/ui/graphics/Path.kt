@@ -199,15 +199,6 @@ expect class NativePathEffect
     fun addRoundRect(roundRect: RoundRect)
 
     /**
-     * Add a round rectangle shape to the path from the given [RoundRect]
-     */
-    @Deprecated(
-        "Use addRoundRect(roundRect) instead",
-        ReplaceWith("addRoundRect(rrect)", "androidx.compose.ui.graphics")
-    )
-    fun addRRect(rrect: RoundRect) = addRoundRect(rrect)
-
-    /**
      * Adds a new subpath that consists of the given `path` offset by the given
      * `offset`.
      *
@@ -229,15 +220,6 @@ expect class NativePathEffect
      * reset to the origin.
      */
     fun reset()
-
-    /**
-     * Translates all the segments of every subpath by the given offset.
-     */
-    @Deprecated(
-        "Use translate(offset) instead",
-        ReplaceWith("translate(offset)", "androidx.compose.ui.graphics.Path")
-    )
-    fun shift(offset: Offset) = translate(offset)
 
     /**
      * Translates all the segments of every subpath by the given offset.
