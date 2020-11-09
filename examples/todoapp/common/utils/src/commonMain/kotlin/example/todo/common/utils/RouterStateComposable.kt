@@ -19,7 +19,7 @@ private typealias SavedState = Map<String, List<Any?>>
 @Composable
 fun <C : Parcelable, T : Any> Value<RouterState<C, T>>.children(render: @Composable() (child: T, configuration: C) -> Unit) {
     val parentRegistry: UiSavedStateRegistry? = UiSavedStateRegistryAmbient.current
-    val children = remember { Children<C>() }
+    val children = remember(value) { Children<C>() }
 
     if (parentRegistry != null) {
         onDispose {
@@ -32,7 +32,7 @@ fun <C : Parcelable, T : Any> Value<RouterState<C, T>>.children(render: @Composa
         }
     }
 
-    invoke { state ->
+    observe { state ->
         val activeChildConfiguration = state.activeChild.configuration
 
         val currentChild: ActiveChild<C>? = children.active

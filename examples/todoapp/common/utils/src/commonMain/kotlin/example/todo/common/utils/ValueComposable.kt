@@ -29,6 +29,6 @@ fun <T : Any> Value<T>.asState(): State<T> {
 }
 
 @Composable
-operator fun <T : Any> Value<T>.invoke(render: @Composable() (T) -> Unit) {
-    render(asState().value)
+fun <T : Any> Value<T>.observe(observer: @Composable() (T) -> Unit) {
+    observer(asState().value)
 }
