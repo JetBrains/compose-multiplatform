@@ -16,12 +16,12 @@
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.compose.ui.tooling.test">
+    package="androidx.compose.ui.tooling">
     <application
         android:debuggable="true"
         tools:ignore="HardcodedDebugMode"
         tools:replace="android:debuggable">
-        <activity android:name="androidx.compose.ui.tooling.ComposeViewAdapterTest$Companion$TestActivity"
+        <activity android:name="androidx.compose.ui.tooling.preview.ComposeViewAdapterTest$Companion$TestActivity"
             android:theme="@style/TestTheme"/>
         <activity android:name="androidx.compose.ui.tooling.TestActivity"
             android:theme="@style/TestTheme"/>
