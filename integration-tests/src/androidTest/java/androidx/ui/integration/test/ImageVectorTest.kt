@@ -48,12 +48,12 @@ import kotlin.math.roundToInt
 @LargeTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @RunWith(AndroidJUnit4::class)
-class VectorAssetTest {
+class ImageVectorTest {
     @get:Rule
     val rule = createComposeRule()
 
     @Test
-    fun testProgrammaticAndXmlVectorAssetsAreTheSame() {
+    fun testProgrammaticAndXmlImageVectorsAreTheSame() {
         val xmlTestCase = XmlVectorTestCase()
         val programmaticTestCase = ProgrammaticVectorTestCase()
 
@@ -94,9 +94,9 @@ class VectorAssetTest {
             with(DensityAmbient.current) {
                 insetRectSize = (10f * this.density).roundToInt()
             }
-            val vectorAsset =
+            val imageVector =
                 vectorResource(R.drawable.ic_pathfill_sample)
-            Image(vectorAsset, modifier = Modifier.testTag(testTag))
+            Image(imageVector, modifier = Modifier.testTag(testTag))
         }
 
         rule.onNodeWithTag(testTag).captureToImage().asAndroidBitmap().apply {

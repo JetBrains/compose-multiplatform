@@ -588,27 +588,14 @@ package androidx.compose.ui.gesture.util {
 
 package androidx.compose.ui.graphics.vector {
 
-  public abstract sealed class VNode {
-    method public abstract void draw(androidx.compose.ui.graphics.drawscope.DrawScope);
-    method public final void invalidate();
-  }
-
-  public final class VectorApplier extends androidx.compose.runtime.AbstractApplier<androidx.compose.ui.graphics.vector.VNode> {
-    ctor public VectorApplier(androidx.compose.ui.graphics.vector.VNode root);
-    method public void insert(int index, androidx.compose.ui.graphics.vector.VNode instance);
-    method public void move(int from, int to, int count);
-    method protected void onClear();
-    method public void remove(int index, int count);
-  }
-
-  @androidx.compose.runtime.Immutable public final class VectorAsset {
+  @androidx.compose.runtime.Immutable public final class ImageVector {
     method public String component1();
     method public float component2-D9Ej5fM();
     method public float component3-D9Ej5fM();
     method public float component4();
     method public float component5();
     method public androidx.compose.ui.graphics.vector.VectorGroup component6();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.vector.VectorAsset copy-pRTh4Qo(String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, androidx.compose.ui.graphics.vector.VectorGroup root);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.vector.ImageVector copy-pRTh4Qo(String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, androidx.compose.ui.graphics.vector.VectorGroup root);
     method public float getDefaultHeight-D9Ej5fM();
     method public float getDefaultWidth-D9Ej5fM();
     method public String getName();
@@ -623,26 +610,31 @@ package androidx.compose.ui.graphics.vector {
     property public final float viewportWidth;
   }
 
-  public final class VectorAssetBuilder {
-    method public androidx.compose.ui.graphics.vector.VectorAssetBuilder addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional androidx.compose.ui.graphics.PathFillType pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
-    method public androidx.compose.ui.graphics.vector.VectorAsset build();
-    method public float getDefaultHeight-D9Ej5fM();
-    method public float getDefaultWidth-D9Ej5fM();
-    method public String getName();
-    method public float getViewportHeight();
-    method public float getViewportWidth();
-    method public androidx.compose.ui.graphics.vector.VectorAssetBuilder popGroup();
-    method public androidx.compose.ui.graphics.vector.VectorAssetBuilder pushGroup(optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData);
-    property public final float defaultHeight;
-    property public final float defaultWidth;
-    property public final String name;
-    property public final float viewportHeight;
-    property public final float viewportWidth;
+  public static final class ImageVector.Builder {
+    method public androidx.compose.ui.graphics.vector.ImageVector.Builder addGroup(optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData);
+    method public androidx.compose.ui.graphics.vector.ImageVector.Builder addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional androidx.compose.ui.graphics.PathFillType pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
+    method public androidx.compose.ui.graphics.vector.ImageVector build();
+    method public androidx.compose.ui.graphics.vector.ImageVector.Builder clearGroup();
+    method @Deprecated public androidx.compose.ui.graphics.vector.ImageVector.Builder popGroup();
+    method @Deprecated public androidx.compose.ui.graphics.vector.ImageVector.Builder pushGroup(optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData);
   }
 
-  public final class VectorAssetBuilderKt {
-    method public static inline androidx.compose.ui.graphics.vector.VectorAssetBuilder group(androidx.compose.ui.graphics.vector.VectorAssetBuilder, optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.VectorAssetBuilder,kotlin.Unit> block);
-    method public static inline androidx.compose.ui.graphics.vector.VectorAssetBuilder path(androidx.compose.ui.graphics.vector.VectorAssetBuilder, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional androidx.compose.ui.graphics.PathFillType pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+  public final class ImageVectorKt {
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder group(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.ImageVector.Builder,kotlin.Unit> block);
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder path(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional androidx.compose.ui.graphics.PathFillType pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+  }
+
+  public abstract sealed class VNode {
+    method public abstract void draw(androidx.compose.ui.graphics.drawscope.DrawScope);
+    method public final void invalidate();
+  }
+
+  public final class VectorApplier extends androidx.compose.runtime.AbstractApplier<androidx.compose.ui.graphics.vector.VNode> {
+    ctor public VectorApplier(androidx.compose.ui.graphics.vector.VNode root);
+    method public void insert(int index, androidx.compose.ui.graphics.vector.VNode instance);
+    method public void move(int from, int to, int count);
+    method protected void onClear();
+    method public void remove(int index, int count);
   }
 
   public final class VectorComposeKt {
@@ -710,9 +702,9 @@ package androidx.compose.ui.graphics.vector {
   }
 
   public final class VectorPainterKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter(androidx.compose.ui.graphics.vector.VectorAsset asset);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter-RKTc9UI(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> children);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.VectorAsset asset);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-RKTc9UI(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> children);
     field public static final String RootGroupName = "VectorRootGroup";
   }
@@ -2419,8 +2411,8 @@ package androidx.compose.ui.res {
   }
 
   public final class VectorResourcesKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.vector.VectorAsset> loadVectorResource(int id, optional androidx.compose.ui.graphics.vector.VectorAsset? pendingResource, optional androidx.compose.ui.graphics.vector.VectorAsset? failedResource);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorAsset vectorResource(@DrawableRes int id);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.vector.ImageVector> loadVectorResource(int id, optional androidx.compose.ui.graphics.vector.ImageVector? pendingResource, optional androidx.compose.ui.graphics.vector.ImageVector? failedResource);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(@DrawableRes int id);
   }
 
 }

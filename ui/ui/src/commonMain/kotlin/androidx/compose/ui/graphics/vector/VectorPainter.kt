@@ -118,10 +118,10 @@ fun VectorPainter(
     )
 
 /**
- * Create a [VectorPainter] with the given [VectorAsset]. This will create a
- * sub-composition of the vector hierarchy given the tree structure in [VectorAsset]
+ * Create a [VectorPainter] with the given [ImageVector]. This will create a
+ * sub-composition of the vector hierarchy given the tree structure in [ImageVector]
  *
- * @param [asset] VectorAsset used to create a vector graphic sub-composition
+ * @param [image] ImageVector used to create a vector graphic sub-composition
  */
 @Suppress("ComposableNaming")
 @Deprecated(
@@ -133,36 +133,36 @@ fun VectorPainter(
     )
 )
 @Composable
-fun VectorPainter(asset: VectorAsset): VectorPainter =
+fun VectorPainter(image: ImageVector): VectorPainter =
     rememberVectorPainter(
-        defaultWidth = asset.defaultWidth,
-        defaultHeight = asset.defaultHeight,
-        viewportWidth = asset.viewportWidth,
-        viewportHeight = asset.viewportHeight,
-        name = asset.name,
-        children = { _, _ -> RenderVectorGroup(group = asset.root) }
+        defaultWidth = image.defaultWidth,
+        defaultHeight = image.defaultHeight,
+        viewportWidth = image.viewportWidth,
+        viewportHeight = image.viewportHeight,
+        name = image.name,
+        children = { _, _ -> RenderVectorGroup(group = image.root) }
     )
 
 /**
- * Create a [VectorPainter] with the given [VectorAsset]. This will create a
- * sub-composition of the vector hierarchy given the tree structure in [VectorAsset]
+ * Create a [VectorPainter] with the given [ImageVector]. This will create a
+ * sub-composition of the vector hierarchy given the tree structure in [ImageVector]
  *
- * @param [asset] VectorAsset used to create a vector graphic sub-composition
+ * @param [image] ImageVector used to create a vector graphic sub-composition
  */
 @Composable
-fun rememberVectorPainter(asset: VectorAsset) =
+fun rememberVectorPainter(image: ImageVector) =
     rememberVectorPainter(
-        defaultWidth = asset.defaultWidth,
-        defaultHeight = asset.defaultHeight,
-        viewportWidth = asset.viewportWidth,
-        viewportHeight = asset.viewportHeight,
-        name = asset.name,
-        children = { _, _ -> RenderVectorGroup(group = asset.root) }
+        defaultWidth = image.defaultWidth,
+        defaultHeight = image.defaultHeight,
+        viewportWidth = image.viewportWidth,
+        viewportHeight = image.viewportHeight,
+        name = image.name,
+        children = { _, _ -> RenderVectorGroup(group = image.root) }
     )
 
 /**
  * [Painter] implementation that abstracts the drawing of a Vector graphic.
- * This can be represented by either a [VectorAsset] or a programmatic
+ * This can be represented by either a [ImageVector] or a programmatic
  * composition of a vector
  */
 class VectorPainter internal constructor() : Painter() {

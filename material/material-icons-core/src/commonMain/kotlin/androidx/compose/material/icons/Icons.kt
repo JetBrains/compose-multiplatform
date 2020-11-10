@@ -28,8 +28,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.DefaultFillType
 import androidx.compose.ui.graphics.vector.PathBuilder
-import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.graphics.vector.VectorAssetBuilder
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
@@ -104,8 +103,8 @@ object Icons {
  */
 inline fun materialIcon(
     name: String,
-    block: VectorAssetBuilder.() -> VectorAssetBuilder
-): VectorAsset = VectorAssetBuilder(
+    block: ImageVector.Builder.() -> ImageVector.Builder
+): ImageVector = ImageVector.Builder(
     name = name,
     defaultWidth = MaterialIconDimension.dp,
     defaultHeight = MaterialIconDimension.dp,
@@ -121,7 +120,7 @@ inline fun materialIcon(
  * @param pathFillType [PathFillType] for this path
  * @param pathBuilder builder lambda to add commands to this path
  */
-inline fun VectorAssetBuilder.materialPath(
+inline fun ImageVector.Builder.materialPath(
     fillAlpha: Float = 1f,
     strokeAlpha: Float = 1f,
     pathFillType: PathFillType = DefaultFillType,
