@@ -19,9 +19,6 @@ package androidx.compose.ui.input.key
 /**
  * When a user presses a key on a hardware keyboard, a [KeyEvent] is sent to the
  * [KeyInputModifier] that is currently active.
- *
- * @property key the key that was pressed.
- * @property type the [type][KeyEventType] of key event.
  */
 @ExperimentalKeyInput
 interface KeyEvent {
@@ -54,8 +51,34 @@ interface KeyEvent {
     val type: KeyEventType
 
     /**
+     * Indicates whether the Alt key is pressed.
+     */
+    val isAltPressed: Boolean
+
+    /**
+     * Indicates whether the Ctrl key is pressed.
+     */
+    val isCtrlPressed: Boolean
+
+    /**
+     * Indicates whether the Meta key is pressed.
+     */
+    val isMetaPressed: Boolean
+
+    /**
+     * Indicates whether the Shift key is pressed.
+     */
+    val isShiftPressed: Boolean
+
+    /**
      * Indicates the status of the Alt key.
      */
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "alt is replaced by isAltPressed",
+        ReplaceWith("isAltPressed"),
+        DeprecationLevel.ERROR
+    )
     val alt: Alt
 }
 
@@ -83,6 +106,10 @@ enum class KeyEventType {
 /**
  * Indicates the status of the Alt key.
  */
+@Deprecated(
+    message = "Alt is replaced by KeyEvent.isAltPressed",
+    level = DeprecationLevel.WARNING
+)
 @ExperimentalKeyInput
 interface Alt {
     /**

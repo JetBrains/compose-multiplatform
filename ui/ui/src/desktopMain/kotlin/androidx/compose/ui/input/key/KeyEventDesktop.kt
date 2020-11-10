@@ -36,10 +36,24 @@ internal inline class KeyEventDesktop(val keyEvent: KeyEventAwt) : KeyEvent {
             else -> KeyEventType.Unknown
         }
 
+    override val isAltPressed: Boolean
+        get() = keyEvent.isAltDown || keyEvent.isAltGraphDown
+
+    override val isCtrlPressed: Boolean
+        get() = keyEvent.isControlDown
+
+    override val isMetaPressed: Boolean
+        get() = keyEvent.isMetaDown
+
+    override val isShiftPressed: Boolean
+        get() = keyEvent.isShiftDown
+
+    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
     override val alt: Alt
         get() = AltDesktop(keyEvent)
 }
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalKeyInput::class)
 internal inline class AltDesktop(val keyEvent: KeyEventAwt) : Alt {
 
