@@ -60,7 +60,7 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_withInput() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(
                     value = "Text",
                     onValueChange = {},
@@ -75,7 +75,7 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_notFocused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(
                     value = "",
                     onValueChange = {},
@@ -90,7 +90,7 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_focused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(
                     value = "",
                     onValueChange = {},
@@ -111,7 +111,7 @@ class TextFieldScreenshotTest {
     fun textField_focused_rtl() {
         rule.setMaterialContent {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+                Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                     TextField(
                         value = "",
                         onValueChange = {},

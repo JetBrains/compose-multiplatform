@@ -312,7 +312,7 @@ class BottomNavigationScreenshotTest {
 private fun DefaultBottomNavigation(
     interactionState: InteractionState
 ) {
-    Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(Tag)) {
+    Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         BottomNavigation {
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },
@@ -355,7 +355,7 @@ private fun CustomBottomNavigation(
     // Apply default emphasis
     @Suppress("NAME_SHADOWING")
     val unselectedContentColor = unselectedContentColor.copy(alpha = ContentAlpha.medium)
-    Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(Tag)) {
+    Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         BottomNavigation(backgroundColor = backgroundColor) {
             BottomNavigationItem(
                 icon = { Icon(Icons.Filled.Favorite) },

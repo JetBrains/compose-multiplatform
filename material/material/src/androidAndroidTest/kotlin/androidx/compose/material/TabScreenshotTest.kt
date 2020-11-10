@@ -308,7 +308,7 @@ class TabScreenshotTest {
 private fun DefaultTabs(
     interactionState: InteractionState
 ) {
-    Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(Tag)) {
+    Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         TabRow(selectedTabIndex = 0) {
             Tab(
                 text = { Text("TAB") },
@@ -348,7 +348,7 @@ private fun CustomTabs(
     // Apply default emphasis
     @Suppress("NAME_SHADOWING")
     val unselectedContentColor = unselectedContentColor.copy(alpha = ContentAlpha.medium)
-    Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(Tag)) {
+    Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         TabRow(selectedTabIndex = 0, backgroundColor = backgroundColor) {
             Tab(
                 text = { Text("TAB") },

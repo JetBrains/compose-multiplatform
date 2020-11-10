@@ -309,12 +309,12 @@ class SemanticsPropertyKey<T>(
     /**
      * Method implementing the semantics merge policy of a particular key.
      *
-     * When mergeAllDescendants is set on a semantics node, then this function will called for each
+     * When mergeDescendants is set on a semantics node, then this function will called for each
      * descendant node of a given key in depth-first-search order.  The parent
      * value accumulates the result of merging the values seen so far, similar to reduce().
      *
      * The default implementation returns the parent value if one exists, otherwise uses the
-     * child element.  This means by default, a SemanticsNode with mergeAllDescendants = true
+     * child element.  This means by default, a SemanticsNode with mergeDescendants = true
      * winds up with the first value found for each key in its subtree in depth-first-search order.
      */
     fun merge(parentValue: T?, childValue: T): T? {

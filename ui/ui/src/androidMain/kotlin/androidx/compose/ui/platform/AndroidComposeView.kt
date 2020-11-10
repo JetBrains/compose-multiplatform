@@ -108,7 +108,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
 
     private val semanticsModifier = SemanticsModifierCore(
         id = SemanticsModifierCore.generateSemanticsId(),
-        mergeAllDescendants = false,
+        mergeDescendants = false,
         properties = {}
     )
 

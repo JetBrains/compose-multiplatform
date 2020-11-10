@@ -60,7 +60,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_withInput() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "Text",
                     onValueChange = {},
@@ -75,7 +75,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_notFocused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
@@ -90,7 +90,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_focused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
@@ -111,7 +111,7 @@ class OutlinedTextFieldScreenshotTest {
     fun outlinedTextField_focused_rtl() {
         rule.setMaterialContent {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+                Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                     OutlinedTextField(
                         value = "",
                         onValueChange = {},
@@ -132,7 +132,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_error_focused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "Input",
                     onValueChange = {},
@@ -153,7 +153,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_error_notFocused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},

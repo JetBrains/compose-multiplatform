@@ -2517,7 +2517,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsModifierKt {
-    method public static androidx.compose.ui.Modifier semantics(androidx.compose.ui.Modifier, optional boolean mergeAllDescendants, kotlin.jvm.functions.Function1<? super androidx.compose.ui.semantics.SemanticsPropertyReceiver,kotlin.Unit> properties);
+    method public static androidx.compose.ui.Modifier semantics(androidx.compose.ui.Modifier, optional boolean mergeDescendants, kotlin.jvm.functions.Function1<? super androidx.compose.ui.semantics.SemanticsPropertyReceiver,kotlin.Unit> properties);
   }
 
   public final class SemanticsNode {
