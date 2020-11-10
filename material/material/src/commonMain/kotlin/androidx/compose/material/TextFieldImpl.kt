@@ -277,10 +277,17 @@ internal fun Decoration(
 ) {
     val colorAndEmphasis = @Composable {
         Providers(AmbientContentColor provides contentColor) {
-            if (contentAlpha != null) Providers(
-                AmbientContentAlpha provides contentAlpha,
-                children = children
-            ) else children()
+            if (contentAlpha != null) {
+                Providers(
+                    AmbientContentAlpha provides contentAlpha,
+                    children = children
+                )
+            } else {
+                Providers(
+                    AmbientContentAlpha provides contentColor.alpha,
+                    children = children
+                )
+            }
         }
     }
     if (typography != null) ProvideTextStyle(typography, colorAndEmphasis) else colorAndEmphasis()
