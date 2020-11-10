@@ -18,7 +18,7 @@ package androidx.compose.ui.res
 
 import android.util.LruCache
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.platform.ContextAmbient
@@ -67,7 +67,7 @@ class ResourcesTest {
         val failedImage = imageFromResource(resource, R.drawable.failed_image)
 
         var uiThreadWork: (() -> Unit)? = null
-        var res: DeferredResource<ImageAsset>? = null
+        var res: DeferredResource<ImageBitmap>? = null
 
         rule.setContent {
             Providers(ContextAmbient provides context) {
@@ -130,7 +130,7 @@ class ResourcesTest {
         val failedImage = imageFromResource(resource, R.drawable.failed_image)
 
         var uiThreadWork: (() -> Unit)? = null
-        var res: DeferredResource<ImageAsset>? = null
+        var res: DeferredResource<ImageBitmap>? = null
 
         rule.setContent {
             Providers(ContextAmbient provides context) {

@@ -59,7 +59,7 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
@@ -115,7 +115,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         )
 
         Box(Modifier.fillMaxSize()) {
-            Image(modifier = inputModifier, asset = colorWheel.image)
+            Image(modifier = inputModifier, bitmap = colorWheel.image)
             val color = colorWheel.colorForPosition(position)
             if (color.isSpecified) {
                 Magnifier(visible = isDragging, position = position, color = color)
@@ -305,7 +305,7 @@ private val MagnifierPopupShape = GenericShape { size ->
 }
 
 /**
- * A color wheel with an [ImageAsset] that draws a circular color wheel of the specified diameter.
+ * A color wheel with an [ImageBitmap] that draws a circular color wheel of the specified diameter.
  */
 private class ColorWheel(diameter: Int) {
     private val radius = diameter / 2f
@@ -326,8 +326,8 @@ private class ColorWheel(diameter: Int) {
         null
     )
 
-    val image = ImageAsset(diameter, diameter).also { asset ->
-        val canvas = Canvas(asset)
+    val image = ImageBitmap(diameter, diameter).also { imageBitmap ->
+        val canvas = Canvas(imageBitmap)
         val center = Offset(radius, radius)
         val paint = Paint().apply { shader = sweepShader }
         canvas.drawCircle(center, radius, paint)

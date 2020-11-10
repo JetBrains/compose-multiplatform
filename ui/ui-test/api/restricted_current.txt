@@ -20,8 +20,8 @@ package androidx.compose.ui.test {
     method @Deprecated public static void assertShape-WOPiG5A(android.graphics.Bitmap, androidx.compose.ui.unit.Density density, float horizontalPadding, float verticalPadding, long backgroundColor, long shapeColor, optional androidx.compose.ui.graphics.Shape shape, optional float shapeOverlapPixelCount);
     method @Deprecated @RequiresApi(android.os.Build.VERSION_CODES.O) public static android.graphics.Bitmap captureToBitmap(androidx.compose.ui.test.SemanticsNodeInteraction);
     method @Deprecated @RequiresApi(android.os.Build.VERSION_CODES.O) public static android.graphics.Bitmap captureToBitmap(android.view.View);
-    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageAsset captureToImage(androidx.compose.ui.test.SemanticsNodeInteraction);
-    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageAsset captureToImage(android.view.View);
+    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageBitmap captureToImage(androidx.compose.ui.test.SemanticsNodeInteraction);
+    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageBitmap captureToImage(android.view.View);
     method @Deprecated public static boolean contains-ej0GBII(androidx.compose.ui.graphics.Path, long offset);
   }
 

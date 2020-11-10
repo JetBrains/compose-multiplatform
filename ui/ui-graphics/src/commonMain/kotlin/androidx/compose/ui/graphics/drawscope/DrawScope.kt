@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.NativePathEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
@@ -409,10 +409,10 @@ interface DrawScope : Density {
     )
 
     /**
-     * Draws the given [ImageAsset] into the canvas with its top-left corner at the
+     * Draws the given [ImageBitmap] into the canvas with its top-left corner at the
      * given [Offset]. The image is composited into the canvas using the given [Paint].
      *
-     * @param image The [ImageAsset] to draw
+     * @param image The [ImageBitmap] to draw
      * @param topLeft Offset from the local origin of 0, 0 relative to the current translation
      * @param alpha Opacity to be applied to [image] from 0.0f to 1.0f representing
      * fully transparent to fully opaque respectively
@@ -421,7 +421,7 @@ interface DrawScope : Density {
      * @param blendMode Blending algorithm to apply to destination
      */
     fun drawImage(
-        image: ImageAsset,
+        image: ImageBitmap,
         topLeft: Offset = Offset.Zero,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
         style: DrawStyle = Fill,
@@ -452,7 +452,7 @@ interface DrawScope : Density {
      * @param blendMode Blending algorithm to apply to destination
      */
     fun drawImage(
-        image: ImageAsset,
+        image: ImageBitmap,
         srcOffset: IntOffset = IntOffset.Zero,
         srcSize: IntSize = IntSize(image.width, image.height),
         dstOffset: IntOffset = IntOffset.Zero,

@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.IntSize
 
 /**
  * Create a new Canvas instance that targets its drawing commands
- * to the provided [ImageAsset]
+ * to the provided [ImageBitmap]
  */
-fun Canvas(image: ImageAsset): Canvas = ActualCanvas(image)
+fun Canvas(image: ImageBitmap): Canvas = ActualCanvas(image)
 
-internal expect fun ActualCanvas(image: ImageAsset): Canvas
+internal expect fun ActualCanvas(image: ImageBitmap): Canvas
 
 expect class NativeCanvas
 
@@ -535,10 +535,10 @@ interface Canvas {
     fun drawPath(path: Path, paint: Paint)
 
     /**
-     * Draws the given [ImageAsset] into the canvas with its top-left corner at the
+     * Draws the given [ImageBitmap] into the canvas with its top-left corner at the
      * given [Offset]. The image is composited into the canvas using the given [Paint].
      */
-    fun drawImage(image: ImageAsset, topLeftOffset: Offset, paint: Paint)
+    fun drawImage(image: ImageBitmap, topLeftOffset: Offset, paint: Paint)
 
     /**
      * Draws the subset of the given image described by the `src` argument into
@@ -547,7 +547,7 @@ interface Canvas {
      * This might sample from outside the `src` rect by up to half the width of
      * an applied filter.
      *
-     * @param image ImageAsset to draw
+     * @param image ImageBitmap to draw
      * @param srcOffset: Optional offset representing the top left offset of the source image
      * to draw, this defaults to the origin of [image]
      * @param srcSize: Optional dimensions of the source image to draw relative to [srcOffset],
@@ -555,10 +555,10 @@ interface Canvas {
      * @param dstOffset: Offset representing the top left offset of the destination image
      * to draw
      * @param dstSize: Dimensions of the destination to draw
-     * @param paint Paint used to composite the [ImageAsset] pixels into the canvas
+     * @param paint Paint used to composite the [ImageBitmap] pixels into the canvas
      */
     fun drawImageRect(
-        image: ImageAsset,
+        image: ImageBitmap,
         srcOffset: IntOffset = IntOffset.Zero,
         srcSize: IntSize = IntSize(image.width, image.height),
         dstOffset: IntOffset = IntOffset.Zero,

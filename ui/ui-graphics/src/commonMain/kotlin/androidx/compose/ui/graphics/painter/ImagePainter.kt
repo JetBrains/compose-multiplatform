@@ -18,7 +18,7 @@ package androidx.compose.ui.graphics.painter
 
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -26,12 +26,12 @@ import androidx.compose.ui.unit.toSize
 import kotlin.math.roundToInt
 
 /**
- * [Painter] implementation used to draw an [ImageAsset] into the provided canvas
+ * [Painter] implementation used to draw an [ImageBitmap] into the provided canvas
  * This implementation can handle applying alpha and [ColorFilter] to it's drawn result
  *
- * @param image The [ImageAsset] to draw
+ * @param image The [ImageBitmap] to draw
  * @param srcOffset Optional offset relative to [image] used to draw a subsection of the
- * [ImageAsset]. By default this uses the origin of [image]
+ * [ImageBitmap]. By default this uses the origin of [image]
  * @param srcSize Optional dimensions representing size of the subsection of [image] to draw
  * Both the offset and size must have the following requirements:
  *
@@ -40,7 +40,7 @@ import kotlin.math.roundToInt
  * 3) Source size must be less than or equal to the dimensions of [image]
  */
 data class ImagePainter(
-    private val image: ImageAsset,
+    private val image: ImageBitmap,
     private val srcOffset: IntOffset = IntOffset.Zero,
     private val srcSize: IntSize = IntSize(image.width, image.height)
 ) : Painter() {
@@ -66,7 +66,7 @@ data class ImagePainter(
     }
 
     /**
-     * Return the dimension of the underlying [ImageAsset] as it's intrinsic width and height
+     * Return the dimension of the underlying [ImageBitmap] as it's intrinsic width and height
      */
     override val intrinsicSize: Size get() = size.toSize()
 

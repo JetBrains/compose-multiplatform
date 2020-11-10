@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.ImagePainter
@@ -85,7 +85,7 @@ class IconTest {
         rule
             .setMaterialContentForSizeAssertions {
                 val image = with(DensityAmbient.current) {
-                    ImageAsset(width.toIntPx(), height.toIntPx())
+                    ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
                 Icon(image)
@@ -102,7 +102,7 @@ class IconTest {
         rule
             .setMaterialContentForSizeAssertions {
                 val image = with(DensityAmbient.current) {
-                    ImageAsset(width.toIntPx(), height.toIntPx())
+                    ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
                 Icon(image)
@@ -132,7 +132,7 @@ class IconTest {
         rule
             .setMaterialContentForSizeAssertions {
                 val image = with(DensityAmbient.current) {
-                    ImageAsset(width.toIntPx(), height.toIntPx())
+                    ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
                 val imagePainter = ImagePainter(image)
@@ -148,7 +148,7 @@ class IconTest {
         val height = 83.dp
         val testTag = "testTag"
         rule.setMaterialContentForSizeAssertions {
-            val image: ImageAsset
+            val image: ImageBitmap
             with(DensityAmbient.current) {
                 image = createBitmapWithColor(
                     this,
@@ -170,7 +170,7 @@ class IconTest {
         val height = 83.dp
         val testTag = "testTag"
         rule.setMaterialContentForSizeAssertions {
-            val image: ImageAsset
+            val image: ImageBitmap
             with(DensityAmbient.current) {
                 image = createBitmapWithColor(
                     this,
@@ -191,9 +191,9 @@ class IconTest {
         width: Int,
         height: Int,
         color: Color
-    ): ImageAsset {
+    ): ImageBitmap {
         val size = Size(width.toFloat(), height.toFloat())
-        val image = ImageAsset(width, height)
+        val image = ImageBitmap(width, height)
         CanvasDrawScope().draw(
             density,
             LayoutDirection.Ltr,

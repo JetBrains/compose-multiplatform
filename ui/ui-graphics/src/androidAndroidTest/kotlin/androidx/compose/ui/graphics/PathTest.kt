@@ -34,7 +34,7 @@ class PathTest {
     fun testAddArcPath() {
         val width = 100
         val height = 100
-        val image = ImageAsset(width, height)
+        val image = ImageBitmap(width, height)
         val canvas = Canvas(image)
         val path1 = Path().apply {
             addArcRad(

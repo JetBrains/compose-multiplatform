@@ -22,7 +22,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
@@ -49,8 +49,8 @@ class DrawScopeTest {
     private val height: Int = 100
     private val dstSize = Size(width.toFloat(), height.toFloat())
 
-    private fun createTestDstImage(): ImageAsset {
-        val dst = ImageAsset(width, height)
+    private fun createTestDstImage(): ImageBitmap {
+        val dst = ImageBitmap(width, height)
         val dstCanvas = Canvas(dst)
         val dstPaint = Paint().apply {
             this.color = Color.White
@@ -398,16 +398,16 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
+        val imageBitmap = ImageBitmap(width, height)
 
-        canvasScope.draw(Canvas(imageAsset), size) {
+        canvasScope.draw(Canvas(imageBitmap), size) {
             drawRect(color = Color.Red)
             scale(0.5f, pivot = Offset.Zero) {
                 drawRect(color = Color.Blue)
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         assertEquals(Color.Blue, pixelMap[0, 0])
         assertEquals(Color.Blue, pixelMap[99, 0])
         assertEquals(Color.Blue, pixelMap[0, 99])
@@ -427,16 +427,16 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
+        val imageBitmap = ImageBitmap(width, height)
 
-        canvasScope.draw(Canvas(imageAsset), size) {
+        canvasScope.draw(Canvas(imageBitmap), size) {
             drawRect(color = Color.Red)
             scale(0.5f) {
                 drawRect(color = Color.Blue)
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         val left = width / 2 - 50
         val top = height / 2 - 50
         val right = width / 2 + 50 - 1
@@ -470,10 +470,10 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
+        val imageBitmap = ImageBitmap(width, height)
 
         try {
-            canvasScope.draw(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageBitmap), size) {
                 inset(100.0f, 0.0f, 101.0f, 0.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -491,10 +491,10 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
+        val imageBitmap = ImageBitmap(width, height)
 
         try {
-            canvasScope.draw(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageBitmap), size) {
                 inset(0.0f, 100.0f, 0.0f, 101.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -517,10 +517,10 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
+        val imageBitmap = ImageBitmap(width, height)
 
         try {
-            canvasScope.draw(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageBitmap), size) {
                 inset(0.0f, 100.0f, 0.0f, 100.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -542,10 +542,10 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
+        val imageBitmap = ImageBitmap(width, height)
 
         try {
-            canvasScope.draw(Canvas(imageAsset), size) {
+            canvasScope.draw(Canvas(imageBitmap), size) {
                 inset(100.0f, 0.0f, 100.0f, 0.0f) {
                     drawRect(color = Color.Red)
                 }
@@ -562,16 +562,16 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
+        val imageBitmap = ImageBitmap(width, height)
 
-        canvasScope.draw(Canvas(imageAsset), size) {
+        canvasScope.draw(Canvas(imageBitmap), size) {
             drawRect(color = Color.Red)
             scale(0.5f, 0.5f, Offset(width.toFloat(), height.toFloat())) {
                 drawRect(color = Color.Blue)
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
 
         val left = width - 100
         val top = height - 100
@@ -595,8 +595,8 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
-        CanvasDrawScope().draw(Canvas(imageAsset), size) {
+        val imageBitmap = ImageBitmap(width, height)
+        CanvasDrawScope().draw(Canvas(imageBitmap), size) {
             drawRect(color = Color.Red)
             rotate(180.0f) {
                 drawRect(
@@ -607,7 +607,7 @@ class DrawScopeTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         assertEquals(Color.Blue, pixelMap[0, 0])
         assertEquals(Color.Blue, pixelMap[99, 0])
         assertEquals(Color.Blue, pixelMap[0, 99])
@@ -625,8 +625,8 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
-        CanvasDrawScope().draw(Canvas(imageAsset), size) {
+        val imageBitmap = ImageBitmap(width, height)
+        CanvasDrawScope().draw(Canvas(imageBitmap), size) {
             drawRect(color = Color.Red)
             rotateRad(kotlin.math.PI.toFloat()) {
                 drawRect(
@@ -637,7 +637,7 @@ class DrawScopeTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         assertEquals(Color.Blue, pixelMap[0, 0])
         assertEquals(Color.Blue, pixelMap[99, 0])
         assertEquals(Color.Blue, pixelMap[0, 99])
@@ -655,8 +655,8 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset = ImageAsset(width, height)
-        CanvasDrawScope().draw(Canvas(imageAsset), size) {
+        val imageBitmap = ImageBitmap(width, height)
+        CanvasDrawScope().draw(Canvas(imageBitmap), size) {
             drawRect(color = Color.Red)
             rotate(-45.0f, Offset.Zero) {
                 drawRect(
@@ -666,7 +666,7 @@ class DrawScopeTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         assertEquals(Color.Blue, pixelMap[2, 0])
         assertEquals(Color.Blue, pixelMap[50, 49])
         assertEquals(Color.Blue, pixelMap[70, 0])
@@ -682,8 +682,8 @@ class DrawScopeTest {
         val width = 200
         val height = 200
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset1 = ImageAsset(width, height)
-        CanvasDrawScope().draw(Canvas(imageAsset1), size) {
+        val imageBitmap1 = ImageBitmap(width, height)
+        CanvasDrawScope().draw(Canvas(imageBitmap1), size) {
             drawRect(color = Color.Red)
             inset(20.0f, 12.0f, 10.0f, 8.0f) {
                 scale(2.0f, 0.5f) {
@@ -699,8 +699,8 @@ class DrawScopeTest {
             }
         }
 
-        val imageAsset2 = ImageAsset(width, height)
-        val saveCountCanvas = SaveCountCanvas(Canvas(imageAsset2))
+        val imageBitmap2 = ImageBitmap(width, height)
+        val saveCountCanvas = SaveCountCanvas(Canvas(imageBitmap2))
         CanvasDrawScope().draw(saveCountCanvas, size) {
             drawRect(color = Color.Red)
             withTransform({
@@ -722,8 +722,8 @@ class DrawScopeTest {
             assertEquals(1, saveCountCanvas.saveCount)
         }
 
-        val pixelMap1 = imageAsset1.toPixelMap()
-        val pixelMap2 = imageAsset2.toPixelMap()
+        val pixelMap1 = imageBitmap1.toPixelMap()
+        val pixelMap2 = imageBitmap2.toPixelMap()
         assertEquals(pixelMap1.width, pixelMap2.width)
         assertEquals(pixelMap1.height, pixelMap2.height)
         assertEquals(pixelMap1.stride, pixelMap2.stride)
@@ -868,7 +868,7 @@ class DrawScopeTest {
 
     @Test
     fun testDensityAndLayoutDirectionConfigured() {
-        val canvas = Canvas(ImageAsset(1, 1))
+        val canvas = Canvas(ImageBitmap(1, 1))
         CanvasDrawScope().draw(
             Density(density = 2.0f, fontScale = 3.0f),
             LayoutDirection.Rtl,
@@ -884,8 +884,8 @@ class DrawScopeTest {
 
     @Test
     fun testParametersRestoredAfterDraw() {
-        val canvas1 = Canvas(ImageAsset(200, 300))
-        val canvas2 = Canvas(ImageAsset(100, 200))
+        val canvas1 = Canvas(ImageBitmap(200, 300))
+        val canvas2 = Canvas(ImageBitmap(100, 200))
 
         val size1 = Size(200f, 300f)
         val size2 = Size(100f, 200f)
@@ -976,7 +976,7 @@ class DrawScopeTest {
         val width = 100
         val height = 150
         TestDrawScopeTransform().draw(
-            Canvas(ImageAsset(width, height)),
+            Canvas(ImageBitmap(width, height)),
             Size(width.toFloat(), height.toFloat())
         ) {
             withWrappedTransform({
@@ -996,16 +996,16 @@ class DrawScopeTest {
         canvasBlock: (Canvas) -> Unit
     ) {
         val size = Size(width.toFloat(), height.toFloat())
-        val imageAsset1 = ImageAsset(width, height)
-        CanvasDrawScope().draw(Canvas(imageAsset1), size) {
+        val imageBitmap1 = ImageBitmap(width, height)
+        CanvasDrawScope().draw(Canvas(imageBitmap1), size) {
             drawScopeBlock()
         }
 
-        val imageAsset2 = ImageAsset(width, height)
-        canvasBlock(Canvas(imageAsset2))
+        val imageBitmap2 = ImageBitmap(width, height)
+        canvasBlock(Canvas(imageBitmap2))
 
-        val pixelMap1 = imageAsset1.toPixelMap()
-        val pixelMap2 = imageAsset2.toPixelMap()
+        val pixelMap1 = imageBitmap1.toPixelMap()
+        val pixelMap2 = imageBitmap2.toPixelMap()
         assertEquals(pixelMap1.width, pixelMap2.width)
         assertEquals(pixelMap1.height, pixelMap2.height)
         assertEquals(pixelMap1.stride, pixelMap2.stride)
