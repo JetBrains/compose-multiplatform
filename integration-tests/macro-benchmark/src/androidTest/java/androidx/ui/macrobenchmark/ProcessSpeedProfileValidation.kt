@@ -16,7 +16,6 @@
 
 package androidx.ui.macrobenchmark
 
-import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.CpuUsageMetric
 import androidx.benchmark.macro.MacrobenchmarkConfig
@@ -29,13 +28,15 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+/**
+ * Macrobenchmark used for local validation of performance numbers coming from MacrobenchmarkRule.
+ */
 @LargeTest
 @RunWith(Parameterized::class)
 class ProcessSpeedProfileValidation(
     private val compilationMode: CompilationMode,
     private val killProcess: Boolean
 ) {
-
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
@@ -51,11 +52,7 @@ class ProcessSpeedProfileValidation(
         )
         benchmarkRule.measureRepeated(config) {
             pressHome()
-            launchPackageAndWait { launchIntent ->
-                // Clear out any previous instances
-                launchIntent.flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            launchPackageAndWait()
         }
     }
 
