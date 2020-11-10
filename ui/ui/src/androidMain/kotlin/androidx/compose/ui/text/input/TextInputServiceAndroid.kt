@@ -16,7 +16,9 @@
 
 package androidx.compose.ui.text.input
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.text.InputType
 import android.view.View
 import android.view.ViewTreeObserver
@@ -243,6 +245,14 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             if (imeOptions.autoCorrect) {
                 outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
             }
+        }
+
+        outInfo.initialSelStart = state.selection.start
+        outInfo.initialSelEnd = state.selection.end
+
+        @SuppressLint("UnsafeNewApiCall")
+        if (Build.VERSION.SDK_INT >= 30) {
+            outInfo.setInitialSurroundingText(state.text)
         }
 
         outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_FULLSCREEN
