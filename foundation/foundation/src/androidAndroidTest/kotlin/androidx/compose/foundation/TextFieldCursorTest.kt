@@ -31,7 +31,7 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasInputMethodsSupport
@@ -254,7 +254,7 @@ class TextFieldCursorTest {
         }
     }
 
-    private fun ImageAsset.assertCursor(cursorWidth: Dp, density: Density) {
+    private fun ImageBitmap.assertCursor(cursorWidth: Dp, density: Density) {
         val cursorWidthPx = (with(density) { cursorWidth.toIntPx() })
         val width = width
         val height = height

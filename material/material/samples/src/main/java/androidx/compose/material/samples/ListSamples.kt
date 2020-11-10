@@ -33,15 +33,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.VectorAsset
 
 @Sampled
 @Composable
 fun OneLineListItems(
-    icon24x24: ImageAsset,
-    icon40x40: ImageAsset,
-    icon56x56: ImageAsset,
+    icon24x24: ImageBitmap,
+    icon40x40: ImageBitmap,
+    icon56x56: ImageBitmap,
     vectorIcon: VectorAsset
 ) {
     Column {
@@ -94,8 +94,8 @@ fun OneLineListItems(
 
 @Sampled
 @Composable
-// TODO(popam, b/159689286): material icons instead of ImageAsset when they can have custom sizes
-fun TwoLineListItems(icon24x24: ImageAsset, icon40x40: ImageAsset) {
+// TODO(popam, b/159689286): material icons instead of ImageBitmap when they can have custom sizes
+fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
     Column {
         ListItem(
             text = { Text("Two line list item") },
@@ -151,7 +151,7 @@ fun TwoLineListItems(icon24x24: ImageAsset, icon40x40: ImageAsset) {
 
 @Sampled
 @Composable
-fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
+fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: VectorAsset) {
     Column {
         ListItem(
             text = { Text("Three line list item") },
@@ -208,7 +208,7 @@ fun ThreeLineListItems(icon24x24: ImageAsset, vectorIcon: VectorAsset) {
 // Demos for mixing RTL and LTR ListItems:
 
 @Composable
-fun OneLineRtlLtrListItems(icon24x24: ImageAsset, icon40x40: ImageAsset) {
+fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
     Column {
         ListItem(text = { Text("One line list item with no icon") })
         Divider()
@@ -236,7 +236,7 @@ fun OneLineRtlLtrListItems(icon24x24: ImageAsset, icon40x40: ImageAsset) {
 }
 
 @Composable
-fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
+fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
     Column {
         ListItem(
             text = { Text("Two line list item") },
@@ -297,7 +297,7 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageAsset) {
 }
 
 @Composable
-fun ThreeLineRtlLtrListItems(icon40x40: ImageAsset) {
+fun ThreeLineRtlLtrListItems(icon40x40: ImageBitmap) {
     Column {
         ListItem(
             text = { Text("Three line list item") },

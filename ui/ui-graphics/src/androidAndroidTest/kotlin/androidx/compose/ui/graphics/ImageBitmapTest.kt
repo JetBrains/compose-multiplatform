@@ -26,22 +26,22 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class ImageAssetTest {
+class ImageBitmapTest {
 
     @Test
     fun testCreatedImage() {
         val cs = ColorSpaces.Srgb
-        val image = ImageAsset(
+        val image = ImageBitmap(
             width = 10,
             height = 20,
-            config = ImageAssetConfig.Argb8888,
+            config = ImageBitmapConfig.Argb8888,
             hasAlpha = false,
             colorSpace = cs
         )
 
         assertEquals(10, image.width)
         assertEquals(20, image.height)
-        assertEquals(ImageAssetConfig.Argb8888, image.config)
+        assertEquals(ImageBitmapConfig.Argb8888, image.config)
         assertFalse(image.hasAlpha)
         assertEquals(cs, image.colorSpace)
     }

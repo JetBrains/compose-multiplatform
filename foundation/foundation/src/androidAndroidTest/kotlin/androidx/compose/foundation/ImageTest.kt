@@ -31,7 +31,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -78,8 +78,8 @@ class ImageTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private fun createImageAsset(): ImageAsset {
-        val image = ImageAsset(imageWidth, imageHeight)
+    private fun createImageBitmap(): ImageBitmap {
+        val image = ImageBitmap(imageWidth, imageHeight)
         val path = Path().apply {
             lineTo(imageWidth.toFloat(), imageHeight.toFloat())
             lineTo(0.0f, imageHeight.toFloat())
@@ -108,7 +108,7 @@ class ImageTest {
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
-                Image(modifier = Modifier.testTag(contentTag), asset = createImageAsset())
+                Image(modifier = Modifier.testTag(contentTag), bitmap = createImageBitmap())
             }
         }
 
@@ -151,7 +151,7 @@ class ImageTest {
             ) {
                 Image(
                     ImagePainter(
-                        createImageAsset(),
+                        createImageBitmap(),
                         IntOffset(
                             imageWidth / 2 - subsectionWidth / 2,
                             imageHeight / 2 - subsectionHeight / 2
@@ -249,10 +249,10 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 // The resultant Image composable should be twice the size of the underlying
-                // ImageAsset that is to be drawn and will stretch the content to fit
+                // ImageBitmap that is to be drawn and will stretch the content to fit
                 // the bounds
                 Image(
-                    asset = createImageAsset(),
+                    bitmap = createImageBitmap(),
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -303,11 +303,11 @@ class ImageTest {
         rule.setContent {
             val density = DensityAmbient.current
             val size = (containerSize * 2 / density.density).dp
-            val imageAsset = ImageAsset(imageWidth, imageHeight)
+            val ImageBitmap = ImageBitmap(imageWidth, imageHeight)
             CanvasDrawScope().draw(
                 density,
                 LayoutDirection.Ltr,
-                Canvas(imageAsset),
+                Canvas(ImageBitmap),
                 Size(imageWidth.toFloat(), imageHeight.toFloat())
             ) {
                 drawRect(color = Color.Blue)
@@ -318,7 +318,7 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 Image(
-                    asset = imageAsset,
+                    bitmap = ImageBitmap,
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -348,16 +348,16 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 // The resultant Image composable should be twice the size of the underlying
-                // ImageAsset that is to be drawn in the bottom end section of the composable
+                // ImageBitmap that is to be drawn in the bottom end section of the composable
                 Image(
-                    asset = createImageAsset(),
+                    bitmap = createImageBitmap(),
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
                             (imageComposableWidth / density).dp,
                             (imageComposableHeight / density).dp
                         ),
-                    // Intentionally do not scale up the contents of the ImageAsset
+                    // Intentionally do not scale up the contents of the ImageBitmap
                     contentScale = ContentScale.Inside,
                     alignment = Alignment.BottomEnd
                 )
@@ -485,7 +485,7 @@ class ImageTest {
     fun testContentScaleCropRespectsMaxDimension() {
         val testTag = "testTag"
         rule.setContent {
-            val asset = with(ImageAsset(100, 100)) {
+            val asset = with(ImageBitmap(100, 100)) {
                 with(Canvas(this)) {
                     val paint = Paint().apply { this.color = Color.Blue }
                     drawRect(0f, 0f, 100f, 100f, paint)

@@ -21,7 +21,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
@@ -126,12 +126,12 @@ internal class EmptyCanvas : Canvas {
         throw UnsupportedOperationException()
     }
 
-    override fun drawImage(image: ImageAsset, topLeftOffset: Offset, paint: Paint) {
+    override fun drawImage(image: ImageBitmap, topLeftOffset: Offset, paint: Paint) {
         throw UnsupportedOperationException()
     }
 
     override fun drawImageRect(
-        image: ImageAsset,
+        image: ImageBitmap,
         srcOffset: IntOffset,
         srcSize: IntSize,
         dstOffset: IntOffset,

@@ -89,13 +89,13 @@ internal expect fun ActualRadialGradientShader(
 ): Shader
 
 fun ImageShader(
-    image: ImageAsset,
+    image: ImageBitmap,
     tileModeX: TileMode = TileMode.Clamp,
     tileModeY: TileMode = TileMode.Clamp
 ): Shader = ActualImageShader(image, tileModeX, tileModeY)
 
 internal expect fun ActualImageShader(
-    image: ImageAsset,
+    image: ImageBitmap,
     tileModeX: TileMode,
     tileModeY: TileMode
 ): Shader

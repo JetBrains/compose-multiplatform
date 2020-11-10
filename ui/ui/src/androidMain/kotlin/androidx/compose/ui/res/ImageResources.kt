@@ -20,7 +20,7 @@ import android.util.TypedValue
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.util.trace
@@ -34,7 +34,7 @@ import androidx.compose.ui.util.trace
  * @return the decoded image data associated with the resource
  */
 @Composable
-fun imageResource(@DrawableRes id: Int): ImageAsset {
+fun imageResource(@DrawableRes id: Int): ImageBitmap {
     val context = ContextAmbient.current
     val value = remember { TypedValue() }
     context.resources.getValue(id, value, true)
@@ -59,9 +59,9 @@ fun imageResource(@DrawableRes id: Int): ImageAsset {
 @Composable
 fun loadImageResource(
     id: Int,
-    pendingImage: ImageAsset? = null,
-    failedImage: ImageAsset? = null
-): DeferredResource<ImageAsset> {
+    pendingImage: ImageBitmap? = null,
+    failedImage: ImageBitmap? = null
+): DeferredResource<ImageBitmap> {
     val context = ContextAmbient.current
     val res = context.resources
     val value = remember { TypedValue() }

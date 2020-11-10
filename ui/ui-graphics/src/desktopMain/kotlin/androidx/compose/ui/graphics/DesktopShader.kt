@@ -55,7 +55,7 @@ internal actual fun ActualRadialGradientShader(
 }
 
 internal actual fun ActualImageShader(
-    image: ImageAsset,
+    image: ImageBitmap,
     tileModeX: TileMode,
     tileModeY: TileMode
 ): Shader {

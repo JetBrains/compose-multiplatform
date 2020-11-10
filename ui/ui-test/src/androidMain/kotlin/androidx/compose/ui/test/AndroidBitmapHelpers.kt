@@ -25,13 +25,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asAndroidPath
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -55,8 +55,8 @@ import kotlin.math.roundToInt
  */
 @Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.O)
-fun SemanticsNodeInteraction.captureToImage(): ImageAsset =
-    captureToBitmap().asImageAsset()
+fun SemanticsNodeInteraction.captureToImage(): ImageBitmap =
+    captureToBitmap().asImageBitmap()
 
 /**
  * Captures the underlying semantics node's surface into bitmap.
@@ -148,7 +148,7 @@ private fun findDialogWindowProviderInParent(view: View): DialogWindowProvider? 
  */
 @Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.O)
-fun View.captureToImage(): ImageAsset = captureToBitmap().asImageAsset()
+fun View.captureToImage(): ImageBitmap = captureToBitmap().asImageBitmap()
 
 /**
  * Captures the underlying view's surface into bitmap.

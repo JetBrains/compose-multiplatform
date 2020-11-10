@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -62,7 +62,7 @@ class PainterTest {
 
         drawPainter(
             p,
-            Canvas(ImageAsset(100, 100)),
+            Canvas(ImageBitmap(100, 100)),
             Size(100f, 100f)
         )
         assertTrue(p.didDraw)
@@ -87,7 +87,7 @@ class PainterTest {
             }
         }
 
-        val image = ImageAsset(100, 100)
+        val image = ImageBitmap(100, 100)
 
         drawPainter(
             p,
@@ -111,7 +111,7 @@ class PainterTest {
             }
         }
 
-        val image = ImageAsset(100, 100)
+        val image = ImageBitmap(100, 100)
         val canvas = Canvas(image)
 
         val paint = Paint().apply { this.color = Color.White }
@@ -164,7 +164,7 @@ class PainterTest {
         }
 
         assertEquals(Color.Red, p.color)
-        val image = ImageAsset(100, 100)
+        val image = ImageBitmap(100, 100)
         val canvas = Canvas(image)
 
         val paint = Paint().apply { this.color = Color.White }
@@ -210,7 +210,7 @@ class PainterTest {
             }
         }
 
-        val image = ImageAsset(100, 100)
+        val image = ImageBitmap(100, 100)
 
         drawPainter(
             p,

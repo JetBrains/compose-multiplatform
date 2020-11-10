@@ -23,12 +23,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class DesktopImageAssetTest : DesktopGraphicsTest() {
+class DesktopImageBitmapTest : DesktopGraphicsTest() {
     private val canvas: Canvas = initCanvas(widthPx = 16, heightPx = 16)
 
     @Test
-    fun drawOnImageAssetAlpha8() {
-        val asset = ImageAsset(width = 8, height = 8, config = ImageAssetConfig.Alpha8)
+    fun drawOnImageBitmapAlpha8() {
+        val asset = ImageBitmap(width = 8, height = 8, config = ImageBitmapConfig.Alpha8)
         val assetCanvas = Canvas(asset)
         assetCanvas.drawImage(
             imageFromResource("androidx/compose/desktop/test.png"),
@@ -41,8 +41,8 @@ class DesktopImageAssetTest : DesktopGraphicsTest() {
     }
 
     @Test
-    fun drawOnImageAssetDisplayP3() {
-        val asset = ImageAsset(width = 8, height = 8, colorSpace = ColorSpaces.DisplayP3)
+    fun drawOnImageBitmapDisplayP3() {
+        val asset = ImageBitmap(width = 8, height = 8, colorSpace = ColorSpaces.DisplayP3)
         val assetCanvas = Canvas(asset)
         assetCanvas.drawImage(
             imageFromResource("androidx/compose/desktop/test.png"),
@@ -55,8 +55,8 @@ class DesktopImageAssetTest : DesktopGraphicsTest() {
     }
 
     @Test
-    fun drawOnImageAsset() {
-        val asset = ImageAsset(width = 8, height = 8)
+    fun drawOnImageBitmap() {
+        val asset = ImageBitmap(width = 8, height = 8)
         val assetCanvas = Canvas(asset)
         assetCanvas.drawImage(
             imageFromResource("androidx/compose/desktop/test.png"),
@@ -69,7 +69,7 @@ class DesktopImageAssetTest : DesktopGraphicsTest() {
     }
 
     @Test(expected = RuntimeException::class)
-    fun `cannot draw on loaded ImageAsset`() {
+    fun `cannot draw on loaded ImageBitmap`() {
         val asset = imageFromResource("androidx/compose/desktop/test.png")
         Canvas(asset)
     }
@@ -80,7 +80,7 @@ class DesktopImageAssetTest : DesktopGraphicsTest() {
         assertEquals(8, asset.width)
         assertEquals(8, asset.height)
         assertTrue(asset.hasAlpha)
-        assertEquals(ImageAssetConfig.Argb8888, asset.config)
+        assertEquals(ImageBitmapConfig.Argb8888, asset.config)
         assertEquals(ColorSpaces.Srgb, asset.colorSpace)
     }
 

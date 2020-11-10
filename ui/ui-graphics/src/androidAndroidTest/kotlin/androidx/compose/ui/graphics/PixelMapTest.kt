@@ -27,9 +27,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @RunWith(AndroidJUnit4::class)
 class PixelMapTest {
 
-    fun createImageAsset(): ImageAsset {
-        val imageAsset = ImageAsset(100, 100)
-        val canvas = Canvas(imageAsset)
+    fun createImageBitmap(): ImageBitmap {
+        val ImageBitmap = ImageBitmap(100, 100)
+        val canvas = Canvas(ImageBitmap)
         val paint = Paint().apply { this.color = Color.Red }
 
         canvas.drawRect(Rect(0.0f, 0.0f, 50.0f, 50.0f), paint)
@@ -42,13 +42,13 @@ class PixelMapTest {
 
         paint.color = Color.Yellow
         canvas.drawRect(Rect(50.0f, 50.0f, 100.0f, 100.0f), paint)
-        return imageAsset
+        return ImageBitmap
     }
 
     @Test
-    fun testImageAssetPixelMap() {
-        val imageAsset = createImageAsset()
-        val pixelmap = imageAsset.toPixelMap()
+    fun testImageBitmapPixelMap() {
+        val ImageBitmap = createImageBitmap()
+        val pixelmap = ImageBitmap.toPixelMap()
 
         Assert.assertEquals(Color.Red, pixelmap[0, 0])
         Assert.assertEquals(Color.Red, pixelmap[49, 0])
@@ -72,8 +72,8 @@ class PixelMapTest {
     }
 
     @Test
-    fun testImageAssetSubsection() {
-        val asset = createImageAsset()
+    fun testImageBitmapSubsection() {
+        val asset = createImageBitmap()
         val subsectionWidth = 3
         val subsectionHeight = 2
         val bufferOffset = 3
