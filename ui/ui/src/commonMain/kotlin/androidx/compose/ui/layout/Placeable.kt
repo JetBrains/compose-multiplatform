@@ -76,8 +76,12 @@ abstract class Placeable {
 
     /**
      * Positions the [Placeable] at [position] in its parent's coordinate system.
+     *
+     * @param zIndex controls the drawing order for the [Placeable]. A [Placeable] with larger
+     * [zIndex] will be drawn on top of all the children with smaller [zIndex]. When children
+     * have the same [zIndex] the order in which the items were placed is used.
      */
-    protected abstract fun placeAt(position: IntOffset)
+    protected abstract fun placeAt(position: IntOffset, zIndex: Float)
 
     /**
      * The constraints used for the measurement made to obtain this [Placeable].
@@ -128,8 +132,13 @@ abstract class Placeable {
          * If this method is used outside the [MeasureScope.layout] positioning block, the
          * automatic position mirroring will not happen and the [Placeable] will be placed at the
          * given [position], similar to the [place] method.
+         *
+         * @param zIndex controls the drawing order for the [Placeable]. A [Placeable] with larger
+         * [zIndex] will be drawn on top of all the children with smaller [zIndex]. When children
+         * have the same [zIndex] the order in which the items were placed is used.
          */
-        fun Placeable.placeRelative(position: IntOffset) = placeAutoMirrored(position)
+        fun Placeable.placeRelative(position: IntOffset, zIndex: Float = 0f) =
+            placeAutoMirrored(position, zIndex)
 
         /**
          * Place a [Placeable] at [position] in its parent's coordinate system.
@@ -144,7 +153,7 @@ abstract class Placeable {
             "Use the overloads with IntOffset instead",
             ReplaceWith("placeRelative(position.round())", "androidx.compose.ui.unit.round")
         )
-        fun Placeable.placeRelative(position: Offset) = placeAutoMirrored(position.round())
+        fun Placeable.placeRelative(position: Offset) = placeRelative(position.round())
 
         /**
          * Place a [Placeable] at [x], [y] in its parent's coordinate system.
@@ -154,8 +163,13 @@ abstract class Placeable {
          * If this method is used outside the [MeasureScope.layout] positioning block, the
          * automatic position mirroring will not happen and the [Placeable] will be placed at the
          * given position, similar to the [place] method.
+         *
+         * @param zIndex controls the drawing order for the [Placeable]. A [Placeable] with larger
+         * [zIndex] will be drawn on top of all the children with smaller [zIndex]. When children
+         * have the same [zIndex] the order in which the items were placed is used.
          */
-        fun Placeable.placeRelative(x: Int, y: Int) = placeAutoMirrored(IntOffset(x, y))
+        fun Placeable.placeRelative(x: Int, y: Int, zIndex: Float = 0f) =
+            placeAutoMirrored(IntOffset(x, y), zIndex)
 
         /**
          * Place a [Placeable] at [position] in its parent's coordinate system.
@@ -172,22 +186,30 @@ abstract class Placeable {
          * Place a [Placeable] at [x], [y] in its parent's coordinate system.
          * Unlike [placeRelative], the given position will not implicitly react in RTL layout direction
          * contexts.
+         *
+         * @param zIndex controls the drawing order for the [Placeable]. A [Placeable] with larger
+         * [zIndex] will be drawn on top of all the children with smaller [zIndex]. When children
+         * have the same [zIndex] the order in which the items were placed is used.
          */
-        fun Placeable.place(x: Int, y: Int) = place(IntOffset(x, y))
+        fun Placeable.place(x: Int, y: Int, zIndex: Float = 0f) = placeAt(IntOffset(x, y), zIndex)
 
         /**
          * Place a [Placeable] at [position] in its parent's coordinate system.
          * Unlike [placeRelative], the given [position] will not implicitly react in RTL layout direction
          * contexts.
+         *
+         * @param zIndex controls the drawing order for the [Placeable]. A [Placeable] with larger
+         * [zIndex] will be drawn on top of all the children with smaller [zIndex]. When children
+         * have the same [zIndex] the order in which the items were placed is used.
          */
-        fun Placeable.place(position: IntOffset) =
-            placeAt(position + apparentToRealOffset)
+        fun Placeable.place(position: IntOffset, zIndex: Float = 0f) =
+            placeAt(position + apparentToRealOffset, zIndex)
 
-        private fun Placeable.placeAutoMirrored(position: IntOffset) {
+        private fun Placeable.placeAutoMirrored(position: IntOffset, zIndex: Float) {
             if (parentLayoutDirection == LayoutDirection.Ltr || parentWidth == 0) {
-                place(position)
+                place(position, zIndex)
             } else {
-                place(IntOffset(parentWidth - measuredSize.width - position.x, position.y))
+                place(IntOffset(parentWidth - measuredSize.width - position.x, position.y), zIndex)
             }
         }
 

@@ -18,8 +18,6 @@ package androidx.compose.ui.node
 import androidx.compose.ui.ContentDrawScope
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.DrawModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -35,7 +33,9 @@ import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -65,7 +65,6 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mockito.times
 
 @RunWith(JUnit4::class)
 @OptIn(ExperimentalLayoutNodeApi::class)
@@ -1576,7 +1575,11 @@ class LayoutNodeTest {
         val parent = LayoutNode(
             0, 0, 2, 2
         ).apply {
-            attach(MockOwner())
+            attach(
+                MockOwner().apply {
+                    measureIteration = 1L
+                }
+            )
         }
         parent.insertAt(
             0,
@@ -1596,6 +1599,8 @@ class LayoutNodeTest {
                 )
             )
         )
+        parent.remeasure()
+        parent.replace()
 
         val hit = mutableListOf<PointerInputFilter>()
 
@@ -1703,9 +1708,11 @@ private class MockOwner(
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         onRequestMeasureParams += layoutNode
+        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRemeasure
     }
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
+        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
     }
 
     override val hasPendingMeasureOrLayout = false
@@ -1794,7 +1801,7 @@ private class MockOwner(
     override fun onSemanticsChange() {
     }
 
-    override val measureIteration: Long = 0
+    override var measureIteration: Long = 0
     override val viewConfiguration: ViewConfiguration
         get() = TODO("Not yet implemented")
 }
@@ -1809,7 +1816,9 @@ fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) 
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult =
-                measureScope.layout(x2 - x, y2 - y) {}
+                measureScope.layout(x2 - x, y2 - y) {
+                    measurables.forEach { it.measure(constraints).place(0, 0) }
+                }
         }
         attach(MockOwner())
         layoutState = LayoutNode.LayoutState.NeedsRemeasure

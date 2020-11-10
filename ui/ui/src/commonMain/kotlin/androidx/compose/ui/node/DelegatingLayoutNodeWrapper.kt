@@ -83,8 +83,9 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override fun get(line: AlignmentLine): Int = wrapped[line]
 
-    override fun placeAt(position: IntOffset) {
+    override fun placeAt(position: IntOffset, zIndex: Float) {
         this.position = position
+        this.zIndex = zIndex
 
         // The wrapper only runs their placement block to obtain our position, which allows them
         // to calculate the offset of an alignment line we have already provided a position for.
