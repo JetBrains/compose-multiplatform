@@ -19,9 +19,9 @@ package androidx.compose.ui.layout
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
@@ -102,7 +102,7 @@ class RootNodeLayoutTest {
     @Test
     fun viewMeasuredCorrectlyWithWrapContent() {
         val latch = CountDownLatch(1)
-        val child = FrameLayout(activity)
+        val child = ComposeView(activity)
         rule.runOnUiThread {
             val parent = FrameLayout(activity)
             parent.addView(
@@ -113,7 +113,7 @@ class RootNodeLayoutTest {
                 )
             )
             activity.setContentView(parent)
-            child.setContent(Recomposer.current()) {
+            child.setContent {
                 Layout(
                     {},
                     Modifier.onGloballyPositioned {
@@ -133,7 +133,7 @@ class RootNodeLayoutTest {
     @Test
     fun viewMeasuredCorrectlyWithMatchParent() {
         val latch = CountDownLatch(1)
-        val child = FrameLayout(activity)
+        val child = ComposeView(activity)
         val parent = FrameLayout(activity)
         rule.runOnUiThread {
             parent.addView(
@@ -144,7 +144,7 @@ class RootNodeLayoutTest {
                 )
             )
             activity.setContentView(parent)
-            child.setContent(Recomposer.current()) {
+            child.setContent {
                 Layout(
                     {},
                     Modifier.fillMaxSize().onGloballyPositioned {

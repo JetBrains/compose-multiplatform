@@ -21,17 +21,16 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 
 // The presence of an ActionBar follows from the theme set in AndroidManifest.xml
 class ActivityWithActionBar : ComponentActivity() {
-    private lateinit var composeHolder: FrameLayout
+    private lateinit var composeHolder: ComposeView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val root = FrameLayout(this)
-        composeHolder = FrameLayout(this).apply {
+        composeHolder = ComposeView(this).apply {
             layoutParams = FrameLayout.LayoutParams(100, 100).apply {
                 gravity = Gravity.BOTTOM or Gravity.END
             }
@@ -43,6 +42,6 @@ class ActivityWithActionBar : ComponentActivity() {
     }
 
     fun setContent(composable: @Composable () -> Unit) {
-        composeHolder.setContent(Recomposer.current(), composable)
+        composeHolder.setContent(composable)
     }
 }

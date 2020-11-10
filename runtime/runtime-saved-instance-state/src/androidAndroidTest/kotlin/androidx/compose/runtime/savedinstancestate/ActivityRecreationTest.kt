@@ -22,9 +22,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.test.R
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -174,18 +174,18 @@ class RecreationTest3Activity : ComponentActivity() {
                 .LayoutParams.WRAP_CONTENT,
             1f
         )
-        val child1 = FrameLayout(this)
+        val child1 = ComposeView(this)
         child1.id = R.id.child1
         linear.addView(child1, params)
-        val child2 = FrameLayout(this)
+        val child2 = ComposeView(this)
         child2.id = R.id.child2
         linear.addView(child2, params)
         setContentView(linear)
 
-        child1.setContent(Recomposer.current()) {
+        child1.setContent {
             array1 = rememberSavedInstanceState(key = "key") { intArrayOf(0) }
         }
-        child2.setContent(Recomposer.current()) {
+        child2.setContent {
             array2 = rememberSavedInstanceState(key = "key") { intArrayOf(0) }
         }
     }
@@ -229,8 +229,8 @@ class TestFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = FrameLayout(container?.context ?: requireContext()).apply {
-        setContent(Recomposer.current()) {
+    ) = ComposeView(requireContext()).apply {
+        setContent {
             array = rememberSavedInstanceState(key = "key") { intArrayOf(0) }
         }
     }

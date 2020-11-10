@@ -23,11 +23,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 
 // TODO(lmr): This should be moved to a separate module, but needs to be one that is not IR-compiled
 class ArrayAdapter<T> : BaseAdapter(), Filterable {
@@ -111,10 +109,10 @@ class ArrayAdapter<T> : BaseAdapter(), Filterable {
         val items = items ?: error("Expected non-null items array")
 
         val item = items[position]
-        val view = convertView ?: FrameLayout(parent.context)
-        val group = view as ViewGroup
+        val view = convertView ?: ComposeView(parent.context)
+        val group = view as ComposeView
 
-        group.setContent(Recomposer.current()) {
+        group.setContent {
             composable!!(item)
         }
 

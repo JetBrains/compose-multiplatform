@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
@@ -35,8 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -507,16 +506,16 @@ class SubcomposeLayoutTest {
         val scenario = rule.activityRule.scenario
 
         lateinit var container1: FrameLayout
-        lateinit var container2: FrameLayout
+        lateinit var container2: ComposeView
         val state = mutableStateOf(10.dp)
         var stateUsedLatch = CountDownLatch(1)
 
         scenario.onActivity {
             container1 = FrameLayout(it)
-            container2 = FrameLayout(it)
+            container2 = ComposeView(it)
             it.setContentView(container1)
             container1.addView(container2)
-            container2.setContent(Recomposer.current()) {
+            container2.setContent {
                 SubcomposeLayout<Unit> { constraints ->
                     val first = subcompose(Unit) {
                         stateUsedLatch.countDown()

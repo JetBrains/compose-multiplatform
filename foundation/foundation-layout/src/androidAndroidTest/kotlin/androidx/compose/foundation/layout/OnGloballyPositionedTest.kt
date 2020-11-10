@@ -15,9 +15,7 @@
  */
 package androidx.compose.foundation.layout
 
-import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +27,7 @@ import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
@@ -129,7 +127,7 @@ class OnGloballyPositionedTest : LayoutTest() {
         val positionedLatch = CountDownLatch(1)
         activityTestRule.runOnUiThread(object : Runnable {
             override fun run() {
-                val frameLayout = FrameLayout(activity)
+                val frameLayout = ComposeView(activity)
                 frameLayout.setPadding(padding, padding, padding, padding)
                 activity.setContentView(frameLayout)
 
@@ -137,7 +135,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                 frameLayout.getLocationOnScreen(position)
                 frameGlobalPosition = Offset(position[0].toFloat(), position[1].toFloat())
 
-                frameLayout.setContent(Recomposer.current()) {
+                frameLayout.setContent {
                     Container(
                         Modifier.onGloballyPositioned {
                             realGlobalPosition = it.localToGlobal(localPosition)

@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.androidview.adapters.setOnClick
@@ -45,7 +44,6 @@ import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -53,7 +51,7 @@ import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -92,8 +90,6 @@ open class ComposeNothingInAndroidTap : ComponentActivity() {
 
     private var currentColor = Color.DarkGray
 
-    private lateinit var composition: Composition
-
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,7 +105,7 @@ open class ComposeNothingInAndroidTap : ComponentActivity() {
             "the middle, the color is supposed to change.  This currently does not occur " +
             "when you tap on the grey box however."
 
-        val container = findViewById<ViewGroup>(R.id.clickableContainer)
+        val container = findViewById<ComposeView>(R.id.clickableContainer)
         container.isClickable = true
         container.setBackgroundColor(currentColor.toArgb())
         container.setOnClick {
@@ -120,14 +116,9 @@ open class ComposeNothingInAndroidTap : ComponentActivity() {
             }
             container.setBackgroundColor(currentColor.toArgb())
         }
-        composition = container.setContent(Recomposer.current()) {
+        container.setContent {
             Box(Modifier.background(color = Color.LightGray).fillMaxSize())
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        composition.dispose()
     }
 }
 
@@ -149,7 +140,7 @@ open class ComposeTapInAndroidTap : ComponentActivity() {
             "only it changes colors. When you tap on the outer box, only the outer box " +
             "changes colors."
 
-        val container = findViewById<ViewGroup>(R.id.clickableContainer)
+        val container = findViewById<ComposeView>(R.id.clickableContainer)
         container.isClickable = true
         container.setBackgroundColor(currentColor.toArgb())
         container.setOnClick {
@@ -161,8 +152,7 @@ open class ComposeTapInAndroidTap : ComponentActivity() {
             container.setBackgroundColor(currentColor.toArgb())
         }
 
-        composition = container.setContent(Recomposer.current()) {
-
+        container.setContent {
             val currentColor = remember { mutableStateOf(Color.LightGray) }
 
             val tap =
@@ -187,8 +177,6 @@ open class ComposeTapInAndroidTap : ComponentActivity() {
 
 open class ComposeTapInAndroidScroll : ComponentActivity() {
 
-    private lateinit var composition: Composition
-
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -207,35 +195,37 @@ open class ComposeTapInAndroidScroll : ComponentActivity() {
             "from the screen will not cause the Compose box to change colors. "
 
         val container = findViewById<ViewGroup>(R.id.container)
-        composition = container.setContent(Recomposer.current()) {
+        container.addView(
+            ComposeView(this).apply {
+                setContent {
+                    val currentColor = remember { mutableStateOf(Color.LightGray) }
 
-            val currentColor = remember { mutableStateOf(Color.LightGray) }
-
-            Box(
-                Modifier
-                    .background(color = Color.Gray)
-                    .fillMaxWidth()
-                    .preferredHeight(456.dp)
-                    .wrapContentSize()
-                    .clickable {
-                        currentColor.value =
-                            if (currentColor.value == Color.Blue) Color.Yellow else Color.Blue
-                    }
-                    .background(currentColor.value, RectangleShape)
-                    .preferredSize(192.dp)
+                    Box(
+                        Modifier
+                            .background(color = Color.Gray)
+                            .fillMaxWidth()
+                            .preferredHeight(456.dp)
+                            .wrapContentSize()
+                            .clickable {
+                                currentColor.value = if (currentColor.value == Color.Blue) {
+                                    Color.Yellow
+                                } else {
+                                    Color.Blue
+                                }
+                            }
+                            .background(currentColor.value, RectangleShape)
+                            .preferredSize(192.dp)
+                    )
+                }
+            },
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
             )
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        composition.dispose()
+        )
     }
 }
 
 open class ComposeScrollInAndroidScrollSameOrientation : ComponentActivity() {
-
-    private lateinit var composition: Composition
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -255,34 +245,34 @@ open class ComposeScrollInAndroidScrollSameOrientation : ComponentActivity() {
             "before the child scrolling container can start scrolling."
 
         val container = findViewById<ViewGroup>(R.id.container)
-        composition = container.setContent(Recomposer.current()) {
-            ScrollableColumn(
-                modifier = Modifier
-                    .padding(48.dp)
-                    .background(color = Color.Gray)
-                    .fillMaxWidth()
-                    .preferredHeight(456.dp)
-            ) {
-                Box(
-                    Modifier
-                        .padding(48.dp)
-                        .background(color = Color.LightGray)
-                        .fillMaxWidth()
-                        .preferredHeight(456.dp)
-                )
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        composition.dispose()
+        container.addView(
+            ComposeView(this).apply {
+                setContent {
+                    ScrollableColumn(
+                        modifier = Modifier
+                            .padding(48.dp)
+                            .background(color = Color.Gray)
+                            .fillMaxWidth()
+                            .preferredHeight(456.dp)
+                    ) {
+                        Box(
+                            Modifier
+                                .padding(48.dp)
+                                .background(color = Color.LightGray)
+                                .fillMaxWidth()
+                                .preferredHeight(456.dp)
+                        )
+                    }
+                }
+            },
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
     }
 }
 
 open class ComposeScrollInAndroidScrollDifferentOrientation : ComponentActivity() {
-
-    private lateinit var composition: Composition
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -300,28 +290,30 @@ open class ComposeScrollInAndroidScrollDifferentOrientation : ComponentActivity(
             "scroll in one orientation at a time."
 
         val container = findViewById<ViewGroup>(R.id.container)
-        composition = container.setContent(Recomposer.current()) {
-            ScrollableRow(
-                modifier = Modifier
-                    .padding(48.dp)
-                    .background(color = Color.Gray)
-                    .fillMaxWidth()
-                    .preferredHeight(456.dp)
-            ) {
-                Box(
-                    Modifier
-                        .padding(48.dp)
-                        .background(color = Color.LightGray)
-                        .preferredWidth(360.dp)
-                        .fillMaxHeight()
-                )
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        composition.dispose()
+        container.addView(
+            ComposeView(this).apply {
+                setContent {
+                    ScrollableRow(
+                        modifier = Modifier
+                            .padding(48.dp)
+                            .background(color = Color.Gray)
+                            .fillMaxWidth()
+                            .preferredHeight(456.dp)
+                    ) {
+                        Box(
+                            Modifier
+                                .padding(48.dp)
+                                .background(color = Color.LightGray)
+                                .preferredWidth(360.dp)
+                                .fillMaxHeight()
+                        )
+                    }
+                }
+            },
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
     }
 }
 
@@ -353,33 +345,26 @@ open class ComposeInAndroidDialogDismissDialogDuringDispatch : FragmentActivity(
 
 class MyDialogFragment : DialogFragment() {
 
-    private lateinit var composition: Composition
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
-        val frameLayout = FrameLayout(inflater.context).apply {
+        val frameLayout = ComposeView(inflater.context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
 
-        composition = frameLayout.setContent(Recomposer.current()) {
+        frameLayout.setContent {
             Button({ this@MyDialogFragment.dismiss() }) {
                 Text("Close me")
             }
         }
 
         return frameLayout
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        composition.dispose()
     }
 
     companion object {

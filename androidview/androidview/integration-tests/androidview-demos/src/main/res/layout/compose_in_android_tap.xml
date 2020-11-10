@@ -36,7 +36,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <RelativeLayout
+        <androidx.compose.ui.platform.ComposeView
             android:id="@+id/clickableContainer"
             android:layout_width="360dp"
             android:layout_height="360dp"

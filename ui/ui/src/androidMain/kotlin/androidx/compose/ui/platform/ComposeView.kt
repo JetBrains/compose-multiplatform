@@ -199,13 +199,23 @@ abstract class AbstractComposeView @JvmOverloads constructor(
     final override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val child = checkNotNull(getChildAt(0)) { "Composition view not present for measure!" }
-        child.measure(widthMeasureSpec, heightMeasureSpec)
+        val width = maxOf(0, MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight)
+        val height = maxOf(0, MeasureSpec.getSize(heightMeasureSpec) - paddingTop - paddingBottom)
+        child.measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.getMode(widthMeasureSpec)),
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(heightMeasureSpec)),
+        )
         setMeasuredDimension(child.measuredWidthAndState, child.measuredHeightAndState)
     }
 
     final override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val child = checkNotNull(getChildAt(0)) { "Composition view not present for layout!" }
-        child.layout(0, 0, right - left, bottom - top)
+        child.layout(
+            paddingLeft,
+            paddingTop,
+            right - left - paddingRight,
+            bottom - top - paddingBottom
+        )
     }
 }
 
