@@ -49,7 +49,8 @@ internal fun LazyList(
         modifier
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-                reverseDirection = reverseDirection,
+                // reverse scroll by default, to have "natural" gesture that goes reversed to layout
+                reverseDirection = !reverseDirection,
                 controller = state.scrollableController
             )
             .clipToBounds()

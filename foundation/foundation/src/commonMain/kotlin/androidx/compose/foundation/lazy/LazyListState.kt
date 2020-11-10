@@ -18,11 +18,15 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.assertNotNestingScrollableContainers
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -137,7 +141,11 @@ class LazyListState constructor(
     val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
 
     /**
-     * whether the Lazy list with this state is currently animating/flinging
+     * whether this [LazyListState] is currently scrolling via [scroll] or via an
+     * animation/fling.
+     *
+     * Note: **all** scrolls initiated via [scroll] are considered to be animations, regardless of
+     * whether they are actually performing an animation.
      */
     val isAnimationRunning
         get() = scrollableController.isAnimationRunning
@@ -156,7 +164,7 @@ class LazyListState constructor(
         ScrollableController(
             flingConfig = flingConfig,
             animationClock = animationClock,
-            consumeScrollDelta = { onScroll(it) },
+            consumeScrollDelta = { -onScroll(-it) },
             interactionState = interactionState
         )
 
@@ -181,20 +189,63 @@ class LazyListState constructor(
         }
     }
 
-    // currently used by the desktop for scrollbars. to be made public
-    internal suspend fun snapToItemIndex(
-        @IntRange(from = 0) index: Int,
-        @IntRange(from = 0) scrollOffset: Int = 0
-    ) {
+    /**
+     * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
+     * pixels.
+     *
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * @param index the data index to snap to
+     * @param scrollOffset the number of pixels past the start of the item to snap to
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    suspend fun snapToItemIndex(
+        @IntRange(from = 0)
+        index: Int,
+        @IntRange(from = 0)
+        scrollOffset: Int = 0
+    ) = scrollableController.scroll {
         scrollPosition.update(
             index = DataIndex(index),
-            // scrollOffset can only be positive
-            scrollOffset = maxOf(scrollOffset, 0),
+            scrollOffset = scrollOffset,
             // `true` will be replaced with the real value during the forceRemeasure() execution
             canScrollForward = true
         )
         remeasurement.forceRemeasure()
     }
+
+    /**
+     * Call this function to take control of scrolling and gain the ability to send scroll events
+     * via [ScrollScope.scrollBy]. All actions that change the logical scroll position must be
+     * performed within a [scroll] block (even if they don't call any other methods on this
+     * object) in order to guarantee that mutual exclusion is enforced.
+     *
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * If [scroll] is called from elsewhere, this will be canceled.
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    suspend fun scroll(
+        block: suspend ScrollScope.() -> Unit
+    ): Unit = scrollableController.scroll(block)
+
+    /**
+     * Smooth scroll by [value] pixels.
+     *
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * @param value delta to scroll by
+     * @param spec [AnimationSpec] to be used for this smooth scrolling
+     *
+     * @return the amount of scroll consumed
+     */
+    suspend fun smoothScrollBy(
+        value: Float,
+        spec: AnimationSpec<Float> = spring()
+    ): Float = scrollableController.smoothScrollBy(value, spec)
 
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
@@ -227,7 +278,7 @@ class LazyListState constructor(
             // We did not consume all of it - return the rest to be consumed elsewhere (e.g.,
             // nested scrolling)
             scrollToBeConsumed = 0f // We're not consuming the rest, give it back
-            scrollableController.stopAnimation()
+            scrollableController.stopFlingAnimation()
             return scrollConsumed
         }
     }

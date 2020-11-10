@@ -24,13 +24,14 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.InternalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -44,21 +45,21 @@ import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.AccessibilityScrollState
+import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
 import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
 import androidx.compose.ui.semantics.verticalAccessibilityScrollState
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
@@ -157,6 +158,22 @@ class ScrollState(
             },
             interactionState = interactionState
         )
+
+    /**
+     * Call this function to take control of scrolling and gain the ability to send scroll events
+     * via [ScrollScope.scrollBy]. All actions that change the logical scroll position must be
+     * performed within a [scroll] block (even if they don't call any other methods on this
+     * object) in order to guarantee that mutual exclusion is enforced.
+     *
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * If [scroll] is called from elsewhere, this will be canceled.
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    suspend fun scroll(
+        block: suspend ScrollScope.() -> Unit
+    ): Unit = scrollableController.scroll(block)
 
     /**
      * Stop any ongoing animation, smooth scrolling or fling occurring on this [ScrollState]

@@ -142,6 +142,7 @@ package androidx.compose.foundation {
     method public float getMaxValue();
     method public float getValue();
     method public boolean isAnimationRunning();
+    method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public void scrollBy(float value);
     method public void scrollTo(float value);
     method public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
@@ -248,10 +249,16 @@ package androidx.compose.foundation.gestures {
     method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
   }
 
+  public interface ScrollScope {
+    method public float scrollBy(float pixels);
+  }
+
   public final class ScrollableController {
     ctor public ScrollableController(internal kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta, internal androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, internal androidx.compose.foundation.InteractionState? interactionState);
     method public boolean isAnimationRunning();
+    method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
+    method public suspend Object? smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
     method public void stopAnimation();
     property public final boolean isAnimationRunning;
   }
@@ -323,6 +330,9 @@ package androidx.compose.foundation.lazy {
     method public int getFirstVisibleItemIndex();
     method public int getFirstVisibleItemScrollOffset();
     method public boolean isAnimationRunning();
+    method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
+    method public suspend Object? snapToItemIndex(@IntRange(from=0) int index, optional @IntRange(from=0) int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final boolean isAnimationRunning;

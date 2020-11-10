@@ -78,5 +78,19 @@ fun monotonicFrameAnimationClockOf(
     clock: MonotonicFrameClock
 ): MonotonicFrameAnimationClock =
     MonotonicFrameAnimationClock(
-        CoroutineScope(coroutineContext + TestUiDispatcher.Main + clock)
+        CoroutineScope(coroutineContext + clock)
+    )
+
+/**
+ * Creates a [MonotonicFrameAnimationClock] from the given [coroutineContext]'s clock. A new
+ * coroutine scope is created from the [coroutineContext].
+ *
+ * @see MonotonicFrameAnimationClock
+ */
+@ExperimentalTesting
+fun monotonicFrameAnimationClockOf(
+    coroutineContext: CoroutineContext
+): MonotonicFrameAnimationClock =
+    MonotonicFrameAnimationClock(
+        CoroutineScope(coroutineContext)
     )

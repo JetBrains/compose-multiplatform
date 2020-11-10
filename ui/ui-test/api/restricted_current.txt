@@ -33,6 +33,7 @@ package androidx.compose.ui.test {
 
   public final class AnimationClocksKt {
     method @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext, androidx.compose.runtime.dispatch.MonotonicFrameClock clock);
+    method @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext);
   }
 
   public final class AssertionsKt {
