@@ -452,16 +452,16 @@ class AffectedModuleDetectorImpl constructor(
         private val COBUILT_TEST_PATHS = setOf(
             // Install media tests together per b/128577735
             setOf(
-                ":support-media-test-client",
-                ":support-media-test-service",
-                ":support-media-test-client-previous",
-                ":support-media-test-service-previous"
+                ":media:version-compat-tests:client",
+                ":media:version-compat-tests:service",
+                ":media:version-compat-tests:client-previous",
+                ":media:version-compat-tests:service-previous"
             ),
             setOf(
-                ":support-media2-test-client",
-                ":support-media2-test-service",
-                ":support-media2-test-client-previous",
-                ":support-media2-test-service-previous"
+                ":media2:media2-session:version-compat-tests:client",
+                ":media2:media2-session:version-compat-tests:service",
+                ":media2:media2-session:version-compat-tests:client-previous",
+                ":media2:media2-session:version-compat-tests:service-previous"
             ), // Link graphics and material to always run @Large in presubmit per b/160624022
             setOf(
                 ":compose:ui:ui-graphics",
