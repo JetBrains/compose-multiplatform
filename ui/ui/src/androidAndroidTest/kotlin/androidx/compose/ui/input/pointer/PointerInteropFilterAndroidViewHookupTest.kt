@@ -23,11 +23,9 @@ import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.PointerProperties
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.viewinterop.AndroidView
@@ -65,12 +63,12 @@ class PointerInteropFilterAndroidViewHookupTest {
                 layoutParams = ViewGroup.LayoutParams(100, 100)
             }
 
-            val parent = FrameLayout(activity).apply {
+            val parent = ComposeView(activity).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                setContent(Recomposer.current()) {
+                setContent {
                     AndroidView(
                         { child },
                         Modifier.spyGestureFilter { eventStringLog.add(it.name) }

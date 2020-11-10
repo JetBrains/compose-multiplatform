@@ -20,9 +20,14 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.globalBounds
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
@@ -40,11 +45,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -128,6 +136,32 @@ class ComposeViewTest {
 
         assertNotNull("composeViewCapture", composeViewCapture)
         assertTrue("ComposeView.isDisposed", composeViewCapture?.isDisposed == true)
+    }
+
+    @Test
+    fun paddingsAreNotIgnored() {
+        var globalBounds = Rect.Zero
+        val latch = CountDownLatch(1)
+        rule.activityRule.scenario.onActivity { activity ->
+            val composeView = ComposeView(activity)
+            composeView.setPadding(10, 20, 30, 40)
+            activity.setContentView(composeView, ViewGroup.LayoutParams(100, 100))
+            composeView.setContent {
+                Box(
+                    Modifier.testTag("box").fillMaxSize().onGloballyPositioned {
+                        val position = IntArray(2)
+                        composeView.getLocationOnScreen(position)
+                        globalBounds = it.globalBounds.translate(
+                            -position[0].toFloat(), -position[1].toFloat()
+                        )
+                        latch.countDown()
+                    }
+                )
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(Rect(10f, 20f, 70f, 60f), globalBounds)
     }
 
     @Test

@@ -19,11 +19,9 @@ package androidx.compose.ui.input.pointer
 import android.content.Context
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.OpenComposeView
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
@@ -39,7 +38,7 @@ import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
@@ -69,20 +68,21 @@ class AndroidPointerInputTest {
     )
 
     private lateinit var androidComposeView: AndroidComposeView
-    private lateinit var container: ViewGroup
+    private lateinit var container: OpenComposeView
 
     @Before
     fun setup() {
         val activity = rule.activity
-        container = spy(FrameLayout(activity)).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        }
+        container = spy(OpenComposeView(activity))
 
         rule.runOnUiThread {
-            activity.setContentView(container)
+            activity.setContentView(
+                container,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
         }
     }
 
@@ -93,7 +93,7 @@ class AndroidPointerInputTest {
 
         countDown { latch ->
             rule.runOnUiThread {
-                container.setContent(Recomposer.current()) {
+                container.setContent {
                     FillLayout(
                         Modifier
                             .onGloballyPositioned { latch.countDown() }
@@ -129,7 +129,7 @@ class AndroidPointerInputTest {
 
         countDown { latch ->
             rule.runOnUiThread {
-                container.setContent(Recomposer.current()) {
+                container.setContent {
                     FillLayout(
                         Modifier
                             .consumeMovementGestureFilter()
@@ -186,7 +186,7 @@ class AndroidPointerInputTest {
         val latch = CountDownLatch(1)
         var consumedDownPosition: Offset? = null
         rule.runOnUiThread {
-            container.setContent(Recomposer.current()) {
+            container.setContent {
                 Layout(
                     {},
                     Modifier
@@ -248,7 +248,7 @@ class AndroidPointerInputTest {
 
         countDown { latch ->
             rule.runOnUiThread {
-                container.setContent(Recomposer.current()) {
+                container.setContent {
                     AndroidWithCompose(context, 1) {
                         AndroidWithCompose(context, 10) {
                             AndroidWithCompose(context, 100) {
@@ -310,7 +310,7 @@ class AndroidPointerInputTest {
 
         countDown { latch ->
             rule.runOnUiThread {
-                container.setContent(Recomposer.current()) {
+                container.setContent {
                     FillLayout(
                         Modifier
                             .consumeMovementGestureFilter(consumeMovement)
@@ -375,7 +375,7 @@ class AndroidPointerInputTest {
 
         countDown { latch ->
             rule.runOnUiThread {
-                container.setContent(Recomposer.current()) {
+                container.setContent {
                     FillLayout(
                         Modifier
                             .logEventsGestureFilter(log)
@@ -434,7 +434,7 @@ class AndroidPointerInputTest {
         var positionedLatch = CountDownLatch(1)
 
         rule.runOnUiThread {
-            container.setContent(Recomposer.current()) {
+            container.setContent {
                 FillLayout(
                     Modifier
                         .tapGestureFilter {
@@ -522,8 +522,8 @@ class AndroidPointerInputTest {
 @Suppress("TestFunctionName")
 @Composable
 fun AndroidWithCompose(context: Context, androidPadding: Int, children: @Composable () -> Unit) {
-    val anotherLayout = FrameLayout(context).also { view ->
-        view.setContent(Recomposer.current()) {
+    val anotherLayout = ComposeView(context).also { view ->
+        view.setContent {
             children()
         }
         view.setPadding(androidPadding, androidPadding, androidPadding, androidPadding)

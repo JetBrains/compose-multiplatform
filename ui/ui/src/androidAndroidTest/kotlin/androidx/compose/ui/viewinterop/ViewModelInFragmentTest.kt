@@ -19,9 +19,7 @@ package androidx.compose.ui.viewinterop
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import androidx.compose.runtime.Recomposer
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentContainerView
@@ -85,8 +83,8 @@ class TestFragment(private val viewModelClass: Class<out ViewModel>) : Fragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = FrameLayout(container?.context ?: requireContext()).apply {
-        setContent(Recomposer.current()) {
+    ) = ComposeView(requireContext()).apply {
+        setContent {
             viewModel(viewModelClass)
             latch.countDown()
         }
