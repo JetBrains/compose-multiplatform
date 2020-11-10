@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
@@ -552,6 +552,6 @@ class SubcomposeLayoutTest {
     }
 }
 
-fun ImageAsset.assertCenterPixelColor(expectedColor: Color) {
+fun ImageBitmap.assertCenterPixelColor(expectedColor: Color) {
     asAndroidBitmap().assertColor(expectedColor, width / 2, height / 2)
 }

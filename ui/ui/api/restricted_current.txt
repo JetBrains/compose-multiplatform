@@ -2357,8 +2357,8 @@ package androidx.compose.ui.res {
   }
 
   public final class ImageResourcesKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.ImageAsset imageResource(@DrawableRes int id);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.ImageAsset> loadImageResource(int id, optional androidx.compose.ui.graphics.ImageAsset? pendingImage, optional androidx.compose.ui.graphics.ImageAsset? failedImage);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.ImageBitmap imageResource(@DrawableRes int id);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.ImageBitmap> loadImageResource(int id, optional androidx.compose.ui.graphics.ImageBitmap? pendingImage, optional androidx.compose.ui.graphics.ImageBitmap? failedImage);
   }
 
   public final class LoadedResource<T> extends androidx.compose.ui.res.Resource<T> {

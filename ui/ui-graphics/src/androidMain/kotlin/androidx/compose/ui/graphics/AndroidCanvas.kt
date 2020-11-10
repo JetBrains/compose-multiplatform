@@ -26,9 +26,9 @@ actual typealias NativeCanvas = android.graphics.Canvas
 
 /**
  * Create a new Canvas instance that targets its drawing commands
- * to the provided [ImageAsset]
+ * to the provided [ImageBitmap]
  */
-internal actual fun ActualCanvas(image: ImageAsset): Canvas =
+internal actual fun ActualCanvas(image: ImageBitmap): Canvas =
     AndroidCanvas().apply {
         internalCanvas = android.graphics.Canvas(image.asAndroidBitmap())
     }
@@ -249,7 +249,7 @@ private val EmptyCanvas = android.graphics.Canvas()
     /**
      * @see Canvas.drawImage
      */
-    override fun drawImage(image: ImageAsset, topLeftOffset: Offset, paint: Paint) {
+    override fun drawImage(image: ImageBitmap, topLeftOffset: Offset, paint: Paint) {
         internalCanvas.drawBitmap(
             image.asAndroidBitmap(),
             topLeftOffset.x,
@@ -262,7 +262,7 @@ private val EmptyCanvas = android.graphics.Canvas()
      * @See Canvas.drawImageRect
      */
     override fun drawImageRect(
-        image: ImageAsset,
+        image: ImageBitmap,
         srcOffset: IntOffset,
         srcSize: IntSize,
         dstOffset: IntOffset,

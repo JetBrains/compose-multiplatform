@@ -41,11 +41,11 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
@@ -528,7 +528,7 @@ class PainterModifierTest {
         // height and width centered within the bounds of the composable
         val boxWidth = 600
         val boxHeight = 400
-        val srcImage = ImageAsset(100, 200)
+        val srcImage = ImageBitmap(100, 200)
         val canvas = Canvas(srcImage)
         val paint = Paint().apply { this.color = Color.Red }
         canvas.drawRect(0f, 0f, 400f, 200f, paint)
@@ -568,12 +568,12 @@ class PainterModifierTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testImagePainterScalesNonUniformly() {
-        // The composable dimensions are larger than the ImageAsset. By not passing in
-        // a ContentScale parameter to the painter, the ImageAsset should be stretched
+        // The composable dimensions are larger than the ImageBitmap. By not passing in
+        // a ContentScale parameter to the painter, the ImageBitmap should be stretched
         // non-uniformly to fully occupy the bounds of the composable
         val boxWidth = 60
         val boxHeight = 40
-        val srcImage = ImageAsset(10, 20)
+        val srcImage = ImageBitmap(10, 20)
         val canvas = Canvas(srcImage)
         val paint = Paint().apply { this.color = Color.Red }
         canvas.drawRect(0f, 0f, 40f, 20f, paint)
@@ -591,7 +591,7 @@ class PainterModifierTest {
             )
         }
 
-        rule.obtainScreenshotBitmap(boxWidth, boxHeight).asImageAsset().assertPixels { Color.Red }
+        rule.obtainScreenshotBitmap(boxWidth, boxHeight).asImageBitmap().assertPixels { Color.Red }
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)

@@ -20,7 +20,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -45,9 +45,9 @@ class ListItemTest {
     @get:Rule
     val rule = createComposeRule()
 
-    val icon24x24 by lazy { ImageAsset(width = 24.dp.toIntPx(), height = 24.dp.toIntPx()) }
-    val icon40x40 by lazy { ImageAsset(width = 40.dp.toIntPx(), height = 40.dp.toIntPx()) }
-    val icon56x56 by lazy { ImageAsset(width = 56.dp.toIntPx(), height = 56.dp.toIntPx()) }
+    val icon24x24 by lazy { ImageBitmap(width = 24.dp.toIntPx(), height = 24.dp.toIntPx()) }
+    val icon40x40 by lazy { ImageBitmap(width = 40.dp.toIntPx(), height = 40.dp.toIntPx()) }
+    val icon56x56 by lazy { ImageBitmap(width = 56.dp.toIntPx(), height = 56.dp.toIntPx()) }
 
     @Test
     fun listItem_oneLine_size() {

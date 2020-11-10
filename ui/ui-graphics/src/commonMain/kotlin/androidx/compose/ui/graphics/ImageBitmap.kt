@@ -23,49 +23,49 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces
  * Graphics object that represents a 2 dimensional array of pixel information represented
  * as ARGB values
  */
-interface ImageAsset {
+interface ImageBitmap {
 
-    /** The number of image pixels along the ImageAssets's horizontal axis. */
+    /** The number of image pixels along the ImageBitmap's horizontal axis. */
     val width: Int
 
-    /** The number of image pixels along the ImageAssets's vertical axis. */
+    /** The number of image pixels along the ImageBitmap's vertical axis. */
     val height: Int
 
     /** ColorSpace the Image renders in **/
     val colorSpace: ColorSpace
 
-    /** Determines whether or not the ImageAsset contains an alpha channel **/
+    /** Determines whether or not the ImageBitmap contains an alpha channel **/
     val hasAlpha: Boolean
 
     /**
      * Returns the current configuration of this Image, either:
-     * @see ImageAssetConfig.Argb8888
-     * @see ImageAssetConfig.Rgb565
-     * @see ImageAssetConfig.Alpha8
-     * @see ImageAssetConfig.Gpu
+     * @see ImageBitmapConfig.Argb8888
+     * @see ImageBitmapConfig.Rgb565
+     * @see ImageBitmapConfig.Alpha8
+     * @see ImageBitmapConfig.Gpu
      */
-    val config: ImageAssetConfig
+    val config: ImageBitmapConfig
 
     /**
-     * Copies the pixel data within the ImageAsset into the given array. Each value is
+     * Copies the pixel data within the ImageBitmap into the given array. Each value is
      * represented as ARGB values packed into an Int.
      * The stride parameter allows the caller to allow for gaps in the returned pixels array
      * between rows. For normal packed, results, the stride value is equivalent to the width of
-     * the [ImageAsset]. The returned colors are non-premultiplied ARGB values in the
+     * the [ImageBitmap]. The returned colors are non-premultiplied ARGB values in the
      * [ColorSpaces.Srgb] color space.
      *
      * Note this method can block so it is recommended to not invoke this method in performance
      * critical code paths
      *
-     * @sample androidx.compose.ui.graphics.samples.ImageAssetReadPixelsSample
+     * @sample androidx.compose.ui.graphics.samples.ImageBitmapReadPixelsSample
      *
-     * @param buffer The array to store the [ImageAsset]'s colors. By default this allocates an
+     * @param buffer The array to store the [ImageBitmap]'s colors. By default this allocates an
      * [IntArray] large enough to store all the pixel information. Consumers of this API are
      * advised to use the smallest [IntArray] necessary to extract relevant pixel information, that
-     * is the 2 dimensional area of the section of the [ImageAsset] to be queried.
+     * is the 2 dimensional area of the section of the [ImageBitmap] to be queried.
      *
-     * @param startX The x-coordinate of the first pixel to read from the [ImageAsset]
-     * @param startY The y-coordinate of the first pixel to read from the [ImageAsset]
+     * @param startX The x-coordinate of the first pixel to read from the [ImageBitmap]
+     * @param startY The y-coordinate of the first pixel to read from the [ImageBitmap]
      * @param width The number of pixels to read from each row
      * @param height The number of rows to read
      * @param bufferOffset The first index to write into the buffer array, this defaults to 0
@@ -82,34 +82,34 @@ interface ImageAsset {
     )
 
     /**
-     * Builds caches associated with the ImageAsset that are used for drawing it. This method can
+     * Builds caches associated with the ImageBitmap that are used for drawing it. This method can
      * be used as a signal to upload textures to the GPU to eventually be rendered
      */
     fun prepareToDraw()
 }
 
 /**
- * Convenience method to extract pixel information from the given ImageAsset into a [PixelMap]
+ * Convenience method to extract pixel information from the given ImageBitmap into a [PixelMap]
  * that supports for querying pixel information based on
  *
  * Note this method can block so it is recommended to not invoke this method in performance
  * critical code paths
  *
- * @sample androidx.compose.ui.graphics.samples.ImageAssetToPixelMapSample
+ * @sample androidx.compose.ui.graphics.samples.ImageBitmapToPixelMapSample
  *
- * @param startX The x-coordinate of the first pixel to read from the [ImageAsset]
- * @param startY The y-coordinate of the first pixel to read from the [ImageAsset]
+ * @param startX The x-coordinate of the first pixel to read from the [ImageBitmap]
+ * @param startY The y-coordinate of the first pixel to read from the [ImageBitmap]
  * @param width The number of pixels to read from each row
  * @param height The number of rows to read
- * @param buffer The array to store the [ImageAsset]'s colors. By default this allocates an
+ * @param buffer The array to store the [ImageBitmap]'s colors. By default this allocates an
  * [IntArray] large enough to store all the pixel information. Consumers of this API are
  * advised to use the smallest [IntArray] necessary to extract relevant pixel information
  * @param bufferOffset The first index to write into the buffer array, this defaults to 0
  * @param stride The number of entries in [buffer] to skip between rows (must be >= [width]
  *
- * @see ImageAsset.readPixels
+ * @see ImageBitmap.readPixels
  */
-fun ImageAsset.toPixelMap(
+fun ImageBitmap.toPixelMap(
     startX: Int = 0,
     startY: Int = 0,
     width: Int = this.width,
@@ -131,11 +131,11 @@ fun ImageAsset.toPixelMap(
 }
 
 /**
- * Possible ImageAsset configurations. An ImageAsset configuration describes
+ * Possible ImageBitmap configurations. An ImageBitmap configuration describes
  * how pixels are stored. This affects the quality (color depth) as
  * well as the ability to display transparent/translucent colors.
  */
-enum class ImageAssetConfig {
+enum class ImageBitmapConfig {
     /**
      * Each pixel is stored on 4 bytes. Each channel (RGB and alpha
      * for translucency) is stored with 8 bits of precision (256
@@ -208,30 +208,51 @@ enum class ImageAssetConfig {
     F16,
 
     /**
-     * Special configuration, when an ImageAsset is stored only in graphic memory.
-     * ImageAssets in this configuration are always immutable.
+     * Special configuration, when an ImageBitmap is stored only in graphic memory.
+     * ImageBitmaps in this configuration are always immutable.
      *
-     * It is optimal for cases, when the only operation with the ImageAsset is to draw it on a
+     * It is optimal for cases, when the only operation with the ImageBitmap is to draw it on a
      * screen.
      */
     Gpu
 }
 
-internal expect fun ActualImageAsset(
+internal expect fun ActualImageBitmap(
     width: Int,
     height: Int,
-    config: ImageAssetConfig,
+    config: ImageBitmapConfig,
     hasAlpha: Boolean,
     colorSpace: ColorSpace
-): ImageAsset
+): ImageBitmap
 
+fun ImageBitmap(
+    width: Int,
+    height: Int,
+    config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
+    hasAlpha: Boolean = true,
+    colorSpace: ColorSpace = ColorSpaces.Srgb
+): ImageBitmap = ActualImageBitmap(
+    width,
+    height,
+    config,
+    hasAlpha,
+    colorSpace
+)
+
+@Deprecated(
+    "Use ImageBitmap instead",
+    ReplaceWith(
+        "ImageBitmap(width, height, config, hasAlpha, colorSpace)",
+        "androidx.compose.ui.graphics"
+    )
+)
 fun ImageAsset(
     width: Int,
     height: Int,
-    config: ImageAssetConfig = ImageAssetConfig.Argb8888,
+    config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
     hasAlpha: Boolean = true,
     colorSpace: ColorSpace = ColorSpaces.Srgb
-): ImageAsset = ActualImageAsset(
+): ImageBitmap = ActualImageBitmap(
     width,
     height,
     config,

@@ -16,7 +16,7 @@
 
 package androidx.compose.testutils
 
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.test.screenshot.ScreenshotTestRule
 import androidx.test.screenshot.assertAgainstGolden
@@ -35,7 +35,7 @@ import androidx.test.screenshot.matchers.MSSIMMatcher
  * @param matcher The algorithm to be used to perform the matching. By default [MSSIMMatcher]
  * is used.
  */
-fun ImageAsset.assertAgainstGolden(
+fun ImageBitmap.assertAgainstGolden(
     rule: ScreenshotTestRule,
     goldenIdentifier: String,
     matcher: BitmapMatcher = MSSIMMatcher()

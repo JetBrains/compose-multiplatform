@@ -20,12 +20,12 @@ import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.test.assertContainsColor
 import androidx.compose.ui.test.assertPixelColor
 import androidx.compose.ui.test.assertPixels
@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.IntSize
  * @throws AssertionError if size or colors don't match.
  */
 @Suppress("DEPRECATION")
-fun ImageAsset.assertPixels(
+fun ImageBitmap.assertPixels(
     expectedSize: IntSize? = null,
     expectedColorProvider: (pos: IntOffset) -> Color?
 ) = asAndroidBitmap().assertPixels(expectedSize, expectedColorProvider)
@@ -55,7 +55,7 @@ fun ImageAsset.assertPixels(
  * Asserts that the color at a specific pixel in the bitmap at ([x], [y]) is [expected].
  */
 @Suppress("DEPRECATION")
-fun ImageAsset.assertPixelColor(
+fun ImageBitmap.assertPixelColor(
     expected: Color,
     x: Int,
     y: Int,
@@ -68,9 +68,9 @@ fun ImageAsset.assertPixelColor(
  * @throws AssertionError if the expected color is not present.
  */
 @Suppress("DEPRECATION")
-fun ImageAsset.assertContainsColor(
+fun ImageBitmap.assertContainsColor(
     expectedColor: Color
-) = asAndroidBitmap().assertContainsColor(expectedColor).asImageAsset()
+) = asAndroidBitmap().assertContainsColor(expectedColor).asImageBitmap()
 
 /**
  * Tests to see if the given point is within the path. (That is, whether the
@@ -106,7 +106,7 @@ fun Path.contains(offset: Offset): Boolean = contains(offset)
  */
 // TODO (mount, malkov) : to investigate why it flakes when shape is not rect
 @Suppress("DEPRECATION")
-fun ImageAsset.assertShape(
+fun ImageBitmap.assertShape(
     density: Density,
     shape: Shape,
     shapeColor: Color,
@@ -149,7 +149,7 @@ fun ImageAsset.assertShape(
  * untested as it is likely anti-aliased. The default is 1 pixel
  */
 @Suppress("DEPRECATION")
-fun ImageAsset.assertShape(
+fun ImageBitmap.assertShape(
     density: Density,
     horizontalPadding: Dp,
     verticalPadding: Dp,

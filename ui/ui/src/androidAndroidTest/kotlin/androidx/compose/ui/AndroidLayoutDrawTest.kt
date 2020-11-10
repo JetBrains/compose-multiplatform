@@ -54,7 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
@@ -3180,7 +3180,7 @@ class AndroidLayoutDrawTest {
             )
         }
 
-        activityTestRule.waitAndScreenShot(frameLayout).asImageAsset()
+        activityTestRule.waitAndScreenShot(frameLayout).asImageBitmap()
             .assertPixels(expectedSize = IntSize(size, size)) {
                 Color.Red
             }

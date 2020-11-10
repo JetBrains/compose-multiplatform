@@ -20,22 +20,22 @@ import androidx.annotation.Sampled
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PixelMap
 import androidx.compose.ui.graphics.toPixelMap
 
 /**
  * Sample showing how to obtain a [PixelMap] to query pixel information
- * from an underlying [ImageAsset]
+ * from an underlying [ImageBitmap]
  */
 @Sampled
-fun ImageAssetToPixelMapSample() {
-    val imageAsset = createImageAsset()
+fun ImageBitmapToPixelMapSample() {
+    val imageBitmap = createImageBitmap()
 
-    // Sample a 3 by 2 subsection of the given ImageAsset
+    // Sample a 3 by 2 subsection of the given ImageBitmap
     // starting at the coordinate (48, 49)
-    val pixelmap = imageAsset.toPixelMap(
+    val pixelmap = imageBitmap.toPixelMap(
         startX = 48,
         startY = 49,
         width = 3,
@@ -43,7 +43,7 @@ fun ImageAssetToPixelMapSample() {
     )
 
     // create a histogram to count the number of occurrences of a color within the specified
-    // subsection of the provided ImageAsset
+    // subsection of the provided ImageBitmap
     val histogram = HashMap<Color, Int>()
     for (x in 0 until pixelmap.width) {
         for (y in 0 until pixelmap.height) {
@@ -55,16 +55,16 @@ fun ImageAssetToPixelMapSample() {
 }
 
 /**
- * [ImageAsset.readPixels] sample that shows how to create a consumer defined
+ * [ImageBitmap.readPixels] sample that shows how to create a consumer defined
  * IntArray to store pixel information and create a PixelMap for querying information
  * within the buffer
  */
 @Sampled
-fun ImageAssetReadPixelsSample() {
-    val imageAsset = createImageAsset()
+fun ImageBitmapReadPixelsSample() {
+    val imageBitmap = createImageBitmap()
 
     val buffer = IntArray(20 * 10)
-    imageAsset.readPixels(
+    imageBitmap.readPixels(
         buffer = buffer,
         startX = 8,
         startY = 9,
@@ -81,7 +81,7 @@ fun ImageAssetReadPixelsSample() {
     )
 
     // create a histogram to count the number of occurrences of a color within the specified
-    // subsection of the provided ImageAsset
+    // subsection of the provided ImageBitmap
     val histogram = HashMap<Color, Int>()
     for (x in 0 until pixelmap.width) {
         for (y in 0 until pixelmap.height) {
@@ -92,9 +92,9 @@ fun ImageAssetReadPixelsSample() {
     }
 }
 
-private fun createImageAsset(): ImageAsset {
-    val imageAsset = ImageAsset(100, 100)
-    val canvas = Canvas(imageAsset)
+private fun createImageBitmap(): ImageBitmap {
+    val imageBitmap = ImageBitmap(100, 100)
+    val canvas = Canvas(imageBitmap)
     val paint = Paint()
 
     // Draw 4 colored squares that are red, blue, green and yellow from the top left, top right
@@ -110,5 +110,5 @@ private fun createImageAsset(): ImageAsset {
 
     paint.color = Color.Yellow
     canvas.drawRect(Rect(50.0f, 50.0f, 100.0f, 100.0f), paint)
-    return imageAsset
+    return imageBitmap
 }

@@ -18,7 +18,7 @@ package androidx.compose.ui.res
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.imageFromResource
 
 /**
@@ -30,6 +30,6 @@ import androidx.compose.ui.graphics.imageFromResource
  * @return the decoded image data associated with the resource
  */
 @Composable
-fun imageResource(path: String): ImageAsset {
+fun imageResource(path: String): ImageBitmap {
     return remember(path) { imageFromResource(path) }
 }

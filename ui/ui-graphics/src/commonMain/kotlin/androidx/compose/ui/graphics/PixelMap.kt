@@ -19,21 +19,21 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.util.annotation.IntRange
 
 /**
- * Result of a pixel read operation. This contains the [ImageAsset] pixel information represented
+ * Result of a pixel read operation. This contains the [ImageBitmap] pixel information represented
  * as a 1 dimensional array of values that supports queries of pixel values based on the 2
- * dimensional coordinates of the corresponding [ImageAsset] this was obtained from
+ * dimensional coordinates of the corresponding [ImageBitmap] this was obtained from
  *
- * @sample androidx.compose.ui.graphics.samples.ImageAssetReadPixelsSample
+ * @sample androidx.compose.ui.graphics.samples.ImageBitmapReadPixelsSample
  *
  * @param buffer IntArray where pixel information is stored as an ARGB value packed into an Int
- * @param bufferOffset first index in the buffer where pixel information for the [ImageAsset] is
+ * @param bufferOffset first index in the buffer where pixel information for the [ImageBitmap] is
  * stored
- * @param width Width of the subsection of the [ImageAsset] this buffer represents
- * @param height Height of the subsection of the [ImageAsset] this buffer represents
+ * @param width Width of the subsection of the [ImageBitmap] this buffer represents
+ * @param height Height of the subsection of the [ImageBitmap] this buffer represents
  * @param stride Number of entries to skip between rows
  *
- * @see ImageAsset.readPixels
- * @See ImageAsset.toPixelMap
+ * @see ImageBitmap.readPixels
+ * @See ImageBitmap.toPixelMap
  */
 class PixelMap(
     val buffer: IntArray,

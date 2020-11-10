@@ -89,8 +89,8 @@ class AndroidCanvasTest {
         val fg = androidx.compose.ui.graphics.Color.Blue
         val width = 200
         val height = 200
-        val imageAsset = ImageAsset(width, height)
-        val canvas = Canvas(imageAsset)
+        val imageBitmap = ImageBitmap(width, height)
+        val canvas = Canvas(imageBitmap)
         val paint = Paint().apply { this.color = bg }
         val rect = Rect(Offset.Zero, Size(width.toFloat(), height.toFloat()))
         with(canvas) {
@@ -102,7 +102,7 @@ class AndroidCanvasTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         assertEquals(fg, pixelMap[0, 0])
         assertEquals(fg, pixelMap[99, 0])
         assertEquals(fg, pixelMap[0, 99])
@@ -121,8 +121,8 @@ class AndroidCanvasTest {
         val fg = androidx.compose.ui.graphics.Color.Blue
         val width = 200
         val height = 200
-        val imageAsset = ImageAsset(width, height)
-        val canvas = Canvas(imageAsset)
+        val imageBitmap = ImageBitmap(width, height)
+        val canvas = Canvas(imageBitmap)
         val paint = Paint().apply { this.color = bg }
         val rect = Rect(Offset(0.0f, 0.0f), Size(width.toFloat(), height.toFloat()))
         with(canvas) {
@@ -134,7 +134,7 @@ class AndroidCanvasTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         val left = width / 2 - 50
         val top = height / 2 - 50
         val right = width / 2 + 50 - 1
@@ -167,8 +167,8 @@ class AndroidCanvasTest {
         val fg = androidx.compose.ui.graphics.Color.Blue
         val width = 200
         val height = 200
-        val imageAsset = ImageAsset(width, height)
-        val canvas = Canvas(imageAsset)
+        val imageBitmap = ImageBitmap(width, height)
+        val canvas = Canvas(imageBitmap)
         val paint = Paint().apply { this.color = bg }
         val rect = Rect(Offset(0.0f, 0.0f), Size(width.toFloat(), height.toFloat()))
         with(canvas) {
@@ -180,7 +180,7 @@ class AndroidCanvasTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
 
         val left = width - 100
         val top = height - 100
@@ -205,8 +205,8 @@ class AndroidCanvasTest {
         val fg = androidx.compose.ui.graphics.Color.Blue
         val width = 200
         val height = 200
-        val imageAsset = ImageAsset(width, height)
-        val canvas = Canvas(imageAsset)
+        val imageBitmap = ImageBitmap(width, height)
+        val canvas = Canvas(imageBitmap)
         val paint = Paint().apply { this.color = bg }
         val rect = Rect(Offset(0.0f, 0.0f), Size(width.toFloat(), height.toFloat()))
         with(canvas) {
@@ -221,7 +221,7 @@ class AndroidCanvasTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         assertEquals(fg, pixelMap[0, 0])
         assertEquals(fg, pixelMap[99, 0])
         assertEquals(fg, pixelMap[0, 99])
@@ -240,8 +240,8 @@ class AndroidCanvasTest {
         val fg = androidx.compose.ui.graphics.Color.Blue
         val width = 200
         val height = 200
-        val imageAsset = ImageAsset(width, height)
-        val canvas = Canvas(imageAsset)
+        val imageBitmap = ImageBitmap(width, height)
+        val canvas = Canvas(imageBitmap)
         val paint = Paint().apply { this.color = bg }
         val rect = Rect(Offset(0.0f, 0.0f), Size(width.toFloat(), height.toFloat()))
         with(canvas) {
@@ -256,7 +256,7 @@ class AndroidCanvasTest {
             }
         }
 
-        val pixelMap = imageAsset.toPixelMap()
+        val pixelMap = imageBitmap.toPixelMap()
         assertEquals(fg, pixelMap[2, 0])
         assertEquals(fg, pixelMap[50, 49])
         assertEquals(fg, pixelMap[70, 0])

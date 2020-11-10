@@ -29,16 +29,16 @@ import java.nio.ByteOrder
 import kotlin.math.abs
 
 /**
- * Create an [ImageAsset] from the given [Bitmap]. Note this does
+ * Create an [ImageBitmap] from the given [Bitmap]. Note this does
  * not create a copy of the original [Bitmap] and changes to it
- * will modify the returned [ImageAsset]
+ * will modify the returned [ImageBitmap]
  */
-fun Bitmap.asImageAsset(): ImageAsset = DesktopImageAsset(this)
+fun Bitmap.asImageBitmap(): ImageBitmap = DesktopImageBitmap(this)
 
 /**
- * Create an [ImageAsset] from the given [Image].
+ * Create an [ImageBitmap] from the given [Image].
  */
-fun Image.asImageAsset(): ImageAsset = DesktopImageAsset(toBitmap())
+fun Image.asImageBitmap(): ImageBitmap = DesktopImageBitmap(toBitmap())
 
 private fun Image.toBitmap(): Bitmap {
     val bitmap = Bitmap()
@@ -49,13 +49,13 @@ private fun Image.toBitmap(): Bitmap {
     return bitmap
 }
 
-internal actual fun ActualImageAsset(
+internal actual fun ActualImageBitmap(
     width: Int,
     height: Int,
-    config: ImageAssetConfig,
+    config: ImageBitmapConfig,
     hasAlpha: Boolean,
     colorSpace: ColorSpace
-): ImageAsset {
+): ImageBitmap {
     val colorType = config.toSkijaColorType()
     val alphaType = if (hasAlpha) ColorAlphaType.PREMUL else ColorAlphaType.OPAQUE
     val skijaColorSpace = colorSpace.toSkijaColorSpace()
@@ -63,18 +63,18 @@ internal actual fun ActualImageAsset(
     val imageInfo = ImageInfo(colorInfo, width, height)
     val bitmap = Bitmap()
     bitmap.allocPixels(imageInfo)
-    return DesktopImageAsset(bitmap)
+    return DesktopImageBitmap(bitmap)
 }
 
 /**
- * Create an [ImageAsset] from an image file stored in resources for the application
+ * Create an [ImageBitmap] from an image file stored in resources for the application
  *
  * @param path path to the image file
  *
- * @return Loaded image file represented as an [ImageAsset]
+ * @return Loaded image file represented as an [ImageBitmap]
  */
-fun imageFromResource(path: String): ImageAsset =
-    Image.makeFromEncoded(loadResource(path)).asImageAsset()
+fun imageFromResource(path: String): ImageBitmap =
+    Image.makeFromEncoded(loadResource(path)).asImageBitmap()
 
 private fun loadResource(path: String): ByteArray {
     val resource = Thread.currentThread().contextClassLoader.getResource(path)
@@ -83,16 +83,16 @@ private fun loadResource(path: String): ByteArray {
 }
 
 /**
- * @Throws UnsupportedOperationException if this [ImageAsset] is not backed by an
+ * @Throws UnsupportedOperationException if this [ImageBitmap] is not backed by an
  * org.jetbrains.skija.Image
  */
-fun ImageAsset.asDesktopBitmap(): Bitmap =
+fun ImageBitmap.asDesktopBitmap(): Bitmap =
     when (this) {
-        is DesktopImageAsset -> bitmap
+        is DesktopImageBitmap -> bitmap
         else -> throw UnsupportedOperationException("Unable to obtain org.jetbrains.skija.Image")
     }
 
-private class DesktopImageAsset(val bitmap: Bitmap) : ImageAsset {
+private class DesktopImageBitmap(val bitmap: Bitmap) : ImageBitmap {
     override val colorSpace = bitmap.colorSpace.toComposeColorSpace()
     override val config = bitmap.colorType.toComposeConfig()
     override val hasAlpha = !bitmap.isOpaque
@@ -140,20 +140,20 @@ private class DesktopImageAsset(val bitmap: Bitmap) : ImageAsset {
 //  in toSkijaColorType/toComposeConfig/toComposeColorSpace/toSkijaColorSpace
 //  see [https://android-review.googlesource.com/c/platform/frameworks/support/+/1429835/comment/c219501b_63c3d1fe/]
 
-private fun ImageAssetConfig.toSkijaColorType() = when (this) {
-    ImageAssetConfig.Argb8888 -> ColorType.N32
-    ImageAssetConfig.Alpha8 -> ColorType.ALPHA_8
-    ImageAssetConfig.Rgb565 -> ColorType.RGB_565
-    ImageAssetConfig.F16 -> ColorType.RGBA_F16
+private fun ImageBitmapConfig.toSkijaColorType() = when (this) {
+    ImageBitmapConfig.Argb8888 -> ColorType.N32
+    ImageBitmapConfig.Alpha8 -> ColorType.ALPHA_8
+    ImageBitmapConfig.Rgb565 -> ColorType.RGB_565
+    ImageBitmapConfig.F16 -> ColorType.RGBA_F16
     else -> ColorType.N32
 }
 
 private fun ColorType.toComposeConfig() = when (this) {
-    ColorType.N32 -> ImageAssetConfig.Argb8888
-    ColorType.ALPHA_8 -> ImageAssetConfig.Alpha8
-    ColorType.RGB_565 -> ImageAssetConfig.Rgb565
-    ColorType.RGBA_F16 -> ImageAssetConfig.F16
-    else -> ImageAssetConfig.Argb8888
+    ColorType.N32 -> ImageBitmapConfig.Argb8888
+    ColorType.ALPHA_8 -> ImageBitmapConfig.Alpha8
+    ColorType.RGB_565 -> ImageBitmapConfig.Rgb565
+    ColorType.RGBA_F16 -> ImageBitmapConfig.F16
+    else -> ImageBitmapConfig.Argb8888
 }
 
 private fun org.jetbrains.skija.ColorSpace?.toComposeColorSpace(): ColorSpace {
