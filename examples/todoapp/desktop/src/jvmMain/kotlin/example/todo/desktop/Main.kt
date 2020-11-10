@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
 import com.arkivanov.decompose.lifecycle.LifecycleRegistry
 import com.arkivanov.decompose.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
@@ -23,21 +24,22 @@ fun main() {
     val lifecycle = LifecycleRegistry()
     lifecycle.resume()
 
-    val todoRoot = TodoRoot(
-        componentContext = DefaultComponentContext(lifecycle),
-        dependencies = object : TodoRoot.Dependencies {
-            override val storeFactory = DefaultStoreFactory
-            override val database = TodoDatabase(TodoDatabaseDriver())
-        }
-    )
-
     Window("Todo") {
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme {
                 DesktopTheme {
-                    todoRoot()
+                    rootComponent(factory = ::todoRoot).invoke()
                 }
             }
         }
     }
 }
+
+private fun todoRoot(componentContext: ComponentContext): TodoRoot =
+    TodoRoot(
+        componentContext = componentContext,
+        dependencies = object : TodoRoot.Dependencies {
+            override val storeFactory = DefaultStoreFactory
+            override val database = TodoDatabase(TodoDatabaseDriver())
+        }
+    )

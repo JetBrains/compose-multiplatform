@@ -10,6 +10,7 @@ kotlin {
                 implementation(Deps.ArkIvanov.MVIKotlin.mvikotlin)
                 implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinExtensionsReaktive)
                 implementation(Deps.ArkIvanov.Decompose.decompose)
+                implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
             }
         }
     }

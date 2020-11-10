@@ -17,6 +17,7 @@ kotlin {
                 implementation(project(":common:main"))
                 implementation(project(":common:edit"))
                 implementation(Deps.ArkIvanov.Decompose.decompose)
+                implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
                 implementation(Deps.Badoo.Reaktive.reaktive)
             }
         }
