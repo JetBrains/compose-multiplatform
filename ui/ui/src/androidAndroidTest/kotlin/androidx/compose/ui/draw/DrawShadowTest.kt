@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
+import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
@@ -48,6 +49,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -233,6 +235,77 @@ class DrawShadowTest {
         }
     }
 
+    @Test
+    fun elevationWithinModifier() {
+        val elevation = mutableStateOf(0f)
+        val color = mutableStateOf(Color.Blue)
+        val underColor = mutableStateOf(Color.Transparent)
+        val modifier = Modifier.drawLayer()
+            .background(underColor)
+            .drawLatchModifier()
+            .then(object : DrawLayerModifier {
+                override val shadowElevation: Float
+                    get() {
+                        return elevation.value
+                    }
+            })
+            .background(color)
+
+        rule.runOnUiThread {
+            activity.setContent {
+                androidx.compose.ui.FixedSize(30, modifier)
+            }
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+
+        drawLatch = CountDownLatch(1)
+
+        rule.runOnUiThread {
+            color.value = Color.Red
+        }
+
+        Assert.assertFalse(drawLatch.await(200, TimeUnit.MILLISECONDS))
+
+        drawLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            elevation.value = 1f
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+
+        drawLatch = CountDownLatch(1)
+
+        rule.runOnUiThread {
+            elevation.value = 2f // elevation was already 1, so it doesn't need to enableZ again
+        }
+        Assert.assertFalse(drawLatch.await(200, TimeUnit.MILLISECONDS))
+
+        rule.runOnUiThread {
+            elevation.value = 0f // going to 0 doesn't trigger invalidation
+        }
+        Assert.assertFalse(drawLatch.await(200, TimeUnit.MILLISECONDS))
+
+        rule.runOnUiThread {
+            elevation.value = 1f // going to 1 won't invalidate because it was last drawn with Z
+        }
+        Assert.assertFalse(drawLatch.await(200, TimeUnit.MILLISECONDS))
+
+        rule.runOnUiThread {
+            elevation.value = 0f
+            underColor.value = Color.Black
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+
+        drawLatch = CountDownLatch(1)
+
+        rule.runOnUiThread {
+            elevation.value = 1f
+        }
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+    }
+
     @Composable
     private fun ShadowContainer(
         elevation: State<Dp> = mutableStateOf(8.dp),
@@ -254,6 +327,16 @@ class DrawShadowTest {
     private fun background(color: Color) = Modifier.drawBehind {
         drawRect(color)
         drawLatch.countDown()
+    }
+
+    fun Modifier.drawLatchModifier() = drawBehind { drawLatch.countDown() }
+
+    private fun Modifier.background(
+        color: State<Color>
+    ) = drawBehind {
+        if (color.value != Color.Transparent) {
+            drawRect(color.value)
+        }
     }
 
     private fun takeScreenShot(width: Int, height: Int = width): Bitmap {

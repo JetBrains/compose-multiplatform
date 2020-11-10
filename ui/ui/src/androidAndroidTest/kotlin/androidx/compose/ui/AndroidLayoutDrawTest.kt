@@ -3377,7 +3377,7 @@ fun androidx.test.rule.ActivityTestRule<*>.validateSquareColors(
     offset: Int = 0,
     totalSize: Int = size * 3
 ) {
-    assertTrue("drawLatch timed out", drawLatch.await(10000, TimeUnit.SECONDS))
+    assertTrue("drawLatch timed out", drawLatch.await(1, TimeUnit.SECONDS))
     val bitmap = waitAndScreenShot()
     assertEquals(totalSize, bitmap.width)
     assertEquals(totalSize, bitmap.height)
@@ -3695,6 +3695,8 @@ class DrawCounterListener(private val view: View) :
 }
 
 fun PaddingModifier(padding: Int) = PaddingModifier(padding, padding, padding, padding)
+
+fun Modifier.padding(padding: Int) = this.then(PaddingModifier(padding))
 
 data class PaddingModifier(
     val left: Int = 0,

@@ -46,6 +46,9 @@ internal class OuterMeasurablePlaceable(
     override var parentData: Any? = null
         private set
 
+    var lastZIndex: Float = 0f
+        private set
+
     /**
      * The function to be executed when the parent layout measures its children.
      */
@@ -109,8 +112,9 @@ internal class OuterMeasurablePlaceable(
 
     override fun get(line: AlignmentLine): Int = outerWrapper[line]
 
-    override fun placeAt(position: IntOffset) {
+    override fun placeAt(position: IntOffset, zIndex: Float) {
         lastPosition = position
+        lastZIndex = zIndex
         with(PlacementScope) {
             outerWrapper.place(position)
         }
@@ -120,7 +124,7 @@ internal class OuterMeasurablePlaceable(
      * Calls [placeAt] with the same position used during the last [placeAt] call
      */
     fun replace() {
-        placeAt(checkNotNull(lastPosition))
+        placeAt(checkNotNull(lastPosition), lastZIndex)
     }
 
     override fun minIntrinsicWidth(height: Int): Int = outerWrapper.minIntrinsicWidth(height)

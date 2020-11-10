@@ -17,34 +17,20 @@
 package androidx.compose.ui
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
-
-/**
- * A [Modifier.Element] that controls the drawing order for the children of the same layout
- * parent. A child with larger [zIndex] will be drawn on top of all the children with smaller
- * [zIndex]. When children have the same [zIndex] the original order in which the items were
- * added into the parent layout is applied.
- *
- * Note that if there would be multiple [ZIndexModifier] modifiers applied for the same layout
- * the sum of their values will be used as the final zIndex. If no [ZIndexModifier]s applied for the
- * layout then zIndex for this Layout is 0.
- *
- * @see [Modifier.zIndex]
- */
-// TODO("Made it internal to be able to later migrate Modifier.zIndex() implementation without
-//  the breaking change to work as LayoutModifier where we provide zIndex right as a param for
-//  placeable.place() call. Tracked in b/171493718")
-internal interface ZIndexModifier : Modifier.Element {
-    val zIndex: Float
-}
+import androidx.compose.ui.unit.Constraints
 
 /**
  * Creates a modifier that controls the drawing order for the children of the same layout parent.
  * A child with larger [zIndex] will be drawn on top of all the children with smaller [zIndex].
- * When children have the same [zIndex] the original order in which the items were added into the
- * parent layout is applied.
+ * When children have the same [zIndex] the original order in which the parent placed the
+ * children is used.
  *
  * Note that if there would be multiple [zIndex] modifiers applied for the same layout
  * the sum of their values will be used as the final zIndex. If no [zIndex] were applied for the
@@ -54,7 +40,7 @@ internal interface ZIndexModifier : Modifier.Element {
  */
 @Stable
 fun Modifier.zIndex(zIndex: Float): Modifier = this.then(
-    SimpleZIndexModifier(
+    ZIndexModifier(
         zIndex = zIndex,
         inspectorInfo = debugInspectorInfo {
             name = "zIndex"
@@ -63,19 +49,27 @@ fun Modifier.zIndex(zIndex: Float): Modifier = this.then(
     )
 )
 
-private class SimpleZIndexModifier(
-    override val zIndex: Float,
+private class ZIndexModifier(
+    private val zIndex: Float,
     inspectorInfo: InspectorInfo.() -> Unit
-) : ZIndexModifier, InspectorValueInfo(inspectorInfo) {
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
 
-    override fun hashCode(): Int =
-        zIndex.hashCode()
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.place(0, 0, zIndex = zIndex)
+        }
+    }
+
+    override fun hashCode(): Int = zIndex.hashCode()
 
     override fun equals(other: Any?): Boolean {
-        val otherModifier = other as? SimpleZIndexModifier ?: return false
+        val otherModifier = other as? ZIndexModifier ?: return false
         return zIndex == otherModifier.zIndex
     }
 
-    override fun toString(): String =
-        "SimpleZIndexModifier(zIndex=$zIndex)"
+    override fun toString(): String = "ZIndexModifier(zIndex=$zIndex)"
 }
