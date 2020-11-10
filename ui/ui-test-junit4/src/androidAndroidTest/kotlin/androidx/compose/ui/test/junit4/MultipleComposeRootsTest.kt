@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test.junit4
 
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
@@ -24,10 +23,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.TriStateCheckbox
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.assertIsOff
@@ -38,11 +36,11 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 fun MutableState<ToggleableState>.toggle() {
     value =
@@ -87,16 +85,16 @@ class MultipleComposeRootsTest {
                 .apply { orientation = LinearLayout.VERTICAL }
 
             val textView1 = TextView(activity).apply { text = "Compose 1" }
-            val frameLayout1 = FrameLayout(activity)
+            val composeView1 = ComposeView(activity)
 
             val textView2 = TextView(activity).apply { text = "Compose 2" }
-            val frameLayout2 = FrameLayout(activity)
+            val composeView2 = ComposeView(activity)
 
             activity.setContentView(linearLayout)
             linearLayout.addView(textView1)
-            linearLayout.addView(frameLayout1)
+            linearLayout.addView(composeView1)
             linearLayout.addView(textView2)
-            linearLayout.addView(frameLayout2)
+            linearLayout.addView(composeView2)
 
             fun updateTitle1() {
                 textView1.text = "Compose 1 - ${state1.value}"
@@ -106,7 +104,7 @@ class MultipleComposeRootsTest {
                 textView2.text = "Compose 2 - ${state2.value}"
             }
 
-            frameLayout1.setContent(Recomposer.current()) {
+            composeView1.setContent {
                 MaterialTheme {
                     Surface {
                         TriStateCheckbox(
@@ -123,7 +121,7 @@ class MultipleComposeRootsTest {
                 }
             }
 
-            frameLayout2.setContent(Recomposer.current()) {
+            composeView2.setContent {
                 MaterialTheme {
                     Surface {
                         TriStateCheckbox(

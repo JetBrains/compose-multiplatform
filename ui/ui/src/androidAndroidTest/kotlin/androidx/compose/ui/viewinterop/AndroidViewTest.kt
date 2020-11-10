@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.captureToImage
@@ -162,6 +163,9 @@ class AndroidViewTest {
         rule.activityRule.scenario.onActivity { activity ->
             root = FrameLayout(activity)
             composeView = ComposeView(activity)
+            composeView.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(activity)
+            )
             viewInsideCompose = View(activity)
 
             activity.setContentView(root)

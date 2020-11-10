@@ -48,8 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -578,7 +578,15 @@ class AndroidViewCompatTest {
         rule.setContent {
             if (composeContent) {
                 Box {
-                    AndroidView(::ComposeView) {
+                    AndroidView(
+                        {
+                            ComposeView(it).apply {
+                                setViewCompositionStrategy(
+                                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                                )
+                            }
+                        }
+                    ) {
                         it.setContent {
                             emit<LayoutNode, Applier<Any>>(
                                 ctor = LayoutEmitHelper.constructor,

@@ -277,6 +277,15 @@ package androidx.compose.runtime {
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NoLiveLiterals {
   }
 
+  public final class PausableMonotonicFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
+    ctor public PausableMonotonicFrameClock(androidx.compose.runtime.dispatch.MonotonicFrameClock frameClock);
+    method public boolean isPaused();
+    method public void pause();
+    method public void resume();
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    property public final boolean isPaused;
+  }
+
   public final class ProduceStateKt {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? subject, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);

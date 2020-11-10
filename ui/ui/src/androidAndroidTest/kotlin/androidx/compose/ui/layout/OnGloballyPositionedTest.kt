@@ -18,7 +18,6 @@ package androidx.compose.ui.layout
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.compose.foundation.layout.Box
@@ -26,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
@@ -523,15 +521,15 @@ class OnGloballyPositionedTest {
 
         val positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
-            val frameLayout = FrameLayout(activity)
-            frameLayout.setPadding(padding, padding, padding, padding)
-            activity.setContentView(frameLayout)
+            val composeView = ComposeView(activity)
+            composeView.setPadding(padding, padding, padding, padding)
+            activity.setContentView(composeView)
 
             val position = IntArray(2)
-            frameLayout.getLocationOnScreen(position)
+            composeView.getLocationOnScreen(position)
             frameGlobalPosition = Offset(position[0].toFloat(), position[1].toFloat())
 
-            frameLayout.setContent(Recomposer.current()) {
+            composeView.setContent {
                 Box(
                     Modifier.fillMaxSize().onGloballyPositioned {
                         realGlobalPosition = it.localToGlobal(localPosition)
