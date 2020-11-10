@@ -7,6 +7,7 @@ at https://android.googlesource.com/platform/frameworks/support.
 ## Repository organization ##
 
    * `artwork` - design artifacts
+   * `benchmarks` - collection of benchmarks
    * `ci` - Continuous Integration helpers
    * `cef` - CEF integration in Jetpack Compose
    * `examples` - examples of multiplatform Compose applications for Desktop and Android
