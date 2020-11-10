@@ -326,9 +326,17 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         return keyInputModifier.processKeyInput(keyEvent)
     }
 
-    override fun dispatchKeyEvent(event: AndroidKeyEvent): Boolean {
-        return sendKeyEvent(KeyEventAndroid(event))
-    }
+    override fun dispatchKeyEvent(event: AndroidKeyEvent) =
+        if (isFocused) {
+            // Focus lies within the Compose hierarchy, so we dispatch the key event to the
+            // appropriate place.
+            sendKeyEvent(KeyEventAndroid(event))
+        } else {
+            // This Owner has a focused child view, which is a view interop use case,
+            // so we use the default ViewGroup behavior which will route tke key event to the
+            // focused view.
+            super.dispatchKeyEvent(event)
+        }
 
     override fun pauseModelReadObserveration(block: () -> Unit) =
         snapshotObserver.pauseObservingReads(block)
