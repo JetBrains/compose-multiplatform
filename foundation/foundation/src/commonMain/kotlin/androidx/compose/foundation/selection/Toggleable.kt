@@ -57,6 +57,8 @@ import androidx.compose.ui.state.ToggleableState.On
  * @param indication indication to be shown when modified element is pressed. Be default,
  * indication from [AmbientIndication] will be used. Pass `null` to show no indication
  */
+// TODO: b/172938345
+@Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.toggleable(
     value: Boolean,
@@ -104,6 +106,8 @@ fun Modifier.toggleable(
  * @param indication indication to be shown when modified element is pressed. Be default,
  * indication from [AmbientIndication] will be used. Pass `null` to show no indication
  */
+// TODO: b/172938345
+@Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.triStateToggleable(
     state: ToggleableState,
@@ -124,14 +128,13 @@ fun Modifier.triStateToggleable(
 )
 
 @Suppress("ModifierInspectorInfo")
-@Composable
 private fun Modifier.toggleableImpl(
     state: ToggleableState,
     enabled: Boolean,
     interactionState: InteractionState,
     indication: Indication?,
     onClick: () -> Unit
-): Modifier {
+): Modifier = composed {
     // TODO(pavlis): Handle multiple states for Semantics
     val semantics = Modifier.semantics(mergeDescendants = true) {
         this.accessibilityValue = when (state) {
@@ -165,7 +168,7 @@ private fun Modifier.toggleableImpl(
             interactionState.removeInteraction(Interaction.Pressed)
         }
     }
-    return this
+    this
         .then(semantics)
         .indication(interactionState, indication)
         .then(interactionUpdate)

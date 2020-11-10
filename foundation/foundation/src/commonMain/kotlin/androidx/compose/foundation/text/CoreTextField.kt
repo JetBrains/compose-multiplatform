@@ -502,7 +502,6 @@ fun CoreTextField(
     }
 }
 
-@Composable
 internal expect fun Modifier.textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
 
 @OptIn(InternalTextApi::class)
@@ -617,26 +616,24 @@ internal class DragEventTracker {
 /**
  * Helper composable for tracking drag position.
  */
-@Composable
+@Suppress("ModifierInspectorInfo")
 private fun Modifier.dragPositionGestureFilter(
     onPress: (Offset) -> Unit,
     onRelease: (Offset) -> Unit
-): Modifier {
+): Modifier = composed {
     val tracker = remember { DragEventTracker() }
     // TODO(shepshapard): PressIndicator doesn't seem to be the right thing to use here.  It
     //  actually may be functionally correct, but might mostly suggest that it should not
     //  actually be called PressIndicator, but instead something else.
-
-    return this
-        .pressIndicatorGestureFilter(
-            onStart = {
-                tracker.init(it)
-                onPress(it)
-            },
-            onStop = {
-                onRelease(tracker.getPosition())
-            }
-        )
+    pressIndicatorGestureFilter(
+        onStart = {
+            tracker.init(it)
+            onPress(it)
+        },
+        onStop = {
+            onRelease(tracker.getPosition())
+        }
+    )
         .dragGestureFilter(
             dragObserver = object :
                 DragObserver {

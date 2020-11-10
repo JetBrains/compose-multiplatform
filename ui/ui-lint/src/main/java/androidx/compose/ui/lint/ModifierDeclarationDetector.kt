@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.lint
 
+import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ComposableModifierFactory
 import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ModifierFactoryReturnType
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
@@ -46,6 +47,7 @@ import org.jetbrains.uast.UMethod
  *
  * - Modifier factory functions must return Modifier as their type, and not a subclass of Modifier
  * - Modifier factory functions must be defined as an extension on Modifier to allow fluent chaining
+ * - Modifier factory functions must not be marked as @Composable, and should use `composed` instead
  */
 class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes() = listOf(UMethod::class.java)
@@ -79,12 +81,27 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
                 if (source.property.isVar) return
             }
 
+            node.checkComposability(context)
             node.checkReturnType(context, returnType)
             node.checkReceiver(context)
         }
     }
 
     companion object {
+        val ComposableModifierFactory = Issue.create(
+            "ComposableModifierFactory",
+            "Modifier factory functions should not be @Composable",
+            "Modifier factory functions that need to be aware of the composition should use " +
+                "androidx.compose.ui.composed {} in their implementation instead of being marked " +
+                "as @Composable. This allows Modifiers to be referenced in top level variables " +
+                "and constructed outside of the composition.",
+            Category.CORRECTNESS, 3, Severity.ERROR,
+            Implementation(
+                ModifierDeclarationDetector::class.java,
+                Scope.JAVA_FILE_SCOPE
+            )
+        )
+
         val ModifierFactoryReturnType = Issue.create(
             "ModifierFactoryReturnType",
             "Modifier factory functions must return Modifier",
@@ -107,6 +124,48 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
                 ModifierDeclarationDetector::class.java,
                 Scope.JAVA_FILE_SCOPE
             )
+        )
+    }
+}
+
+/**
+ * @see [ModifierDeclarationDetector.ComposableModifierFactory]
+ */
+private fun UMethod.checkComposability(context: JavaContext) {
+    if (isComposable) {
+        val source = sourcePsi as KtDeclarationWithBody
+
+        val replaceWhitespaceRegex = "[\\s\\t\\n\\r]+"
+
+        val body = source.bodyExpression!!.text
+
+        val newBody = if (source.hasBlockBody()) {
+            "= composed " + body.replace("return$replaceWhitespaceRegex".toRegex(), "")
+        } else {
+            "composed { $body }"
+        }
+
+        val scope = if (source is KtPropertyAccessor) source.property else source
+
+        val functionWithoutComposable = scope.text
+            .replaceFirst("@Composable$replaceWhitespaceRegex".toRegex(), "")
+            .replaceFirst("@get:Composable$replaceWhitespaceRegex".toRegex(), "")
+
+        val newFunction = functionWithoutComposable.replace(body, newBody)
+        context.report(
+            ComposableModifierFactory,
+            this,
+            context.getNameLocation(this),
+            "Modifier factory functions should not be marked as @Composable, and should " +
+                "use composed instead",
+            LintFix.create()
+                .replace()
+                .name("Replace @Composable with composed call")
+                .range(context.getLocation(scope))
+                .all()
+                .with(newFunction)
+                .autoFix()
+                .build()
         )
     }
 }
@@ -252,6 +311,10 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
 
 private const val ModifierFqn = "androidx.compose.ui.Modifier"
 private val ModifierShortName = ModifierFqn.split(".").last()
+
+private const val ComposableAnnotation = "androidx.compose.runtime.Composable"
+
+private val UMethod.isComposable get() = hasAnnotation(ComposableAnnotation)
 
 /**
  * TODO: UMethod.returnTypeReference is not available in LINT_API_MIN, so instead use this with a

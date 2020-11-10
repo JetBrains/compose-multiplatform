@@ -133,7 +133,6 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
  * the current / last input event, [onPositionChange] is called with the new position when the
  * pointer moves, and [onDragStateChange] is called when dragging starts / stops.
  */
-@Composable
 private fun Modifier.simplePointerInput(
     position: Offset,
     onPositionChange: (Offset) -> Unit,

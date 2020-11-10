@@ -52,6 +52,8 @@ import androidx.compose.ui.semantics.semantics
  * @param indication indication to be shown when the modified element is pressed. By default,
  * the indication from [AmbientIndication] will be used. Set to `null` to show no indication
  */
+// TODO: b/172938345
+@Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.selectable(
     selected: Boolean,

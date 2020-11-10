@@ -17,8 +17,8 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
@@ -41,20 +41,21 @@ private val cutToClipboardKeySet by lazy { modifier + Key.X }
 private val selectAllKeySet by lazy { modifier + Key.A }
 
 @OptIn(ExperimentalKeyInput::class)
-@Composable
 internal actual fun Modifier.textFieldKeyboardModifier(
     manager: TextFieldSelectionManager
-): Modifier = shortcuts {
-    on(copyToClipboardKeySet) {
-        manager.copy(false)
-    }
-    on(pasteFromClipboardKeySet) {
-        manager.paste()
-    }
-    on(cutToClipboardKeySet) {
-        manager.cut()
-    }
-    on(selectAllKeySet) {
-        manager.selectAll()
+): Modifier = composed {
+    shortcuts {
+        on(copyToClipboardKeySet) {
+            manager.copy(false)
+        }
+        on(pasteFromClipboardKeySet) {
+            manager.paste()
+        }
+        on(cutToClipboardKeySet) {
+            manager.cut()
+        }
+        on(selectAllKeySet) {
+            manager.selectAll()
+        }
     }
 }

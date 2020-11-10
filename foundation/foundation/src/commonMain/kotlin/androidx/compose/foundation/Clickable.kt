@@ -50,6 +50,8 @@ import androidx.compose.ui.semantics.semantics
  * @param onDoubleClick will be called when user double clicks on the element
  * @param onClick will be called when user clicks on the element
  */
+// TODO: b/172938345
+@Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.clickable(
     enabled: Boolean = true,
