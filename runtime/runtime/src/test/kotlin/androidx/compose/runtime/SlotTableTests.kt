@@ -2834,6 +2834,54 @@ class SlotTableTests {
     }
 
     @Test
+    fun testRemoveDataBoundaryCondition() {
+        // Remove when the slot table contains amount that would make the slotGapSize 0
+        // Test insert exactly 64 data slots.
+        val slots = SlotTable().also {
+            it.write { writer ->
+                writer.insert {
+                    writer.group(treeRoot) {
+                        repeat(4) {
+                            writer.group(it * 10 + 100) {
+                                repeat(8) { value ->
+                                    writer.update(value)
+                                }
+                            }
+                        }
+                        writer.group(1000) {
+                            repeat(16) { value ->
+                                writer.update(value)
+                            }
+                        }
+                        repeat(2) {
+                            writer.group(it * 10 + 200) {
+                                repeat(8) { value ->
+                                    writer.update(value)
+                                }
+                            }
+                        }
+                        repeat(10) {
+                            writer.group(300 + it) { }
+                        }
+                    }
+                }
+            }
+        }
+        slots.verifyWellFormed()
+
+        slots.write { writer ->
+            writer.group(treeRoot) {
+                repeat(4) { writer.skipGroup() }
+                writer.removeGroup()
+                writer.skipGroup()
+                writer.set(4, 100)
+                writer.skipToGroupEnd()
+            }
+        }
+        slots.verifyWellFormed()
+    }
+
+    @Test
     fun testInsertDataBoundaryCondition() {
         // Test insert exactly 64 data slots.
         val slots = SlotTable().also {

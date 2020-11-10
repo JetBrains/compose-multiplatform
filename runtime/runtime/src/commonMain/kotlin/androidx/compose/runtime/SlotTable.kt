@@ -2081,15 +2081,10 @@ class SlotWriter internal constructor(
     private fun removeSlots(start: Int, len: Int, group: Int) {
         if (len > 0) {
             val gapLen = slotsGapLen
-            if (gapLen == 0) {
-                slotsGapStart = start
-                slotsGapLen = len
-            } else {
-                val removeEnd = start + len
-                moveSlotGapTo(removeEnd, group)
-                slotsGapStart = start
-                slotsGapLen = gapLen + len
-            }
+            val removeEnd = start + len
+            moveSlotGapTo(removeEnd, group)
+            slotsGapStart = start
+            slotsGapLen = gapLen + len
             slots.fill(null, start, start + len)
             val currentDataEnd = currentSlotEnd
             if (currentDataEnd >= start) this.currentSlotEnd = currentDataEnd - len
