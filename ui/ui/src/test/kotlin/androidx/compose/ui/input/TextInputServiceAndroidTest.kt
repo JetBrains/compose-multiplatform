@@ -22,17 +22,19 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.ImeOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -636,6 +638,39 @@ class TextInputServiceAndroidTest {
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
             assertTrue((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+        }
+    }
+
+    @Test
+    fun initial_default_selection_info_is_set() {
+        textInputService.startInput(
+            value = TextFieldValue(),
+            imeOptions = ImeOptions.Default,
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertEquals(info.initialSelStart, 0)
+            assertEquals(info.initialSelEnd, 0)
+        }
+    }
+
+    @Test
+    fun initial_selection_info_is_set() {
+        val selection = TextRange(1, 2)
+        textInputService.startInput(
+            value = TextFieldValue("abc", selection),
+            imeOptions = ImeOptions.Default,
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertEquals(info.initialSelStart, selection.start)
+            assertEquals(info.initialSelEnd, selection.end)
         }
     }
 }
