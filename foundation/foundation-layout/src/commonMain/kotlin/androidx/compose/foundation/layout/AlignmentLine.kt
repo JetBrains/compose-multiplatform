@@ -110,8 +110,8 @@ fun Modifier.paddingFrom(
 @Stable
 fun Modifier.paddingFrom(
     alignmentLine: AlignmentLine,
-    before: TextUnit = TextUnit.Inherit,
-    after: TextUnit = TextUnit.Inherit
+    before: TextUnit = TextUnit.Unspecified,
+    after: TextUnit = TextUnit.Unspecified
 ): Modifier = this.then(
     AlignmentLineOffsetTextUnit(
         alignmentLine,
@@ -171,11 +171,11 @@ fun Modifier.paddingFromBaseline(top: Dp = Dp.Unspecified, bottom: Dp = Dp.Unspe
  */
 @Stable
 fun Modifier.paddingFromBaseline(
-    top: TextUnit = TextUnit.Inherit,
-    bottom: TextUnit = TextUnit.Inherit
+    top: TextUnit = TextUnit.Unspecified,
+    bottom: TextUnit = TextUnit.Unspecified
 ) = this
-    .then(if (bottom != TextUnit.Inherit) paddingFrom(LastBaseline, after = bottom) else Modifier)
-    .then(if (top != TextUnit.Inherit) paddingFrom(FirstBaseline, before = top) else Modifier)
+    .then(if (!bottom.isUnspecified) paddingFrom(LastBaseline, after = bottom) else Modifier)
+    .then(if (!top.isUnspecified) paddingFrom(FirstBaseline, before = top) else Modifier)
 
 private class AlignmentLineOffsetDp(
     val alignmentLine: AlignmentLine,
@@ -231,8 +231,8 @@ private class AlignmentLineOffsetTextUnit(
     ): MeasureResult {
         return alignmentLineOffsetMeasure(
             alignmentLine,
-            if (before != TextUnit.Inherit) before.toDp() else Dp.Unspecified,
-            if (after != TextUnit.Inherit) after.toDp() else Dp.Unspecified,
+            if (before.isUnspecified) before.toDp() else Dp.Unspecified,
+            if (after.isUnspecified) after.toDp() else Dp.Unspecified,
             measurable,
             constraints
         )

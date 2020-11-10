@@ -34,14 +34,23 @@ import androidx.compose.ui.util.lerp
  *  XXXXXXXXXXXXXXXXXXXXXXXX                                        : Unused bits
  */
 private const val UNIT_MASK = 0xFFL shl 32 // 0xFF_0000_0000
-private const val UNIT_TYPE_INHERIT = 0x00L shl 32 // 0x00_0000_0000
+private const val UNIT_TYPE_UNSPECIFIED = 0x00L shl 32 // 0x00_0000_0000
 private const val UNIT_TYPE_SP = 0x01L shl 32 // 0x01_0000_0000
 private const val UNIT_TYPE_EM = 0x02L shl 32 // 0x2_0000_0000
 
 /**
  * An enum class defining for type of thextUnit.
  */
-enum class TextUnitType { Inherit, Sp, Em }
+enum class TextUnitType(val value: Int) {
+    @Deprecated(
+        "Renamed to TextUnitType.Unspecified",
+        replaceWith = ReplaceWith("TextUnitType.Unspecified", "androidx.compose.ui.unit")
+    )
+    Inherit(0),
+    Unspecified(0),
+    Sp(1),
+    Em(2)
+}
 
 /**
  * The unit used for text related dimension value.
@@ -59,7 +68,7 @@ inline class TextUnit(val packedValue: Long) {
      * Add two [TextUnit]s together.
      *
      * This operation works only if all the operands are the same unit type and not they are not
-     * equal to [TextUnit.Inherit].
+     * equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun plus(other: TextUnit): TextUnit {
@@ -71,7 +80,7 @@ inline class TextUnit(val packedValue: Long) {
      * Subtract a [TextUnit] from another one.
 
      * This operation works only if all the operands are the same unit type and not they are not
-     * equal to [TextUnit.Inherit].
+     * equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun minus(other: TextUnit): TextUnit {
@@ -82,7 +91,7 @@ inline class TextUnit(val packedValue: Long) {
     /**
      * This is the same as multiplying the [TextUnit] by -1.0.
      *
-     * This operation works only if the operand is not equal to [TextUnit.Inherit].
+     * This operation works only if the operand is not equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun unaryMinus(): TextUnit {
@@ -93,7 +102,7 @@ inline class TextUnit(val packedValue: Long) {
     /**
      * Divide a [TextUnit] by a scalar.
      *
-     * This operation works only if the left operand is not equal to [TextUnit.Inherit].
+     * This operation works only if the left operand is not equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun div(other: Float): TextUnit {
@@ -104,7 +113,7 @@ inline class TextUnit(val packedValue: Long) {
     /**
      * Divide a [TextUnit] by a scalar.
      *
-     * This operation works only if the left operand is not equal to [TextUnit.Inherit].
+     * This operation works only if the left operand is not equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun div(other: Double): TextUnit {
@@ -115,7 +124,7 @@ inline class TextUnit(val packedValue: Long) {
     /**
      * Divide a [TextUnit] by a scalar.
      *
-     * This operation works only if the left operand is not equal to [TextUnit.Inherit].
+     * This operation works only if the left operand is not equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun div(other: Int): TextUnit {
@@ -127,7 +136,7 @@ inline class TextUnit(val packedValue: Long) {
      * Divide by another [TextUnit] to get a scalar.
      *
      * This operation works only if all the operands are the same unit type and they are not
-     * equal to [TextUnit.Inherit].
+     * equal to [TextUnit.Unspecified].
      */
     inline operator fun div(other: TextUnit): Float {
         checkArithmetic(this, other)
@@ -137,7 +146,7 @@ inline class TextUnit(val packedValue: Long) {
     /**
      * Multiply a [TextUnit] by a scalar.
      *
-     * This operation works only if the left operand is not equal to [TextUnit.Inherit].
+     * This operation works only if the left operand is not equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun times(other: Float): TextUnit {
@@ -148,7 +157,7 @@ inline class TextUnit(val packedValue: Long) {
     /**
      * Multiply a [TextUnit] by a scalar.
      *
-     * This operation works only if the left operand is not equal to [TextUnit.Inherit].
+     * This operation works only if the left operand is not equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun times(other: Double): TextUnit {
@@ -159,7 +168,7 @@ inline class TextUnit(val packedValue: Long) {
     /**
      * Multiply a [TextUnit] by a scalar.
      *
-     * This operation works only if the left operand is not equal to [TextUnit.Inherit].
+     * This operation works only if the left operand is not equal to [TextUnit.Unspecified].
      * The result of this operation is the same unit type of the given one.
      */
     inline operator fun times(other: Int): TextUnit {
@@ -175,8 +184,10 @@ inline class TextUnit(val packedValue: Long) {
         return value.compareTo(other.value)
     }
 
+    @Suppress("DEPRECATION")
     override fun toString(): String {
         return when (type) {
+            TextUnitType.Unspecified -> "Unspecified"
             TextUnitType.Inherit -> "Inherit"
             TextUnitType.Sp -> "$value.sp"
             TextUnitType.Em -> "$value.em"
@@ -184,7 +195,8 @@ inline class TextUnit(val packedValue: Long) {
     }
 
     companion object {
-        internal val TextUnitTypes = arrayOf(TextUnitType.Inherit, TextUnitType.Sp, TextUnitType.Em)
+        internal val TextUnitTypes =
+            arrayOf(TextUnitType.Unspecified, TextUnitType.Sp, TextUnitType.Em)
 
         /**
          * Creates a SP unit [TextUnit].
@@ -220,7 +232,17 @@ inline class TextUnit(val packedValue: Long) {
          * A special [TextUnit] instance for representing inheriting from parent value.
          */
         @Stable
-        val Inherit = pack(UNIT_TYPE_INHERIT, 0f)
+        val Unspecified = pack(UNIT_TYPE_UNSPECIFIED, 0f)
+
+        /**
+         * A special [TextUnit] instance for representing inheriting from parent value.
+         */
+        @Stable
+        @Deprecated(
+            "Renamed to TextUnit.Unspecified",
+            replaceWith = ReplaceWith("TextUnit.Unspecified", "androidx.compose.ui.unit")
+        )
+        val Inherit = Unspecified
     }
 
     /**
@@ -239,9 +261,18 @@ inline class TextUnit(val packedValue: Long) {
     val type: TextUnitType get() = TextUnitTypes[(rawType ushr 32).toInt()]
 
     /**
-     * True if this is [TextUnit.Inherit], otherwise false.
+     * True if this is [TextUnit.Unspecified], otherwise false.
      */
-    val isInherit get() = rawType == UNIT_TYPE_INHERIT
+    @Deprecated(
+        "Renamed to TextUnit.isUnspecified",
+        replaceWith = ReplaceWith("isUnspecified", "androidx.compose.ui.unit")
+    )
+    val isInherit get() = isUnspecified
+
+    /**
+     * True if this is [TextUnit.Unspecified], otherwise false.
+     */
+    val isUnspecified get() = rawType == UNIT_TYPE_UNSPECIFIED
 
     /**
      * True if this is a SP unit type.
@@ -298,7 +329,7 @@ val Int.em: TextUnit get() = pack(UNIT_TYPE_EM, this.toFloat())
 /**
  * Multiply a [TextUnit] by a scalar.
  *
- * This operation works only if the right operand is not equal to [TextUnit.Inherit].
+ * This operation works only if the right operand is not equal to [TextUnit.Unspecified].
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
@@ -310,7 +341,7 @@ inline operator fun Float.times(other: TextUnit): TextUnit {
 /**
  * Multiply a [TextUnit] by a scalar.
  *
- * This operation works only if the right operand is not equal to [TextUnit.Inherit].
+ * This operation works only if the right operand is not equal to [TextUnit.Unspecified].
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
@@ -322,7 +353,7 @@ inline operator fun Double.times(other: TextUnit): TextUnit {
 /**
  * Multiply a [TextUnit] by a scalar.
  *
- * This operation works only if the right operand is not equal to [TextUnit.Inherit].
+ * This operation works only if the right operand is not equal to [TextUnit.Unspecified].
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
@@ -335,7 +366,7 @@ inline operator fun Int.times(other: TextUnit): TextUnit {
  * Returns the smaller value from the given values.
  *
  * This operation works only if all the operands are the same unit type and they are not
- * equal to [TextUnit.Inherit].
+ * equal to [TextUnit.Unspecified].
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
@@ -348,7 +379,7 @@ inline fun min(a: TextUnit, b: TextUnit): TextUnit {
  * Returns the smaller value from the given values.
  *
  * This operation works only if all the operands are the same unit type and they are not
- * equal to [TextUnit.Inherit].
+ * equal to [TextUnit.Unspecified].
  * The result of this operation is the same unit type of the given one.
  */
 @Stable
@@ -362,7 +393,7 @@ inline fun max(a: TextUnit, b: TextUnit): TextUnit {
  *
  *
  * This operation works only if all the operands are the same unit type and they are not
- * equal to [TextUnit.Inherit].
+ * equal to [TextUnit.Unspecified].
  * The result of this operation is the same unit type of the given one.
  *
  * @return this value if it's in the range, or [minimumValue] if this value is less than
@@ -404,15 +435,15 @@ internal inline fun pack(unitType: Long, v: Float): TextUnit =
 
 @PublishedApi
 internal fun checkArithmetic(a: TextUnit) {
-    require(a.type != TextUnitType.Inherit) {
-        "Cannot perform operation for Inherit type."
+    require(!a.isUnspecified) {
+        "Cannot perform operation for Unspecified type."
     }
 }
 
 @PublishedApi
 internal fun checkArithmetic(a: TextUnit, b: TextUnit) {
-    require(a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit) {
-        "Cannot perform operation for Inherit type."
+    require(!a.isUnspecified && !b.isUnspecified) {
+        "Cannot perform operation for Unspecified type."
     }
     require(a.type == b.type) {
         "Cannot perform operation for ${a.type} and ${b.type}"
@@ -421,11 +452,8 @@ internal fun checkArithmetic(a: TextUnit, b: TextUnit) {
 
 @PublishedApi
 internal fun checkArithmetic(a: TextUnit, b: TextUnit, c: TextUnit) {
-    require(
-        a.type != TextUnitType.Inherit && b.type != TextUnitType.Inherit &&
-            c.type != TextUnitType.Inherit
-    ) {
-        "Cannot perform operation for Inherit type."
+    require(!a.isUnspecified && !b.isUnspecified && !c.isUnspecified) {
+        "Cannot perform operation for Unspecified type."
     }
     require(a.type == b.type && b.type == c.type) {
         "Cannot perform operation for ${a.type} and ${b.type}"

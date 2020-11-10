@@ -49,11 +49,11 @@ import androidx.compose.ui.unit.TextUnit
 data class ParagraphStyle constructor(
     val textAlign: TextAlign? = null,
     val textDirection: TextDirection? = null,
-    val lineHeight: TextUnit = TextUnit.Inherit,
+    val lineHeight: TextUnit = TextUnit.Unspecified,
     val textIndent: TextIndent? = null
 ) {
     init {
-        if (lineHeight != TextUnit.Inherit) {
+        if (lineHeight != TextUnit.Unspecified) {
             // Since we are checking if it's negative, no need to convert Sp into Px at this point.
             check(lineHeight.value >= 0f) {
                 "lineHeight can't be negative (${lineHeight.value})"
@@ -72,7 +72,7 @@ data class ParagraphStyle constructor(
         if (other == null) return this
 
         return ParagraphStyle(
-            lineHeight = if (other.lineHeight == TextUnit.Inherit) {
+            lineHeight = if (other.lineHeight.isUnspecified) {
                 this.lineHeight
             } else {
                 other.lineHeight

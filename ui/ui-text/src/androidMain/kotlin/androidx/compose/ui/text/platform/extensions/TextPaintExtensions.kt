@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 
+@Suppress("DEPRECATION")
 internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
     typefaceAdapter: TypefaceAdapter,
@@ -46,7 +47,7 @@ internal fun AndroidTextPaint.applySpanStyle(
         TextUnitType.Em -> {
             textSize *= style.fontSize.value
         }
-        TextUnitType.Inherit -> {} // Do nothing
+        TextUnitType.Unspecified, TextUnitType.Inherit -> {} // Do nothing
     }
 
     if (style.hasFontAttributes()) {
@@ -69,7 +70,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     when (style.letterSpacing.type) {
         TextUnitType.Em -> { letterSpacing = style.letterSpacing.value }
         TextUnitType.Sp -> {} // Sp will be handled by applying a span
-        TextUnitType.Inherit -> {} // Do nothing
+        TextUnitType.Unspecified, TextUnitType.Inherit -> {} // Do nothing
     }
 
     if (style.fontFeatureSettings != null && style.fontFeatureSettings != "") {
@@ -105,7 +106,7 @@ internal fun AndroidTextPaint.applySpanStyle(
         ) {
             style.letterSpacing
         } else {
-            TextUnit.Inherit
+            TextUnit.Unspecified
         },
         background = if (style.background == Color.Transparent) {
             Color.Unspecified // No need to add transparent background for default text style.
