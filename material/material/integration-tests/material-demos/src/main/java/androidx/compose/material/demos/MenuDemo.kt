@@ -31,8 +31,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Position
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
@@ -44,8 +47,12 @@ fun MenuDemo() {
             for (j in 0..10) {
                 MenuInstance(
                     Modifier.fillMaxSize().wrapContentSize(
-                        { _, space, _ ->
-                            IntOffset(
+                        object : Alignment {
+                            override fun align(
+                                size: IntSize,
+                                space: IntSize,
+                                layoutDirection: LayoutDirection
+                            ) = IntOffset(
                                 (space.width * i / 10f).roundToInt(),
                                 (space.height * j / 10f).roundToInt()
                             )
