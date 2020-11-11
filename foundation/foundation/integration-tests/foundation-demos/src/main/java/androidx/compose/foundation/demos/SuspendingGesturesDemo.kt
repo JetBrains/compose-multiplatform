@@ -19,15 +19,24 @@ package androidx.compose.foundation.demos
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.tapGestureDetector
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -37,15 +46,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.drawLayer
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
 val CoroutineGestureDemos = listOf(
-    ComposableDemo("Tap/Double-Tap/Long Press") { CoroutineTapDemo() }
+    ComposableDemo("Tap/Double-Tap/Long Press") { CoroutineTapDemo() },
+    ComposableDemo("Drag Horizontal and Vertical") { TouchSlopDragGestures() },
+    ComposableDemo("Drag with orientation locking") { OrientationLockDragGestures() },
+    ComposableDemo("Drag 2D") { Drag2DGestures() },
 )
 
 fun hueToColor(hue: Float): Color {
@@ -95,7 +114,7 @@ fun CoroutineTapDemo() {
                 .fillMaxWidth()
                 .preferredHeight(50.dp)
                 .pointerInput {
-                    tapGestureDetector(
+                    detectTapGestures(
                         onTap = { tapHue = anotherRandomHue(tapHue) },
                         onDoubleTap = { doubleTapHue = anotherRandomHue(doubleTapHue) },
                         onLongPress = { longPressHue = anotherRandomHue(longPressHue) },
@@ -179,5 +198,158 @@ fun CoroutineTapDemo() {
             )
             Text("Changes color on cancel", Modifier.align(Alignment.CenterVertically))
         }
+    }
+}
+
+@OptIn(ExperimentalPointerInput::class)
+@Composable
+fun TouchSlopDragGestures() {
+    Column {
+        var width by remember { mutableStateOf(0f) }
+        Box(
+            Modifier.fillMaxWidth()
+                .background(Color.Cyan)
+                .onSizeChanged { width = it.width.toFloat() }
+        ) {
+            var offset by remember { mutableStateOf(0.dp) }
+            Box(
+                Modifier.offset(offset, 0.dp)
+                    .size(50.dp)
+                    .background(Color.Blue)
+                    .pointerInput {
+                        detectHorizontalDragGestures { change, dragDistance ->
+                            val offsetPx = offset.toPx()
+                            val newOffset =
+                                (offsetPx + dragDistance).coerceIn(0f, width - 50.dp.toPx())
+                            val consumed = newOffset - offsetPx
+                            if (consumed != 0f) {
+                                change.consumePositionChange(change.positionChange().x, 0f)
+                                offset = newOffset.toDp()
+                            }
+                        }
+                    }
+            )
+            Text("Drag blue box within here", Modifier.align(Alignment.Center))
+        }
+
+        Box(Modifier.weight(1f)) {
+            var height by remember { mutableStateOf(0f) }
+            Box(
+                Modifier.fillMaxHeight()
+                    .background(Color.Yellow)
+                    .onSizeChanged { height = it.height.toFloat() }
+            ) {
+                var offset by remember { mutableStateOf(0.dp) }
+                Box(
+                    Modifier.offset(0.dp, offset)
+                        .size(50.dp)
+                        .background(Color.Red)
+                        .pointerInput {
+                            detectVerticalDragGestures { change, dragDistance ->
+                                val offsetPx = offset.toPx()
+                                val newOffset = (offsetPx + dragDistance)
+                                    .coerceIn(0f, height - 50.dp.toPx())
+                                val consumed = newOffset - offsetPx
+                                if (consumed != 0f) {
+                                    change.consumePositionChange(
+                                        0f,
+                                        change.positionChange().y
+                                    )
+                                    offset = newOffset.toDp()
+                                }
+                            }
+                        }
+                )
+            }
+            Box(
+                Modifier.height(50.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.TopStart)
+                    .drawLayer(
+                        rotationZ = 90f,
+                        transformOrigin = TransformOrigin(0f, 1f)
+                    )
+            ) {
+                Text(
+                    "Drag red box within here",
+                    Modifier.align(Alignment.Center)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalPointerInput::class)
+@Composable
+fun OrientationLockDragGestures() {
+    var size by remember { mutableStateOf(IntSize.Zero) }
+    var offsetX by remember { mutableStateOf(0.dp) }
+    var offsetY by remember { mutableStateOf(0.dp) }
+    Box(
+        Modifier.onSizeChanged {
+            size = it
+        }.pointerInput {
+            detectVerticalDragGestures(orientationLock = true) { change, dragAmount ->
+                change.consumePositionChange(0f, change.positionChange().y)
+                offsetY = (offsetY.toPx() + dragAmount)
+                    .coerceIn(0f, size.height.toFloat() - 50.dp.toPx()).toDp()
+            }
+        }
+
+    ) {
+        Box(
+            Modifier.offset(offsetX, 0.dp)
+                .background(Color.Blue.copy(alpha = 0.5f))
+                .width(50.dp)
+                .fillMaxHeight()
+                .pointerInput {
+                    detectHorizontalDragGestures(orientationLock = true) { change, dragAmount ->
+                        change.consumePositionChange(change.positionChange().x, 0f)
+                        offsetX = (offsetX.toPx() + dragAmount)
+                            .coerceIn(0f, size.width.toFloat() - 50.dp.toPx()).toDp()
+                    }
+                }
+        )
+        Box(
+            Modifier.offset(0.dp, offsetY)
+                .background(Color.Red.copy(alpha = 0.5f))
+                .height(50.dp)
+                .fillMaxWidth()
+        )
+
+        Text(
+            "Drag the columns around. They should lock to vertical or horizontal.",
+            Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+@OptIn(ExperimentalPointerInput::class)
+@Composable
+fun Drag2DGestures() {
+    var size by remember { mutableStateOf(IntSize.Zero) }
+    val offsetX = remember { mutableStateOf(0f) }
+    val offsetY = remember { mutableStateOf(0f) }
+    Box(
+        Modifier.onSizeChanged {
+            size = it
+        }.fillMaxSize()
+    ) {
+        Box(
+            Modifier.offsetPx(offsetX, offsetY)
+                .background(Color.Blue)
+                .size(50.dp)
+                .pointerInput {
+                    detectDragGestures { change, dragAmount ->
+                        change.consumeAllChanges()
+                        offsetX.value = (offsetX.value + dragAmount.x)
+                            .coerceIn(0f, size.width.toFloat() - 50.dp.toPx())
+
+                        offsetY.value = (offsetY.value + dragAmount.y)
+                            .coerceIn(0f, size.height.toFloat() - 50.dp.toPx())
+                    }
+                }
+        )
+        Text("Drag the box around", Modifier.align(Alignment.Center))
     }
 }

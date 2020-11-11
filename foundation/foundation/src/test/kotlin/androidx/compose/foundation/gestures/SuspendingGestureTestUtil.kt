@@ -146,14 +146,16 @@ internal class SuspendingGestureTestUtil(
     /**
      * Creates a new pointer being down at [timeDiff] from the previous event. The position
      * [x], [y] is used for the touch point. The [PointerInputChange] may be mutated
-     * prior to invoking the change on all passes in [also], if provided. All other "down"
+     * prior to invoking the change on all passes in [initial], if provided. All other "down"
      * pointers will also be included in the change event.
      */
     suspend fun down(
         x: Float,
         y: Float,
         timeDiff: Duration = 10.milliseconds,
-        also: PointerInputChange.() -> Unit = {}
+        main: PointerInputChange.() -> Unit = {},
+        final: PointerInputChange.() -> Unit = {},
+        initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
         lastTime += timeDiff
         val change = PointerInputChange(
@@ -166,21 +168,38 @@ internal class SuspendingGestureTestUtil(
             PointerInputData(null, null, false),
             ConsumedData(Offset.Zero, false)
         )
-        also(change)
         activePointers[change.id] = change
-        invokeOverAllPasses()
+        invokeOverAllPasses(change, initial, main, final)
         return change
     }
 
     /**
-     * Raises the pointer. [also] will be called on the [PointerInputChange] prior to the
+     * Creates a new pointer being down at [timeDiff] from the previous event. The position
+     * [offset] is used for the touch point. The [PointerInputChange] may be mutated
+     * prior to invoking the change on all passes in [initial], if provided. All other "down"
+     * pointers will also be included in the change event.
+     */
+    suspend fun down(
+        offset: Offset = Offset.Zero,
+        timeDiff: Duration = 10.milliseconds,
+        main: PointerInputChange.() -> Unit = {},
+        final: PointerInputChange.() -> Unit = {},
+        initial: PointerInputChange.() -> Unit = {}
+    ): PointerInputChange {
+        return down(offset.x, offset.y, timeDiff, main, final, initial)
+    }
+
+    /**
+     * Raises the pointer. [initial] will be called on the [PointerInputChange] prior to the
      * event being invoked on all passes. After [up], the event will no longer participate
      * in other events. [timeDiff] indicates the [Duration] from the previous event that
      * the [up] takes place.
      */
     suspend fun PointerInputChange.up(
         timeDiff: Duration = 10.milliseconds,
-        also: PointerInputChange.() -> Unit = {}
+        main: PointerInputChange.() -> Unit = {},
+        final: PointerInputChange.() -> Unit = {},
+        initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
         lastTime += timeDiff
         val change = copy(
@@ -192,23 +211,24 @@ internal class SuspendingGestureTestUtil(
             ),
             consumed = ConsumedData()
         )
-        also(change)
         activePointers[change.id] = change
-        invokeOverAllPasses()
+        invokeOverAllPasses(change, initial, main, final)
         activePointers.remove(change.id)
         return change
     }
 
     /**
      * Moves an existing [down] pointer to a new position at [timeDiff] from the most recent
-     * event. [also] will be called on the [PointerInputChange] prior to invoking the event
+     * event. [initial] will be called on the [PointerInputChange] prior to invoking the event
      * on all passes.
      */
     suspend fun PointerInputChange.moveTo(
         x: Float,
         y: Float,
         timeDiff: Duration = 10.milliseconds,
-        also: PointerInputChange.() -> Unit = {}
+        main: PointerInputChange.() -> Unit = {},
+        final: PointerInputChange.() -> Unit = {},
+        initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
         lastTime += timeDiff
         val change = copy(
@@ -220,11 +240,44 @@ internal class SuspendingGestureTestUtil(
             ),
             consumed = ConsumedData()
         )
-        also(change)
+        initial(change)
         activePointers[change.id] = change
-        invokeOverAllPasses()
+        invokeOverAllPasses(change, initial, main, final)
         return change
     }
+
+    /**
+     * Moves an existing [down] pointer to a new position at [timeDiff] from the most recent
+     * event. [initial] will be called on the [PointerInputChange] prior to invoking the event
+     * on all passes.
+     */
+    suspend fun PointerInputChange.moveTo(
+        offset: Offset,
+        timeDiff: Duration = 10.milliseconds,
+        main: PointerInputChange.() -> Unit = {},
+        final: PointerInputChange.() -> Unit = {},
+        initial: PointerInputChange.() -> Unit = {}
+    ): PointerInputChange = moveTo(offset.x, offset.y, timeDiff, main, final, initial)
+
+    /**
+     * Moves an existing [down] pointer to a new position at [timeDiff] from the most recent
+     * event. [initial] will be called on the [PointerInputChange] prior to invoking the event
+     * on all passes.
+     */
+    suspend fun PointerInputChange.moveBy(
+        offset: Offset,
+        timeDiff: Duration = 10.milliseconds,
+        main: PointerInputChange.() -> Unit = {},
+        final: PointerInputChange.() -> Unit = {},
+        initial: PointerInputChange.() -> Unit = {}
+    ): PointerInputChange = moveTo(
+        current.position!!.x + offset.x,
+        current.position!!.y + offset.y,
+        timeDiff,
+        main,
+        final,
+        initial
+    )
 
     /**
      * Updates all changes so that all events are at the current time.
@@ -248,14 +301,23 @@ internal class SuspendingGestureTestUtil(
     /**
      * Invokes events for all passes.
      */
-    private suspend fun invokeOverAllPasses() {
+    private suspend fun invokeOverAllPasses(
+        change: PointerInputChange,
+        initial: PointerInputChange.() -> Unit,
+        main: PointerInputChange.() -> Unit,
+        final: PointerInputChange.() -> Unit
+    ) {
         updateCurrentTime()
         val event = PointerEvent(activePointers.values.toList())
         val size = IntSize(width, height)
+
+        change.initial()
         pointerInputFilter?.onPointerEvent(event, PointerEventPass.Initial, size)
         yield()
+        change.main()
         pointerInputFilter?.onPointerEvent(event, PointerEventPass.Main, size)
         yield()
+        change.final()
         pointerInputFilter?.onPointerEvent(event, PointerEventPass.Final, size)
         yield()
     }

@@ -44,7 +44,7 @@ class TapGestureDetectorTest {
     private var longPressed = false
 
     private val util = SuspendingGestureTestUtil {
-        tapGestureDetector(
+        detectTapGestures(
             onPress = {
                 pressed = true
                 if (tryAwaitRelease()) {
@@ -60,7 +60,7 @@ class TapGestureDetectorTest {
     }
 
     private val allGestures = SuspendingGestureTestUtil {
-        tapGestureDetector(
+        detectTapGestures(
             onPress = {
                 pressed = true
                 try {

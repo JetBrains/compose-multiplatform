@@ -48,7 +48,7 @@ import kotlin.coroutines.resume
  */
 @ExperimentalPointerInput
 @RestrictsSuspension
-interface HandlePointerInputScope {
+interface HandlePointerInputScope : Density {
     /**
      * The measured size of the pointer input region. Input events will be reported with
      * a coordinate space of (0, 0) to (size.width, size,height) as the input region, with
@@ -60,6 +60,11 @@ interface HandlePointerInputScope {
      * The state of the pointers as of the most recent event
      */
     val currentPointers: List<PointerInputData>
+
+    /**
+     * The [ViewConfiguration] used to tune gesture detectors.
+     */
+    val viewConfiguration: ViewConfiguration
 
     /**
      * Suspend until a [PointerEvent] is reported to the specified input [pass].
@@ -323,7 +328,13 @@ internal class SuspendingPointerInputFilter(
     override suspend fun <R> handlePointerInput(
         handler: suspend HandlePointerInputScope.() -> R
     ): R = suspendCancellableCoroutine { continuation ->
-        val handlerCoroutine = PointerEventHandlerCoroutine(continuation, currentPointers, size)
+        val handlerCoroutine = PointerEventHandlerCoroutine(
+            continuation,
+            currentPointers,
+            size,
+            viewConfiguration,
+            this
+        )
         synchronized(pointerHandlers) {
             pointerHandlers += handlerCoroutine
 
@@ -355,8 +366,10 @@ internal class SuspendingPointerInputFilter(
     private inner class PointerEventHandlerCoroutine<R>(
         private val completion: Continuation<R>,
         override val currentPointers: List<PointerInputData>,
-        override val size: IntSize
-    ) : HandlePointerInputScope, Continuation<R> {
+        override val size: IntSize,
+        override val viewConfiguration: ViewConfiguration,
+        density: Density
+    ) : HandlePointerInputScope, Density by density, Continuation<R> {
         private var pointerAwaiter: Continuation<PointerEvent>? = null
         private var customAwaiter: Continuation<CustomEvent>? = null
         private var awaitPass: PointerEventPass = PointerEventPass.Main
