@@ -28,7 +28,7 @@ import com.squareup.kotlinpoet.buildCodeBlock
 import java.util.Locale
 
 /**
- * Generator for creating a Kotlin source file with a VectorAsset property for the given [vector],
+ * Generator for creating a Kotlin source file with a ImageVectror property for the given [vector],
  * with name [iconName] and theme [iconTheme].
  *
  * @param iconName the name for the generated property, which is also used for the generated file.
@@ -36,9 +36,9 @@ import java.util.Locale
  * the file will be `Menu.kt` (under the theme package name).
  * @param iconTheme the theme that this vector belongs to. Used to scope the property to the
  * correct receiver object, and also for the package name of the generated file.
- * @param vector the parsed vector to generate VectorAssetBuilder commands for
+ * @param vector the parsed vector to generate ImageVector.Builder commands for
  */
-class VectorAssetGenerator(
+class ImageVectorGenerator(
     private val iconName: String,
     private val iconTheme: IconTheme,
     private val vector: Vector
@@ -65,7 +65,7 @@ class VectorAssetGenerator(
             packageName = combinedPackageName,
             fileName = iconName
         ).addProperty(
-            PropertySpec.builder(name = iconName, type = ClassNames.VectorAsset)
+            PropertySpec.builder(name = iconName, type = ClassNames.ImageVector)
                 .receiver(iconTheme.className)
                 .getter(iconGetter(backingProperty, iconName, iconTheme))
                 .build()
@@ -110,14 +110,14 @@ class VectorAssetGenerator(
     }
 
     /**
-     * @return The private backing property that is used to cache the VectorAsset for a given
+     * @return The private backing property that is used to cache the ImageVector for a given
      * icon once created.
      *
      * @param name the name of this property
      */
     private fun backingProperty(name: String): PropertySpec {
-        val nullableVectorAsset = ClassNames.VectorAsset.copy(nullable = true)
-        return PropertySpec.builder(name = name, type = nullableVectorAsset)
+        val nullableImageVector = ClassNames.ImageVector.copy(nullable = true)
+        return PropertySpec.builder(name = name, type = nullableImageVector)
             .mutable()
             .addModifiers(KModifier.PRIVATE)
             .initializer("null")

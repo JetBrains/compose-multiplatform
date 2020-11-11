@@ -33,8 +33,8 @@ import androidx.compose.ui.graphics.vector.DefaultScaleY
 import androidx.compose.ui.graphics.vector.DefaultTranslationX
 import androidx.compose.ui.graphics.vector.DefaultTranslationY
 import androidx.compose.ui.graphics.vector.EmptyPath
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathNode
-import androidx.compose.ui.graphics.vector.VectorAssetBuilder
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ComplexColorCompat
@@ -85,7 +85,7 @@ internal fun XmlPullParser.parseCurrentVectorNode(
     res: Resources,
     attrs: AttributeSet,
     theme: Resources.Theme? = null,
-    builder: VectorAssetBuilder,
+    builder: ImageVector.Builder,
     nestedGroups: Int
 ): Int {
     when (eventType) {
@@ -106,7 +106,7 @@ internal fun XmlPullParser.parseCurrentVectorNode(
         XmlPullParser.END_TAG -> {
             if (SHAPE_GROUP == name) {
                 repeat(nestedGroups + 1) {
-                    builder.popGroup()
+                    builder.clearGroup()
                 }
                 return 0
             }
@@ -136,7 +136,7 @@ internal fun XmlPullParser.createVectorImageBuilder(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet
-): VectorAssetBuilder {
+): ImageVector.Builder {
     val vectorAttrs = TypedArrayUtils.obtainAttributes(
         res,
         theme,
@@ -186,7 +186,7 @@ internal fun XmlPullParser.createVectorImageBuilder(
 
     vectorAttrs.recycle()
 
-    return VectorAssetBuilder(
+    return ImageVector.Builder(
         defaultWidth = defaultWidthDp,
         defaultHeight = defaultHeightDp,
         viewportWidth = viewportWidth,
@@ -200,7 +200,7 @@ internal fun XmlPullParser.parsePath(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet,
-    builder: VectorAssetBuilder
+    builder: ImageVector.Builder
 ) {
     val a = TypedArrayUtils.obtainAttributes(
         res,
@@ -339,7 +339,7 @@ internal fun XmlPullParser.parseClipPath(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet,
-    builder: VectorAssetBuilder
+    builder: ImageVector.Builder
 ) {
     val a = theme?.obtainStyledAttributes(
         attrs,
@@ -361,7 +361,7 @@ internal fun XmlPullParser.parseClipPath(
     // <clip-path> is parsed out as an additional VectorGroup.
     // This allows us to replicate the behavior of VectorDrawable where <clip-path> only affects
     // <path> that comes after it in <group>.
-    builder.pushGroup(
+    builder.addGroup(
         name = name,
         clipPathData = pathData
     )
@@ -372,7 +372,7 @@ internal fun XmlPullParser.parseGroup(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet,
-    builder: VectorAssetBuilder
+    builder: ImageVector.Builder
 ) {
     val a = TypedArrayUtils.obtainAttributes(
         res,
@@ -443,7 +443,7 @@ internal fun XmlPullParser.parseGroup(
 
     a.recycle()
 
-    builder.pushGroup(
+    builder.addGroup(
         name,
         rotate,
         pivotX,

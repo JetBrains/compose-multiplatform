@@ -60,9 +60,9 @@ class IconTestingManifestGenerator(private val icons: List<Icon>) {
 
                 fileSpec.writeToWithCopyright(outputSrcDirectory) { fileContent ->
                     fileContent.replace(
-                        "import androidx.compose.ui.graphics.vector.VectorAsset",
+                        "import androidx.compose.ui.graphics.vector.ImageVector",
                         "$wildcardImport\n" +
-                            "import androidx.compose.ui.graphics.vector.VectorAsset"
+                            "import androidx.compose.ui.graphics.vector.ImageVector"
                     )
                 }
             }
@@ -127,7 +127,7 @@ private fun List<Icon>.toStatements(): List<CodeBlock> {
 }
 
 private val kPropertyType =
-    (KProperty0::class).asClassName().parameterizedBy(ClassNames.VectorAsset)
+    (KProperty0::class).asClassName().parameterizedBy(ClassNames.ImageVector)
 private val pairType = (Pair::class).asClassName().parameterizedBy(
     kPropertyType,
     (String::class).asTypeName()

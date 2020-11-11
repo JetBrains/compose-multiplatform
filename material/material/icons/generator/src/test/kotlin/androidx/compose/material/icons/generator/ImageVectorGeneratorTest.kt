@@ -28,17 +28,17 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 /**
- * Test for [VectorAssetGenerator].
+ * Test for [ImageVectorGenerator].
  */
 @RunWith(JUnit4::class)
-class VectorAssetGeneratorTest {
+class ImageVectorGeneratorTest {
 
     @Test
     fun generateFileSpec() {
         val iconName = "TestVector"
         val theme = IconTheme.Filled
 
-        val generator = VectorAssetGenerator(
+        val generator = ImageVectorGenerator(
             iconName = iconName,
             iconTheme = theme,
             vector = TestVector
@@ -69,10 +69,10 @@ private val ExpectedFile = """
     import androidx.compose.material.icons.materialIcon
     import androidx.compose.material.icons.materialPath
     import androidx.compose.ui.graphics.PathFillType.EvenOdd
-    import androidx.compose.ui.graphics.vector.VectorAsset
+    import androidx.compose.ui.graphics.vector.ImageVector
     import androidx.compose.ui.graphics.vector.group
 
-    val Icons.Filled.TestVector: VectorAsset
+    val Icons.Filled.TestVector: ImageVector
         get() {
             if (_testVector != null) {
                 return _testVector!!
@@ -95,7 +95,7 @@ private val ExpectedFile = """
             return _testVector!!
         }
 
-    private var _testVector: VectorAsset? = null
+    private var _testVector: ImageVector? = null
 
 """.trimIndent()
 

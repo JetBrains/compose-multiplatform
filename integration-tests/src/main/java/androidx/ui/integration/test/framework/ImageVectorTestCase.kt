@@ -26,8 +26,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.graphics.vector.VectorAssetBuilder
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -35,12 +34,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 
 /**
- * Generic test case for drawing a [VectorAsset].
+ * Generic test case for drawing a [ImageVector].
  *
  * Subclasses are responsible for providing the vector asset, so we can test and benchmark different
  * methods of loading / creating this asset.
  */
-sealed class VectorAssetTestCase : ComposeTestCase {
+sealed class ImageVectorTestCase : ComposeTestCase {
 
     @Composable
     override fun Content() {
@@ -48,13 +47,13 @@ sealed class VectorAssetTestCase : ComposeTestCase {
             Box(
                 Modifier.testTag(testTag)
                     .preferredSize(24.dp)
-                    .paint(rememberVectorPainter(getVectorAsset()))
+                    .paint(rememberVectorPainter(getImageVector()))
             )
         }
     }
 
     @Composable
-    abstract fun getVectorAsset(): VectorAsset
+    abstract fun getImageVector(): ImageVector
 
     abstract val testTag: String
 }
@@ -62,10 +61,10 @@ sealed class VectorAssetTestCase : ComposeTestCase {
 /**
  * Test case that loads and parses a vector asset from an XML file.
  */
-class XmlVectorTestCase : VectorAssetTestCase() {
+class XmlVectorTestCase : ImageVectorTestCase() {
     // TODO: should switch to async loading here, and force that to be run synchronously
     @Composable
-    override fun getVectorAsset() = vectorResource(
+    override fun getImageVector() = vectorResource(
         androidx.ui.integration.test.R.drawable.ic_baseline_menu_24
     )
 
@@ -75,13 +74,13 @@ class XmlVectorTestCase : VectorAssetTestCase() {
 /**
  * Test case that creates a vector asset purely from code.
  */
-class ProgrammaticVectorTestCase : VectorAssetTestCase() {
+class ProgrammaticVectorTestCase : ImageVectorTestCase() {
 
     /**
      * Returns a clone of ic_baseline_menu_24 built purely in code
      */
     @Composable
-    override fun getVectorAsset() = VectorAssetBuilder(
+    override fun getImageVector() = ImageVector.Builder(
         defaultWidth = 24.dp,
         defaultHeight = 24.dp,
         viewportWidth = 24f,

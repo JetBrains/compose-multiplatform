@@ -23,7 +23,7 @@ import android.util.Xml
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.compat.createVectorImageBuilder
 import androidx.compose.ui.graphics.vector.compat.isAtEnd
 import androidx.compose.ui.graphics.vector.compat.parseCurrentVectorNode
@@ -33,15 +33,15 @@ import androidx.compose.ui.util.trace
 import org.xmlpull.v1.XmlPullParserException
 
 /**
- * Effect used to load a [VectorAsset] from an Android resource id
- * This is useful for querying top level properties of the [VectorAsset]
+ * Load a [ImageVector] from an Android resource id
+ * This is useful for querying top level properties of the [ImageVector]
  * such as it's intrinsic width and height to be able to size components
  * based off of it's dimensions appropriately
  *
  * Note: This API is transient and will be likely removed for encouraging async resource loading.
  */
 @Composable
-fun vectorResource(@DrawableRes id: Int): VectorAsset {
+fun vectorResource(@DrawableRes id: Int): ImageVector {
     val context = ContextAmbient.current
     val res = context.resources
     val theme = context.theme
@@ -65,9 +65,9 @@ fun vectorResource(@DrawableRes id: Int): VectorAsset {
 @Composable
 fun loadVectorResource(
     id: Int,
-    pendingResource: VectorAsset? = null,
-    failedResource: VectorAsset? = null
-): DeferredResource<VectorAsset> {
+    pendingResource: ImageVector? = null,
+    failedResource: ImageVector? = null
+): DeferredResource<ImageVector> {
     val context = ContextAmbient.current
     val res = context.resources
     val theme = context.theme
@@ -91,7 +91,7 @@ internal fun loadVectorResource(
     theme: Resources.Theme? = null,
     res: Resources,
     resId: Int
-): VectorAsset {
+): ImageVector {
     @SuppressLint("ResourceType") val parser = res.getXml(resId)
     val attrs = Xml.asAttributeSet(parser)
     val builder = parser.seekToStartTag().createVectorImageBuilder(res, theme, attrs)
