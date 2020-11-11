@@ -29,15 +29,17 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.Window
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.O)
-internal fun captureRegionToBitmap(
+internal fun captureRegionToImage(
     captureRectInWindow: Rect,
     view: View,
     window: Window? = null
-): Bitmap {
+): ImageBitmap {
     fun Context.getActivity(): Activity? {
         return when (this) {
             is Activity -> this
@@ -98,5 +100,5 @@ internal fun captureRegionToBitmap(
     if (copyResult != PixelCopy.SUCCESS) {
         throw AssertionError("PixelCopy failed!")
     }
-    return destBitmap
+    return destBitmap.asImageBitmap()
 }

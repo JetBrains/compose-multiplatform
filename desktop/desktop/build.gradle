@@ -59,7 +59,7 @@ kotlin {
             dependencies {
                 implementation(KOTLIN_COROUTINES_TEST)
                 implementation(SKIKO_CURRENT_OS)
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation(JUNIT)
                 implementation(TRUTH)
             }
