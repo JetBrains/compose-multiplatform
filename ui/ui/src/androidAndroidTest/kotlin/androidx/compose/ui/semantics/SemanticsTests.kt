@@ -22,6 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -37,7 +40,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,6 +56,16 @@ class SemanticsTests {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     private fun executeUpdateBlocking(updateFunction: () -> Unit) {
         val latch = CountDownLatch(1)
@@ -366,6 +381,21 @@ class SemanticsTests {
         // This is the important part: make sure we didn't replace the identity due to unwanted
         // pivotal properties
         assertThat(nodeCount).isEqualTo(1)
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val properties: SemanticsPropertyReceiver.() -> Unit = {}
+        rule.setContent {
+            val modifier = Modifier.semantics(true, properties) as InspectableValue
+
+            assertThat(modifier.nameFallback).isEqualTo("semantics")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                ValueElement("mergeAllDescendants", true),
+                ValueElement("properties", properties)
+            )
+        }
     }
 }
 

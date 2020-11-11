@@ -35,6 +35,7 @@ import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
@@ -65,7 +66,12 @@ import androidx.compose.ui.util.fastForEach
 
 fun Modifier.tapGestureFilter(
     onTap: (Offset) -> Unit
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "tapGestureFilter"
+        this.properties["onTap"] = onTap
+    }
+) {
     val filter = remember { TapGestureFilter() }
     filter.onTap = onTap
     PointerInputModifierImpl(filter)
@@ -78,7 +84,12 @@ fun Modifier.tapGestureFilter(
  */
 internal fun Modifier.noConsumptionTapGestureFilter(
     onTap: (Offset) -> Unit
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "noConsumptionTapGestureFilter"
+        this.properties["onTap"] = onTap
+    }
+) {
     val filter = remember { TapGestureFilter() }
     filter.onTap = onTap
     filter.consumeChanges = false

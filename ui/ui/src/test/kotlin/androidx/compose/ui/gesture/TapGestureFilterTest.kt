@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.gesture
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.DelayUpEvent
 import androidx.compose.ui.gesture.customevents.DelayUpMessage
@@ -31,15 +32,21 @@ import androidx.compose.ui.input.pointer.invokeOverPass
 import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -55,6 +62,12 @@ class TapGestureFilterTest {
     fun setup() {
         filter = TapGestureFilter()
         filter.onTap = mock()
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     // Verification for when onReleased should not be called.
@@ -957,5 +970,29 @@ class TapGestureFilterTest {
 
         verify(filter.onTap).invoke(any())
         verifyNoMoreInteractions(filter.onTap)
+    }
+
+    @Test
+    fun testInspectorValueForTapGestureFilter() = runBlocking<Unit> {
+        val onTap: (Offset) -> Unit = {}
+        val modifier = Modifier.tapGestureFilter(onTap) as InspectableValue
+
+        assertThat(modifier.nameFallback).isEqualTo("tapGestureFilter")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("onTap", onTap)
+        )
+    }
+
+    @Test
+    fun testInspectorValueForNoConsumptionTapGestureFilter() = runBlocking<Unit> {
+        val onTap: (Offset) -> Unit = {}
+        val modifier = Modifier.noConsumptionTapGestureFilter(onTap) as InspectableValue
+
+        assertThat(modifier.nameFallback).isEqualTo("noConsumptionTapGestureFilter")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("onTap", onTap)
+        )
     }
 }

@@ -382,7 +382,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="729"
+            line="731"
             column="13"/>
     </issue>
 
@@ -569,7 +569,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="304"
+            line="306"
             column="13"/>
     </issue>
 
@@ -580,7 +580,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="306"
+            line="308"
             column="13"/>
     </issue>
 
@@ -681,72 +681,6 @@
             file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.kt"
             line="40"
             column="16"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1=") = this.then(object : OnGloballyPositionedModifier {"
-        errorLine2="              ^">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/layout/OnGloballyPositionedModifier.kt"
-            line="31"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1=") = composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/layout/OnRemeasuredModifier.kt"
-            line="40"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/semantics/SemanticsModifier.kt"
-            line="85"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1=") = composed {"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/input/pointer/SuspendingPointerInputFilter.kt"
-            line="129"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
-            line="68"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="ModifierInspectorInfo"
-        message="Modifier missing inspectorInfo"
-        errorLine1="): Modifier = composed {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/gesture/TapGestureFilter.kt"
-            line="81"
-            column="15"/>
     </issue>
 
     <issue

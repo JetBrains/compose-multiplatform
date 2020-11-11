@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.AtomicInt
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [Modifier.Element] that adds semantics key/value for use in testing,
@@ -82,7 +83,13 @@ internal class SemanticsModifierCore(
 fun Modifier.semantics(
     mergeAllDescendants: Boolean = false,
     properties: (SemanticsPropertyReceiver.() -> Unit)
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "semantics"
+        this.properties["mergeAllDescendants"] = mergeAllDescendants
+        this.properties["properties"] = properties
+    }
+) {
     val id = remember { SemanticsModifierCore.generateSemanticsId() }
     SemanticsModifierCore(id, mergeAllDescendants, properties)
 }
