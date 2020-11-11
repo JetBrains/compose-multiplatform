@@ -43,7 +43,7 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
@@ -177,7 +177,7 @@ private fun Scrollbar(
     style: ScrollbarStyle,
     interactionState: InteractionState,
     isVertical: Boolean
-) = with(DensityAmbient.current) {
+) = with(AmbientDensity.current) {
     onDispose {
         interactionState.removeInteraction(Interaction.Dragged)
     }
@@ -305,7 +305,7 @@ fun rememberScrollbarAdapter(
     itemCount: Int,
     averageItemSize: Dp
 ): ScrollbarAdapter {
-    val averageItemSizePx = with(DensityAmbient.current) {
+    val averageItemSizePx = with(AmbientDensity.current) {
         averageItemSize.toPx()
     }
     return remember(scrollState, itemCount, averageItemSizePx) {

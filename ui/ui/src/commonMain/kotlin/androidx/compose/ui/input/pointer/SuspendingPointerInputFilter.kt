@@ -23,9 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.ExperimentalPointerInput
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.platform.ViewConfigurationAmbient
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -158,8 +158,8 @@ fun Modifier.pointerInput(
         this.properties["block"] = block
     }
 ) {
-    val density = DensityAmbient.current
-    val viewConfiguration = ViewConfigurationAmbient.current
+    val density = AmbientDensity.current
+    val viewConfiguration = AmbientViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
         LaunchedEffect(this) {
             block()

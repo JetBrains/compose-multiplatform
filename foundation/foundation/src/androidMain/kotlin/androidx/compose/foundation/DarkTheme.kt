@@ -19,7 +19,7 @@ package androidx.compose.foundation
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
-import androidx.compose.ui.platform.ConfigurationAmbient
+import androidx.compose.ui.platform.AmbientConfiguration
 
 /**
  * This function should be used to help build responsive UIs that follow the system setting, to
@@ -45,6 +45,6 @@ import androidx.compose.ui.platform.ConfigurationAmbient
 @Composable
 @ComposableContract(readonly = true)
 fun isSystemInDarkTheme(): Boolean {
-    val uiMode = ConfigurationAmbient.current.uiMode
+    val uiMode = AmbientConfiguration.current.uiMode
     return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 }

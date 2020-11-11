@@ -37,9 +37,9 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.platform.AndroidOwner
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.FontLoaderAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
@@ -353,7 +353,7 @@ internal class ComposeViewAdapter : FrameLayout {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
-        Providers(FontLoaderAmbient provides LayoutlibFontResourceLoader(context)) {
+        Providers(AmbientFontLoader provides LayoutlibFontResourceLoader(context)) {
             Inspectable(slotTableRecord, children)
         }
     }
@@ -429,7 +429,7 @@ internal class ComposeViewAdapter : FrameLayout {
                         // Preview will animate when the states are read inside the draw scope.
                         (getChildAt(0) as? AndroidOwner)?.invalidateDescendants()
                     }
-                    Providers(AnimationClockAmbient provides clock) {
+                    Providers(AmbientAnimationClock provides clock) {
                         composable()
                     }
                 } else {

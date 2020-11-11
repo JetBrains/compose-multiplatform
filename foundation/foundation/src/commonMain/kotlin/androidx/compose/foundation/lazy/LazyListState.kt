@@ -41,7 +41,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.layout.SubcomposeMeasureScope
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
@@ -83,7 +83,7 @@ fun rememberLazyListState(
     initialFirstVisibleItemScrollOffset: Int = 0,
     interactionState: InteractionState? = null
 ): LazyListState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     val config = defaultFlingConfig()
 
     // Avoid creating a new instance every invocation

@@ -24,7 +24,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.AccessibilityIterators
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -426,7 +426,7 @@ class AccessibilityIteratorsTest {
         var textLayoutResult: TextLayoutResult? = null
         rule.setContent {
             // TODO(yingleiw): use predefined DensityAmbient.current when b/163142237 is fixed.
-            with(DensityAmbient.current) {
+            with(AmbientDensity.current) {
                 BasicText(
                     style = TextStyle(
                         fontSize = fontSize,

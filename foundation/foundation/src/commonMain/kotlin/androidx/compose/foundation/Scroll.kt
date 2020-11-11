@@ -53,8 +53,8 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
@@ -83,7 +83,7 @@ fun rememberScrollState(
     initial: Float = 0f,
     interactionState: InteractionState? = null
 ): ScrollState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     val config = defaultFlingConfig()
     return rememberSavedInstanceState(
         clock, config, interactionState,
@@ -424,7 +424,7 @@ private fun Modifier.scroll(
                 )
             }
         }
-        val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val scrolling = Modifier.scrollable(
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
             // reverse scroll by default, to have "natural" gesture that goes reversed to layout

@@ -17,7 +17,7 @@
 package androidx.compose.ui.viewinterop
 
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.platform.ViewModelStoreOwnerAmbient
+import androidx.compose.ui.platform.AmbientViewModelStoreOwner
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.ViewModel
@@ -42,7 +42,7 @@ class ViewModelTest {
     fun viewModelCreatedViaDefaultFactory() {
         val owner = FakeViewModelStoreOwner()
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 viewModel<TestViewModel>()
             }
         }
@@ -55,7 +55,7 @@ class ViewModelTest {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 createdInComposition = viewModel<TestViewModel>()
             }
         }
@@ -70,7 +70,7 @@ class ViewModelTest {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 createdInComposition = viewModel<TestViewModel>()
             }
         }
@@ -85,7 +85,7 @@ class ViewModelTest {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 createdInComposition = viewModel<TestViewModel>(key = "test")
             }
         }
@@ -100,7 +100,7 @@ class ViewModelTest {
         val owner = FakeViewModelStoreOwner()
         val customFactory = FakeViewModelProviderFactory()
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 viewModel<TestViewModel>(factory = customFactory)
             }
         }
@@ -113,7 +113,7 @@ class ViewModelTest {
         val owner = FakeViewModelStoreOwner()
         val customFactory = FakeViewModelProviderFactory()
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 viewModel<TestViewModel>(factory = customFactory)
             }
         }
@@ -127,7 +127,7 @@ class ViewModelTest {
         var createdInComposition: Any? = null
         val customFactory = FakeViewModelProviderFactory()
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 createdInComposition = viewModel<TestViewModel>()
             }
         }
@@ -143,7 +143,7 @@ class ViewModelTest {
         var createdInComposition: Any? = null
         val customFactory = FakeViewModelProviderFactory()
         rule.setContent {
-            Providers(ViewModelStoreOwnerAmbient provides owner) {
+            Providers(AmbientViewModelStoreOwner provides owner) {
                 createdInComposition = viewModel<TestViewModel>(key = "test")
             }
         }

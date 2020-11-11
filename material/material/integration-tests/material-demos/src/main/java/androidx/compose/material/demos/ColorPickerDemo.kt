@@ -66,7 +66,7 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -166,7 +166,7 @@ private fun Modifier.simplePointerInput(
  */
 @Composable
 private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
-    val offset = with(DensityAmbient.current) {
+    val offset = with(AmbientDensity.current) {
         Modifier.offset(
             position.x.toDp() - MagnifierWidth / 2,
             // Align with the center of the selection circle

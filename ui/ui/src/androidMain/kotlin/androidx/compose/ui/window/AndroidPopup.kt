@@ -39,8 +39,8 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
@@ -87,14 +87,14 @@ internal actual fun ActualPopup(
     properties: PopupProperties?,
     content: @Composable () -> Unit
 ) {
-    val view = ViewAmbient.current
-    val density = DensityAmbient.current
+    val view = AmbientView.current
+    val density = AmbientDensity.current
 
     val popupLayout = remember { PopupLayout(view, density) }
 
     // Refresh anything that might have changed
     popupLayout.onDismissRequest = onDismissRequest
-    popupLayout.testTag = PopupTestTagAmbient.current
+    popupLayout.testTag = AmbientPopupTestTag.current
     remember(popupPositionProvider) { popupLayout.setPositionProvider(popupPositionProvider) }
     remember(isFocusable) { popupLayout.setIsFocusable(isFocusable) }
     remember(properties) { popupLayout.setProperties(properties) }

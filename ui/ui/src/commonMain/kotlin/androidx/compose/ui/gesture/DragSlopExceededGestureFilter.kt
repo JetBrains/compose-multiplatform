@@ -32,7 +32,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.abs
@@ -71,7 +71,7 @@ fun Modifier.dragSlopExceededGestureFilter(
         properties["orientation"] = orientation
     }
 ) {
-    val touchSlop = with(DensityAmbient.current) { TouchSlop.toPx() }
+    val touchSlop = with(AmbientDensity.current) { TouchSlop.toPx() }
     val filter = remember {
         DragSlopExceededGestureFilter(touchSlop)
     }

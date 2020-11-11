@@ -35,8 +35,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AndroidOwner
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -205,7 +205,7 @@ open class LayoutTest {
         modifier: Modifier = Modifier,
         children: @Composable () -> Unit
     ) {
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             val pxConstraints = Constraints(constraints)
             Layout(
                 children,

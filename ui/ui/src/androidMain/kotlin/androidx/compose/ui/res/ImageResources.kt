@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.imageFromResource
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.util.trace
 
 /**
@@ -35,7 +35,7 @@ import androidx.compose.ui.util.trace
  */
 @Composable
 fun imageResource(@DrawableRes id: Int): ImageBitmap {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val value = remember { TypedValue() }
     context.resources.getValue(id, value, true)
     // We use the file path as a key of the request cache.
@@ -62,7 +62,7 @@ fun loadImageResource(
     pendingImage: ImageBitmap? = null,
     failedImage: ImageBitmap? = null
 ): DeferredResource<ImageBitmap> {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val res = context.resources
     val value = remember { TypedValue() }
     res.getValue(id, value, true)

@@ -54,9 +54,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.accessibilityValueRange
@@ -127,14 +127,14 @@ fun Slider(
     activeTickColor: Color = MaterialTheme.colors.onPrimary.copy(alpha = TickColorAlpha),
     inactiveTickColor: Color = activeTrackColor.copy(alpha = TickColorAlpha)
 ) {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     val position = remember(valueRange, steps) {
         SliderPosition(value, valueRange, steps, clock, onValueChange)
     }
     position.onValueChange = onValueChange
     position.scaledValue = value
     WithConstraints(modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)) {
-        val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
         val minPx = 0f
         position.setBounds(minPx, maxPx)
@@ -220,7 +220,7 @@ private fun SliderImpl(
     interactionState: InteractionState,
     modifier: Modifier
 ) {
-    val widthDp = with(DensityAmbient.current) {
+    val widthDp = with(AmbientDensity.current) {
         width.toDp()
     }
     Box(modifier.then(DefaultSliderConstraints)) {
@@ -230,7 +230,7 @@ private fun SliderImpl(
 
         val trackStrokeWidth: Float
         val thumbPx: Float
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             trackStrokeWidth = TrackHeight.toPx()
             thumbPx = ThumbRadius.toPx()
         }

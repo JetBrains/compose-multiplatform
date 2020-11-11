@@ -38,8 +38,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -56,7 +56,7 @@ val ComplexTouchInterop = DemoCategory(
 
 @Composable
 fun ComposeInAndroidInComposeEtcTargetingDemo() {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     Column {
         Text(
             "In this demo, from the inside out, we have a Compose Button, wrapped in 2 Android " +

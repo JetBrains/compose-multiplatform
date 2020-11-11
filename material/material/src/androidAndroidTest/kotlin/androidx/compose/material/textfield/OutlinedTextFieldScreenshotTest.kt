@@ -25,7 +25,7 @@ import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.Providers
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.captureToImage
@@ -110,7 +110,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_focused_rtl() {
         rule.setMaterialContent {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                     OutlinedTextField(
                         value = "",

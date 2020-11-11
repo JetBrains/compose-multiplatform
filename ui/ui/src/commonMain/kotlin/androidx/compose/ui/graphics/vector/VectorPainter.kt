@@ -27,7 +27,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -59,7 +59,7 @@ fun rememberVectorPainter(
     name: String = RootGroupName,
     children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
-    val density = DensityAmbient.current
+    val density = AmbientDensity.current
     val widthPx = with(density) { defaultWidth.toPx() }
     val heightPx = with(density) { defaultHeight.toPx() }
 

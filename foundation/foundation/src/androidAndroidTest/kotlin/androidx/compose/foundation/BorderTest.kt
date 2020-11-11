@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -183,7 +183,7 @@ class BorderTest(val shape: Shape) {
     fun SemanticParent(children: @Composable Density.() -> Unit) {
         Box {
             Box(modifier = Modifier.testTag(testTag)) {
-                DensityAmbient.current.children()
+                AmbientDensity.current.children()
             }
         }
     }

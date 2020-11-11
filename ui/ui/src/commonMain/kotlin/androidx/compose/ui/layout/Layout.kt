@@ -31,8 +31,8 @@ import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -234,8 +234,8 @@ fun measureBlocksOf(
         ctor = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(DensityAmbient.current, LayoutEmitHelper.setDensity)
-            set(LayoutDirectionAmbient.current, LayoutEmitHelper.setLayoutDirection)
+            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
+            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
         },
         skippableUpdate = materializerOf(modifier),
         children = children
@@ -273,8 +273,8 @@ fun MultiMeasureLayout(
         update = {
             set(materialized, LayoutEmitHelper.setModifier)
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(DensityAmbient.current, LayoutEmitHelper.setDensity)
-            set(LayoutDirectionAmbient.current, LayoutEmitHelper.setLayoutDirection)
+            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
+            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
             @Suppress("DEPRECATION")
             set(Unit) { this.canMultiMeasure = true }
         },

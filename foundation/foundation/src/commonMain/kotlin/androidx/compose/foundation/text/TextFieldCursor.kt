@@ -36,7 +36,7 @@ import androidx.compose.ui.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
@@ -53,7 +53,7 @@ internal fun Modifier.cursor(
 ) = composed {
     // this should be a disposable clock, but it's not available in this module
     // however, we only launch one animation and guarantee that we stop it (via snap) in dispose
-    val animationClocks = AnimationClockAmbient.current
+    val animationClocks = AmbientAnimationClock.current
     val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
 
     if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unspecified) {

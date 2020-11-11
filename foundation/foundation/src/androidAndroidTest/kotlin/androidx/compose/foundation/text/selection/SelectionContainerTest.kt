@@ -38,8 +38,9 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.HapticFeedBackAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientHapticFeedback
+import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -249,7 +250,7 @@ class SelectionContainerTest {
         with(rule.density) {
             rule.setContent {
                 // Get the compose view position on screen
-                val composeView = androidx.compose.ui.platform.ViewAmbient.current
+                val composeView = AmbientView.current
                 val positionArray = IntArray(2)
                 composeView.getLocationOnScreen(positionArray)
                 composeViewAbsolutePos = IntOffset(
@@ -257,8 +258,8 @@ class SelectionContainerTest {
                     positionArray[1]
                 )
                 Providers(
-                    HapticFeedBackAmbient provides hapticFeedback,
-                    LayoutDirectionAmbient provides layoutDirection
+                    AmbientHapticFeedback provides hapticFeedback,
+                    AmbientLayoutDirection provides layoutDirection
                 ) {
                     TestParent(Modifier.gestureSpy(log)) {
                         SelectionContainer(

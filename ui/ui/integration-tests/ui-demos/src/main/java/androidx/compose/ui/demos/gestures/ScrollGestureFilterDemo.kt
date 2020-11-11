@@ -35,7 +35,7 @@ import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -71,7 +71,7 @@ fun ScrollableBox(
     val color = remember { mutableStateOf(idleColor) }
     val offsetPx = remember { mutableStateOf(0f) }
 
-    val offsetDp = with(DensityAmbient.current) {
+    val offsetDp = with(AmbientDensity.current) {
         offsetPx.value.toDp()
     }
 

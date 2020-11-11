@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.vector.compat.createVectorImageBuilder
 import androidx.compose.ui.graphics.vector.compat.isAtEnd
 import androidx.compose.ui.graphics.vector.compat.parseCurrentVectorNode
 import androidx.compose.ui.graphics.vector.compat.seekToStartTag
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.util.trace
 import org.xmlpull.v1.XmlPullParserException
 
@@ -42,7 +42,7 @@ import org.xmlpull.v1.XmlPullParserException
  */
 @Composable
 fun vectorResource(@DrawableRes id: Int): ImageVector {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val res = context.resources
     val theme = context.theme
     return remember(id) {
@@ -68,7 +68,7 @@ fun loadVectorResource(
     pendingResource: ImageVector? = null,
     failedResource: ImageVector? = null
 ): DeferredResource<ImageVector> {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val res = context.resources
     val theme = context.theme
 

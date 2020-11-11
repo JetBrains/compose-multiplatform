@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.longPressDragGestureFilter
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
 /**
@@ -67,7 +67,7 @@ fun LongPressDragGestureFilterDemo() {
         }
 
     val (offsetX, offsetY) =
-        with(DensityAmbient.current) { offset.value.x.toDp() to offset.value.y.toDp() }
+        with(AmbientDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
 
     Column {
         Text("Demonstrates dragging that only begins once a long press has occurred!")

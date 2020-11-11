@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.down
@@ -88,11 +88,11 @@ class LayerTouchTransformTest {
 
             val latchDrawModifier = Modifier.drawBehind { latch?.countDown() }
 
-            val containerDp = (200.0f / DensityAmbient.current.density).dp
-            val boxDp = (50.0f / DensityAmbient.current.density).dp
+            val containerDp = (200.0f / AmbientDensity.current.density).dp
+            val boxDp = (50.0f / AmbientDensity.current.density).dp
 
-            val offsetX = (270.0f / DensityAmbient.current.density).dp
-            val offsetY = (120.0f / DensityAmbient.current.density).dp
+            val offsetX = (270.0f / AmbientDensity.current.density).dp
+            val offsetY = (120.0f / AmbientDensity.current.density).dp
             Box(Modifier.testTag(testTag)) {
                 SimpleLayout(
                     modifier = Modifier.fillMaxSize().offset(offsetX, offsetY)

@@ -24,8 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LayoutDirectionAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
@@ -308,7 +308,7 @@ class PopupAlignmentTest {
 
             rule.setContent {
                 // Get the compose view position on screen
-                val composeView = ViewAmbient.current
+                val composeView = AmbientView.current
                 val positionArray = IntArray(2)
                 composeView.getLocationOnScreen(positionArray)
                 composeViewAbsolutePos = IntOffset(
@@ -320,7 +320,7 @@ class PopupAlignmentTest {
                 // position of the parent to be (0, 0)
                 TestAlign {
                     val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                    Providers(LayoutDirectionAmbient provides layoutDirection) {
+                    Providers(AmbientLayoutDirection provides layoutDirection) {
                         SimpleContainer(width = parentWidthDp, height = parentHeightDp) {
                             PopupTestTag(testTag) {
                                 Popup(alignment = alignment, offset = offset) {

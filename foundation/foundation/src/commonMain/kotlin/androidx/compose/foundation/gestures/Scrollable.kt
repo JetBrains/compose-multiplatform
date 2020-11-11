@@ -44,7 +44,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -67,7 +67,7 @@ fun rememberScrollableController(
     interactionState: InteractionState? = null,
     consumeScrollDelta: (Float) -> Float
 ): ScrollableController {
-    val clocks = AnimationClockAmbient.current.asDisposableClock()
+    val clocks = AmbientAnimationClock.current.asDisposableClock()
     val flingConfig = defaultFlingConfig()
     return remember(clocks, flingConfig, interactionState) {
         ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)

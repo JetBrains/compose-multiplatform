@@ -19,8 +19,8 @@ package androidx.compose.ui.lifecycleowner
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LifecycleOwnerAmbient
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentContainerView
@@ -80,7 +80,7 @@ class TestFragment : Fragment() {
         savedInstanceState: Bundle?
     ) = ComposeView(requireContext()).apply {
         setContent {
-            owner = LifecycleOwnerAmbient.current
+            owner = AmbientLifecycleOwner.current
             latch.countDown()
         }
     }

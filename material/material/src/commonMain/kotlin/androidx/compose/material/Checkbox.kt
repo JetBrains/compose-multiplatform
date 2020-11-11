@@ -52,7 +52,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -211,7 +211,7 @@ object CheckboxConstants {
         disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
         disabledIndeterminateColor: Color = checkedColor.copy(alpha = ContentAlpha.disabled)
     ): CheckboxColors {
-        val clock = AnimationClockAmbient.current.asDisposableClock()
+        val clock = AmbientAnimationClock.current.asDisposableClock()
         return remember(
             checkedColor,
             uncheckedColor,

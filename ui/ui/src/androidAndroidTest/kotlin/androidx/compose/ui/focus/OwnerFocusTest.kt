@@ -25,7 +25,7 @@ import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -184,5 +184,5 @@ class OwnerFocusTest {
     }
 
     @Composable
-    private fun getOwner() = ViewAmbient.current
+    private fun getOwner() = AmbientView.current
 }

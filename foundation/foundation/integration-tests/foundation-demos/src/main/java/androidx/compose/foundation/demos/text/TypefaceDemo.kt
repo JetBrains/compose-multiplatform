@@ -20,7 +20,7 @@ import android.graphics.Typeface
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.fontFamily
@@ -40,7 +40,7 @@ fun TypefaceDemo() {
 
 @Composable
 fun TypefaceFromFontFamilyDemo() {
-    val typeface = typeface(ContextAmbient.current, FontFamily.Cursive)
+    val typeface = typeface(AmbientContext.current, FontFamily.Cursive)
     val fontFamily = fontFamily(typeface)
     Text("Hello World", style = TextStyle(fontFamily = fontFamily))
 }

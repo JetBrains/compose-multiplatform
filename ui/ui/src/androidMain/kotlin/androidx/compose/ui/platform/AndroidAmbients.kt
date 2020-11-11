@@ -30,7 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
 import androidx.lifecycle.LifecycleOwner
@@ -40,7 +40,21 @@ import androidx.lifecycle.ViewModelStoreOwner
  * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
  * UI.
  */
-val ConfigurationAmbient = ambientOf<Configuration>(
+@Suppress("AmbientNaming")
+@Deprecated(
+    "Renamed to AmbientConfiguration",
+    replaceWith = ReplaceWith(
+        "AmbientConfiguration",
+        "androidx.compose.ui.platform.AmbientConfiguration"
+    )
+)
+val ConfigurationAmbient get() = AmbientConfiguration
+
+/**
+ * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
+ * UI.
+ */
+val AmbientConfiguration = ambientOf<Configuration>(
     @OptIn(ExperimentalComposeApi::class)
     neverEqualPolicy()
 )
@@ -48,22 +62,74 @@ val ConfigurationAmbient = ambientOf<Configuration>(
 /**
  * Provides a [Context] that can be used by Android applications.
  */
-val ContextAmbient = staticAmbientOf<Context>()
+@Suppress("AmbientNaming")
+@Deprecated(
+    "Renamed to AmbientContext",
+    replaceWith = ReplaceWith(
+        "AmbientContext",
+        "androidx.compose.ui.platform.AmbientContext"
+    )
+)
+val ContextAmbient get() = AmbientContext
+
+/**
+ * Provides a [Context] that can be used by Android applications.
+ */
+val AmbientContext = staticAmbientOf<Context>()
 
 /**
  * The ambient containing the current [LifecycleOwner].
  */
-val LifecycleOwnerAmbient = staticAmbientOf<LifecycleOwner>()
+@Suppress("AmbientNaming")
+@Deprecated(
+    "Renamed to AmbientLifecycleOwner",
+    replaceWith = ReplaceWith(
+        "AmbientLifecycleOwner",
+        "androidx.compose.ui.platform.AmbientLifecycleOwner"
+    )
+)
+val LifecycleOwnerAmbient get() = AmbientLifecycleOwner
+
+/**
+ * The ambient containing the current [LifecycleOwner].
+ */
+val AmbientLifecycleOwner = staticAmbientOf<LifecycleOwner>()
 
 /**
  * The ambient containing the current Compose [View].
  */
-val ViewAmbient = staticAmbientOf<View>()
+@Suppress("AmbientNaming")
+@Deprecated(
+    "Renamed to AmbientView",
+    replaceWith = ReplaceWith(
+        "AmbientView",
+        "androidx.compose.ui.platform.AmbientView"
+    )
+)
+val ViewAmbient get() = AmbientView
+
+/**
+ * The ambient containing the current Compose [View].
+ */
+val AmbientView = staticAmbientOf<View>()
 
 /**
  * The ambient containing the current [ViewModelStoreOwner].
  */
-val ViewModelStoreOwnerAmbient = staticAmbientOf<ViewModelStoreOwner>()
+@Suppress("AmbientNaming")
+@Deprecated(
+    "Renamed to AmbientViewModelStoreOwner",
+    replaceWith = ReplaceWith(
+        "AmbientViewModelStoreOwner",
+        "androidx.compose.ui.platform.AmbientViewModelStoreOwner"
+    )
+)
+val ViewModelStoreOwnerAmbient get() = AmbientViewModelStoreOwner
+
+/**
+ * The ambient containing the current [ViewModelStoreOwner].
+ */
+val AmbientViewModelStoreOwner = staticAmbientOf<ViewModelStoreOwner>()
 
 @Composable
 @OptIn(InternalAnimationApi::class)
@@ -95,12 +161,12 @@ internal fun ProvideAndroidAmbients(owner: AndroidOwner, content: @Composable ()
     }
 
     Providers(
-        ConfigurationAmbient provides configuration,
-        ContextAmbient provides context,
-        LifecycleOwnerAmbient provides viewTreeOwners.lifecycleOwner,
-        UiSavedStateRegistryAmbient provides uiSavedStateRegistry,
-        ViewAmbient provides owner.view,
-        ViewModelStoreOwnerAmbient provides viewTreeOwners.viewModelStoreOwner
+        AmbientConfiguration provides configuration,
+        AmbientContext provides context,
+        AmbientLifecycleOwner provides viewTreeOwners.lifecycleOwner,
+        AmbientUiSavedStateRegistry provides uiSavedStateRegistry,
+        AmbientView provides owner.view,
+        AmbientViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
     ) {
         ProvideCommonAmbients(
             owner = owner,

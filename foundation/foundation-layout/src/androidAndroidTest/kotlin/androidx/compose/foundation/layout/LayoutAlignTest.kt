@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -129,7 +129,7 @@ class LayoutAlignTest : LayoutTest() {
         val childSize = Array(3) { Ref<IntSize>() }
         val childPosition = Array(3) { Ref<Offset>() }
         show {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.fillMaxSize()) {
                     Box(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
                         Box(

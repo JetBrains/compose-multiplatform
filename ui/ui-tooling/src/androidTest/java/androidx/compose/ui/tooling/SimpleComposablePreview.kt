@@ -19,9 +19,9 @@ package androidx.compose.ui.tooling
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LifecycleOwnerAmbient
+import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.Lifecycle
 
@@ -70,7 +70,7 @@ fun DefaultParametersPreview3(a: () -> Int = { 4 }, b: Int = 3, c: Data = Data()
 @Preview
 @Composable
 private fun LifecyclePreview() {
-    val lifecycleState = LifecycleOwnerAmbient.current.lifecycle.currentState
+    val lifecycleState = AmbientLifecycleOwner.current.lifecycle.currentState
     if (lifecycleState != Lifecycle.State.RESUMED) throw IllegalArgumentException(
         "Lifecycle state is not resumed. $lifecycleState"
     )
@@ -80,7 +80,7 @@ private fun LifecyclePreview() {
 @Preview
 @Composable
 private fun UiSavedStateRegistryPreview() {
-    if (UiSavedStateRegistryAmbient.current == null) throw IllegalArgumentException(
+    if (AmbientUiSavedStateRegistry.current == null) throw IllegalArgumentException(
         "UiSavedStateRegistry is not provided"
     )
     Text("UiSavedStateRegistry preview")

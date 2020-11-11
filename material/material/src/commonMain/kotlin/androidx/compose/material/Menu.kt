@@ -45,7 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
@@ -104,7 +104,7 @@ fun DropdownMenu(
 
         if (visibleMenu) {
             var transformOrigin by remember { mutableStateOf(TransformOrigin.Center) }
-            val density = DensityAmbient.current
+            val density = AmbientDensity.current
             val popupPositionProvider = DropdownMenuPositionProvider(
                 dropdownOffset,
                 density

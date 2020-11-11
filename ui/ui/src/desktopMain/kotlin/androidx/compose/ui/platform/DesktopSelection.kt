@@ -28,8 +28,8 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.gesture.rawPressStartGestureFilter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.selection.AmbientSelectionRegistrar
 import androidx.compose.ui.selection.Selection
-import androidx.compose.ui.selection.SelectionRegistrarAmbient
 import androidx.compose.ui.selection.SelectionRegistrarImpl
 import kotlin.math.max
 
@@ -118,7 +118,7 @@ fun DesktopSelectionContainer(
         }
     }
 
-    Providers(SelectionRegistrarAmbient provides registrarImpl) {
+    Providers(AmbientSelectionRegistrar provides registrarImpl) {
         Wrap(modifier) {
             children()
         }

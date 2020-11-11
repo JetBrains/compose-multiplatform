@@ -26,7 +26,7 @@ import android.widget.LinearLayout
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.setViewContent
 import androidx.compose.ui.platform.subcomposeInto
 import java.util.concurrent.CountDownLatch
@@ -149,7 +149,7 @@ class ComposeTester(val activity: Activity, val composable: @Composable () -> Un
     private fun initialComposition(composable: @Composable () -> Unit): Composition {
         return activity.show {
             Providers(
-                ContextAmbient provides activity
+                AmbientContext provides activity
             ) {
                 composable()
             }

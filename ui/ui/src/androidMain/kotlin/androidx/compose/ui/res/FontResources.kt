@@ -20,7 +20,7 @@ import android.content.Context
 import android.util.TypedValue
 import androidx.annotation.GuardedBy
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -47,7 +47,7 @@ private val syncLoadedTypefaces = mutableMapOf<FontFamily, Typeface>()
  */
 @Composable
 fun fontResource(fontFamily: FontFamily): Typeface {
-    return fontResourceFromContext(ContextAmbient.current, fontFamily)
+    return fontResourceFromContext(AmbientContext.current, fontFamily)
 }
 
 internal fun fontResourceFromContext(context: Context, fontFamily: FontFamily): Typeface {
@@ -85,7 +85,7 @@ fun loadFontResource(
     pendingFontFamily: FontFamily? = null,
     failedFontFamily: FontFamily? = null
 ): DeferredResource<Typeface> {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val pendingTypeface = if (pendingFontFamily == null) {
         null
     } else if (!pendingFontFamily.canLoadSynchronously) {
@@ -138,7 +138,7 @@ fun loadFontResource(
     pendingTypeface: Typeface? = null,
     failedTypeface: Typeface? = null
 ): DeferredResource<Typeface> {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     if (fontFamily.canLoadSynchronously) {
         val typeface = synchronized(cacheLock) {
             syncLoadedTypefaces.getOrPut(fontFamily) {

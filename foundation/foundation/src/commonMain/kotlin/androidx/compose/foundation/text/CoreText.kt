@@ -44,11 +44,11 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.MeasureBlock
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.FontLoaderAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientFontLoader
+import androidx.compose.ui.selection.AmbientSelectionRegistrar
 import androidx.compose.ui.selection.Selectable
 import androidx.compose.ui.selection.SelectionRegistrar
-import androidx.compose.ui.selection.SelectionRegistrarAmbient
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -111,9 +111,9 @@ fun CoreText(
     require(maxLines > 0) { "maxLines should be greater than 0" }
 
     // selection registrar, if no SelectionContainer is added ambient value will be null
-    val selectionRegistrar = SelectionRegistrarAmbient.current
-    val density = DensityAmbient.current
-    val resourceLoader = FontLoaderAmbient.current
+    val selectionRegistrar = AmbientSelectionRegistrar.current
+    val density = AmbientDensity.current
+    val resourceLoader = AmbientFontLoader.current
 
     val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)
 

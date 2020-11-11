@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -91,7 +91,7 @@ fun Surface(
     elevation: Dp = 0.dp,
     content: @Composable () -> Unit
 ) {
-    val elevationPx = with(DensityAmbient.current) { elevation.toPx() }
+    val elevationPx = with(AmbientDensity.current) { elevation.toPx() }
     val elevationOverlay = AmbientElevationOverlay.current
     val absoluteElevation = AmbientAbsoluteElevation.current + elevation
     val backgroundColor = if (color == MaterialTheme.colors.surface && elevationOverlay != null) {

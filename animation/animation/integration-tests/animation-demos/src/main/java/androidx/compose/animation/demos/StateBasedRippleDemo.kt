@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -47,7 +47,7 @@ fun StateBasedRippleDemo() {
 
 @Composable
 private fun RippleRect() {
-    val radius = with(DensityAmbient.current) { TargetRadius.toPx() }
+    val radius = with(AmbientDensity.current) { TargetRadius.toPx() }
     val toState = remember { mutableStateOf(ButtonStatus.Initial) }
     val rippleTransDef = remember { createTransDef(radius) }
     val onPress: (Offset) -> Unit = { position ->

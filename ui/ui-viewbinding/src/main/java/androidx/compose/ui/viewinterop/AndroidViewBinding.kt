@@ -26,8 +26,8 @@ import androidx.compose.runtime.emit
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.viewbinding.ViewBinding
 
 /**
@@ -53,14 +53,14 @@ fun <T : ViewBinding> AndroidViewBinding(
     modifier: Modifier = Modifier,
     update: T.() -> Unit = {}
 ) {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val materialized = currentComposer.materialize(modifier)
     emit<ViewBindingHolder<T>, UiApplier>(
         ctor = { ViewBindingHolder(context) },
         update = {
             set(Unit) { this.bindingBlock = bindingBlock }
             set(materialized) { this.modifier = it }
-            set(DensityAmbient.current) { this.density = it }
+            set(AmbientDensity.current) { this.density = it }
             set(update) { this.updateBlock = it }
         }
     )

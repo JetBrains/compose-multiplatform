@@ -25,7 +25,7 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -210,7 +210,7 @@ private fun TestSurface(elevation: Dp, colors: Colors) {
     MaterialTheme(colors) {
         Box {
             Surface(elevation = elevation) {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     // Make the surface size small so we compare less pixels
                     Box(
                         Modifier.preferredSize(

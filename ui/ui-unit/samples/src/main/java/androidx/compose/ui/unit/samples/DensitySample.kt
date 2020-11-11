@@ -18,12 +18,12 @@ package androidx.compose.ui.unit.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
 @Suppress("UNUSED_VARIABLE")
 fun WithDensitySample() {
-    val sizeInPx = with(DensityAmbient.current) { 16.dp.toPx() }
+    val sizeInPx = with(AmbientDensity.current) { 16.dp.toPx() }
 }

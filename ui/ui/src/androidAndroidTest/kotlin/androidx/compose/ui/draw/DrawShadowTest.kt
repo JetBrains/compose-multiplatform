@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -166,7 +166,7 @@ class DrawShadowTest {
         rule.runOnUiThreadIR {
             activity.setContent {
                 AtLeastSize(size = 12, modifier = background(Color.White)) {
-                    val elevation = with(DensityAmbient.current) { 4.dp.toPx() }
+                    val elevation = with(AmbientDensity.current) { 4.dp.toPx() }
                     AtLeastSize(
                         size = 10,
                         modifier = Modifier.drawLayer(
