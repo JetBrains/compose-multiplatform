@@ -19,7 +19,7 @@ package androidx.compose.material.icons.generator
 import java.io.File
 
 /**
- * Generates programmatic representation of all [icons] using [VectorAssetGenerator].
+ * Generates programmatic representation of all [icons] using [ImageVectorGenerator].
  *
  * @property icons the list of [Icon]s to generate Kotlin files for
  */
@@ -41,7 +41,7 @@ class IconWriter(private val icons: List<Icon>) {
 
             val vector = IconParser(icon).parse()
 
-            val fileSpec = VectorAssetGenerator(
+            val fileSpec = ImageVectorGenerator(
                 icon.kotlinName,
                 icon.theme,
                 vector

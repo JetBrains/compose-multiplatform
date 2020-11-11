@@ -409,7 +409,7 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 // This is an async call to parse the VectorDrawable xml asset into
-                // a VectorAsset, update the latch once we receive this callback
+                // a ImageVector, update the latch once we receive this callback
                 // and draw the Image composable
                 loadVectorResource(R.drawable.ic_vector_asset_test).resource.resource?.let {
                     Image(

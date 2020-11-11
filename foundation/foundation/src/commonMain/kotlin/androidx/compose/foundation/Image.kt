@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 
@@ -82,36 +82,36 @@ inline fun Image(
 }
 
 /**
- * A composable that lays out and draws a given [VectorAsset]. This will attempt to
- * size the composable according to the [VectorAsset]'s given width and height. However, an
+ * A composable that lays out and draws a given [ImageVector]. This will attempt to
+ * size the composable according to the [ImageVector]'s given width and height. However, an
  * optional [Modifier] parameter can be provided to adjust sizing or draw additional content (ex.
- * background). Any unspecified dimension will leverage the [VectorAsset]'s size as a minimum
+ * background). Any unspecified dimension will leverage the [ImageVector]'s size as a minimum
  * constraint.
  *
- * @sample androidx.compose.foundation.samples.ImageVectorAssetSample
+ * @sample androidx.compose.foundation.samples.ImageVectorSample
  *
- * @param asset The [VectorAsset] to draw.
+ * @param imageVector The [ImageVector] to draw.
  * @param modifier Modifier used to adjust the layout algorithm or draw decoration content (ex.
  * background)
- * @param alignment Optional alignment parameter used to place the [VectorAsset] in the given
+ * @param alignment Optional alignment parameter used to place the [ImageVector] in the given
  * bounds defined by the width and height.
  * @param contentScale Optional scale parameter used to determine the aspect ratio scaling to be used
- * if the bounds are a different size from the intrinsic size of the [VectorAsset].
- * @param alpha Optional opacity to be applied to the [VectorAsset] when it is rendered onscreen
- * @param colorFilter Optional ColorFilter to apply for the [VectorAsset] when it is rendered
+ * if the bounds are a different size from the intrinsic size of the [ImageVector].
+ * @param alpha Optional opacity to be applied to the [ImageVector] when it is rendered onscreen
+ * @param colorFilter Optional ColorFilter to apply for the [ImageVector] when it is rendered
  * onscreen
  */
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 inline fun Image(
-    asset: VectorAsset,
+    imageVector: ImageVector,
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.Center,
     contentScale: ContentScale = ContentScale.Fit,
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null
 ) = Image(
-    painter = rememberVectorPainter(asset),
+    painter = rememberVectorPainter(imageVector),
     modifier = modifier,
     alignment = alignment,
     contentScale = contentScale,

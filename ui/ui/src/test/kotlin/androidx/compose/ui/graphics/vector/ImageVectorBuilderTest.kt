@@ -23,12 +23,12 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class VectorAssetBuilderTest {
+class ImageVectorBuilderTest {
 
     @Test
     fun dslAndBuilderAreEqual() {
         val builderFunctionVector = builder().apply {
-            pushGroup(name = "Vector", pivotX = 0.2f, pivotY = 0.4f)
+            addGroup(name = "Vector", pivotX = 0.2f, pivotY = 0.4f)
             addPath(
                 listOf(PathNode.LineTo(10f, 10f), PathNode.Close)
             )
@@ -39,7 +39,7 @@ class VectorAssetBuilderTest {
                     PathNode.Close
                 )
             )
-            popGroup()
+            clearGroup()
         }.build()
 
         val dslFunctionVector = builder().apply {
@@ -61,23 +61,23 @@ class VectorAssetBuilderTest {
 
     @Test
     fun testAddGroup() {
-        val vectorAsset = builder().apply {
-            pushGroup("group1")
+        val imageVector = builder().apply {
+            addGroup("group1")
             addPath(name = "path1", pathData = emptyList())
-            pushGroup("group2")
+            addGroup("group2")
             addPath(name = "path2", pathData = emptyList())
-            popGroup()
-            pushGroup("group3")
+            clearGroup()
+            addGroup("group3")
             addPath(name = "path3", pathData = emptyList())
             addPath(name = "path4", pathData = emptyList())
-            popGroup()
-            popGroup()
-            pushGroup(name = "group4")
+            clearGroup()
+            clearGroup()
+            addGroup(name = "group4")
             addPath(name = "path5", pathData = emptyList())
             // intentionally avoid popping group as build will pop all groups to the root
         }.build()
 
-        val root = vectorAsset.root
+        val root = imageVector.root
         Truth.assertThat(root.size).isEqualTo(2)
 
         val group1 = root[0] as VectorGroup
@@ -114,7 +114,7 @@ class VectorAssetBuilderTest {
     }
 }
 
-private fun builder() = VectorAssetBuilder(
+private fun builder() = ImageVector.Builder(
     defaultWidth = 10.dp,
     defaultHeight = 10.dp,
     viewportWidth = 10f,

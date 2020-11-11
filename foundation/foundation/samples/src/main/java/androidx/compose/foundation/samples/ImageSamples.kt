@@ -62,11 +62,11 @@ fun ImagePainterSubsectionSample() {
 
 @Sampled
 @Composable
-fun ImageVectorAssetSample() {
-    val vectorAsset = loadVectorResource(R.drawable.ic_sample_vector)
-    vectorAsset.resource.resource?.let {
+fun ImageVectorSample() {
+    val imageVector = loadVectorResource(R.drawable.ic_sample_vector)
+    imageVector.resource.resource?.let {
         Image(
-            asset = it,
+            imageVector = it,
             modifier = Modifier.preferredSize(200.dp, 200.dp),
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(Color.Cyan)

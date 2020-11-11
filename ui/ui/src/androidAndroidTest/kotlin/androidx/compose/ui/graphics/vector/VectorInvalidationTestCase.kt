@@ -46,9 +46,9 @@ class VectorInvalidationTestCase(var latch: CountDownLatch) {
         val state = remember { mutableStateOf(R.drawable.ic_triangle2) }
         vectorState = state
 
-        val vectorAsset = loadVectorResource(state.value)
+        val imageVector = loadVectorResource(state.value)
         with(DensityAmbient.current) {
-            vectorAsset.resource.resource?.let {
+            imageVector.resource.resource?.let {
                 val width = it.defaultWidth
                 vectorSize = width.toIntPx()
                 AtLeastSize(

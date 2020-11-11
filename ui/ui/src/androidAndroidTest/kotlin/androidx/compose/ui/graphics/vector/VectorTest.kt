@@ -177,13 +177,13 @@ class VectorTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun testVectorAssetChangeOnStateChange() {
+    fun testImageVectorChangeOnStateChange() {
         val defaultWidth = 24.dp
         val defaultHeight = 24.dp
         val viewportWidth = 24f
         val viewportHeight = 24f
 
-        val icon1 = VectorAssetBuilder(
+        val icon1 = ImageVector.Builder(
             defaultWidth = defaultWidth,
             defaultHeight = defaultHeight,
             viewportWidth = viewportWidth,
@@ -199,7 +199,7 @@ class VectorTest {
                 }
             ).build()
 
-        val icon2 = VectorAssetBuilder(
+        val icon2 = ImageVector.Builder(
             defaultWidth = defaultWidth,
             defaultHeight = defaultHeight,
             viewportWidth = viewportWidth,
@@ -219,7 +219,7 @@ class VectorTest {
         rule.setContent {
             val clickState = remember { mutableStateOf(false) }
             Image(
-                asset = if (clickState.value) icon1 else icon2,
+                imageVector = if (clickState.value) icon1 else icon2,
                 modifier = Modifier
                     .testTag(testTag)
                     .preferredSize(icon1.defaultWidth, icon1.defaultHeight)

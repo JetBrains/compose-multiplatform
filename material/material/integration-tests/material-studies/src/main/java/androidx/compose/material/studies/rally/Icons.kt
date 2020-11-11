@@ -19,7 +19,7 @@ package androidx.compose.material.studies.rally
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Icons below are copied from [Icons.Filled] in material-icons-extended to avoid recompiling the
@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.vector.VectorAsset
  * file, which should appear in Studio sources by searching for the name of that icon.
  */
 
-val Icons.Filled.Sort: VectorAsset by lazy {
+val Icons.Filled.Sort: ImageVector by lazy {
     materialIcon("Filled.Sort") {
         materialPath {
             moveTo(3.0f, 18.0f)
@@ -55,7 +55,7 @@ val Icons.Filled.Sort: VectorAsset by lazy {
     }
 }
 
-val Icons.Filled.ArrowForwardIos: VectorAsset by lazy {
+val Icons.Filled.ArrowForwardIos: ImageVector by lazy {
     materialIcon("Filled.ArrowForwardIos") {
         materialPath {
             moveTo(5.88f, 4.12f)
@@ -69,7 +69,7 @@ val Icons.Filled.ArrowForwardIos: VectorAsset by lazy {
     }
 }
 
-val Icons.Filled.AttachMoney: VectorAsset by lazy {
+val Icons.Filled.AttachMoney: ImageVector by lazy {
     materialIcon("Filled.AttachMoney") {
         materialPath {
             moveTo(11.8f, 10.9f)
@@ -98,7 +98,7 @@ val Icons.Filled.AttachMoney: VectorAsset by lazy {
     }
 }
 
-val Icons.Filled.MoneyOff: VectorAsset by lazy {
+val Icons.Filled.MoneyOff: ImageVector by lazy {
     materialIcon("Filled.MoneyOff") {
         materialPath {
             moveTo(12.5f, 6.9f)
@@ -133,7 +133,7 @@ val Icons.Filled.MoneyOff: VectorAsset by lazy {
     }
 }
 
-val Icons.Filled.PieChart: VectorAsset by lazy {
+val Icons.Filled.PieChart: ImageVector by lazy {
     materialIcon("Filled.PieChart") {
         materialPath {
             moveTo(11.0f, 2.0f)
