@@ -23,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.test.click
-import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.TextRange
@@ -93,7 +93,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         }
 
         // Perform click to focus in.
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .performGesture { click(Offset(1f, 1f)) }
 
         rule.runOnIdle {

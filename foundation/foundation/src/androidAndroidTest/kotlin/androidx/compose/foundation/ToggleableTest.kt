@@ -18,10 +18,8 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.triStateToggleable
-import androidx.compose.foundation.semantics.FoundationSemanticsProperties
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
@@ -105,7 +105,7 @@ class ToggleableTest {
         }
 
         fun hasIndeterminateState(): SemanticsMatcher = SemanticsMatcher.expectValue(
-            FoundationSemanticsProperties.ToggleableState, ToggleableState.Indeterminate
+            SemanticsProperties.ToggleableState, ToggleableState.Indeterminate
         )
 
         rule.onNodeWithTag("checkedToggleable")

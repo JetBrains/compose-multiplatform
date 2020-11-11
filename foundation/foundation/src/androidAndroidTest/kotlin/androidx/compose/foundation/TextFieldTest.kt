@@ -56,7 +56,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasImeAction
-import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.isNotFocused
 import androidx.compose.ui.test.junit4.StateRestorationTester
@@ -126,7 +126,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         rule.runOnIdle {
             assertThat(isFocused).isTrue()
@@ -161,7 +161,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
         rule.runOnIdle {
@@ -232,7 +232,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
         rule.runOnIdle {
@@ -299,7 +299,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
         rule.runOnIdle {
@@ -404,7 +404,7 @@ class TextFieldTest {
             )
         }
 
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -428,7 +428,7 @@ class TextFieldTest {
         rule.onNodeWithTag("textField")
             .assertTextEquals("")
             .assertHasClickAction()
-            .assert(hasInputMethodsSupport())
+            .assert(hasSetTextAction())
             .assert(hasImeAction(ImeAction.Unspecified))
             .assert(isNotFocused())
             .assert(
@@ -510,7 +510,7 @@ class TextFieldTest {
             )
         }
 
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .assert(hasImeAction(ImeAction.Search))
     }
 

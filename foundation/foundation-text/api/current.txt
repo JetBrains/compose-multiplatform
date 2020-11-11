@@ -31,20 +31,6 @@ package androidx.compose.foundation.text {
   public final class TextFieldDelegateKt {
   }
 
-  public final class TextSemanticsProperties {
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> getImeAction();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getSupportsInputMethods();
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> ImeAction;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> SupportsInputMethods;
-    field public static final androidx.compose.foundation.text.TextSemanticsProperties INSTANCE;
-  }
-
-  public final class TextSemanticsPropertiesKt {
-    method public static androidx.compose.ui.text.input.ImeAction getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.input.ImeAction p);
-    method public static void supportsInputMethods(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-  }
-
 }
 
 package androidx.compose.foundation.text.selection {

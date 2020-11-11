@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.foundation.text.TextSemanticsProperties
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.DeleteAllEditOp
 import androidx.compose.ui.text.input.EditOperation
@@ -97,9 +97,9 @@ fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) 
     val errorOnFail = "Failed to perform IME action."
     val node = fetchSemanticsNode(errorOnFail)
 
-    assert(hasInputMethodsSupport()) { errorOnFail }
+    assert(hasSetTextAction()) { errorOnFail }
 
-    val actionSpecified = node.config.getOrElse(TextSemanticsProperties.ImeAction) {
+    val actionSpecified = node.config.getOrElse(SemanticsProperties.ImeAction) {
         ImeAction.Unspecified
     }
     if (actionSpecified == ImeAction.Unspecified) {
@@ -117,7 +117,7 @@ fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) 
 internal fun SemanticsNodeInteraction.sendTextInputCommand(command: List<EditOperation>) {
     val errorOnFail = "Failed to perform text input."
     val node = fetchSemanticsNode(errorOnFail)
-    assert(hasInputMethodsSupport()) { errorOnFail }
+    assert(hasSetTextAction()) { errorOnFail }
 
     @OptIn(InternalTestingApi::class)
     testContext.testOwner.sendTextInputCommand(node, command)

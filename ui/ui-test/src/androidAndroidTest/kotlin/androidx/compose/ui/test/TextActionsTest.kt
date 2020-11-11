@@ -218,7 +218,7 @@ class TextActionsTest {
         expectErrorMessageStartsWith(
             "" +
                 "Failed to perform IME action.\n" +
-                "Failed to assert the following: (SupportsInputMethods is defined)\n" +
+                "Failed to assert the following: (SetText is defined)\n" +
                 "Semantics of the node:"
         ) {
             rule.onNodeWithTag("node")

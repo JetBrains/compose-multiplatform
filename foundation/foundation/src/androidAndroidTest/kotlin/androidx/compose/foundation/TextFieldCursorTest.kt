@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
@@ -87,14 +87,14 @@ class TextFieldCursorTest {
                 cursorColor = Color.Red
             )
         }
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.waitForIdle()
 
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
-            rule.onNode(hasInputMethodsSupport())
+            rule.onNode(hasSetTextAction())
                 .captureToImage()
                 .assertCursor(2.dp, this)
         }
@@ -124,7 +124,7 @@ class TextFieldCursorTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.waitForIdle()
@@ -132,14 +132,14 @@ class TextFieldCursorTest {
         // cursor visible first 500 ms
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
-            rule.onNode(hasInputMethodsSupport())
+            rule.onNode(hasSetTextAction())
                 .captureToImage()
                 .assertCursor(2.dp, this)
         }
 
         // cursor invisible during next 500 ms
         rule.clockTestRule.advanceClock(700)
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -174,14 +174,14 @@ class TextFieldCursorTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.waitForIdle()
 
         // no cursor when usually shown
         rule.clockTestRule.advanceClock(100)
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -193,7 +193,7 @@ class TextFieldCursorTest {
 
         // no cursor when should be no cursor
         rule.clockTestRule.advanceClock(700)
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -230,7 +230,7 @@ class TextFieldCursorTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
         rule.waitForIdle()
 
@@ -240,7 +240,7 @@ class TextFieldCursorTest {
         //  cursor position when sending a text
 
         // change text field value
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .performTextReplacement("", true)
         rule.waitForIdle()
 
@@ -248,7 +248,7 @@ class TextFieldCursorTest {
         // To prevent blinking while typing we restart animation when new symbol is typed.
         rule.clockTestRule.advanceClock(400)
         with(rule.density) {
-            rule.onNode(hasInputMethodsSupport())
+            rule.onNode(hasSetTextAction())
                 .captureToImage()
                 .assertCursor(2.dp, this)
         }

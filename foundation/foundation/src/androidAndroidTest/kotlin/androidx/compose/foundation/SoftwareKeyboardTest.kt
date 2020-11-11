@@ -23,7 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.TextInputServiceAmbient
-import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -73,7 +73,7 @@ class SoftwareKeyboardTest {
         }
 
         // Perform click to focus in.
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .performClick()
 
         rule.runOnIdle {
