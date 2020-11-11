@@ -17,42 +17,26 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationConstants
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.repeatable
 import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawWithContent
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -63,7 +47,6 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.FontLoaderAmbient
@@ -97,12 +80,9 @@ import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.NO_SESSION
-import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -577,151 +557,3 @@ internal class TextFieldState(
         )
     }
 }
-
-/**
- * Helper class for tracking dragging event.
- */
-internal class DragEventTracker {
-    private var origin = Offset.Zero
-    private var distance = Offset.Zero
-
-    /**
-     * Restart the tracking from given origin.
-     *
-     * @param origin The origin of the drag gesture.
-     */
-    fun init(origin: Offset) {
-        this.origin = origin
-    }
-
-    /**
-     * Pass distance parameter called by DragGestureDetector$onDrag callback
-     *
-     * @param distance The distance from the origin of the drag origin.
-     */
-    fun onDrag(distance: Offset) {
-        this.distance = distance
-    }
-
-    /**
-     * Returns the current position.
-     *
-     * @return The position of the current drag point.
-     */
-    fun getPosition(): Offset {
-        return origin + distance
-    }
-}
-
-/**
- * Helper composable for tracking drag position.
- */
-@Suppress("ModifierInspectorInfo")
-private fun Modifier.dragPositionGestureFilter(
-    onPress: (Offset) -> Unit,
-    onRelease: (Offset) -> Unit
-): Modifier = composed {
-    val tracker = remember { DragEventTracker() }
-    // TODO(shepshapard): PressIndicator doesn't seem to be the right thing to use here.  It
-    //  actually may be functionally correct, but might mostly suggest that it should not
-    //  actually be called PressIndicator, but instead something else.
-    pressIndicatorGestureFilter(
-        onStart = {
-            tracker.init(it)
-            onPress(it)
-        },
-        onStop = {
-            onRelease(tracker.getPosition())
-        }
-    )
-        .dragGestureFilter(
-            dragObserver = object :
-                DragObserver {
-                override fun onDrag(dragDistance: Offset): Offset {
-                    tracker.onDrag(dragDistance)
-                    return Offset.Zero
-                }
-            }
-        )
-}
-
-private val cursorAnimationSpec: AnimationSpec<Float>
-    get() = repeatable(
-        iterations = AnimationConstants.Infinite,
-        animation = keyframes {
-            durationMillis = 1000
-            1f at 0
-            1f at 499
-            0f at 500
-            0f at 999
-        }
-    )
-
-private val DefaultCursorThickness = 2.dp
-
-@OptIn(InternalTextApi::class)
-@Suppress("ModifierInspectorInfo")
-private fun Modifier.cursor(
-    state: TextFieldState,
-    value: TextFieldValue,
-    offsetMap: OffsetMap,
-    cursorColor: Color
-) = composed {
-    // this should be a disposable clock, but it's not available in this module
-    // however, we only launch one animation and guarantee that we stop it (via snap) in dispose
-    val animationClocks = AnimationClockAmbient.current
-    val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
-
-    if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unspecified) {
-        onCommit(cursorColor, value.text) {
-            if (@Suppress("DEPRECATION_ERROR") blinkingCursorEnabled) {
-                cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
-            } else {
-                cursorAlpha.snapTo(1f)
-            }
-            onDispose {
-                cursorAlpha.snapTo(0f)
-            }
-        }
-        drawWithContent {
-            this.drawContent()
-            val cursorAlphaValue = cursorAlpha.value.coerceIn(0f, 1f)
-            if (cursorAlphaValue != 0f) {
-                val transformedOffset = offsetMap
-                    .originalToTransformed(value.selection.start)
-                val cursorRect = state.layoutResult?.getCursorRect(transformedOffset)
-                    ?: Rect(0f, 0f, 0f, 0f)
-                val cursorWidth = DefaultCursorThickness.toPx()
-                val cursorX = (cursorRect.left + cursorWidth / 2)
-                    .coerceAtMost(size.width - cursorWidth / 2)
-
-                drawLine(
-                    cursorColor,
-                    Offset(cursorX, cursorRect.top),
-                    Offset(cursorX, cursorRect.bottom),
-                    alpha = cursorAlphaValue,
-                    strokeWidth = cursorWidth
-                )
-            }
-        }
-    } else {
-        Modifier
-    }
-}
-
-@Stable
-private class AnimatedFloatModel(
-    initialValue: Float,
-    clock: AnimationClockObservable,
-    visibilityThreshold: Float = Spring.DefaultDisplacementThreshold
-) : AnimatedFloat(clock, visibilityThreshold) {
-    override var value: Float by mutableStateOf(initialValue, structuralEqualityPolicy())
-}
-
-// TODO(b/151940543): Remove this variable when we have a solution for idling animations
-/** @suppress */
-@InternalTextApi
-@Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API and should not be used")
-var blinkingCursorEnabled: Boolean = true
-    @VisibleForTesting
-    set
