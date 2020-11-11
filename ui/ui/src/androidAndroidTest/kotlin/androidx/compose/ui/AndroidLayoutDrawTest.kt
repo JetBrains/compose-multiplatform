@@ -52,6 +52,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -227,14 +228,24 @@ class AndroidLayoutDrawTest {
         val layer = ViewLayer(
             AndroidComposeView(activity),
             ViewLayerContainer(activity),
-            object : DrawLayerModifier {
-                override val cameraDistance: Float
-                    get() = cameraDistance
-            },
             {},
             {}
         ).apply {
-            updateLayerProperties()
+            updateLayerProperties(
+                scaleX = 1f,
+                scaleY = 1f,
+                alpha = 1f,
+                translationX = 0f,
+                translationY = 0f,
+                shadowElevation = 0f,
+                rotationX = 0f,
+                rotationY = 0f,
+                rotationZ = 0f,
+                cameraDistance = cameraDistance,
+                transformOrigin = TransformOrigin.Center,
+                shape = RectangleShape,
+                clip = true
+            )
         }
         // Verify that the camera distance is applied properly even after accounting for
         // the internal dp conversion within View

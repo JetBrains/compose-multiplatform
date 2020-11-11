@@ -16,17 +16,17 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.DrawLayerModifier
+import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 /**
- * A layer returned by [Owner.createLayer] to separate drawn content. An `OwnedLayer` has
- * the implementation to make [DrawLayerModifier]s work.
+ * A layer returned by [Owner.createLayer] to separate drawn content.
  */
-interface OwnedLayer : OwnerScope {
+interface OwnedLayer {
     /**
      * The ID of the layer. This is used by tooling to match a layer to the associated
      * LayoutNode.
@@ -34,14 +34,23 @@ interface OwnedLayer : OwnerScope {
     val layerId: Long
 
     /**
-     * The DrawLayerModifier used in this layer.
+     * Applies the new layer properties and causing this layer to be redrawn.
      */
-    var modifier: DrawLayerModifier
-
-    /**
-     * Reads the [DrawLayerModifier] and dirties the layer so that it will be redrawn.
-     */
-    fun updateLayerProperties()
+    fun updateLayerProperties(
+        scaleX: Float,
+        scaleY: Float,
+        alpha: Float,
+        translationX: Float,
+        translationY: Float,
+        shadowElevation: Float,
+        rotationX: Float,
+        rotationY: Float,
+        rotationZ: Float,
+        cameraDistance: Float,
+        transformOrigin: TransformOrigin,
+        shape: Shape,
+        clip: Boolean
+    )
 
     /**
      * Changes the position of the layer contents.

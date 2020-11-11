@@ -17,13 +17,13 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -31,7 +31,8 @@ import androidx.compose.ui.unit.IntOffset
 internal class LayerWrapper(
     wrapped: LayoutNodeWrapper,
     modifier: DrawLayerModifier
-) : DelegatingLayoutNodeWrapper<DrawLayerModifier>(wrapped, modifier), (Canvas) -> Unit {
+) : OwnerScope, (Canvas) -> Unit,
+    DelegatingLayoutNodeWrapper<DrawLayerModifier>(wrapped, modifier) {
     private var _layer: OwnedLayer? = null
 
     // Do not invalidate itself on position change.
@@ -40,9 +41,37 @@ internal class LayerWrapper(
     override var modifier: DrawLayerModifier
         get() = super.modifier
         set(value) {
+            val oldModifier = super.modifier
             super.modifier = value
-            _layer?.modifier = value
+            if (_layer != null && value != oldModifier) {
+                updateLayerParameters()
+            }
         }
+
+    private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
+
+    private fun updateLayerParameters() {
+        val layer = _layer
+        if (layer != null) {
+            snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
+                layer.updateLayerProperties(
+                    scaleX = modifier.scaleX,
+                    scaleY = modifier.scaleY,
+                    alpha = modifier.alpha,
+                    translationX = modifier.translationX,
+                    translationY = modifier.translationY,
+                    shadowElevation = modifier.shadowElevation,
+                    rotationX = modifier.rotationX,
+                    rotationY = modifier.rotationY,
+                    rotationZ = modifier.rotationZ,
+                    cameraDistance = modifier.cameraDistance,
+                    transformOrigin = modifier.transformOrigin,
+                    shape = modifier.shape,
+                    clip = modifier.clip
+                )
+            }
+        }
+    }
 
     private val invalidateParentLayer: () -> Unit = {
         wrappedBy?.invalidateLayer()
@@ -81,10 +110,10 @@ internal class LayerWrapper(
     override fun attach() {
         super.attach()
         _layer = layoutNode.requireOwner().createLayer(
-            modifier,
             this,
             invalidateParentLayer
         )
+        updateLayerParameters()
         invalidateParentLayer()
     }
 
@@ -167,13 +196,29 @@ internal class LayerWrapper(
             require(layoutNode.layoutState == LayoutNode.LayoutState.Ready) {
                 "Layer is redrawn for LayoutNode in state ${layoutNode.layoutState} [$layoutNode]"
             }
-            wrapped.draw(canvas)
+            snapshotObserver.observeReads(this, onCommitAffectingLayer) {
+                wrapped.draw(canvas)
+            }
             lastDrawingWasSkipped = false
         } else {
             // The invalidation is requested even for nodes which are not placed. As we are not
             // going to display them we skip the drawing. It is safe to just draw nothing as the
             // layer will be invalidated again when the node will be finally placed.
             lastDrawingWasSkipped = true
+        }
+    }
+
+    override val isValid: Boolean
+        get() = _layer != null
+
+    companion object {
+        private val onCommitAffectingLayerParams: (LayerWrapper) -> Unit = { wrapper ->
+            if (wrapper.isValid) {
+                wrapper.updateLayerParameters()
+            }
+        }
+        private val onCommitAffectingLayer: (LayerWrapper) -> Unit = { wrapper ->
+            wrapper._layer?.invalidate()
         }
     }
 }

@@ -24,7 +24,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.node.OwnedLayer
 
 /**
  * RenderNode on M-O devices, where RenderNode isn't officially supported. This class uses
@@ -198,7 +197,6 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
     override fun record(
         canvasHolder: CanvasHolder,
         clipPath: Path?,
-        observerScope: OwnedLayer,
         drawBlock: (Canvas) -> Unit
     ) {
         val canvas = renderNode.start(width, height)
@@ -207,9 +205,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
                 save()
                 clipPath(clipPath)
             }
-            ownerView.snapshotObserver.observeLayerSnapshotReads(observerScope) {
-                drawBlock(this)
-            }
+            drawBlock(this)
             if (clipPath != null) {
                 restore()
             }

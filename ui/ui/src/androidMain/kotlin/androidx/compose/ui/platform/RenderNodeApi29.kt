@@ -23,7 +23,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.node.OwnedLayer
 
 /**
  * RenderNode on Q+ devices, where it is officially supported.
@@ -147,7 +146,6 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
     override fun record(
         canvasHolder: CanvasHolder,
         clipPath: Path?,
-        observerScope: OwnedLayer,
         drawBlock: (Canvas) -> Unit
     ) {
         canvasHolder.drawInto(renderNode.beginRecording()) {
@@ -155,9 +153,7 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
                 save()
                 clipPath(clipPath)
             }
-            ownerView.snapshotObserver.observeLayerSnapshotReads(observerScope) {
-                drawBlock(this)
-            }
+            drawBlock(this)
             if (clipPath != null) {
                 restore()
             }

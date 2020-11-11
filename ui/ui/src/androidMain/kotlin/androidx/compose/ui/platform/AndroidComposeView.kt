@@ -36,7 +36,6 @@ import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.collection.ExperimentalCollectionApi
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
 import androidx.compose.ui.autofill.Autofill
@@ -450,17 +449,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     }
 
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
-        drawBlock: (Canvas) -> Unit,
-        invalidateParentLayer: () -> Unit
-    ): OwnedLayer {
-        val layer = instantiateLayer(drawLayerModifier, drawBlock, invalidateParentLayer)
-        snapshotObserver.updateLayerProperties(layer)
-        return layer
-    }
-
-    private fun instantiateLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
@@ -472,7 +460,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
             try {
                 return RenderNodeLayer(
                     this,
-                    drawLayerModifier,
                     drawBlock,
                     invalidateParentLayer
                 )
@@ -483,7 +470,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         return ViewLayer(
             this,
             viewLayersContainer,
-            drawLayerModifier,
             drawBlock,
             invalidateParentLayer
         )

@@ -22,7 +22,6 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -181,21 +180,16 @@ class DesktopOwner(
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ) = SkijaLayer(
         this,
-        drawLayerModifier,
         invalidateParentLayer = {
             invalidateParentLayer()
             container.invalidate()
-        }
-    ) { canvas ->
-        snapshotObserver.observeLayerSnapshotReads(this) {
-            drawBlock(canvas)
-        }
-    }
+        },
+        drawBlock = drawBlock
+    )
 
     override fun onSemanticsChange() = Unit
 

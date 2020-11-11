@@ -15,7 +15,6 @@
  */
 package androidx.compose.ui.node
 
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -155,13 +154,9 @@ interface Owner {
     fun measureAndLayout()
 
     /**
-     * Creates and returns an [OwnedLayer] for the given [drawLayerModifier].
+     * Creates an [OwnedLayer] which will be drawing the passed [drawBlock].
      */
-    fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
-        drawBlock: (Canvas) -> Unit,
-        invalidateParentLayer: () -> Unit
-    ): OwnedLayer
+    fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit): OwnedLayer
 
     /**
      * The semantics have changed. This function will be called when a SemanticsNode is added to

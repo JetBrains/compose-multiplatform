@@ -42,18 +42,6 @@ class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -> Unit) {
         }
     }
 
-    private val onCommitAffectingLayer: (OwnedLayer) -> Unit = { layer ->
-        if (layer.isValid) {
-            layer.invalidate()
-        }
-    }
-
-    private val onCommitAffectingLayerParams: (OwnedLayer) -> Unit = { layer ->
-        if (layer.isValid) {
-            updateLayerProperties(layer)
-        }
-    }
-
     /**
      * Observing the snapshot reads are temporary disabled during the [block] execution.
      * For example if we are currently within the measure stage and we want some code block to
@@ -79,13 +67,6 @@ class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -> Unit) {
     }
 
     /**
-     * Observe snapshot reads during drawing the content of an [OwnedLayer], executed in [block].
-     */
-    internal fun observeLayerSnapshotReads(layer: OwnedLayer, block: () -> Unit) {
-        observeReads(layer, onCommitAffectingLayer, block)
-    }
-
-    /**
      * Observe snapshot reads for any target, allowing consumers to determine how to respond
      * to state changes.
      */
@@ -103,12 +84,6 @@ class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -> Unit) {
 
     internal fun clear(target: Any) {
         observer.clear(target)
-    }
-
-    internal fun updateLayerProperties(layer: OwnedLayer) {
-        observer.observeReads(layer, onCommitAffectingLayerParams) {
-            layer.updateLayerProperties()
-        }
     }
 
     internal fun startObserving() {

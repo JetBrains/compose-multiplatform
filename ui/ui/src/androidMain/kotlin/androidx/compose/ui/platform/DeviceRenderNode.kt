@@ -20,7 +20,6 @@ import android.graphics.Outline
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.node.OwnedLayer
 
 /**
  * RenderNode on Q+ and RenderNode on M-P devices have different APIs. This interface
@@ -57,7 +56,6 @@ internal interface DeviceRenderNode {
     fun record(
         canvasHolder: CanvasHolder,
         clipPath: Path?,
-        observerScope: OwnedLayer,
         drawBlock: (Canvas) -> Unit
     )
     fun getMatrix(matrix: android.graphics.Matrix)

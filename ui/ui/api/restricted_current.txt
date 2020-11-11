@@ -2021,25 +2021,22 @@ package androidx.compose.ui.node {
     property public final androidx.compose.ui.Modifier modifier;
   }
 
-  public interface OwnedLayer extends androidx.compose.ui.node.OwnerScope {
+  public interface OwnedLayer {
     method public void destroy();
     method public void drawLayer(androidx.compose.ui.graphics.Canvas canvas);
     method public long getLayerId();
     method public void getMatrix-58bKbWc(float[] matrix);
-    method public androidx.compose.ui.DrawLayerModifier getModifier();
     method public void invalidate();
     method public void move--gyyYBs(long position);
     method public void resize-ozmzZPI(long size);
-    method public void setModifier(androidx.compose.ui.DrawLayerModifier p);
     method public void updateDisplayList();
-    method public void updateLayerProperties();
+    method public void updateLayerProperties-EAWP0Yk(float scaleX, float scaleY, float alpha, float translationX, float translationY, float shadowElevation, float rotationX, float rotationY, float rotationZ, float cameraDistance, long transformOrigin, androidx.compose.ui.graphics.Shape shape, boolean clip);
     property public abstract long layerId;
-    property public abstract androidx.compose.ui.DrawLayerModifier modifier;
   }
 
   public interface Owner {
     method public long calculatePosition-nOcc-ac();
-    method public androidx.compose.ui.node.OwnedLayer createLayer(androidx.compose.ui.DrawLayerModifier drawLayerModifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Canvas,kotlin.Unit> drawBlock, kotlin.jvm.functions.Function0<kotlin.Unit> invalidateParentLayer);
+    method public androidx.compose.ui.node.OwnedLayer createLayer(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Canvas,kotlin.Unit> drawBlock, kotlin.jvm.functions.Function0<kotlin.Unit> invalidateParentLayer);
     method public androidx.compose.ui.autofill.Autofill? getAutofill();
     method public androidx.compose.ui.autofill.AutofillTree getAutofillTree();
     method public androidx.compose.ui.platform.ClipboardManager getClipboardManager();
