@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.rules.RuleChain
+import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
@@ -53,21 +54,26 @@ actual fun createComposeRule(): ComposeTestRule = createAndroidComposeRule<Compo
 
 /**
  * Factory method to provide android specific implementation of [createComposeRule], for a given
- * activity class type [T].
+ * activity class type [A].
  *
  * This method is useful for tests that require a custom Activity. This is usually the case for
  * app tests. Make sure that you add the provided activity into your app's manifest file (usually
  * in main/AndroidManifest.xml).
  *
+ * This creates a test rule that is using [ActivityScenarioRule] as the activity launcher. If you
+ * would like to use a different one you can create [AndroidComposeTestRule] directly and supply
+ * it with your own launcher.
+ *
  * If you don't care about specific activity and just want to test composables in general, see
  * [createComposeRule].
  */
-inline fun <reified T : ComponentActivity> createAndroidComposeRule(): AndroidComposeTestRule<T> {
+inline fun <reified A : ComponentActivity> createAndroidComposeRule(
+): AndroidComposeTestRule<ActivityScenarioRule<A>, A> {
     // TODO(b/138993381): By launching custom activities we are losing control over what content is
     //  already there. This is issue in case the user already set some compose content and decides
     //  to set it again via our API. In such case we won't be able to dispose the old composition.
     //  Other option would be to provide a smaller interface that does not expose these methods.
-    return AndroidComposeTestRule(ActivityScenarioRule(T::class.java))
+    return createAndroidComposeRule(A::class.java)
 }
 
 /**
@@ -78,35 +84,36 @@ inline fun <reified T : ComponentActivity> createAndroidComposeRule(): AndroidCo
  * app tests. Make sure that you add the provided activity into your app's manifest file (usually
  * in main/AndroidManifest.xml).
  *
+ * This creates a test rule that is using [ActivityScenarioRule] as the activity launcher. If you
+ * would like to use a different one you can create [AndroidComposeTestRule] directly and supply
+ * it with your own launcher.
+ *
  * If you don't care about specific activity and just want to test composables in general, see
  * [createComposeRule].
  */
-fun <T : ComponentActivity> createAndroidComposeRule(
-    activityClass: Class<T>
-): AndroidComposeTestRule<T> = AndroidComposeTestRule(
-    ActivityScenarioRule(activityClass)
+fun <A : ComponentActivity> createAndroidComposeRule(
+    activityClass: Class<A>
+): AndroidComposeTestRule<ActivityScenarioRule<A>, A> = AndroidComposeTestRule(
+    activityRule = ActivityScenarioRule(activityClass),
+    activityProvider = { it.getActivity() }
 )
 
 /**
  * Android specific implementation of [ComposeTestRule].
+ *
+ * This rule wraps around the given [activityRule], which is responsible for launching the activity.
+ * The [activityProvider] should return the launched activity instance when the [activityRule] is
+ * passed to it. In this way, you can provide any test rule that can launch an activity
+ *
+ * @param activityRule Test rule to use to launch the activity.
+ * @param activityProvider To resolve the activity from the given test rule. Must be a blocking
+ * function.
  */
 @OptIn(InternalTestingApi::class)
-class AndroidComposeTestRule<T : ComponentActivity>(
-    // TODO(b/153623653): Remove activityRule from arguments when AndroidComposeTestRule can
-    //  work with any kind of Activity launcher.
-    val activityRule: ActivityScenarioRule<T>
+class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
+    val activityRule: R,
+    private val activityProvider: (R) -> A
 ) : ComposeTestRule {
-
-    private fun getActivity(): T {
-        var activity: T? = null
-        if (activity == null) {
-            activityRule.scenario.onActivity { activity = it }
-            if (activity == null) {
-                throw IllegalStateException("Activity was not set in the ActivityScenarioRule!")
-            }
-        }
-        return activity!!
-    }
 
     override val clockTestRule: AnimationClockTestRule = AndroidAnimationClockTestRule()
 
@@ -115,12 +122,22 @@ class AndroidComposeTestRule<T : ComponentActivity>(
     private val testOwner = AndroidTestOwner()
     private val testContext = createTestContext(testOwner)
 
-    override val density: Density
-        get() =
-            Density(getActivity().resources.displayMetrics.density)
+    private var activity: A? = null
+
+    override val density: Density by lazy {
+        // Using a cached activity is fine for density
+        if (activity == null) {
+            activity = activityProvider(activityRule)
+        }
+        Density(activity!!.resources.displayMetrics.density)
+    }
 
     override val displaySize by lazy {
-        getActivity().resources.displayMetrics.let {
+        // Using a cached activity is fine for display size
+        if (activity == null) {
+            activity = activityProvider(activityRule)
+        }
+        activity!!.resources.displayMetrics.let {
             IntSize(it.widthPixels, it.heightPixels)
         }
     }
@@ -144,11 +161,11 @@ class AndroidComposeTestRule<T : ComponentActivity>(
             "Cannot call setContent twice per test!"
         }
 
-        lateinit var activity: T
-        activityRule.scenario.onActivity { activity = it }
+        // We always make sure we have the latest activity when setting a content
+        activity = activityProvider(activityRule)
 
         runOnUiThread {
-            val composition = activity.setContent(
+            val composition = activity!!.setContent(
                 Recomposer.current(),
                 composable
             )
@@ -239,6 +256,7 @@ class AndroidComposeTestRule<T : ComponentActivity>(
                     disposeContentHook = null
                 }
             }
+            activity = null
         }
     }
 
@@ -306,4 +324,13 @@ class AndroidComposeTestRule<T : ComponentActivity>(
                 )
         }
     }
+}
+
+private fun <A : ComponentActivity> ActivityScenarioRule<A>.getActivity(): A {
+    var activity: A? = null
+    scenario.onActivity { activity = it }
+    if (activity == null) {
+        throw IllegalStateException("Activity was not set in the ActivityScenarioRule!")
+    }
+    return activity!!
 }
