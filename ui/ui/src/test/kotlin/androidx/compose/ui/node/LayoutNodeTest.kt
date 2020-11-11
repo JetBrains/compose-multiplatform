@@ -16,7 +16,6 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
@@ -35,6 +34,7 @@ import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -705,10 +705,15 @@ class LayoutNodeTest {
     // even with multiple LayoutNodeWrappers for one modifier.
     @Test
     fun layoutNodeWrapperSameWithReplacementMultiModifier() {
-        class TestModifier : DrawModifier, DrawLayerModifier {
+        class TestModifier : DrawModifier, LayoutModifier {
             override fun ContentDrawScope.draw() {
                 drawContent()
             }
+
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ) = layout(0, 0) {}
         }
         val layoutNode = LayoutNode()
 

@@ -27,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.AtLeastSize
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
@@ -576,9 +575,8 @@ class DrawReorderingTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testChangingZOrderUncle() {
         val state = mutableStateOf(0f)
-        val elevation = object : DrawLayerModifier {
-            override val shadowElevation: Float
-                get() = state.value
+        val elevation = Modifier.drawLayer {
+            shadowElevation = state.value
         }
         val view = View(activity)
         rule.runOnUiThread {

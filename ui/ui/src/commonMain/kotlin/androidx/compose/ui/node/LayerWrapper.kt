@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.globalPosition
@@ -50,26 +51,31 @@ internal class LayerWrapper(
 
     private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
 
+    private var isClipping: Boolean = false
+
     private fun updateLayerParameters() {
         val layer = _layer
         if (layer != null) {
+            graphicsLayerScope.reset()
             snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
-                layer.updateLayerProperties(
-                    scaleX = modifier.scaleX,
-                    scaleY = modifier.scaleY,
-                    alpha = modifier.alpha,
-                    translationX = modifier.translationX,
-                    translationY = modifier.translationY,
-                    shadowElevation = modifier.shadowElevation,
-                    rotationX = modifier.rotationX,
-                    rotationY = modifier.rotationY,
-                    rotationZ = modifier.rotationZ,
-                    cameraDistance = modifier.cameraDistance,
-                    transformOrigin = modifier.transformOrigin,
-                    shape = modifier.shape,
-                    clip = modifier.clip
-                )
+                modifier.block(graphicsLayerScope)
             }
+            layer.updateLayerProperties(
+                scaleX = graphicsLayerScope.scaleX,
+                scaleY = graphicsLayerScope.scaleY,
+                alpha = graphicsLayerScope.alpha,
+                translationX = graphicsLayerScope.translationX,
+                translationY = graphicsLayerScope.translationY,
+                shadowElevation = graphicsLayerScope.shadowElevation,
+                rotationX = graphicsLayerScope.rotationX,
+                rotationY = graphicsLayerScope.rotationY,
+                rotationZ = graphicsLayerScope.rotationZ,
+                cameraDistance = graphicsLayerScope.cameraDistance,
+                transformOrigin = graphicsLayerScope.transformOrigin,
+                shape = graphicsLayerScope.shape,
+                clip = graphicsLayerScope.clip
+            )
+            isClipping = graphicsLayerScope.clip
         }
     }
 
@@ -148,7 +154,7 @@ internal class LayerWrapper(
     }
 
     override fun rectInParent(bounds: MutableRect) {
-        if (modifier.clip) {
+        if (isClipping) {
             bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
             if (bounds.isEmpty) {
                 return
@@ -164,7 +170,7 @@ internal class LayerWrapper(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        if (modifier.clip) {
+        if (isClipping) {
             val l = globalPosition.x
             val t = globalPosition.y
             val r = l + width
@@ -220,5 +226,6 @@ internal class LayerWrapper(
         private val onCommitAffectingLayer: (LayerWrapper) -> Unit = { wrapper ->
             wrapper._layer?.invalidate()
         }
+        private val graphicsLayerScope = ReusableGraphicsLayerScope()
     }
 }

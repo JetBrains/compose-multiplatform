@@ -42,9 +42,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.drawLayer
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntBounds
@@ -103,13 +103,13 @@ fun DropdownMenu(
         toggle()
 
         if (visibleMenu) {
-            var transformOrigin by remember { mutableStateOf(TransformOrigin.Center) }
+            val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
             val density = AmbientDensity.current
             val popupPositionProvider = DropdownMenuPositionProvider(
                 dropdownOffset,
                 density
             ) { parentBounds, menuBounds ->
-                transformOrigin = calculateTransformOrigin(parentBounds, menuBounds)
+                transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
             }
 
             Popup(
@@ -125,14 +125,16 @@ fun DropdownMenu(
                         visibleMenu = it
                     }
                 )
-                val drawLayer = remember {
-                    MenuDrawLayerModifier(
-                        { state[Scale] },
-                        { state[Alpha] },
-                        { transformOrigin }
-                    )
-                }
-                Card(modifier = drawLayer, elevation = MenuElevation) {
+                Card(
+                    modifier = Modifier.drawLayer {
+                        val scale = state[Scale]
+                        scaleX = scale
+                        scaleY = scale
+                        alpha = state[Alpha]
+                        transformOrigin = transformOriginState.value
+                    },
+                    elevation = MenuElevation
+                ) {
                     @OptIn(ExperimentalLayout::class)
                     ScrollableColumn(
                         modifier = dropdownModifier
@@ -242,17 +244,6 @@ private val DropdownMenuOpenCloseTransition = transitionDefinition<Boolean> {
             durationMillis = OutTransitionDuration
         )
     }
-}
-
-private class MenuDrawLayerModifier(
-    val scaleProvider: () -> Float,
-    val alphaProvider: () -> Float,
-    val transformOriginProvider: () -> TransformOrigin
-) : DrawLayerModifier {
-    override val scaleX: Float get() = scaleProvider()
-    override val scaleY: Float get() = scaleProvider()
-    override val alpha: Float get() = alphaProvider()
-    override val transformOrigin: TransformOrigin get() = transformOriginProvider()
 }
 
 private fun calculateTransformOrigin(

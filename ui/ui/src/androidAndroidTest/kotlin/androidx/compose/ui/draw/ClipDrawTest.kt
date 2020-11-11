@@ -20,7 +20,6 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
 import androidx.compose.ui.PaddingModifier
@@ -28,6 +27,7 @@ import androidx.compose.ui.assertColorsEqual
 import androidx.compose.ui.assertRect
 import androidx.compose.ui.background
 import androidx.compose.ui.drawBehind
+import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -399,11 +399,9 @@ class ClipDrawTest {
             drawLatch.countDown()
         }
 
-        val clip = object : DrawLayerModifier {
-            override val shape: Shape
-                get() = model.value
-            override val clip: Boolean
-                get() = true
+        val clip = Modifier.drawLayer {
+            shape = model.value
+            clip = true
         }
 
         rule.runOnUiThreadIR {
