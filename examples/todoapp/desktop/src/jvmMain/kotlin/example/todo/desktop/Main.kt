@@ -35,7 +35,7 @@ fun main() {
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme {
                 DesktopTheme {
-                    todoRoot.invoke()
+                    todoRoot()
                 }
             }
         }
