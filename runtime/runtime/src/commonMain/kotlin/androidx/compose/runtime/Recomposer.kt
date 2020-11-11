@@ -27,6 +27,8 @@ import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
@@ -447,6 +449,7 @@ class Recomposer(
     }
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
         private val mainRecomposer: Recomposer by lazy {
             val embeddingContext = EmbeddingContext()
             val mainScope = CoroutineScope(
@@ -454,7 +457,11 @@ class Recomposer(
             )
 
             Recomposer(mainScope.coroutineContext).also {
-                mainScope.launch {
+                // NOTE: Launching undispatched so that compositions created with the
+                // Recomposer.current() singleton instance can assume the recomposer is running
+                // when they perform initial composition. The relevant Recomposer code is
+                // appropriately thread-safe for this.
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     it.runRecomposeAndApplyChanges()
                 }
             }
