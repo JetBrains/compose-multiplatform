@@ -21,6 +21,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.logging.Logger
 import org.slf4j.Marker
 
+internal const val TERMINAL_RED = "\u001B[31m"
+internal const val TERMINAL_RESET = "\u001B[0m"
+
 // TODO(b/132773278) move this functionality into Gradle itself?
 open class LogUtils {
     companion object {
