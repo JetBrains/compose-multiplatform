@@ -18,18 +18,19 @@ package androidx.compose.foundation.layout
 
 import android.util.Log
 import androidx.annotation.FloatRange
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.MultiMeasureLayout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -531,10 +532,17 @@ class ConstraintLayoutScope internal constructor() : ConstraintLayoutBaseScope()
         constrainBlock: ConstrainScope.() -> Unit
     ): Modifier {
         // TODO(popam, b/157782492): make equals comparable modifiers here.
-        return this.then(object : ParentDataModifier {
-            override fun Density.modifyParentData(parentData: Any?) =
-                ConstraintLayoutParentData(ref, constrainBlock)
-        })
+        return this.then(
+            object : ParentDataModifier, InspectorValueInfo(
+                debugInspectorInfo {
+                    name = "constrainAs"
+                    properties["ref"] = ref
+                    properties["constrainBlock"] = constrainBlock
+                }
+            ) {
+                override fun Density.modifyParentData(parentData: Any?) =
+                    ConstraintLayoutParentData(ref, constrainBlock)
+            })
     }
 }
 

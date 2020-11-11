@@ -26,6 +26,7 @@ import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.ViewConfigurationAmbient
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAll
@@ -151,7 +152,12 @@ interface PointerInputScope : Density {
 @ExperimentalPointerInput
 fun Modifier.pointerInput(
     block: suspend PointerInputScope.() -> Unit
-) = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "pointerInput"
+        this.properties["block"] = block
+    }
+) {
     val density = DensityAmbient.current
     val viewConfiguration = ViewConfigurationAmbient.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {

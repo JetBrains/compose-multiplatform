@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
  * Usage example:
  * @sample androidx.compose.ui.samples.OnGloballyPositioned
  */
+@Suppress("ModifierInspectorInfo") // cannot access crossinline parameter
 inline fun Modifier.onGloballyPositioned(
     crossinline onGloballyPositioned: (LayoutCoordinates) -> Unit
 ) = this.then(object : OnGloballyPositionedModifier {
