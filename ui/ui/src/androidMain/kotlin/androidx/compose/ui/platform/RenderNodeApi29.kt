@@ -155,7 +155,7 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
                 save()
                 clipPath(clipPath)
             }
-            ownerView.observeLayerModelReads(observerScope) {
+            ownerView.snapshotObserver.observeLayerSnapshotReads(observerScope) {
                 drawBlock(this)
             }
             if (clipPath != null) {

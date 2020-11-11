@@ -58,7 +58,7 @@ import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.ClipboardManager
@@ -409,6 +409,7 @@ internal class SuspendingGestureTestUtil(
         override val layoutDirection: LayoutDirection
             get() = LayoutDirection.Ltr
         override var showLayoutBounds: Boolean = false
+        override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
         override fun onRequestMeasure(layoutNode: LayoutNode) {
             onRequestMeasureParams += layoutNode
@@ -433,26 +434,6 @@ internal class SuspendingGestureTestUtil(
 
         @ExperimentalKeyInput
         override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
-
-        override fun pauseModelReadObserveration(block: () -> Unit) {
-            block()
-        }
-
-        override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-            block()
-        }
-
-        override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-            block()
-        }
-
-        override fun <T : OwnerScope> observeReads(
-            target: T,
-            onChanged: (T) -> Unit,
-            block: () -> Unit
-        ) {
-            block()
-        }
 
         override fun measureAndLayout() {
         }

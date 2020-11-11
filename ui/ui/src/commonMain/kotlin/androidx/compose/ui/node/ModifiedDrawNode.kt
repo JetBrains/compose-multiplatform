@@ -61,7 +61,7 @@ internal class ModifiedDrawNode(
     override fun draw(canvas: Canvas) {
         val size = measuredSize.toSize()
         if (cacheDrawModifier != null && invalidateCache) {
-            layoutNode.owner?.observeReads(
+            layoutNode.requireOwner().snapshotObserver.observeReads(
                 this,
                 onCommitAffectingModifiedDrawNode,
                 updateCache

@@ -1705,6 +1705,7 @@ private class MockOwner(
     override val layoutDirection: LayoutDirection
         get() = LayoutDirection.Ltr
     override var showLayoutBounds: Boolean = false
+    override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         onRequestMeasureParams += layoutNode
@@ -1731,26 +1732,6 @@ private class MockOwner(
 
     @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
-
-    override fun pauseModelReadObserveration(block: () -> Unit) {
-        block()
-    }
-
-    override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun <T : OwnerScope> observeReads(
-        target: T,
-        onChanged: (T) -> Unit,
-        block: () -> Unit
-    ) {
-        block()
-    }
 
     override fun measureAndLayout() {
     }

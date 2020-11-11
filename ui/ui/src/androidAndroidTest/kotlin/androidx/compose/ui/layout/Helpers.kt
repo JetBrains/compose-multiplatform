@@ -19,6 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth
@@ -44,15 +45,12 @@ internal fun createDelegate(
                 delegate.requestRemeasure(it.arguments[0] as LayoutNode)
                 Unit
             }
-            on { observeMeasureModelReads(any(), any()) } doAnswer {
-                (it.arguments[1] as () -> Unit).invoke()
-            }
-            on { observeLayoutModelReads(any(), any()) } doAnswer {
-                (it.arguments[1] as () -> Unit).invoke()
-            }
             on { measureAndLayout() } doAnswer {
                 delegate.measureAndLayout()
                 Unit
+            }
+            on { snapshotObserver } doAnswer {
+                OwnerSnapshotObserver { it.invoke() }
             }
         }
     )

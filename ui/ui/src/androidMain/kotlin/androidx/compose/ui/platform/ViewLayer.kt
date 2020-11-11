@@ -197,7 +197,7 @@ internal class ViewLayer(
                 save()
                 clipPath(clipPath)
             }
-            ownerView.observeLayerModelReads(this@ViewLayer) {
+            ownerView.snapshotObserver.observeLayerSnapshotReads(this@ViewLayer) {
                 drawBlock(this)
             }
             if (clipPath != null) {

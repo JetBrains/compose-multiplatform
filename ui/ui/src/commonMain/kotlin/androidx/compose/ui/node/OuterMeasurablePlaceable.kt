@@ -90,7 +90,7 @@ internal class OuterMeasurablePlaceable(
             measurementConstraints = constraints
             lastProvidedAlignmentLines.clear()
             lastProvidedAlignmentLines.putAll(layoutNode.providedAlignmentLines)
-            owner.observeMeasureModelReads(layoutNode) {
+            owner.snapshotObserver.observeMeasureSnapshotReads(layoutNode) {
                 outerWrapper.measure(constraints)
             }
             layoutNode.layoutState = LayoutState.NeedsRelayout

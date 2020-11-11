@@ -150,30 +150,6 @@ interface Owner {
     fun sendKeyEvent(keyEvent: KeyEvent): Boolean
 
     /**
-     * Observing the model reads are temporary disabled during the [block] execution.
-     * For example if we are currently within the measure stage and we want some code block to
-     * be skipped from the observing we disable if before calling the block, execute block and
-     * then enable it again.
-     */
-    fun pauseModelReadObserveration(block: () -> Unit)
-
-    /**
-     * Observe model reads during layout of [node], executed in [block].
-     */
-    fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit)
-
-    /**
-     * Observe model reads during measure of [node], executed in [block].
-     */
-    fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit)
-
-    /**
-     * Observe model reads for any target, allowing consumers to determine how to respond
-     * to state changes
-     */
-    fun <T : OwnerScope> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit)
-
-    /**
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out
      */
     fun measureAndLayout()
@@ -200,6 +176,12 @@ interface Owner {
      * The [ViewConfiguration] to use in the application.
      */
     val viewConfiguration: ViewConfiguration
+
+    /**
+     * Performs snapshot observation for blocks like draw and layout which should be re-invoked
+     * automatically when the snapshot value has been changed.
+     */
+    val snapshotObserver: OwnerSnapshotObserver
 
     companion object {
         /**

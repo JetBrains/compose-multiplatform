@@ -24,13 +24,7 @@ import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.FocusObserverModifier
 import androidx.compose.ui.FocusRequesterModifier
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.OnGloballyPositionedModifier
-import androidx.compose.ui.layout.OnRemeasuredModifier
-import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.Remeasurement
-import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -49,7 +43,13 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.OnGloballyPositionedModifier
+import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.Remeasurement
+import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.layout.merge
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
@@ -936,7 +936,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         if (layoutState == NeedsRelayout) {
             layoutState = LayoutState.LayingOut
             val owner = requireOwner()
-            owner.observeLayoutModelReads(this) {
+            owner.snapshotObserver.observeLayoutSnapshotReads(this) {
                 // reset the place order counter which will be used by the children
                 nextChildPlaceOrder = 0
                 _children.forEach { child ->
@@ -1101,11 +1101,13 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         this.providedAlignmentLines += measureResult.alignmentLines
 
         if (onRemeasuredCallbacks.isNotEmpty()) {
-            owner?.pauseModelReadObserveration {
+            val invokeRemeasureCallbacks = {
                 val content = innerLayoutNodeWrapper
                 val size = IntSize(content.measuredWidth, content.measuredHeight)
                 onRemeasuredCallbacks.forEach { it.onRemeasured(size) }
             }
+            owner?.snapshotObserver?.pauseSnapshotReadObservation(invokeRemeasureCallbacks)
+                ?: invokeRemeasureCallbacks.invoke()
         }
     }
 
@@ -1128,7 +1130,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * model reads even if you are currently inside some observed scope like measuring.
      */
     fun ignoreModelReads(block: () -> Unit) {
-        requireOwner().pauseModelReadObserveration(block)
+        requireOwner().snapshotObserver.pauseSnapshotReadObservation(block)
     }
 
     internal fun dispatchOnPositionedCallbacks() {
