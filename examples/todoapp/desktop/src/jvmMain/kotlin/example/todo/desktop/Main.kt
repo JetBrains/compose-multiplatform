@@ -1,6 +1,5 @@
 package example.todo.desktop
 
-import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.DesktopTheme
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,17 +23,19 @@ fun main() {
     val lifecycle = LifecycleRegistry()
     lifecycle.resume()
 
+    val todoRoot = TodoRoot(
+        componentContext = DefaultComponentContext(lifecycle),
+        dependencies = object : TodoRoot.Dependencies {
+            override val storeFactory = DefaultStoreFactory
+            override val database = TodoDatabase(TodoDatabaseDriver())
+        }
+    )
+
     Window("Todo") {
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme {
                 DesktopTheme {
-                    TodoRoot(
-                        componentContext = DefaultComponentContext(lifecycle),
-                        dependencies = object : TodoRoot.Dependencies {
-                            override val storeFactory = DefaultStoreFactory
-                            override val database = TodoDatabase(TodoDatabaseDriver())
-                        }
-                    ).invoke()
+                    todoRoot.invoke()
                 }
             }
         }
