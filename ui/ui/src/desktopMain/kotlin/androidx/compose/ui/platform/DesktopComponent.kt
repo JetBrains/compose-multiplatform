@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.unit.Density
 import java.awt.Point
 import java.awt.im.InputMethodRequests
 
@@ -24,5 +25,7 @@ interface DesktopComponent : DesktopInputComponent
 object DummyDesktopComponent : DesktopComponent {
     override fun enableInput(inputMethodRequests: InputMethodRequests) {}
     override fun disableInput() {}
-    override fun locationOnScreen() = Point(0, 0)
+    override val locationOnScreen = Point(0, 0)
+    override val density: Density
+        get() = Density(1f, 1f)
 }

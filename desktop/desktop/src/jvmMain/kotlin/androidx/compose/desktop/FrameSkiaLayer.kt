@@ -26,6 +26,7 @@ import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import java.awt.DisplayMode
+import java.awt.Point
 import java.awt.event.FocusEvent
 import java.awt.im.InputMethodRequests
 
@@ -72,7 +73,11 @@ internal class FrameSkiaLayer {
             currentInputMethodRequests = null
         }
 
-        override fun locationOnScreen() = locationOnScreen
+        override val locationOnScreen: Point
+            get() = super.getLocationOnScreen()
+
+        override val density: Density
+            get() = this@FrameSkiaLayer.density
 
         override fun scaleCanvas(dpi: Float) {}
     }
