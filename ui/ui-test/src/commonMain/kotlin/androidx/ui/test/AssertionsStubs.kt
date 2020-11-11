@@ -171,6 +171,7 @@ fun SemanticsNodeInteraction.assertIsSelectable() =
 /**
  * @Deprecated Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Moved to androidx.compose.ui.test in androidx.compose.ui:ui-test library",
     replaceWith = ReplaceWith("assertIsInMutuallyExclusiveGroup()", "androidx.compose.ui.test")

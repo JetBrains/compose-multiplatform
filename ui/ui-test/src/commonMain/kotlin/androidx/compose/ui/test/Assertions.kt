@@ -155,9 +155,15 @@ fun SemanticsNodeInteraction.assertIsNotFocused(): SemanticsNodeInteraction =
 /**
  * Asserts the semantics node is in a mutually exclusive group. This is used by radio groups to
  * assert only one is selected at a given time.
+ *
+ * @Deprecated Replaced with androidx.compose.ui.test.assertIsSelectable
  */
+@Deprecated(
+    "Replaced with androidx.compose.ui.test.assertIsSelectable",
+    ReplaceWith("assertIsSelectable()", "androidx.compose.ui.test")
+)
 fun SemanticsNodeInteraction.assertIsInMutuallyExclusiveGroup(): SemanticsNodeInteraction =
-    assert(isInMutuallyExclusiveGroup())
+    assertIsSelectable()
 
 /**
  * Asserts the node's label equals the given String.

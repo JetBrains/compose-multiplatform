@@ -17,14 +17,14 @@ package androidx.compose.material
 
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.selection.ToggleableState
-import androidx.compose.foundation.selection.ToggleableState.Indeterminate
-import androidx.compose.foundation.selection.ToggleableState.Off
-import androidx.compose.foundation.selection.ToggleableState.On
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.state.ToggleableState.Indeterminate
+import androidx.compose.ui.state.ToggleableState.Off
+import androidx.compose.ui.state.ToggleableState.On
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff

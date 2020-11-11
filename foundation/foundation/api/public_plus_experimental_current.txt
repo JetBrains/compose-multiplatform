@@ -356,38 +356,8 @@ package androidx.compose.foundation.selection {
   }
 
   public final class ToggleableKt {
-    method public static androidx.compose.foundation.selection.ToggleableState ToggleableState(boolean value);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier toggleable(androidx.compose.ui.Modifier, boolean value, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.foundation.selection.ToggleableState state, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
-  }
-
-  public enum ToggleableState {
-    enum_constant public static final androidx.compose.foundation.selection.ToggleableState Indeterminate;
-    enum_constant public static final androidx.compose.foundation.selection.ToggleableState Off;
-    enum_constant public static final androidx.compose.foundation.selection.ToggleableState On;
-  }
-
-}
-
-package androidx.compose.foundation.semantics {
-
-  public final class FoundationSemanticsProperties {
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getInMutuallyExclusiveGroup();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getSelected();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.foundation.selection.ToggleableState> getToggleableState();
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> InMutuallyExclusiveGroup;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Selected;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.foundation.selection.ToggleableState> ToggleableState;
-    field public static final androidx.compose.foundation.semantics.FoundationSemanticsProperties INSTANCE;
-  }
-
-  public final class FoundationSemanticsPropertiesKt {
-    method public static boolean getInMutuallyExclusiveGroup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static boolean getSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.foundation.selection.ToggleableState getToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void setInMutuallyExclusiveGroup(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
-    method public static void setSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
-    method public static void setToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.foundation.selection.ToggleableState p);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState state, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
 }

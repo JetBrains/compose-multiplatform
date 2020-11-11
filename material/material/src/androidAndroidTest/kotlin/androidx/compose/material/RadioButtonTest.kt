@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.assertIsInMutuallyExclusiveGroup
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertValueEquals
@@ -49,14 +48,10 @@ class RadioButtonTest {
     private val itemThree = "Sap"
 
     private fun SemanticsNodeInteraction.assertHasSelectedSemantics(): SemanticsNodeInteraction =
-        assertIsInMutuallyExclusiveGroup()
-            .assertIsSelected()
-            .assertValueEquals(Strings.Selected)
+        assertIsSelected().assertValueEquals(Strings.Selected)
 
     private fun SemanticsNodeInteraction.assertHasUnSelectedSemantics(): SemanticsNodeInteraction =
-        assertIsInMutuallyExclusiveGroup()
-            .assertIsNotSelected()
-            .assertValueEquals(Strings.NotSelected)
+        assertIsNotSelected().assertValueEquals(Strings.NotSelected)
 
     private val options = listOf(itemOne, itemTwo, itemThree)
 

@@ -49,9 +49,6 @@ dependencies {
         implementation(ESPRESSO_CORE)
         implementation "androidx.collection:collection:1.1.0"
         implementation project(":compose:runtime:runtime")
-        implementation project(":compose:foundation:foundation")
-        implementation project(":compose:foundation:foundation-layout")
-        implementation project(":compose:foundation:foundation-text")
 
         testImplementation(TRUTH)
 
@@ -75,9 +72,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
         sourceSets {
             commonMain.dependencies {
-                implementation project(":compose:foundation:foundation")
-                implementation project(":compose:foundation:foundation-layout")
-                implementation project(":compose:foundation:foundation-text")
                 api project(":compose:runtime:runtime-dispatch")
                 api project(":compose:ui:ui")
                 api project(":compose:ui:ui-geometry")
