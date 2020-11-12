@@ -62,7 +62,6 @@ class DesktopComposeTestRule : ComposeTestRule {
     var owners: DesktopOwners? = null
     private var owner: DesktopOwner? = null
 
-    @ExperimentalTesting
     override val clockTestRule: AnimationClockTestRule = DesktopAnimationClockTestRule()
 
     override val density: Density

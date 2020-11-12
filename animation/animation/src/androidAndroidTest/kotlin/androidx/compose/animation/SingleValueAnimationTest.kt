@@ -33,7 +33,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Position
@@ -48,7 +47,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@OptIn(ExperimentalTesting::class)
 class SingleValueAnimationTest {
 
     @get:Rule
