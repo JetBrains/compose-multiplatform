@@ -10,7 +10,7 @@ object Deps {
         }
 
         object Compose {
-            // __UPDATE_COMPOSE_VERSION_MARKER__
+            // __LATEST_COMPOSE_RELEASE_VERSION__
             private const val VERSION = "0.1.0-build113"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }

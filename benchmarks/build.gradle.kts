@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.allopen.gradle.*
 
 plugins {
     kotlin("jvm") version "1.4.0"
-    // __UPDATE_COMPOSE_VERSION_MARKER__
+    // __LATEST_COMPOSE_RELEASE_VERSION__
     id("org.jetbrains.compose") version "0.1.0-build113"
     kotlin("plugin.allopen") version "1.4.0"
     id("kotlinx.benchmark") version "0.2.0-dev-20"
