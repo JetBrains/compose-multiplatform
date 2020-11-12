@@ -34,6 +34,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -1677,6 +1678,22 @@ class LayoutNodeTest {
         )
     }
 
+    @Test
+    fun measureResultAndPositionChangesCallOnLayoutChange() {
+        val node = LayoutNode(20, 20, 100, 100)
+        val owner = MockOwner()
+        node.attach(owner)
+        node.innerLayoutNodeWrapper.measureResult = object : MeasureResult {
+            override val width = 50
+            override val height = 50
+            override val alignmentLines: Map<AlignmentLine, Int> get() = mapOf()
+            override fun placeChildren() {}
+        }
+        assertEquals(1, owner.layoutChangeCount)
+        node.place(0, 0)
+        assertEquals(2, owner.layoutChangeCount)
+    }
+
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
         val layoutNode = ZeroSizedLayoutNode()
         val child1 = ZeroSizedLayoutNode()
@@ -1700,6 +1717,7 @@ private class MockOwner(
     val onRequestMeasureParams = mutableListOf<LayoutNode>()
     val onAttachParams = mutableListOf<LayoutNode>()
     val onDetachParams = mutableListOf<LayoutNode>()
+    var layoutChangeCount = 0
 
     override val hapticFeedBack: HapticFeedback
         get() = TODO("Not yet implemented")
@@ -1806,6 +1824,10 @@ private class MockOwner(
     }
 
     override fun onSemanticsChange() {
+    }
+
+    override fun onLayoutChange(layoutNode: LayoutNode) {
+        layoutChangeCount++
     }
 
     override var measureIteration: Long = 0

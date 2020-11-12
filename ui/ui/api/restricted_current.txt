@@ -2162,6 +2162,7 @@ package androidx.compose.ui.node {
     method public void measureAndLayout();
     method public void onAttach(androidx.compose.ui.node.LayoutNode node);
     method public void onDetach(androidx.compose.ui.node.LayoutNode node);
+    method public void onLayoutChange(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onRequestMeasure(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onRequestRelayout(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onSemanticsChange();

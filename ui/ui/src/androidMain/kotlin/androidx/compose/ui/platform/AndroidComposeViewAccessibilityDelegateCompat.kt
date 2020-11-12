@@ -38,6 +38,8 @@ import androidx.annotation.RequiresApi
 import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsActions.CustomActions
@@ -58,7 +60,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalLayoutNodeApi::class
+)
 internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidComposeView) :
     AccessibilityDelegateCompat() {
     companion object {
@@ -1175,6 +1180,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             checkingForSemanticsChanges = true
             handler.post(semanticsChangeChecker)
         }
+    }
+
+    internal fun onLayoutChange(layoutNode: LayoutNode) {
     }
 
     private fun checkForSemanticsChanges() {

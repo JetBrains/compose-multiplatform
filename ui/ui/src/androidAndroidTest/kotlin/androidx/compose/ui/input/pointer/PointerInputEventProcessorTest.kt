@@ -3193,6 +3193,9 @@ private class MockOwner(
     override fun onSemanticsChange() {
     }
 
+    override fun onLayoutChange(layoutNode: LayoutNode) {
+    }
+
     override val measureIteration: Long
         get() = 0
 
