@@ -18,10 +18,12 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.AnimationClockObserver
 import androidx.compose.animation.core.InternalAnimationApi
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestAnimationClock
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
+@ExperimentalTesting
 internal class DesktopTestAnimationClock : TestAnimationClock {
     override val isIdle: Boolean
         get() = TODO("Not yet implemented")
@@ -50,6 +52,7 @@ internal class DesktopTestAnimationClock : TestAnimationClock {
     }
 }
 
+@ExperimentalTesting
 internal class DesktopAnimationClockTestRule : AnimationClockTestRule {
 
     override val clock: TestAnimationClock get() = DesktopTestAnimationClock()
@@ -86,5 +89,6 @@ internal class DesktopAnimationClockTestRule : AnimationClockTestRule {
     }
 }
 
+@ExperimentalTesting
 actual fun createAnimationClockRule(): AnimationClockTestRule =
     DesktopAnimationClockTestRule()

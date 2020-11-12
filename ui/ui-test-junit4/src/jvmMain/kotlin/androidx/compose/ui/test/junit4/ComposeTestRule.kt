@@ -45,6 +45,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
      * A test rule that allows you to control the animation clock
      */
+    @OptIn(ExperimentalTesting::class)
     val clockTestRule: AnimationClockTestRule
 
     /**
