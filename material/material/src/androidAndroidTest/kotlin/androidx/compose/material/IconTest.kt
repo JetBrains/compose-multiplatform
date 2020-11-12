@@ -15,6 +15,7 @@
  */
 package androidx.compose.material
 
+import android.os.Build
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.testutils.assertPixels
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -142,6 +144,7 @@ class IconTest {
             .assertHeightIsEqualTo(height)
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun iconUnspecifiedTintColorIgnored() {
         val width = 35.dp
@@ -164,6 +167,7 @@ class IconTest {
         rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Red }
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun iconSpecifiedTintColorApplied() {
         val width = 35.dp
