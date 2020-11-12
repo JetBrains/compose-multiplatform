@@ -28,6 +28,13 @@ Features:
 ./gradlew :desktop:run
 ```
 
+#### Screenshots
+
+<details><summary>Desktop</summary>
+
+![MacOS Todo main screen](screenshots/MacOS-20201112.png)
+</details>
+
 ### Building native desktop distribution
 ```
 ./gradlew :desktop:package
@@ -37,3 +44,13 @@ Features:
 ### Running Android application
 
 Open project in Intellij IDEA or Android Studio and run "android" configuration.
+
+#### Screenshots
+
+<details><summary>Android</summary>
+
+  <p align="center">
+    <img src="screenshots/Android-20201111.png" alt="Android Todo main screen" width="350"/>
+  </p>
+
+</details>
