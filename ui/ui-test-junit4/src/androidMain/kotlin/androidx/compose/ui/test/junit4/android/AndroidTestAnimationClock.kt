@@ -19,7 +19,6 @@ package androidx.compose.ui.test.junit4.android
 import android.view.Choreographer
 import androidx.compose.animation.core.AnimationClockObserver
 import androidx.compose.animation.core.ManualAnimationClock
-import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.compose.ui.test.junit4.runOnUiThread
 
@@ -36,7 +35,6 @@ import androidx.compose.ui.test.junit4.runOnUiThread
  * @see advanceClock
  * @see resumeClock
  */
-@ExperimentalTesting
 internal class AndroidTestAnimationClock : TestAnimationClock {
 
     /**

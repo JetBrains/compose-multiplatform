@@ -57,7 +57,6 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.TextInputServiceAmbient
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
@@ -96,7 +95,7 @@ import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFocus::class, ExperimentalTesting::class)
+@OptIn(ExperimentalFocus::class)
 class TextFieldTest {
 
     private val ExpectedMinimumTextFieldHeight = 56.dp
