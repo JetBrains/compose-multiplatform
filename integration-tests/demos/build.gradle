@@ -36,7 +36,7 @@ dependencies {
 
     implementation "androidx.preference:preference-ktx:1.1.0"
 
-    androidTestImplementation project(":ui:ui-test")
+    androidTestImplementation project(":compose:ui:ui-test-junit4")
 
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(ANDROIDX_TEST_RUNNER)

@@ -58,7 +58,6 @@ dependencies {
         testImplementation(KOTLIN_COROUTINES_TEST)
 
         androidTestImplementation project(":compose:test-utils")
-        androidTestImplementation project(':ui:ui-test')
         androidTestImplementation project(":compose:ui:ui-test-font")
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
@@ -116,7 +115,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation project(":compose:test-utils")
-                implementation project(':ui:ui-test')
                 implementation project(":compose:ui:ui-test-font")
 
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
@@ -135,7 +133,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopTest.dependencies {
-                implementation project(':ui:ui-test')
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation(TRUTH)
                 implementation(JUNIT)
                 implementation(SKIKO_CURRENT_OS)

@@ -62,11 +62,11 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         }
 
         androidTestImplementation project(":compose:ui:ui-test-font")
+        androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
-        androidTestImplementation project(":ui:ui-test")
         androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
         // DexMaker has it"s own MockMaker
         androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy)
@@ -134,12 +134,12 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidAndroidTest.dependencies {
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation project(":compose:ui:ui-test-font")
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(ESPRESSO_CORE)
                 implementation(JUNIT)
-                implementation project(":ui:ui-test")
                 implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
                 // DexMaker has it"s own MockMaker
                 implementation(MOCKITO_CORE, libs.exclude_bytebuddy)

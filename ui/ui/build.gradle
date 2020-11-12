@@ -79,7 +79,7 @@ dependencies {
             exclude group: 'org.mockito' // to keep control on the mockito version
         }
         testImplementation(ROBOLECTRIC)
-        testImplementation project(":ui:ui-test")
+        testImplementation project(":compose:ui:ui-test-junit4")
         testImplementation project(":compose:test-utils")
 
         androidTestImplementation "androidx.fragment:fragment:1.2.4"
@@ -102,7 +102,7 @@ dependencies {
         androidTestImplementation project(":compose:foundation:foundation-text")
         androidTestImplementation project(":compose:test-utils")
         androidTestImplementation project(":compose:ui:ui-test-font")
-        androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
 
         lintChecks project(":compose:ui:ui-lint")
@@ -171,7 +171,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                     exclude group: 'org.mockito' // to keep control on the mockito version
                 }
                 implementation(ROBOLECTRIC)
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation project(":compose:test-utils")
             }
 
@@ -196,7 +196,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:foundation:foundation-text")
                 implementation project(":compose:test-utils")
                 implementation project(":compose:ui:ui-test-font")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation "androidx.recyclerview:recyclerview:1.1.0"
             }
 
@@ -209,7 +209,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 }
                 implementation(SKIKO_CURRENT_OS)
                 implementation project(":compose:foundation:foundation")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
             }
         }
     }

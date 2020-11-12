@@ -36,7 +36,6 @@ dependencies {
 
     androidTestImplementation project(':compose:foundation:foundation')
     androidTestImplementation project(":compose:test-utils")
-    androidTestImplementation project(':ui:ui-test')
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(TRUTH)
