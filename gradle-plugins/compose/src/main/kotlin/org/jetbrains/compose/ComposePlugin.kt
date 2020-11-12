@@ -5,6 +5,7 @@ package org.jetbrains.compose
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
@@ -16,6 +17,16 @@ class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
+
+        if (!project.buildFile.endsWith(".gradle.kts")) {
+            // add compose extension for Groovy DSL to work
+            project.dependencies.extensions.add("compose", Dependencies)
+            project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
+                (project.extensions.getByName("kotlin") as? ExtensionAware)?.apply {
+                    extensions.add("compose", Dependencies)
+                }
+            }
+        }
 
         project.afterEvaluate {
             if (desktopExtension._isApplicationInitialized) {
