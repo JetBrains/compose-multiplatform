@@ -43,7 +43,6 @@ import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composition
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -126,8 +125,6 @@ open class ComposeTapInAndroidTap : ComponentActivity() {
 
     private var currentColor = Color.DarkGray
 
-    private lateinit var composition: Composition
-
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,11 +164,6 @@ open class ComposeTapInAndroidTap : ComponentActivity() {
                 )
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        composition.dispose()
     }
 }
 
