@@ -51,9 +51,9 @@ import androidx.compose.ui.unit.TextUnit
  *
  * For ease of use, commonly used parameters from [TextStyle] are also present here. The order of
  * precedence is as follows:
- * - If a parameter is explicitly set here (i.e, it is _not_ `null` or [TextUnit.Inherit]), then
- * this parameter will always be used.
- * - If a parameter is _not_ set, (`null` or [TextUnit.Inherit]), then the corresponding value
+ * - If a parameter is explicitly set here (i.e, it is _not_ `null` or [TextUnit.Unspecified]),
+ * then this parameter will always be used.
+ * - If a parameter is _not_ set, (`null` or [TextUnit.Unspecified]), then the corresponding value
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
@@ -103,14 +103,14 @@ fun Text(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Inherit,
+    fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
     fontFamily: FontFamily? = null,
-    letterSpacing: TextUnit = TextUnit.Inherit,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,
-    lineHeight: TextUnit = TextUnit.Inherit,
+    lineHeight: TextUnit = TextUnit.Unspecified,
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
@@ -148,9 +148,9 @@ fun Text(
  *
  * For ease of use, commonly used parameters from [TextStyle] are also present here. The order of
  * precedence is as follows:
- * - If a parameter is explicitly set here (i.e, it is _not_ `null` or [TextUnit.Inherit]), then
- * this parameter will always be used.
- * - If a parameter is _not_ set, (`null` or [TextUnit.Inherit]), then the corresponding value
+ * - If a parameter is explicitly set here (i.e, it is _not_ `null` or [TextUnit.Unspecified]),
+ * then this parameter will always be used.
+ * - If a parameter is _not_ set, (`null` or [TextUnit.Unspecified]), then the corresponding value
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
@@ -202,14 +202,14 @@ fun Text(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Inherit,
+    fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
     fontFamily: FontFamily? = null,
-    letterSpacing: TextUnit = TextUnit.Inherit,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,
-    lineHeight: TextUnit = TextUnit.Inherit,
+    lineHeight: TextUnit = TextUnit.Unspecified,
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,

@@ -504,7 +504,7 @@ class ParagraphPlaceholderIntegrationTest {
 
     private fun simpleParagraph(
         text: String = "",
-        fontSize: TextUnit = TextUnit.Inherit,
+        fontSize: TextUnit = TextUnit.Unspecified,
         spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
         placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
         width: Float = Float.MAX_VALUE,

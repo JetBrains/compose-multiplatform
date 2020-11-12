@@ -589,9 +589,9 @@ class ParameterFactoryTest {
             parameter("style", ParameterType.String, TextStyle::class.java.simpleName) {
                 parameter("background", ParameterType.String, "Unspecified")
                 parameter("color", ParameterType.Color, Color.Red.toArgb())
-                parameter("fontSize", ParameterType.String, "Inherit")
-                parameter("letterSpacing", ParameterType.String, "Inherit")
-                parameter("lineHeight", ParameterType.String, "Inherit")
+                parameter("fontSize", ParameterType.String, "Unspecified")
+                parameter("letterSpacing", ParameterType.String, "Unspecified")
+                parameter("lineHeight", ParameterType.String, "Unspecified")
                 parameter("textDecoration", ParameterType.String, "Underline")
             }
         }
@@ -599,7 +599,9 @@ class ParameterFactoryTest {
 
     @Test
     fun testTextUnit() {
-        assertThat(lookup(TextUnit.Inherit)).isEqualTo(ParameterType.String to "Inherit")
+        @Suppress("DEPRECATION")
+        assertThat(lookup(TextUnit.Inherit)).isEqualTo(ParameterType.String to "Unspecified")
+        assertThat(lookup(TextUnit.Unspecified)).isEqualTo(ParameterType.String to "Unspecified")
         assertThat(lookup(12.0.sp)).isEqualTo(ParameterType.DimensionSp to 12.0f)
         assertThat(lookup(2.0.em)).isEqualTo(ParameterType.DimensionEm to 2.0f)
         assertThat(lookup(TextUnit.Sp(9.0f))).isEqualTo(ParameterType.DimensionSp to 9.0f)

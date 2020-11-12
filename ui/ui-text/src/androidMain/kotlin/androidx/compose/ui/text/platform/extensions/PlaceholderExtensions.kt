@@ -62,11 +62,12 @@ private fun Spannable.setPlaceholder(
 
 /** Helper function that converts [TextUnit.type] to the unit in [PlaceholderSpan]. */
 @OptIn(InternalPlatformTextApi::class)
+@Suppress("DEPRECATION")
 private val TextUnit.spanUnit: Int
     get() = when (type) {
         TextUnitType.Sp -> PlaceholderSpan.UNIT_SP
         TextUnitType.Em -> PlaceholderSpan.UNIT_EM
-        TextUnitType.Inherit -> PlaceholderSpan.UNIT_INHERIT
+        TextUnitType.Unspecified, TextUnitType.Inherit -> PlaceholderSpan.UNIT_UNSPECIFIED
     }
 
 /**

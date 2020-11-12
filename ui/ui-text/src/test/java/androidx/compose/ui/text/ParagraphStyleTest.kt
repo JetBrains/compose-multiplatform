@@ -109,9 +109,9 @@ class ParagraphStyleTest {
     }
 
     @Test
-    fun `merge lineHeight other Inherit, return original`() {
+    fun `merge lineHeight other unspecified, return original`() {
         val style = ParagraphStyle(lineHeight = 12.sp)
-        val otherStyle = ParagraphStyle(lineHeight = TextUnit.Inherit)
+        val otherStyle = ParagraphStyle(lineHeight = TextUnit.Unspecified)
 
         val newStyle = style.merge(otherStyle)
 
@@ -119,13 +119,13 @@ class ParagraphStyleTest {
     }
 
     @Test
-    fun `merge lineHeight both inherit returns inherit`() {
-        val style = ParagraphStyle(lineHeight = TextUnit.Inherit)
-        val otherStyle = ParagraphStyle(lineHeight = TextUnit.Inherit)
+    fun `merge lineHeight both unspecified returns unspecified`() {
+        val style = ParagraphStyle(lineHeight = TextUnit.Unspecified)
+        val otherStyle = ParagraphStyle(lineHeight = TextUnit.Unspecified)
 
         val newStyle = style.merge(otherStyle)
 
-        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Inherit)
+        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Unspecified)
     }
 
     @Test
@@ -263,7 +263,7 @@ class ParagraphStyleTest {
     }
 
     @Test
-    fun `lerp lineHeight with a and b are not inherit`() {
+    fun `lerp lineHeight with a and b are specified`() {
         val style1 = ParagraphStyle(lineHeight = 10.sp)
         val style2 = ParagraphStyle(lineHeight = 20.sp)
         val fraction = 0.4f
@@ -276,24 +276,24 @@ class ParagraphStyleTest {
     }
 
     @Test
-    fun `lerp lineHeight with a and b are inherit`() {
-        val style1 = ParagraphStyle(lineHeight = TextUnit.Inherit)
-        val style2 = ParagraphStyle(lineHeight = TextUnit.Inherit)
+    fun `lerp lineHeight with a and b are unspecified`() {
+        val style1 = ParagraphStyle(lineHeight = TextUnit.Unspecified)
+        val style2 = ParagraphStyle(lineHeight = TextUnit.Unspecified)
 
         val newStyle = lerp(start = style1, stop = style2, fraction = 0.4f)
 
-        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Inherit)
+        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Unspecified)
     }
 
     @Test
-    fun `lerp lineHeight with either a or b is inherit`() {
-        val style1 = ParagraphStyle(lineHeight = TextUnit.Inherit)
+    fun `lerp lineHeight with either a or b is unspecified`() {
+        val style1 = ParagraphStyle(lineHeight = TextUnit.Unspecified)
         val style2 = ParagraphStyle(lineHeight = 22.sp)
 
         val newStyle = lerp(start = style1, stop = style2, fraction = 0.4f)
         val anotherNewStyle = lerp(start = style1, stop = style2, fraction = 0.8f)
 
-        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Inherit)
+        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Unspecified)
         assertThat(anotherNewStyle.lineHeight).isEqualTo(22.sp)
     }
 }

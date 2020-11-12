@@ -1442,7 +1442,7 @@ class MultiParagraphIntegrationTest {
 
     private fun simpleMultiParagraphIntrinsics(
         text: AnnotatedString,
-        fontSize: TextUnit = TextUnit.Inherit,
+        fontSize: TextUnit = TextUnit.Unspecified,
         placeholders: List<AnnotatedString.Range<Placeholder>> = listOf()
     ): MultiParagraphIntrinsics {
         return MultiParagraphIntrinsics(
@@ -1460,7 +1460,7 @@ class MultiParagraphIntegrationTest {
     private fun simpleMultiParagraph(
         text: String,
         style: TextStyle? = null,
-        fontSize: TextUnit = TextUnit.Inherit,
+        fontSize: TextUnit = TextUnit.Unspecified,
         maxLines: Int = Int.MAX_VALUE,
         width: Float = Float.MAX_VALUE
     ): MultiParagraph {
@@ -1480,7 +1480,7 @@ class MultiParagraphIntegrationTest {
     private fun simpleMultiParagraph(
         text: AnnotatedString,
         style: TextStyle? = null,
-        fontSize: TextUnit = TextUnit.Inherit,
+        fontSize: TextUnit = TextUnit.Unspecified,
         maxLines: Int = Int.MAX_VALUE,
         width: Float = Float.MAX_VALUE,
         localeList: LocaleList? = null

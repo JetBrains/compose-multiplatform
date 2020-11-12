@@ -437,7 +437,7 @@ internal class ParagraphBuilder(
         with(density) {
             return when {
                 units.isSp -> units.toPx()
-                units.isInherit -> currentStyle?.fontSize ?: DefaultFontSize.toPx()
+                units.isUnspecified -> currentStyle?.fontSize ?: DefaultFontSize.toPx()
                 units.isEm -> {
                     val currentFontSize: Float? = currentStyle?.fontSize
                     (currentFontSize ?: DefaultFontSize.toPx()) * units.value

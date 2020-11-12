@@ -415,11 +415,13 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return parameter
         }
 
+        @Suppress("DEPRECATION")
         private fun createFromTextUnit(name: String, value: TextUnit): NodeParameter? =
             when (value.type) {
                 TextUnitType.Sp -> NodeParameter(name, ParameterType.DimensionSp, value.value)
                 TextUnitType.Em -> NodeParameter(name, ParameterType.DimensionEm, value.value)
-                TextUnitType.Inherit -> NodeParameter(name, ParameterType.String, "Inherit")
+                TextUnitType.Inherit, TextUnitType.Unspecified ->
+                    NodeParameter(name, ParameterType.String, "Unspecified")
             }
 
         private fun createFromImageVector(name: String, value: ImageVector): NodeParameter? =
