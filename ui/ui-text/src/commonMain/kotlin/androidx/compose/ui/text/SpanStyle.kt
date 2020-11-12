@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.lerp
  *
  * @param color The text color.
  * @param fontSize The size of glyphs (in logical pixels) to use when painting the text. This
- * may be [TextUnit.Inherit] for inheriting from another [SpanStyle].
+ * may be [TextUnit.Unspecified] for inheriting from another [SpanStyle].
  * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight or
@@ -70,13 +70,13 @@ import androidx.compose.ui.unit.lerp
 @Immutable
 data class SpanStyle(
     val color: Color = Color.Unspecified,
-    val fontSize: TextUnit = TextUnit.Inherit,
+    val fontSize: TextUnit = TextUnit.Unspecified,
     val fontWeight: FontWeight? = null,
     val fontStyle: FontStyle? = null,
     val fontSynthesis: FontSynthesis? = null,
     val fontFamily: FontFamily? = null,
     val fontFeatureSettings: String? = null,
-    val letterSpacing: TextUnit = TextUnit.Inherit,
+    val letterSpacing: TextUnit = TextUnit.Unspecified,
     val baselineShift: BaselineShift? = null,
     val textGeometricTransform: TextGeometricTransform? = null,
     val localeList: LocaleList? = null,
@@ -100,12 +100,12 @@ data class SpanStyle(
         return SpanStyle(
             color = other.color.useOrElse { this.color },
             fontFamily = other.fontFamily ?: this.fontFamily,
-            fontSize = if (!other.fontSize.isInherit) other.fontSize else this.fontSize,
+            fontSize = if (!other.fontSize.isUnspecified) other.fontSize else this.fontSize,
             fontWeight = other.fontWeight ?: this.fontWeight,
             fontStyle = other.fontStyle ?: this.fontStyle,
             fontSynthesis = other.fontSynthesis ?: this.fontSynthesis,
             fontFeatureSettings = other.fontFeatureSettings ?: this.fontFeatureSettings,
-            letterSpacing = if (!other.letterSpacing.isInherit) {
+            letterSpacing = if (!other.letterSpacing.isUnspecified) {
                 other.letterSpacing
             } else {
                 this.letterSpacing
@@ -127,11 +127,11 @@ data class SpanStyle(
 }
 
 /**
- * @param a An sp value. Maybe [TextUnit.Inherit]
- * @param b An sp value. Maybe [TextUnit.Inherit]
+ * @param a An sp value. Maybe [TextUnit.Unspecified]
+ * @param b An sp value. Maybe [TextUnit.Unspecified]
  */
 internal fun lerpTextUnitInheritable(a: TextUnit, b: TextUnit, t: Float): TextUnit {
-    if (a.isInherit || b.isInherit) return lerpDiscrete(a, b, t)
+    if (a.isUnspecified || b.isUnspecified) return lerpDiscrete(a, b, t)
     return lerp(a, b, t)
 }
 

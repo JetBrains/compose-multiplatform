@@ -25,12 +25,12 @@ import androidx.compose.ui.unit.TextUnit
  * paragraph.
  *
  * @param width the width of the placeholder, it must be specified in sp or em.
- * [TextUnit.Inherit] is not allowed.
+ * [TextUnit.Unspecified] is not allowed.
  * @param height the height of the placeholder, it must be specified in sp or em.
- * [TextUnit.Inherit] is not allowed.
+ * [TextUnit.Unspecified] is not allowed.
  * @param placeholderVerticalAlign the vertical alignment of the placeholder within the text line.
  * Check [PlaceholderVerticalAlign] for more information.
- * @throws IllegalArgumentException if [TextUnit.Inherit] is passed to [width] or [height].
+ * @throws IllegalArgumentException if [TextUnit.Unspecified] is passed to [width] or [height].
  */
 @Immutable
 data class Placeholder(
@@ -39,8 +39,8 @@ data class Placeholder(
     val placeholderVerticalAlign: PlaceholderVerticalAlign
 ) {
     init {
-        require(!width.isInherit) { "width cannot be TextUnit.Inherit" }
-        require(!height.isInherit) { "height cannot be TextUnit.Inherit" }
+        require(!width.isUnspecified) { "width cannot be TextUnit.Unspecified" }
+        require(!height.isUnspecified) { "height cannot be TextUnit.Unspecified" }
     }
 }
 /**

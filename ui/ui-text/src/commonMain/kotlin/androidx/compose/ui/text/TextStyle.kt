@@ -43,7 +43,7 @@ private val DefaultLetterSpacing = 0.sp
 private val DefaultBackgroundColor = Color.Transparent
 // TODO(nona): Introduce TextUnit.Original for representing "do not change the original result".
 //  Need to distinguish from Inherit.
-private val DefaultLineHeight = TextUnit.Inherit
+private val DefaultLineHeight = TextUnit.Unspecified
 private val DefaultColor = Color.Black
 
 /**
@@ -53,7 +53,7 @@ private val DefaultColor = Color.Black
  *
  * @param color The text color.
  * @param fontSize The size of glyphs to use when painting the text. This
- * may be [TextUnit.Inherit] for inheriting from another [TextStyle].
+ * may be [TextUnit.Unspecified] for inheriting from another [TextStyle].
  * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight or
@@ -83,13 +83,13 @@ private val DefaultColor = Color.Black
 @Immutable
 data class TextStyle(
     val color: Color = Color.Unspecified,
-    val fontSize: TextUnit = TextUnit.Inherit,
+    val fontSize: TextUnit = TextUnit.Unspecified,
     val fontWeight: FontWeight? = null,
     val fontStyle: FontStyle? = null,
     val fontSynthesis: FontSynthesis? = null,
     val fontFamily: FontFamily? = null,
     val fontFeatureSettings: String? = null,
-    val letterSpacing: TextUnit = TextUnit.Inherit,
+    val letterSpacing: TextUnit = TextUnit.Unspecified,
     val baselineShift: BaselineShift? = null,
     val textGeometricTransform: TextGeometricTransform? = null,
     val localeList: LocaleList? = null,
@@ -98,7 +98,7 @@ data class TextStyle(
     val shadow: Shadow? = null,
     val textAlign: TextAlign? = null,
     val textDirection: TextDirection? = null,
-    val lineHeight: TextUnit = TextUnit.Inherit,
+    val lineHeight: TextUnit = TextUnit.Unspecified,
     val textIndent: TextIndent? = null
 ) {
     internal constructor(spanStyle: SpanStyle, paragraphStyle: ParagraphStyle) : this (
@@ -123,7 +123,7 @@ data class TextStyle(
     )
 
     init {
-        if (lineHeight != TextUnit.Inherit) {
+        if (!lineHeight.isUnspecified) {
             // Since we are checking if it's negative, no need to convert Sp into Px at this point.
             check(lineHeight.value >= 0f) {
                 "lineHeight can't be negative (${lineHeight.value})"
@@ -251,20 +251,20 @@ fun lerp(start: TextStyle, stop: TextStyle, fraction: Float): TextStyle {
 /**
  * Fills missing values in TextStyle with default values and resolve [TextDirection].
  *
- * This function will fill all null or [TextUnit.Inherit] field with actual values.
+ * This function will fill all null or [TextUnit.Unspecified] field with actual values.
  * @param style a text style to be resolved
  * @param direction a layout direction to be used for resolving text layout direction algorithm
  * @return resolved text style.
  */
 fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
     color = style.color.useOrElse { DefaultColor },
-    fontSize = if (style.fontSize == TextUnit.Inherit) DefaultFontSize else style.fontSize,
+    fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,
     fontWeight = style.fontWeight ?: FontWeight.Normal,
     fontStyle = style.fontStyle ?: FontStyle.Normal,
     fontSynthesis = style.fontSynthesis ?: FontSynthesis.All,
     fontFamily = style.fontFamily ?: FontFamily.Default,
     fontFeatureSettings = style.fontFeatureSettings ?: "",
-    letterSpacing = if (style.letterSpacing.isInherit) {
+    letterSpacing = if (style.letterSpacing.isUnspecified) {
         DefaultLetterSpacing
     } else {
         style.letterSpacing
@@ -277,7 +277,7 @@ fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
     shadow = style.shadow ?: Shadow.None,
     textAlign = style.textAlign ?: TextAlign.Start,
     textDirection = resolveTextDirection(direction, style.textDirection),
-    lineHeight = if (style.lineHeight.isInherit) DefaultLineHeight else style.lineHeight,
+    lineHeight = if (style.lineHeight.isUnspecified) DefaultLineHeight else style.lineHeight,
     textIndent = style.textIndent ?: TextIndent.None
 )
 

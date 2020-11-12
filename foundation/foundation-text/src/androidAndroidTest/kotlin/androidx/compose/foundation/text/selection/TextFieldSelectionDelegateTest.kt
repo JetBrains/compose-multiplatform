@@ -357,7 +357,7 @@ class TextFieldSelectionDelegateTest {
 
     private fun simpleTextLayout(
         text: String = "",
-        fontSize: TextUnit = TextUnit.Inherit,
+        fontSize: TextUnit = TextUnit.Unspecified,
         density: Density
     ): TextLayoutResult {
         val spanStyle = SpanStyle(fontSize = fontSize, fontFamily = fontFamily)

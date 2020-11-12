@@ -43,7 +43,7 @@ class TextStyleResolveDefaultsTest {
     private val DefaultFontSize = 14.sp
     private val DefaultLetterSpacing = 0.sp
     private val DefaultBackgroundColor = Color.Transparent
-    private val DefaultLineHeight = TextUnit.Inherit
+    private val DefaultLineHeight = TextUnit.Unspecified
     private val DefaultColor = Color.Black
 
     @Test
