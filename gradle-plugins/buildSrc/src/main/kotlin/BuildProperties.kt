@@ -7,8 +7,9 @@ object BuildProperties {
     const val website = "https://jetbrains.org/compose"
     const val vcs = "https://github.com/JetBrains/compose-jb"
     fun composeVersion(project: Project): String =
-        project.findProperty("compose.version") as? String
-            ?: System.getenv("COMPOSE_GRADLE_PLUGIN_COMPOSE_VERSION")
-            ?: "0.1.0-SNAPSHOT"
-    fun deployVersion(project: Project): String = System.getenv("COMPOSE_GRADLE_PLUGIN_VERSION") ?: composeVersion(project)
+        System.getenv("COMPOSE_GRADLE_PLUGIN_COMPOSE_VERSION")
+            ?: project.findProperty("compose.version") as String
+    fun deployVersion(project: Project): String =
+        System.getenv("COMPOSE_GRADLE_PLUGIN_VERSION")
+            ?: project.findProperty("deploy.version") as String
 }
