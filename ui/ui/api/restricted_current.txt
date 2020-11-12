@@ -2117,16 +2117,7 @@ package androidx.compose.ui.node {
     property public Object current;
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public interface ViewAdapter {
-    method public void didInsert(android.view.View view, android.view.ViewGroup parent);
-    method public void didUpdate(android.view.View view, android.view.ViewGroup parent);
-    method public int getId();
-    method public void willInsert(android.view.View view, android.view.ViewGroup parent);
-    property public abstract int id;
-  }
-
   public final class ViewInteropKt {
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public static <T extends androidx.compose.ui.node.ViewAdapter> T getOrAddAdapter(android.view.View, int id, kotlin.jvm.functions.Function0<? extends T> factory);
   }
 
 }
@@ -2188,12 +2179,6 @@ package androidx.compose.ui.platform {
     property public abstract kotlin.jvm.functions.Function1<android.content.res.Configuration,kotlin.Unit> configurationChangeObserver;
     property public abstract android.view.View view;
     property public abstract androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners? viewTreeOwners;
-  }
-
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public static final class AndroidOwner.Companion {
-    method public kotlin.jvm.functions.Function1<androidx.compose.ui.platform.AndroidOwner,kotlin.Unit>? getOnAndroidOwnerCreatedCallback();
-    method @org.jetbrains.annotations.TestOnly public void setOnAndroidOwnerCreatedCallback(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.AndroidOwner,kotlin.Unit>? p);
-    property public final kotlin.jvm.functions.Function1<androidx.compose.ui.platform.AndroidOwner,kotlin.Unit>? onAndroidOwnerCreatedCallback;
   }
 
   public static final class AndroidOwner.ViewTreeOwners {
