@@ -1,4 +1,8 @@
 // Baseline format: 1.0
+AutoBoxing: androidx.compose.ui.text.FractionTtsAnnotation#FractionTtsAnnotation(long, long, Long) parameter #2:
+    Must avoid boxed primitives (`java.lang.Long`)
+
+
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#append(String):
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.append(String)
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#append(androidx.compose.ui.text.AnnotatedString):
@@ -15,6 +19,8 @@ BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#pushStyle(andr
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.pushStyle(androidx.compose.ui.text.ParagraphStyle)
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#pushStyle(androidx.compose.ui.text.SpanStyle):
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.pushStyle(androidx.compose.ui.text.SpanStyle)
+BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#pushTtsAnnotation(androidx.compose.ui.text.TtsAnnotation):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.pushTtsAnnotation(androidx.compose.ui.text.TtsAnnotation)
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#toAnnotatedString():
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.toAnnotatedString()
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#toString():
