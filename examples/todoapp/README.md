@@ -37,3 +37,5 @@ Features:
 ### Running Android application
 
 Open project in Intellij IDEA or Android Studio and run "android" configuration.
+
+![Desktop](screenshots/todo.png)

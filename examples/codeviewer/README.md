@@ -15,3 +15,5 @@ MPP Code Viewer example for desktop/android written in Multiplatform Compose lib
 ```
 ./gradlew installDebug
 ```
+
+![Desktop](screenshots/codeviewer.png)

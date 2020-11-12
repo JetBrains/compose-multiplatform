@@ -11,3 +11,5 @@ Github Issues viewer example written in Jetpack Compose UI library.
 ./gradlew :desktop:package
 # outputs are written to desktop/build/compose/binaries
 ```
+
+![Desktop](screenshots/issues.png)
