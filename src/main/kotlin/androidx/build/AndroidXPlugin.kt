@@ -455,7 +455,7 @@ class AndroidXPlugin : Plugin<Project> {
             Jacoco.registerClassFilesTask(project, this)
         }
 
-        this.configureTestConfigGenerationViaReflection(project)
+        project.configureTestConfigGeneration(this)
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         testVariants.all { variant ->
@@ -563,7 +563,7 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        project.addAppApkToTestConfigGenerationViaReflection()
+        project.addAppApkToTestConfigGeneration()
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
