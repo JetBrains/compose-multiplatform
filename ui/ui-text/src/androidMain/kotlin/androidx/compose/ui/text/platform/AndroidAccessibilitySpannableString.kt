@@ -32,12 +32,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
+import androidx.compose.ui.text.length
 import androidx.compose.ui.text.platform.TypefaceAdapter.Companion.getTypefaceStyle
 import androidx.compose.ui.text.platform.extensions.setBackground
 import androidx.compose.ui.text.platform.extensions.setColor
 import androidx.compose.ui.text.platform.extensions.setFontSize
 import androidx.compose.ui.text.platform.extensions.setLocaleList
 import androidx.compose.ui.text.platform.extensions.setTextDecoration
+import androidx.compose.ui.text.platform.extensions.toSpan
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
 
@@ -54,6 +56,16 @@ fun AnnotatedString.toAccessibilitySpannableString(
     spanStyles.fastForEach { (style, start, end) ->
         spannableString.setSpanStyle(style, start, end, density, typefaceAdapter)
     }
+
+    getTtsAnnotations(0, length).fastForEach { (ttsAnnotation, start, end) ->
+        spannableString.setSpan(
+            ttsAnnotation.toSpan(),
+            start,
+            end,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+
     return spannableString
 }
 

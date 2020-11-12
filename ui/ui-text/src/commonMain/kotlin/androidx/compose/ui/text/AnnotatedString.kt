@@ -50,7 +50,7 @@ data class AnnotatedString internal constructor(
     val text: String,
     val spanStyles: List<SpanStyleRange> = listOf(),
     val paragraphStyles: List<ParagraphStyleRange> = listOf(),
-    internal val annotations: List<Range<String>> = listOf()
+    internal val annotations: List<Range<out Any>> = listOf()
 ) {
     /**
      * The basic data structure of text with multiple styles. To construct an [AnnotatedString]
@@ -113,7 +113,7 @@ data class AnnotatedString internal constructor(
      * list will be returned.
      */
     fun getStringAnnotations(tag: String, start: Int, end: Int): List<StringAnnotation> =
-        annotations.filter {
+        annotations.filterIsInstance<Range<String>>().filter {
             tag == it.tag && intersect(start, end, it.start, it.end)
         }
 
@@ -127,7 +127,23 @@ data class AnnotatedString internal constructor(
      * list will be returned.
      */
     fun getStringAnnotations(start: Int, end: Int): List<StringAnnotation> =
-        annotations.filter { intersect(start, end, it.start, it.end) }
+        annotations.filterIsInstance<Range<String>>().filter {
+            intersect(start, end, it.start, it.end)
+        }
+
+    /**
+     * Query all of the string annotations attached on this AnnotatedString.
+     *
+     * @param start the start of the query range, inclusive.
+     * @param end the end of the query range, exclusive.
+     * @return a list of annotations stored in [Range].  Notice that All annotations that intersect
+     * with the range [start, end) will be returned. When [start] is bigger than [end], an empty
+     * list will be returned.
+     */
+    fun getTtsAnnotations(start: Int, end: Int): List<Range<TtsAnnotation>> =
+        annotations.filterIsInstance<Range<TtsAnnotation>>().filter {
+            intersect(start, end, it.start, it.end)
+        }
 
     /**
      * The information attached on the text such as a [SpanStyle].
@@ -177,7 +193,7 @@ data class AnnotatedString internal constructor(
         private val text: StringBuilder = StringBuilder(capacity)
         private val spanStyles: MutableList<MutableRange<SpanStyle>> = mutableListOf()
         private val paragraphStyles: MutableList<MutableRange<ParagraphStyle>> = mutableListOf()
-        private val annotations: MutableList<MutableRange<String>> = mutableListOf()
+        private val annotations: MutableList<MutableRange<out Any>> = mutableListOf()
         private val styleStack: MutableList<MutableRange<out Any>> = mutableListOf()
 
         /**
@@ -236,7 +252,9 @@ data class AnnotatedString internal constructor(
             }
 
             text.annotations.forEach {
-                addStringAnnotation(it.tag, it.item, start + it.start, start + it.end)
+                annotations.add(
+                    MutableRange(it.item, start + it.start, start + it.end, it.tag)
+                )
             }
         }
 
@@ -322,6 +340,25 @@ data class AnnotatedString internal constructor(
          */
         fun pushStringAnnotation(tag: String, annotation: String): Int {
             MutableRange(item = annotation, start = text.length, tag = tag).also {
+                styleStack.add(it)
+                annotations.add(it)
+            }
+            return styleStack.size - 1
+        }
+
+        /**
+         * Attach the given [ttsAnnotation] to any appended text until a corresponding [pop]
+         * is called.
+         *
+         * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderPushStringAnnotationSample
+         *
+         * @param ttsAnnotation an object stores text to speech metadata that intended for the
+         * TTS engine.
+         * @see getStringAnnotations
+         * @see Range
+         */
+        fun pushTtsAnnotation(ttsAnnotation: TtsAnnotation): Int {
+            MutableRange(item = ttsAnnotation, start = text.length).also {
                 styleStack.add(it)
                 annotations.add(it)
             }
@@ -636,7 +673,7 @@ inline fun <R : Any> Builder.withStyle(
  * @param start the inclusive start offset of the text range
  * @param end the exclusive end offset of the text range
  */
-private fun <T> filterRanges(ranges: List<Range<T>>, start: Int, end: Int): List<Range<T>> {
+private fun <T> filterRanges(ranges: List<Range<out T>>, start: Int, end: Int): List<Range<T>> {
     require(start <= end) { "start ($start) should be less than or equal to end ($end)" }
     return ranges.filter { intersect(start, end, it.start, it.end) }.map {
         Range(

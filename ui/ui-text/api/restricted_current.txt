@@ -6,12 +6,13 @@ package androidx.compose.ui.text {
     method public String component1();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> component2();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.AnnotatedString copy(String text, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<java.lang.String>> annotations);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.AnnotatedString copy(String text, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles, java.util.List<? extends androidx.compose.ui.text.AnnotatedString.Range<?>> annotations);
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> getParagraphStyles();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> getSpanStyles();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<java.lang.String>> getStringAnnotations(String tag, int start, int end);
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<java.lang.String>> getStringAnnotations(int start, int end);
     method public String getText();
+    method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.TtsAnnotation>> getTtsAnnotations(int start, int end);
     method @androidx.compose.runtime.Stable public operator androidx.compose.ui.text.AnnotatedString plus(androidx.compose.ui.text.AnnotatedString other);
     property public final java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles;
     property public final java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles;
@@ -35,6 +36,7 @@ package androidx.compose.ui.text {
     method public int pushStringAnnotation(String tag, String annotation);
     method public int pushStyle(androidx.compose.ui.text.SpanStyle style);
     method public int pushStyle(androidx.compose.ui.text.ParagraphStyle style);
+    method public int pushTtsAnnotation(androidx.compose.ui.text.TtsAnnotation ttsAnnotation);
     method public androidx.compose.ui.text.AnnotatedString toAnnotatedString();
     property public final int length;
   }
@@ -518,9 +520,18 @@ package androidx.compose.ui.text {
     method public static androidx.compose.ui.text.TextStyle resolveDefaults(androidx.compose.ui.text.TextStyle style, androidx.compose.ui.unit.LayoutDirection direction);
   }
 
+  public abstract sealed class TtsAnnotation {
+  }
+
   public interface Typeface {
     method public androidx.compose.ui.text.font.FontFamily getFontFamily();
     property public abstract androidx.compose.ui.text.font.FontFamily fontFamily;
+  }
+
+  public final class VerbatimTtsAnnotation extends androidx.compose.ui.text.TtsAnnotation {
+    ctor public VerbatimTtsAnnotation(String verbatim);
+    method public String getVerbatim();
+    property public final String verbatim;
   }
 
 }
@@ -1082,6 +1093,11 @@ package androidx.compose.ui.text.platform.extensions {
   }
 
   public final class TextPaintExtensionsKt {
+  }
+
+  public final class TtsAnnotationExtensionsKt {
+    method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.TtsAnnotation);
+    method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.VerbatimTtsAnnotation);
   }
 
 }

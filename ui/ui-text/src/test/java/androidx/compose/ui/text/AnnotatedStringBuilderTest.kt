@@ -575,7 +575,11 @@ class AnnotatedStringBuilderTest {
         }.toAnnotatedString()
 
         assertThat(buildResult.text).isEqualTo(text)
-        assertThat(buildResult.getStringAnnotations(tag, 0, text.length)).hasSize(1)
+        val stringAnnotations = buildResult.getStringAnnotations(tag, 0, text.length)
+        assertThat(stringAnnotations).hasSize(1)
+        assertThat(stringAnnotations.first()).isEqualTo(
+            AnnotatedString.Range(annotation, 0, text.length, tag)
+        )
     }
 
     @Test
