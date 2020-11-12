@@ -1,5 +1,6 @@
 package org.jetbrains.compose.desktop
 
+import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.desktop.application.dsl.Application
@@ -14,7 +15,7 @@ abstract class DesktopExtension @Inject constructor(private val objectFactory: O
         objectFactory.newInstance(Application::class.java, "main")
     }
 
-    fun application(fn: Application.() -> Unit) {
-        application.fn()
+    fun application(fn: Action<Application>) {
+        fn.execute(application)
     }
 }
