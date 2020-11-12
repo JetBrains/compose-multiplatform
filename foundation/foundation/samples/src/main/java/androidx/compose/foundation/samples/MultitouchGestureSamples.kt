@@ -25,7 +25,7 @@ import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectMultitouchGestures
 import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.gestures.waitForFirstDown
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
@@ -83,7 +83,7 @@ fun CalculateRotation() {
             .pointerInput {
                 forEachGesture {
                     handlePointerInput {
-                        waitForFirstDown()
+                        awaitFirstDown()
                         do {
                             val event = awaitPointerEvent()
                             val rotation = event.calculateRotation()
@@ -108,7 +108,7 @@ fun CalculateZoom() {
             .pointerInput {
                 forEachGesture {
                     handlePointerInput {
-                        waitForFirstDown()
+                        awaitFirstDown()
                         do {
                             val event = awaitPointerEvent()
                             zoom *= event.calculateZoom()
@@ -134,7 +134,7 @@ fun CalculatePan() {
             .pointerInput {
                 forEachGesture {
                     handlePointerInput {
-                        waitForFirstDown()
+                        awaitFirstDown()
                         do {
                             val event = awaitPointerEvent()
                             val offset = event.calculatePan()
@@ -163,7 +163,7 @@ fun CalculateCentroidSize() {
             .pointerInput {
                 forEachGesture {
                     handlePointerInput {
-                        waitForFirstDown().also {
+                        awaitFirstDown().also {
                             position = it.current.position!!
                         }
                         do {

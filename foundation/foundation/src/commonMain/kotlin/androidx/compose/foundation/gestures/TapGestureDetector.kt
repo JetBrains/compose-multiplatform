@@ -98,7 +98,7 @@ suspend fun PointerInputScope.detectTapGestures(
         coroutineScope {
             pressScope.reset()
             val down = handlePointerInput {
-                waitForFirstDown().also {
+                awaitFirstDown().also {
                     it.consumeDownChange()
                 }
             }
@@ -118,7 +118,7 @@ suspend fun PointerInputScope.detectTapGestures(
                 // wait for first tap up or long press
                 up = withTimeout(longPressTimeout.inMilliseconds()) {
                     handlePointerInput {
-                        waitForUpOrCancel()?.also { it.consumeDownChange() }
+                        waitForUpOrCancellation()?.also { it.consumeDownChange() }
                     }
                 }
                 if (up == null) {
@@ -154,7 +154,7 @@ suspend fun PointerInputScope.detectTapGestures(
                             // Might have a long second press as the second tap
                             withTimeout(longPressTimeout.inMilliseconds()) {
                                 handlePointerInput {
-                                    val secondUp = waitForUpOrCancel()
+                                    val secondUp = waitForUpOrCancellation()
                                     if (secondUp == null) {
                                         pressScope.cancel()
                                         onTap()
@@ -187,7 +187,7 @@ suspend fun PointerInputScope.detectTapGestures(
  * down is consumed in the [PointerEventPass.Main] pass, that gesture is ignored.
  */
 @ExperimentalPointerInput
-suspend fun HandlePointerInputScope.waitForFirstDown(
+suspend fun HandlePointerInputScope.awaitFirstDown(
     requireUnconsumed: Boolean = true
 ): PointerInputChange {
     var event: PointerEvent
@@ -209,7 +209,7 @@ suspend fun HandlePointerInputScope.waitForFirstDown(
  * event was canceled.
  */
 @ExperimentalPointerInput
-suspend fun HandlePointerInputScope.waitForUpOrCancel(): PointerInputChange? {
+suspend fun HandlePointerInputScope.waitForUpOrCancellation(): PointerInputChange? {
     while (true) {
         val event = awaitPointerEvent(PointerEventPass.Main)
         if (event.changes.fastAll { it.changedToUp() }) {
@@ -261,7 +261,7 @@ private suspend fun PointerInputScope.detectSecondTapDown(
             var change: PointerInputChange
             // The second tap doesn't count if it happens before DoubleTapMinTime of the first tap
             do {
-                change = waitForFirstDown()
+                change = awaitFirstDown()
             } while (change.current.uptime!! < minUptime)
             change
         }

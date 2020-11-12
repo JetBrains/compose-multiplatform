@@ -21,6 +21,7 @@ import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.util.fastAny
@@ -66,10 +67,10 @@ suspend fun PointerInputScope.detectMultitouchGestures(
             val touchSlop = viewConfiguration.touchSlop
             var lockedToPanZoom = false
 
-            waitForFirstDown()
+            awaitFirstDown()
             do {
                 val event = awaitPointerEvent()
-                val canceled = anyPositionConsumed(event)
+                val canceled = event.changes.fastAny { it.anyPositionChangeConsumed() }
                 if (!canceled) {
                     val zoomChange = event.calculateZoom()
                     val rotationChange = event.calculateRotation()
