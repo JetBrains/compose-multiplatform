@@ -18,6 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.rootAnimationClockFactory
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.test.espresso.IdlingResource
 import androidx.compose.ui.test.junit4.android.registerTestClock
@@ -42,6 +43,7 @@ import org.junit.runners.model.Statement
  * animations. Otherwise, built in steps that make sure the UI is stable when performing actions
  * or assertions will fail to work.
  */
+@ExperimentalTesting
 internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
 
     /** Backing property for [clock] */
@@ -99,5 +101,6 @@ internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
     }
 }
 
+@ExperimentalTesting
 actual fun createAnimationClockRule(): AnimationClockTestRule =
     AndroidAnimationClockTestRule()
