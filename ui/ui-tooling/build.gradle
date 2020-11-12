@@ -43,7 +43,7 @@ dependencies {
     compileOnly(project(":ui:ui-animation-tooling-internal"))
     compileOnly(KOTLIN_REFLECT)
 
-    androidTestImplementation project(":ui:ui-test")
+    androidTestImplementation project(":compose:ui:ui-test-junit4")
 
     androidTestImplementation(JUNIT)
     androidTestImplementation(ANDROIDX_TEST_RUNNER)

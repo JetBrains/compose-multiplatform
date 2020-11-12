@@ -59,7 +59,7 @@ dependencies {
 
         androidTestImplementation project(":compose:foundation:foundation-layout")
         androidTestImplementation project(":compose:ui:ui-test-font")
-        androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation "androidx.core:core:1.5.0-alpha01"
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
@@ -116,7 +116,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation project(":compose:foundation:foundation-layout")
                 implementation project(":compose:ui:ui-test-font")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation "androidx.core:core:1.5.0-alpha01"
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
@@ -133,7 +133,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopTest.dependencies {
-                implementation project(':ui:ui-test')
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation(TRUTH)
                 implementation(JUNIT)
                 implementation(SKIKO_CURRENT_OS)

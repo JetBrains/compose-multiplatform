@@ -18,23 +18,23 @@ package androidx.compose.testutils
 
 import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PixelMap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.test.assertContainsColor
-import androidx.compose.ui.test.assertPixelColor
-import androidx.compose.ui.test.assertPixels
-import androidx.compose.ui.test.assertShape
-import androidx.compose.ui.test.contains
+import androidx.compose.ui.graphics.addOutline
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import org.junit.Assert
+import kotlin.math.roundToInt
 
 /**
  * A helper function to run asserts on [Bitmap].
@@ -45,32 +45,74 @@ import androidx.compose.ui.unit.IntSize
  *
  * @throws AssertionError if size or colors don't match.
  */
-@Suppress("DEPRECATION")
 fun ImageBitmap.assertPixels(
     expectedSize: IntSize? = null,
     expectedColorProvider: (pos: IntOffset) -> Color?
-) = asAndroidBitmap().assertPixels(expectedSize, expectedColorProvider)
+) {
+    if (expectedSize != null) {
+        if (width != expectedSize.width || height != expectedSize.height) {
+            throw AssertionError(
+                "Bitmap size is wrong! Expected '$expectedSize' but got " +
+                    "'$width x $height'"
+            )
+        }
+    }
+
+    val pixel = toPixelMap()
+    for (x in 0 until width) {
+        for (y in 0 until height) {
+            val pxPos = IntOffset(x, y)
+            val expectedClr = expectedColorProvider(pxPos)
+            if (expectedClr != null) {
+                pixel.assertPixelColor(expectedClr, x, y)
+            }
+        }
+    }
+}
 
 /**
  * Asserts that the color at a specific pixel in the bitmap at ([x], [y]) is [expected].
  */
-@Suppress("DEPRECATION")
-fun ImageBitmap.assertPixelColor(
+fun PixelMap.assertPixelColor(
     expected: Color,
     x: Int,
     y: Int,
     error: (Color) -> String = { color -> "Pixel($x, $y) expected to be $expected, but was $color" }
-) = asAndroidBitmap().assertPixelColor(expected, x, y, error)
+) {
+    val color = this[x, y]
+    val errorString = error(color)
+    Assert.assertEquals(errorString, expected.red, color.red, 0.02f)
+    Assert.assertEquals(errorString, expected.green, color.green, 0.02f)
+    Assert.assertEquals(errorString, expected.blue, color.blue, 0.02f)
+    Assert.assertEquals(errorString, expected.alpha, color.alpha, 0.02f)
+}
 
 /**
  * Asserts that the expected color is present in this bitmap.
  *
  * @throws AssertionError if the expected color is not present.
  */
-@Suppress("DEPRECATION")
 fun ImageBitmap.assertContainsColor(
     expectedColor: Color
-) = asAndroidBitmap().assertContainsColor(expectedColor).asImageBitmap()
+): ImageBitmap {
+    if (!containsColor(expectedColor)) {
+        throw AssertionError("The given color $expectedColor was not found in the bitmap.")
+    }
+    return this
+}
+
+private fun ImageBitmap.containsColor(expectedColor: Color): Boolean {
+    val pixels = this.toPixelMap()
+    for (x in 0 until width) {
+        for (y in 0 until height) {
+            val color = pixels[x, y]
+            if (color == expectedColor) {
+                return true
+            }
+        }
+    }
+    return false
+}
 
 /**
  * Tests to see if the given point is within the path. (That is, whether the
@@ -81,8 +123,20 @@ fun ImageBitmap.assertContainsColor(
  *
  * Returns true if the point is in the path, and false otherwise.
  */
-@Suppress("DEPRECATION")
-fun Path.contains(offset: Offset): Boolean = contains(offset)
+fun Path.contains(offset: Offset): Boolean {
+    val path = android.graphics.Path()
+    path.addRect(
+        offset.x - 0.01f,
+        offset.y - 0.01f,
+        offset.x + 0.01f,
+        offset.y + 0.01f,
+        android.graphics.Path.Direction.CW
+    )
+    if (path.op(asAndroidPath(), android.graphics.Path.Op.INTERSECT)) {
+        return !path.isEmpty
+    }
+    return false
+}
 
 /**
  * Asserts that the given [shape] is drawn within the bitmap with the size the dimensions
@@ -105,7 +159,6 @@ fun Path.contains(offset: Offset): Boolean = contains(offset)
  * untested as it is likely anti-aliased. The default is 1 pixel
  */
 // TODO (mount, malkov) : to investigate why it flakes when shape is not rect
-@Suppress("DEPRECATION")
 fun ImageBitmap.assertShape(
     density: Density,
     shape: Shape,
@@ -119,20 +172,62 @@ fun ImageBitmap.assertShape(
     centerX: Float = width / 2f,
     centerY: Float = height / 2f,
     shapeOverlapPixelCount: Float = 1.0f
-) = asAndroidBitmap().assertShape(
-    density,
-    shape,
-    shapeColor,
-    backgroundColor,
-    backgroundShape,
-    sizeX,
-    sizeY,
-    shapeSizeX,
-    shapeSizeY,
-    centerX,
-    centerY,
-    shapeOverlapPixelCount
-)
+) {
+    val width = width
+    val height = height
+    val pixels = toPixelMap()
+    Assert.assertTrue(centerX + sizeX / 2 <= width)
+    Assert.assertTrue(centerX - sizeX / 2 >= 0.0f)
+    Assert.assertTrue(centerY + sizeY / 2 <= height)
+    Assert.assertTrue(centerY - sizeY / 2 >= 0.0f)
+    val outline = shape.createOutline(Size(shapeSizeX, shapeSizeY), density)
+    val path = Path()
+    path.addOutline(outline)
+    val shapeOffset = Offset(
+        (centerX - shapeSizeX / 2f),
+        (centerY - shapeSizeY / 2f)
+    )
+    val backgroundPath = Path()
+    backgroundPath.addOutline(backgroundShape.createOutline(Size(sizeX, sizeY), density))
+    for (x in centerX - sizeX / 2 until centerX + sizeX / 2) {
+        for (y in centerY - sizeY / 2 until centerY + sizeY / 2) {
+            val point = Offset(x.toFloat(), y.toFloat())
+            if (!backgroundPath.contains(
+                    pixelFartherFromCenter(
+                            point,
+                            sizeX,
+                            sizeY,
+                            shapeOverlapPixelCount
+                        )
+                )
+            ) {
+                continue
+            }
+            val offset = point - shapeOffset
+            val isInside = path.contains(
+                pixelFartherFromCenter(
+                    offset,
+                    shapeSizeX,
+                    shapeSizeY,
+                    shapeOverlapPixelCount
+                )
+            )
+            val isOutside = !path.contains(
+                pixelCloserToCenter(
+                    offset,
+                    shapeSizeX,
+                    shapeSizeY,
+                    shapeOverlapPixelCount
+                )
+            )
+            if (isInside) {
+                pixels.assertPixelColor(shapeColor, x, y)
+            } else if (isOutside) {
+                pixels.assertPixelColor(backgroundColor, x, y)
+            }
+        }
+    }
+}
 
 /**
  * Asserts that the bitmap is fully occupied by the given [shape] with the color [shapeColor]
@@ -148,7 +243,6 @@ fun ImageBitmap.assertShape(
  * @param shapeOverlapPixelCount The size of the border area from the shape outline to leave it
  * untested as it is likely anti-aliased. The default is 1 pixel
  */
-@Suppress("DEPRECATION")
 fun ImageBitmap.assertShape(
     density: Density,
     horizontalPadding: Dp,
@@ -157,12 +251,68 @@ fun ImageBitmap.assertShape(
     shapeColor: Color,
     shape: Shape = RectangleShape,
     shapeOverlapPixelCount: Float = 1.0f
-) = asAndroidBitmap().assertShape(
-    density,
-    horizontalPadding,
-    verticalPadding,
-    backgroundColor,
-    shapeColor,
-    shape,
-    shapeOverlapPixelCount
-)
+) {
+    val fullHorizontalPadding = with(density) { horizontalPadding.toPx() * 2 }
+    val fullVerticalPadding = with(density) { verticalPadding.toPx() * 2 }
+    return assertShape(
+        density = density,
+        shape = shape,
+        shapeColor = shapeColor,
+        backgroundColor = backgroundColor,
+        backgroundShape = RectangleShape,
+        shapeSizeX = width.toFloat() - fullHorizontalPadding,
+        shapeSizeY = height.toFloat() - fullVerticalPadding,
+        shapeOverlapPixelCount = shapeOverlapPixelCount
+    )
+}
+
+private infix fun Float.until(until: Float): IntRange {
+    val from = this.roundToInt()
+    val to = until.roundToInt()
+    if (from <= Int.MIN_VALUE) return IntRange.EMPTY
+    return from..(to - 1)
+}
+
+private fun pixelCloserToCenter(
+    offset: Offset,
+    shapeSizeX: Float,
+    shapeSizeY: Float,
+    delta: Float
+): Offset {
+    val centerX = shapeSizeX / 2f
+    val centerY = shapeSizeY / 2f
+    val d = delta
+    val x = when {
+        offset.x > centerX -> offset.x - d
+        offset.x < centerX -> offset.x + d
+        else -> offset.x
+    }
+    val y = when {
+        offset.y > centerY -> offset.y - d
+        offset.y < centerY -> offset.y + d
+        else -> offset.y
+    }
+    return Offset(x, y)
+}
+
+private fun pixelFartherFromCenter(
+    offset: Offset,
+    shapeSizeX: Float,
+    shapeSizeY: Float,
+    delta: Float
+): Offset {
+    val centerX = shapeSizeX / 2f
+    val centerY = shapeSizeY / 2f
+    val d = delta
+    val x = when {
+        offset.x > centerX -> offset.x + d
+        offset.x < centerX -> offset.x - d
+        else -> offset.x
+    }
+    val y = when {
+        offset.y > centerY -> offset.y + d
+        offset.y < centerY -> offset.y - d
+        else -> offset.y
+    }
+    return Offset(x, y)
+}
