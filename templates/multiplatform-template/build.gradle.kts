@@ -1,5 +1,5 @@
 buildscript {
-    // __UPDATE_COMPOSE_VERSION_MARKER__
+    // __LATEST_COMPOSE_RELEASE_VERSION__
     val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.1.0-build113"
 
     repositories {
