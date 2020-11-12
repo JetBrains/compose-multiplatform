@@ -17,18 +17,16 @@ import java.util.*
 // todo: file associations
 // todo: use workers
 fun configureApplicationImpl(project: Project, app: Application) {
-    project.afterEvaluate {
-        if (app._isDefaultConfigurationEnabled) {
-            if (project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
-                project.configureFromMppPlugin(app)
-            } else if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
-                val mainSourceSet = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main")
-                app.from(mainSourceSet)
-            }
+    if (app._isDefaultConfigurationEnabled) {
+        if (project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+            project.configureFromMppPlugin(app)
+        } else if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
+            val mainSourceSet = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main")
+            app.from(mainSourceSet)
         }
-        project.configurePackagingTasks(listOf(app))
-        project.configureWix()
     }
+    project.configurePackagingTasks(listOf(app))
+    project.configureWix()
 }
 
 internal fun Project.configureFromMppPlugin(mainApplication: Application) {
