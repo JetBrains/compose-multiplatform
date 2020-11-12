@@ -552,6 +552,10 @@ internal class AndroidComposeView(context: Context) :
         }
     }
 
+    suspend fun boundsUpdatesEventLoop() {
+        accessibilityDelegate.boundsUpdatesEventLoop()
+    }
+
     /**
      * Android has an issue where calling showSoftwareKeyboard after calling
      * hideSoftwareKeyboard, it results in keyboard flickering and sometimes the keyboard ends up

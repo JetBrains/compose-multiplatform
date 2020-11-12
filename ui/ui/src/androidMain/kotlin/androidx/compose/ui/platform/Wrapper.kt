@@ -234,6 +234,7 @@ private class WrappedComposition(
                     lifecycle.addObserver(this)
                 } else if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
                     original.setContent {
+
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
                             owner.getTag(R.id.inspection_slot_table_set) as?
@@ -247,6 +248,7 @@ private class WrappedComposition(
                         }
 
                         LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
+                        LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
                         Providers(InspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner, content)
