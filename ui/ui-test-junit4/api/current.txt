@@ -2,7 +2,7 @@
 package androidx.compose.ui.test.junit4 {
 
   public final class AndroidAnimationClockTestRuleKt {
-    method @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
+    method public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
   }
 
   public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeTestRule {
@@ -39,7 +39,7 @@ package androidx.compose.ui.test.junit4 {
   public final class AndroidSynchronizationKt {
   }
 
-  @androidx.compose.ui.test.ExperimentalTesting public interface AnimationClockTestRule extends org.junit.rules.TestRule {
+  public interface AnimationClockTestRule extends org.junit.rules.TestRule {
     method public default void advanceClock(long milliseconds);
     method public androidx.compose.ui.test.TestAnimationClock getClock();
     method public boolean isPaused();
@@ -84,9 +84,9 @@ package androidx.compose.ui.test.junit4.android {
 
   public final class ComposeIdlingResourceKt {
     method public static void registerComposeWithEspresso();
-    method @androidx.compose.ui.test.ExperimentalTesting public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+    method public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);
     method public static void unregisterComposeFromEspresso();
-    method @androidx.compose.ui.test.ExperimentalTesting public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+    method public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
   }
 
   public final class ComposeNotIdleException extends java.lang.Throwable {

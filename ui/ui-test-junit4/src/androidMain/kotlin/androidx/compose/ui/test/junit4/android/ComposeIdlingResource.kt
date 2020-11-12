@@ -21,7 +21,6 @@ import android.os.Looper
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.test.ExperimentalTesting
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.compose.ui.test.TestAnimationClock
@@ -62,7 +61,6 @@ fun unregisterComposeFromEspresso() {
 /**
  * Registers the given [clock] so Espresso can await the animations subscribed to that clock.
  */
-@ExperimentalTesting
 fun registerTestClock(clock: TestAnimationClock) {
     ComposeIdlingResource.registerTestClock(clock)
 }
@@ -70,7 +68,6 @@ fun registerTestClock(clock: TestAnimationClock) {
 /**
  * Unregisters the [clock] that was registered with [registerTestClock].
  */
-@ExperimentalTesting
 fun unregisterTestClock(clock: TestAnimationClock) {
     ComposeIdlingResource.unregisterTestClock(clock)
 }
@@ -89,7 +86,6 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
 
     private var isIdleCheckScheduled = false
 
-    @OptIn(ExperimentalTesting::class)
     private val clocks = mutableSetOf<TestAnimationClock>()
 
     private val handler = Handler(Looper.getMainLooper())
@@ -167,21 +163,18 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
         compositionAwaiters.decrementAndGet()
     }
 
-    @OptIn(ExperimentalTesting::class)
     internal fun registerTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.add(clock)
         }
     }
 
-    @OptIn(ExperimentalTesting::class)
     internal fun unregisterTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.remove(clock)
         }
     }
 
-    @OptIn(ExperimentalTesting::class)
     private fun areAllClocksIdle(): Boolean {
         return synchronized(clocks) {
             clocks.all { it.isIdle }

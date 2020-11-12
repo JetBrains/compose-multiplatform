@@ -30,7 +30,6 @@ import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -50,7 +49,6 @@ private val demosWithInifinateAnimations = listOf("Material > Progress Indicator
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTesting::class)
 class DemoTest {
     @get:Rule
     val rule = createAndroidComposeRule<DemoActivity>()
