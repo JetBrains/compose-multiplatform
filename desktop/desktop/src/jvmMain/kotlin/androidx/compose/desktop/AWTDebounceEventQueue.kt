@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
 
@@ -42,7 +43,7 @@ internal class AWTDebounceEventQueue constructor(
     // 4 ms is enough for the user not to see the lags
     private val maxNanosToBlockThread: Long = 4.milliseconds.nanoseconds,
     private val nanoTime: () -> Long = System::nanoTime,
-    context: CoroutineContext = Dispatchers.Main
+    context: CoroutineContext = Dispatchers.Swing
 ) {
     private val queue = Channel<() -> Unit>(Channel.UNLIMITED)
 
