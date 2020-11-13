@@ -17,10 +17,8 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-@Composable
 internal actual fun Modifier.textFieldKeyboardModifier(
     manager: TextFieldSelectionManager
 ): Modifier = this.then(Modifier)
