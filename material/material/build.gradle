@@ -41,7 +41,6 @@ dependencies {
          */
         api project(":compose:animation:animation-core")
         api project(":compose:foundation:foundation")
-        api project(":compose:foundation:foundation-text")
         api project(":compose:material:material-icons-core")
         api project(":compose:runtime:runtime")
         api project(":compose:ui:ui")
@@ -86,7 +85,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(KOTLIN_STDLIB_COMMON)
                 api project(":compose:animation:animation-core")
                 api project(":compose:foundation:foundation")
-                api project(":compose:foundation:foundation-text")
                 api project(":compose:material:material-icons-core")
                 api project(":compose:runtime:runtime")
                 api project(":compose:ui:ui")
