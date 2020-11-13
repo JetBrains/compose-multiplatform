@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.lint
 
+import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ModifierFactoryReturnType
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
@@ -28,18 +29,23 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import com.intellij.psi.PsiType
 import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
+import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
+import org.jetbrains.kotlin.psi.KtUserType
+import org.jetbrains.kotlin.psi.psiUtil.containingClass
 import org.jetbrains.uast.UMethod
 
 /**
  * [Detector] that checks functions returning Modifiers for consistency with guidelines.
  *
  * - Modifier factory functions must return Modifier as their type, and not a subclass of Modifier
+ * - Modifier factory functions must be defined as an extension on Modifier to allow fluent chaining
  */
 class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes() = listOf(UMethod::class.java)
@@ -50,97 +56,31 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             val returnType = node.returnType ?: return
 
             // Ignore functions that do not return Modifier or something implementing Modifier
-            if (!InheritanceUtil.isInheritor(returnType, Modifier)) return
+            if (!InheritanceUtil.isInheritor(returnType, ModifierFqn)) return
 
-            fun report(lintFix: LintFix? = null) {
-                context.report(
-                    ModifierFactoryReturnType,
-                    node,
-                    context.getNameLocation(node),
-                    "Modifier factory functions must have a return type of Modifier",
-                    lintFix
-                )
+            val source = node.sourcePsi
+
+            // If this node is a property that is a constructor parameter, ignore it.
+            if (source is KtParameter) return
+
+            // Ignore properties in some cases
+            if (source is KtProperty) {
+                // If this node is inside a class, ignore it.
+                if (source.containingClass() != null) return
+                // If this node is a var, ignore it.
+                if (source.isVar) return
+                // If this node is a val with no getter, ignore it.
+                if (source.getter == null) return
+            }
+            if (source is KtPropertyAccessor) {
+                // If this node is inside a class, ignore it.
+                if (source.property.containingClass() != null) return
+                // If this node is a getter on a var, ignore it.
+                if (source.property.isVar) return
             }
 
-            if (returnType.canonicalText != Modifier) {
-                val source = node.sourcePsi
-                // If this node is a property that is a constructor parameter, ignore it.
-                if (source is KtParameter) return
-                // If this node is a var, then this isn't a Modifier factory API, so just
-                // ignore it.
-                if ((source as? KtProperty)?.isVar == true) return
-                if (source is KtCallableDeclaration && source.returnTypeString != null) {
-                    // Function declaration with an explicit return type, such as
-                    // `fun foo(): Modifier.element = Bar`. Replace the type with `Modifier`.
-                    report(
-                        LintFix.create()
-                            .replace()
-                            .name("Change return type to Modifier")
-                            .range(context.getLocation(node))
-                            .text(source.returnTypeString)
-                            .with(Modifier.split(".").last())
-                            .autoFix()
-                            .build()
-                    )
-                    return
-                }
-                if (source is KtPropertyAccessor) {
-                    // If the getter is on a var, then this isn't a Modifier factory API, so just
-                    // ignore it.
-                    if (source.property.isVar) return
-
-                    // Getter declaration with an explicit return type on the getter, such as
-                    // `val foo get(): Modifier.Element = Bar`. Replace the type with `Modifier`.
-                    val getterReturnType = source.returnTypeReference?.text
-
-                    if (getterReturnType != null) {
-                        report(
-                            LintFix.create()
-                                .replace()
-                                .name("Change return type to Modifier")
-                                .range(context.getLocation(node))
-                                .text(getterReturnType)
-                                .with(Modifier.split(".").last())
-                                .autoFix()
-                                .build()
-                        )
-                        return
-                    }
-                    // Getter declaration with an implicit return type from the property, such as
-                    // `val foo: Modifier.Element get() = Bar`. Replace the type with `Modifier`.
-                    val propertyType = source.property.returnTypeString
-
-                    if (propertyType != null) {
-                        report(
-                            LintFix.create()
-                                .replace()
-                                .name("Change return type to Modifier")
-                                .range(context.getLocation(source.property))
-                                .text(propertyType)
-                                .with(Modifier.split(".").last())
-                                .autoFix()
-                                .build()
-                        )
-                        return
-                    }
-                }
-                if (source is KtDeclarationWithBody) {
-                    // Declaration without an explicit return type, such as `fun foo() = Bar`
-                    // or val foo get() = Bar
-                    // Replace the `=` with `: Modifier =`
-                    report(
-                        LintFix.create()
-                            .replace()
-                            .name("Add explicit Modifier return type")
-                            .range(context.getLocation(node))
-                            .pattern("[ \\t\\n]+=")
-                            .with(": " + Modifier.split(".").last() + " =")
-                            .autoFix()
-                            .build()
-                    )
-                    return
-                }
-            }
+            node.checkReturnType(context, returnType)
+            node.checkReceiver(context)
         }
     }
 
@@ -156,10 +96,162 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
                 Scope.JAVA_FILE_SCOPE
             )
         )
+
+        val ModifierFactoryExtensionFunction = Issue.create(
+            "ModifierFactoryExtensionFunction",
+            "Modifier factory functions must be extensions on Modifier",
+            "Modifier factory functions must be defined as extension functions on" +
+                " Modifier to allow modifiers to be fluently chained.",
+            Category.CORRECTNESS, 3, Severity.ERROR,
+            Implementation(
+                ModifierDeclarationDetector::class.java,
+                Scope.JAVA_FILE_SCOPE
+            )
+        )
     }
 }
 
-private const val Modifier = "androidx.compose.ui.Modifier"
+/**
+ * @see [ModifierDeclarationDetector.ModifierFactoryExtensionFunction]
+ */
+private fun UMethod.checkReceiver(context: JavaContext) {
+    fun report(lintFix: LintFix? = null) {
+        context.report(
+            ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
+            this,
+            context.getNameLocation(this),
+            "Modifier factory functions must be extensions on Modifier",
+            lintFix
+        )
+    }
+
+    val source = when (val source = sourcePsi) {
+        is KtFunction -> source
+        is KtPropertyAccessor -> source.property
+        else -> return
+    }
+
+    val receiverTypeReference = source.receiverTypeReference
+
+    // No receiver
+    if (receiverTypeReference == null) {
+        val name = source.nameIdentifier!!.text
+        report(
+            LintFix.create()
+                .replace()
+                .name("Add Modifier receiver")
+                .range(context.getLocation(source))
+                .text(name)
+                .with("$ModifierShortName.$name")
+                .autoFix()
+                .build()
+        )
+    } else {
+        val receiverType = (receiverTypeReference.typeElement as KtUserType).referencedName
+        // A receiver that isn't Modifier
+        if (receiverType != ModifierShortName) {
+            report(
+                LintFix.create()
+                    .replace()
+                    .name("Change receiver to Modifier")
+                    .range(context.getLocation(source))
+                    .text(receiverType)
+                    .with(ModifierShortName)
+                    .autoFix()
+                    .build()
+            )
+        }
+    }
+}
+
+/**
+ * @see [ModifierDeclarationDetector.ModifierFactoryReturnType]
+ */
+private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
+    fun report(lintFix: LintFix? = null) {
+        context.report(
+            ModifierFactoryReturnType,
+            this,
+            context.getNameLocation(this),
+            "Modifier factory functions must have a return type of Modifier",
+            lintFix
+        )
+    }
+
+    if (returnType.canonicalText == ModifierFqn) return
+
+    val source = sourcePsi
+    if (source is KtCallableDeclaration && source.returnTypeString != null) {
+        // Function declaration with an explicit return type, such as
+        // `fun foo(): Modifier.element = Bar`. Replace the type with `Modifier`.
+        report(
+            LintFix.create()
+                .replace()
+                .name("Change return type to Modifier")
+                .range(context.getLocation(this))
+                .text(source.returnTypeString)
+                .with(ModifierShortName)
+                .autoFix()
+                .build()
+        )
+        return
+    }
+    if (source is KtPropertyAccessor) {
+        // Getter declaration with an explicit return type on the getter, such as
+        // `val foo get(): Modifier.Element = Bar`. Replace the type with `Modifier`.
+        val getterReturnType = source.returnTypeReference?.text
+
+        if (getterReturnType != null) {
+            report(
+                LintFix.create()
+                    .replace()
+                    .name("Change return type to Modifier")
+                    .range(context.getLocation(this))
+                    .text(getterReturnType)
+                    .with(ModifierShortName)
+                    .autoFix()
+                    .build()
+            )
+            return
+        }
+        // Getter declaration with an implicit return type from the property, such as
+        // `val foo: Modifier.Element get() = Bar`. Replace the type with `Modifier`.
+        val propertyType = source.property.returnTypeString
+
+        if (propertyType != null) {
+            report(
+                LintFix.create()
+                    .replace()
+                    .name("Change return type to Modifier")
+                    .range(context.getLocation(source.property))
+                    .text(propertyType)
+                    .with(ModifierShortName)
+                    .autoFix()
+                    .build()
+            )
+            return
+        }
+    }
+    if (source is KtDeclarationWithBody) {
+        // Declaration without an explicit return type, such as `fun foo() = Bar`
+        // or val foo get() = Bar
+        // Replace the `=` with `: Modifier =`
+        report(
+            LintFix.create()
+                .replace()
+                .name("Add explicit Modifier return type")
+                .range(context.getLocation(this))
+                .pattern("[ \\t\\n]+=")
+                .with(": $ModifierShortName =")
+                .autoFix()
+                .build()
+        )
+        return
+    }
+}
+
+private const val ModifierFqn = "androidx.compose.ui.Modifier"
+private val ModifierShortName = ModifierFqn.split(".").last()
 
 /**
  * TODO: UMethod.returnTypeReference is not available in LINT_API_MIN, so instead use this with a

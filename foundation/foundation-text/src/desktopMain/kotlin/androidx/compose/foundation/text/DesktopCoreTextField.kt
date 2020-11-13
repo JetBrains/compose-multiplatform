@@ -42,19 +42,19 @@ private val selectAllKeySet by lazy { modifier + Key.A }
 
 @OptIn(ExperimentalKeyInput::class)
 @Composable
-internal actual fun textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier {
-    return Modifier.shortcuts {
-        on(copyToClipboardKeySet) {
-            manager.copy(false)
-        }
-        on(pasteFromClipboardKeySet) {
-            manager.paste()
-        }
-        on(cutToClipboardKeySet) {
-            manager.cut()
-        }
-        on(selectAllKeySet) {
-            manager.selectAll()
-        }
+internal actual fun Modifier.textFieldKeyboardModifier(
+    manager: TextFieldSelectionManager
+): Modifier = shortcuts {
+    on(copyToClipboardKeySet) {
+        manager.copy(false)
+    }
+    on(pasteFromClipboardKeySet) {
+        manager.paste()
+    }
+    on(cutToClipboardKeySet) {
+        manager.cut()
+    }
+    on(selectAllKeySet) {
+        manager.selectAll()
     }
 }

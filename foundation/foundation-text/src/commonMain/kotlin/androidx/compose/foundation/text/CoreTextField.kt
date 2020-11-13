@@ -440,7 +440,7 @@ fun CoreTextField(
         .then(drawModifier)
         .then(onPositionedModifier)
         .then(semanticsModifier)
-        .then(textFieldKeyboardModifier(manager))
+        .textFieldKeyboardModifier(manager)
         .focus()
 
     SimpleLayout(modifiers) {
@@ -503,7 +503,7 @@ fun CoreTextField(
 }
 
 @Composable
-internal expect fun textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
+internal expect fun Modifier.textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
 
 @OptIn(InternalTextApi::class)
 internal class TextFieldState(

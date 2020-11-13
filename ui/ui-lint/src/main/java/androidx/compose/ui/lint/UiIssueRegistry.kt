@@ -27,6 +27,7 @@ class UiIssueRegistry : IssueRegistry() {
     override val api = 8
     override val minApi = CURRENT_API
     override val issues get() = listOf(
+        ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
         ModifierDeclarationDetector.ModifierFactoryReturnType
     )
 }
