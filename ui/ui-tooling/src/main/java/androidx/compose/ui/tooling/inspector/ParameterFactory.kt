@@ -88,6 +88,11 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         false
     }
 
+    /**
+     * Do not decompose instances from these package prefixes.
+     */
+    private val ignoredPackagePrefixes = listOf("android.graphics.")
+
     var density = Density(1.0f)
 
     init {
@@ -325,8 +330,16 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
         private fun createFromKotlinReflection(name: String, value: Any): NodeParameter? {
             val kClass = value::class
-            if (kClass.simpleName == null || !kotlinReflectionSupported) {
-                // internal synthetic class or kotlin reflection library not available
+            val qualifiedName = kClass.qualifiedName
+            if (kClass.simpleName == null ||
+                qualifiedName == null ||
+                ignoredPackagePrefixes.any { qualifiedName.startsWith(it) } ||
+                !kotlinReflectionSupported
+            ) {
+                // Exit without creating a parameter for:
+                // - internal synthetic classes
+                // - certain android packages
+                // - if kotlin reflection library not available
                 return null
             }
             val parameter = NodeParameter(name, ParameterType.String, kClass.simpleName)
