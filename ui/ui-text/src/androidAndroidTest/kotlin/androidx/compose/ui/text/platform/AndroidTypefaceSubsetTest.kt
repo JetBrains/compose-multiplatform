@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.fontFamily
+import androidx.compose.ui.text.font.typeface
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -62,7 +63,7 @@ class AndroidTypefaceSubsetTest {
         fontFamily: FontFamily,
         necessaryStyles: List<Pair<FontWeight, FontStyle>>? = null
     ): AndroidTypeface {
-        return typefaceFromFontFamily(context, fontFamily, necessaryStyles) as AndroidTypeface
+        return typeface(context, fontFamily, necessaryStyles) as AndroidTypeface
     }
 
     @Test
