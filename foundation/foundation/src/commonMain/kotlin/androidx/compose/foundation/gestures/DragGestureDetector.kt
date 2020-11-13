@@ -592,6 +592,6 @@ private suspend inline fun HandlePointerInputScope.awaitTouchSlop(
 /**
  * Return `true` when [event] has any position consumed.
  */
-private fun anyPositionConsumed(event: PointerEvent): Boolean {
+internal fun anyPositionConsumed(event: PointerEvent): Boolean {
     return event.changes.fastAny { it.anyPositionChangeConsumed() }
 }
