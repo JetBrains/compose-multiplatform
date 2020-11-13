@@ -274,7 +274,7 @@ fun typefaceFromFontFamily(
     context: Context,
     fontFamily: FontFamily,
     necessaryStyles: List<Pair<FontWeight, FontStyle>>? = null
-): androidx.compose.ui.text.Typeface {
+): androidx.compose.ui.text.font.Typeface {
     return when (fontFamily) {
         is FontListFontFamily -> AndroidFontListTypeface(fontFamily, context, necessaryStyles)
         is GenericFontFamily -> AndroidGenericFontFamilyTypeface(fontFamily)

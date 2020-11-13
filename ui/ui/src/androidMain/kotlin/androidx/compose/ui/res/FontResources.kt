@@ -21,7 +21,7 @@ import android.util.TypedValue
 import androidx.annotation.GuardedBy
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.text.Typeface
+import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.LoadedFontFamily
