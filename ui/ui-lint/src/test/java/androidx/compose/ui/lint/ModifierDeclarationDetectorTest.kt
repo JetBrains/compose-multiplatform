@@ -36,6 +36,7 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
 
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(
+            ModifierDeclarationDetector.ComposableModifierFactory,
             ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
             ModifierDeclarationDetector.ModifierFactoryReturnType,
         )
@@ -47,6 +48,22 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
             interface Modifier {
                 interface Element : Modifier
             }
+        """
+    )
+
+    private val composableStub = kotlin(
+        """
+            package androidx.compose.runtime
+
+            @MustBeDocumented
+            @Retention(AnnotationRetention.BINARY)
+            @Target(
+                AnnotationTarget.FUNCTION,
+                AnnotationTarget.TYPE,
+                AnnotationTarget.TYPE_PARAMETER,
+                AnnotationTarget.PROPERTY
+            )
+            annotation class Composable
         """
     )
 
@@ -458,6 +475,93 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Change receiver to 
 @@ -20 +20
 -                 val TestModifier.fooModifier3: Modifier get() = TestModifier
 +                 val Modifier.fooModifier3: Modifier get() = TestModifier
+            """
+            )
+    }
+
+    @Test
+    fun composableModifierFactories() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.ui.foo
+
+                import androidx.compose.runtime.Composable
+                import androidx.compose.ui.Modifier
+
+                class TestModifier(val value: Int) : Modifier.Element
+
+                @Composable
+                fun someComposableCall(int: Int) = 5
+
+                @Composable
+                fun Modifier.fooModifier1(): Modifier {
+                    val value = someComposableCall(3)
+                    return TestModifier(value)
+                }
+
+                @Composable
+                fun Modifier.fooModifier2(): Modifier = TestModifier(someComposableCall(3))
+
+                @get:Composable
+                val Modifier.fooModifier3: Modifier get() {
+                    val value = someComposableCall(3)
+                    return TestModifier(value)
+                }
+
+                @get:Composable
+                val Modifier.fooModifier4: Modifier get() = TestModifier(someComposableCall(3))
+            """
+            ),
+            modifierStub,
+            composableStub
+        )
+            .run()
+            .expect(
+                """
+src/androidx/compose/ui/foo/TestModifier.kt:13: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+                fun Modifier.fooModifier1(): Modifier {
+                             ~~~~~~~~~~~~
+src/androidx/compose/ui/foo/TestModifier.kt:19: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+                fun Modifier.fooModifier2(): Modifier = TestModifier(someComposableCall(3))
+                             ~~~~~~~~~~~~
+src/androidx/compose/ui/foo/TestModifier.kt:22: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+                val Modifier.fooModifier3: Modifier get() {
+                                                    ~~~
+src/androidx/compose/ui/foo/TestModifier.kt:28: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+                val Modifier.fooModifier4: Modifier get() = TestModifier(someComposableCall(3))
+                                                    ~~~
+4 errors, 0 warnings
+            """
+            )
+            .expectFixDiffs(
+                """
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 13: Replace @Composable with composed call:
+@@ -12 +12
+-                 @Composable
+-                 fun Modifier.fooModifier1(): Modifier {
++                 fun Modifier.fooModifier1(): Modifier = composed {
+@@ -15 +14
+-                     return TestModifier(value)
++                     TestModifier(value)
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 19: Replace @Composable with composed call:
+@@ -18 +18
+-                 @Composable
+-                 fun Modifier.fooModifier2(): Modifier = TestModifier(someComposableCall(3))
++                 fun Modifier.fooModifier2(): Modifier = composed { TestModifier(someComposableCall(3)) }
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 22: Replace @Composable with composed call:
+@@ -21 +21
+-                 @get:Composable
+-                 val Modifier.fooModifier3: Modifier get() {
++                 val Modifier.fooModifier3: Modifier get() = composed {
+@@ -24 +23
+-                     return TestModifier(value)
++                     TestModifier(value)
+Fix for src/androidx/compose/ui/foo/TestModifier.kt line 28: Replace @Composable with composed call:
+@@ -27 +27
+-                 @get:Composable
+-                 val Modifier.fooModifier4: Modifier get() = TestModifier(someComposableCall(3))
++                 val Modifier.fooModifier4: Modifier get() = composed { TestModifier(someComposableCall(3)) }
             """
             )
     }
