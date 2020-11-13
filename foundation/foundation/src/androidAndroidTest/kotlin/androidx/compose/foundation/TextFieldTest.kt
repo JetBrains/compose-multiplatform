@@ -81,6 +81,7 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.length
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -586,6 +587,7 @@ class TextFieldTest {
         }
     }
 
+    @LargeTest
     @Test
     fun semantics_longClick() {
         val text = "Hello World"
