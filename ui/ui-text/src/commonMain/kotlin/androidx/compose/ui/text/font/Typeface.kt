@@ -21,7 +21,9 @@ package androidx.compose.ui.text.font
  */
 interface Typeface {
     /**
-     * The font family used for creating this Typeface
+     * The font family used for creating this Typeface. If a platform Typeface was used, will
+     * return null.
+     *
      */
-    val fontFamily: FontFamily
+    val fontFamily: FontFamily?
 }

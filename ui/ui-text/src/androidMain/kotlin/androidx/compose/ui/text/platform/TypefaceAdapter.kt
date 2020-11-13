@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text.platform
 
-import android.content.Context
 import android.graphics.Typeface
 import android.os.Build
 import androidx.collection.LruCache
@@ -252,33 +251,5 @@ internal open class TypefaceAdapter(
         }
 
         return synthesize(typeface, font, fontWeight, fontStyle, fontSynthesis)
-    }
-}
-
-/**
- * Android specific Typeface builder function from FontFamily.
- *
- * You can pass necessaryStyles for loading only specific styles. The font style matching happens
- * only with the loaded Typeface.
- *
- * This function caches the internal native Typeface but always create the new Typeface object.
- * Caller should cache if necessary.
- *
- * @param context the context to be used for loading Typeface.
- * @param fontFamily the font family to be loaded
- * @param necessaryStyles optional style filter for loading subset of fontFamily. null means load
- *                        all fonts in fontFamily.
- * @return A loaded Typeface.
- */
-fun typefaceFromFontFamily(
-    context: Context,
-    fontFamily: FontFamily,
-    necessaryStyles: List<Pair<FontWeight, FontStyle>>? = null
-): androidx.compose.ui.text.font.Typeface {
-    return when (fontFamily) {
-        is FontListFontFamily -> AndroidFontListTypeface(fontFamily, context, necessaryStyles)
-        is GenericFontFamily -> AndroidGenericFontFamilyTypeface(fontFamily)
-        is DefaultFontFamily -> AndroidDefaultTypeface()
-        is LoadedFontFamily -> fontFamily.typeface
     }
 }

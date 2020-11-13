@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.font
 import androidx.compose.ui.text.font.fontFamily
+import androidx.compose.ui.text.font.typeface
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.test.R
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -55,7 +56,7 @@ class AndroidTypefaceTest {
         context: Context,
         fontFamily: FontFamily
     ): AndroidTypeface {
-        return typefaceFromFontFamily(context, fontFamily) as AndroidTypeface
+        return typeface(context, fontFamily) as AndroidTypeface
     }
 
     @Test
@@ -523,5 +524,17 @@ class AndroidTypefaceTest {
 
         assertThat(typeface500.isBold).isFalse()
         assertThat(typeface600.isBold).isTrue()
+    }
+
+    @Test
+    fun typefaceWrapper_returnsExactSameInstance() {
+        val typeface = typeface(Typeface.MONOSPACE) as AndroidTypefaceWrapper
+        assertThat(
+            typeface.getNativeTypeface(
+                FontWeight.Light,
+                FontStyle.Italic,
+                FontSynthesis.None
+            )
+        ).isEqualTo(Typeface.MONOSPACE)
     }
 }
