@@ -42,7 +42,7 @@ class UnnecessaryLambdaCreationDetectorTest {
         fun function() {}
 
         @Composable
-        fun ComposableFunction(children: @Composable () -> Unit) {
+        fun ComposableFunction(content: @Composable () -> Unit) {
             children()
         }
     """
@@ -233,7 +233,7 @@ src/test/test.kt:21: Error: Creating an unnecessary lambda to emit a captured la
             class OtherScope
 
             @Composable
-            fun ScopedComposableFunction(children: @Composable SomeScope.() -> Unit) {
+            fun ScopedComposableFunction(content: @Composable SomeScope.() -> Unit) {
                 children()
             }
 

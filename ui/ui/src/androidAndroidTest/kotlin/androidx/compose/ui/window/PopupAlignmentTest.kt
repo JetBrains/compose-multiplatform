@@ -332,7 +332,7 @@ class PopupAlignmentTest {
                                         modifier = Modifier.onGloballyPositioned {
                                             measureLatch.countDown()
                                         },
-                                        children = emptyContent()
+                                        content = emptyContent()
                                     )
                                 }
                             }
@@ -346,8 +346,8 @@ class PopupAlignmentTest {
     }
 
     @Composable
-    private fun TestAlign(children: @Composable () -> Unit) {
-        Layout(children) { measurables, constraints ->
+    private fun TestAlign(content: @Composable () -> Unit) {
+        Layout(content) { measurables, constraints ->
             val measurable = measurables.firstOrNull()
             // The child cannot be larger than our max constraints, but we ignore min constraints.
             val placeable = measurable?.measure(constraints.copy(minWidth = 0, minHeight = 0))

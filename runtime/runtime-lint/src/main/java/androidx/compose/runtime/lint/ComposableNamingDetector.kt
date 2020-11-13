@@ -107,8 +107,4 @@ class ComposableNamingDetector : Detector(), SourceCodeScanner {
     }
 }
 
-private const val ComposableAnnotation = "androidx.compose.runtime.Composable"
-
-private val UMethod.isComposable get() = hasAnnotation(ComposableAnnotation)
-
 private val UMethod.returnsUnit get() = returnType == PsiType.VOID

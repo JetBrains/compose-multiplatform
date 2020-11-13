@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
  * @param contentColor The preferred content color for content inside this FAB
  * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
  * in different states. This controls the size of the shadow below the FAB.
- * @param icon the content of this FAB
+ * @param content the content of this FAB - this is typically an [Icon].
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -80,7 +80,7 @@ fun FloatingActionButton(
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonConstants.defaultElevation(),
-    icon: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     // TODO(aelias): Avoid manually managing the ripple once http://b/157687898
     // is fixed and we have more flexibility to move the clickable modifier
@@ -103,7 +103,7 @@ fun FloatingActionButton(
                         .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
                         .indication(interactionState, AmbientIndication.current()),
                     alignment = Alignment.Center
-                ) { icon() }
+                ) { content() }
             }
         }
     }

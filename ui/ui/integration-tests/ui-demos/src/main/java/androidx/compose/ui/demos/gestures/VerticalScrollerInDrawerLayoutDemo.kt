@@ -79,7 +79,7 @@ fun VerticalScrollerInDrawerDemo() {
 }
 
 @Composable
-private fun DrawerLayout(drawerWidth: Dp, children: @Composable ColumnScope.() -> Unit) {
+private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() -> Unit) {
 
     val minOffset =
         with(AmbientDensity.current) {
@@ -109,7 +109,7 @@ private fun DrawerLayout(drawerWidth: Dp, children: @Composable ColumnScope.() -
 
     Box(Modifier.scrollGestureFilter(scrollObserver, Orientation.Horizontal, canDrag)) {
         Column {
-            children()
+            content()
         }
         Box(
             Modifier
@@ -132,7 +132,7 @@ private fun DrawerLayout(drawerWidth: Dp, children: @Composable ColumnScope.() -
  * A very simple ScrollView like implementation that allows for vertical scrolling.
  */
 @Composable
-private fun Scrollable(orientation: Orientation, children: @Composable () -> Unit) {
+private fun Scrollable(orientation: Orientation, content: @Composable () -> Unit) {
     val maxOffset = 0f
     val offset = remember { mutableStateOf(maxOffset) }
     val minOffset = remember { mutableStateOf(0f) }
@@ -168,7 +168,7 @@ private fun Scrollable(orientation: Orientation, children: @Composable () -> Uni
     }
 
     Layout(
-        children = children,
+        content = content,
         modifier = Modifier.scrollGestureFilter(scrollObserver, orientation, canDrag).then(
             ClipModifier
         ),
@@ -286,10 +286,10 @@ private fun Pressable(
  */
 @Suppress("SameParameterValue")
 @Composable
-private fun RepeatingColumn(repetitions: Int, children: @Composable () -> Unit) {
+private fun RepeatingColumn(repetitions: Int, content: @Composable () -> Unit) {
     Column {
         for (i in 1..repetitions) {
-            children()
+            content()
         }
     }
 }
@@ -300,10 +300,10 @@ private fun RepeatingColumn(repetitions: Int, children: @Composable () -> Unit) 
  */
 @Suppress("SameParameterValue")
 @Composable
-private fun RepeatingRow(repetitions: Int, children: @Composable () -> Unit) {
+private fun RepeatingRow(repetitions: Int, content: @Composable () -> Unit) {
     Row {
         for (i in 1..repetitions) {
-            children()
+            content()
         }
     }
 }

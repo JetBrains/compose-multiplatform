@@ -309,6 +309,6 @@ internal fun ProvideCommonAmbients(
         AmbientTextToolbar provides owner.textToolbar,
         AmbientUriHandler provides uriHandler,
         AmbientViewConfiguration provides owner.viewConfiguration,
-        children = content
+        content = content
     )
 }

@@ -105,7 +105,7 @@ fun ComposeTestRule.setMaterialContentForSizeAssertions(
     parentMaxWidth: Dp = BigTestMaxWidth,
     parentMaxHeight: Dp = BigTestMaxHeight,
     // TODO : figure out better way to make it flexible
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ): SemanticsNodeInteraction {
     setContent {
         MaterialTheme {
@@ -117,7 +117,7 @@ fun ComposeTestRule.setMaterialContentForSizeAssertions(
                             maxHeight = parentMaxHeight
                         ).testTag("containerForSizeAssertion")
                     ) {
-                        children()
+                        content()
                     }
                 }
             }

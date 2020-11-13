@@ -95,7 +95,7 @@ fun Tab(
 ) {
     val styledText = @Composable {
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
-        ProvideTextStyle(style, children = text)
+        ProvideTextStyle(style, content = text)
     }
     Tab(
         selected,
@@ -157,7 +157,7 @@ fun Tab(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            children = content
+            content = content
         )
     }
 }
@@ -299,7 +299,7 @@ private fun TabTransition(
     Providers(
         AmbientContentColor provides color.copy(alpha = 1f),
         AmbientContentAlpha provides color.alpha,
-        children = content
+        content = content
     )
 }
 

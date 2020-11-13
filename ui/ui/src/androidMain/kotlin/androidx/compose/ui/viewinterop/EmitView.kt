@@ -44,7 +44,7 @@ fun <T : View> emitView(
     )
 }
 
-@Suppress("ComposableNaming")
+@Suppress("ComposableNaming", "ComposableLambdaParameterNaming")
 @Composable
 @Deprecated(
     "emitView will be removed. Use AndroidView instead if possible. " +
@@ -62,6 +62,6 @@ fun <T : ViewGroup> emitView(
         update = {
             reconcile(update)
         },
-        children = children
+        content = children
     )
 }

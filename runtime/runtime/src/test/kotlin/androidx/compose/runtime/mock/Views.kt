@@ -33,12 +33,12 @@ fun <T : Any> MockComposeScope.repeat(
 }
 
 @Composable
-fun MockComposeScope.linear(block: @Composable MockComposeScope.() -> Unit) {
+fun MockComposeScope.linear(content: @Composable MockComposeScope.() -> Unit) {
     emit<View, ViewApplier>(
         ctor = { View().also { it.name = "linear" } },
         update = { }
     ) {
-        block()
+        content()
     }
 }
 
@@ -59,14 +59,17 @@ fun MockComposeScope.edit(value: String) {
 }
 
 @Composable
-fun MockComposeScope.selectBox(selected: Boolean, block: @Composable MockComposeScope.() -> Unit) {
+fun MockComposeScope.selectBox(
+    selected: Boolean,
+    content: @Composable MockComposeScope.() -> Unit
+) {
     if (selected) {
         emit<View, ViewApplier>(
             ctor = { View().also { it.name = "box" } },
             update = { },
-            children = { block() }
+            content = { content() }
         )
     } else {
-        block()
+        content()
     }
 }

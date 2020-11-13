@@ -182,8 +182,8 @@ class SubcomposeLayoutTest {
     }
 
     @Composable
-    private fun NonInlineBox(modifier: Modifier, children: @Composable () -> Unit) {
-        Box(modifier = modifier) { children() }
+    private fun NonInlineBox(modifier: Modifier, content: @Composable () -> Unit) {
+        Box(modifier = modifier) { content() }
     }
 
     @Test
@@ -279,9 +279,9 @@ class SubcomposeLayoutTest {
     }
 
     @Composable
-    private fun MySubcomposeLayout(slotContent: @Composable () -> Unit) {
+    private fun MySubcomposeLayout(content: @Composable () -> Unit) {
         SubcomposeLayout<Unit> { constraints ->
-            val placeables = subcompose(Unit, slotContent).map { it.measure(constraints) }
+            val placeables = subcompose(Unit, content).map { it.measure(constraints) }
             val maxWidth = placeables.maxByOrNull { it.width }!!.width
             val height = placeables.sumBy { it.height }
             layout(maxWidth, height) {

@@ -99,7 +99,7 @@ fun BottomNavigation(
         Row(
             Modifier.fillMaxWidth().preferredHeight(BottomNavigationHeight),
             horizontalArrangement = Arrangement.SpaceBetween,
-            children = content
+            content = content
         )
     }
 }
@@ -148,7 +148,7 @@ fun BottomNavigationItem(
 ) {
     val styledLabel = @Composable {
         val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
-        ProvideTextStyle(style, children = label)
+        ProvideTextStyle(style, content = label)
     }
     // The color of the Ripple should always the selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is

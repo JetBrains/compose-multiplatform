@@ -159,7 +159,7 @@ class OnGloballyPositionedTest {
                             measurables[0].measure(constraints).place(position, 0)
                         }
                     },
-                    children = {
+                    content = {
                         Wrap(
                             minWidth = 10,
                             minHeight = 10
@@ -202,7 +202,7 @@ class OnGloballyPositionedTest {
                             measurables[1].measure(constraints).place(0, 0)
                         }
                     },
-                    children = {
+                    content = {
                         Wrap(
                             minWidth = 10,
                             minHeight = 10,
@@ -436,9 +436,9 @@ class OnGloballyPositionedTest {
 fun DelayedMeasure(
     size: Int,
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = emptyContent()
 ) {
-    Layout(children = children, modifier = modifier) { measurables, _ ->
+    Layout(content = content, modifier = modifier) { measurables, _ ->
         layout(size, size) {
             val newConstraints = Constraints(maxWidth = size, maxHeight = size)
             val placeables = measurables.map { m ->

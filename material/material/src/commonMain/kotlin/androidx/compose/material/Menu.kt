@@ -138,7 +138,7 @@ fun DropdownMenu(
                         modifier = dropdownModifier
                             .padding(vertical = DropdownMenuVerticalPadding)
                             .preferredWidth(IntrinsicSize.Max),
-                        children = dropdownContent
+                        content = dropdownContent
                     )
                 }
             }
@@ -191,7 +191,7 @@ fun DropdownMenuItem(
         val typography = MaterialTheme.typography
         ProvideTextStyle(typography.subtitle1) {
             val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-            Providers(AmbientContentAlpha provides contentAlpha, children = content)
+            Providers(AmbientContentAlpha provides contentAlpha, content = content)
         }
     }
 }

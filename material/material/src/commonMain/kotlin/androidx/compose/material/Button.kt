@@ -135,7 +135,7 @@ fun Button(
                         .padding(contentPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    children = content
+                    content = content
                 )
             }
         }

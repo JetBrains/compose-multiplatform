@@ -211,7 +211,7 @@ private fun MagnifierTransition(
     visible: Boolean,
     maxWidth: Dp,
     maxDiameter: Dp,
-    children: @Composable (labelWidth: Dp, selectionDiameter: Dp, opacity: Float) -> Unit
+    content: @Composable (labelWidth: Dp, selectionDiameter: Dp, opacity: Float) -> Unit
 ) {
     val transitionDefinition = remember {
         transitionDefinition<Boolean> {
@@ -241,7 +241,7 @@ private fun MagnifierTransition(
         }
     }
     val state = transition(transitionDefinition, visible)
-    children(state[LabelWidthPropKey], state[MagnifierDiameterPropKey], state[OpacityPropKey])
+    content(state[LabelWidthPropKey], state[MagnifierDiameterPropKey], state[OpacityPropKey])
 }
 
 private val LabelWidthPropKey = DpPropKey()

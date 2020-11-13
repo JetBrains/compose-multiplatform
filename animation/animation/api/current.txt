@@ -41,7 +41,7 @@ package androidx.compose.animation {
   }
 
   public final class CrossfadeKt {
-    method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? current, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animation, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> children);
+    method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? current, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animation, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
   }
 
   public final class DisposableAnimationClock implements androidx.compose.animation.core.AnimationClockObservable {

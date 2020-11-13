@@ -119,8 +119,8 @@ internal fun DropdownPopup(
 internal val AmbientPopupTestTag = ambientOf { "DEFAULT_TEST_TAG" }
 
 @Composable
-internal fun PopupTestTag(tag: String, children: @Composable () -> Unit) {
-    Providers(AmbientPopupTestTag provides tag, children = children)
+internal fun PopupTestTag(tag: String, content: @Composable () -> Unit) {
+    Providers(AmbientPopupTestTag provides tag, content = content)
 }
 
 /**

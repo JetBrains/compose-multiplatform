@@ -81,7 +81,7 @@ class ToggleableTest {
                     Modifier
                         .triStateToggleable(state = ToggleableState.On, onClick = {})
                         .testTag("checkedToggleable"),
-                    children = {
+                    content = {
                         BasicText("ToggleableText")
                     }
                 )
@@ -89,7 +89,7 @@ class ToggleableTest {
                     Modifier
                         .triStateToggleable(state = ToggleableState.Off, onClick = {})
                         .testTag("unCheckedToggleable"),
-                    children = {
+                    content = {
                         BasicText("ToggleableText")
                     }
                 )
@@ -97,7 +97,7 @@ class ToggleableTest {
                     Modifier
                         .triStateToggleable(state = ToggleableState.Indeterminate, onClick = {})
                         .testTag("indeterminateToggleable"),
-                    children = {
+                    content = {
                         BasicText("ToggleableText")
                     }
                 )
@@ -130,7 +130,7 @@ class ToggleableTest {
                     Modifier
                         .toggleable(value = true, onValueChange = {})
                         .testTag("checkedToggleable"),
-                    children = {
+                    content = {
                         BasicText("ToggleableText")
                     }
                 )
@@ -138,7 +138,7 @@ class ToggleableTest {
                     Modifier
                         .toggleable(value = false, onValueChange = {})
                         .testTag("unCheckedToggleable"),
-                    children = {
+                    content = {
                         BasicText("ToggleableText")
                     }
                 )
@@ -165,7 +165,7 @@ class ToggleableTest {
                         onClick = {},
                         enabled = false
                     ),
-                    children = {
+                    content = {
                         BasicText("ToggleableText")
                     }
                 )
@@ -186,7 +186,7 @@ class ToggleableTest {
             Box {
                 Box(
                     Modifier.toggleable(value = checked, onValueChange = onCheckedChange),
-                    children = {
+                    content = {
                         BasicText("ToggleableText")
                     }
                 )

@@ -36,8 +36,8 @@ import androidx.compose.ui.util.fastForEach
  * @sample androidx.compose.animation.samples.CrossfadeSample
  *
  * @param current is a key representing your current layout state. every time you change a key
- * the animation will be triggered. The [children] called with the old key will be faded out while
- * the [children] called with the new key will be faded in.
+ * the animation will be triggered. The [content] called with the old key will be faded out while
+ * the [content] called with the new key will be faded in.
  * @param modifier Modifier to be applied to the animation container.
  * @param animation the [AnimationSpec] to configure the animation.
  */
@@ -46,7 +46,7 @@ fun <T> Crossfade(
     current: T,
     modifier: Modifier = Modifier,
     animation: AnimationSpec<Float> = tween(),
-    children: @Composable (T) -> Unit
+    content: @Composable (T) -> Unit
 ) {
     val state = remember { CrossfadeState<T>() }
     if (current != state.current) {
@@ -80,7 +80,7 @@ fun <T> Crossfade(
         state.items.fastForEach { (item, opacity) ->
             key(item) {
                 opacity {
-                    children(item)
+                    content(item)
                 }
             }
         }
@@ -99,7 +99,7 @@ private data class CrossfadeAnimationItem<T>(
     val transition: CrossfadeTransition
 )
 
-private typealias CrossfadeTransition = @Composable (children: @Composable () -> Unit) -> Unit
+private typealias CrossfadeTransition = @Composable (content: @Composable () -> Unit) -> Unit
 
 @Composable
 private fun animatedOpacity(

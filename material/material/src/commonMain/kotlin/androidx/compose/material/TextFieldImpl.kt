@@ -191,7 +191,7 @@ internal fun TextFieldImpl(
                     Decoration(
                         contentColor = animatedLabelColor,
                         typography = labelAnimatedStyle,
-                        children = label
+                        content = label
                     )
                 }
             } else null
@@ -204,7 +204,7 @@ internal fun TextFieldImpl(
                             contentColor = inactiveColor,
                             typography = MaterialTheme.typography.subtitle1,
                             contentAlpha = ContentAlpha.medium,
-                            children = placeholder
+                            content = placeholder
                         )
                     }
                 }
@@ -266,26 +266,26 @@ internal fun Color.applyAlpha(alpha: Float): Color {
 }
 
 /**
- * Set content color, typography and emphasis for [children] composable
+ * Set content color, typography and emphasis for [content] composable
  */
 @Composable
 internal fun Decoration(
     contentColor: Color,
     typography: TextStyle? = null,
     contentAlpha: Float? = null,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val colorAndEmphasis = @Composable {
         Providers(AmbientContentColor provides contentColor) {
             if (contentAlpha != null) {
                 Providers(
                     AmbientContentAlpha provides contentAlpha,
-                    children = children
+                    content = content
                 )
             } else {
                 Providers(
                     AmbientContentAlpha provides contentColor.alpha,
-                    children = children
+                    content = content
                 )
             }
         }
@@ -341,7 +341,7 @@ private object TextFieldTransitionScope {
         activeColor: Color,
         labelInactiveColor: Color,
         indicatorInactiveColor: Color,
-        children: @Composable (
+        content: @Composable (
             labelProgress: Float,
             labelColor: Color,
             indicatorWidth: Dp,
@@ -363,7 +363,7 @@ private object TextFieldTransitionScope {
             )
         }
         val state = transition(definition = definition, toState = inputState)
-        children(
+        content(
             state[LabelProgressProp],
             state[LabelColorProp],
             state[IndicatorWidthProp],

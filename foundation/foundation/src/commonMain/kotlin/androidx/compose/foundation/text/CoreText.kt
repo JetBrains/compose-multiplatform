@@ -148,7 +148,7 @@ fun CoreText(
     controller.update(selectionRegistrar)
 
     Layout(
-        children = if (inlineComposables.isEmpty()) {
+        content = if (inlineComposables.isEmpty()) {
             emptyContent()
         } else {
             { InlineChildren(text, inlineComposables) }
@@ -184,7 +184,7 @@ internal fun InlineChildren(
 ) {
     inlineContents.fastForEach { (content, start, end) ->
         Layout(
-            children = { content(text.subSequence(start, end).text) }
+            content = { content(text.subSequence(start, end).text) }
         ) { children, constrains ->
             val placeables = children.map { it.measure(constrains) }
             layout(width = constrains.maxWidth, height = constrains.maxHeight) {

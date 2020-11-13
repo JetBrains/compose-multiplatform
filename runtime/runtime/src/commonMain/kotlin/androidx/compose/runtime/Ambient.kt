@@ -172,7 +172,7 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T>
 /**
  * [Providers] binds values to [ProvidableAmbient] keys. Reading the ambient using
  * [Ambient.current] will return the value provided in [Providers]'s [values] parameter for all
- * composable functions called directly or indirectly in the [children] lambda.
+ * composable functions called directly or indirectly in the [content] lambda.
  *
  * @sample androidx.compose.runtime.samples.ambientProvider
  *
@@ -182,8 +182,8 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T>
  */
 @Composable
 @OptIn(ComposeCompilerApi::class)
-fun Providers(vararg values: ProvidedValue<*>, children: @Composable () -> Unit) {
+fun Providers(vararg values: ProvidedValue<*>, content: @Composable () -> Unit) {
     currentComposer.startProviders(values)
-    children()
+    content()
     currentComposer.endProviders()
 }

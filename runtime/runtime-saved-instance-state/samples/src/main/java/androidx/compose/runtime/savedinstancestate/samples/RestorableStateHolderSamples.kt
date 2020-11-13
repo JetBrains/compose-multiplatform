@@ -93,13 +93,13 @@ fun Screen2() {
 }
 
 @Composable
-fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, children: @Composable () -> Unit) {
+fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         modifier
             .clickable(onClick = onClick)
             .background(Color(0xFF6200EE), RoundedCornerShape(4.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        children()
+        content()
     }
 }

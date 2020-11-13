@@ -88,9 +88,9 @@ internal fun SimpleContainer(
     modifier: Modifier = Modifier,
     width: Dp? = null,
     height: Dp? = null,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
-    Layout(children, modifier) { measurables, incomingConstraints ->
+    Layout(content, modifier) { measurables, incomingConstraints ->
         val containerConstraints = Constraints()
             .copy(
                 width?.toIntPx() ?: 0,

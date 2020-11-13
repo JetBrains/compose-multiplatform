@@ -81,11 +81,11 @@ class ScrollToTest {
         modifier: Modifier,
         offset: Int,
         columnHeight: Int,
-        children: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
         with(AmbientDensity.current) {
             Layout(
-                children,
+                content,
                 modifier.size(crossAxisSize.toDp(), columnHeight.toDp()),
                 verticalLayout(offset, columnHeight)
             )
@@ -97,11 +97,11 @@ class ScrollToTest {
         modifier: Modifier,
         offset: Int,
         rowWidth: Int,
-        children: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
         with(AmbientDensity.current) {
             Layout(
-                children,
+                content,
                 modifier.size(rowWidth.toDp(), crossAxisSize.toDp()),
                 horizontalLayout(offset, rowWidth)
             )
@@ -114,11 +114,11 @@ class ScrollToTest {
         orientation: Orientation,
         offset: Int,
         mainAxisSize: Int,
-        boxes: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
         when (orientation) {
-            Horizontal -> SimpleRow(modifier, offset, mainAxisSize, boxes)
-            Vertical -> SimpleColumn(modifier, offset, mainAxisSize, boxes)
+            Horizontal -> SimpleRow(modifier, offset, mainAxisSize, content)
+            Vertical -> SimpleColumn(modifier, offset, mainAxisSize, content)
         }
     }
 

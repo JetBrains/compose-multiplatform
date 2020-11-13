@@ -475,8 +475,8 @@ class RecomposerTests : BaseComposeTest() {
 }
 
 @Composable
-fun Wrapper(children: @Composable () -> Unit) {
-    children()
+fun Wrapper(content: @Composable () -> Unit) {
+    content()
 }
 
 fun assertChildHierarchy(root: ViewGroup, getHierarchy: () -> String) {

@@ -71,7 +71,7 @@ class PopupTest {
             SimpleContainer {
                 PopupTestTag(testTag) {
                     Popup(alignment = Alignment.Center) {
-                        SimpleContainer(Modifier.preferredSize(50.dp), children = emptyContent())
+                        SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
                     }
                 }
             }
@@ -96,7 +96,7 @@ class PopupTest {
                         SimpleContainer(
                             width = popupWidthDp,
                             height = popupHeightDp,
-                            children = emptyContent()
+                            content = emptyContent()
                         )
                     }
                 }

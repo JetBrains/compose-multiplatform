@@ -74,10 +74,10 @@ private fun FocusableText(text: String) {
 }
 
 @Composable
-private fun CenteredRow(children: @Composable RowScope.() -> Unit) {
+private fun CenteredRow(content: @Composable RowScope.() -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
-        children = children
+        content = content
     )
 }

@@ -39,7 +39,7 @@ fun Group(
     translationX: Float = DefaultTranslationX,
     translationY: Float = DefaultTranslationY,
     clipPathData: List<PathNode> = EmptyPath,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     emit<GroupComponent, VectorApplier>(
         ctor = { GroupComponent() },
@@ -55,7 +55,7 @@ fun Group(
             set(clipPathData) { this.clipPathData = it }
         }
     ) {
-        children()
+        content()
     }
 }
 
