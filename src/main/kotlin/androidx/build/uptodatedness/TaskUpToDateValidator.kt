@@ -35,10 +35,12 @@ import java.util.Date
 const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
 const val RECORD_FLAG_NAME = "verifyUpToDate"
 
-// Temporary list of exempt tasks that are known to still be out-of-date after running once
+// Temporary set of exempt tasks that are known to still be out-of-date after running once
 // Entries in this set may be task names (like assembleDebug) or task paths
 // (like :core:core:assembleDebug)
-val EXEMPT_TASKS = setOf(
+// Entries in this set do still get rerun because they might produce files that are needed by
+// subsequent tasks
+val ALLOW_RERUNNING_TASKS = setOf(
     "analyticsRecordingRelease",
     "buildOnServer",
     "checkExternalLicenses",
@@ -47,7 +49,6 @@ val EXEMPT_TASKS = setOf(
     "createProjectZip",
     "desugarPublicDebugFileDependencies",
     "desugarTipOfTreeDebugFileDependencies",
-    "dokkaKotlinDocs",
     "externalNativeBuildDebug",
     "externalNativeBuildRelease",
     "generateJsonModelDebug",
@@ -81,9 +82,6 @@ val EXEMPT_TASKS = setOf(
     "generatePomFileForSafeargsKotlinPluginMarkerMavenPublication",
     "jacocoPublicDebug",
     "jacocoTipOfTreeDebug",
-    "lint",
-    "lintDebug",
-    "lintVitalRelease",
     "partiallyDejetifyArchive",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishAndroidDebugPublicationToMavenRepository",
@@ -111,7 +109,6 @@ val EXEMPT_TASKS = setOf(
     "verifyDependencyVersions",
     "zipEcFiles",
     "zipTestConfigsWithApks",
-    "zipDokkaDocs",
 
     ":camera:integration-tests:camera-testapp-core:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-core:packageDebug",
@@ -129,6 +126,20 @@ val EXEMPT_TASKS = setOf(
         "publishInspectionPluginMarkerMavenPublicationToMavenRepository"
 )
 
+// Additional tasks that are expected to be temporarily out-of-date after running once
+// Tasks in this set we don't even try to rerun, because they're known to be somewhat slow
+// and also known to not generate any new, necessary files during subsequent runs
+val DONT_TRY_RERUNNING_TASKS = setOf(
+    // More information about the fact that these dokka tasks rerun can be found at b/167569304
+    "dokkaKotlinDocs",
+    "zipDokkaDocs",
+
+    // We should be able to remove these entries when b/160392650 is fixed
+    "lint",
+    "lintDebug",
+    "lintVitalRelease",
+)
+
 class TaskUpToDateValidator {
     companion object {
 
@@ -142,8 +153,16 @@ class TaskUpToDateValidator {
             return project.hasProperty(DISALLOW_TASK_EXECUTION_FLAG_NAME)
         }
 
-        private fun isExemptTask(task: Task): Boolean {
-            return EXEMPT_TASKS.contains(task.name) || EXEMPT_TASKS.contains(task.path)
+        private fun isAllowedToRerunTask(task: Task): Boolean {
+            return ALLOW_RERUNNING_TASKS.contains(task.name) ||
+                ALLOW_RERUNNING_TASKS.contains(task.path)
+        }
+
+        private fun shouldTryRerunningTask(task: Task): Boolean {
+            return !(
+                DONT_TRY_RERUNNING_TASKS.contains(task.name) ||
+                    DONT_TRY_RERUNNING_TASKS.contains(task.path)
+                )
         }
 
         private fun recordBuildStartTime(rootProject: Project) {
@@ -158,9 +177,14 @@ class TaskUpToDateValidator {
             recordBuildStartTime(rootProject)
             if (shouldValidate(rootProject)) {
                 val taskGraph = rootProject.gradle.taskGraph
+                taskGraph.beforeTask { task ->
+                    if (!shouldTryRerunningTask(task)) {
+                        task.enabled = false
+                    }
+                }
                 taskGraph.afterTask { task ->
                     if (task.didWork) {
-                        if (!isExemptTask(task)) {
+                        if (!isAllowedToRerunTask(task)) {
                             val message = "Ran two consecutive builds of the same tasks," +
                                 " and in the second build, observed $task to be not UP-TO-DATE." +
                                 " This indicates that $task does not declare" +
@@ -173,7 +197,7 @@ class TaskUpToDateValidator {
             }
             if (shouldRecord(rootProject)) {
                 rootProject.gradle.taskGraph.afterTask { task ->
-                    if (!isExemptTask(task)) {
+                    if (shouldTryRerunningTask(task) && !isAllowedToRerunTask(task)) {
                         recordTaskInputs(task)
                     }
                 }
@@ -281,7 +305,7 @@ class TaskUpToDateValidator {
             if (createdByTask == null) {
                 return "This file is not declared as the output of any task in this build."
             }
-            if (isExemptTask(createdByTask)) {
+            if (isAllowedToRerunTask(createdByTask)) {
                 return "This file is declared as an output of " + createdByTask +
                     ", which is a task that is not yet validated by the TaskUpToDateValidator"
             } else {
