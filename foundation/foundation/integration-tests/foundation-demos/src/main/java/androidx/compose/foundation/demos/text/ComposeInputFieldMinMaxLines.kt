@@ -17,7 +17,7 @@
 package androidx.compose.foundation.demos.text
 
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.draw.clipToBounds
@@ -29,21 +29,26 @@ import androidx.compose.ui.text.input.TextFieldValue
 @Composable
 fun CoreTextFieldMinMaxDemo() {
     ScrollableColumn {
-        CoreTextFieldWithMaxLines("", maxLines = Int.MAX_VALUE) // empty text, no maxLines
-        CoreTextFieldWithMaxLines("abc", maxLines = 1) // maxLines == line count
-        CoreTextFieldWithMaxLines("", maxLines = 2) // empty text, maxLines > line count
-        CoreTextFieldWithMaxLines("abc", maxLines = 4) // maxLines > line count
-        CoreTextFieldWithMaxLines("abc".repeat(20), maxLines = 1) // maxLines < line count
+        TagLine("empty text, no maxLines")
+        TextFieldWithMaxLines("", maxLines = Int.MAX_VALUE)
+        TagLine("maxLines == line count")
+        TextFieldWithMaxLines("abc", maxLines = 1)
+        TagLine("empty text, maxLines > line count")
+        TextFieldWithMaxLines("", maxLines = 2)
+        TagLine("maxLines > line count")
+        TextFieldWithMaxLines("abc", maxLines = 4)
+        TagLine("maxLines < line count")
+        TextFieldWithMaxLines("abc".repeat(20), maxLines = 1)
     }
 }
 
 @Composable
 @OptIn(InternalTextApi::class)
-private fun CoreTextFieldWithMaxLines(str: String? = null, maxLines: Int) {
+private fun TextFieldWithMaxLines(str: String? = null, maxLines: Int) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) {
         TextFieldValue(str ?: "abc ".repeat(20))
     }
-    CoreTextField(
+    BasicTextField(
         modifier = demoTextFieldModifiers.clipToBounds(),
         value = state.value,
         onValueChange = { state.value = it },

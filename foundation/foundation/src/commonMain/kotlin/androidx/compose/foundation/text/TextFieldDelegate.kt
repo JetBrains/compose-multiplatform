@@ -46,17 +46,13 @@ import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.constrainHeight
 import kotlin.jvm.JvmStatic
-import androidx.compose.ui.unit.constrainWidth
 import kotlin.math.ceil
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 // visible for testing
@@ -74,7 +70,7 @@ private val EmptyTextReplacement = "H".repeat(DefaultWidthCharCount) // just a r
  *
  * Until we have font metrics APIs, use the height of reference text as a workaround.
  */
-private fun computeSizeForEmptyText(
+internal fun computeSizeForEmptyText(
     style: TextStyle,
     density: Density,
     resourceLoader: Font.ResourceLoader
@@ -119,22 +115,8 @@ class TextFieldDelegate {
         ): Triple<Int, Int, TextLayoutResult> {
             val layoutResult = textDelegate.layout(constraints, layoutDirection, prevResultText)
 
-            var height = layoutResult.size.height
-            var width = layoutResult.size.width
-
-            val constrainedWithDefaultSize = constrainWithDefaultSize(
-                textDelegate,
-                layoutResult,
-                constraints,
-                layoutDirection,
-                width,
-                height
-            )
-
-            height = constrainedWithDefaultSize.height
-            width = constrainedWithDefaultSize.width
-
-            height = constrainWithMaxLines(maxLines, height, layoutResult)
+            val height = constrainWithMaxLines(maxLines, layoutResult.size.height, layoutResult)
+            val width = layoutResult.size.width
 
             return Triple(width, height, layoutResult)
         }
@@ -149,42 +131,6 @@ class TextFieldDelegate {
             } else {
                 ceil(layoutResult.getLineBottom(maxLines - 1)).toInt()
             }
-        }
-
-        private fun constrainWithDefaultSize(
-            textDelegate: TextDelegate,
-            layoutResult: TextLayoutResult,
-            constraints: Constraints,
-            layoutDirection: LayoutDirection,
-            width: Int,
-            height: Int
-        ): IntSize {
-            val isEmptyText = textDelegate.text.text.isEmpty()
-            val needDefaultWidth = layoutResult.size.width < constraints.maxWidth
-
-            val defaultSize = if (isEmptyText || needDefaultWidth) {
-                computeSizeForEmptyText(
-                    style = resolveDefaults(textDelegate.style, layoutDirection),
-                    density = textDelegate.density,
-                    resourceLoader = textDelegate.resourceLoader
-                )
-            } else {
-                IntSize.Zero
-            }
-
-            val newHeight = if (isEmptyText) {
-                constraints.constrainHeight(defaultSize.height)
-            } else {
-                height
-            }
-
-            val newWidth = if (needDefaultWidth) {
-                constraints.constrainWidth(max(defaultSize.width, layoutResult.size.width))
-            } else {
-                width
-            }
-
-            return IntSize(newWidth, newHeight)
         }
 
         /**

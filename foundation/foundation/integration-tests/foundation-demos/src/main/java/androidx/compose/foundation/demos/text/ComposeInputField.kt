@@ -18,30 +18,51 @@ package androidx.compose.foundation.demos.text
 
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun InputFieldDemo() {
     ScrollableColumn {
-        TagLine(tag = "simple editing")
-        EditLine()
-        TagLine(tag = "simple editing2")
-        EditLine()
+        TagLine(tag = "LTR Layout")
+        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                TagLine(tag = "simple editing single line")
+                EditLine(singleLine = true)
+                TagLine(tag = "simple editing multi line")
+                EditLine(text = displayTextHindi)
+                TagLine(tag = "simple editing RTL")
+                EditLine(text = displayTextArabic)
+            }
+        }
+        TagLine(tag = "RTL Layout")
+        Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                TagLine(tag = "simple editing RTL")
+                EditLine()
+                EditLine(text = displayTextArabic)
+                EditLine(text = displayText)
+            }
+        }
     }
 }
 
@@ -49,10 +70,11 @@ fun InputFieldDemo() {
 internal fun EditLine(
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Unspecified,
-    singleLine: Boolean = true
+    singleLine: Boolean = false,
+    text: String = ""
 ) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue(text) }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
