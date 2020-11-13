@@ -53,7 +53,6 @@ android {
 androidx {
     name = "AndroidX Compose UI Graphics Components Samples"
     type = LibraryType.SAMPLES
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Graphics Components"

@@ -80,7 +80,6 @@ tasks.withType(KotlinCompile).configureEach {
 androidx {
     name = "Jetpack Compose desktop implementation"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.DESKTOP
     inceptionYear = "2020"
     legacyDisableKotlinStrictApiMode = true
