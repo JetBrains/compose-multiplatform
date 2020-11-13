@@ -48,6 +48,7 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -104,6 +105,12 @@ internal fun TextFieldImpl(
     backgroundColor: Color,
     shape: Shape
 ) {
+    // If color is not provided via the text style, use content color as a default
+    val textColor = textStyle.color.useOrElse {
+        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+    }
+    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+
     val keyboardController: Ref<SoftwareKeyboardController> = remember { Ref() }
 
     var isFocused by remember { mutableStateOf(false) }
@@ -122,7 +129,7 @@ internal fun TextFieldImpl(
             BasicTextField(
                 value = value,
                 modifier = tagModifier.defaultMinSizeConstraints(minWidth = TextFieldMinWidth),
-                textStyle = textStyle,
+                textStyle = mergedTextStyle,
                 onValueChange = onValueChange,
                 cursorColor = if (isErrorValue) errorColor else activeColor,
                 visualTransformation = visualTransformation,
@@ -182,7 +189,7 @@ internal fun TextFieldImpl(
 
         val decoratedLabel: @Composable (() -> Unit)? =
             if (label != null) {
-                {
+                @Composable {
                     val labelAnimatedStyle = lerp(
                         MaterialTheme.typography.subtitle1,
                         MaterialTheme.typography.caption,
@@ -198,7 +205,7 @@ internal fun TextFieldImpl(
 
         val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
             if (placeholder != null && value.text.isEmpty()) {
-                { modifier ->
+                @Composable { modifier ->
                     Box(modifier.drawOpacity(placeholderOpacity)) {
                         Decoration(
                             contentColor = inactiveColor,
