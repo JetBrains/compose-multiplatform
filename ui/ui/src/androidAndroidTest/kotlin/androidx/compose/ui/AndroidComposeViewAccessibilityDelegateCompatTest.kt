@@ -368,10 +368,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     private fun createSemanticsNodeWithProperties(
         id: Int,
-        mergeAllDescendants: Boolean,
+        mergeDescendants: Boolean,
         properties: (SemanticsPropertyReceiver.() -> Unit)
     ): SemanticsNode {
-        val semanticsModifier = SemanticsModifierCore(id, mergeAllDescendants, properties)
+        val semanticsModifier = SemanticsModifierCore(id, mergeDescendants, properties)
         return SemanticsNode(
             SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
             true

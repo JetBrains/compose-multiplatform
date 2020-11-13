@@ -62,7 +62,7 @@ fun Modifier.clickable(
     onClick: () -> Unit
 ) = composed(
     factory = {
-        val semanticModifier = Modifier.semantics(mergeAllDescendants = true) {
+        val semanticModifier = Modifier.semantics(mergeDescendants = true) {
             if (enabled) {
                 // b/156468846:  add long click semantics and double click if needed
                 onClick(action = { onClick(); true }, label = onClickLabel)

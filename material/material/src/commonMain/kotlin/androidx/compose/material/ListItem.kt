@@ -78,7 +78,7 @@ fun ListItem(
     val styledOverlineText = applyTextStyle(typography.overline, ContentAlpha.high, overlineText)
     val styledTrailing = applyTextStyle(typography.caption, ContentAlpha.high, trailing)
 
-    val semanticsModifier = modifier.semantics(mergeAllDescendants = true) {}
+    val semanticsModifier = modifier.semantics(mergeDescendants = true) {}
 
     if (styledSecondaryText == null && styledOverlineText == null) {
         OneLine.ListItem(semanticsModifier, icon, styledText, styledTrailing)

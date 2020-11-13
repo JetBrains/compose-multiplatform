@@ -345,7 +345,7 @@ class SnackbarTest {
                 Providers(AmbientShapes provides Shapes(medium = shape)) {
                     Snackbar(
                         modifier = Modifier
-                            .semantics(mergeAllDescendants = true) {}
+                            .semantics(mergeDescendants = true) {}
                             .testTag("snackbar"),
                         text = { Text("") }
                     )

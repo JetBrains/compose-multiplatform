@@ -623,7 +623,7 @@ class RippleIndicationTest {
  */
 @Composable
 private fun RippleBox(interactionState: InteractionState, rippleIndication: RippleIndication) {
-    Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(Tag)) {
+    Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         Surface(
             Modifier.padding(25.dp),
             color = RippleBoxBackgroundColor, shape = RoundedCornerShape(20)

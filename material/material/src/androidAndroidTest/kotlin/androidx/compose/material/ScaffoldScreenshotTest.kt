@@ -660,7 +660,7 @@ private fun ScreenshotScaffold(
             Modifier
                 .fillMaxSize(0.5f)
                 .wrapContentSize()
-                .semantics(mergeAllDescendants = true) {}
+                .semantics(mergeDescendants = true) {}
                 .testTag(Tag)
         ) {
             Scaffold(
