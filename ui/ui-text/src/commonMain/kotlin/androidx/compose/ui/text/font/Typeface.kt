@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text
-
-import androidx.compose.ui.text.font.FontFamily
+package androidx.compose.ui.text.font
 
 /**
  * A class that can be used for changing the font used in text.
