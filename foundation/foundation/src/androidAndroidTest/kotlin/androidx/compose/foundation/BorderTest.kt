@@ -19,7 +19,9 @@ package androidx.compose.foundation
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertShape
@@ -29,17 +31,21 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import kotlin.math.floor
 
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -177,6 +183,38 @@ class BorderTest(val shape: Shape) {
             shape = RectangleShape,
             shapeOverlapPixelCount = 1.0f
         )
+    }
+
+    @Test
+    fun border_triangle_shape() {
+        val testTag = "testTag"
+        val triangle = GenericShape() { size ->
+            lineTo(size.width, 0f)
+            lineTo(size.width, size.height)
+            close()
+        }
+        rule.setContent {
+            Box(
+                Modifier.testTag(testTag)
+                    .size(100.dp, 100.dp)
+                    .background(Color.White)
+                    .border(BorderStroke(10.dp, Color.Red), triangle)
+            )
+        }
+
+        val offsetLeft = 30
+        val offsetRight = 15
+        val offsetTop = 15
+        val offsetBottom = 30
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            val map = toPixelMap()
+            assertEquals(Color.Red, map[offsetLeft, offsetTop]) // Top left
+            assertEquals(Color.Red, map[width - offsetRight, offsetTop]) // Top right
+            assertEquals(Color.Red, map[width - offsetRight, height - offsetBottom]) // Bottom right
+            // inside triangle
+            assertEquals(Color.White, map[floor(width * 3f / 4f).toInt(), height / 2])
+        }
     }
 
     @Composable
