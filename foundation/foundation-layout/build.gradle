@@ -53,7 +53,6 @@ dependencies {
         testImplementation(JUNIT)
 
         androidTestImplementation project(":compose:foundation:foundation")
-        androidTestImplementation project(":compose:foundation:foundation-text")
         androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
@@ -97,7 +96,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation project(":compose:foundation:foundation")
-                implementation project(":compose:foundation:foundation-text")
                 implementation project(":compose:ui:ui-test-junit4")
 
                 implementation(ANDROIDX_TEST_RULES)

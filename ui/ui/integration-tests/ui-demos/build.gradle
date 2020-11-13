@@ -17,7 +17,6 @@ dependencies {
     implementation project(":compose:animation:animation")
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:foundation:foundation-layout")
-    implementation project(":compose:foundation:foundation-text")
     implementation project(":compose:integration-tests:demos:common")
     implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime")
