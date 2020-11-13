@@ -43,12 +43,12 @@ interface SemanticsModifier : Modifier.Element {
 
 internal class SemanticsModifierCore(
     override val id: Int,
-    mergeAllDescendants: Boolean,
+    mergeDescendants: Boolean,
     properties: (SemanticsPropertyReceiver.() -> Unit)
 ) : SemanticsModifier {
     override val semanticsConfiguration: SemanticsConfiguration =
         SemanticsConfiguration().also {
-            it.isMergingSemanticsOfDescendants = mergeAllDescendants
+            it.isMergingSemanticsOfDescendants = mergeDescendants
 
             it.properties()
         }
@@ -75,21 +75,22 @@ internal class SemanticsModifierCore(
 /**
  * Add semantics key/value for use in testing, accessibility, and similar use cases.
  *
- * @param mergeAllDescendants Whether the semantic information provided by the owning component and
- * all of its descendants should be treated as one logical entity.
+ * @param mergeDescendants Whether the semantic information provided by the owning component and
+ * its descendants (which do not themselves merge descendants) should be treated as one logical
+ * entity.
  * @param properties properties to add to the semantics. [SemanticsPropertyReceiver] will be
  * provided in the scope to allow access for common properties and its values.
  */
 fun Modifier.semantics(
-    mergeAllDescendants: Boolean = false,
+    mergeDescendants: Boolean = false,
     properties: (SemanticsPropertyReceiver.() -> Unit)
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "semantics"
-        this.properties["mergeAllDescendants"] = mergeAllDescendants
+        this.properties["mergeDescendants"] = mergeDescendants
         this.properties["properties"] = properties
     }
 ) {
     val id = remember { SemanticsModifierCore.generateSemanticsId() }
-    SemanticsModifierCore(id, mergeAllDescendants, properties)
+    SemanticsModifierCore(id, mergeDescendants, properties)
 }

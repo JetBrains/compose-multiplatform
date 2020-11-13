@@ -91,7 +91,7 @@ class SemanticsConfiguration :
      * Absorb the semantic information from a child SemanticsNode into this configuration.
      *
      * This merges the child's semantic configuration using the `merge()` method defined
-     * on the key.  This is used when mergeAllDescendants is specified (for accessibility focusable
+     * on the key.  This is used when mergeDescendants is specified (for accessibility focusable
      * nodes).
      */
     @Suppress("UNCHECKED_CAST")

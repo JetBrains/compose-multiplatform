@@ -58,7 +58,7 @@ class SurfaceTest {
             Box(
                 Modifier
                     .preferredSize(10.dp, 10.dp)
-                    .semantics(mergeAllDescendants = true) {}
+                    .semantics(mergeDescendants = true) {}
                     .testTag("box")
             ) {
                 Surface(color = Color.Yellow) {
@@ -108,7 +108,7 @@ class SurfaceTest {
                     Modifier
                         .padding(10.dp)
                         .preferredSize(10.dp, 10.dp)
-                        .semantics(mergeAllDescendants = true) {}
+                        .semantics(mergeDescendants = true) {}
                         .testTag("top level")
                 ) {
                     Surface(
@@ -125,7 +125,7 @@ class SurfaceTest {
                         Modifier
                             .padding(10.dp)
                             .preferredSize(10.dp, 10.dp)
-                            .semantics(mergeAllDescendants = true) {}
+                            .semantics(mergeDescendants = true) {}
                             .testTag("nested")
                     ) {
                         Surface(

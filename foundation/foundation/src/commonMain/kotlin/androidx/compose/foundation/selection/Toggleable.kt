@@ -133,7 +133,7 @@ private fun Modifier.toggleableImpl(
     onClick: () -> Unit
 ): Modifier {
     // TODO(pavlis): Handle multiple states for Semantics
-    val semantics = Modifier.semantics(mergeAllDescendants = true) {
+    val semantics = Modifier.semantics(mergeDescendants = true) {
         this.accessibilityValue = when (state) {
             // TODO(ryanmentley): These should be set by Checkbox, Switch, etc.
             On -> Strings.Checked
