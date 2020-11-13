@@ -21,6 +21,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectMultitouchGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -48,16 +53,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.drawBehind
+import androidx.compose.ui.drawLayer
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.consumePositionChange
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 val CoroutineGestureDemos = listOf(
@@ -65,6 +77,8 @@ val CoroutineGestureDemos = listOf(
     ComposableDemo("Drag Horizontal and Vertical") { TouchSlopDragGestures() },
     ComposableDemo("Drag with orientation locking") { OrientationLockDragGestures() },
     ComposableDemo("Drag 2D") { Drag2DGestures() },
+    ComposableDemo("Rotation/Pan/Zoom") { MultitouchGestureDetector() },
+    ComposableDemo("Rotation/Pan/Zoom with Lock") { MultitouchLockGestureDetector() },
 )
 
 fun hueToColor(hue: Float): Color {
@@ -93,6 +107,7 @@ fun anotherRandomHue(hue: Float): Float {
         newHue
     }
 }
+
 /**
  * Gesture detector for tap, double-tap, and long-press.
  */
@@ -351,5 +366,106 @@ fun Drag2DGestures() {
                 }
         )
         Text("Drag the box around", Modifier.align(Alignment.Center))
+    }
+}
+
+@OptIn(ExperimentalPointerInput::class)
+@Composable
+fun MultitouchArea(
+    text: String,
+    gestureDetector: suspend PointerInputScope.(
+        (angle: Float) -> Unit,
+        (zoom: Float) -> Unit,
+        (pan: Offset) -> Unit
+    ) -> Unit
+) {
+    var angle by remember { mutableStateOf(0f) }
+    var zoom by remember { mutableStateOf(1f) }
+    val offsetX = remember { mutableStateOf(0f) }
+    val offsetY = remember { mutableStateOf(0f) }
+
+    Box(Modifier.fillMaxSize()) {
+        Box(
+            Modifier.offsetPx(offsetX, offsetY)
+                .drawLayer(
+                    scaleX = zoom,
+                    scaleY = zoom,
+                    rotationZ = angle
+                ).drawBehind {
+                    val approximateRectangleSize = 10.dp.toPx()
+                    val numRectanglesHorizontal =
+                        (size.width / approximateRectangleSize).roundToInt()
+                    val numRectanglesVertical =
+                        (size.height / approximateRectangleSize).roundToInt()
+                    val rectangleWidth = size.width / numRectanglesHorizontal
+                    val rectangleHeight = size.height / numRectanglesVertical
+                    var hue = 0f
+                    val rectangleSize = Size(rectangleWidth, rectangleHeight)
+                    for (x in 0 until numRectanglesHorizontal) {
+                        for (y in 0 until numRectanglesVertical) {
+                            hue += 30
+                            if (hue >= 360f) {
+                                hue = 0f
+                            }
+                            val color = hueToColor(hue)
+                            val topLeft = Offset(
+                                x = x * size.width / numRectanglesHorizontal,
+                                y = y * size.height / numRectanglesVertical
+                            )
+                            drawRect(color = color, topLeft = topLeft, size = rectangleSize)
+                        }
+                    }
+                }.pointerInput {
+                    gestureDetector(
+                        { angle += it },
+                        { zoom *= it },
+                        {
+                            offsetX.value += it.x
+                            offsetY.value += it.y
+                        }
+                    )
+                }
+                .fillMaxSize()
+        )
+        Text(text)
+    }
+}
+
+/**
+ * This is a multi-touch gesture detector, including pan, zoom, and rotation.
+ * The user can pan, zoom, and rotate once touch slop has been reached.
+ */
+@OptIn(ExperimentalPointerInput::class)
+@Composable
+fun MultitouchGestureDetector() {
+    MultitouchArea(
+        "Zoom, Pan, and Rotate"
+    ) { onRotate, onZoom, onPan ->
+        detectMultitouchGestures(
+            panZoomLock = false,
+            onRotate = onRotate,
+            onZoom = onZoom,
+            onPan = onPan
+        )
+    }
+}
+
+/**
+ * This is a multi-touch gesture detector, including pan, zoom, and rotation.
+ * It is common to want to lean toward zoom over rotation, so this gesture detector will
+ * lock into zoom if the first unless the rotation passes touch slop first.
+ */
+@OptIn(ExperimentalPointerInput::class)
+@Composable
+fun MultitouchLockGestureDetector() {
+    MultitouchArea(
+        "Zoom, Pan, and Rotate Locking to Zoom"
+    ) { onRotate, onZoom, onPan ->
+        detectMultitouchGestures(
+            panZoomLock = true,
+            onRotate = onRotate,
+            onZoom = onZoom,
+            onPan = onPan
+        )
     }
 }

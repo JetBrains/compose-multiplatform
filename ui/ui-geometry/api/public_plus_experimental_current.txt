@@ -90,8 +90,10 @@ package androidx.compose.ui.geometry {
 
   public static final class Offset.Companion {
     method public long getInfinite-F1C5BW0();
+    method public long getUnspecified-F1C5BW0();
     method public long getZero-F1C5BW0();
     property public final long Infinite;
+    property public final long Unspecified;
     property public final long Zero;
   }
 
