@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.compose.ui.text.Typeface
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

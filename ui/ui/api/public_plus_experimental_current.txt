@@ -2296,9 +2296,9 @@ package androidx.compose.ui.res {
   }
 
   public final class FontResourcesKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.text.Typeface fontResource(androidx.compose.ui.text.font.FontFamily fontFamily);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.FontFamily? pendingFontFamily, optional androidx.compose.ui.text.font.FontFamily? failedFontFamily);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.Typeface? pendingTypeface, optional androidx.compose.ui.text.Typeface? failedTypeface);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.text.font.Typeface fontResource(androidx.compose.ui.text.font.FontFamily fontFamily);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.FontFamily? pendingFontFamily, optional androidx.compose.ui.text.font.FontFamily? failedFontFamily);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.Typeface? pendingTypeface, optional androidx.compose.ui.text.font.Typeface? failedTypeface);
   }
 
   public final class ImageResourcesKt {
