@@ -46,7 +46,6 @@ dependencies {
 androidx {
     name = "Compose LiveData integration"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"
     description = "Compose integration with LiveData"

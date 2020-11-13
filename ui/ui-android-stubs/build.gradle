@@ -39,7 +39,6 @@ dependencies {
 androidx {
     name = "Compose Android Stubs"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Stubs for classes in older Android APIs"

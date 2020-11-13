@@ -76,7 +76,6 @@ IconGenerationTask.registerCoreIconProject(
 androidx {
     name = "Compose Material Icons Core"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.MATERIAL
     inceptionYear = "2020"
     description = "Compose Material Design core icons. This module contains the most commonly used set of Material icons."
