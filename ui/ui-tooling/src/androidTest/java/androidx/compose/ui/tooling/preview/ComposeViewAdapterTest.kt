@@ -53,10 +53,17 @@ class ComposeViewAdapterTest {
      * Asserts that the given Composable method executes correct and outputs some [ViewInfo]s.
      */
     private fun assertRendersCorrectly(className: String, methodName: String): List<ViewInfo> {
+        val committed = CountDownLatch(1)
         activityTestRule.runOnUiThread {
-            composeViewAdapter.init(className, methodName, debugViewInfos = true)
+            composeViewAdapter.init(
+                className, methodName, debugViewInfos = true,
+                onCommit = {
+                    committed.countDown()
+                }
+            )
         }
 
+        committed.await()
         activityTestRule.runOnUiThread {
             assertTrue(composeViewAdapter.viewInfos.isNotEmpty())
         }
@@ -243,19 +250,21 @@ class ComposeViewAdapterTest {
     @Test
     fun testNoInvalidation() {
         compositionCount.set(0)
+        var onDrawCounter = 0
         activityTestRule.runOnUiThread {
             composeViewAdapter.init(
                 "androidx.compose.ui.tooling.TestInvalidationPreviewKt",
                 "CounterPreview",
-                forceCompositionInvalidation = false
+                forceCompositionInvalidation = false,
+                onDraw = { onDrawCounter++ }
             )
-            assertEquals(1, compositionCount.get())
         }
-        activityTestRule.runOnUiThread {
-            assertEquals(1, compositionCount.get())
-        }
-        activityTestRule.runOnUiThread {
-            assertEquals(1, compositionCount.get())
+        repeat(5) {
+            activityTestRule.runOnUiThread {
+                assertEquals(1, compositionCount.get())
+                assertTrue("At most, 1 draw is expected", onDrawCounter < 2)
+            }
+            Thread.sleep(250)
         }
     }
 
@@ -265,20 +274,20 @@ class ComposeViewAdapterTest {
     @Test
     fun testInvalidation() {
         compositionCount.set(0)
+        val drawCountDownLatch = CountDownLatch(10)
         activityTestRule.runOnUiThread {
             composeViewAdapter.init(
                 "androidx.compose.ui.tooling.TestInvalidationPreviewKt",
                 "CounterPreview",
-                forceCompositionInvalidation = true
+                forceCompositionInvalidation = true,
+                onDraw = { drawCountDownLatch.countDown() }
             )
+        }
+        activityTestRule.runOnUiThread {
             assertEquals(1, compositionCount.get())
         }
-        activityTestRule.runOnUiThread {
-            assertEquals(2, compositionCount.get())
-        }
-        activityTestRule.runOnUiThread {
-            assertEquals(3, compositionCount.get())
-        }
+        // Draw will keep happening so, eventually this will hit 0
+        assertTrue(drawCountDownLatch.await(10, TimeUnit.SECONDS))
     }
 
     companion object {
