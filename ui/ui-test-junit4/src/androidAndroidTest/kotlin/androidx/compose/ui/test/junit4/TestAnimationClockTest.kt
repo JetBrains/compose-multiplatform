@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
@@ -48,6 +49,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
+@OptIn(ExperimentalTesting::class)
 class TestAnimationClockTest {
 
     companion object {
