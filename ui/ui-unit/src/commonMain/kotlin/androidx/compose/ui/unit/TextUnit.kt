@@ -39,7 +39,7 @@ private const val UNIT_TYPE_SP = 0x01L shl 32 // 0x01_0000_0000
 private const val UNIT_TYPE_EM = 0x02L shl 32 // 0x2_0000_0000
 
 /**
- * An enum class defining for type of thextUnit.
+ * An enum class defining for type of [TextUnit].
  */
 enum class TextUnitType(val value: Int) {
     @Deprecated(
@@ -232,7 +232,7 @@ inline class TextUnit(val packedValue: Long) {
          * A special [TextUnit] instance for representing inheriting from parent value.
          */
         @Stable
-        val Unspecified = pack(UNIT_TYPE_UNSPECIFIED, 0f)
+        val Unspecified = pack(UNIT_TYPE_UNSPECIFIED, Float.NaN)
 
         /**
          * A special [TextUnit] instance for representing inheriting from parent value.
