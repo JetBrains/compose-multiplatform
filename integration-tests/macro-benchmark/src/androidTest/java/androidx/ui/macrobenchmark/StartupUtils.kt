@@ -29,7 +29,8 @@ import androidx.benchmark.macro.StartupTimingMetric
 fun MacrobenchmarkRule.measureStartup(
     profileCompiled: Boolean,
     coldLaunch: Boolean,
-    block: MacrobenchmarkScope.() -> Unit = {
+    setupBlock: MacrobenchmarkScope.() -> Unit = {},
+    measureBlock: MacrobenchmarkScope.() -> Unit = {
         pressHome()
         launchPackageAndWait()
     }
@@ -45,5 +46,6 @@ fun MacrobenchmarkRule.measureStartup(
         killProcessEachIteration = coldLaunch,
         iterations = 10
     ),
-    block
+    setupBlock,
+    measureBlock
 )
