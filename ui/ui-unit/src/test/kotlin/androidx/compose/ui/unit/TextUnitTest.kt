@@ -1047,6 +1047,11 @@ class TextUnitTest {
     }
 
     @Test
+    fun unspecified_value_equals_nan() {
+        assertThat(TextUnit.Unspecified.value).isEqualTo(Float.NaN)
+    }
+
+    @Test
     @Suppress("DEPRECATION")
     fun inherit_isEqualTo_unspecified() {
         assertThat(TextUnit.Unspecified).isEqualTo(TextUnit.Inherit)
