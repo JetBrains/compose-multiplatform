@@ -78,7 +78,7 @@ fun <T : Any> rememberRestorableStateHolder(): RestorableStateHolder<T> =
     ) {
         RestorableStateHolderImpl<T>()
     }.apply {
-        parentSavedStateRegistry = UiSavedStateRegistryAmbient.current
+        parentSavedStateRegistry = AmbientUiSavedStateRegistry.current
     }
 
 @ExperimentalRestorableStateHolder
@@ -100,7 +100,7 @@ private class RestorableStateHolderImpl<T : Any>(
                 RegistryHolder(key)
             }
             Providers(
-                UiSavedStateRegistryAmbient provides registryHolder.registry,
+                AmbientUiSavedStateRegistry provides registryHolder.registry,
                 children = content
             )
             onActive {

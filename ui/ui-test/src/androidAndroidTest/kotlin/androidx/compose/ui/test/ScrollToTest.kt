@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.MeasureBlock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
@@ -83,7 +83,7 @@ class ScrollToTest {
         columnHeight: Int,
         children: @Composable () -> Unit
     ) {
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             Layout(
                 children,
                 modifier.size(crossAxisSize.toDp(), columnHeight.toDp()),
@@ -99,7 +99,7 @@ class ScrollToTest {
         rowWidth: Int,
         children: @Composable () -> Unit
     ) {
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             Layout(
                 children,
                 modifier.size(rowWidth.toDp(), crossAxisSize.toDp()),

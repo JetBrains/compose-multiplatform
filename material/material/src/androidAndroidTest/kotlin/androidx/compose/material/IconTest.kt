@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
@@ -86,7 +86,7 @@ class IconTest {
         val height = 24.dp
         rule
             .setMaterialContentForSizeAssertions {
-                val image = with(DensityAmbient.current) {
+                val image = with(AmbientDensity.current) {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
@@ -103,7 +103,7 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val image = with(DensityAmbient.current) {
+                val image = with(AmbientDensity.current) {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
@@ -133,7 +133,7 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val image = with(DensityAmbient.current) {
+                val image = with(AmbientDensity.current) {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
@@ -152,7 +152,7 @@ class IconTest {
         val testTag = "testTag"
         rule.setMaterialContentForSizeAssertions {
             val image: ImageBitmap
-            with(DensityAmbient.current) {
+            with(AmbientDensity.current) {
                 image = createBitmapWithColor(
                     this,
                     width.toIntPx(),
@@ -175,7 +175,7 @@ class IconTest {
         val testTag = "testTag"
         rule.setMaterialContentForSizeAssertions {
             val image: ImageBitmap
-            with(DensityAmbient.current) {
+            with(AmbientDensity.current) {
                 image = createBitmapWithColor(
                     this,
                     width.toIntPx(),

@@ -23,7 +23,7 @@ import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.mouseScrollFilter
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.DesktopPlatformAmbient
 import androidx.compose.ui.unit.Density
@@ -45,7 +45,7 @@ internal actual fun Modifier.mouseScrollable(
     scrollCallback: ScrollCallback,
     orientation: Orientation
 ): Modifier = composed {
-    val density = DensityAmbient.current
+    val density = AmbientDensity.current
     val desktopPlatform = DesktopPlatformAmbient.current
     val config = PlatformScrollConfig(density, desktopPlatform)
 

@@ -21,9 +21,9 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
 
 /**
  * Helps to test the state restoration for your Composable component.
@@ -78,12 +78,12 @@ class StateRestorationTester(private val composeTestRule: ComposeTestRule) {
 
     @Composable
     private fun InjectRestorationRegistry(children: @Composable (RestorationRegistry) -> Unit) {
-        val original = requireNotNull(UiSavedStateRegistryAmbient.current) {
+        val original = requireNotNull(AmbientUiSavedStateRegistry.current) {
             "StateRestorationTester requires composeTestRule.setContent() to provide " +
                 "an UiSavedStateRegistry implementation via UiSavedStateRegistryAmbient"
         }
         val restorationRegistry = remember { RestorationRegistry(original) }
-        Providers(UiSavedStateRegistryAmbient provides restorationRegistry) {
+        Providers(AmbientUiSavedStateRegistry provides restorationRegistry) {
             if (restorationRegistry.shouldEmitChildren) {
                 children(restorationRegistry)
             }

@@ -84,7 +84,20 @@ fun UiSavedStateRegistry(
 /**
  * Ambient with a current [UiSavedStateRegistry] instance.
  */
-val UiSavedStateRegistryAmbient = staticAmbientOf<UiSavedStateRegistry?> { null }
+@Suppress("AmbientNaming")
+@Deprecated(
+    "Renamed to AmbientUiSavedStateRegistry",
+    replaceWith = ReplaceWith(
+        "AmbientUiSavedStateRegistry",
+        "androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry"
+    )
+)
+val UiSavedStateRegistryAmbient get() = AmbientUiSavedStateRegistry
+
+/**
+ * Ambient with a current [UiSavedStateRegistry] instance.
+ */
+val AmbientUiSavedStateRegistry = staticAmbientOf<UiSavedStateRegistry?> { null }
 
 private class UiSavedStateRegistryImpl(
     restored: Map<String, List<Any?>>?,

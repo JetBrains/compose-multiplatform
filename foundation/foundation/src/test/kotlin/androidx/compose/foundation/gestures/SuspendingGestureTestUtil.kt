@@ -59,11 +59,11 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.platform.ViewConfigurationAmbient
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
@@ -129,8 +129,8 @@ internal class SuspendingGestureTestUtil(
         withRunningRecomposer { recomposer ->
             compose(recomposer) {
                 Providers(
-                    DensityAmbient provides Density(1f),
-                    ViewConfigurationAmbient provides TestViewConfiguration()
+                    AmbientDensity provides Density(1f),
+                    AmbientViewConfiguration provides TestViewConfiguration()
                 ) {
                     pointerInputFilter = currentComposer
                         .materialize(Modifier.pointerInput(gestureDetector)) as

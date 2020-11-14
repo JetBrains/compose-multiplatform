@@ -49,7 +49,7 @@ import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -82,7 +82,7 @@ fun VerticalScrollerInDrawerDemo() {
 private fun DrawerLayout(drawerWidth: Dp, children: @Composable ColumnScope.() -> Unit) {
 
     val minOffset =
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             -drawerWidth.toPx()
         }
 

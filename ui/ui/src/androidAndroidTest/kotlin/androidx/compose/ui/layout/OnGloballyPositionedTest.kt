@@ -35,8 +35,8 @@ import androidx.compose.ui.SimpleRow
 import androidx.compose.ui.Wrap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -395,7 +395,7 @@ class OnGloballyPositionedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     DelayedMeasure(50) {
                         Box(Modifier.size(25.toDp())) {
                             Box(

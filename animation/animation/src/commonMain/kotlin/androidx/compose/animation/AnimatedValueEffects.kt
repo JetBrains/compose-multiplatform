@@ -31,7 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 
 /**
  * The animatedValue effect creates an [AnimatedValue] and positionally memoizes it. When the
@@ -49,7 +49,7 @@ fun <T, V : AnimationVector> animatedValue(
     initVal: T,
     converter: TwoWayConverter<T, V>,
     visibilityThreshold: T? = null,
-    clock: AnimationClockObservable = AnimationClockAmbient.current
+    clock: AnimationClockObservable = AmbientAnimationClock.current
 ): AnimatedValue<T, V> = clock.asDisposableClock().let { disposableClock ->
     remember(disposableClock) {
         AnimatedValueModel(initVal, converter, disposableClock, visibilityThreshold)
@@ -67,7 +67,7 @@ fun <T, V : AnimationVector> animatedValue(
 fun animatedFloat(
     initVal: Float,
     visibilityThreshold: Float = Spring.DefaultDisplacementThreshold,
-    clock: AnimationClockObservable = AnimationClockAmbient.current
+    clock: AnimationClockObservable = AmbientAnimationClock.current
 ): AnimatedFloat = clock.asDisposableClock().let { disposableClock ->
     remember(disposableClock) { AnimatedFloatModel(initVal, disposableClock, visibilityThreshold) }
 }
@@ -82,7 +82,7 @@ fun animatedFloat(
 @Composable
 fun animatedColor(
     initVal: Color,
-    clock: AnimationClockObservable = AnimationClockAmbient.current
+    clock: AnimationClockObservable = AmbientAnimationClock.current
 ): AnimatedValue<Color, AnimationVector4D> = clock.asDisposableClock().let { disposableClock ->
     remember(disposableClock) {
         AnimatedValueModel(

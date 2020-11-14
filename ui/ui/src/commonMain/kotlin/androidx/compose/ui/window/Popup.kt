@@ -116,11 +116,11 @@ internal fun DropdownPopup(
 // TODO(b/142431825): This is a hack to work around Popups not using Semantics for test tags
 //  We should either remove it, or come up with an abstracted general solution that isn't specific
 //  to Popup
-internal val PopupTestTagAmbient = ambientOf { "DEFAULT_TEST_TAG" }
+internal val AmbientPopupTestTag = ambientOf { "DEFAULT_TEST_TAG" }
 
 @Composable
 internal fun PopupTestTag(tag: String, children: @Composable () -> Unit) {
-    Providers(PopupTestTagAmbient provides tag, children = children)
+    Providers(AmbientPopupTestTag provides tag, children = children)
 }
 
 /**

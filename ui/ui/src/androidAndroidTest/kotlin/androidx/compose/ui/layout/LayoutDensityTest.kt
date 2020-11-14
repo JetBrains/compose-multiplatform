@@ -20,7 +20,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -45,7 +45,7 @@ class LayoutDensityTest {
         var measureScopeDensity = 0f
         var measureScopeFontScale = 0f
         rule.setContent {
-            Providers(DensityAmbient provides Density(ambientDensity, ambientFontScale)) {
+            Providers(AmbientDensity provides Density(ambientDensity, ambientFontScale)) {
                 Layout({}) { _, _ ->
                     measureScopeDensity = density
                     measureScopeFontScale = fontScale

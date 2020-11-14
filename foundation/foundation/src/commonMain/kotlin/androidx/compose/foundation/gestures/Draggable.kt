@@ -27,7 +27,7 @@ import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 
@@ -73,7 +73,7 @@ fun Modifier.draggable(
     onDrag: Density.(Float) -> Unit
 ): Modifier = composed(
     factory = {
-        val density = DensityAmbient.current
+        val density = AmbientDensity.current
         onDispose {
             interactionState?.removeInteraction(Interaction.Dragged)
         }

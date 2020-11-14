@@ -37,8 +37,8 @@ import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
@@ -167,7 +167,7 @@ fun rememberDismissState(
     initialValue: DismissValue = Default,
     confirmStateChange: (DismissValue) -> Boolean = { true }
 ): DismissState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     return rememberSavedInstanceState(
         clock,
         saver = DismissState.Saver(clock, confirmStateChange)
@@ -200,7 +200,7 @@ fun SwipeToDismiss(
     dismissContent: @Composable RowScope.() -> Unit
 ) = WithConstraints(modifier) {
     val width = constraints.maxWidth.toFloat()
-    val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+    val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
 
     val anchors = mutableMapOf(0f to Default)
     if (StartToEnd in directions) anchors += width to DismissedToEnd

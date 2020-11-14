@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -84,7 +84,7 @@ class AnimatedVisibilityTest {
                     }
                 }
             }
-            density = DensityAmbient.current.density
+            density = AmbientDensity.current.density
         }
 
         rule.runOnIdle {
@@ -188,7 +188,7 @@ class AnimatedVisibilityTest {
                     }
                 }
             }
-            density = DensityAmbient.current.density
+            density = AmbientDensity.current.density
         }
 
         rule.runOnIdle {

@@ -26,9 +26,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.AmbientClipboardManager
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
-import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.SemanticsModifierCore
@@ -103,7 +103,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             )
         }
         rule.setContent {
-            ClipboardManagerAmbient.current.setText(AnnotatedString("test"))
+            AmbientClipboardManager.current.setText(AnnotatedString("test"))
         }
     }
 

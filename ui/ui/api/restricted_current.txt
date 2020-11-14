@@ -2138,26 +2138,44 @@ package androidx.compose.ui.platform {
   }
 
   public final class AmbientsKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable> getAnimationClockAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill> getAutofillAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree> getAutofillTreeAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager> getClipboardManagerAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density> getDensityAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager> getFocusManagerAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.hapticfeedback.HapticFeedback> getHapticFeedBackAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.LayoutDirection> getLayoutDirectionAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.input.TextInputService> getTextInputServiceAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar> getTextToolbarAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getUriHandlerAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getViewConfigurationAmbient();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable> getAmbientAnimationClock();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill> getAmbientAutofill();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree> getAmbientAutofillTree();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager> getAmbientClipboardManager();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density> getAmbientDensity();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager> getAmbientFocusManager();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.hapticfeedback.HapticFeedback> getAmbientHapticFeedback();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.LayoutDirection> getAmbientLayoutDirection();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.input.TextInputService> getAmbientTextInputService();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar> getAmbientTextToolbar();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getAmbientUriHandler();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getAmbientViewConfiguration();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable>! getAnimationClockAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill>! getAutofillAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree>! getAutofillTreeAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager>! getClipboardManagerAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density>! getDensityAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager>! getFocusManagerAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.font.Font.ResourceLoader>! getFontLoaderAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.hapticfeedback.HapticFeedback>! getHapticFeedBackAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.LayoutDirection>! getLayoutDirectionAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.input.TextInputService>! getTextInputServiceAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar>! getTextToolbarAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler>! getUriHandlerAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration>! getViewConfigurationAmbient();
   }
 
   public final class AndroidAmbientsKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration> getConfigurationAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<android.content.Context> getContextAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.LifecycleOwner> getLifecycleOwnerAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<android.view.View> getViewAmbient();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.ViewModelStoreOwner> getViewModelStoreOwnerAmbient();
+    method public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration> getAmbientConfiguration();
+    method public static androidx.compose.runtime.ProvidableAmbient<android.content.Context> getAmbientContext();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.LifecycleOwner> getAmbientLifecycleOwner();
+    method public static androidx.compose.runtime.ProvidableAmbient<android.view.View> getAmbientView();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.ViewModelStoreOwner> getAmbientViewModelStoreOwner();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration>! getConfigurationAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.content.Context>! getContextAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.LifecycleOwner>! getLifecycleOwnerAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.view.View>! getViewAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.ViewModelStoreOwner>! getViewModelStoreOwnerAmbient();
   }
 
   public final class AndroidClipboardManagerKt {
@@ -2464,7 +2482,8 @@ package androidx.compose.ui.selection {
   }
 
   public final class SelectionRegistrarKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.SelectionRegistrar> getSelectionRegistrarAmbient();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.SelectionRegistrar> getAmbientSelectionRegistrar();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.SelectionRegistrar>! getSelectionRegistrarAmbient();
   }
 
   public final class SimpleLayoutKt {

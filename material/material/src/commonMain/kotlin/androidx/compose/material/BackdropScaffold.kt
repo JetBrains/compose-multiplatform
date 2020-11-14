@@ -44,8 +44,8 @@ import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -176,7 +176,7 @@ class BackdropScaffoldState(
 @ExperimentalMaterialApi
 fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
-    clock: AnimationClockObservable = AnimationClockAmbient.current,
+    clock: AnimationClockObservable = AmbientAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -284,8 +284,8 @@ fun BackdropScaffold(
     backLayerContent: @Composable () -> Unit,
     frontLayerContent: @Composable () -> Unit
 ) {
-    val peekHeightPx = with(DensityAmbient.current) { peekHeight.toPx() }
-    val headerHeightPx = with(DensityAmbient.current) { headerHeight.toPx() }
+    val peekHeightPx = with(AmbientDensity.current) { peekHeight.toPx() }
+    val headerHeightPx = with(AmbientDensity.current) { headerHeight.toPx() }
 
     val backLayer = @Composable {
         if (persistentAppBar) {
@@ -398,7 +398,7 @@ private fun BackLayerTransition(
     val animationProgress = animate(
         target = if (target == Revealed) 0f else 2f, animSpec = TweenSpec()
     )
-    val animationSlideOffset = with(DensityAmbient.current) { AnimationSlideOffset.toPx() }
+    val animationSlideOffset = with(AmbientDensity.current) { AnimationSlideOffset.toPx() }
 
     val appBarFloat = (animationProgress - 1).coerceIn(0f, 1f)
     val contentFloat = (1 - animationProgress).coerceIn(0f, 1f)

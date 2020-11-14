@@ -27,9 +27,9 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.ClipboardManagerAmbient
-import androidx.compose.ui.platform.HapticFeedBackAmbient
-import androidx.compose.ui.platform.TextToolbarAmbient
+import androidx.compose.ui.platform.AmbientClipboardManager
+import androidx.compose.ui.platform.AmbientHapticFeedback
+import androidx.compose.ui.platform.AmbientTextToolbar
 import androidx.compose.ui.text.InternalTextApi
 
 /**
@@ -61,7 +61,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -
 @Composable
 fun DisableSelection(content: @Composable () -> Unit) {
     Providers(
-        SelectionRegistrarAmbient provides null,
+        AmbientSelectionRegistrar provides null,
         children = content
     )
 }
@@ -88,9 +88,9 @@ fun SelectionContainer(
     val registrarImpl = remember { SelectionRegistrarImpl() }
     val manager = remember { SelectionManager(registrarImpl) }
 
-    manager.hapticFeedBack = HapticFeedBackAmbient.current
-    manager.clipboardManager = ClipboardManagerAmbient.current
-    manager.textToolbar = TextToolbarAmbient.current
+    manager.hapticFeedBack = AmbientHapticFeedback.current
+    manager.clipboardManager = AmbientClipboardManager.current
+    manager.textToolbar = AmbientTextToolbar.current
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
 
@@ -110,7 +110,7 @@ fun SelectionContainer(
         }
     }
 
-    Providers(SelectionRegistrarAmbient provides registrarImpl) {
+    Providers(AmbientSelectionRegistrar provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
         SimpleLayout(

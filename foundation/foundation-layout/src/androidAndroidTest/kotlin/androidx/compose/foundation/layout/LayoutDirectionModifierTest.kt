@@ -22,7 +22,7 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
@@ -44,7 +44,7 @@ class LayoutDirectionModifierTest : LayoutTest() {
         val resultLayoutDirection = Ref<LayoutDirection>()
 
         show {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Layout(children = @Composable {}) { _, _ ->
                     resultLayoutDirection.value = layoutDirection
                     latch.countDown()
@@ -64,7 +64,7 @@ class LayoutDirectionModifierTest : LayoutTest() {
 
         show {
             @OptIn(ExperimentalLayout::class)
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Layout(
                     children = @Composable {},
                     modifier = Modifier.preferredWidth(IntrinsicSize.Max),
@@ -93,10 +93,10 @@ class LayoutDirectionModifierTest : LayoutTest() {
         val resultLayoutDirection = Ref<LayoutDirection>()
 
         show {
-            val initialLayoutDirection = LayoutDirectionAmbient.current
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            val initialLayoutDirection = AmbientLayoutDirection.current
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Box {
-                    Providers(LayoutDirectionAmbient provides initialLayoutDirection) {
+                    Providers(AmbientLayoutDirection provides initialLayoutDirection) {
                         Layout(emptyContent()) { _, _ ->
                             resultLayoutDirection.value = layoutDirection
                             latch.countDown()

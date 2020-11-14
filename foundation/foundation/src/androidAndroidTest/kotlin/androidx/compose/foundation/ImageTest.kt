@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.test.captureToImage
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.testutils.assertPixels
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -102,7 +102,7 @@ class ImageTest {
     @Test
     fun testImage() {
         rule.setContent {
-            val size = (containerSize / DensityAmbient.current.density).dp
+            val size = (containerSize / AmbientDensity.current.density).dp
             Box(
                 Modifier.preferredSize(size)
                     .background(color = Color.White)
@@ -143,7 +143,7 @@ class ImageTest {
         val subsectionWidth = imageWidth / 2
         val subsectionHeight = imageHeight / 2
         rule.setContent {
-            val size = (containerSize / DensityAmbient.current.density).dp
+            val size = (containerSize / AmbientDensity.current.density).dp
             Box(
                 Modifier.preferredSize(size)
                     .background(color = Color.White)
@@ -241,7 +241,7 @@ class ImageTest {
         val imageComposableWidth = imageWidth * 2
         val imageComposableHeight = imageHeight * 2
         rule.setContent {
-            val density = DensityAmbient.current.density
+            val density = AmbientDensity.current.density
             val size = (containerSize * 2 / density).dp
             Box(
                 Modifier.preferredSize(size)
@@ -301,7 +301,7 @@ class ImageTest {
         val imageComposableHeight = imageHeight * 7
 
         rule.setContent {
-            val density = DensityAmbient.current
+            val density = AmbientDensity.current
             val size = (containerSize * 2 / density.density).dp
             val ImageBitmap = ImageBitmap(imageWidth, imageHeight)
             CanvasDrawScope().draw(
@@ -340,7 +340,7 @@ class ImageTest {
         val imageComposableWidth = imageWidth * 2
         val imageComposableHeight = imageHeight * 2
         rule.setContent {
-            val density = DensityAmbient.current.density
+            val density = AmbientDensity.current.density
             val size = (containerSize * 2 / density).dp
             Box(
                 Modifier.preferredSize(size)
@@ -399,7 +399,7 @@ class ImageTest {
         // latch used to wait until vector resource is loaded asynchronously
         val vectorLatch = CountDownLatch(1)
         rule.setContent {
-            val density = DensityAmbient.current.density
+            val density = AmbientDensity.current.density
             val size = (boxWidth * 2 / density).dp
             val minWidth = (boxWidth / density).dp
             val minHeight = (boxHeight / density).dp
@@ -496,7 +496,7 @@ class ImageTest {
                 }
                 this
             }
-            val heightDp = asset.height / DensityAmbient.current.density
+            val heightDp = asset.height / AmbientDensity.current.density
             Image(
                 asset,
                 modifier = Modifier

@@ -43,9 +43,9 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.platform.AmbientTextInputService
+import androidx.compose.ui.platform.AmbientTextToolbar
 import androidx.compose.ui.platform.TextToolbar
-import androidx.compose.ui.platform.TextToolbarAmbient
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -117,7 +117,7 @@ class TextFieldTest {
         rule.setContent {
             val state = remember { mutableStateOf(TextFieldValue("")) }
             Providers(
-                TextInputServiceAmbient provides inputService
+                AmbientTextInputService provides inputService
             ) {
                 BasicTextField(
                     value = state.value,
@@ -156,7 +156,7 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 TextFieldApp()
             }
@@ -227,7 +227,7 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 OnlyDigitsApp()
             }
@@ -286,7 +286,7 @@ class TextFieldTest {
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 val state = remember { mutableStateOf(TextFieldValue("")) }
                 BasicTextField(
@@ -595,7 +595,7 @@ class TextFieldTest {
         var toolbar: TextToolbar? = null
 
         rule.setContent {
-            toolbar = TextToolbarAmbient.current
+            toolbar = AmbientTextToolbar.current
             BasicTextField(
                 modifier = Modifier.testTag(Tag),
                 value = value,

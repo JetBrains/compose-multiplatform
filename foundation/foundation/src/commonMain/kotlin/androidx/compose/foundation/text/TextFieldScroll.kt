@@ -34,7 +34,7 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
@@ -56,7 +56,7 @@ internal fun Modifier.textFieldScroll(
 ) = composed(
     factory = {
         // do not reverse direction only in case of RTL in horizontal orientation
-        val rtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val rtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val reverseDirection = orientation == Orientation.Vertical || !rtl
         val scroll = Modifier.scrollable(
             orientation = orientation,

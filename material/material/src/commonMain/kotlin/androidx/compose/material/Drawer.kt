@@ -39,9 +39,9 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -276,7 +276,7 @@ fun rememberDrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ): DrawerState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     return rememberSavedInstanceState(
         clock,
         saver = DrawerState.Saver(clock, confirmStateChange)
@@ -296,7 +296,7 @@ fun rememberBottomDrawerState(
     initialValue: BottomDrawerValue,
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
 ): BottomDrawerState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     return rememberSavedInstanceState(
         clock,
         saver = BottomDrawerState.Saver(clock, confirmStateChange)
@@ -356,7 +356,7 @@ fun ModalDrawerLayout(
         val maxValue = 0f
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
-        val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         Box(
             Modifier.swipeable(
                 state = drawerState,
@@ -379,7 +379,7 @@ fun ModalDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = with(DensityAmbient.current) {
+                modifier = with(AmbientDensity.current) {
                     Modifier.preferredSizeIn(
                         minWidth = constraints.minWidth.toDp(),
                         minHeight = constraints.minHeight.toDp(),
@@ -493,7 +493,7 @@ fun BottomDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = with(DensityAmbient.current) {
+                modifier = with(AmbientDensity.current) {
                     Modifier.preferredSizeIn(
                         minWidth = constraints.minWidth.toDp(),
                         minHeight = constraints.minHeight.toDp(),

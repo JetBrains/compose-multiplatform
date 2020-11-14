@@ -58,4 +58,18 @@ interface SelectionRegistrar {
  * Ambient of SelectionRegistrar. Composables that implement selection logic can use this ambient
  * to get a [SelectionRegistrar] in order to subscribe and unsubscribe to [SelectionRegistrar].
  */
-val SelectionRegistrarAmbient = ambientOf<SelectionRegistrar?>()
+@Suppress("AmbientNaming")
+@Deprecated(
+    "Renamed to AmbientSelectionRegistrar",
+    replaceWith = ReplaceWith(
+        "AmbientSelectionRegistrar",
+        "androidx.compose.ui.selection.AmbientSelectionRegistrar"
+    )
+)
+val SelectionRegistrarAmbient get() = AmbientSelectionRegistrar
+
+/**
+ * Ambient of SelectionRegistrar. Composables that implement selection logic can use this ambient
+ * to get a [SelectionRegistrar] in order to subscribe and unsubscribe to [SelectionRegistrar].
+ */
+val AmbientSelectionRegistrar = ambientOf<SelectionRegistrar?>()

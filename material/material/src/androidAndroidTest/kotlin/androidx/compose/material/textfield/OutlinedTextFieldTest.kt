@@ -45,7 +45,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
@@ -599,7 +599,7 @@ class OutlinedTextFieldTest {
         val textInputService = mock<TextInputService>()
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 var text = remember { mutableStateOf(TextFieldValue("")) }
                 OutlinedTextField(

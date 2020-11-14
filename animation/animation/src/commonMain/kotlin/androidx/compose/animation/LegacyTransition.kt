@@ -20,7 +20,7 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.TransitionDefinition
 import androidx.compose.animation.core.TransitionState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 
 /**
  * __Deprecated:__ [Transition] has been deprecated. Please use [transition] instead.
@@ -71,7 +71,7 @@ import androidx.compose.ui.platform.AnimationClockAmbient
 fun <T> Transition(
     definition: TransitionDefinition<T>,
     toState: T,
-    clock: AnimationClockObservable = AnimationClockAmbient.current,
+    clock: AnimationClockObservable = AmbientAnimationClock.current,
     initState: T = toState,
     onStateChangeFinished: ((T) -> Unit)? = null,
     children: @Composable (state: TransitionState) -> Unit

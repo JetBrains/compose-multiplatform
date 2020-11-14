@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -61,10 +61,10 @@ fun RtlDemo() {
         )
         CustomLayout(false)
         Text("WITH CONSTRAINTS", Modifier.align(Alignment.CenterHorizontally))
-        Providers(LayoutDirectionAmbient provides LayoutDirection.Ltr) {
+        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
             LayoutWithConstraints("LD: set LTR via ambient")
         }
-        Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+        Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
             LayoutWithConstraints("LD: set RTL via ambient")
         }
         LayoutWithConstraints(text = "LD: locale")
@@ -109,7 +109,7 @@ private fun TestRowWithModifier() {
     Row {
         Box(boxSize.background(Color.Red)) {}
         Box(boxSize.background(Color.Green)) {}
-        Providers(LayoutDirectionAmbient provides LayoutDirection.Ltr) {
+        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
             Row {
                 Box(boxSize.background(Color.Magenta)) {}
                 Box(boxSize.background(Color.Yellow)) {}
@@ -179,7 +179,7 @@ private fun CustomLayout(rtlSupport: Boolean) {
 private fun LayoutWithConstraints(text: String) {
     WithConstraints {
         val w = maxWidth / 3
-        val color = if (LayoutDirectionAmbient.current == LayoutDirection.Ltr) {
+        val color = if (AmbientLayoutDirection.current == LayoutDirection.Ltr) {
             Color.Red
         } else {
             Color.Magenta

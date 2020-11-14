@@ -356,7 +356,7 @@ private fun WrapRegistry(
     children: @Composable () -> Unit
 ) {
     Providers(
-        UiSavedStateRegistryAmbient provides wrap(UiSavedStateRegistryAmbient.current!!),
+        AmbientUiSavedStateRegistry provides wrap(AmbientUiSavedStateRegistry.current!!),
         children = children
     )
 }

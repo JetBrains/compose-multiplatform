@@ -71,7 +71,7 @@ fun ViewGroup.setViewContent(
     }
 ).apply {
     setContent {
-        Providers(ContextAmbient provides this@setViewContent.context) {
+        Providers(AmbientContext provides this@setViewContent.context) {
             composable()
         }
     }

@@ -47,12 +47,12 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.ClipboardManagerAmbient
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.FontLoaderAmbient
-import androidx.compose.ui.platform.HapticFeedBackAmbient
-import androidx.compose.ui.platform.TextInputServiceAmbient
-import androidx.compose.ui.platform.TextToolbarAmbient
+import androidx.compose.ui.platform.AmbientClipboardManager
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientFontLoader
+import androidx.compose.ui.platform.AmbientHapticFeedback
+import androidx.compose.ui.platform.AmbientTextInputService
+import androidx.compose.ui.platform.AmbientTextToolbar
 import androidx.compose.ui.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
@@ -158,9 +158,9 @@ fun CoreTextField(
     val focusRequester = FocusRequester()
 
     // Ambients
-    val textInputService = TextInputServiceAmbient.current
-    val density = DensityAmbient.current
-    val resourceLoader = FontLoaderAmbient.current
+    val textInputService = AmbientTextInputService.current
+    val density = AmbientDensity.current
+    val resourceLoader = AmbientFontLoader.current
 
     // State
     val (visualText, offsetMap) = remember(value, visualTransformation) {
@@ -205,9 +205,9 @@ fun CoreTextField(
     manager.onValueChange = onValueChangeWrapper
     manager.state = state
     manager.value = value
-    manager.clipboardManager = ClipboardManagerAmbient.current
-    manager.textToolbar = TextToolbarAmbient.current
-    manager.hapticFeedBack = HapticFeedBackAmbient.current
+    manager.clipboardManager = AmbientClipboardManager.current
+    manager.textToolbar = AmbientTextToolbar.current
+    manager.hapticFeedBack = AmbientHapticFeedback.current
 
     val focusObserver = Modifier.focusObserver {
         if (state.hasFocus == it.isFocused) {

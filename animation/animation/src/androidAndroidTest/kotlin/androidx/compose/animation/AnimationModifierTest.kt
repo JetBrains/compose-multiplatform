@@ -28,7 +28,7 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -95,7 +95,7 @@ class AnimationModifierTest {
                     }
                     .size(width.dp, height.dp)
             )
-            density = DensityAmbient.current.density
+            density = AmbientDensity.current.density
         }
 
         rule.runOnIdle {

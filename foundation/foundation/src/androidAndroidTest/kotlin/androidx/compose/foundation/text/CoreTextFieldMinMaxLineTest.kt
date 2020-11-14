@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
@@ -61,7 +61,7 @@ class CoreTextFieldMinMaxLineTest {
     @Test(expected = IllegalArgumentException::class)
     fun textField_maxLines_should_be_greater_than_zero() {
         rule.setContent {
-            Providers(DensityAmbient provides density) {
+            Providers(AmbientDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(""),
                     onValueChange = {},
@@ -158,7 +158,7 @@ class CoreTextFieldMinMaxLineTest {
         var height: Int? = null
 
         rule.setContent {
-            Providers(DensityAmbient provides density) {
+            Providers(AmbientDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(string),
                     onValueChange = {},

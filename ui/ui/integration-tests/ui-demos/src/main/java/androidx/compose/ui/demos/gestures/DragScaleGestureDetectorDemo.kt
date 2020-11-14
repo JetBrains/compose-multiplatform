@@ -35,7 +35,7 @@ import androidx.compose.ui.gesture.ScaleObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.scaleGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
 /**
@@ -86,7 +86,7 @@ fun DragAndScaleGestureFilterDemo() {
         }
 
     val (offsetX, offsetY) =
-        with(DensityAmbient.current) { offset.value.x.toDp() to offset.value.y.toDp() }
+        with(AmbientDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
 
     Column {
         Text("Demonstrates combining dragging with scaling.")

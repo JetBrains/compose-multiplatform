@@ -77,11 +77,11 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.RenderNodeApi23
 import androidx.compose.ui.platform.RenderNodeApi29
 import androidx.compose.ui.platform.ViewLayer
@@ -1978,7 +1978,7 @@ class AndroidLayoutDrawTest {
         val layoutDirection = Ref<LayoutDirection>()
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                     FixedSize(
                         size = 50,
                         modifier = Modifier.drawBehind {
@@ -2011,7 +2011,7 @@ class AndroidLayoutDrawTest {
         }
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                     FixedSize(
                         size = 50,
                         modifier = layoutModifier
@@ -2799,7 +2799,7 @@ class AndroidLayoutDrawTest {
         var zIndex by mutableStateOf(0f)
         activityTestRule.runOnUiThread {
             activity.setContent {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     FixedSize(
                         size = 30,
                         modifier = Modifier.background(color = Color.Blue).drawLatchModifier()
@@ -3020,7 +3020,7 @@ class AndroidLayoutDrawTest {
         activityTestRule.runOnUiThread {
             view = ComposeView(activity)
             view.setContent {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     Box(
                         Modifier
                             .background(Color.Blue)
@@ -3064,7 +3064,7 @@ class AndroidLayoutDrawTest {
         activityTestRule.runOnUiThread {
             view = ComposeView(activity)
             view.setContent {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     Box(
                         Modifier
                             .background(Color.Blue)

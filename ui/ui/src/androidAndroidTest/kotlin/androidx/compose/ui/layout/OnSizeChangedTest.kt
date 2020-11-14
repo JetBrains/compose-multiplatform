@@ -23,7 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
@@ -64,7 +64,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (DensityAmbient.current) {
+                with (AmbientDensity.current) {
                     Box(
                         Modifier.padding(10.toDp()).onSizeChanged {
                             changedSize = it
@@ -99,7 +99,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (DensityAmbient.current) {
+                with (AmbientDensity.current) {
                     Box(
                         Modifier.padding(sizePx.toDp()).onSizeChanged {
                             changedSize = it
@@ -132,7 +132,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (DensityAmbient.current) {
+                with (AmbientDensity.current) {
                     Box(
                         Modifier.padding(10.toDp()).onSizeChanged {
                             changedSize = it
@@ -171,7 +171,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (DensityAmbient.current) {
+                with (AmbientDensity.current) {
                     val mod = if (addModifier) Modifier.onSizeChanged {
                         changedSize2 = it
                         latch2.countDown()

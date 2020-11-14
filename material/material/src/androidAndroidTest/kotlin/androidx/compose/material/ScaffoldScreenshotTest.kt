@@ -30,7 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.captureToImage
@@ -655,7 +655,7 @@ private fun ScreenshotScaffold(
 
     val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 
-    Providers(LayoutDirectionAmbient provides layoutDirection) {
+    Providers(AmbientLayoutDirection provides layoutDirection) {
         Box(
             Modifier
                 .fillMaxSize(0.5f)

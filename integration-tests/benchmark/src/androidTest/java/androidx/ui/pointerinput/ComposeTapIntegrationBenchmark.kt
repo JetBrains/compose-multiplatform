@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.dp
 import androidx.test.annotation.UiThreadTest
@@ -93,7 +93,7 @@ class ComposeTapIntegrationBenchmark {
 
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     itemHeightDp = ItemHeightPx.toDp()
                 }
                 App()

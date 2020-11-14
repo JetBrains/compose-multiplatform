@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.ScaleObserver
 import androidx.compose.ui.gesture.scaleGestureFilter
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
@@ -42,7 +42,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
  */
 @Composable
 fun rememberZoomableController(onZoomDelta: (Float) -> Unit): ZoomableController {
-    val clocks = AnimationClockAmbient.current.asDisposableClock()
+    val clocks = AmbientAnimationClock.current.asDisposableClock()
     return remember(clocks) { ZoomableController(clocks, onZoomDelta) }
 }
 

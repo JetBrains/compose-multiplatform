@@ -23,7 +23,7 @@ import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -173,7 +173,7 @@ class RtlLayoutTest {
                         layout(100, 100) {}
                     }
                 }
-                Providers(LayoutDirectionAmbient provides direction.value) {
+                Providers(AmbientLayoutDirection provides direction.value) {
                     Layout(children) { measurables, constraints ->
                         layout(100, 100) {
                             measurables.first().measure(constraints).placeRelative(0, 0)
@@ -197,7 +197,7 @@ class RtlLayoutTest {
         absolutePositioning: Boolean,
         testLayoutDirection: LayoutDirection
     ) {
-        Providers(LayoutDirectionAmbient provides testLayoutDirection) {
+        Providers(AmbientLayoutDirection provides testLayoutDirection) {
             Layout(
                 children = @Composable {
                     FixedSize(size, modifier = saveLayoutInfo(position[0], countDownLatch)) {

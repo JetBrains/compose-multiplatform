@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -74,7 +74,7 @@ class ScaleGestureFilterTest {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
                 Box {
-                    touchSlop = with(DensityAmbient.current) { TouchSlop.toPx() }
+                    touchSlop = with(AmbientDensity.current) { TouchSlop.toPx() }
                     Layout(
                         modifier = Modifier.scaleGestureFilter(scaleObserver),
                         measureBlock = { _, _ ->

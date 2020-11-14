@@ -27,7 +27,7 @@ import androidx.compose.runtime.emit
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.accessibilityLabel
@@ -66,7 +66,7 @@ class HotReloadTests {
         var value = "First value"
 
         @Composable fun text(text: String, id: Int = -1) {
-            val context = ContextAmbient.current
+            val context = AmbientContext.current
             emit<TextView, UiApplier>(
                 ctor = { TextView(context) },
                 update = {
@@ -77,7 +77,7 @@ class HotReloadTests {
         }
 
         @Composable fun column(children: @Composable () -> Unit) {
-            val context = ContextAmbient.current
+            val context = AmbientContext.current
             emit<LinearLayout, UiApplier>(
                 ctor = { LinearLayout(context) },
                 update = {},

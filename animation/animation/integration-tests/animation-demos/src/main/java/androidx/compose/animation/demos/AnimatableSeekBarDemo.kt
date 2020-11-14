@@ -42,14 +42,14 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun AnimatableSeekBarDemo() {
     val clock = remember { ManualAnimationClock(0L) }
-    Providers(AnimationClockAmbient provides clock) {
+    Providers(AmbientAnimationClock provides clock) {
         Column {
             Text(
                 "Drag to update AnimationClock",

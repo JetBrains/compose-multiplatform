@@ -33,7 +33,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.semantics
@@ -76,7 +76,7 @@ internal actual fun ActualDialog(
     properties: DialogProperties?,
     content: @Composable () -> Unit
 ) {
-    val view = ViewAmbient.current
+    val view = AmbientView.current
 
     val dialog = remember(view) { DialogWrapper(view) }
     dialog.onCloseRequest = onDismissRequest

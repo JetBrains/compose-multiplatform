@@ -20,7 +20,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
@@ -222,7 +222,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,
@@ -255,7 +255,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,

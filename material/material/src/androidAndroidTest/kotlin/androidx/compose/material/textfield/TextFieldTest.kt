@@ -54,8 +54,8 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.TextInputServiceAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientTextInputService
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.captureToImage
@@ -198,7 +198,7 @@ class TextFieldTest {
         val focusRequester = FocusRequester()
         lateinit var hostView: View
         rule.setMaterialContent {
-            hostView = ViewAmbient.current
+            hostView = AmbientView.current
             Box {
                 TextField(
                     modifier = Modifier
@@ -229,7 +229,7 @@ class TextFieldTest {
         lateinit var softwareKeyboardController: SoftwareKeyboardController
         lateinit var hostView: View
         rule.setMaterialContent {
-            hostView = ViewAmbient.current
+            hostView = AmbientView.current
             Box {
                 TextField(
                     modifier = Modifier
@@ -752,7 +752,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 val text = remember { mutableStateOf(TextFieldValue("")) }
                 TextField(

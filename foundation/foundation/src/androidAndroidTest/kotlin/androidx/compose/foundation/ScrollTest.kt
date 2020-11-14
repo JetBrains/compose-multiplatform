@@ -31,8 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.GestureScope
@@ -799,7 +799,7 @@ class ScrollTest {
         with(rule.density) {
             rule.setContent {
                 val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                Providers(LayoutDirectionAmbient provides direction) {
+                Providers(AmbientLayoutDirection provides direction) {
                     Box {
                         ScrollableRow(
                             reverseScrollDirection = isReversed,
@@ -887,7 +887,7 @@ class ScrollTest {
                         }
                     } else {
                         val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                        Providers(LayoutDirectionAmbient provides direction) {
+                        Providers(AmbientLayoutDirection provides direction) {
                             ScrollableRow(
                                 Modifier.testTag(scrollerTag),
                                 scrollState = scrollState,

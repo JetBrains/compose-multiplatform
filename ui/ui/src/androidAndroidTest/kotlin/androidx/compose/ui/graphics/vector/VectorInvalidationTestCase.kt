@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.test.R
 import java.util.concurrent.CountDownLatch
@@ -47,7 +47,7 @@ class VectorInvalidationTestCase(var latch: CountDownLatch) {
         vectorState = state
 
         val imageVector = loadVectorResource(state.value)
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             imageVector.resource.resource?.let {
                 val width = it.defaultWidth
                 vectorSize = width.toIntPx()

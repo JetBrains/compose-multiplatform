@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.TouchSlop
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.milliseconds
 import androidx.test.filters.MediumTest
@@ -175,7 +175,7 @@ class SendSwipeTest {
             }
         )
         rule.setContent {
-            with(DensityAmbient.current) {
+            with(AmbientDensity.current) {
                 // Scrollable with a viewport the size of 10 boxes
                 ScrollableColumn(
                     Modifier.testTag("scrollable").size(100.toDp(), 1000.toDp()),

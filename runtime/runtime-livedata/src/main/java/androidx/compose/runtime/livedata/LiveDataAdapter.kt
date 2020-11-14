@@ -21,7 +21,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LifecycleOwnerAmbient
+import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -53,7 +53,7 @@ inline fun <T> LiveData<T>.observeAsState(): State<T?> = observeAsState(value)
  */
 @Composable
 fun <R, T : R> LiveData<T>.observeAsState(initial: R): State<R> {
-    val lifecycleOwner = LifecycleOwnerAmbient.current
+    val lifecycleOwner = AmbientLifecycleOwner.current
     val state = remember { mutableStateOf(initial) }
     onCommit(this, lifecycleOwner) {
         val observer = Observer<T> { state.value = it }

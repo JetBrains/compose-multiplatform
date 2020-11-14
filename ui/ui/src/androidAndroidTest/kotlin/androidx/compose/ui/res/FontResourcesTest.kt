@@ -17,7 +17,7 @@
 package androidx.compose.ui.res
 
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.FontFamily
@@ -49,7 +49,7 @@ class FontResourcesTest {
         var syncLoadedTypeface: Typeface? = null
 
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
 
                 // async API
                 result = loadFontResource(
@@ -77,7 +77,7 @@ class FontResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 loadFontResource(
                     fontFamily = font(R.font.sample_font).asFontFamily(),
                     pendingFontFamily = font(R.font.sample_font).asFontFamily(),
@@ -92,7 +92,7 @@ class FontResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 loadFontResource(
                     fontFamily = font(R.font.sample_font).asFontFamily(),
                     pendingFontFamily = FontFamily.Serif,

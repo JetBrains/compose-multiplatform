@@ -38,8 +38,8 @@ import androidx.compose.ui.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -682,7 +682,7 @@ class WithConstraintsTest {
                 Layout(
                     children = @Composable {
                         WithConstraints {
-                            with(DensityAmbient.current) {
+                            with(AmbientDensity.current) {
                                 assertEquals(minWidthConstraint.toIntPx(), minWidth.toIntPx())
                                 assertEquals(maxWidthConstraint.toIntPx(), maxWidth.toIntPx())
                                 assertEquals(minHeightConstraint.toIntPx(), minHeight.toIntPx())

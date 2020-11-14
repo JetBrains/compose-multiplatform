@@ -42,7 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -224,7 +224,7 @@ object FloatingActionButtonConstants {
         // focused: Dp = 8.dp,
         // hovered: Dp = 8.dp,
     ): FloatingActionButtonElevation {
-        val clock = AnimationClockAmbient.current.asDisposableClock()
+        val clock = AmbientAnimationClock.current.asDisposableClock()
         return remember(defaultElevation, pressedElevation, clock) {
             DefaultFloatingActionButtonElevation(
                 defaultElevation = defaultElevation,

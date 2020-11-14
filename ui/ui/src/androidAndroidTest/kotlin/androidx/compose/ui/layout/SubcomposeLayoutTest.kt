@@ -33,9 +33,9 @@ import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -455,7 +455,7 @@ class SubcomposeLayoutTest {
             val size = 50.dp
             val density = Density(3f)
             val sizeIpx = with(density) { size.toIntPx() }
-            Providers(DensityAmbient provides density) {
+            Providers(AmbientDensity provides density) {
                 SubcomposeLayout<Unit>(
                     Modifier.size(size).onGloballyPositioned {
                         assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))

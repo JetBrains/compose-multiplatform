@@ -32,7 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -457,7 +457,7 @@ class LazyRowForTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.preferredWidth(100.dp)) {
                     LazyRowFor(items, Modifier.testTag(LazyRowForTag)) {
                         Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
