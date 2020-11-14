@@ -44,7 +44,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -204,8 +203,6 @@ private fun Density.getCursorRectInScroller(
     }
     return cursorRect.copy(left = cursorLeft, right = cursorRight)
 }
-
-private val DefaultCursorThickness = 2.dp
 
 @Stable
 internal class TextFieldScrollerPosition(initial: Float = 0f) {
