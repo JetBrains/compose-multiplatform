@@ -2,6 +2,7 @@ package example.todo.common.root.integration
 
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.extensions.compose.jetbrains.children
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
@@ -13,7 +14,6 @@ import example.todo.common.root.TodoRoot.Dependencies
 import example.todo.common.utils.Component
 import example.todo.common.utils.Consumer
 import example.todo.common.utils.Crossfade
-import example.todo.common.utils.children
 
 internal class TodoRootImpl(
     componentContext: ComponentContext,

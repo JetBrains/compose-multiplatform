@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -19,6 +18,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -147,8 +147,10 @@ private fun TodoInput(
             label = { Text(text = "Add a todo") }
         )
 
-        Button(modifier = Modifier.padding(start = 8.dp), onClick = onAddClicked) {
-            Text(text = "+")
+        Spacer(modifier = Modifier.width(8.dp))
+
+        IconButton(onClick = onAddClicked) {
+            Icon(Icons.Default.Add)
         }
     }
 }

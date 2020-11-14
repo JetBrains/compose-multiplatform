@@ -13,7 +13,7 @@ import com.badoo.reaktive.observable.subscribe
 val <T : Any> Store<*, T, *>.composeState: State<T>
     get() {
         val composeState = remember(this) { mutableStateOf(state) }
-        val disposable = states.subscribe(onNext = { composeState.value = it })
+        val disposable = remember(this) { states.subscribe(onNext = { composeState.value = it }) }
         onDispose(disposable::dispose)
 
         return composeState

@@ -36,4 +36,5 @@ dependencies {
     implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinLogging)
     implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinTimeTravel)
     implementation(Deps.ArkIvanov.Decompose.decompose)
+    implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
 }
