@@ -531,6 +531,9 @@ package androidx.compose.foundation.text {
   public final class TextFieldScrollKt {
   }
 
+  public final class TextFieldSizeKt {
+  }
+
 }
 
 package androidx.compose.foundation.text.selection {

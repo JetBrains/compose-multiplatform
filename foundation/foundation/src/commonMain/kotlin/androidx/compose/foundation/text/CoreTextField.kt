@@ -420,6 +420,7 @@ fun CoreTextField(
         .then(drawModifier)
         .then(onPositionedModifier)
         .then(semanticsModifier)
+        .textFieldMinSize(textStyle)
         .textFieldKeyboardModifier(manager)
         .focus()
 
