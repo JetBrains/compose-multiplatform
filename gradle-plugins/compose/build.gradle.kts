@@ -32,7 +32,8 @@ dependencies {
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(kotlin("gradle-plugin"))
     testImplementation(gradleTestKit())
-    testImplementation("junit:junit:4.13")
+    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 
     fun embeddedCompileOnly(dep: String) {
         compileOnly(dep)
@@ -77,6 +78,11 @@ tasks.register("testMinGradleVersion", Test::class.java) {
 }
 
 fun Test.configureTest(gradleVersion: String) {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+
     dependsOn("publishToMavenLocal")
     systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
     systemProperty("gradle.version.for.tests", gradleVersion)
