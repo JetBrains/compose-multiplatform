@@ -472,7 +472,7 @@ package androidx.compose.foundation.text {
   }
 
   public final class CoreTextFieldKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void CoreTextField--SxaZeI(androidx.compose.ui.text.input.TextFieldValue value, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor, optional boolean softWrap, optional int maxLines, optional androidx.compose.ui.text.input.ImeOptions imeOptions);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void CoreTextField-lVEleRQ(androidx.compose.ui.text.input.TextFieldValue value, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor, optional boolean softWrap, optional androidx.compose.ui.text.input.ImeOptions imeOptions);
   }
 
   public final class CoreTextKt {
@@ -516,6 +516,10 @@ package androidx.compose.foundation.text {
   public static final class KeyboardOptions.Companion {
     method public androidx.compose.foundation.text.KeyboardOptions getDefault();
     property public final androidx.compose.foundation.text.KeyboardOptions Default;
+  }
+
+  public final class MaxLinesHeightModifierKt {
+    method public static androidx.compose.ui.Modifier maxLinesHeight(androidx.compose.ui.Modifier, @IntRange(from=1) int maxLines, androidx.compose.ui.text.TextStyle textStyle);
   }
 
   public final class TextFieldCursorKt {

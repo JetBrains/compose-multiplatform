@@ -17,25 +17,49 @@
 package androidx.compose.foundation.demos.text
 
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
+private val LongText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam pellentesque" +
+    " arcu quis diam malesuada pulvinar. In id condimentum metus. Suspendisse potenti. " +
+    "Praesent arcu tortor, ultrices ut vehicula sit amet, accumsan id sem."
+
 @Composable
-fun TextFieldWithScrollerDemo() {
+fun ScrollableTextFieldDemo() {
     ScrollableColumn {
-        val state = remember {
-            mutableStateOf(List(100) { "Line: $it" }.joinToString("\n"))
-        }
-        BasicTextField(
-            value = state.value,
-            onValueChange = { state.value = it },
-            modifier = Modifier
-                .padding(20.dp)
-        )
+        TagLine("Multiline with 200.dp height")
+        MultilineTextField()
+        TagLine("Single line with 200.dp width")
+        SingleLineTextField()
     }
+}
+
+@Composable
+fun MultilineTextField() {
+    val state = remember { mutableStateOf(LongText) }
+    BasicTextField(
+        value = state.value,
+        onValueChange = { state.value = it },
+        modifier = demoTextFieldModifiers.size(200.dp),
+        singleLine = false,
+        textStyle = TextStyle(fontSize = fontSize8)
+    )
+}
+
+@Composable
+fun SingleLineTextField() {
+    val state = remember { mutableStateOf(LongText) }
+    BasicTextField(
+        value = state.value,
+        onValueChange = { state.value = it },
+        modifier = demoTextFieldModifiers.width(200.dp),
+        singleLine = true,
+        textStyle = TextStyle(fontSize = fontSize8)
+    )
 }

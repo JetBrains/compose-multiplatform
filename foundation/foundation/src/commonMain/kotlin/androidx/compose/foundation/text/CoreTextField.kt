@@ -126,8 +126,6 @@ import kotlin.math.roundToInt
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space.
- * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
  */
 @Composable
 @OptIn(
@@ -147,13 +145,8 @@ fun CoreTextField(
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = Color.Unspecified,
     softWrap: Boolean = true,
-    maxLines: Int = Int.MAX_VALUE,
     imeOptions: ImeOptions = ImeOptions.Default
 ) {
-    require(maxLines > 0) {
-        "maxLines should be greater than 0"
-    }
-
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
     val recompose = invalidate
@@ -416,7 +409,8 @@ fun CoreTextField(
 
     onDispose { manager.hideSelectionToolbar() }
 
-    val modifiers = modifier.focusRequester(focusRequester)
+    val modifiers = modifier
+        .focusRequester(focusRequester)
         .then(focusObserver)
         .then(cursorModifier)
         .then(pointerModifier)
@@ -433,7 +427,6 @@ fun CoreTextField(
                 state.textDelegate,
                 constraints,
                 layoutDirection,
-                maxLines,
                 state.layoutResult
             ).let { (width, height, result) ->
                 if (state.layoutResult != result) {

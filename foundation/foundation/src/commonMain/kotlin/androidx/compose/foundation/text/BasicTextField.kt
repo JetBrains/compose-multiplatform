@@ -213,6 +213,7 @@ fun BasicTextField(
     val scrollerPosition = rememberSavedInstanceState(saver = TextFieldScrollerPosition.Saver) {
         TextFieldScrollerPosition()
     }
+
     CoreTextField(
         value = value,
         onValueChange = onValueChange,
@@ -226,14 +227,15 @@ fun BasicTextField(
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor,
         imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
-        maxLines = if (singleLine) 1 else maxLines,
         softWrap = !singleLine,
-        modifier = modifier.textFieldScroll(
-            orientation,
-            scrollerPosition,
-            value,
-            visualTransformation,
-            textLayoutResult
-        )
+        modifier = modifier
+            .maxLinesHeight(if (singleLine) 1 else maxLines, textStyle)
+            .textFieldScroll(
+                orientation,
+                scrollerPosition,
+                value,
+                visualTransformation,
+                textLayoutResult
+            )
     )
 }

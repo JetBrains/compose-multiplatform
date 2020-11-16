@@ -43,7 +43,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.buildTextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -74,8 +73,6 @@ class TextFieldDelegateTest {
     private lateinit var layoutCoordinates: LayoutCoordinates
     private lateinit var multiParagraphIntrinsics: MultiParagraphIntrinsics
     private lateinit var textLayoutResult: TextLayoutResult
-
-    private val layoutDirection = LayoutDirection.Ltr
 
     /**
      * Test implementation of offset map which doubles the offset in transformed text.
