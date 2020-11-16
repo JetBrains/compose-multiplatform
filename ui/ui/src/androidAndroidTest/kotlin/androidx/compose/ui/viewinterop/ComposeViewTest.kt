@@ -19,6 +19,7 @@ package androidx.compose.ui.viewinterop
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -162,6 +164,30 @@ class ComposeViewTest {
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         assertEquals(Rect(10f, 20f, 70f, 60f), globalBounds)
+    }
+
+    @Test
+    fun viewSizeIsChildSizePlusPaddings() {
+        var size = IntSize.Zero
+        val latch = CountDownLatch(1)
+        rule.activityRule.scenario.onActivity { activity ->
+            val composeView = ComposeView(activity)
+            composeView.setPadding(10, 20, 30, 40)
+            activity.setContentView(composeView, ViewGroup.LayoutParams(100, 100))
+            composeView.viewTreeObserver.addOnPreDrawListener(
+                object : ViewTreeObserver.OnPreDrawListener {
+                    override fun onPreDraw(): Boolean {
+                        composeView.viewTreeObserver.removeOnPreDrawListener(this)
+                        size = IntSize(composeView.measuredWidth, composeView.measuredHeight)
+                        latch.countDown()
+                        return true
+                    }
+                }
+            )
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(IntSize(100, 100), size)
     }
 
     @Test
