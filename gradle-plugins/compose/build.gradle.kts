@@ -70,7 +70,7 @@ tasks.test {
     configureTest(maxGradleVersionForTests)
 }
 
-tasks.register("testMinGradleVersion", Test::class.java) {
+val testMinGradleVersion by tasks.registering(Test::class) {
     tasks.test.get().let { defaultTest ->
         classpath = defaultTest.classpath
     }
@@ -93,4 +93,8 @@ fun Test.configureTest(gradleVersion: String) {
     } else {
         doFirst { error("Use JDK 14 to run tests or set up JDK_14 env. var") }
     }
+}
+
+tasks.named("check") {
+    dependsOn(testMinGradleVersion)
 }
