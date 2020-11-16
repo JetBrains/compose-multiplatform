@@ -205,7 +205,10 @@ abstract class AbstractComposeView @JvmOverloads constructor(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.getMode(widthMeasureSpec)),
             MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(heightMeasureSpec)),
         )
-        setMeasuredDimension(child.measuredWidthAndState, child.measuredHeightAndState)
+        setMeasuredDimension(
+            child.measuredWidth + paddingLeft + paddingRight,
+            child.measuredHeight + paddingTop + paddingBottom
+        )
     }
 
     final override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
