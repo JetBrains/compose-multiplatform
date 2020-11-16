@@ -57,24 +57,34 @@ val jar = tasks.named<Jar>("jar") {
     this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-val gradleVersionForTests = "6.7"
+val minGradleVersionForTests = "6.4"
+val maxGradleVersionForTests = "6.7"
 val java14Home: String? = when (JavaVersion.current()) {
     JavaVersion.VERSION_14 -> System.getProperty("java.home")
     else -> System.getenv("JDK_14")
 }
 val isWindows = getCurrentOperatingSystem().isWindows
 
-afterEvaluate {
-    tasks.named<Test>("test") {
-        dependsOn("publishToMavenLocal")
-        systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
-        systemProperty("gradle.version.for.tests", gradleVersionForTests)
+tasks.test {
+    configureTest(maxGradleVersionForTests)
+}
 
-        if (java14Home != null) {
-            val executableFileName = if (isWindows) "java.exe" else "java"
-            executable = File(java14Home).resolve("bin/$executableFileName").absolutePath
-        } else {
-            doFirst { error("Use JDK 14 to run tests or set up JDK_14 env. var") }
-        }
+tasks.register("testMinGradleVersion", Test::class.java) {
+    tasks.test.get().let { defaultTest ->
+        classpath = defaultTest.classpath
+    }
+    configureTest(minGradleVersionForTests)
+}
+
+fun Test.configureTest(gradleVersion: String) {
+    dependsOn("publishToMavenLocal")
+    systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
+    systemProperty("gradle.version.for.tests", gradleVersion)
+
+    if (java14Home != null) {
+        val executableFileName = if (isWindows) "java.exe" else "java"
+        executable = File(java14Home).resolve("bin/$executableFileName").absolutePath
+    } else {
+        doFirst { error("Use JDK 14 to run tests or set up JDK_14 env. var") }
     }
 }

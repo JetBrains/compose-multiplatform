@@ -7,6 +7,6 @@ object TestProperties {
     val composeVersion: String
         get() = System.getProperty("compose.plugin.version")!!
 
-    val defaultGradleVersionForTests: String
+    val gradleVersionForTests: String
         get() = System.getProperty("gradle.version.for.tests")!!
 }
