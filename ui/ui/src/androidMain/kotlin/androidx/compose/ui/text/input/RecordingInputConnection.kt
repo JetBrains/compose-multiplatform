@@ -32,8 +32,8 @@ import android.view.inputmethod.InputContentInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.VisibleForTesting
 
-private val DEBUG = false
-private val TAG = "RecordingIC"
+internal val DEBUG = false
+internal val TAG = "RecordingIC"
 
 /**
  * [InputConnection] implementation that binds Android IME to Compose.
@@ -82,32 +82,29 @@ internal class RecordingInputConnection(
      */
     fun updateInputState(state: TextFieldValue, imm: InputMethodManager, view: View) {
         val prev = mTextFieldValue
-        val next = state
-        mTextFieldValue = next
+        mTextFieldValue = state
 
-        if (prev == next) {
+        if (prev == state) {
             return
         }
 
         if (extractedTextMonitorMode) {
-            imm.updateExtractedText(view, currentExtractedTextRequestToken, next.toExtractedText())
+            imm.updateExtractedText(view, currentExtractedTextRequestToken, state.toExtractedText())
         }
 
-        // The candidateStart and candidateEnd is composition start and composition end in
-        // updateSelection API. Need to pass -1 if there is no composition.
-        val candidateStart = next.composition?.min ?: -1
-        val candidateEnd = next.composition?.max ?: -1
+        // updateSelection API requires -1 if there is no composition
+        val compositionStart = state.composition?.min ?: -1
+        val compositionEnd = state.composition?.max ?: -1
         if (DEBUG) {
             Log.d(
                 TAG,
                 "updateSelection(" +
-                    "selection = (${next.selection.min},${next.selection.max}), " +
-                    "compoairion = ($candidateStart, $candidateEnd)"
+                    "selection = (${state.selection.min},${state.selection.max}), " +
+                    "composition = ($compositionStart, $compositionEnd)"
             )
         }
         imm.updateSelection(
-            view, next.selection.min, next.selection.max,
-            candidateStart, candidateEnd
+            view, state.selection.min, state.selection.max, compositionStart, compositionEnd
         )
     }
 
