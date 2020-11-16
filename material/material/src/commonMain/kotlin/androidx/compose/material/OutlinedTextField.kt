@@ -38,11 +38,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -136,22 +133,14 @@ fun OutlinedTextField(
     inactiveColor: Color = MaterialTheme.colors.onSurface,
     errorColor: Color = MaterialTheme.colors.error
 ) {
-    var selection by remember { mutableStateOf(TextRange.Zero) }
-    var composition by remember { mutableStateOf<TextRange?>(null) }
-
-    @OptIn(InternalTextApi::class)
-    val textFieldValue = TextFieldValue(
-        text = value,
-        selection = selection.constrain(0, value.length),
-        composition = composition?.constrain(0, value.length)
-    )
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value)) }
+    textFieldValue = textFieldValue.copy(text = value)
 
     TextFieldImpl(
         type = TextFieldType.Outlined,
         value = textFieldValue,
         onValueChange = {
-            selection = it.selection
-            composition = it.composition
+            textFieldValue = it
             if (value != it.text) {
                 onValueChange(it.text)
             }

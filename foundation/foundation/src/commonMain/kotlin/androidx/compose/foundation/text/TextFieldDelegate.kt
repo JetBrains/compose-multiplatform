@@ -275,7 +275,7 @@ class TextFieldDelegate {
             onImeActionPerformed: (ImeAction) -> Unit
         ): InputSessionToken {
             val inputSessionToken = textInputService?.startInput(
-                value = TextFieldValue(value.text, value.selection, value.composition),
+                value = value.copy(),
                 imeOptions = imeOptions,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
