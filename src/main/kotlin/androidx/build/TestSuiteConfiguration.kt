@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
+@file:Suppress("UnstableApiUsage") // Incubating AGP APIs
+
 package androidx.build
 
 import androidx.build.dependencyTracker.AffectedModuleDetector
+import androidx.build.gradle.getByType
 import com.android.build.api.artifact.ArtifactType
 import com.android.build.api.artifact.Artifacts
-import com.android.build.api.dsl.ApplicationExtension
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.extension.AndroidComponentsExtension
+import com.android.build.api.extension.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.TestedExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -60,59 +63,15 @@ fun Project.createTestConfigurationGenerationTask(
         .dependsOn(generateTestConfigurationTask)
 }
 
-fun Project.addAppApkToTestConfigGenerationViaReflection() {
-    try {
-        val androidComponentsExtensionType = Class.forName(
-            "com.android.build.api.extension.ApplicationAndroidComponentsExtension"
-        )
-        val androidComponentsExtension =
-            this.extensions.getByType(androidComponentsExtensionType)
-        val selectorType = Class.forName(
-            "com.android.build.api.extension.VariantSelector"
-        )
-        val selector = androidComponentsExtensionType.getMethod("selector")
-            .invoke(androidComponentsExtension)
-        androidComponentsExtensionType
-            .getMethod("onVariants", selectorType, Function1::class.java)
-            .invoke(
-                androidComponentsExtension,
-                selectorType.getMethod("withBuildType", String::class.java)
-                    .invoke(selector, "debug"),
-                { debugVariant: Any ->
-                    val artifacts = debugVariant.javaClass.getMethod("getArtifacts")
-                        .invoke(debugVariant) as Artifacts
-                    this.tasks.withType(GenerateTestConfigurationTask::class.java) {
-                        it.appFolder.set(artifacts.get(ArtifactType.APK))
-                        it.appLoader.set(artifacts.getBuiltArtifactsLoader())
-                    }
-                }
-            )
-    } catch (cnfe: ClassNotFoundException) {
-        val applicationExtension = this.extensions.getByType(
-            ApplicationExtension::class.java
-        )
-        applicationExtension.addAppApkToTestConfigGeneration(this)
-    }
-}
-
-fun ApplicationExtension<*, *, *, *, *>
-.addAppApkToTestConfigGeneration(project: Project) {
-    val allVariants = javaClass.getMethod("getOnVariantProperties")
-        .invoke(this)
-
-    allVariants.javaClass.getMethod("withBuildType", String::class.java, Function1::class.java)
-        .invoke(
-            allVariants,
-            "debug",
-            { debugVariant: Any ->
-                val artifacts = debugVariant.javaClass.getMethod("getArtifacts")
-                    .invoke(debugVariant) as Artifacts
-                project.tasks.withType(GenerateTestConfigurationTask::class.java) {
-                    it.appFolder.set(artifacts.get(ArtifactType.APK))
-                    it.appLoader.set(artifacts.getBuiltArtifactsLoader())
-                }
+fun Project.addAppApkToTestConfigGeneration() {
+    extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
+        onVariants(selector().withBuildType("debug")) { debugVariant ->
+            tasks.withType(GenerateTestConfigurationTask::class.java).configureEach {
+                it.appFolder.set(debugVariant.artifacts.get(ArtifactType.APK))
+                it.appLoader.set(debugVariant.artifacts.getBuiltArtifactsLoader())
             }
-        )
+        }
+    }
 }
 
 private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
@@ -204,139 +163,37 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
     }
 }
 
-fun CommonExtension<*, *, *, *, *, *, *, *>
-.configureTestConfigGeneration(project: Project) {
-    // old iteration of the new API.
-    javaClass.getMethod("onVariants", Function1::class.java)
-        .invoke(
-            this,
-            { variant: Any ->
-                variant.javaClass.getMethod(
-                    "androidTestProperties",
-                    Function1::class.java
-                ).invoke(
-                    variant,
-                    { androidTest: Any ->
-                        when {
-                            project.path.contains("media2:version-compat-tests") -> {
-                                project.createOrUpdateMediaTestConfigurationGenerationTask(
-                                    androidTest.javaClass.getMethod(
-                                        "getName"
-                                    ).invoke(androidTest) as String,
-                                    androidTest.javaClass.getMethod(
-                                        "getArtifacts"
-                                    ).invoke(androidTest) as Artifacts,
-                                    defaultConfig.minSdk!!,
-                                    defaultConfig.testInstrumentationRunner!!,
-                                    true
-                                )
-                            }
-                            project.path.contains("media:version-compat-tests") -> {
-                                project.createOrUpdateMediaTestConfigurationGenerationTask(
-                                    androidTest.javaClass.getMethod(
-                                        "getName"
-                                    ).invoke(androidTest) as String,
-                                    androidTest.javaClass.getMethod(
-                                        "getArtifacts"
-                                    ).invoke(androidTest) as Artifacts,
-                                    defaultConfig.minSdk!!,
-                                    defaultConfig.testInstrumentationRunner!!,
-                                    false
-                                )
-                            }
-                            else -> {
-                                project.createTestConfigurationGenerationTask(
-                                    androidTest.javaClass.getMethod(
-                                        "getName"
-                                    ).invoke(androidTest) as String,
-                                    androidTest.javaClass.getMethod(
-                                        "getArtifacts"
-                                    ).invoke(androidTest) as Artifacts,
-                                    defaultConfig.minSdk!!,
-                                    defaultConfig.testInstrumentationRunner!!
-                                )
-                            }
-                        }
-                    }
-                )
-            } as Function1<Any, Any>
-        )
-}
-
-fun TestedExtension.configureTestConfigGenerationViaReflection(project: Project) {
-    val commonExtension = project.extensions.getByType(CommonExtension::class.java)
-    try {
-        val androidComponentsExtensionType =
-            Class.forName("com.android.build.api.extension.AndroidComponentsExtension")
-        val androidComponentsExtension =
-            project.extensions.getByType(androidComponentsExtensionType)
-        val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
-        val selector = androidComponentsExtensionType.getMethod("selector")
-            .invoke(androidComponentsExtension)
-        androidComponentsExtension.javaClass.getMethod(
-            "androidTest",
-            selectorType,
-            Function1::class.java
-        ).invoke(
-            androidComponentsExtension,
-            selector.javaClass.getMethod("all").invoke(selector),
-            { androidTest: Any ->
-                when {
-                    // support-media tests are special cased
-                    project.path.contains("media2:version-compat-tests") -> {
-                        project.createOrUpdateMediaTestConfigurationGenerationTask(
-                            androidTest.javaClass.getMethod(
-                                "getName"
-                            ).invoke(
-                                androidTest
-                            ) as String,
-                            androidTest.javaClass.getMethod(
-                                "getArtifacts"
-                            ).invoke(
-                                androidTest
-                            ) as Artifacts,
-                            defaultConfig.minSdk!!,
-                            defaultConfig.testInstrumentationRunner!!,
-                            true
-                        )
-                    }
-                    project.path.contains("media:version-compat-tests") -> {
-                        project.createOrUpdateMediaTestConfigurationGenerationTask(
-                            androidTest.javaClass.getMethod(
-                                "getName"
-                            ).invoke(
-                                androidTest
-                            ) as String,
-                            androidTest.javaClass.getMethod(
-                                "getArtifacts"
-                            ).invoke(
-                                androidTest
-                            ) as Artifacts,
-                            defaultConfig.minSdk!!,
-                            defaultConfig.testInstrumentationRunner!!,
-                            false
-                        )
-                    }
-                    else -> {
-                        project.createTestConfigurationGenerationTask(
-                            androidTest.javaClass.getMethod(
-                                "getName"
-                            ).invoke(
-                                androidTest
-                            ) as String,
-                            androidTest.javaClass.getMethod(
-                                "getArtifacts"
-                            ).invoke(
-                                androidTest
-                            ) as Artifacts,
-                            defaultConfig.minSdk!!,
-                            defaultConfig.testInstrumentationRunner!!
-                        )
-                    }
+fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
+    extensions.getByType<AndroidComponentsExtension<*, *>>().apply {
+        androidTest(selector().all()) { androidTest ->
+            when {
+                path.contains("media2:version-compat-tests") -> {
+                    createOrUpdateMediaTestConfigurationGenerationTask(
+                        androidTest.name,
+                        androidTest.artifacts,
+                        testedExtension.defaultConfig.minSdk!!,
+                        testedExtension.defaultConfig.testInstrumentationRunner!!,
+                        isMedia2 = true
+                    )
+                }
+                path.contains("media:version-compat-tests") -> {
+                    createOrUpdateMediaTestConfigurationGenerationTask(
+                        androidTest.name,
+                        androidTest.artifacts,
+                        testedExtension.defaultConfig.minSdk!!,
+                        testedExtension.defaultConfig.testInstrumentationRunner!!,
+                        isMedia2 = false
+                    )
+                }
+                else -> {
+                    createTestConfigurationGenerationTask(
+                        androidTest.name,
+                        androidTest.artifacts,
+                        testedExtension.defaultConfig.minSdk!!,
+                        testedExtension.defaultConfig.testInstrumentationRunner!!
+                    )
                 }
             }
-        )
-    } catch (cnfe: ClassNotFoundException) {
-        commonExtension.configureTestConfigGeneration(project)
+        }
     }
 }
