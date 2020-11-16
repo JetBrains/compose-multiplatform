@@ -134,37 +134,12 @@ class TextDelegate(
      * The text will layout with a width that's as close to its max intrinsic width as possible
      * while still being greater than or equal to `minWidth` and less than or equal to `maxWidth`.
      */
-    private fun layoutText(minWidth: Float, maxWidth: Float, layoutDirection: LayoutDirection):
-        MultiParagraph {
-            layoutIntrinsics(layoutDirection)
-            // if minWidth == maxWidth the width is fixed.
-            //    therefore we can pass that value to our paragraph and use it
-            // if minWidth != maxWidth there is a range
-            //    then we should check if the max intrinsic width is in this range to decide the
-            //    width to be passed to Paragraph
-            //        if max intrinsic width is between minWidth and maxWidth
-            //           we can use it to layout
-            //        else if max intrinsic width is greater than maxWidth, we can only use maxWidth
-            //        else if max intrinsic width is less than minWidth, we should use minWidth
-            val width = if (minWidth == maxWidth) {
-                maxWidth
-            } else {
-                nonNullIntrinsics.maxIntrinsicWidth.coerceIn(minWidth, maxWidth)
-            }
-
-            return MultiParagraph(
-                intrinsics = nonNullIntrinsics,
-                maxLines = maxLines,
-                ellipsis = overflow == TextOverflow.Ellipsis,
-                width = width
-            )
-        }
-
-    fun layout(
+    private fun layoutText(
         constraints: Constraints,
-        layoutDirection: LayoutDirection,
-        prevResult: TextLayoutResult? = null
-    ): TextLayoutResult {
+        layoutDirection: LayoutDirection
+    ): MultiParagraph {
+        layoutIntrinsics(layoutDirection)
+
         val minWidth = constraints.minWidth.toFloat()
         val widthMatters = softWrap || overflow == TextOverflow.Ellipsis
         val maxWidth = if (widthMatters && constraints.hasBoundedWidth) {
@@ -173,6 +148,52 @@ class TextDelegate(
             Float.POSITIVE_INFINITY
         }
 
+        // This is a fallback behavior because native text layout doesn't support multiple
+        // ellipsis in one text layout.
+        // When softWrap is turned off and overflow is ellipsis, it's expected that each line
+        // that exceeds maxWidth will be ellipsized.
+        // For example,
+        // input text:
+        //     "AAAA\nAAAA"
+        // maxWidth:
+        //     3 * fontSize that only allow 3 characters to be displayed each line.
+        // expected output:
+        //     AA…
+        //     AA…
+        // Here we assume there won't be any '\n' character when softWrap is false. And make
+        // maxLines 1 to implement the similar behavior.
+        val overwriteMaxLines = !softWrap && overflow == TextOverflow.Ellipsis
+        val finalMaxLines = if (overwriteMaxLines) 1 else maxLines
+
+        // if minWidth == maxWidth the width is fixed.
+        //    therefore we can pass that value to our paragraph and use it
+        // if minWidth != maxWidth there is a range
+        //    then we should check if the max intrinsic width is in this range to decide the
+        //    width to be passed to Paragraph
+        //        if max intrinsic width is between minWidth and maxWidth
+        //           we can use it to layout
+        //        else if max intrinsic width is greater than maxWidth, we can only use maxWidth
+        //        else if max intrinsic width is less than minWidth, we should use minWidth
+        val width = if (minWidth == maxWidth) {
+            maxWidth
+        } else {
+            nonNullIntrinsics.maxIntrinsicWidth.coerceIn(minWidth, maxWidth)
+        }
+
+        return MultiParagraph(
+            intrinsics = nonNullIntrinsics,
+            // This is a fallback behavior for ellipsis. Native
+            maxLines = finalMaxLines,
+            ellipsis = overflow == TextOverflow.Ellipsis,
+            width = width
+        )
+    }
+
+    fun layout(
+        constraints: Constraints,
+        layoutDirection: LayoutDirection,
+        prevResult: TextLayoutResult? = null
+    ): TextLayoutResult {
         if (prevResult != null && prevResult.canReuse(
                 text, style, maxLines, softWrap, overflow, density, layoutDirection,
                 resourceLoader, constraints
@@ -195,8 +216,7 @@ class TextDelegate(
         }
 
         val multiParagraph = layoutText(
-            minWidth,
-            maxWidth,
+            constraints,
             layoutDirection
         )
 
