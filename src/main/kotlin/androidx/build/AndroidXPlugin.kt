@@ -33,6 +33,7 @@ import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.studio.StudioTask
+import com.android.build.api.extension.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -262,66 +263,12 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidLibraryOptions(project, androidXExtension)
         }
 
-        try {
-            val libraryAndroidComponentsExtensionType =
-                Class.forName("com.android.build.api.extension.LibraryAndroidComponentsExtension")
-            val androidComponentsExtension =
-                project.extensions.getByType(libraryAndroidComponentsExtensionType)
-            val selectorType = Class.forName("com.android.build.api.extension.VariantSelector")
-            val selector = libraryAndroidComponentsExtensionType.getMethod("selector")
-                .invoke(androidComponentsExtension)
-            libraryAndroidComponentsExtensionType
-                .getMethod("beforeUnitTest", selectorType, Function1::class.java)
-                .invoke(
-                    androidComponentsExtension,
-                    selectorType.getMethod("withBuildType", String::class.java)
-                        .invoke(selector, "release"),
-                    { unitTest: Any ->
-                        unitTest.javaClass.getMethod("setEnabled", Boolean::class.java)
-                            .invoke(unitTest, false)
-                    }
-                )
-        } catch (cnfe: ClassNotFoundException) {
-            // old iteration of the new API.
-            val allVariants = libraryExtension.javaClass.getMethod("getOnVariants")
-                .invoke(libraryExtension)
-
-            allVariants.javaClass.getMethod(
-                "withBuildType",
-                String::class.java,
-                Function1::class.java
-            ).invoke(
-                allVariants,
-                "release",
-                { variant: Any ->
-                    variant.javaClass.getMethod(
-                        "unitTest",
-                        Function1::class.java
-                    ).invoke(
-                        variant,
-                        { unitTest: Any ->
-                            unitTest.javaClass.getMethod(
-                                "setEnabled",
-                                Boolean::class.java
-                            ).invoke(
-                                unitTest,
-                                false
-                            )
-                        }
-                    )
-                }
-            )
+        project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
+            beforeUnitTest(selector().withBuildType("release")) { unitTest ->
+                unitTest.enabled = false
+            }
         }
 
-        // switch to this code once 4.2.0-beta1 can be used.
-
-        // project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
-        //   beforeUnitTest(selector().withBuildType("release")) {
-        //     // Disable unit test for release build type
-        //     @Suppress("UnstableApiUsage")
-        //     enabled = false
-        //   }
-        // }
         libraryExtension.packagingOptions.resources {
             // TODO: Replace this with a per-variant packagingOption for androidTest specifically
             //  once b/69953968 is resolved.
@@ -508,7 +455,7 @@ class AndroidXPlugin : Plugin<Project> {
             Jacoco.registerClassFilesTask(project, this)
         }
 
-        this.configureTestConfigGenerationViaReflection(project)
+        project.configureTestConfigGeneration(this)
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         testVariants.all { variant ->
@@ -616,7 +563,7 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        project.addAppApkToTestConfigGenerationViaReflection()
+        project.addAppApkToTestConfigGeneration()
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
