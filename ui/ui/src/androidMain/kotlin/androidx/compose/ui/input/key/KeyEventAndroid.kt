@@ -41,11 +41,24 @@ internal inline class KeyEventAndroid(val keyEvent: AndroidKeyEvent) : KeyEvent 
             ACTION_UP -> KeyUp
             else -> Unknown
         }
+    override val isAltPressed: Boolean
+        get() = keyEvent.isAltPressed
 
+    override val isCtrlPressed: Boolean
+        get() = keyEvent.isCtrlPressed
+
+    override val isMetaPressed: Boolean
+        get() = keyEvent.isMetaPressed
+
+    override val isShiftPressed: Boolean
+        get() = keyEvent.isShiftPressed
+
+    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
     override val alt: Alt
         get() = AltAndroid(keyEvent)
 }
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalKeyInput::class)
 internal inline class AltAndroid(val keyEvent: AndroidKeyEvent) : Alt {
     override val isLeftAltPressed
