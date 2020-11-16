@@ -1,13 +1,12 @@
 package org.jetbrains.compose.test
 
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
 
 abstract class GradlePluginTestBase {
-    @Rule
-    @JvmField
-    val testDir: TemporaryFolder = TemporaryFolder()
+    @TempDir
+    lateinit var testWorkDir: File
 
     fun testProject(name: String): TestProject =
-        TestProject(name, workingDir = testDir.root)
+        TestProject(name, workingDir = testWorkDir)
 }

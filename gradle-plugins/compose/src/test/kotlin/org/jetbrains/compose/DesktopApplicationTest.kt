@@ -4,8 +4,8 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.test.*
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
