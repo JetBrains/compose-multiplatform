@@ -192,4 +192,21 @@ class DesktopPathTest : DesktopGraphicsTest() {
         path.addRect(Rect(8f, 8f, 16f, 16f))
         assertEquals(Rect(0f, 0f, 16f, 16f), path.getBounds())
     }
+
+    @Test
+    fun `initial parameters`() {
+        val path = Path()
+
+        assertEquals(PathFillType.NonZero, path.fillType)
+    }
+
+    @Test
+    fun `reset should preserve fillType`() {
+        val path = Path()
+
+        path.fillType = PathFillType.EvenOdd
+        path.reset()
+
+        assertEquals(PathFillType.EvenOdd, path.fillType)
+    }
 }
