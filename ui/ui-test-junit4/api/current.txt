@@ -42,11 +42,11 @@ package androidx.compose.ui.test.junit4 {
   @androidx.compose.ui.test.ExperimentalTesting public interface AnimationClockTestRule extends org.junit.rules.TestRule {
     method public default void advanceClock(long milliseconds);
     method public androidx.compose.ui.test.TestAnimationClock getClock();
-    method public boolean isPaused();
-    method public void pauseClock();
+    method public default boolean isPaused();
+    method public default void pauseClock();
     method public default void resumeClock();
     property public abstract androidx.compose.ui.test.TestAnimationClock clock;
-    property public abstract boolean isPaused;
+    property public default boolean isPaused;
   }
 
   public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
