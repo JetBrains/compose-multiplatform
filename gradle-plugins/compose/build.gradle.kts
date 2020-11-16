@@ -58,6 +58,7 @@ val jar = tasks.named<Jar>("jar") {
     this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
+// __SUPPORTED_GRADLE_VERSIONS__
 val minGradleVersionForTests = "6.4"
 val maxGradleVersionForTests = "6.7"
 val java14Home: String? = when (JavaVersion.current()) {
