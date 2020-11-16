@@ -57,26 +57,6 @@ internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
      */
     override val clock: TestAnimationClock get() = _clock
 
-    /**
-     * Convenience property for calling [`clock.isPaused`][TestAnimationClock.isPaused]
-     */
-    override val isPaused: Boolean get() = clock.isPaused
-
-    /**
-     * Convenience method for calling [`clock.pauseClock()`][TestAnimationClock.pauseClock]
-     */
-    override fun pauseClock() = clock.pauseClock()
-
-    /**
-     * Convenience method for calling [`clock.resumeClock()`][TestAnimationClock.resumeClock]
-     */
-    override fun resumeClock() = clock.resumeClock()
-
-    /**
-     * Convenience method for calling [`clock.advanceClock()`][TestAnimationClock.advanceClock]
-     */
-    override fun advanceClock(milliseconds: Long) = clock.advanceClock(milliseconds)
-
     override fun apply(base: Statement, description: Description?): Statement {
         return AnimationClockStatement(base)
     }

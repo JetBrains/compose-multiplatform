@@ -30,12 +30,12 @@ interface AnimationClockTestRule : TestRule {
     /**
      * Convenience property for calling [`clock.isPaused`][TestAnimationClock.isPaused]
      */
-    val isPaused: Boolean
+    val isPaused: Boolean get() = clock.isPaused
 
     /**
      * Convenience method for calling [`clock.pauseClock()`][TestAnimationClock.pauseClock]
      */
-    fun pauseClock()
+    fun pauseClock() = clock.pauseClock()
 
     /**
      * Convenience method for calling [`clock.resumeClock()`][TestAnimationClock.resumeClock]
