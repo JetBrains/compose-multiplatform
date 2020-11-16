@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtUserType
 import org.jetbrains.kotlin.psi.psiUtil.containingClass
 import org.jetbrains.uast.UMethod
+import java.util.EnumSet
 
 /**
  * [Detector] that checks functions returning Modifiers for consistency with guidelines.
@@ -98,7 +99,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             Category.CORRECTNESS, 3, Severity.ERROR,
             Implementation(
                 ModifierDeclarationDetector::class.java,
-                Scope.JAVA_FILE_SCOPE
+                EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
 
@@ -110,7 +111,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             Category.CORRECTNESS, 3, Severity.ERROR,
             Implementation(
                 ModifierDeclarationDetector::class.java,
-                Scope.JAVA_FILE_SCOPE
+                EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
 
@@ -122,7 +123,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             Category.CORRECTNESS, 3, Severity.ERROR,
             Implementation(
                 ModifierDeclarationDetector::class.java,
-                Scope.JAVA_FILE_SCOPE
+                EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
     }

@@ -42,7 +42,7 @@ class VectorInvalidationTestCase(var latch: CountDownLatch) {
     var vectorSize: Int = 0
 
     @Composable
-    fun createTestVector() {
+    fun TestVector() {
         val state = remember { mutableStateOf(R.drawable.ic_triangle2) }
         vectorState = state
 

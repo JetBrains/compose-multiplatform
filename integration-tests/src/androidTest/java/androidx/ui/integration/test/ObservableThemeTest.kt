@@ -172,7 +172,7 @@ private fun App(
     primaryTracker: CompositionTracker,
     secondaryTracker: CompositionTracker
 ) {
-    Providers(TestThemeAmbient provides theme) {
+    Providers(AmbientTestTheme provides theme) {
         CheapPrimaryColorConsumer(primaryTracker)
         ExpensiveSecondaryColorConsumer(secondaryTracker)
         CheapPrimaryColorConsumer(primaryTracker)
@@ -181,7 +181,7 @@ private fun App(
 
 @Composable
 private fun CheapPrimaryColorConsumer(compositionTracker: CompositionTracker) {
-    val primary = TestThemeAmbient.current.primary
+    val primary = AmbientTestTheme.current.primary
     // Consume color variable to avoid any optimizations
     println("Color $primary")
     compositionTracker.compositions++
@@ -189,7 +189,7 @@ private fun CheapPrimaryColorConsumer(compositionTracker: CompositionTracker) {
 
 @Composable
 private fun ExpensiveSecondaryColorConsumer(compositionTracker: CompositionTracker) {
-    val secondary = TestThemeAmbient.current.secondary
+    val secondary = AmbientTestTheme.current.secondary
     // simulate some (relatively) expensive work
     Thread.sleep(1)
     // Consume color variable to avoid any optimizations
@@ -204,4 +204,4 @@ private fun ExpensiveSecondaryColorConsumer(compositionTracker: CompositionTrack
 @Immutable
 private class CompositionTracker(var compositions: Int = 0)
 
-private val TestThemeAmbient = staticAmbientOf<TestTheme>()
+private val AmbientTestTheme = staticAmbientOf<TestTheme>()

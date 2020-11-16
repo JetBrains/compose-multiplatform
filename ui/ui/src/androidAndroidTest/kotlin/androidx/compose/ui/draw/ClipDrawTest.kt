@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
-import androidx.compose.ui.PaddingModifier
 import androidx.compose.ui.assertColorsEqual
 import androidx.compose.ui.assertRect
 import androidx.compose.ui.background
@@ -40,6 +39,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.padding
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -105,10 +105,10 @@ class ClipDrawTest {
     fun simpleRectClip() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                Padding(size = 10, modifier = FillColor(Color.Green)) {
+                Padding(size = 10, modifier = Modifier.fillColor(Color.Green)) {
                     AtLeastSize(
                         size = 10,
-                        modifier = Modifier.clip(rectShape).then(FillColor(Color.Cyan))
+                        modifier = Modifier.clip(rectShape).fillColor(Color.Cyan)
                     ) {
                     }
                 }
@@ -126,10 +126,10 @@ class ClipDrawTest {
     fun simpleClipToBounds() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                Padding(size = 10, modifier = FillColor(Color.Green)) {
+                Padding(size = 10, modifier = Modifier.fillColor(Color.Green)) {
                     AtLeastSize(
                         size = 10,
-                        modifier = Modifier.clipToBounds().then(FillColor(Color.Cyan))
+                        modifier = Modifier.clipToBounds().fillColor(Color.Cyan)
                     ) {
                     }
                 }
@@ -149,12 +149,11 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 10,
-                    modifier = FillColor(Color.Green)
-                        .then(PaddingModifier(10))
-                        .then(Modifier.clip(rectShape))
-                        .then(FillColor(Color.Cyan))
-                ) {
-                }
+                    modifier = Modifier.fillColor(Color.Green)
+                        .padding(10)
+                        .clip(rectShape)
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -175,11 +174,10 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 30,
-                    modifier = FillColor(Color.Green)
+                    modifier = Modifier.fillColor(Color.Green)
                         .clip(shape)
-                        .then(FillColor(Color.Cyan))
-                ) {
-                }
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -218,9 +216,10 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 30,
-                    modifier = FillColor(Color.Green).clip(shape).then(FillColor(Color.Cyan))
-                ) {
-                }
+                    modifier = Modifier.fillColor(Color.Green)
+                        .clip(shape)
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -242,11 +241,10 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 30,
-                    modifier = FillColor(Color.Green).then(Modifier.clip(triangleShape)).then(
-                        FillColor(Color.Cyan)
-                    )
-                ) {
-                }
+                    modifier = Modifier.fillColor(Color.Green)
+                        .clip(triangleShape)
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -275,11 +273,10 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 30,
-                    modifier = FillColor(Color.Green).then(Modifier.clip(concaveShape)).then(
-                        FillColor(Color.Cyan)
-                    )
-                ) {
-                }
+                    modifier = Modifier.fillColor(Color.Green)
+                        .clip(concaveShape)
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -298,11 +295,10 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 30,
-                    modifier = FillColor(Color.Green).then(Modifier.clip(model.value)).then(
-                        FillColor(Color.Cyan)
-                    )
-                ) {
-                }
+                    modifier = Modifier.fillColor(Color.Green)
+                        .clip(model.value)
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -335,11 +331,10 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 30,
-                    modifier = FillColor(Color.Green).then(Modifier.clip(model.value)).then(
-                        FillColor(Color.Cyan)
-                    )
-                ) {
-                }
+                    modifier = Modifier.fillColor(Color.Green)
+                        .clip(model.value)
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -364,11 +359,10 @@ class ClipDrawTest {
             activity.setContent {
                 AtLeastSize(
                     size = 30,
-                    modifier = FillColor(Color.Green).then(Modifier.clip(model.value)).then(
-                        FillColor(Color.Cyan)
-                    )
-                ) {
-                }
+                    modifier = Modifier.fillColor(Color.Green)
+                        .clip(model.value)
+                        .fillColor(Color.Cyan)
+                ) {}
             }
         }
 
@@ -435,9 +429,9 @@ class ClipDrawTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                Padding(size = 10, modifier = FillColor(Color.Green)) {
+                Padding(size = 10, modifier = Modifier.fillColor(Color.Green)) {
                     val modifier = if (model.value) {
-                        Modifier.clip(rectShape).then(FillColor(Color.Cyan))
+                        Modifier.clip(rectShape).fillColor(Color.Cyan)
                     } else {
                         Modifier
                     }
@@ -459,8 +453,8 @@ class ClipDrawTest {
         }
     }
 
-    private fun FillColor(color: Color): Modifier {
-        return Modifier.drawBehind {
+    private fun Modifier.fillColor(color: Color): Modifier {
+        return drawBehind {
             drawRect(
                 color,
                 topLeft = Offset(-100f, -100f),
