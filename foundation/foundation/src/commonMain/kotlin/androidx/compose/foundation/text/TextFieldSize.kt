@@ -30,7 +30,6 @@ import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import kotlin.math.max
 
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.textFieldMinSize(style: TextStyle) = composed {
@@ -44,11 +43,10 @@ internal fun Modifier.textFieldMinSize(style: TextStyle) = composed {
     Modifier.layout { measurable, constraints ->
         Modifier.defaultMinSizeConstraints()
         val minSize = minSizeState.minSize
+
         val childConstraints = constraints.copy(
-            minWidth = max(minSize.width, constraints.minWidth)
-                .coerceAtMost(constraints.maxWidth),
-            minHeight = max(minSize.height, constraints.minHeight)
-                .coerceAtMost(constraints.maxHeight)
+            minWidth = minSize.width.coerceIn(constraints.minWidth, constraints.maxWidth),
+            minHeight = minSize.height.coerceIn(constraints.minHeight, constraints.maxHeight)
         )
         val measured = measurable.measure(childConstraints)
         layout(measured.width, measured.height) {
