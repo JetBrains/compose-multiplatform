@@ -1,6 +1,6 @@
 pluginManagement {
     plugins {
-        id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+        id 'org.jetbrains.kotlin.jvm' version 'KOTLIN_VERSION_PLACEHOLDER'
         id 'org.jetbrains.compose' version 'COMPOSE_VERSION_PLACEHOLDER'
     }
     repositories {

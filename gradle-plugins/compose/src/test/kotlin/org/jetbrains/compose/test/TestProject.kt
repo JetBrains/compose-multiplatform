@@ -21,7 +21,9 @@ data class TestProject(
 
             if (orig.name.endsWith(".gradle") || orig.name.endsWith(".gradle.kts")) {
                 val origContent = orig.readText()
-                val newContent = origContent.replace("COMPOSE_VERSION_PLACEHOLDER", TestProperties.composeVersion)
+                val newContent = origContent
+                    .replace("COMPOSE_VERSION_PLACEHOLDER", TestProperties.composeVersion)
+                    .replace("KOTLIN_VERSION_PLACEHOLDER", TestProperties.kotlinVersion)
                 target.writeText(newContent)
             } else {
                 orig.copyTo(target)
