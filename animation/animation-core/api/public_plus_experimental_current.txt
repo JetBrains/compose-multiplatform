@@ -2,7 +2,7 @@
 package androidx.compose.animation.core {
 
   public final class AndroidAnimationClockKt {
-    method @VisibleForTesting public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function0<? extends androidx.compose.animation.core.AnimationClockObservable> p);
+    method @VisibleForTesting public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function1<? super kotlinx.coroutines.CoroutineScope,? extends androidx.compose.animation.core.AnimationClockObservable> p);
   }
 
   public abstract class AnimatedFloat extends androidx.compose.animation.core.BaseAnimatedValue<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
@@ -316,8 +316,10 @@ package androidx.compose.animation.core {
 
   public final class MonotonicFrameAnimationClock implements androidx.compose.animation.core.AnimationClockObservable {
     ctor public MonotonicFrameAnimationClock(kotlinx.coroutines.CoroutineScope scope);
+    method public boolean getHasObservers();
     method public void subscribe(androidx.compose.animation.core.AnimationClockObserver observer);
     method public void unsubscribe(androidx.compose.animation.core.AnimationClockObserver observer);
+    property public final boolean hasObservers;
   }
 
   public interface MutableTransitionState {
