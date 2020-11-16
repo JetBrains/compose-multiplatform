@@ -94,15 +94,25 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
             return requested
         } else {
             val sections = path.split(":")
-            if (sections.size == 3) {
-                // first is empty, second is project, third is artifact
-                var group = "androidx.${sections[1]}"
-                if (group == "androidx.arch") {
-                    group = "androidx.arch.core"
-                }
-                return "$group:${sections[2]}:$SNAPSHOT_MARKER"
+
+            if (sections[0].isNotEmpty()) {
+                throw GradleException(
+                    "Expected projectOrArtifact path to start with empty section but got $path"
+                )
             }
-            throw GradleException("cannot find/replace project $path")
+
+            // Typically androidx projects have 3 sections, compose has 4.
+            if (sections.size >= 3) {
+                // first is empty, last is artifact
+                val group = if (sections[1] == "androidx.arch") {
+                    "androidx.${sections.drop(1).dropLast(1).joinToString(".")}"
+                } else {
+                    "androidx.arch.core"
+                }
+                return "$group:${sections.last()}:$SNAPSHOT_MARKER"
+            }
+
+            throw GradleException("projectOrArtifact cannot find/replace project $path")
         }
     }
 
