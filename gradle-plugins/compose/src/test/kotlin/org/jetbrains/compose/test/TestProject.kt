@@ -5,8 +5,7 @@ import java.io.File
 
 data class TestProject(
     private val name: String,
-    private val workingDir: File,
-    private val defaultGradleVersion: String = TestProperties.defaultGradleVersionForTests
+    private val workingDir: File
 ) {
     private val additionalArgs = listOf("--stacktrace")
 
@@ -32,7 +31,7 @@ data class TestProject(
 
     fun gradle(vararg args: String): GradleRunner =
         GradleRunner.create().apply {
-            withGradleVersion(defaultGradleVersion)
+            withGradleVersion(TestProperties.gradleVersionForTests)
             withProjectDir(workingDir)
             withArguments(args.toList() + additionalArgs)
         }
