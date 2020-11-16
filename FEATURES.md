@@ -18,3 +18,10 @@ Following limitations apply to Milestone 1 (M1) release.
   * Only macOS 10.15 or later is supported
   * Only 64-bit Windows is supported
   * Only JDK 11 or later is supported due to the memory management scheme used in Skia bindings
+
+[comment]: <> (__SUPPORTED_GRADLE_VERSIONS__)
+
+### Gradle plugin compatibility
+
+* M1 works only with Gradle 6.4 and 6.5;
+* M2 works only with Gradle 6.4 or later (6.7 is the latest tested version).
