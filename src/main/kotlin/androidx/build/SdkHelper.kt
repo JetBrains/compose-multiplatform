@@ -74,29 +74,39 @@ fun Project.getSdkPath(): File {
                 }
             }
         }
-        // check for environment variables, in the order AGP checks
-        listOf("ANDROID_HOME", "ANDROID_SDK_ROOT").forEach {
-            val envValue = System.getenv(it)
-            if (envValue != null) {
-                val sdkDirectory = File(envValue)
-                if (sdkDirectory.isDirectory) {
-                    return sdkDirectory
-                }
-            }
-        }
-        // only print the error for SDK ROOT since ANDROID_HOME is deprecated but we first check
-        // it because it is prioritized according to the documentation
-        throw GradleException("ANDROID_SDK_ROOT environment variable is not set")
+        return getSdkPathFromEnvironmentVariable()
     }
 
     val osName = System.getProperty("os.name").toLowerCase(Locale.US)
     val isMacOsX = osName.contains("mac os x") ||
         osName.contains("darwin") ||
         osName.contains("osx")
-    val platform = if (isMacOsX) "darwin" else "linux"
+    val isWindows = osName.startsWith("win")
 
-    // By convention, the SDK prebuilts live under the root checkout directory.
-    return File(project.getCheckoutRoot(), "prebuilts/fullsdk-$platform")
+    return if (isWindows) {
+        getSdkPathFromEnvironmentVariable()
+    } else {
+        val platform = if (isMacOsX) "darwin" else "linux"
+
+        // By convention, the SDK prebuilts live under the root checkout directory.
+        File(project.getCheckoutRoot(), "prebuilts/fullsdk-$platform")
+    }
+}
+
+private fun getSdkPathFromEnvironmentVariable(): File {
+    // check for environment variables, in the order AGP checks
+    listOf("ANDROID_HOME", "ANDROID_SDK_ROOT").forEach {
+        val envValue = System.getenv(it)
+        if (envValue != null) {
+            val sdkDirectory = File(envValue)
+            if (sdkDirectory.isDirectory) {
+                return sdkDirectory
+            }
+        }
+    }
+    // only print the error for SDK ROOT since ANDROID_HOME is deprecated but we first check
+    // it because it is prioritized according to the documentation
+    throw GradleException("ANDROID_SDK_ROOT environment variable is not set")
 }
 
 /**
