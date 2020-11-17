@@ -23,6 +23,7 @@ import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.positionChange
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -38,12 +39,11 @@ class DragGestureDetectorTest(dragType: GestureType) {
     enum class GestureType {
         VerticalDrag,
         HorizontalDrag,
-        VerticalDragLock,
-        HorizontalDragLock,
         AwaitVerticalDragOrCancel,
         AwaitHorizontalDragOrCancel,
+        AwaitDragOrCancel,
         DragWithVertical,
-        DragWithHorizontal
+        DragWithHorizontal,
     }
 
     companion object {
@@ -56,15 +56,19 @@ class DragGestureDetectorTest(dragType: GestureType) {
     private var dragged = false
     private var gestureEnded = false
     private var gestureCanceled = false
+    private var consumePositiveOnly = false
 
     private val DragTouchSlopUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         detectDragGestures(
             onDragEnd = { gestureEnded = true },
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
-            change.consumeAllChanges()
-            dragged = true
-            dragDistance += dragAmount.getDistance()
+            val positionChange = change.positionChange()
+            if (positionChange.x > 0f || positionChange.y > 0f || !consumePositiveOnly) {
+                change.consumeAllChanges()
+                dragged = true
+                dragDistance += dragAmount.getDistance()
+            }
         }
     }
 
@@ -73,9 +77,11 @@ class DragGestureDetectorTest(dragType: GestureType) {
             onDragEnd = { gestureEnded = true },
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
-            change.consumeAllChanges()
-            dragged = true
-            dragDistance += dragAmount
+            if (change.positionChange().y > 0f || !consumePositiveOnly) {
+                change.consumePositionChange(0f, change.positionChange().y)
+                dragged = true
+                dragDistance += dragAmount
+            }
         }
     }
 
@@ -84,96 +90,121 @@ class DragGestureDetectorTest(dragType: GestureType) {
             onDragEnd = { gestureEnded = true },
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
-            change.consumeAllChanges()
-            dragged = true
-            dragDistance += dragAmount
-        }
-    }
-
-    private val VerticalDragLockUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
-        detectVerticalDragGestures(
-            orientationLock = true,
-            onDragEnd = { gestureEnded = true },
-            onDragCancel = { gestureCanceled = true }
-        ) { change, dragAmount ->
-            change.consumeAllChanges()
-            dragged = true
-            dragDistance += dragAmount
-        }
-    }
-
-    private val HorizontalDragLockUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
-        detectHorizontalDragGestures(
-            orientationLock = true,
-            onDragEnd = { gestureEnded = true },
-            onDragCancel = { gestureCanceled = true }
-        ) { change, dragAmount ->
-            change.consumeAllChanges()
-            dragged = true
-            dragDistance += dragAmount
+            if (change.positionChange().x > 0f || !consumePositiveOnly) {
+                change.consumePositionChange(change.positionChange().x, 0f)
+                dragged = true
+                dragDistance += dragAmount
+            }
         }
     }
 
     private val AwaitVerticalDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
-        handlePointerInput {
-            var pointer = awaitVerticalTouchSlop { change, overSlop ->
-                dragged = true
-                dragDistance = overSlop
-                change.consumeAllChanges()
-            }
-            do {
-                val change = awaitVerticalDragOrCancel(pointer)
-                if (change == null) {
-                    gestureCanceled = true
-                } else {
-                    dragDistance += change.positionChange().y
-                    change.consumeAllChanges()
-                    if (change.changedToUpIgnoreConsumed()) {
-                        gestureEnded = true
+        forEachGesture {
+            handlePointerInput {
+                val down = awaitFirstDown()
+                val slopChange = awaitVerticalTouchSlopOrCancellation(down.id) { change, overSlop ->
+                    if (change.positionChange().y > 0f || !consumePositiveOnly) {
+                        dragged = true
+                        dragDistance = overSlop
+                        change.consumePositionChange(0f, change.positionChange().y)
                     }
-                    pointer = change.id
                 }
-            } while (!gestureEnded && !gestureCanceled)
+                if (slopChange != null) {
+                    var pointer = slopChange.id
+                    do {
+                        val change = awaitVerticalDragOrCancellation(pointer)
+                        if (change == null) {
+                            gestureCanceled = true
+                        } else {
+                            dragDistance += change.positionChange().y
+                            change.consumeAllChanges()
+                            if (change.changedToUpIgnoreConsumed()) {
+                                gestureEnded = true
+                            }
+                            pointer = change.id
+                        }
+                    } while (!gestureEnded && !gestureCanceled)
+                }
+            }
         }
     }
 
     private val AwaitHorizontalDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
-        handlePointerInput {
-            var pointer = awaitHorizontalTouchSlop { change, overSlop ->
-                dragged = true
-                dragDistance = overSlop
-                change.consumeAllChanges()
-            }
-            do {
-                val change = awaitHorizontalDragOrCancel(pointer)
-                if (change == null) {
-                    gestureCanceled = true
-                } else {
-                    dragDistance += change.positionChange().x
-                    change.consumeAllChanges()
-                    if (change.changedToUpIgnoreConsumed()) {
-                        gestureEnded = true
+        forEachGesture {
+            handlePointerInput {
+                val down = awaitFirstDown()
+                val slopChange =
+                    awaitHorizontalTouchSlopOrCancellation(down.id) { change, overSlop ->
+                        if (change.positionChange().x > 0f || !consumePositiveOnly) {
+                            dragged = true
+                            dragDistance = overSlop
+                            change.consumePositionChange(change.positionChange().x, 0f)
+                        }
                     }
-                    pointer = change.id
+                if (slopChange != null) {
+                    var pointer = slopChange.id
+                    do {
+                        val change = awaitHorizontalDragOrCancellation(pointer)
+                        if (change == null) {
+                            gestureCanceled = true
+                        } else {
+                            dragDistance += change.positionChange().x
+                            change.consumeAllChanges()
+                            if (change.changedToUpIgnoreConsumed()) {
+                                gestureEnded = true
+                            }
+                            pointer = change.id
+                        }
+                    } while (!gestureEnded && !gestureCanceled)
                 }
-            } while (!gestureEnded && !gestureCanceled)
+            }
+        }
+    }
+
+    private val AwaitDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
+        forEachGesture {
+            handlePointerInput {
+                val down = awaitFirstDown()
+                val slopChange = awaitTouchSlopOrCancellation(down.id) { change, overSlop ->
+                    val positionChange = change.positionChange()
+                    if (positionChange.x > 0f || positionChange.y > 0f || !consumePositiveOnly) {
+                        dragged = true
+                        dragDistance = overSlop.getDistance()
+                        change.consumeAllChanges()
+                    }
+                }
+                if (slopChange != null) {
+                    var pointer = slopChange.id
+                    do {
+                        val change = awaitDragOrCancellation(pointer)
+                        if (change == null) {
+                            gestureCanceled = true
+                        } else {
+                            dragDistance += change.positionChange().getDistance()
+                            change.consumeAllChanges()
+                            if (change.changedToUpIgnoreConsumed()) {
+                                gestureEnded = true
+                            }
+                            pointer = change.id
+                        }
+                    } while (!gestureEnded && !gestureCanceled)
+                }
+            }
         }
     }
 
     private val util = when (dragType) {
         GestureType.VerticalDrag -> VerticalTouchSlopUtil
         GestureType.HorizontalDrag -> HorizontalTouchSlopUtil
-        GestureType.VerticalDragLock -> VerticalDragLockUtil
-        GestureType.HorizontalDragLock -> HorizontalDragLockUtil
         GestureType.AwaitVerticalDragOrCancel -> AwaitVerticalDragUtil
         GestureType.AwaitHorizontalDragOrCancel -> AwaitHorizontalDragUtil
+        GestureType.AwaitDragOrCancel -> AwaitDragUtil
         GestureType.DragWithVertical -> DragTouchSlopUtil
         GestureType.DragWithHorizontal -> DragTouchSlopUtil
     }
 
     private val dragMotion = when (dragType) {
         GestureType.VerticalDrag,
-        GestureType.VerticalDragLock,
         GestureType.AwaitVerticalDragOrCancel,
         GestureType.DragWithVertical -> Offset(0f, 18f)
         else -> Offset(18f, 0f)
@@ -181,19 +212,17 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
     private val crossDragMotion = when (dragType) {
         GestureType.VerticalDrag,
-        GestureType.VerticalDragLock,
         GestureType.AwaitVerticalDragOrCancel,
         GestureType.DragWithVertical -> Offset(18f, 0f)
         else -> Offset(0f, 18f)
     }
 
-    private val isLock = when (dragType) {
-        GestureType.VerticalDragLock, GestureType.HorizontalDragLock -> true
+    private val twoAxisDrag = when (dragType) {
+        GestureType.DragWithVertical,
+        GestureType.DragWithHorizontal,
+        GestureType.AwaitDragOrCancel -> true
         else -> false
     }
-
-    private val twoAxisDrag = dragType == GestureType.DragWithVertical ||
-        dragType == GestureType.DragWithHorizontal
 
     @Before
     fun setup() {
@@ -307,7 +336,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
      */
     @Test
     fun dragLockedWithPriority() = util.executeInComposition {
-        if (isLock) {
+        if (!twoAxisDrag) {
             down().moveBy(
                 (dragMotion * 2f) + crossDragMotion,
                 final = {
@@ -329,7 +358,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
      */
     @Test
     fun dragLockedWithLowPriority() = util.executeInComposition {
-        if (isLock) {
+        if (!twoAxisDrag) {
             down().moveBy(
                 dragMotion + (crossDragMotion * 2f),
                 final = {
@@ -355,7 +384,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
      */
     @Test
     fun dragLockFailWithLowPriority() = util.executeInComposition {
-        if (isLock) {
+        if (!twoAxisDrag) {
             down().moveBy(
                 dragMotion + (crossDragMotion * 2f),
                 final = {
@@ -375,7 +404,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
      */
     @Test
     fun dragLockFailNested() = util.executeInComposition {
-        if (isLock) {
+        if (!twoAxisDrag) {
             down().moveBy(
                 dragMotion + (crossDragMotion * 2f),
                 final = {
@@ -389,6 +418,26 @@ class DragGestureDetectorTest(dragType: GestureType) {
             assertFalse(dragged)
             assertFalse(gestureEnded)
             assertFalse(gestureCanceled)
+        }
+    }
+
+    /**
+     * When a drag is not consumed, it should lead to the touch slop being reset. This is
+     * important when you drag your finger to
+     */
+    @Test
+    fun dragBackAndForth() = util.executeInComposition {
+        try {
+            consumePositiveOnly = true
+
+            val back = down().moveBy(-dragMotion)
+
+            assertFalse(dragged)
+            back.moveBy(dragMotion).up()
+
+            assertTrue(dragged)
+        } finally {
+            consumePositiveOnly = false
         }
     }
 }

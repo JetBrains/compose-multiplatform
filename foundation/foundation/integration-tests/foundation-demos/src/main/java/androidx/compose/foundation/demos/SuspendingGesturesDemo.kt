@@ -24,10 +24,6 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectMultitouchGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,12 +53,10 @@ import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -304,7 +298,7 @@ fun OrientationLockDragGestures() {
         Modifier.onSizeChanged {
             size = it
         }.pointerInput {
-            detectVerticalDragGestures(orientationLock = true) { change, dragAmount ->
+            detectVerticalDragGestures { change, dragAmount ->
                 change.consumePositionChange(0f, change.positionChange().y)
                 offsetY = (offsetY.toPx() + dragAmount)
                     .coerceIn(0f, size.height.toFloat() - 50.dp.toPx()).toDp()
@@ -318,7 +312,7 @@ fun OrientationLockDragGestures() {
                 .width(50.dp)
                 .fillMaxHeight()
                 .pointerInput {
-                    detectHorizontalDragGestures(orientationLock = true) { change, dragAmount ->
+                    detectHorizontalDragGestures { change, dragAmount ->
                         change.consumePositionChange(change.positionChange().x, 0f)
                         offsetX = (offsetX.toPx() + dragAmount)
                             .coerceIn(0f, size.width.toFloat() - 50.dp.toPx()).toDp()
