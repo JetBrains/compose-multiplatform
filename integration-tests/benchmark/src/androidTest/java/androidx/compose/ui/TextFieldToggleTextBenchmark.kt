@@ -78,7 +78,7 @@ class TextFieldToggleTextBenchmark(
      * given input. This is the time taken to call the [BaseTextField] composable function.
      */
     @Test
-    @Ignore
+    @Ignore("b/170960653")
     fun first_compose() {
         benchmarkRule.benchmarkFirstComposeFast(caseFactory)
     }
@@ -89,7 +89,7 @@ class TextFieldToggleTextBenchmark(
      * [BaseTextField] composable.
      */
     @Test
-    @Ignore
+    @Ignore("b/170960653")
     fun first_measure() {
         benchmarkRule.benchmarkFirstMeasureFast(caseFactory)
     }
@@ -99,7 +99,7 @@ class TextFieldToggleTextBenchmark(
      * given input.
      */
     @Test
-    @Ignore
+    @Ignore("b/170960653")
     fun first_layout() {
         benchmarkRule.benchmarkFirstLayoutFast(caseFactory)
     }
@@ -109,7 +109,7 @@ class TextFieldToggleTextBenchmark(
      * input.
      */
     @Test
-    @Ignore
+    @Ignore("b/170960653")
     fun first_draw() {
         benchmarkRule.benchmarkFirstDrawFast(caseFactory)
     }
@@ -119,7 +119,7 @@ class TextFieldToggleTextBenchmark(
      * constrains changed. This is mainly the time used to re-measure and re-layout the composable.
      */
     @Test
-    @Ignore
+    @Ignore("b/170960653")
     fun layout() {
         benchmarkRule.benchmarkLayoutPerf(caseFactory)
     }
@@ -128,7 +128,7 @@ class TextFieldToggleTextBenchmark(
      * Measure the time taken by redrawing the [BaseTextField] composable.
      */
     @Test
-    @Ignore
+    @Ignore("b/170960653")
     fun draw() {
         benchmarkRule.benchmarkDrawPerf(caseFactory)
     }
