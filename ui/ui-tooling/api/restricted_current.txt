@@ -220,7 +220,7 @@ package androidx.compose.ui.tooling.preview {
     method public abstract String locale() default "";
     method public abstract String name() default "";
     method public abstract boolean showBackground() default false;
-    method public abstract boolean showDecoration() default false;
+    method public abstract boolean showSystemUi() default false;
     method public abstract int uiMode() default 0;
     method public abstract int widthDp() default -1;
     property public abstract int apiLevel;
@@ -232,7 +232,7 @@ package androidx.compose.ui.tooling.preview {
     property public abstract String locale;
     property public abstract String name;
     property public abstract boolean showBackground;
-    property public abstract boolean showDecoration;
+    property public abstract boolean showSystemUi;
     property public abstract int uiMode;
     property public abstract int widthDp;
   }

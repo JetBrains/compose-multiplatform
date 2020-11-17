@@ -42,7 +42,7 @@ import androidx.compose.runtime.Composable
  * qualifier. By default, the `default` folder will be used.
  * @param fontScale User preference for the scaling factor for fonts, relative to the base
  * density scaling.
- * @param showDecoration If true, the status bar and action bar of the device will be displayed.
+ * @param showSystemUi If true, the status bar and action bar of the device will be displayed.
  * The @[Composable] will be render in the context of a full activity.
  * @param showBackground If true, the @[Composable] will use a default background color.
  * @param backgroundColor The 32-bit ARGB color int for the background or 0 if not set
@@ -66,7 +66,7 @@ annotation class Preview(
     val heightDp: Int = -1,
     val locale: String = "",
     @FloatRange(from = 0.01) val fontScale: Float = 1f,
-    val showDecoration: Boolean = false,
+    val showSystemUi: Boolean = false,
     val showBackground: Boolean = false,
     val backgroundColor: Long = 0,
     @UiMode val uiMode: Int = 0,
