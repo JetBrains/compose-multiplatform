@@ -16,7 +16,6 @@
 
 package androidx.compose.material.demos
 
-import android.graphics.SweepGradient
 import androidx.compose.animation.DpPropKey
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.transitionDefinition
@@ -62,6 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.SweepGradient
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
@@ -310,25 +310,23 @@ private class ColorWheel(diameter: Int) {
     private val radius = diameter / 2f
 
     // TODO: b/152063545 - replace with Compose SweepGradient when it is available
-    private val sweepShader = SweepGradient(
-        radius,
-        radius,
-        intArrayOf(
-            android.graphics.Color.RED,
-            android.graphics.Color.MAGENTA,
-            android.graphics.Color.BLUE,
-            android.graphics.Color.CYAN,
-            android.graphics.Color.GREEN,
-            android.graphics.Color.YELLOW,
-            android.graphics.Color.RED
+    private val sweepGradient = SweepGradient(
+        listOf(
+            Color.Red,
+            Color.Magenta,
+            Color.Blue,
+            Color.Cyan,
+            Color.Green,
+            Color.Yellow,
+            Color.Red
         ),
-        null
+        Offset(radius, radius)
     )
 
     val image = ImageBitmap(diameter, diameter).also { imageBitmap ->
         val canvas = Canvas(imageBitmap)
         val center = Offset(radius, radius)
-        val paint = Paint().apply { shader = sweepShader }
+        val paint = Paint().apply { sweepGradient.applyTo(this, 1.0f) }
         canvas.drawCircle(center, radius, paint)
     }
 }

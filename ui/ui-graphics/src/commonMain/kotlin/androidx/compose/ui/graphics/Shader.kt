@@ -88,6 +88,30 @@ internal expect fun ActualRadialGradientShader(
     tileMode: TileMode
 ): Shader
 
+/**
+ * Creates a circular gradient that sweeps around a provided center point. The sweep begins
+ * relative to 3 o'clock and continues clockwise until it reaches the starting position again.
+ *
+ * If `colorStops` is provided, each value is a number from 0.0 to 1.0
+ * that specifies where the color at the corresponding index in [colors]
+ * begins in the gradient. If `colorStops` is not provided, then the colors are dispersed evenly
+ *
+ * @param center Position for the gradient to sweep around
+ * @param colors Colors to be rendered as part of the gradient
+ * @param colorStops Placement of the colors along the sweep about the center position
+ */
+fun SweepGradientShader(
+    center: Offset,
+    colors: List<Color>,
+    colorStops: List<Float>? = null,
+): Shader = ActualSweepGradientShader(center, colors, colorStops)
+
+internal expect fun ActualSweepGradientShader(
+    center: Offset,
+    colors: List<Color>,
+    colorStops: List<Float>?,
+): Shader
+
 fun ImageShader(
     image: ImageBitmap,
     tileModeX: TileMode = TileMode.Clamp,
