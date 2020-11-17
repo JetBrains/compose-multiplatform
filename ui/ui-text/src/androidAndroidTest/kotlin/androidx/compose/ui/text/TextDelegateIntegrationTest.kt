@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -398,6 +399,28 @@ class TextDelegateIntegrationTest {
             resultFirstLayout
         )
         assertThat(resultSecondLayout.size.height).isEqualTo(heightSecondLayout)
+    }
+
+    @Test
+    fun TextLayoutResult_layout_withEllipsis_withoutSoftWrap() {
+        val fontSize = 20f
+        val text = AnnotatedString(text = "Hello World! Hello World! Hello World! Hello World!")
+        val textDelegate = TextDelegate(
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp),
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+            density = density,
+            resourceLoader = resourceLoader
+        )
+        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+        // Makes width smaller than needed.
+        val width = textDelegate.maxIntrinsicWidth / 2
+        val constraints = Constraints(maxWidth = width)
+        val layoutResult = textDelegate.layout(constraints, LayoutDirection.Ltr)
+
+        assertThat(layoutResult.lineCount).isEqualTo(1)
+        assertThat(layoutResult.isLineEllipsized(0)).isTrue()
     }
 }
 
