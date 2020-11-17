@@ -391,6 +391,9 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void ListItem(optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? secondaryText, optional boolean singleLineSecondaryText, optional kotlin.jvm.functions.Function0<kotlin.Unit>? overlineText, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailing, kotlin.jvm.functions.Function0<kotlin.Unit> text);
   }
 
+  public final class MaterialTextSelectionColorsKt {
+  }
+
   public final class MaterialTheme {
     method public androidx.compose.material.Colors getColors();
     method public androidx.compose.material.Shapes getShapes();
