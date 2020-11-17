@@ -16,18 +16,26 @@
 package androidx.compose.desktop
 
 import androidx.compose.ui.unit.Density
+import java.awt.Graphics
+import java.awt.GridLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
+import javax.swing.JPanel
+import javax.swing.SwingUtilities.getRoot
 
-class ComposeWindow : JFrame {
+/**
+ * ComposePanel is panel for building UI using Compose for Desktop.
+ */
+class ComposePanel : JPanel {
     companion object {
         init {
             initCompose()
         }
     }
 
-    val parent: AppFrame
+    private var init: Boolean = false
+
     internal val layer = ComposeLayer()
 
     val density get() = layer.density
@@ -36,9 +44,11 @@ class ComposeWindow : JFrame {
         layer.onDensityChanged = action
     }
 
-    constructor(parent: AppFrame) : super() {
-        this.parent = parent
-        contentPane.add(layer.wrapped)
+    internal var onDispose: (() -> Unit)? = null
+
+    constructor() : super() {
+        setLayout(GridLayout(1, 1))
+        add(layer.wrapped)
 
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
@@ -48,46 +58,32 @@ class ComposeWindow : JFrame {
         })
     }
 
-    private fun updateLayer() {
-        if (!isVisible) {
-            return
+    internal fun needRedrawLayer() {
+        if (isWindowReady()) {
+            if (!init) {
+                layer.updateLayer()
+                init = true
+            }
+            layer.needRedrawLayer()
         }
-        layer.updateLayer()
     }
 
-    fun needRedrawLayer() {
-        if (!isVisible) {
-            return
-        }
-        layer.needRedrawLayer()
-    }
-
-    override fun dispose() {
+    override fun removeNotify() {
+        remove(layer.wrapped)
+        onDispose?.invoke()
         layer.dispose()
-        super.dispose()
     }
 
-    override fun setVisible(value: Boolean) {
-        if (value != isVisible) {
-            super.setVisible(value)
-            layer.wrapped.requestFocus()
-            updateLayer()
-            needRedrawLayer()
-        }
+    override fun requestFocus() {
+        layer.wrapped.requestFocus()
     }
-}
 
-// Simple FPS tracker for debug purposes
-internal class FPSTracker {
-    private var t0 = 0L
-    private val times = DoubleArray(155)
-    private var timesIdx = 0
+    private fun isWindowReady(): Boolean {
+        val window = getRoot(this)
+        return if (window is JFrame) window.isVisible else false
+    }
 
-    fun track() {
-        val t1 = System.nanoTime()
-        times[timesIdx] = (t1 - t0) / 1000000.0
-        t0 = t1
-        timesIdx = (timesIdx + 1) % times.size
-        println("FPS: ${1000 / times.takeWhile { it > 0 }.average()}")
+    override fun paint(g: Graphics?) {
+        needRedrawLayer()
     }
 }

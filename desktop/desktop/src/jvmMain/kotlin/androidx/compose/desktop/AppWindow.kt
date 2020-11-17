@@ -251,7 +251,7 @@ class AppWindow : AppFrame {
         }
 
         onCreate {
-            window.owners?.keyboard = keyboard
+            window.layer.owners?.keyboard = keyboard
             content()
         }
 
