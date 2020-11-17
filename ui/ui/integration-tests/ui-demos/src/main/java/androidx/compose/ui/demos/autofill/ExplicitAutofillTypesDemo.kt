@@ -117,7 +117,7 @@ fun ExplicitAutofillTypesDemo() {
 private fun Autofill(
     autofillTypes: List<AutofillType>,
     onFill: ((String) -> Unit),
-    children: @Composable (AutofillNode) -> Unit
+    content: @Composable (AutofillNode) -> Unit
 ) {
     val autofillNode = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
 
@@ -129,7 +129,7 @@ private fun Autofill(
             autofillNode.boundingBox = it.boundingBox().toComposeRect()
         }
     ) {
-        children(autofillNode)
+        content(autofillNode)
     }
 }
 

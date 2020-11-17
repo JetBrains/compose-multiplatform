@@ -376,12 +376,12 @@ internal class ComposeViewAdapter : FrameLayout {
      * Wraps a given [Preview] method an does any necessary setup.
      */
     @Composable
-    private fun WrapPreview(children: @Composable () -> Unit) {
+    private fun WrapPreview(content: @Composable () -> Unit) {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
         Providers(AmbientFontLoader provides LayoutlibFontResourceLoader(context)) {
-            Inspectable(slotTableRecord, children)
+            Inspectable(slotTableRecord, content)
         }
     }
 

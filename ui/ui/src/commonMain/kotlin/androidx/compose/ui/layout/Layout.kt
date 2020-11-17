@@ -66,7 +66,7 @@ import kotlin.math.max
  * Example usage:
  * @sample androidx.compose.ui.samples.LayoutWithProvidedIntrinsicsUsage
  *
- * @param children The children composable to be laid out.
+ * @param content The children composable to be laid out.
  * @param modifier Modifiers to be applied to the layout.
  * @param minIntrinsicWidthMeasureBlock The minimum intrinsic width of the layout.
  * @param minIntrinsicHeightMeasureBlock The minimum intrinsic height of the layout.
@@ -77,10 +77,11 @@ import kotlin.math.max
  * @see Layout
  * @see WithConstraints
  */
+@Suppress("ComposableLambdaParameterPosition")
 @Composable
 @OptIn(ExperimentalLayoutNodeApi::class)
 fun Layout(
-    children: @Composable () -> Unit,
+    content: @Composable () -> Unit,
     minIntrinsicWidthMeasureBlock: IntrinsicMeasureBlock,
     minIntrinsicHeightMeasureBlock: IntrinsicMeasureBlock,
     maxIntrinsicWidthMeasureBlock: IntrinsicMeasureBlock,
@@ -95,7 +96,7 @@ fun Layout(
         maxIntrinsicHeightMeasureBlock,
         measureBlock
     )
-    Layout(children, measureBlocks, modifier)
+    Layout(content, measureBlocks, modifier)
 }
 
 /**
@@ -180,24 +181,25 @@ fun measureBlocksOf(
  * Example usage:
  * @sample androidx.compose.ui.samples.LayoutUsage
  *
- * @param children The children composable to be laid out.
+ * @param content The children composable to be laid out.
  * @param modifier Modifiers to be applied to the layout.
  * @param measureBlock The block defining the measurement and positioning of the layout.
  *
  * @see Layout
  * @see WithConstraints
  */
+@Suppress("ComposableLambdaParameterPosition")
 @Composable
 @OptIn(ExperimentalLayoutNodeApi::class)
 /*inline*/ fun Layout(
     /*crossinline*/
-    children: @Composable () -> Unit,
+    content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     /*noinline*/
     measureBlock: MeasureBlock
 ) {
     val measureBlocks = remember(measureBlock) { MeasuringIntrinsicsMeasureBlocks(measureBlock) }
-    Layout(children, measureBlocks, modifier)
+    Layout(content, measureBlocks, modifier)
 }
 
 /**
@@ -213,7 +215,7 @@ fun measureBlocksOf(
  * Example usage:
  * @sample androidx.compose.ui.samples.LayoutWithMeasureBlocksWithIntrinsicUsage
  *
- * @param children The children composable to be laid out.
+ * @param content The children composable to be laid out.
  * @param modifier Modifiers to be applied to the layout.
  * @param measureBlocks An [LayoutNode.MeasureBlocks] instance defining the measurement and
  * positioning of the layout.
@@ -223,9 +225,10 @@ fun measureBlocksOf(
  * @see WithConstraints
  */
 
+@Suppress("ComposableLambdaParameterPosition")
 @ExperimentalLayoutNodeApi
 @Composable inline fun Layout(
-    children: @Composable () -> Unit,
+    content: @Composable () -> Unit,
     measureBlocks: LayoutNode.MeasureBlocks,
     modifier: Modifier = Modifier
 ) {
@@ -238,7 +241,7 @@ fun measureBlocksOf(
             set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
         },
         skippableUpdate = materializerOf(modifier),
-        children = children
+        content = content
     )
 }
 
@@ -253,6 +256,7 @@ internal fun materializerOf(
     }
 }
 
+@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 @Composable
 @Deprecated(
     "This composable is temporary to enable quicker prototyping in ConstraintLayout. " +
@@ -278,7 +282,7 @@ fun MultiMeasureLayout(
             @Suppress("DEPRECATION")
             set(Unit) { this.canMultiMeasure = true }
         },
-        children = children
+        content = children
     )
 }
 
@@ -524,11 +528,11 @@ private inline fun Density.MeasuringMaxIntrinsicHeight(
 @Composable
 fun WithConstraints(
     modifier: Modifier = Modifier,
-    children: @Composable WithConstraintsScope.() -> Unit
+    content: @Composable WithConstraintsScope.() -> Unit
 ) {
     SubcomposeLayout<Unit>(modifier) { constraints ->
         val scope = WithConstraintsScopeImpl(this, constraints)
-        val placeables = subcompose(Unit) { scope.children() }
+        val placeables = subcompose(Unit) { scope.content() }
             .fastMap { it.measure(constraints) }
 
         var maxWidth: Int = constraints.minWidth

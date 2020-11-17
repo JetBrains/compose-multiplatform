@@ -276,7 +276,7 @@ class TouchSlopDragGestureFilterTest {
                                 setupLatch.countDown()
                             }
                         },
-                        children = {}
+                        content = {}
                     )
                 }
             }

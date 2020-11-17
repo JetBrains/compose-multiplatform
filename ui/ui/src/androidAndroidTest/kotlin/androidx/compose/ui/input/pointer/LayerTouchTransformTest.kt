@@ -143,9 +143,9 @@ class LayerTouchTransformTest {
 }
 
 @Composable
-fun SimpleLayout(modifier: Modifier, children: @Composable () -> Unit = emptyContent()) {
+fun SimpleLayout(modifier: Modifier, content: @Composable () -> Unit = emptyContent()) {
     Layout(
-        children,
+        content,
         modifier
     ) { measurables, constraints ->
         val childConstraints = constraints.copy(minWidth = 0, minHeight = 0)

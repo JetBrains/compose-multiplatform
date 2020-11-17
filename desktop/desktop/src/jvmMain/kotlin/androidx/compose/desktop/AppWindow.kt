@@ -238,7 +238,7 @@ class AppWindow : AppFrame {
         window.setContent {
             Providers(
                 AppWindowAmbient provides this,
-                children = content
+                content = content
             )
         }
     }

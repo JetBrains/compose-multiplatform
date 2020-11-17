@@ -199,7 +199,7 @@ class RtlLayoutTest {
     ) {
         Providers(AmbientLayoutDirection provides testLayoutDirection) {
             Layout(
-                children = @Composable {
+                content = @Composable {
                     FixedSize(size, modifier = saveLayoutInfo(position[0], countDownLatch)) {
                     }
                     FixedSize(size, modifier = saveLayoutInfo(position[1], countDownLatch)) {

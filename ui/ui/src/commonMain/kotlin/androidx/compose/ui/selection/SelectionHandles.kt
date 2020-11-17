@@ -208,7 +208,7 @@ private fun SelectionHandlePopup(
     isStartHandle: Boolean,
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
     handlesCrossed: Boolean,
-    handle: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val offset = (if (isStartHandle) startHandlePosition else endHandlePosition) ?: return
 
@@ -228,7 +228,7 @@ private fun SelectionHandlePopup(
 
         Popup(
             popupPositionProvider = popupPositioner,
-            content = handle
+            content = content
         )
     }
 }

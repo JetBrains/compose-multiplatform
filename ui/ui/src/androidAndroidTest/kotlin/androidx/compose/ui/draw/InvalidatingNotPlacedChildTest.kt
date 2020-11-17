@@ -159,7 +159,7 @@ private fun ConditionallyPlacedChild(
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
-    Layout(children = content, modifier = modifier) { measurables, constraints ->
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
         val placeable = measurables.first().measure(constraints)
         layout(placeable.width, placeable.height) {
             if (shouldPlace.value) {
@@ -171,7 +171,7 @@ private fun ConditionallyPlacedChild(
 
 @Composable
 private fun MeasureInLayoutBlock(content: @Composable () -> Unit) {
-    Layout(children = content) { measurables, constraints ->
+    Layout(content = content) { measurables, constraints ->
         val size = 5.dp.toIntPx()
         layout(size, size) {
             measurables.first().measure(constraints).place(0, 0)

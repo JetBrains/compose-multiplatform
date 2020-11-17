@@ -342,12 +342,12 @@ private fun IconsWithTextFieldLayout(
     onLabelMeasured: (Int) -> Unit
 ) {
     Layout(
-        children = {
+        content = {
             if (leading != null) {
                 Box(Modifier.layoutId("leading").iconPadding(start = HorizontalIconPadding)) {
                     Decoration(
                         contentColor = leadingColor,
-                        children = leading
+                        content = leading
                     )
                 }
             }
@@ -355,7 +355,7 @@ private fun IconsWithTextFieldLayout(
                 Box(Modifier.layoutId("trailing").iconPadding(end = HorizontalIconPadding)) {
                     Decoration(
                         contentColor = trailingColor,
-                        children = trailing
+                        content = trailing
                     )
                 }
             }

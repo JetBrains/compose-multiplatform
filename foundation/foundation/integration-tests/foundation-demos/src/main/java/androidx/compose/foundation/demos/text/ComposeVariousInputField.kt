@@ -261,7 +261,7 @@ private fun VariousEditLine(
 }
 
 @Composable
-private fun HintEditText(hintText: @Composable () -> Unit) {
+private fun HintEditText(content: @Composable () -> Unit) {
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
 
     Box(demoTextFieldModifiers) {
@@ -272,7 +272,7 @@ private fun HintEditText(hintText: @Composable () -> Unit) {
             textStyle = TextStyle(fontSize = fontSize8)
         )
         if (state.value.text.isEmpty()) {
-            hintText()
+            content()
         }
     }
 }

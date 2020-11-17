@@ -236,7 +236,7 @@ fun ModalBottomSheetLayout(
             color = sheetBackgroundColor,
             contentColor = sheetContentColor
         ) {
-            Column(children = sheetContent)
+            Column(content = sheetContent)
         }
     },
     content = { constraints, sheetHeight ->

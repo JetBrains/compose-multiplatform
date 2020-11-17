@@ -209,7 +209,7 @@ class LayoutAlignTest : LayoutTest() {
         val childPosition = Ref<Offset>()
         show {
             Layout(
-                children = {
+                content = {
                     Container(
                         Modifier.saveLayoutInfo(alignSize, alignPosition, positionedLatch)
                     ) {
@@ -258,7 +258,7 @@ class LayoutAlignTest : LayoutTest() {
                         wrapSize.value = coordinates.size
                         positionedLatch.countDown()
                     },
-                    children = {
+                    content = {
                         Container(
                             Modifier.wrapContentSize(Alignment.Center)
                                 .preferredSize(sizeDp)
@@ -448,7 +448,7 @@ class LayoutAlignTest : LayoutTest() {
         val childPosition = Ref<Offset>()
         show {
             Layout(
-                children = {
+                content = {
                     Container(
                         Modifier.preferredSize(parentSize)
                             .saveLayoutInfo(alignSize, alignPosition, positionedLatch)

@@ -101,7 +101,7 @@ private class RestorableStateHolderImpl<T : Any>(
             }
             Providers(
                 AmbientUiSavedStateRegistry provides registryHolder.registry,
-                children = content
+                content = content
             )
             onActive {
                 require(key !in registryHolders)

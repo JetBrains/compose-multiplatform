@@ -54,7 +54,7 @@ fun FlowRow(
     crossAxisAlignment: FlowCrossAxisAlignment = FlowCrossAxisAlignment.Start,
     crossAxisSpacing: Dp = 0.dp,
     lastLineMainAxisAlignment: FlowMainAxisAlignment = mainAxisAlignment,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     Flow(
         orientation = LayoutOrientation.Horizontal,
@@ -64,7 +64,7 @@ fun FlowRow(
         crossAxisAlignment = crossAxisAlignment,
         crossAxisSpacing = crossAxisSpacing,
         lastLineMainAxisAlignment = lastLineMainAxisAlignment,
-        children = children
+        content = content
     )
 }
 
@@ -94,7 +94,7 @@ fun FlowColumn(
     crossAxisAlignment: FlowCrossAxisAlignment = FlowCrossAxisAlignment.Start,
     crossAxisSpacing: Dp = 0.dp,
     lastLineMainAxisAlignment: FlowMainAxisAlignment = mainAxisAlignment,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     Flow(
         orientation = LayoutOrientation.Vertical,
@@ -104,7 +104,7 @@ fun FlowColumn(
         crossAxisAlignment = crossAxisAlignment,
         crossAxisSpacing = crossAxisSpacing,
         lastLineMainAxisAlignment = lastLineMainAxisAlignment,
-        children = children
+        content = content
     )
 }
 
@@ -141,14 +141,14 @@ private fun Flow(
     crossAxisAlignment: FlowCrossAxisAlignment,
     crossAxisSpacing: Dp,
     lastLineMainAxisAlignment: FlowMainAxisAlignment,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     fun Placeable.mainAxisSize() =
         if (orientation == LayoutOrientation.Horizontal) width else height
     fun Placeable.crossAxisSize() =
         if (orientation == LayoutOrientation.Horizontal) height else width
 
-    Layout(children) { measurables, outerConstraints ->
+    Layout(content) { measurables, outerConstraints ->
         val sequences = mutableListOf<List<Placeable>>()
         val crossAxisSizes = mutableListOf<Int>()
         val crossAxisPositions = mutableListOf<Int>()

@@ -313,7 +313,7 @@ class VectorTest {
         return rememberVectorPainter(
             defaultWidth = sizeDp,
             defaultHeight = sizeDp,
-            children = { _, _ ->
+            content = { _, _ ->
                 Path(
                     pathData = PathData {
                         lineTo(sizePx, 0.0f)

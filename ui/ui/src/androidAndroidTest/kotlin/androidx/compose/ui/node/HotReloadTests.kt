@@ -76,12 +76,12 @@ class HotReloadTests {
             )
         }
 
-        @Composable fun column(children: @Composable () -> Unit) {
+        @Composable fun column(content: @Composable () -> Unit) {
             val context = AmbientContext.current
             emit<LinearLayout, UiApplier>(
                 ctor = { LinearLayout(context) },
                 update = {},
-                children = children
+                content = content
             )
         }
 
@@ -129,8 +129,8 @@ class HotReloadTests {
             }
         }
 
-        @Composable fun columnNode(children: @Composable () -> Unit) {
-            children()
+        @Composable fun columnNode(content: @Composable () -> Unit) {
+            content()
         }
 
         val composeLatch = CountDownLatch(1)

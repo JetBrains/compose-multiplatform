@@ -35,6 +35,7 @@ package androidx.compose.runtime
  * @see emit
  * @see compositionFor
  */
+@Suppress("ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable inline fun <T : Any, reified E : Applier<*>> emit(
     noinline ctor: () -> T,
@@ -55,7 +56,7 @@ package androidx.compose.runtime
 // TODO(lmr): consider invoking children manually
 // TODO(lmr): consider ComposableContract for this
 /**
- * Emits a node into the composition of type [T]. Nodes emitted inside of [children] will become
+ * Emits a node into the composition of type [T]. Nodes emitted inside of [content] will become
  * children of the emitted node.
  *
  * This function will throw a runtime exception if [E] is not a subtype of the applier of the
@@ -67,19 +68,20 @@ package androidx.compose.runtime
  * guaranteed to be called in place.
  * @param update A function to perform updates on the node. This will run every time emit is
  * executed. This function is called in place and will be inlined.
- * @param children the composable content that will emit the "children" of this node.
+ * @param content the composable content that will emit the "children" of this node.
  *
  * @see Updater
  * @see Applier
  * @see emit
  * @see compositionFor
  */
+@Suppress("ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T : Any?, reified E : Applier<*>> emit(
     noinline ctor: () -> T,
     update: Updater<T>.() -> Unit,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
@@ -89,17 +91,18 @@ inline fun <T : Any?, reified E : Applier<*>> emit(
         @Suppress("UNCHECKED_CAST")
         currentComposer.useNode() as T
     Updater(currentComposer, node).update()
-    children()
+    content()
     currentComposer.endNode()
 }
 
+@Suppress("ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable @ComposableContract(readonly = true)
 inline fun <T : Any?, reified E : Applier<*>> emit(
     noinline ctor: () -> T,
     update: Updater<T>.() -> Unit,
     noinline skippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
@@ -111,7 +114,7 @@ inline fun <T : Any?, reified E : Applier<*>> emit(
     Updater(currentComposer, node).update()
     SkippableUpdater(currentComposer, node).skippableUpdate()
     currentComposer.startReplaceableGroup(0x7ab4aae9)
-    children()
+    content()
     currentComposer.endReplaceableGroup()
     currentComposer.endNode()
 }

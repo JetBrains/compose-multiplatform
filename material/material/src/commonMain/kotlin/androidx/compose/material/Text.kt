@@ -236,12 +236,12 @@ val AmbientTextStyle = ambientOf(structuralEqualityPolicy()) { TextStyle.Default
 /**
  * This function is used to set the current value of [AmbientTextStyle], merging the given style
  * with the current style values for any missing attributes. Any [Text] components included in
- * this component's [children] will be styled with this style unless styled explicitly.
+ * this component's [content] will be styled with this style unless styled explicitly.
  *
  * @see AmbientTextStyle
  */
 @Composable
-fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
+fun ProvideTextStyle(value: TextStyle, content: @Composable () -> Unit) {
     val mergedStyle = AmbientTextStyle.current.merge(value)
-    Providers(AmbientTextStyle provides mergedStyle, children = children)
+    Providers(AmbientTextStyle provides mergedStyle, content = content)
 }

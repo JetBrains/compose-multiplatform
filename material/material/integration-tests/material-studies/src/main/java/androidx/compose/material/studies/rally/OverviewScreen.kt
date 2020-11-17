@@ -135,7 +135,7 @@ private fun <T> OverviewScreenCard(
     amount: Float,
     onClickSeeAll: () -> Unit,
     data: List<T>,
-    row: @Composable (T) -> Unit
+    content: @Composable (T) -> Unit
 ) {
     Card {
         Column {
@@ -146,7 +146,7 @@ private fun <T> OverviewScreenCard(
             }
             Divider(color = rallyGreen, thickness = 1.dp)
             Column(Modifier.padding(start = 16.dp, top = 4.dp, end = 8.dp)) {
-                data.take(3).forEach { row(it) }
+                data.take(3).forEach { content(it) }
                 SeeAllButton(onClick = onClickSeeAll)
             }
         }

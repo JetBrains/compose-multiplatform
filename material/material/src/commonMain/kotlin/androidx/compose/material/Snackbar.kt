@@ -226,9 +226,9 @@ object SnackbarConstants {
 }
 
 @Composable
-private fun TextOnlySnackbar(text: @Composable () -> Unit) {
+private fun TextOnlySnackbar(content: @Composable () -> Unit) {
     Layout(
-        text,
+        content,
         modifier = Modifier.padding(
             start = HorizontalSpacing,
             end = HorizontalSpacing,

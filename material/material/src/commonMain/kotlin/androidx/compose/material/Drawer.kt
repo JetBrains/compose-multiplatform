@@ -392,7 +392,7 @@ fun ModalDrawerLayout(
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), children = drawerContent)
+                Column(Modifier.fillMaxSize(), content = drawerContent)
             }
         }
     }
@@ -506,7 +506,7 @@ fun BottomDrawerLayout(
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), children = drawerContent)
+                Column(Modifier.fillMaxSize(), content = drawerContent)
             }
         }
     }

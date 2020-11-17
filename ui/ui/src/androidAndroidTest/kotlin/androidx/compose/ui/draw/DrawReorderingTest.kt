@@ -82,7 +82,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(
                             10,
                             Modifier.padding(10)
@@ -122,7 +122,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(
                             10,
                             Modifier.padding(10)
@@ -162,7 +162,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(
                             10,
                             Modifier.padding(10)
@@ -203,7 +203,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(
                             10,
                             Modifier.padding(10)
@@ -244,7 +244,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(
                             30,
                             Modifier.drawLayer()
@@ -291,7 +291,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(30)
                     }
                 ) { measurables, constraints ->
@@ -829,7 +829,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(30) {
                             FixedSize(
                                 10,
@@ -871,7 +871,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(30) {
                             FixedSize(
                                 10,
@@ -913,7 +913,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(30, Modifier.zIndex(2f)) {
                             FixedSize(
                                 10,
@@ -955,7 +955,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(30) {
                             FixedSize(
                                 10,
@@ -998,7 +998,7 @@ class DrawReorderingTest {
         rule.runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         FixedSize(30) {
                             FixedSize(
                                 10,
@@ -1049,9 +1049,9 @@ class DrawReorderingTest {
 private fun FixedSize(
     size: State<Int>,
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = emptyContent()
 ) {
-    Layout(children = children, modifier = modifier) { measurables, _ ->
+    Layout(content = content, modifier = modifier) { measurables, _ ->
         val newConstraints = Constraints.fixed(size.value, size.value)
         val placeables = measurables.map { m ->
             m.measure(newConstraints)

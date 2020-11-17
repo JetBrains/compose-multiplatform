@@ -54,7 +54,7 @@ fun LinearLayout(
     id: Int = 0,
     orientation: Int = LinearLayout.VERTICAL,
     onClickListener: View.OnClickListener? = null,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     @Suppress("Deprecation")
     emitView(
@@ -64,6 +64,6 @@ fun LinearLayout(
             if (onClickListener != null) it.setOnClickListener(onClickListener)
             it.orientation = orientation
         },
-        children
+        content
     )
 }

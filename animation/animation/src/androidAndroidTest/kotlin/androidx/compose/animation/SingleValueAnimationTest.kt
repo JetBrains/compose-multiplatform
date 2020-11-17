@@ -69,7 +69,7 @@ class SingleValueAnimationTest {
                 durationMillis = 100
             )
 
-        val children: @Composable() (Boolean) -> Unit = { enabled ->
+        val content: @Composable (Boolean) -> Unit = { enabled ->
             floatValue = animate(
                 if (enabled) endVal else startVal,
                 tween()
@@ -100,7 +100,7 @@ class SingleValueAnimationTest {
             }
         }
 
-        animateTest(children, verify)
+        animateTest(content, verify)
     }
 
     @Test
@@ -120,7 +120,7 @@ class SingleValueAnimationTest {
                 durationMillis = 100
             )
 
-        val children: @Composable() (Boolean) -> Unit = { enabled ->
+        val content: @Composable (Boolean) -> Unit = { enabled ->
             vectorValue = animate(
                 if (enabled) endVal else startVal,
                 tween()
@@ -167,7 +167,7 @@ class SingleValueAnimationTest {
             }
         }
 
-        animateTest(children, verify)
+        animateTest(content, verify)
     }
 
     @Test
@@ -185,7 +185,7 @@ class SingleValueAnimationTest {
                 durationMillis = 100
             )
 
-        val children: @Composable() (Boolean) -> Unit = { enabled ->
+        val content: @Composable (Boolean) -> Unit = { enabled ->
             vectorValue = animate(
                 if (enabled) endVal else startVal,
                 tween()
@@ -226,7 +226,7 @@ class SingleValueAnimationTest {
             }
         }
 
-        animateTest(children, verify)
+        animateTest(content, verify)
     }
 
     @Suppress("DEPRECATION")
@@ -244,7 +244,7 @@ class SingleValueAnimationTest {
                 durationMillis = 100
             )
 
-        val children: @Composable() (Boolean) -> Unit = { enabled ->
+        val content: @Composable (Boolean) -> Unit = { enabled ->
             vectorValue = animate(
                 if (enabled) endVal else startVal,
                 tween()
@@ -276,13 +276,13 @@ class SingleValueAnimationTest {
             }
         }
 
-        animateTest(children, verify)
+        animateTest(content, verify)
     }
 
     @Test
     fun animateColorTest() {
         var value = Color.Black
-        val children: @Composable() (Boolean) -> Unit = { enabled ->
+        val content: @Composable (Boolean) -> Unit = { enabled ->
             value = animate(
                 if (enabled) Color.Cyan else Color.Black,
                 TweenSpec(
@@ -303,7 +303,7 @@ class SingleValueAnimationTest {
             }
         }
 
-        animateTest(children, verify)
+        animateTest(content, verify)
     }
 
     @Test
@@ -319,7 +319,7 @@ class SingleValueAnimationTest {
         val specForOffset = FloatSpringSpec(visibilityThreshold = PxVisibilityThreshold)
         val specForBounds = FloatSpringSpec(visibilityThreshold = DpVisibilityThreshold)
 
-        val children: @Composable() (Boolean) -> Unit = { enabled ->
+        val content: @Composable (Boolean) -> Unit = { enabled ->
             floatValue = animate(if (enabled) 100f else 0f)
 
             vectorValue = animate(
@@ -380,16 +380,16 @@ class SingleValueAnimationTest {
             }
         }
 
-        animateTest(children, verify)
+        animateTest(content, verify)
     }
 
-    private fun animateTest(children: @Composable() (Boolean) -> Unit, verify: () -> Unit) {
+    private fun animateTest(content: @Composable (Boolean) -> Unit, verify: () -> Unit) {
 
         rule.clockTestRule.pauseClock()
         var enabled by mutableStateOf(false)
         rule.setContent {
             Box {
-                children(enabled)
+                content(enabled)
             }
         }
         rule.runOnIdle { enabled = true }

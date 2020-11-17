@@ -48,7 +48,7 @@ private class SlotTableRecordImpl : SlotTableRecord {
  * A wrapper for compositions in inspection mode. The composition inside the Inspectable component
  * is in inspection mode.
  *
- * @param slotTableRecord [SlotTableRecord] to record the SlotTable used in the composition of [children]
+ * @param slotTableRecord [SlotTableRecord] to record the SlotTable used in the composition of [content]
  *
  * @suppress
  */
@@ -56,7 +56,7 @@ private class SlotTableRecordImpl : SlotTableRecord {
 @OptIn(InternalComposeApi::class)
 internal fun Inspectable(
     slotTableRecord: SlotTableRecord,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     currentComposer.collectKeySourceInformation()
     val store = (slotTableRecord as SlotTableRecordImpl).store
@@ -64,7 +64,7 @@ internal fun Inspectable(
     Providers(
         InspectionMode provides true,
         InspectionTables provides store,
-        children = children
+        content = content
     )
 }
 
@@ -73,8 +73,8 @@ internal fun Inspectable(
  * in the composition when the composition is in inspection mode.
  */
 @Composable
-fun InInspectionModeOnly(children: @Composable () -> Unit) {
+fun InInspectionModeOnly(content: @Composable () -> Unit) {
     if (InspectionMode.current) {
-        children()
+        content()
     }
 }

@@ -48,7 +48,7 @@ const val RootGroupName = "VectorRootGroup"
  * paths are drawn on.
  *  This parameter is optional. Not providing it will use the [defaultHeight] converted to pixels
  * @param [name] optional identifier used to identify the root of this vector graphic
- * @param [children] Composable used to define the structure and contents of the vector graphic
+ * @param [content] Composable used to define the structure and contents of the vector graphic
  */
 @Composable
 fun rememberVectorPainter(
@@ -57,7 +57,7 @@ fun rememberVectorPainter(
     viewportWidth: Float = Float.NaN,
     viewportHeight: Float = Float.NaN,
     name: String = RootGroupName,
-    children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+    content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
     val density = AmbientDensity.current
     val widthPx = with(density) { defaultWidth.toPx() }
@@ -70,7 +70,7 @@ fun rememberVectorPainter(
         // This assignment is thread safe as the internal Size parameter is
         // backed by a mutableState object
         size = Size(widthPx, heightPx)
-        RenderVector(name, vpWidth, vpHeight, children)
+        RenderVector(name, vpWidth, vpHeight, content)
     }
 }
 
@@ -140,7 +140,7 @@ fun VectorPainter(image: ImageVector): VectorPainter =
         viewportWidth = image.viewportWidth,
         viewportHeight = image.viewportHeight,
         name = image.name,
-        children = { _, _ -> RenderVectorGroup(group = image.root) }
+        content = { _, _ -> RenderVectorGroup(group = image.root) }
     )
 
 /**
@@ -157,7 +157,7 @@ fun rememberVectorPainter(image: ImageVector) =
         viewportWidth = image.viewportWidth,
         viewportHeight = image.viewportHeight,
         name = image.name,
-        children = { _, _ -> RenderVectorGroup(group = image.root) }
+        content = { _, _ -> RenderVectorGroup(group = image.root) }
     )
 
 /**
@@ -182,7 +182,7 @@ class VectorPainter internal constructor() : Painter() {
         name: String,
         viewportWidth: Float,
         viewportHeight: Float,
-        children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+        content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
     ) {
         vector.apply {
             this.name = name
@@ -192,7 +192,7 @@ class VectorPainter internal constructor() : Painter() {
         val composition = composeVector(
             vector,
             compositionReference(),
-            children
+            content
         )
 
         onDispose {

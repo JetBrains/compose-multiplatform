@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.test.util
+@file:Suppress("UnstableApiUsage")
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+package androidx.compose.runtime.lint
 
-@Composable
-fun BoundaryNode(
-    testTag: String,
-    content: @Composable () -> Unit
-) {
-    Column(Modifier.testTag(testTag)) { content() }
-}
+import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 
-@Composable
-fun BoundaryNode(
-    testTag: String
-) {
-    Column(Modifier.testTag(testTag)) {}
-}
+val composableStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
+    """
+        package androidx.compose.runtime
+
+        @MustBeDocumented
+        @Retention(AnnotationRetention.BINARY)
+        @Target(
+            AnnotationTarget.FUNCTION,
+            AnnotationTarget.TYPE,
+            AnnotationTarget.TYPE_PARAMETER,
+            AnnotationTarget.PROPERTY
+        )
+        annotation class Composable
+    """
+)

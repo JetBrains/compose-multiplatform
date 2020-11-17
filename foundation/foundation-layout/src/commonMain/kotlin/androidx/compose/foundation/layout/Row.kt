@@ -68,14 +68,14 @@ inline fun Row(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
-    children: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit
 ) {
     val measureBlocks = rowMeasureBlocks(
         horizontalArrangement,
         verticalAlignment
     )
     Layout(
-        children = { RowScope.children() },
+        content = { RowScope.content() },
         measureBlocks = measureBlocks,
         modifier = modifier
     )

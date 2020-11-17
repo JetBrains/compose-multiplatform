@@ -618,7 +618,7 @@ class PainterModifierTest {
                         rememberVectorPainter(
                             defaultWidth = vectorWidthDp,
                             defaultHeight = vectorHeightDp,
-                            children = { viewportWidth, viewportHeight ->
+                            content = { viewportWidth, viewportHeight ->
                                 Path(
                                     fill = SolidColor(Color.Red),
                                     pathData = PathData {
@@ -723,8 +723,8 @@ private class TestPainter(
  * before giving them to their child
  */
 @Composable
-fun NoMinSizeContainer(children: @Composable () -> Unit) {
-    Layout(children) { measurables, constraints ->
+fun NoMinSizeContainer(content: @Composable () -> Unit) {
+    Layout(content) { measurables, constraints ->
         val loosenedConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         val placeables = measurables.map { it.measure(loosenedConstraints) }
         val maxPlaceableWidth = placeables.maxByOrNull { it.width }?.width ?: 0
@@ -743,9 +743,9 @@ fun NoMinSizeContainer(children: @Composable () -> Unit) {
 @Composable
 fun NoIntrinsicSizeContainer(
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
-    Layout(children, modifier) { measurables, constraints ->
+    Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
         val width = max(
             placeables.maxByOrNull { it.width }?.width ?: 0,

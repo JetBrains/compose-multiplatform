@@ -125,7 +125,7 @@ fun SimpleRelativeToSiblingsInColumn() {
     @Composable
     fun RectangleWithStartEnd(modifier: Modifier = Modifier, color: Color, width: Dp, height: Dp) {
         Layout(
-            children = { },
+            content = { },
             modifier = modifier.background(color = color)
         ) { _, constraints ->
             val widthPx = max(width.toIntPx(), constraints.minWidth)

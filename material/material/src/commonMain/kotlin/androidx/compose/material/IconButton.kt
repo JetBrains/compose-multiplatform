@@ -31,13 +31,13 @@ import androidx.compose.ui.unit.dp
 
 /**
  * IconButton is a clickable icon, used to represent actions. An IconButton has an overall minimum
- * touch target size of 48 x 48dp, to meet accessibility guidelines. [icon] is centered
+ * touch target size of 48 x 48dp, to meet accessibility guidelines. [content] is centered
  * inside the IconButton.
  *
  * This component is typically used inside an App Bar for the navigation icon / actions. See App
  * Bar documentation for samples of this.
  *
- * [icon] should typically be an [Icon], using an icon from
+ * [content] should typically be an [Icon], using an icon from
  * [androidx.compose.material.icons.Icons]. If using a custom icon, note that the typical size for the
  * internal icon is 24 x 24 dp.
  *
@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
  * present on this IconButton. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this IconButton in different [Interaction]s.
- * @param icon the content (icon) to be drawn inside the IconButton. This is typically an
+ * @param content the content (icon) to be drawn inside the IconButton. This is typically an
  * [Icon].
  */
 @Composable
@@ -60,7 +60,7 @@ fun IconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    icon: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -72,7 +72,7 @@ fun IconButton(
             )
             .then(IconButtonSizeModifier),
         alignment = Alignment.Center
-    ) { icon() }
+    ) { content() }
 }
 
 /**
@@ -90,7 +90,7 @@ fun IconButton(
  * present on this IconToggleButton. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this IconToggleButton in different [Interaction]s.
- * @param icon the content (icon) to be drawn inside the IconToggleButton. This is typically an
+ * @param content the content (icon) to be drawn inside the IconToggleButton. This is typically an
  * [Icon].
  */
 @Composable
@@ -100,7 +100,7 @@ fun IconToggleButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    icon: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     Box(
         modifier = modifier.toggleable(
@@ -111,7 +111,7 @@ fun IconToggleButton(
             indication = rememberRippleIndication(bounded = false, radius = RippleRadius)
         ).then(IconButtonSizeModifier),
         alignment = Alignment.Center
-    ) { icon() }
+    ) { content() }
 }
 
 // Default radius of an unbounded ripple in an IconButton

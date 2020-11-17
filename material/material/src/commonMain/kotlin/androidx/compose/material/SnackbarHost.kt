@@ -314,7 +314,7 @@ private data class FadeInFadeOutAnimationItem<T>(
     val transition: FadeInFadeOutTransition
 )
 
-private typealias FadeInFadeOutTransition = @Composable (children: @Composable () -> Unit) -> Unit
+private typealias FadeInFadeOutTransition = @Composable (content: @Composable () -> Unit) -> Unit
 
 @Composable
 private fun animatedOpacity(

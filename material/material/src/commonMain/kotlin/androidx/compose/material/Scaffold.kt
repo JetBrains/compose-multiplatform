@@ -280,7 +280,7 @@ private fun ScaffoldLayout(
             val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar) {
                 Providers(
                     AmbientFabPlacement provides fabPlacement,
-                    children = bottomBar
+                    content = bottomBar
                 )
             }.fastMap { it.measure(looseConstraints) }
 

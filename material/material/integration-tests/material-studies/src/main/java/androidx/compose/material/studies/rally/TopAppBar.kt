@@ -91,7 +91,7 @@ private fun RallyTab(
 @Composable
 private fun TabTransition(
     selected: Boolean,
-    children: @Composable (color: Color) -> Unit
+    content: @Composable (color: Color) -> Unit
 ) {
     val color = MaterialTheme.colors.onSurface
     val transitionDefinition = remember {
@@ -122,7 +122,7 @@ private fun TabTransition(
         }
     }
     val state = transition(transitionDefinition, selected)
-    children(state[TabTintColorKey])
+    content(state[TabTintColorKey])
 }
 
 private val TabTintColorKey = ColorPropKey()

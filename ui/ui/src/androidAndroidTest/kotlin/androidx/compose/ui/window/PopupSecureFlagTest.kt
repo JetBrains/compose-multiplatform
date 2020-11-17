@@ -123,7 +123,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
                     alignment = Alignment.Center,
                     properties = popupProperties
                 ) {
-                    SimpleContainer(Modifier.preferredSize(50.dp), children = emptyContent())
+                    SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
                 }
             }
         }

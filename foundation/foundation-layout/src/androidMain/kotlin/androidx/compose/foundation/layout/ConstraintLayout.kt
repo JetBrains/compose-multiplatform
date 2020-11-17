@@ -63,7 +63,7 @@ import androidx.constraintlayout.core.widgets.analyzer.BasicMeasure
 @Composable
 fun ConstraintLayout(
     modifier: Modifier = Modifier,
-    children: @Composable ConstraintLayoutScope.() -> Unit
+    content: @Composable ConstraintLayoutScope.() -> Unit
 ) {
     val measurer = remember { Measurer() }
     val scope = remember { ConstraintLayoutScope() }
@@ -73,7 +73,7 @@ fun ConstraintLayout(
         modifier = modifier,
         children = {
             scope.reset()
-            scope.children()
+            scope.content()
         }
     ) { measurables, constraints ->
         val constraintSet = object : ConstraintSet {
@@ -117,13 +117,13 @@ fun ConstraintLayout(
 fun ConstraintLayout(
     constraintSet: ConstraintSet,
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val measurer = remember { Measurer() }
     @Suppress("Deprecation")
     MultiMeasureLayout(
         modifier,
-        children
+        content
     ) { measurables, constraints ->
         val layoutSize = measurer.performMeasure(
             constraints,

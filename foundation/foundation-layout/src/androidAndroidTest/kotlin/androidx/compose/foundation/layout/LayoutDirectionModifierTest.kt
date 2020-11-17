@@ -45,7 +45,7 @@ class LayoutDirectionModifierTest : LayoutTest() {
 
         show {
             Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
-                Layout(children = @Composable {}) { _, _ ->
+                Layout(content = @Composable {}) { _, _ ->
                     resultLayoutDirection.value = layoutDirection
                     latch.countDown()
                     layout(0, 0) {}
@@ -66,7 +66,7 @@ class LayoutDirectionModifierTest : LayoutTest() {
             @OptIn(ExperimentalLayout::class)
             Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Layout(
-                    children = @Composable {},
+                    content = @Composable {},
                     modifier = Modifier.preferredWidth(IntrinsicSize.Max),
                     minIntrinsicWidthMeasureBlock = { _, _ -> 0 },
                     minIntrinsicHeightMeasureBlock = { _, _ -> 0 },

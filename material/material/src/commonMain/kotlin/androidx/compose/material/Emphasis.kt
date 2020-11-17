@@ -111,7 +111,7 @@ interface EmphasisLevels {
 @Composable
 fun ProvideEmphasis(emphasis: Emphasis, content: @Composable () -> Unit) {
     val emphasizedColor = emphasis.applyEmphasis(AmbientContentColor.current)
-    Providers(AmbientContentColor provides emphasizedColor, children = content)
+    Providers(AmbientContentColor provides emphasizedColor, content = content)
 }
 
 @Deprecated(

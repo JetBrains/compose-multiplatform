@@ -335,7 +335,7 @@ fun BottomSheetScaffold(
                         elevation = sheetElevation,
                         color = sheetBackgroundColor,
                         contentColor = sheetContentColor,
-                        content = { Column(children = sheetContent) }
+                        content = { Column(content = sheetContent) }
                     )
                 },
                 floatingActionButton = {
@@ -380,7 +380,7 @@ private fun BottomSheetScaffoldStack(
     floatingActionButtonPosition: FabPosition
 ) {
     Layout(
-        children = {
+        content = {
             body()
             bottomSheet()
             floatingActionButton()

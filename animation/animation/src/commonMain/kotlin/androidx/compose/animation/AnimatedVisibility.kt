@@ -270,7 +270,7 @@ private fun AnimatedVisibilityImpl(
     }
 
     Layout(
-        children = content,
+        content = content,
         modifier = modifier.then(animations.modifier)
     ) { measureables, constraints ->
 

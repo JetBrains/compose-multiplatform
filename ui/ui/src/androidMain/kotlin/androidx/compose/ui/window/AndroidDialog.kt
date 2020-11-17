@@ -142,8 +142,8 @@ private class DialogWrapper(
 
     // TODO(b/159900354): Make the Android Dialog full screen and the scrim fully transparent
 
-    fun setContent(parentComposition: CompositionReference, children: @Composable () -> Unit) {
-        composition = dialogLayout.setContent(parentComposition, children)
+    fun setContent(parentComposition: CompositionReference, content: @Composable () -> Unit) {
+        composition = dialogLayout.setContent(parentComposition, content)
     }
 
     private fun setSecureFlagEnabled(secureFlagEnabled: Boolean) {
@@ -197,7 +197,7 @@ private fun DialogLayout(
     content: @Composable () -> Unit
 ) {
     Layout(
-        children = content,
+        content = content,
         modifier = modifier
     ) { measurables, constraints ->
         val placeables = measurables.fastMap { it.measure(constraints) }

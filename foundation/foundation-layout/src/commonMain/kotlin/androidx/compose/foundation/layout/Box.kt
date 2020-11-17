@@ -60,11 +60,11 @@ import kotlin.math.max
 inline fun Box(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.TopStart,
-    crossinline children: @Composable BoxScope.() -> Unit
+    crossinline content: @Composable BoxScope.() -> Unit
 ) {
     val measureBlocks = rememberMeasureBlocks(alignment)
     Layout(
-        children = { BoxScope.children() },
+        content = { BoxScope.content() },
         measureBlocks = measureBlocks,
         modifier = modifier
     )

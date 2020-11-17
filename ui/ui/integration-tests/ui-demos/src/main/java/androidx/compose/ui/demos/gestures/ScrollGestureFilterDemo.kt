@@ -65,7 +65,7 @@ fun ScrollableBox(
     orientation: Orientation,
     activeColor: Color,
     idleColor: Color,
-    children: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = emptyContent()
 ) {
 
     val color = remember { mutableStateOf(idleColor) }
@@ -107,6 +107,6 @@ fun ScrollableBox(
             .preferredSize(size)
             .background(color.value)
     ) {
-        children()
+        content()
     }
 }

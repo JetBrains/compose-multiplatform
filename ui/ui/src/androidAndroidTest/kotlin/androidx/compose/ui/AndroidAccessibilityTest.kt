@@ -139,7 +139,7 @@ class AndroidAccessibilityTest {
                         Modifier
                             .toggleable(value = checked, onValueChange = { checked = it })
                             .testTag(ToggleableTag),
-                        children = {
+                        content = {
                             BasicText("ToggleableText")
                         }
                     )

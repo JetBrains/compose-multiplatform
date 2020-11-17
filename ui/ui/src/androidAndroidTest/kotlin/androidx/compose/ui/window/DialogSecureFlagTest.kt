@@ -117,7 +117,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
                 onDismissRequest = { },
                 properties = dialogProperties
             ) {
-                SimpleContainer(Modifier.preferredSize(50.dp), children = emptyContent())
+                SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
             }
         }
     }

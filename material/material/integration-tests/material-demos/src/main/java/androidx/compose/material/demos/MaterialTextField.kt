@@ -133,7 +133,7 @@ fun MaterialTextFieldDemo() {
             if (selectedOption == Option.None) {
                 textField()
             } else {
-                TextFieldWithMessage(textField, selectedOption)
+                TextFieldWithMessage(selectedOption, textField)
             }
         }
 
@@ -223,8 +223,8 @@ fun MaterialTextFieldDemo() {
  */
 @Composable
 private fun TextFieldWithMessage(
-    textField: @Composable () -> Unit,
-    helperMessageOption: Option
+    helperMessageOption: Option,
+    content: @Composable () -> Unit
 ) {
     val typography = MaterialTheme.typography.caption
     val color = when (helperMessageOption) {
@@ -236,7 +236,7 @@ private fun TextFieldWithMessage(
     }
 
     Column {
-        Box(modifier = Modifier.weight(1f, fill = false)) { textField() }
+        Box(modifier = Modifier.weight(1f, fill = false)) { content() }
         Text(
             text = "Helper message",
             color = color,

@@ -269,6 +269,7 @@ val AmbientTextStyle = ambientOf(
  *
  * @see AmbientTextStyle
  */
+@Suppress("ComposableLambdaParameterNaming")
 @Deprecated(
     message = "ProvideTextStyle has moved to the Material library. For non-Material applications," +
         " create your own design system specific theming ambients.",
@@ -280,7 +281,7 @@ val AmbientTextStyle = ambientOf(
 @Composable
 fun ProvideTextStyle(value: TextStyle, children: @Composable () -> Unit) {
     val mergedStyle = AmbientTextStyle.current.merge(value)
-    Providers(AmbientTextStyle provides mergedStyle, children = children)
+    Providers(AmbientTextStyle provides mergedStyle, content = children)
 }
 
 /**

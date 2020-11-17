@@ -40,7 +40,7 @@ import androidx.compose.ui.text.InternalTextApi
 @Suppress("DEPRECATION")
 @OptIn(InternalTextApi::class)
 @Composable
-fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
+fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     var selection by remember { mutableStateOf<Selection?>(null) }
     SelectionContainer(
         modifier = modifier,
@@ -48,7 +48,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -
         onSelectionChange = {
             selection = it
         },
-        children = children
+        children = content
     )
 }
 
@@ -62,7 +62,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -
 fun DisableSelection(content: @Composable () -> Unit) {
     Providers(
         AmbientSelectionRegistrar provides null,
-        children = content
+        content = content
     )
 }
 
@@ -72,6 +72,7 @@ fun DisableSelection(content: @Composable () -> Unit) {
  * The selection composable wraps composables and let them to be selectable. It paints the selection
  * area with start and end handles.
  */
+@Suppress("ComposableLambdaParameterNaming")
 @OptIn(InternalTextApi::class)
 @Deprecated("Please use SelectionContainer with no callback")
 @InternalTextApi

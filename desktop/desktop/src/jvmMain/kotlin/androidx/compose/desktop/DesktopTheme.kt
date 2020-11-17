@@ -53,5 +53,5 @@ fun DesktopTheme(
     content: @Composable () -> Unit
 ) = Providers(
     ScrollbarStyleAmbient provides scrollbar,
-    children = content
+    content = content
 )

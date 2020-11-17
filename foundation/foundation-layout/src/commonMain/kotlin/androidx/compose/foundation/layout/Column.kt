@@ -67,11 +67,11 @@ inline fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    children: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     val measureBlocks = columnMeasureBlocks(verticalArrangement, horizontalAlignment)
     Layout(
-        children = { ColumnScope.children() },
+        content = { ColumnScope.content() },
         measureBlocks = measureBlocks,
         modifier = modifier
     )

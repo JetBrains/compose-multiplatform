@@ -63,15 +63,15 @@ class LayoutIdTest {
             activity.setContent {
                 Layout(
                     {
-                        AtLeastSize(0, Modifier.layoutId("first"), children = emptyContent())
+                        AtLeastSize(0, Modifier.layoutId("first"), content = emptyContent())
                         Box(Modifier.layoutId("second")) {
                             AtLeastSize(
                                 0,
-                                children = emptyContent()
+                                content = emptyContent()
                             )
                         }
                         Box(Modifier.layoutId("third")) {
-                            AtLeastSize(0, children = emptyContent())
+                            AtLeastSize(0, content = emptyContent())
                         }
                     }
                 ) { measurables, _ ->

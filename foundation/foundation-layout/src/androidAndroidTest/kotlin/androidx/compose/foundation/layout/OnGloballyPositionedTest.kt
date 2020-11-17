@@ -146,7 +146,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                             positionedLatch.countDown()
                         },
                         expanded = true,
-                        children = emptyContent()
+                        content = emptyContent()
                     )
                 }
             }
@@ -191,7 +191,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                     }
                         .fillMaxSize()
                         .padding(start = left.value),
-                    children = emptyContent()
+                    content = emptyContent()
                 )
             }
         }
@@ -255,7 +255,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                 Assert.assertEquals(lineValue, coordinates[line])
                 latch.countDown()
             }
-            Layout(modifier = onPositioned, children = { }) { _, _ ->
+            Layout(modifier = onPositioned, content = { }) { _, _ ->
                 layout(0, 0, mapOf(line to lineValue)) { }
             }
         }
@@ -263,9 +263,9 @@ class OnGloballyPositionedTest : LayoutTest() {
     }
 
     @Composable
-    private fun Offset(sizeModel: State<Dp>, children: @Composable () -> Unit) {
+    private fun Offset(sizeModel: State<Dp>, content: @Composable () -> Unit) {
         // simple copy of Padding which doesn't recompose when the size changes
-        Layout(children) { measurables, constraints ->
+        Layout(content) { measurables, constraints ->
             layout(constraints.maxWidth, constraints.maxHeight) {
                 measurables.first().measure(constraints)
                     .placeRelative(sizeModel.value.toPx().roundToInt(), 0)

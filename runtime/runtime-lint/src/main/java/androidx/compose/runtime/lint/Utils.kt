@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.test.util
+package androidx.compose.runtime.lint
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import org.jetbrains.uast.UMethod
 
-@Composable
-fun BoundaryNode(
-    testTag: String,
-    content: @Composable () -> Unit
-) {
-    Column(Modifier.testTag(testTag)) { content() }
-}
+// TODO: KotlinUMethodWithFakeLightDelegate.hasAnnotation() returns null for some reason, so just
+// look at the annotations directly
+// TODO: annotations is deprecated but the replacement uAnnotations isn't available on the
+// version of lint / uast we compile against
+@Suppress("DEPRECATION")
+val UMethod.isComposable get() = annotations.any { it.qualifiedName == ComposableFqn }
 
-@Composable
-fun BoundaryNode(
-    testTag: String
-) {
-    Column(Modifier.testTag(testTag)) {}
-}
+const val ComposableFqn = "androidx.compose.runtime.Composable"
+val ComposableShortName = ComposableFqn.split(".").last()
