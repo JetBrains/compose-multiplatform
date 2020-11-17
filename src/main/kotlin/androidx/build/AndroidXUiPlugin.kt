@@ -116,6 +116,8 @@ class AndroidXUiPlugin : Plugin<Project> {
                 // it just to log `Lint: Unknown issue id "ComposableNaming"`, which will still
                 // cause the build log simplifier to fail.
                 error("ComposableNaming")
+                error("ComposableLambdaParameterNaming")
+                error("ComposableLambdaParameterPosition")
             }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
