@@ -48,6 +48,12 @@ class MonotonicFrameAnimationClock(
 
     private val observers = mutableMapOf<AnimationClockObserver, Job>()
 
+    val hasObservers: Boolean
+        @Suppress("DEPRECATION_ERROR")
+        get() = synchronized(observers) {
+            observers.isNotEmpty()
+        }
+
     override fun subscribe(observer: AnimationClockObserver) {
         // Launch a new coroutine that keeps awaiting frames on the monotonic clock,
         // until unsubscribe for that observer is called.

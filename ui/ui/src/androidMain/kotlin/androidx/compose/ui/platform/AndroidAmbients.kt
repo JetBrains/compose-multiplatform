@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
@@ -136,7 +137,10 @@ val AmbientViewModelStoreOwner = staticAmbientOf<ViewModelStoreOwner>()
 internal fun ProvideAndroidAmbients(owner: AndroidOwner, content: @Composable () -> Unit) {
     val view = owner.view
     val context = view.context
-    val rootAnimationClock = remember { rootAnimationClockFactory() }
+    val scope = rememberCoroutineScope()
+    val rootAnimationClock = remember(scope) {
+        rootAnimationClockFactory(scope)
+    }
 
     var configuration by remember {
         mutableStateOf(

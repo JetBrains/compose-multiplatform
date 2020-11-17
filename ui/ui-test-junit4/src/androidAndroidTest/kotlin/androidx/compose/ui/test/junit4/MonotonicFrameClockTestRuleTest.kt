@@ -1,0 +1,140 @@
+/*
+ * Copyright 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.compose.ui.test.junit4
+
+import androidx.compose.animation.core.FloatPropKey
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.transition
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.dispatch.AndroidUiDispatcher
+import androidx.compose.runtime.dispatch.withFrameNanos
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.ExperimentalTesting
+import androidx.test.espresso.Espresso.onIdle
+import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.junit.Rule
+import org.junit.Test
+
+@LargeTest
+@OptIn(ExperimentalTesting::class)
+class MonotonicFrameClockTestRuleTest {
+
+    companion object {
+        private const val startValue = 0f
+        private const val endValue = 50f
+        private const val duration = 1000L
+    }
+
+    private var animationRunning = false
+    private var hasRecomposed = false
+
+    @get:Rule
+    val rule = createAndroidComposeRule(driveClockByMonotonicFrameClock = true)
+    private val clockTestRule = rule.clockTestRule
+
+    /**
+     * Tests if advancing the clock manually works when the clock is resumed, and that idleness
+     * is reported correctly when doing that.
+     */
+    @Test
+    fun test() = runBlocking {
+        val animationState = mutableStateOf(AnimationStates.From)
+        rule.setContent {
+            Ui(animationState)
+        }
+
+        // Before we kick off the animation, the test clock should be idle
+        assertThat(clockTestRule.clock.isIdle).isTrue()
+
+        rule.runOnIdle {
+            // Kick off the animation
+            animationRunning = true
+            animationState.value = AnimationStates.To
+        }
+
+        // Perform a single recomposition by awaiting the same signal as the Recomposer
+        withContext(AndroidUiDispatcher.Main) { withFrameNanos {} }
+
+        // After we kicked off the animation, the test clock should be non-idle
+        assertThat(clockTestRule.clock.isIdle).isFalse()
+
+        onIdle()
+
+        // After the animation is finished, ...
+        assertThat(animationRunning).isFalse()
+        // ... the test clock should be idle again
+        assertThat(clockTestRule.clock.isIdle).isTrue()
+    }
+
+    @Composable
+    private fun Ui(animationState: State<AnimationStates>) {
+        val size = Size(50.0f, 50.0f)
+        hasRecomposed = true
+        Box(modifier = Modifier.background(color = Color.Yellow).fillMaxSize()) {
+            hasRecomposed = true
+            val state = transition(
+                definition = animationDefinition,
+                toState = animationState.value,
+                onStateChangeFinished = { animationRunning = false }
+            )
+            hasRecomposed = true
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawRect(Color.Cyan, Offset(state[x], 0.0f), size)
+            }
+        }
+    }
+
+    private val x = FloatPropKey()
+
+    private enum class AnimationStates {
+        From,
+        To
+    }
+
+    private val animationDefinition = transitionDefinition<AnimationStates> {
+        state(AnimationStates.From) {
+            this[x] = startValue
+        }
+        state(AnimationStates.To) {
+            this[x] = endValue
+        }
+        transition(AnimationStates.From to AnimationStates.To) {
+            x using tween(
+                easing = LinearEasing,
+                durationMillis = duration.toInt()
+            )
+        }
+        transition(AnimationStates.To to AnimationStates.From) {
+            x using snap()
+        }
+    }
+}

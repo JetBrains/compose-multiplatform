@@ -93,9 +93,34 @@ inline fun <reified A : ComponentActivity> createAndroidComposeRule(
  */
 fun <A : ComponentActivity> createAndroidComposeRule(
     activityClass: Class<A>
+): AndroidComposeTestRule<ActivityScenarioRule<A>, A> =
+    @OptIn(ExperimentalTesting::class)
+    createAndroidComposeRule(
+        activityClass = activityClass,
+        driveClockByMonotonicFrameClock = false
+    )
+
+/**
+ * Factory method to provide an implementation of [createComposeRule] that installs an animation
+ * clock that is driven by the MonotonicFrameClock instead of the Choreographer. This is highly
+ * experimental and _will_ be removed in the future. See the other overloads of
+ * [createAndroidComposeRule] for the recommended way of creating a [ComposeTestRule].
+ */
+@ExperimentalTesting
+internal fun createAndroidComposeRule(
+    driveClockByMonotonicFrameClock: Boolean
+): AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity> {
+    return createAndroidComposeRule(ComponentActivity::class.java, driveClockByMonotonicFrameClock)
+}
+
+@ExperimentalTesting
+private fun <A : ComponentActivity> createAndroidComposeRule(
+    activityClass: Class<A>,
+    driveClockByMonotonicFrameClock: Boolean
 ): AndroidComposeTestRule<ActivityScenarioRule<A>, A> = AndroidComposeTestRule(
     activityRule = ActivityScenarioRule(activityClass),
-    activityProvider = { it.getActivity() }
+    activityProvider = { it.getActivity() },
+    driveClockByMonotonicFrameClock = driveClockByMonotonicFrameClock
 )
 
 /**
@@ -110,13 +135,27 @@ fun <A : ComponentActivity> createAndroidComposeRule(
  * function.
  */
 @OptIn(InternalTestingApi::class)
-class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
+class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>
+@ExperimentalTesting
+internal constructor(
     val activityRule: R,
-    private val activityProvider: (R) -> A
+    private val activityProvider: (R) -> A,
+    driveClockByMonotonicFrameClock: Boolean
 ) : ComposeTestRule {
 
+    @OptIn(ExperimentalTesting::class)
+    constructor(
+        activityRule: R,
+        activityProvider: (R) -> A
+    ) : this(activityRule, activityProvider, false)
+
     @ExperimentalTesting
-    override val clockTestRule: AnimationClockTestRule = AndroidAnimationClockTestRule()
+    override val clockTestRule: AnimationClockTestRule =
+        if (!driveClockByMonotonicFrameClock) {
+            AndroidAnimationClockTestRule()
+        } else {
+            MonotonicFrameClockTestRule()
+        }
 
     internal var disposeContentHook: (() -> Unit)? = null
 
