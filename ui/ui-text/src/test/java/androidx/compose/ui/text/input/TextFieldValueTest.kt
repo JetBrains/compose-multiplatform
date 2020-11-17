@@ -30,19 +30,23 @@ class TextFieldValueTest {
         TextFieldValue(text = "", selection = TextRange(-1))
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun throws_exception_for_outofbounds_selection() {
-        TextFieldValue(text = "a", selection = TextRange("a".length + 1))
+    @Test
+    fun aligns_selection_to_the_text_length() {
+        val text = "a"
+        val textFieldValue = TextFieldValue(text = text, selection = TextRange(text.length + 1))
+        assertThat(textFieldValue.selection.collapsed).isTrue()
+        assertThat(textFieldValue.selection.max).isEqualTo(textFieldValue.text.length)
     }
 
     @Test
-    fun accepts_selection_end_equal_to_text_length() {
-        val text = "a"
-        val textRange = TextRange(text.length)
-        val textFieldValue = TextFieldValue(text = text, selection = textRange)
+    fun keep_selection_that_is_less_than_text_length() {
+        val text = "a bc"
+        val selection = TextRange(0, "a".length)
+
+        val textFieldValue = TextFieldValue(text = text, selection = selection)
 
         assertThat(textFieldValue.text).isEqualTo(text)
-        assertThat(textFieldValue.selection).isEqualTo(textRange)
+        assertThat(textFieldValue.selection).isEqualTo(selection)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -50,19 +54,88 @@ class TextFieldValueTest {
         TextFieldValue(text = "", composition = TextRange(-1))
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun throws_exception_for_outofbounds_composition() {
-        TextFieldValue(text = "a", composition = TextRange("a".length + 1))
+    @Test
+    fun aligns_composition_to_text_length() {
+        val text = "a"
+        val textFieldValue = TextFieldValue(text = text, composition = TextRange(text.length + 1))
+        assertThat(textFieldValue.composition?.collapsed).isTrue()
+        assertThat(textFieldValue.composition?.max).isEqualTo(textFieldValue.text.length)
     }
 
     @Test
-    fun accepts_composition_end_equal_to_text_length() {
-        val text = "a"
-        val textRange = TextRange(text.length)
+    fun keep_composition_that_is_less_than_text_length() {
+        val text = "a bc"
+        val composition = TextRange(0, "a".length)
 
-        val textFieldValue = TextFieldValue(text = text, composition = textRange)
+        val textFieldValue = TextFieldValue(text = text, composition = composition)
 
         assertThat(textFieldValue.text).isEqualTo(text)
-        assertThat(textFieldValue.composition).isEqualTo(textRange)
+        assertThat(textFieldValue.composition).isEqualTo(composition)
+    }
+
+    @Test
+    fun equals_returns_true_for_same_instance() {
+        val textFieldValue = TextFieldValue(
+            text = "a",
+            selection = TextRange(1),
+            composition = TextRange(2)
+        )
+
+        assertThat(textFieldValue).isEqualTo(textFieldValue)
+    }
+
+    @Test
+    fun equals_returns_true_for_same_object() {
+        val textFieldValue = TextFieldValue(
+            text = "a",
+            selection = TextRange(1),
+            composition = TextRange(2)
+        )
+
+        assertThat(textFieldValue).isEqualTo(textFieldValue.copy())
+    }
+
+    @Test
+    fun copy_sets_text_correctly() {
+        val textFieldValue = TextFieldValue(
+            text = "a",
+            selection = TextRange(1),
+            composition = TextRange(2)
+        )
+
+        val expected = TextFieldValue(
+            text = "b",
+            selection = textFieldValue.selection,
+            composition = textFieldValue.composition
+        )
+
+        assertThat(textFieldValue.copy(text = "b")).isEqualTo(expected)
+    }
+
+    @Test
+    fun copy_sets_selection_correctly() {
+        val textFieldValue = TextFieldValue(
+            text = "a",
+            selection = TextRange(1),
+            composition = TextRange(2)
+        )
+
+        val expected = TextFieldValue(
+            text = textFieldValue.text,
+            selection = TextRange.Zero,
+            composition = textFieldValue.composition
+        )
+
+        assertThat(textFieldValue.copy(selection = TextRange.Zero)).isEqualTo(expected)
+    }
+
+    @Test
+    fun text_and_selection_parameter_constructor_has_null_composition() {
+        val textFieldValue = TextFieldValue(
+            text = "a",
+            selection = TextRange(1)
+        )
+
+        assertThat(textFieldValue.composition).isNull()
     }
 }

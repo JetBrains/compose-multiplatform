@@ -30,9 +30,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -112,20 +110,13 @@ fun BasicTextField(
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = Color.Black
 ) {
-    var selection by remember { mutableStateOf(TextRange.Zero) }
-    var composition by remember { mutableStateOf<TextRange?>(null) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value)) }
+    textFieldValue = textFieldValue.copy(text = value)
 
-    @OptIn(InternalTextApi::class)
-    val textFieldValue = TextFieldValue(
-        text = value,
-        selection = selection.constrain(0, value.length),
-        composition = composition?.constrain(0, value.length)
-    )
     BasicTextField(
         value = textFieldValue,
         onValueChange = {
-            selection = it.selection
-            composition = it.composition
+            textFieldValue = it
             if (value != it.text) {
                 onValueChange(it.text)
             }
@@ -215,7 +206,6 @@ fun BasicTextField(
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = Color.Black
 ) {
-
     // We use it to get the cursor position
     val textLayoutResult: Ref<TextLayoutResult?> = remember { Ref() }
 

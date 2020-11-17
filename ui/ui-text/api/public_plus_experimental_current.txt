@@ -950,10 +950,8 @@ package androidx.compose.ui.text.input {
   }
 
   @androidx.compose.runtime.Immutable public final class TextFieldValue {
-    method public String component1();
-    method public long component2-d9O1mEE();
-    method public androidx.compose.ui.text.TextRange? component3-MzsxiRA();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.TextFieldValue copy-Dr2r1M0(String text, long selection, androidx.compose.ui.text.TextRange? composition);
+    method public androidx.compose.ui.text.input.TextFieldValue commitComposition();
+    method public androidx.compose.ui.text.input.TextFieldValue copy-rJy5ZHU(optional String text, optional long selection);
     method public androidx.compose.ui.text.TextRange? getComposition-MzsxiRA();
     method public long getSelection-d9O1mEE();
     method public String getText();

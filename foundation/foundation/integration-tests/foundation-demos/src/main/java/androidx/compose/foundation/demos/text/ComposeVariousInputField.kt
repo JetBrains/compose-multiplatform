@@ -27,7 +27,6 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -255,21 +254,10 @@ private fun VariousEditLine(
         visualTransformation = visualTransformation,
         onValueChange = {
             val value = onValueChange(state.value.text, it.text)
-            val selection = it.selection.constrain(0, value.length)
-            val composition = it.composition?.constrain(0, value.length)
-            state.value = TextFieldValue(value, selection, composition)
+            state.value = it.copy(text = value)
         },
         textStyle = TextStyle(fontSize = fontSize8)
     )
-}
-
-private fun TextRange.constrain(minimumValue: Int, maximumValue: Int): TextRange {
-    val newStart = start.coerceIn(minimumValue, maximumValue)
-    val newEnd = end.coerceIn(minimumValue, maximumValue)
-    if (newStart != start || newEnd != end) {
-        return TextRange(newStart, newEnd)
-    }
-    return this
 }
 
 @Composable

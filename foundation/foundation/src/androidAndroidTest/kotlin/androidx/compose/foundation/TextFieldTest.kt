@@ -67,11 +67,9 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
@@ -620,7 +618,7 @@ class TextFieldTest {
         var lastSeenText = ""
         rule.setContent {
             var text by remember { mutableStateOf("") }
-            TextFieldStringOverride(
+            BasicTextField(
                 value = text,
                 onValueChange = {
                     text = it
@@ -644,32 +642,4 @@ class TextFieldTest {
             assertThat(lastSeenText).isEqualTo("")
         }
     }
-}
-
-@Composable
-@OptIn(InternalTextApi::class, ExperimentalFoundationApi::class)
-private fun TextFieldStringOverride(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var selection by remember { mutableStateOf(TextRange.Zero) }
-    var composition by remember { mutableStateOf<TextRange?>(null) }
-    val textFieldValue = TextFieldValue(
-        text = value,
-        selection = selection.constrain(0, value.length),
-        composition = composition?.constrain(0, value.length)
-    )
-
-    BasicTextField(
-        value = textFieldValue,
-        onValueChange = {
-            selection = it.selection
-            composition = it.composition
-            if (textFieldValue.text != it.text) {
-                onValueChange(it.text)
-            }
-        },
-        modifier = modifier.width(100.dp)
-    )
 }
