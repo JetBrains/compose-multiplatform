@@ -651,7 +651,7 @@ class MultiParagraphIntegrationTest {
         assertThat(paragraph.getLineLeft(0)).isEqualTo(0)
         assertThat(paragraph.getLineRight(0)).isEqualTo(0)
         assertThat(paragraph.getLineEnd(0)).isEqualTo(0)
-        assertThat(paragraph.getLineVisibleEnd(0)).isEqualTo(0)
+        assertThat(paragraph.getLineEnd(0, true)).isEqualTo(0)
         assertThat(paragraph.isLineEllipsized(0)).isFalse()
     }
 
