@@ -21,17 +21,55 @@ import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 
+/**
+ * Sets Compose content of the ComposeWindow.
+ *
+ * @param content Composable content of the ComposeWindow.
+ *
+ * @return Composition of the content.
+ */
 fun ComposeWindow.setContent(content: @Composable () -> Unit): Composition {
+    return this.layer.setContent(
+        parent = parent,
+        invalidate = this::needRedrawLayer,
+        content = content
+    )
+}
+
+/**
+ * Sets Compose content of the ComposePanel.
+ *
+ * @param content Composable content of the ComposePanel.
+ *
+ * @return Composition of the content.
+ */
+fun ComposePanel.setContent(content: @Composable () -> Unit): Composition {
+    return this.layer.setContent(
+        parent = this,
+        invalidate = this::needRedrawLayer,
+        content = content
+    )
+}
+
+internal fun ComposeLayer.setContent(
+    parent: Any? = null,
+    invalidate: () -> Unit = this::needRedrawLayer,
+    content: @Composable () -> Unit
+): Composition {
     check(owners == null) {
         "Cannot setContent twice."
     }
-    val owners = DesktopOwners(this.layer.wrapped, this::needRedrawLayer)
+    val owners = DesktopOwners(this.wrapped, invalidate)
     val owner = DesktopOwner(owners, density)
     this.owners = owners
     val composition = owner.setContent(content)
 
     onDensityChanged(owner::density::set)
-    parent.onDismissEvents.add(owner::dispose)
+
+    when (parent) {
+        is AppFrame -> parent.onDismissEvents.add(owner::dispose)
+        is ComposePanel -> parent.onDispose = owner::dispose
+    }
 
     return composition
 }

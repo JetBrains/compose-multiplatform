@@ -16,10 +16,15 @@
 
 package androidx.compose.desktop
 
+import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.input.mouse.MouseScrollEvent
+import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopComponent
+import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.FrameDispatcher
 import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.Canvas
+import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
 import org.jetbrains.skija.Rect
@@ -28,9 +33,26 @@ import org.jetbrains.skiko.SkiaRenderer
 import java.awt.DisplayMode
 import java.awt.Point
 import java.awt.event.FocusEvent
+import java.awt.event.InputMethodEvent
+import java.awt.event.InputMethodListener
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionAdapter
+import java.awt.event.MouseWheelEvent
 import java.awt.im.InputMethodRequests
 
-internal class FrameSkiaLayer {
+internal class ComposeLayer {
+
+    private val events = AWTDebounceEventQueue()
+
+    var owners: DesktopOwners? = null
+        set(value) {
+            field = value
+            renderer = value?.let(::OwnersRenderer)
+        }
+
     var renderer: Renderer? = null
 
     private var isDisposed = false
@@ -50,6 +72,10 @@ internal class FrameSkiaLayer {
     }
 
     var onDensityChanged: ((Density) -> Unit)? = null
+
+    fun onDensityChanged(action: ((Density) -> Unit)?) {
+        onDensityChanged = action
+    }
 
     private var _density: Density? = null
     val density
@@ -77,12 +103,15 @@ internal class FrameSkiaLayer {
             get() = super.getLocationOnScreen()
 
         override val density: Density
-            get() = this@FrameSkiaLayer.density
+            get() = this@ComposeLayer.density
 
         override fun scaleCanvas(dpi: Float) {}
     }
 
-    val wrapped = Wrapped()
+    internal val wrapped = Wrapped()
+
+    val component: HardwareLayer
+        get() = wrapped
 
     init {
         wrapped.renderer = object : SkiaRenderer {
@@ -103,7 +132,96 @@ internal class FrameSkiaLayer {
             override fun onInit() = Unit
             override fun onReshape(width: Int, height: Int) = Unit
         }
+        initCanvas()
     }
+
+    private fun initCanvas() {
+        wrapped.addInputMethodListener(object : InputMethodListener {
+            override fun caretPositionChanged(p0: InputMethodEvent?) {
+                TODO("Implement input method caret change")
+            }
+
+            override fun inputMethodTextChanged(event: InputMethodEvent) = events.post {
+                owners?.onInputMethodTextChanged(event)
+            }
+        })
+
+        wrapped.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(event: MouseEvent) = Unit
+
+            override fun mousePressed(event: MouseEvent) = events.post {
+                owners?.onMousePressed(
+                    (event.x * density.density).toInt(),
+                    (event.y * density.density).toInt()
+                )
+            }
+
+            override fun mouseReleased(event: MouseEvent) = events.post {
+                owners?.onMouseReleased(
+                    (event.x * density.density).toInt(),
+                    (event.y * density.density).toInt()
+                )
+            }
+        })
+        wrapped.addMouseMotionListener(object : MouseMotionAdapter() {
+            override fun mouseDragged(event: MouseEvent) = events.post {
+                owners?.onMouseDragged(
+                    (event.x * density.density).toInt(),
+                    (event.y * density.density).toInt()
+                )
+            }
+
+            override fun mouseMoved(event: MouseEvent) = events.post {
+                owners?.onMouseMoved(
+                    (event.x * density.density).toInt(),
+                    (event.y * density.density).toInt()
+                )
+            }
+        })
+        wrapped.addMouseWheelListener { event ->
+            events.post {
+                owners?.onMouseScroll(
+                    (event.x * density.density).toInt(),
+                    (event.y * density.density).toInt(),
+                    event.toComposeEvent()
+                )
+            }
+        }
+        wrapped.addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(event: KeyEvent) = events.post {
+                owners?.onKeyPressed(event)
+            }
+
+            override fun keyReleased(event: KeyEvent) = events.post {
+                owners?.onKeyReleased(event)
+            }
+
+            override fun keyTyped(event: KeyEvent) = events.post {
+                owners?.onKeyTyped(event)
+            }
+        })
+    }
+
+    private class OwnersRenderer(private val owners: DesktopOwners) : ComposeLayer.Renderer {
+        override suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            owners.onFrame(canvas, width, height, nanoTime)
+        }
+    }
+
+    private fun MouseWheelEvent.toComposeEvent() = MouseScrollEvent(
+        delta = if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
+            MouseScrollUnit.Page((scrollAmount * preciseWheelRotation).toFloat())
+        } else {
+            MouseScrollUnit.Line((scrollAmount * preciseWheelRotation).toFloat())
+        },
+
+        // There are no other way to detect horizontal scrolling in AWT
+        orientation = if (isShiftDown) {
+            Orientation.Horizontal
+        } else {
+            Orientation.Vertical
+        }
+    )
 
     // We draw into picture, because SkiaLayer.draw can be called from the other thread,
     // but onRender should be called in AWT thread. Picture doesn't add any visible overhead on
@@ -150,10 +268,10 @@ internal class FrameSkiaLayer {
     }
 
     fun dispose() {
+        events.cancel()
         check(!isDisposed)
         frameDispatcher.cancel()
         wrapped.disposeLayer()
-        wrapped.updateLayer()
         picture.close()
         pictureRecorder.close()
         isDisposed = true
