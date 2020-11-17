@@ -1209,4 +1209,30 @@ class MeasureAndLayoutDelegateTest {
         delegate.measureAndLayout()
         assertThat(delegate.hasPendingMeasureOrLayout).isFalse()
     }
+
+    @Test
+    fun theWholeSubtreeIsNotPlacedWhenParentWasntPlaced() {
+        val root = root {
+            add(
+                node {
+                    add(
+                        node {
+                            add(node())
+                        }
+                    )
+                }
+            )
+        }
+
+        val delegate = createDelegate(root)
+
+        root.shouldPlaceChildren = false
+        delegate.requestRelayout(root)
+        delegate.measureAndLayout()
+
+        assertThat(root.isPlaced).isTrue()
+        assertThat(root.first.isPlaced).isFalse()
+        assertThat(root.first.first.isPlaced).isFalse()
+        assertThat(root.first.first.isPlaced).isFalse()
+    }
 }

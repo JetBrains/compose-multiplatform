@@ -1008,7 +1008,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         if (isPlaced) {
             isPlaced = false
             _children.forEach {
-                markSubtreeAsNotPlaced()
+                it.markSubtreeAsNotPlaced()
             }
         }
     }

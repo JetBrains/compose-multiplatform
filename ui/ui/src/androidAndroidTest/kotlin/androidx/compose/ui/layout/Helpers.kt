@@ -221,6 +221,12 @@ internal var LayoutNode.childrenDirection: LayoutDirection?
     set(value) {
         (measureBlocks as SmartMeasureBlock).childrenLayoutDirection = value
     }
+@ExperimentalLayoutNodeApi
+internal var LayoutNode.shouldPlaceChildren: Boolean
+    get() = (measureBlocks as SmartMeasureBlock).shouldPlaceChildren
+    set(value) {
+        (measureBlocks as SmartMeasureBlock).shouldPlaceChildren = value
+    }
 
 internal val TestAlignmentLine = HorizontalAlignmentLine(::min)
 
@@ -239,6 +245,7 @@ internal abstract class SmartMeasureBlock : LayoutNode.NoIntrinsicsMeasureBlocks
     var childrenLayoutDirection: LayoutDirection? = null
     // child size is used when null
     var size: Int? = null
+    var shouldPlaceChildren = true
 }
 
 @OptIn(ExperimentalLayoutNodeApi::class)
@@ -278,8 +285,10 @@ internal class MeasureInMeasureBlock : SmartMeasureBlock() {
             layoutsCount++
             preLayoutCallback?.invoke()
             preLayoutCallback = null
-            placeables.forEach { placeable ->
-                placeable.placeRelative(0, 0)
+            if (shouldPlaceChildren) {
+                placeables.forEach { placeable ->
+                    placeable.placeRelative(0, 0)
+                }
             }
         }
     }
@@ -326,8 +335,10 @@ internal class MeasureInLayoutBlock : SmartMeasureBlock() {
             preLayoutCallback = null
             layoutsCount++
             measurables.forEach {
-                it.measure(childConstraints)
-                    .placeRelative(0, 0)
+                val placeable = it.measure(childConstraints)
+                if (shouldPlaceChildren) {
+                    placeable.placeRelative(0, 0)
+                }
             }
         }
     }
