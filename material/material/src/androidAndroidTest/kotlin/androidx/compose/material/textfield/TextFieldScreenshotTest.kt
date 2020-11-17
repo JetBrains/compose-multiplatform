@@ -18,6 +18,7 @@ package androidx.compose.material.textfield
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.GOLDEN_MATERIAL
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.captureToImage
@@ -162,6 +164,21 @@ class TextFieldScreenshotTest {
         }
 
         assertAgainstGolden("filled_textField_notFocused_errorState")
+    }
+
+    @Test
+    fun textField_textColor_fallbackToContentColor() {
+        rule.setMaterialContent {
+            Providers(AmbientContentColor provides Color.Green) {
+                TextField(
+                    value = "Hello, world!",
+                    onValueChange = {},
+                    modifier = Modifier.testTag(TextFieldTag)
+                )
+            }
+        }
+
+        assertAgainstGolden("filled_textField_textColor_defaultContentColor")
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {
