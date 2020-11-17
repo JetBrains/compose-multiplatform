@@ -273,6 +273,68 @@ class DrawModifierTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    fun testCacheInvalidatedWithHelperModifier() {
+        // If Modifier.drawWithCache is used as part of the implementation for another modifier
+        // defined in a helper function, make sure that an change in state parameter ends up calling
+        // ModifiedDrawNode.onModifierChanged and updates the internal cache for
+        // Modifier.drawWithCache
+        val testTag = "testTag"
+        val startSize = 200
+        rule.setContent {
+            val color = remember { mutableStateOf(Color.Red) }
+            AtLeastSize(
+                size = startSize,
+                modifier = Modifier.testTag(testTag).drawPathHelperModifier(color.value)
+                    .clickable {
+                        if (color.value == Color.Red) {
+                            color.value = Color.Blue
+                        } else {
+                            color.value = Color.Red
+                        }
+                    }
+            ) { }
+        }
+
+        rule.onNodeWithTag(testTag).apply {
+            // Verify that the path was created only once
+            captureToBitmap().apply {
+                assertEquals(Color.Red.toArgb(), getPixel(1, 1))
+                assertEquals(Color.Red.toArgb(), getPixel(width - 2, height - 2))
+            }
+            performClick()
+        }
+
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(testTag).apply {
+            // Verify that the path was re-used and only built once
+            captureToBitmap().apply {
+                assertEquals(Color.Blue.toArgb(), getPixel(1, 1))
+                assertEquals(Color.Blue.toArgb(), getPixel(width - 2, height - 2))
+            }
+        }
+    }
+
+    // Helper Modifier that uses Modifier.drawWithCache internally. If the color
+    // parameter
+    private fun Modifier.drawPathHelperModifier(color: Color) =
+        this.then(
+            Modifier.drawWithCache {
+                val drawSize = this.size
+                val path = Path().apply {
+                    lineTo(drawSize.width, 0f)
+                    lineTo(drawSize.height, drawSize.height)
+                    lineTo(0f, drawSize.height)
+                    close()
+                }
+                onDrawBehind {
+                    drawPath(path, color)
+                }
+            }
+        )
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
     fun testDrawWithCacheContentDrawnImplicitly() {
         // Verify that drawContent is invoked even if it is not explicitly called within
         // the implementation of the callback provided in the onDraw method
