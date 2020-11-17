@@ -132,7 +132,6 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
             "StreamFiles",
             "AbstractInner",
             "NotCloseable",
-            "ArrayReturn",
             "MethodNameTense",
             "UseIcu",
             "NoByteOrShort",
@@ -145,9 +144,9 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
         ).joinToString()
     )
     if (targetsJavaConsumers) {
-        args.addAll(listOf("--error", "MissingJvmstatic"))
+        args.addAll(listOf("--error", "MissingJvmstatic", "--error", "ArrayReturn"))
     } else {
-        args.addAll(listOf("--hide", "MissingJvmstatic"))
+        args.addAll(listOf("--hide", "MissingJvmstatic", "--hide", "ArrayReturn"))
     }
     return args
 }
