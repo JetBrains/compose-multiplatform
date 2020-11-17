@@ -105,9 +105,9 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
             if (sections.size >= 3) {
                 // first is empty, last is artifact
                 val group = if (sections[1] == "androidx.arch") {
-                    "androidx.${sections.drop(1).dropLast(1).joinToString(".")}"
-                } else {
                     "androidx.arch.core"
+                } else {
+                    "androidx.${sections.drop(1).dropLast(1).joinToString(".")}"
                 }
                 return "$group:${sections.last()}:$SNAPSHOT_MARKER"
             }
