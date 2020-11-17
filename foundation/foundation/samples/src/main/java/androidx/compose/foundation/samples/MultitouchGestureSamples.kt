@@ -164,7 +164,7 @@ fun CalculateCentroidSize() {
                 forEachGesture {
                     handlePointerInput {
                         awaitFirstDown().also {
-                            position = it.current.position!!
+                            position = it.current.position
                         }
                         do {
                             val event = awaitPointerEvent()

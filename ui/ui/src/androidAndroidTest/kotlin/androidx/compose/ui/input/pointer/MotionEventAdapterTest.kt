@@ -1523,6 +1523,6 @@ private fun assertPointerInputEventData(
     val pointerInputData = actual.pointerInputData
     assertThat(actual.id).isEqualTo(id)
     assertThat(pointerInputData.down).isEqualTo(isDown)
-    assertThat(pointerInputData.position!!.x).isEqualTo(x)
-    assertThat(pointerInputData.position!!.y).isEqualTo(y)
+    assertThat(pointerInputData.position.x).isEqualTo(x)
+    assertThat(pointerInputData.position.y).isEqualTo(y)
 }

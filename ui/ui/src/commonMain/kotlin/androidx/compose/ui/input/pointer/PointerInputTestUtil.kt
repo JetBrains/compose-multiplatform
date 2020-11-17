@@ -36,7 +36,7 @@ internal fun down(
             Offset(x, y),
             true
         ),
-        PointerInputData(null, null, false),
+        PointerInputData(Uptime.Boot + duration, Offset(x, y), false),
         ConsumedData(Offset.Zero, false)
     )
 
@@ -55,8 +55,8 @@ internal fun PointerInputChange.moveBy(duration: Duration, dx: Float = 0f, dy: F
     copy(
         previous = current,
         current = PointerInputData(
-            current.uptime!! + duration,
-            Offset(current.position!!.x + dx, current.position.y + dy),
+            current.uptime + duration,
+            Offset(current.position.x + dx, current.position.y + dy),
             true
         ),
         consumed = ConsumedData()
@@ -67,7 +67,7 @@ internal fun PointerInputChange.up(duration: Duration) =
         previous = current,
         current = PointerInputData(
             Uptime.Boot + duration,
-            null,
+            current.position,
             false
         ),
         consumed = ConsumedData()

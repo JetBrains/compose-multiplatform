@@ -333,7 +333,7 @@ class ClipPointerInputTest {
                 if (pass == PointerEventPass.Initial) {
                     pointerEvent.changes.forEach {
                         println("testtest, bounds: $bounds")
-                        log.add(it.current.position!!)
+                        log.add(it.current.position)
                     }
                 }
             }
