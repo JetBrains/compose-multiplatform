@@ -234,11 +234,11 @@ fun SwipeToDismiss(
         )
     ) {
         Row(
-            children = background,
+            content = background,
             modifier = Modifier.matchParentSize()
         )
         Row(
-            children = dismissContent,
+            content = dismissContent,
             modifier = Modifier.offsetPx(x = state.offset)
         )
     }

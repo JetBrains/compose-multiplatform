@@ -105,7 +105,7 @@ internal actual fun ActualPopup(
     // used instead of this custom Layout
     // Get the parent's global position, size and layout direction
     Layout(
-        children = emptyContent(),
+        content = emptyContent(),
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
             // Get the global position of the parent
@@ -132,7 +132,7 @@ internal actual fun ActualPopup(
                     // Update the popup's position
                     popupLayout.updatePosition()
                 },
-                children = content
+                content = content
             )
         }
     }
@@ -148,8 +148,8 @@ internal actual fun ActualPopup(
 // Popup's SimpleStack and Box.
 @Suppress("NOTHING_TO_INLINE")
 @Composable
-private inline fun SimpleStack(modifier: Modifier, noinline children: @Composable () -> Unit) {
-    Layout(children = children, modifier = modifier) { measurables, constraints ->
+private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable () -> Unit) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
         when (measurables.size) {
             0 -> layout(0, 0) {}
             1 -> {

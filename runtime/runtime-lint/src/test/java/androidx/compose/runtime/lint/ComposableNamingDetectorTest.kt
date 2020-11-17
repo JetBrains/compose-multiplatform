@@ -37,22 +37,6 @@ class ComposableNamingDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(ComposableNamingDetector.ComposableNaming)
 
-    private val composableStub = kotlin(
-        """
-            package androidx.compose.runtime
-
-            @MustBeDocumented
-            @Retention(AnnotationRetention.BINARY)
-            @Target(
-                AnnotationTarget.FUNCTION,
-                AnnotationTarget.TYPE,
-                AnnotationTarget.TYPE_PARAMETER,
-                AnnotationTarget.PROPERTY
-            )
-            annotation class Composable
-        """
-    )
-
     @Test
     fun returnsUnit_lowerCaseName_fails() {
         lint().files(

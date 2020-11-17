@@ -185,16 +185,14 @@ private fun ListHoistedStateDemo() {
 }
 
 @Composable
-fun Button(modifier: Modifier, onClick: () -> Unit, children: @Composable () -> Unit) {
+fun Button(modifier: Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         modifier
             .clickable(onClick = onClick)
             .background(Color(0xFF6200EE), RoundedCornerShape(4.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Providers(AmbientContentColor provides Color.White) {
-            children()
-        }
+        Providers(AmbientContentColor provides Color.White, content = content)
     }
 }
 

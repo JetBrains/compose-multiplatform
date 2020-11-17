@@ -85,7 +85,7 @@ fun TopAppBar(
             Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
                 Providers(
                     AmbientContentAlpha provides ContentAlpha.high,
-                    children = navigationIcon
+                    content = navigationIcon
                 )
             }
         }
@@ -95,7 +95,7 @@ fun TopAppBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                Providers(AmbientContentAlpha provides ContentAlpha.high, children = title)
+                Providers(AmbientContentAlpha provides ContentAlpha.high, content = title)
             }
         }
 
@@ -104,7 +104,7 @@ fun TopAppBar(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
-                children = actions
+                content = actions
             )
         }
     }
@@ -140,7 +140,7 @@ fun TopAppBar(
         elevation,
         RectangleShape,
         modifier = modifier,
-        children = content
+        content = content
     )
 }
 
@@ -187,7 +187,7 @@ fun BottomAppBar(
         Row(
             Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
-            children = content
+            content = content
         )
     }
 }
@@ -432,7 +432,7 @@ private fun AppBar(
     elevation: Dp,
     shape: Shape,
     modifier: Modifier = Modifier,
-    children: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit
 ) {
     Surface(
         color = backgroundColor,
@@ -446,7 +446,7 @@ private fun AppBar(
                 .padding(start = AppBarHorizontalPadding, end = AppBarHorizontalPadding)
                 .preferredHeight(AppBarHeight),
             horizontalArrangement = Arrangement.SpaceBetween,
-            children = children
+            content = content
         )
     }
 }

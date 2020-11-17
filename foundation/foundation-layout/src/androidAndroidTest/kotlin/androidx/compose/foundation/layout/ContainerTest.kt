@@ -384,7 +384,7 @@ class ContainerTest : LayoutTest() {
         show {
             Box {
                 Layout(
-                    children = {
+                    content = {
                         Container {
                             EmptyBox(
                                 width = size.value,
@@ -426,7 +426,7 @@ class ContainerTest : LayoutTest() {
         show {
             Box {
                 Layout(
-                    children = {
+                    content = {
                         Container(expanded = true) {
                             EmptyBox(
                                 width = size.value,
@@ -468,7 +468,7 @@ class ContainerTest : LayoutTest() {
         show {
             Box {
                 Layout(
-                    children = {
+                    content = {
                         Container(width = 20.dp, height = 20.dp) {
                             EmptyBox(
                                 width = size.value,
@@ -503,7 +503,7 @@ class ContainerTest : LayoutTest() {
 
     @Composable
     fun EmptyBox(width: Dp, height: Dp, modifier: Modifier = Modifier) {
-        Layout(modifier = modifier, children = { }) { _, constraints ->
+        Layout(modifier = modifier, content = { }) { _, constraints ->
             layout(
                 constraints.constrainWidth(width.toIntPx()),
                 constraints.constrainHeight(height.toIntPx())

@@ -113,7 +113,7 @@ class DemoActivity : ComponentActivity() {
 private fun DemoTheme(
     demoColors: DemoColors,
     window: Window,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     MaterialTheme(demoColors.colors) {
         val statusBarColor = with(MaterialTheme.colors) {
@@ -122,7 +122,7 @@ private fun DemoTheme(
         onCommit(statusBarColor) {
             window.statusBarColor = statusBarColor
         }
-        children()
+        content()
     }
 }
 

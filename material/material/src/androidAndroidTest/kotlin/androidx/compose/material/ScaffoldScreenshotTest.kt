@@ -647,7 +647,7 @@ private fun ScreenshotScaffold(
     val fab = @Composable {
         if (showFab) {
             FloatingActionButton(
-                icon = { Icon(Icons.Filled.Favorite) },
+                content = { Icon(Icons.Filled.Favorite) },
                 onClick = {}
             )
         }

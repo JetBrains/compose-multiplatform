@@ -100,7 +100,7 @@ private fun DynamicThemeApp(scrollFraction: ScrollFraction, palette: Colors) {
             bodyContent = { innerPadding ->
                 ScrollableColumn(
                     scrollState = scrollState,
-                    children = {
+                    content = {
                         Column(Modifier.padding(innerPadding)) {
                             repeat(20) { index ->
                                 Card(index)

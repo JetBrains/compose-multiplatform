@@ -29,8 +29,8 @@ import kotlin.math.max
  */
 @InternalTextApi
 @Composable
-fun SimpleLayout(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
-    Layout(modifier = modifier, children = children) { measurables, constraints ->
+fun SimpleLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(modifier = modifier, content = content) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints)
         }

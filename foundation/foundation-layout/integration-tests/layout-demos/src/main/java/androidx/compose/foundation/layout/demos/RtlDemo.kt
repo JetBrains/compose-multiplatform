@@ -150,7 +150,7 @@ private fun TestSiblings() {
 @Composable
 private fun CustomLayout(rtlSupport: Boolean) {
     Layout(
-        children = @Composable {
+        content = @Composable {
             Box(boxSize.background(color = Color.Red)) {}
             Box(boxSize.background(color = Color.Green)) {}
             Box(boxSize.background(color = Color.Blue)) {}

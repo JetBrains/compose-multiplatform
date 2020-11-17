@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2019 The Android Open Source Project
  *
@@ -190,9 +191,9 @@ class BackgroundTest {
     }
 
     @Composable
-    private fun SemanticParent(children: @Composable Density.() -> Unit) {
+    private fun SemanticParent(content: @Composable Density.() -> Unit) {
         Box(Modifier.testTag(contentTag)) {
-            AmbientDensity.current.children()
+            AmbientDensity.current.content()
         }
     }
 }

@@ -179,12 +179,12 @@ private fun Square(index: Int) {
 }
 
 @Composable
-private fun Button(onClick: () -> Unit, text: @Composable () -> Unit) {
+private fun Button(onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         Modifier.padding(5.dp)
             .preferredSize(120.dp, 60.dp)
             .clickable(onClick = onClick)
             .background(color = Color.LightGray),
         alignment = Alignment.Center
-    ) { text() }
+    ) { content() }
 }

@@ -115,7 +115,7 @@ class AndroidViewCompatTest {
             Align {
                 Layout(
                     modifier = Modifier.testTag("content"),
-                    children = @Composable {
+                    content = @Composable {
                         AndroidView(::ColoredSquareView) {
                             it.size = squareSize.value
                             it.ref = squareRef
@@ -772,9 +772,9 @@ class AndroidViewCompatTest {
     @Composable
     fun Container(
         modifier: Modifier = Modifier,
-        children: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
-        Layout(children, modifier) { measurables, constraints ->
+        Layout(content, modifier) { measurables, constraints ->
             val placeable = measurables[0].measure(constraints)
             layout(placeable.width, placeable.height) {
                 placeable.place(0, 0)

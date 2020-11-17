@@ -180,10 +180,10 @@ class BorderTest(val shape: Shape) {
     }
 
     @Composable
-    fun SemanticParent(children: @Composable Density.() -> Unit) {
+    fun SemanticParent(content: @Composable Density.() -> Unit) {
         Box {
             Box(modifier = Modifier.testTag(testTag)) {
-                AmbientDensity.current.children()
+                AmbientDensity.current.content()
             }
         }
     }

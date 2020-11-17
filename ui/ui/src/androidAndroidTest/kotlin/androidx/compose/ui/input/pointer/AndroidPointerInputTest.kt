@@ -519,12 +519,11 @@ class AndroidPointerInputTest {
         )
 }
 
-@Suppress("TestFunctionName")
 @Composable
-fun AndroidWithCompose(context: Context, androidPadding: Int, children: @Composable () -> Unit) {
+fun AndroidWithCompose(context: Context, androidPadding: Int, content: @Composable () -> Unit) {
     val anotherLayout = ComposeView(context).also { view ->
         view.setContent {
-            children()
+            content()
         }
         view.setPadding(androidPadding, androidPadding, androidPadding, androidPadding)
     }

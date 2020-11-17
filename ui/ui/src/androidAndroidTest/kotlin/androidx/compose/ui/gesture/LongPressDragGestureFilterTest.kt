@@ -85,7 +85,7 @@ class LongPressDragGestureFilterTest {
                                 setupLatch.countDown()
                             }
                         },
-                        children = emptyContent()
+                        content = emptyContent()
                     )
                 }
             }

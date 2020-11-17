@@ -61,7 +61,7 @@ class ParentDataModifierTest {
         runOnUiThread {
             activity.setContent {
                 Layout(
-                    children = {
+                    content = {
                         SimpleDrawChild(drawLatch = drawLatch)
                     },
                     measureBlock = { measurables, constraints ->
@@ -89,7 +89,7 @@ class ParentDataModifierTest {
             activity.setContent {
                 Layout(
                     modifier = Modifier.layoutId("Hello"),
-                    children = {
+                    content = {
                         SimpleDrawChild(drawLatch = drawLatch)
                     },
                     measureBlock = { measurables, constraints ->
@@ -115,13 +115,13 @@ class ParentDataModifierTest {
                 val header = @Composable {
                     Layout(
                         modifier = Modifier.layoutId(0),
-                        children = emptyContent()
+                        content = emptyContent()
                     ) { _, _ -> layout(0, 0) {} }
                 }
                 val footer = @Composable {
                     Layout(
                         modifier = Modifier.layoutId(1),
-                        children = emptyContent()
+                        content = emptyContent()
                     ) { _, _ -> layout(0, 0) {} }
                 }
 

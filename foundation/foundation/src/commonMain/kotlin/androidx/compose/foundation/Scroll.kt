@@ -280,7 +280,7 @@ fun ScrollableColumn(
     reverseScrollDirection: Boolean = false,
     isScrollEnabled: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    children: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier
@@ -293,7 +293,7 @@ fun ScrollableColumn(
             .padding(contentPadding),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
-        children = children
+        content = content
     )
 }
 
@@ -325,7 +325,7 @@ fun ScrollableRow(
     reverseScrollDirection: Boolean = false,
     isScrollEnabled: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    children: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit
 ) {
     Row(
         modifier = modifier
@@ -338,7 +338,7 @@ fun ScrollableRow(
             .padding(contentPadding),
         horizontalArrangement = horizontalArrangement,
         verticalAlignment = verticalAlignment,
-        children = children
+        content = content
     )
 }
 

@@ -107,9 +107,9 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
             }
         }
         if (useScrollerPosition) {
-            ScrollableRow(scrollState = scrollState, children = content)
+            ScrollableRow(scrollState = scrollState, content = content)
         } else {
-            ScrollableRow(children = content)
+            ScrollableRow(content = content)
         }
     }
 }

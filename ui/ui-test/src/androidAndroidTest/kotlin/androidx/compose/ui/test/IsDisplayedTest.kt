@@ -89,8 +89,8 @@ class IsDisplayedTest(val config: TestConfig) {
     }
 
     @Composable
-    fun PlaceConditionally(place: Boolean, child: @Composable () -> Unit) {
-        Layout(children = child) { measurables, constraints ->
+    fun PlaceConditionally(place: Boolean, content: @Composable () -> Unit) {
+        Layout(content = content) { measurables, constraints ->
             if (place) {
                 val placeable = measurables[0].measure(constraints)
                 layout(placeable.width, placeable.height) {

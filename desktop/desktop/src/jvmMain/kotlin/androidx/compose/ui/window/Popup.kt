@@ -38,7 +38,7 @@ fun Popup(
     offset: IntOffset = IntOffset(0, 0),
     isFocusable: Boolean = false,
     onDismissRequest: (() -> Unit)? = null,
-    children: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = emptyContent()
 ) {
     PopupLayout {
         Box(
@@ -55,19 +55,19 @@ fun Popup(
             Box(
                 modifier = Modifier.tapGestureFilter {}
             ) {
-                children()
+                content()
             }
         }
     }
 }
 
 @Composable
-private fun PopupLayout(children: @Composable () -> Unit) {
+private fun PopupLayout(content: @Composable () -> Unit) {
     val owners = DesktopOwnersAmbient.current
     val density = AmbientDensity.current
     val owner = remember {
         val owner = DesktopOwner(owners, density)
-        owner.setContent(children)
+        owner.setContent(content)
         owner
     }
     owner.density = density

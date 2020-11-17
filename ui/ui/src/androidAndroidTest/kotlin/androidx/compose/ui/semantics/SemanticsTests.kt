@@ -411,7 +411,7 @@ private class Counter(var count: Int)
 private fun CountingLayout(modifier: Modifier, counter: Counter) {
     Layout(
         modifier = modifier,
-        children = {}
+        content = {}
     ) { _, constraints ->
         counter.count++
         layout(constraints.minWidth, constraints.minHeight) {}
@@ -423,8 +423,8 @@ private fun CountingLayout(modifier: Modifier, counter: Counter) {
  * children reasonably.  Useful for Semantics hierarchy testing
  */
 @Composable
-private fun SimpleTestLayout(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
-    Layout(modifier = modifier, children = children) { measurables, constraints ->
+private fun SimpleTestLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(modifier = modifier, content = content) { measurables, constraints ->
         if (measurables.isEmpty()) {
             layout(constraints.minWidth, constraints.minHeight) {}
         } else {

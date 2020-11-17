@@ -28,6 +28,8 @@ class RuntimeIssueRegistry : IssueRegistry() {
     override val minApi = CURRENT_API
     override val issues get() = listOf(
         AmbientNamingDetector.AmbientNaming,
+        ComposableLambdaParameterDetector.ComposableLambdaParameterNaming,
+        ComposableLambdaParameterDetector.ComposableLambdaParameterPosition,
         ComposableNamingDetector.ComposableNaming
     )
 }
