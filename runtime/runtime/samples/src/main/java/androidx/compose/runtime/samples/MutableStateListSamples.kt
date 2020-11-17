@@ -29,14 +29,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.TextFieldValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Sampled
 fun stateListSample() {
     @Composable
     fun Names() {
-        var name by remember { mutableStateOf(TextFieldValue("user")) }
+        var name by remember { mutableStateOf("user") }
         val names = mutableStateListOf<String>()
 
         Column {
@@ -45,7 +44,7 @@ fun stateListSample() {
                     value = name,
                     onValueChange = { name = it }
                 )
-                Button(onClick = { names.add(name.text) }) {
+                Button(onClick = { names.add(name) }) {
                     Text("Add")
                 }
             }

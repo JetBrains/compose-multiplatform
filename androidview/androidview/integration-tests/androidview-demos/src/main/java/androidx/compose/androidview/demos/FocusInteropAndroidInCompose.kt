@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -46,7 +45,7 @@ fun EditTextInteropDemo() {
     Column {
         Row(horizontalArrangement = SpaceEvenly, verticalAlignment = CenterVertically) {
             Text("TextField in Compose:")
-            val text = remember { mutableStateOf(TextFieldValue()) }
+            val text = remember { mutableStateOf("") }
             TextField(text.value, onValueChange = { text.value = it })
         }
         Spacer(Modifier.height(20.dp))
@@ -76,7 +75,7 @@ fun EditTextInteropDemo() {
                             addView(
                                 RelativeLayout(it).apply {
                                     setContent(Recomposer.current()) {
-                                        val text = remember { mutableStateOf(TextFieldValue()) }
+                                        val text = remember { mutableStateOf("") }
                                         TextField(text.value, onValueChange = { text.value = it })
                                     }
                                 }

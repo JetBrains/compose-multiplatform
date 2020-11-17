@@ -72,7 +72,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -755,7 +754,7 @@ class TextFieldTest {
             Providers(
                 AmbientTextInputService provides textInputService
             ) {
-                val text = remember { mutableStateOf(TextFieldValue("")) }
+                val text = remember { mutableStateOf("") }
                 TextField(
                     modifier = Modifier.testTag(TextfieldTag),
                     value = text.value,

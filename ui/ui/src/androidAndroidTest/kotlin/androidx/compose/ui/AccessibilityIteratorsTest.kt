@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -450,7 +449,7 @@ class AccessibilityIteratorsTest {
         var textLayoutResult: TextLayoutResult? = null
         rule.setContent {
             ScrollableColumn {
-                val state = remember { mutableStateOf(TextFieldValue(text = InputText)) }
+                val state = remember { mutableStateOf(InputText) }
                 BasicTextField(
                     value = state.value,
                     onValueChange = { state.value = it },

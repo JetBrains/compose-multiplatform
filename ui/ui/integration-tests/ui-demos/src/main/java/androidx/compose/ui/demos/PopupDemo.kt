@@ -50,7 +50,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -519,7 +518,7 @@ private fun EditLine(
     initialText: String = "",
     color: Color = Color.White
 ) {
-    val state = remember { mutableStateOf(TextFieldValue(initialText)) }
+    val state = remember { mutableStateOf(initialText) }
     BasicTextField(
         value = state.value,
         modifier = modifier.background(color = color),
@@ -529,7 +528,7 @@ private fun EditLine(
         ),
         onValueChange = {
             state.value = it
-            onValueChange(it.text)
+            onValueChange(it)
         }
     )
 }

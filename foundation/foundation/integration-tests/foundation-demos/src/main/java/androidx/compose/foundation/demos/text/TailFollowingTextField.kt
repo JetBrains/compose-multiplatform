@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
@@ -35,9 +34,7 @@ import kotlin.math.min
 @Composable
 fun TailFollowingTextFieldDemo() {
     Column {
-        val hstate = savedInstanceState(saver = TextFieldValue.Saver) {
-            TextFieldValue("abc def ghi jkl mno pqr stu vwx yz")
-        }
+        val hstate = savedInstanceState { "abc def ghi jkl mno pqr stu vwx yz" }
         HorizontalTailFollowingTextField(
             value = hstate.value,
             onValueChange = { hstate.value = it },
@@ -47,9 +44,7 @@ fun TailFollowingTextFieldDemo() {
                 .clipToBounds()
         )
 
-        val vstate = savedInstanceState(saver = TextFieldValue.Saver) {
-            TextFieldValue("a\nb\nc\nd\ne\nf\ng\nh")
-        }
+        val vstate = savedInstanceState { "a\nb\nc\nd\ne\nf\ng\nh" }
         VerticalTailFollowintTextField(
             value = vstate.value,
             onValueChange = { vstate.value = it },
@@ -64,8 +59,8 @@ fun TailFollowingTextFieldDemo() {
 
 @Composable
 private fun HorizontalTailFollowingTextField(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier,
     textStyle: TextStyle = TextStyle(fontSize = fontSize8)
 ) {
@@ -100,8 +95,8 @@ private fun HorizontalTailFollowingTextField(
 
 @Composable
 private fun VerticalTailFollowintTextField(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier,
     textStyle: TextStyle = TextStyle(fontSize = fontSize8)
 ) {

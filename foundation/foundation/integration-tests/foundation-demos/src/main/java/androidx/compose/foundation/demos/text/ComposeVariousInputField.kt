@@ -32,7 +32,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.LocaleList
@@ -242,7 +241,7 @@ private fun VariousEditLine(
     onValueChange: (String, String) -> String = { _, new -> new },
     visualTransformation: VisualTransformation
 ) {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val state = savedInstanceState { "" }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
@@ -253,8 +252,8 @@ private fun VariousEditLine(
         ),
         visualTransformation = visualTransformation,
         onValueChange = {
-            val value = onValueChange(state.value.text, it.text)
-            state.value = it.copy(text = value)
+            val value = onValueChange(state.value, it)
+            state.value = value
         },
         textStyle = TextStyle(fontSize = fontSize8)
     )
@@ -262,7 +261,7 @@ private fun VariousEditLine(
 
 @Composable
 private fun HintEditText(content: @Composable () -> Unit) {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val state = savedInstanceState { "" }
 
     Box(demoTextFieldModifiers) {
         BasicTextField(
@@ -271,7 +270,7 @@ private fun HintEditText(content: @Composable () -> Unit) {
             onValueChange = { state.value = it },
             textStyle = TextStyle(fontSize = fontSize8)
         )
-        if (state.value.text.isEmpty()) {
+        if (state.value.isEmpty()) {
             content()
         }
     }
