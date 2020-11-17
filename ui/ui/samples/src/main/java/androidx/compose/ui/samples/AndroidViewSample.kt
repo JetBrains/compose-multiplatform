@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 
+@Suppress("SetTextI18n")
 @Sampled
 @Composable
 fun AndroidViewSample() {
