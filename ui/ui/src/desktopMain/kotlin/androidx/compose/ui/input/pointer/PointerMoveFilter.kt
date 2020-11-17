@@ -23,10 +23,17 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.unit.IntSize
 
+/**
+ * Modifier allowing to track pointer (i.e. mouse or trackpad) move events.
+ *  @param onMove The callback invoked when pointer is moved inside a component,
+ *  relative position inside a component is passed
+ *  @param onEnter The callback invoked when pointer enters the component
+ *  @param onExit The callback invoked when pointer leaves the component
+ */
 fun Modifier.pointerMoveFilter(
     onMove: (position: Offset) -> Boolean = { false },
     onExit: () -> Boolean = { false },
-    onEnter: () -> Boolean
+    onEnter: () -> Boolean = { false },
 ): Modifier = composed {
     val filter = remember(::PointerMoveEventFilter)
     filter.onEnterHandler = onEnter
