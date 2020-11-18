@@ -66,7 +66,6 @@ class ComposePlugin : Plugin<Project> {
         val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
         val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
         val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
-        val all = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-all")
 
         @Deprecated(
             "compose.desktop.linux is deprecated, use compose.desktop.linux_x64 instead",
