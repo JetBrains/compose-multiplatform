@@ -26,11 +26,11 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 /* ktlint-disable max-line-length */
-@RunWith(JUnit4::class)
 
 /**
  * Test for [ModifierDeclarationDetector].
  */
+@RunWith(JUnit4::class)
 class ModifierDeclarationDetectorTest : LintDetectorTest() {
     override fun getDetector(): Detector = ModifierDeclarationDetector()
 
@@ -40,32 +40,6 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
             ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
             ModifierDeclarationDetector.ModifierFactoryReturnType,
         )
-
-    private val modifierStub = kotlin(
-        """
-            package androidx.compose.ui
-
-            interface Modifier {
-                interface Element : Modifier
-            }
-        """
-    )
-
-    private val composableStub = kotlin(
-        """
-            package androidx.compose.runtime
-
-            @MustBeDocumented
-            @Retention(AnnotationRetention.BINARY)
-            @Target(
-                AnnotationTarget.FUNCTION,
-                AnnotationTarget.TYPE,
-                AnnotationTarget.TYPE_PARAMETER,
-                AnnotationTarget.PROPERTY
-            )
-            annotation class Composable
-        """
-    )
 
     @Test
     fun functionReturnsModifierElement() {

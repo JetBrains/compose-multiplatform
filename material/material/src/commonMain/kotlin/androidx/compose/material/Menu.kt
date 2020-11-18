@@ -86,6 +86,7 @@ import kotlin.math.min
  * @param dropdownOffset Offset to be added to the position of the menu
  * @param dropdownModifier Modifier to be applied to the menu content
  */
+@Suppress("ModifierParameter")
 @Composable
 fun DropdownMenu(
     toggle: @Composable () -> Unit,
