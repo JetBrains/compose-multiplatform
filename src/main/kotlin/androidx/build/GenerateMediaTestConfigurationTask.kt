@@ -69,16 +69,16 @@ const val MEDIA_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         </configuration>"""
 
 const val CLIENT_PREVIOUS = """
-    <option name="instrumentation-arg" value="client_version=previous" />
+    <option name="instrumentation-arg" key="client_version" value="previous" />
 """
 const val CLIENT_TOT = """
-    <option name="instrumentation-arg" value="client_version=tot" />
+    <option name="instrumentation-arg" key="client_version" value="tot" />
 """
 const val SERVICE_PREVIOUS = """
-    <option name="instrumentation-arg" value="service_version=previous" />
+    <option name="instrumentation-arg" key="service_version" value="previous" />
 """
 const val SERVICE_TOT = """
-    <option name="instrumentation-arg" value="service_version=tot" />
+    <option name="instrumentation-arg" key="service_version" value="tot" />
 """
 
 /**
