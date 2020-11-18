@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.draw
 
-import androidx.compose.ui.DefaultCameraDistance
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement

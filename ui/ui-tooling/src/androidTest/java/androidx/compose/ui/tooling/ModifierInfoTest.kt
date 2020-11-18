@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
@@ -99,11 +98,6 @@ class ModifierInfoTest : ToolingTest() {
                 columnModifierInfo[0].modifier is LayoutModifier
             )
             assertEquals(0f, columnModifierInfo[0].coordinates.positionInRoot.x)
-            assertTrue(
-                "The second modifier in the column should be a DrawLayerModifier" +
-                    "but was ${columnModifierInfo[1].modifier}",
-                columnModifierInfo[1].modifier is DrawLayerModifier
-            )
             assertTrue(columnModifierInfo[1].extra is OwnedLayer)
             assertEquals(10f, columnModifierInfo[1].coordinates.positionInRoot.x)
             assertTrue(

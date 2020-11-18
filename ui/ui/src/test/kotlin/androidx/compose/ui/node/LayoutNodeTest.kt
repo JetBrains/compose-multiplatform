@@ -16,9 +16,9 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.drawBehind
@@ -28,11 +28,13 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -703,10 +705,15 @@ class LayoutNodeTest {
     // even with multiple LayoutNodeWrappers for one modifier.
     @Test
     fun layoutNodeWrapperSameWithReplacementMultiModifier() {
-        class TestModifier : DrawModifier, DrawLayerModifier {
+        class TestModifier : DrawModifier, LayoutModifier {
             override fun ContentDrawScope.draw() {
                 drawContent()
             }
+
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ) = layout(0, 0) {}
         }
         val layoutNode = LayoutNode()
 
@@ -1641,7 +1648,8 @@ class LayoutNodeTest {
         val root = LayoutNode()
         root.attach(
             mock {
-                on { createLayer(anyOrNull(), anyOrNull(), anyOrNull()) } doReturn mock()
+                on { createLayer(anyOrNull(), anyOrNull()) } doReturn mock()
+                on { snapshotObserver } doReturn OwnerSnapshotObserver { it.invoke() }
             }
         )
 
@@ -1705,6 +1713,7 @@ private class MockOwner(
     override val layoutDirection: LayoutDirection
         get() = LayoutDirection.Ltr
     override var showLayoutBounds: Boolean = false
+    override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         onRequestMeasureParams += layoutNode
@@ -1732,43 +1741,32 @@ private class MockOwner(
     @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
-    override fun pauseModelReadObserveration(block: () -> Unit) {
-        block()
-    }
-
-    override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun <T : OwnerScope> observeReads(
-        target: T,
-        onChanged: (T) -> Unit,
-        block: () -> Unit
-    ) {
-        block()
-    }
-
     override fun measureAndLayout() {
     }
 
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
         return object : OwnedLayer {
             override val layerId: Long
                 get() = 0
-            @Suppress("UNUSED_PARAMETER")
-            override var modifier: DrawLayerModifier
-                get() = drawLayerModifier
-                set(value) {}
 
-            override fun updateLayerProperties() {
+            override fun updateLayerProperties(
+                scaleX: Float,
+                scaleY: Float,
+                alpha: Float,
+                translationX: Float,
+                translationY: Float,
+                shadowElevation: Float,
+                rotationX: Float,
+                rotationY: Float,
+                rotationZ: Float,
+                cameraDistance: Float,
+                transformOrigin: TransformOrigin,
+                shape: Shape,
+                clip: Boolean
+            ) {
             }
 
             override fun move(position: IntOffset) {
@@ -1792,9 +1790,6 @@ private class MockOwner(
 
             override fun getMatrix(matrix: Matrix) {
             }
-
-            override val isValid: Boolean
-                get() = true
         }
     }
 

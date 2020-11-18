@@ -17,13 +17,14 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -31,7 +32,8 @@ import androidx.compose.ui.unit.IntOffset
 internal class LayerWrapper(
     wrapped: LayoutNodeWrapper,
     modifier: DrawLayerModifier
-) : DelegatingLayoutNodeWrapper<DrawLayerModifier>(wrapped, modifier), (Canvas) -> Unit {
+) : OwnerScope, (Canvas) -> Unit,
+    DelegatingLayoutNodeWrapper<DrawLayerModifier>(wrapped, modifier) {
     private var _layer: OwnedLayer? = null
 
     // Do not invalidate itself on position change.
@@ -40,9 +42,42 @@ internal class LayerWrapper(
     override var modifier: DrawLayerModifier
         get() = super.modifier
         set(value) {
+            val oldModifier = super.modifier
             super.modifier = value
-            _layer?.modifier = value
+            if (_layer != null && value != oldModifier) {
+                updateLayerParameters()
+            }
         }
+
+    private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
+
+    private var isClipping: Boolean = false
+
+    private fun updateLayerParameters() {
+        val layer = _layer
+        if (layer != null) {
+            graphicsLayerScope.reset()
+            snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
+                modifier.block(graphicsLayerScope)
+            }
+            layer.updateLayerProperties(
+                scaleX = graphicsLayerScope.scaleX,
+                scaleY = graphicsLayerScope.scaleY,
+                alpha = graphicsLayerScope.alpha,
+                translationX = graphicsLayerScope.translationX,
+                translationY = graphicsLayerScope.translationY,
+                shadowElevation = graphicsLayerScope.shadowElevation,
+                rotationX = graphicsLayerScope.rotationX,
+                rotationY = graphicsLayerScope.rotationY,
+                rotationZ = graphicsLayerScope.rotationZ,
+                cameraDistance = graphicsLayerScope.cameraDistance,
+                transformOrigin = graphicsLayerScope.transformOrigin,
+                shape = graphicsLayerScope.shape,
+                clip = graphicsLayerScope.clip
+            )
+            isClipping = graphicsLayerScope.clip
+        }
+    }
 
     private val invalidateParentLayer: () -> Unit = {
         wrappedBy?.invalidateLayer()
@@ -81,10 +116,10 @@ internal class LayerWrapper(
     override fun attach() {
         super.attach()
         _layer = layoutNode.requireOwner().createLayer(
-            modifier,
             this,
             invalidateParentLayer
         )
+        updateLayerParameters()
         invalidateParentLayer()
     }
 
@@ -119,7 +154,7 @@ internal class LayerWrapper(
     }
 
     override fun rectInParent(bounds: MutableRect) {
-        if (modifier.clip) {
+        if (isClipping) {
             bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
             if (bounds.isEmpty) {
                 return
@@ -135,7 +170,7 @@ internal class LayerWrapper(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        if (modifier.clip) {
+        if (isClipping) {
             val l = globalPosition.x
             val t = globalPosition.y
             val r = l + width
@@ -167,7 +202,9 @@ internal class LayerWrapper(
             require(layoutNode.layoutState == LayoutNode.LayoutState.Ready) {
                 "Layer is redrawn for LayoutNode in state ${layoutNode.layoutState} [$layoutNode]"
             }
-            wrapped.draw(canvas)
+            snapshotObserver.observeReads(this, onCommitAffectingLayer) {
+                wrapped.draw(canvas)
+            }
             lastDrawingWasSkipped = false
         } else {
             // The invalidation is requested even for nodes which are not placed. As we are not
@@ -175,5 +212,20 @@ internal class LayerWrapper(
             // layer will be invalidated again when the node will be finally placed.
             lastDrawingWasSkipped = true
         }
+    }
+
+    override val isValid: Boolean
+        get() = _layer != null
+
+    companion object {
+        private val onCommitAffectingLayerParams: (LayerWrapper) -> Unit = { wrapper ->
+            if (wrapper.isValid) {
+                wrapper.updateLayerParameters()
+            }
+        }
+        private val onCommitAffectingLayer: (LayerWrapper) -> Unit = { wrapper ->
+            wrapper._layer?.invalidate()
+        }
+        private val graphicsLayerScope = ReusableGraphicsLayerScope()
     }
 }

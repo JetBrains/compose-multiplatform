@@ -52,6 +52,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -227,14 +228,24 @@ class AndroidLayoutDrawTest {
         val layer = ViewLayer(
             AndroidComposeView(activity),
             ViewLayerContainer(activity),
-            object : DrawLayerModifier {
-                override val cameraDistance: Float
-                    get() = cameraDistance
-            },
             {},
             {}
         ).apply {
-            updateLayerProperties()
+            updateLayerProperties(
+                scaleX = 1f,
+                scaleY = 1f,
+                alpha = 1f,
+                translationX = 0f,
+                translationY = 0f,
+                shadowElevation = 0f,
+                rotationX = 0f,
+                rotationY = 0f,
+                rotationZ = 0f,
+                cameraDistance = cameraDistance,
+                transformOrigin = TransformOrigin.Center,
+                shape = RectangleShape,
+                clip = true
+            )
         }
         // Verify that the camera distance is applied properly even after accounting for
         // the internal dp conversion within View
@@ -2404,9 +2415,9 @@ class AndroidLayoutDrawTest {
     @Test
     fun layerModifier_scaleChange() {
         val scale = mutableStateOf(1f)
-        val layerModifier = object : DrawLayerModifier {
-            override val scaleX: Float get() = scale.value
-            override val scaleY: Float get() = scale.value
+        val layerModifier = Modifier.drawLayer {
+            scaleX = scale.value
+            scaleY = scale.value
         }
         activityTestRule.runOnUiThread {
             activity.setContent {
@@ -2626,17 +2637,12 @@ class AndroidLayoutDrawTest {
                 FixedSize(30, Modifier.background(Color.Red).drawLatchModifier()) {
                     FixedSize(
                         10,
-                        PaddingModifier(10).then(
-                            object : DrawLayerModifier {
-                                override val translationX: Float
-                                    get() {
-                                        translationLatch.countDown()
-                                        return offset.value
-                                    }
-                                override val translationY: Float
-                                    get() = offset.value
-                            }
-                        ).background(Color.Yellow)
+                        PaddingModifier(10)
+                            .drawLayer {
+                                translationLatch.countDown()
+                                translationX = offset.value
+                                translationY = offset.value
+                            }.background(Color.Yellow)
                     ) {
                     }
                 }
@@ -2707,22 +2713,24 @@ class AndroidLayoutDrawTest {
         var color by mutableStateOf(Color.Red)
         var m: Measurable? = null
 
-        var layerLatch = CountDownLatch(1)
+        var layoutLatch = CountDownLatch(1)
 
-        class SpecialModifier(
-            val drawLatch: CountDownLatch,
-            val layerLatch: CountDownLatch
-        ) : DrawModifier, DrawLayerModifier {
+        class SpecialModifier : DrawModifier, LayoutModifier {
             override fun ContentDrawScope.draw() {
                 drawContent()
                 drawLatch.countDown()
             }
 
-            override val translationX: Float
-                get() {
-                    layerLatch.countDown()
-                    return super.translationX
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val placeable = measurable.measure(constraints)
+                layoutLatch.countDown()
+                return layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
                 }
+            }
         }
 
         val layoutCaptureModifier = object : LayoutModifier {
@@ -2742,16 +2750,16 @@ class AndroidLayoutDrawTest {
                 FixedSize(
                     30,
                     layoutCaptureModifier
-                        .then(SpecialModifier(drawLatch, layerLatch))
+                        .then(SpecialModifier())
                         .background(color)
                 ) {}
             }
         }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
-        assertTrue(layerLatch.await(1, TimeUnit.SECONDS))
         var firstMeasurable = m
         drawLatch = CountDownLatch(1)
-        layerLatch = CountDownLatch(1)
+        layoutLatch = CountDownLatch(1)
 
         activityTestRule.runOnUiThread {
             m = null
@@ -2759,8 +2767,8 @@ class AndroidLayoutDrawTest {
         }
 
         // The latches are triggered in the new instance
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
-        assertTrue(layerLatch.await(1, TimeUnit.SECONDS))
         // The new instance's measurable is the same.
         assertNotNull(m)
         assertSame(firstMeasurable, m)
