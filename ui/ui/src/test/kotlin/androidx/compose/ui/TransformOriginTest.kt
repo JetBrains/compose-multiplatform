@@ -45,4 +45,12 @@ class TransformOriginTest {
         assertEquals(0.4f, copy.pivotFractionX)
         assertEquals(0.1f, copy.pivotFractionY)
     }
+
+    @Test
+    fun testDestructuringComponents() {
+        val transformOrigin = TransformOrigin(0.1f, 0.2f)
+        val (pivotX, pivotY) = transformOrigin
+        assertEquals(0.1f, pivotX)
+        assertEquals(0.2f, pivotY)
+    }
 }
