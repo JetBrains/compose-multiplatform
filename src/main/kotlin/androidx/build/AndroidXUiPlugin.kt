@@ -24,6 +24,8 @@ import com.android.build.gradle.TestedExtension
 import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.api.attributes.Attribute
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.invoke
@@ -54,15 +56,24 @@ class AndroidXUiPlugin : Plugin<Project> {
                 is KotlinBasePluginWrapper -> {
                     val conf = project.configurations.create("kotlinPlugin")
 
+                    val kotlinPlugin = conf.incoming.artifactView { view ->
+                        view.attributes { attributes ->
+                            attributes.attribute(
+                                Attribute.of("artifactType", String::class.java),
+                                ArtifactTypeDefinition.JAR_TYPE
+                            )
+                        }
+                    }.files
+
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs +=
                             "-Xopt-in=kotlin.RequiresOptIn"
-                        compile.dependsOn(conf)
+                        compile.inputs.files(kotlinPlugin)
                         compile.doFirst {
                             if (!conf.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
-                                    "-Xplugin=${conf.files.first()}"
+                                    "-Xplugin=${kotlinPlugin.first()}"
                             }
                         }
                     }
