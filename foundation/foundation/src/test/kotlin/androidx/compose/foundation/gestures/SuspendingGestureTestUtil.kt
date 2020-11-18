@@ -27,8 +27,8 @@ import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.withRunningRecomposer
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -37,6 +37,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
@@ -58,7 +59,7 @@ import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.ClipboardManager
@@ -409,6 +410,7 @@ internal class SuspendingGestureTestUtil(
         override val layoutDirection: LayoutDirection
             get() = LayoutDirection.Ltr
         override var showLayoutBounds: Boolean = false
+        override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
         override fun onRequestMeasure(layoutNode: LayoutNode) {
             onRequestMeasureParams += layoutNode
@@ -434,43 +436,32 @@ internal class SuspendingGestureTestUtil(
         @ExperimentalKeyInput
         override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
-        override fun pauseModelReadObserveration(block: () -> Unit) {
-            block()
-        }
-
-        override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-            block()
-        }
-
-        override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-            block()
-        }
-
-        override fun <T : OwnerScope> observeReads(
-            target: T,
-            onChanged: (T) -> Unit,
-            block: () -> Unit
-        ) {
-            block()
-        }
-
         override fun measureAndLayout() {
         }
 
         override fun createLayer(
-            drawLayerModifier: DrawLayerModifier,
             drawBlock: (Canvas) -> Unit,
             invalidateParentLayer: () -> Unit
         ): OwnedLayer {
             return object : OwnedLayer {
                 override val layerId: Long
                     get() = 0
-                @Suppress("UNUSED_PARAMETER")
-                override var modifier: DrawLayerModifier
-                    get() = drawLayerModifier
-                    set(value) {}
 
-                override fun updateLayerProperties() {
+                override fun updateLayerProperties(
+                    scaleX: Float,
+                    scaleY: Float,
+                    alpha: Float,
+                    translationX: Float,
+                    translationY: Float,
+                    shadowElevation: Float,
+                    rotationX: Float,
+                    rotationY: Float,
+                    rotationZ: Float,
+                    cameraDistance: Float,
+                    transformOrigin: TransformOrigin,
+                    shape: Shape,
+                    clip: Boolean
+                ) {
                 }
 
                 override fun move(position: IntOffset) {
@@ -494,9 +485,6 @@ internal class SuspendingGestureTestUtil(
 
                 override fun getMatrix(matrix: Matrix) {
                 }
-
-                override val isValid: Boolean
-                    get() = true
             }
         }
 

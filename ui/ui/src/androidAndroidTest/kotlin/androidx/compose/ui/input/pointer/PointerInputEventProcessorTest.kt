@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -36,7 +35,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
@@ -3135,10 +3134,6 @@ private class MockOwner(
     @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
-    override fun pauseModelReadObserveration(block: () -> Unit) {
-        block()
-    }
-
     override val root: LayoutNode
         get() = targetRoot
     override val hapticFeedBack: HapticFeedback
@@ -3181,23 +3176,10 @@ private class MockOwner(
     override fun onDetach(node: LayoutNode) {
     }
 
-    override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun <T : OwnerScope> observeReads(
-        target: T,
-        onChanged: (T) -> Unit,
-        block: () -> Unit
-    ) {
-        block()
-    }
-
     override fun measureAndLayout() {
     }
 
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
@@ -3212,10 +3194,7 @@ private class MockOwner(
 
     override val viewConfiguration: ViewConfiguration
         get() = TODO("Not yet implemented")
-
-    override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
+    override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 }
 
 private fun List<LogEntry>.verifyOnPointerEventCall(

@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
@@ -243,12 +242,9 @@ class DrawShadowTest {
         val modifier = Modifier.drawLayer()
             .background(underColor)
             .drawLatchModifier()
-            .then(object : DrawLayerModifier {
-                override val shadowElevation: Float
-                    get() {
-                        return elevation.value
-                    }
-            })
+            .drawLayer {
+                shadowElevation = elevation.value
+            }
             .background(color)
 
         rule.runOnUiThread {

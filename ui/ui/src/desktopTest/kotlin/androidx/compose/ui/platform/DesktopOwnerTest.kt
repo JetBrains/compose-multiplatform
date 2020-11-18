@@ -80,11 +80,11 @@ class DesktopOwnerTest {
         val node = LayoutNode()
         val state = mutableStateOf(2)
 
-        owner.observeLayoutModelReads(node) {
+        owner.snapshotObserver.observeLayoutSnapshotReads(node) {
             state.value
         }
 
-        owner.observeLayoutModelReads(node) {
+        owner.snapshotObserver.observeLayoutSnapshotReads(node) {
             state.value
         }
 

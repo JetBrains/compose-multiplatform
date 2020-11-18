@@ -16,8 +16,7 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DesktopCanvas
@@ -25,6 +24,9 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asDesktopPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -42,25 +44,28 @@ import org.jetbrains.skija.ShadowUtils
 
 class SkijaLayer(
     private val owner: DesktopOwner,
-    modifier: DrawLayerModifier,
     private val invalidateParentLayer: () -> Unit,
-    private val drawBlock: SkijaLayer.(Canvas) -> Unit
+    private val drawBlock: (Canvas) -> Unit
 ) : OwnedLayer {
     private var size = IntSize.Zero
     private var position = IntOffset.Zero
-    private var outlineCache = OutlineCache(owner.density, size, modifier.shape)
+    private var outlineCache = OutlineCache(owner.density, size, RectangleShape)
     private val matrix = Matrix()
     private val pictureRecorder = PictureRecorder()
     private var picture: Picture? = null
     private var isDestroyed = false
 
-    override var modifier: DrawLayerModifier = modifier
-        set(value) {
-            field = value
-            outlineCache.shape = value.shape
-            updateMatrix()
-            invalidate()
-        }
+    private var transformOrigin: TransformOrigin = TransformOrigin.Center
+    private var translationX: Float = 0f
+    private var translationY: Float = 0f
+    private var rotationX: Float = 0f
+    private var rotationY: Float = 0f
+    private var rotationZ: Float = 0f
+    private var scaleX: Float = 1f
+    private var scaleY: Float = 1f
+    private var alpha: Float = 1f
+    private var clip: Boolean = false
+    private var shadowElevation: Float = 0f
 
     override val layerId = lastId++
 
@@ -90,32 +95,60 @@ class SkijaLayer(
         matrix.setFrom(this.matrix)
     }
 
+    override fun updateLayerProperties(
+        scaleX: Float,
+        scaleY: Float,
+        alpha: Float,
+        translationX: Float,
+        translationY: Float,
+        shadowElevation: Float,
+        rotationX: Float,
+        rotationY: Float,
+        rotationZ: Float,
+        cameraDistance: Float,
+        transformOrigin: TransformOrigin,
+        shape: Shape,
+        clip: Boolean
+    ) {
+        this.transformOrigin = transformOrigin
+        this.translationX = translationX
+        this.translationY = translationY
+        this.rotationX = rotationX
+        this.rotationY = rotationY
+        this.rotationZ = rotationZ
+        this.scaleX = scaleX
+        this.scaleY = scaleY
+        this.alpha = alpha
+        this.clip = clip
+        this.shadowElevation = shadowElevation
+        outlineCache.shape = shape
+        updateMatrix()
+        invalidate()
+    }
+
     // TODO(demin): support perspective projection for rotationX/rotationY (as in Android)
     // TODO(njawad) Add camera distance leveraging Sk3DView along with rotationX/rotationY
     // see https://cs.android.com/search?q=RenderProperties.cpp&sq= updateMatrix method
-    // for how 3d transformations along with camera distance are applied
+    // for how 3d transformations along with camera distance are applied. b/173402019
     private fun updateMatrix() {
-        val pivotX = modifier.transformOrigin.pivotFractionX * size.width
-        val pivotY = modifier.transformOrigin.pivotFractionY * size.height
+        val pivotX = transformOrigin.pivotFractionX * size.width
+        val pivotY = transformOrigin.pivotFractionY * size.height
 
         matrix.reset()
         matrix *= Matrix().apply {
             translate(x = -pivotX, y = -pivotY)
         }
         matrix *= Matrix().apply {
-            translate(modifier.translationX, modifier.translationY)
-            rotateX(modifier.rotationX)
-            rotateY(modifier.rotationY)
-            rotateZ(modifier.rotationZ)
-            scale(modifier.scaleX, modifier.scaleY)
+            translate(translationX, translationY)
+            rotateX(rotationX)
+            rotateY(rotationY)
+            rotateZ(rotationZ)
+            scale(scaleX, scaleY)
         }
         matrix *= Matrix().apply {
             translate(x = pivotX, y = pivotY)
         }
     }
-
-    override val isValid: Boolean
-        get() = !isDestroyed
 
     override fun invalidate() {
         if (!isDestroyed && picture != null) {
@@ -142,21 +175,21 @@ class SkijaLayer(
     }
 
     private fun performDrawLayer(canvas: DesktopCanvas, bounds: Rect) {
-        if (modifier.alpha > 0) {
-            if (modifier.shadowElevation > 0) {
+        if (alpha > 0) {
+            if (shadowElevation > 0) {
                 drawShadow(canvas)
             }
 
-            if (modifier.alpha < 1) {
+            if (alpha < 1) {
                 canvas.saveLayer(
                     bounds,
-                    Paint().apply { alpha = modifier.alpha }
+                    Paint().apply { alpha = this@SkijaLayer.alpha }
                 )
             } else {
                 canvas.save()
             }
 
-            if (modifier.clip) {
+            if (clip) {
                 when (val outline = outlineCache.outline) {
                     is Outline.Rectangle -> canvas.clipRect(outline.rect)
                     is Outline.Rounded -> canvas.clipRoundRect(outline.roundRect)
@@ -171,8 +204,6 @@ class SkijaLayer(
 
     override fun updateDisplayList() = Unit
 
-    override fun updateLayerProperties() = Unit
-
     @OptIn(ExperimentalUnsignedTypes::class)
     fun drawShadow(canvas: DesktopCanvas) = with (owner.density) {
         val path = when (val outline = outlineCache.outline) {
@@ -183,14 +214,14 @@ class SkijaLayer(
         }
 
         // TODO: perspective?
-        val zParams = Point3(0f, 0f, modifier.shadowElevation)
+        val zParams = Point3(0f, 0f, shadowElevation)
 
         // TODO: configurable?
         val lightPos = Point3(0f, 0f, 600.dp.toPx())
         val lightRad = 800.dp.toPx()
 
-        val ambientAlpha = 0.039f * modifier.alpha
-        val spotAlpha = 0.19f * modifier.alpha
+        val ambientAlpha = 0.039f * alpha
+        val spotAlpha = 0.19f * alpha
         val ambientColor = Color.Black.copy(alpha = ambientAlpha)
         val spotColor = Color.Black.copy(alpha = spotAlpha)
 
@@ -198,7 +229,7 @@ class SkijaLayer(
             canvas.nativeCanvas, path.asDesktopPath(), zParams, lightPos,
             lightRad,
             ambientColor.toArgb(),
-            spotColor.toArgb(), modifier.alpha < 1f, false
+            spotColor.toArgb(), alpha < 1f, false
         )
     }
 
