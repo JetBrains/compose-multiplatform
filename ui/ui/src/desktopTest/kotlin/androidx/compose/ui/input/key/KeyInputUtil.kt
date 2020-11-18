@@ -19,6 +19,8 @@ package androidx.compose.ui.input.key
 import java.awt.Component
 import java.awt.event.KeyEvent.KEY_PRESSED
 import java.awt.event.KeyEvent.KEY_RELEASED
+import java.awt.event.KeyEvent.KEY_TYPED
+import java.awt.event.KeyEvent.VK_UNDEFINED
 import java.awt.event.KeyEvent as KeyEventAwt
 
 private object DummyComponent : Component()
@@ -36,6 +38,19 @@ fun keyEvent(key: Key, keyEventType: KeyEventType): KeyEvent {
     return KeyEventDesktop(
         KeyEventAwt(
             DummyComponent, action, 0L, 0, key.keyCode,
+            KeyEventAwt.getKeyText(key.keyCode)[0]
+        )
+    )
+}
+
+/**
+ * Creates [KeyEvent] of Unknown type. It wraps KEY_TYPED AWTs KeyEvent
+ */
+@OptIn(ExperimentalKeyInput::class)
+fun keyTypedEvent(key: Key): KeyEvent {
+    return KeyEventDesktop(
+        KeyEventAwt(
+            DummyComponent, KEY_TYPED, 0L, 0, VK_UNDEFINED,
             KeyEventAwt.getKeyText(key.keyCode)[0]
         )
     )
