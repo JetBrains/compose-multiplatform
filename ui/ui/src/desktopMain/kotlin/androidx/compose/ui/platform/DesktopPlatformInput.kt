@@ -93,9 +93,9 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
         println("DesktopPlatformInput.hideSoftwareKeyboard")
     }
 
-    override fun onStateUpdated(value: TextFieldValue) {
+    override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
         currentInput?.let { input ->
-            input.value = value
+            input.value = newValue
         }
     }
 

@@ -179,3 +179,16 @@ fun TextFieldValue.getTextAfterSelection(maxChars: Int): String =
  * Helper function for getting text currently selected.
  */
 fun TextFieldValue.getSelectedText(): String = text.substring(selection)
+
+/**
+ * Temporary constructor until we figure out how to enforce composition for internal values
+ * while enforcing higher level API not to accept composition modification.
+ *
+ * @suppress
+ */
+@InternalTextApi
+fun buildTextFieldValue(
+    text: String,
+    selection: TextRange,
+    composition: TextRange?
+): TextFieldValue = TextFieldValue(text, selection, composition)

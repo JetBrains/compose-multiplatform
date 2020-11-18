@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
@@ -116,8 +117,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         this.onImeActionPerformed = onImeActionPerformed
 
         view.post {
-            imm.restartInput(view)
-            imm.showSoftInput(view, 0)
+            restartInput()
+            showSoftwareKeyboard()
         }
     }
 
@@ -127,8 +128,13 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         onImeActionPerformed = {}
         focusedRect = null
 
-        imm.restartInput(view)
+        restartInput()
         editorHasFocus = false
+    }
+
+    private fun restartInput() {
+        if (DEBUG) Log.d(TAG, "restartInput")
+        imm.restartInput(view)
     }
 
     override fun showSoftwareKeyboard() {
@@ -139,9 +145,22 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    override fun onStateUpdated(value: TextFieldValue) {
-        this.state = value
-        ic?.updateInputState(this.state, imm, view)
+    override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
+        if (oldValue == newValue) return
+
+        this.state = newValue
+
+        val restartInput = oldValue?.let {
+            it.text != newValue.text ||
+                // when selection is the same but composition has changed, need to reset the input.
+                (it.selection == newValue.selection && it.composition != newValue.composition)
+        } ?: false
+
+        if (restartInput) {
+            restartInput()
+        } else {
+            ic?.updateInputState(this.state, imm, view)
+        }
     }
 
     override fun notifyFocusedRect(rect: Rect) {

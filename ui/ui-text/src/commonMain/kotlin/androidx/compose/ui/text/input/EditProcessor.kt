@@ -33,7 +33,7 @@ class EditProcessor {
 
     // The previous editor state we passed back to the user of this class.
     @VisibleForTesting
-    internal var mPreviousState: TextFieldValue? = null
+    internal var mPreviousValue: TextFieldValue? = null
         private set
 
     // The editing buffer used for applying editor commands from IME.
@@ -48,19 +48,27 @@ class EditProcessor {
      * This method may tell the IME about the selection offset changes or extracted text changes.
      */
     fun onNewState(
-        model: TextFieldValue,
+        value: TextFieldValue,
         textInputService: TextInputService?,
         token: InputSessionToken
     ) {
-        if (mPreviousState != model) {
+        val oldValue = mPreviousValue
+
+        if (oldValue == null || oldValue.text != value.text) {
             mBuffer = EditingBuffer(
-                initialText = model.text,
-                initialSelection = model.selection
+                initialText = value.text,
+                initialSelection = value.selection
             )
+        } else if (oldValue.selection != value.selection) {
+            mBuffer.setSelection(value.selection.start, value.selection.end)
         }
 
-        mPreviousState = model
-        textInputService?.onStateUpdated(token, model)
+        if (value.composition == null) {
+            mBuffer.commitComposition()
+        }
+
+        mPreviousValue = value
+        textInputService?.onStateUpdated(token, oldValue, value)
     }
 
     /**
@@ -82,7 +90,7 @@ class EditProcessor {
             }
         )
 
-        mPreviousState = newState
+        mPreviousValue = newState
         return newState
     }
 }
