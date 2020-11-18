@@ -146,7 +146,7 @@ class TaskUpToDateValidator {
         private val BUILD_START_TIME_KEY = "taskUpToDateValidatorSetupTime"
 
         private fun shouldRecord(project: Project): Boolean {
-            return project.hasProperty(RECORD_FLAG_NAME) && !shouldValidate(project)
+            return project.hasProperty(RECORD_FLAG_NAME)
         }
 
         private fun shouldValidate(project: Project): Boolean {
@@ -175,28 +175,34 @@ class TaskUpToDateValidator {
 
         fun setup(rootProject: Project) {
             recordBuildStartTime(rootProject)
+            val taskGraph = rootProject.gradle.taskGraph
             if (shouldValidate(rootProject)) {
-                val taskGraph = rootProject.gradle.taskGraph
                 taskGraph.beforeTask { task ->
                     if (!shouldTryRerunningTask(task)) {
                         task.enabled = false
                     }
                 }
+            }
+            if (shouldRecord(rootProject) || shouldValidate(rootProject)) {
                 taskGraph.afterTask { task ->
-                    if (task.didWork) {
-                        if (!isAllowedToRerunTask(task)) {
-                            val message = "Ran two consecutive builds of the same tasks," +
-                                " and in the second build, observed $task to be not UP-TO-DATE." +
-                                " This indicates that $task does not declare" +
-                                " inputs and/or outputs correctly.\n" +
-                                tryToExplainTaskExecution(task, taskGraph)
-                            throw GradleException(message)
+                    // In the second build, make sure that the task didn't rerun
+                    if (shouldValidate(rootProject)) {
+                        if (task.didWork) {
+                            if (!isAllowedToRerunTask(task)) {
+                                val message = "Ran two consecutive builds of the same tasks," +
+                                    " and in the second build, observed $task to be not " +
+                                    " UP-TO-DATE. This indicates that $task does not declare" +
+                                    " inputs and/or outputs correctly.\n" +
+                                    tryToExplainTaskExecution(task, taskGraph)
+                                throw GradleException(message)
+                            }
                         }
                     }
-                }
-            }
-            if (shouldRecord(rootProject)) {
-                rootProject.gradle.taskGraph.afterTask { task ->
+                    // In the first build, record the task's inputs so that if they change in
+                    // the second build then we can compare.
+                    // In the second build, also record the task's inputs because we recorded
+                    // them in the first build, and we want the two builds to be as similar as
+                    // possible
                     if (shouldTryRerunningTask(task) && !isAllowedToRerunTask(task)) {
                         recordTaskInputs(task)
                     }
