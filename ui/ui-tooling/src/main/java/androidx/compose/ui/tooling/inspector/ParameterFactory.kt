@@ -19,6 +19,8 @@ package androidx.compose.ui.tooling.inspector
 import android.util.Log
 import android.view.View
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.runtime.ComposeCompilerApi
+import androidx.compose.runtime.internal.ComposableLambda
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import java.lang.reflect.Field
+import kotlin.jvm.internal.Lambda
 import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -58,12 +61,16 @@ import java.lang.reflect.Modifier as JavaModifier
 private const val MAX_RECURSIONS = 10
 private const val MAX_ITERABLE = 25
 
+@OptIn(ComposeCompilerApi::class)
+private typealias CLambda =
+    ComposableLambda<*, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *>
+
 /**
  * Factory of [NodeParameter]s.
  *
  * Each parameter value is converted to a user readable value.
  */
-@ExperimentalLayoutNodeApi
+@OptIn(ExperimentalLayoutNodeApi::class)
 internal class ParameterFactory(private val inlineClassConverter: InlineClassConverter) {
     /**
      * A map from known values to a user readable string representation.
@@ -265,6 +272,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                     is AnnotatedString -> NodeParameter(name, ParameterType.String, value.text)
                     is BaselineShift -> createFromBaselineShift(name, value)
                     is Boolean -> NodeParameter(name, ParameterType.Boolean, value)
+                    is CLambda -> createFromCLambda(name, value)
                     is Color -> NodeParameter(name, ParameterType.Color, value.toArgb())
                     is CornerSize -> createFromCornerSize(name, value)
                     is Double -> NodeParameter(name, ParameterType.Double, value)
@@ -277,6 +285,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                     is InspectableValue -> createFromInspectableValue(name, value)
                     is Int -> NodeParameter(name, ParameterType.Int32, value)
                     is Iterable<*> -> createFromIterable(name, value)
+                    is Lambda<*> -> createFromLambda(name, value)
                     is Locale -> NodeParameter(name, ParameterType.String, value.toString())
                     is LocaleList ->
                         NodeParameter(name, ParameterType.String, value.localeList.joinToString())
@@ -303,6 +312,15 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                 else -> return NodeParameter(name, ParameterType.Float, value.multiplier)
             }
             return NodeParameter(name, ParameterType.String, converted)
+        }
+
+        private fun createFromCLambda(name: String, value: CLambda): NodeParameter? = try {
+            val lambda = value.javaClass.getDeclaredField("_block")
+                .apply { isAccessible = true }
+                .get(value)
+            NodeParameter(name, ParameterType.Lambda, lambda)
+        } catch (_: Throwable) {
+            null
         }
 
         private fun createFromConstant(name: String, value: Any): NodeParameter? {
@@ -393,6 +411,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                 .toCollection(elements)
             return parameter
         }
+
+        private fun createFromLambda(name: String, value: Lambda<*>): NodeParameter =
+            NodeParameter(name, ParameterType.Lambda, value)
 
         private fun createFromModifier(name: String, value: Modifier): NodeParameter? =
             when {
