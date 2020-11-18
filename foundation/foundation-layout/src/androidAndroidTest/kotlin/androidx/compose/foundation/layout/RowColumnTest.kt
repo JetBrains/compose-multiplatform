@@ -4512,7 +4512,7 @@ class RowColumnTest : LayoutTest() {
                         parentLayoutCoordinates = coordinates
                         drawLatch.countDown()
                     },
-                horizontalArrangement = AbsoluteArrangement.Left
+                horizontalArrangement = Arrangement.Absolute.Left
             ) {
                 for (i in childPosition.indices) {
                     Container(
@@ -4565,7 +4565,7 @@ class RowColumnTest : LayoutTest() {
                             parentLayoutCoordinates = coordinates
                             drawLatch.countDown()
                         },
-                    horizontalArrangement = AbsoluteArrangement.Left
+                    horizontalArrangement = Arrangement.Absolute.Left
                 ) {
                     for (i in childPosition.indices) {
                         Container(
@@ -4619,7 +4619,7 @@ class RowColumnTest : LayoutTest() {
                         parentLayoutCoordinates = coordinates
                         drawLatch.countDown()
                     },
-                horizontalArrangement = AbsoluteArrangement.Right
+                horizontalArrangement = Arrangement.Absolute.Right
             ) {
                 for (i in childPosition.indices) {
                     Container(
@@ -4678,7 +4678,7 @@ class RowColumnTest : LayoutTest() {
                             parentLayoutCoordinates = coordinates
                             drawLatch.countDown()
                         },
-                    horizontalArrangement = AbsoluteArrangement.Right
+                    horizontalArrangement = Arrangement.Absolute.Right
                 ) {
                     for (i in childPosition.indices) {
                         Container(
@@ -4738,7 +4738,7 @@ class RowColumnTest : LayoutTest() {
                         parentLayoutCoordinates = coordinates
                         drawLatch.countDown()
                     },
-                horizontalArrangement = AbsoluteArrangement.Center
+                horizontalArrangement = Arrangement.Absolute.Center
             ) {
                 for (i in 0 until childPosition.size) {
                     Container(
@@ -4807,7 +4807,7 @@ class RowColumnTest : LayoutTest() {
                             parentLayoutCoordinates = coordinates
                             drawLatch.countDown()
                         },
-                    horizontalArrangement = AbsoluteArrangement.Center
+                    horizontalArrangement = Arrangement.Absolute.Center
                 ) {
                     for (i in 0 until childPosition.size) {
                         Container(
@@ -4877,7 +4877,7 @@ class RowColumnTest : LayoutTest() {
                         parentLayoutCoordinates = coordinates
                         drawLatch.countDown()
                     },
-                horizontalArrangement = AbsoluteArrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.Absolute.SpaceEvenly
             ) {
                 for (i in childPosition.indices) {
                     Container(
@@ -4944,7 +4944,7 @@ class RowColumnTest : LayoutTest() {
                                     coordinates
                                 drawLatch.countDown()
                             },
-                        horizontalArrangement = AbsoluteArrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.Absolute.SpaceEvenly
                     ) {
                         for (i in childPosition.indices) {
                             Container(
@@ -5011,7 +5011,7 @@ class RowColumnTest : LayoutTest() {
                         parentLayoutCoordinates = coordinates
                         drawLatch.countDown()
                     },
-                horizontalArrangement = AbsoluteArrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween
             ) {
                 for (i in childPosition.indices) {
                     Container(
@@ -5076,7 +5076,7 @@ class RowColumnTest : LayoutTest() {
                                     coordinates
                                 drawLatch.countDown()
                             },
-                        horizontalArrangement = AbsoluteArrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.Absolute.SpaceBetween
                     ) {
                         for (i in childPosition.indices) {
                             Container(
@@ -5140,7 +5140,7 @@ class RowColumnTest : LayoutTest() {
                         parentLayoutCoordinates = coordinates
                         drawLatch.countDown()
                     },
-                horizontalArrangement = AbsoluteArrangement.SpaceAround
+                horizontalArrangement = Arrangement.Absolute.SpaceAround
             ) {
                 for (i in 0 until childPosition.size) {
                     Container(
@@ -5208,7 +5208,7 @@ class RowColumnTest : LayoutTest() {
                                     coordinates
                                 drawLatch.countDown()
                             },
-                        horizontalArrangement = AbsoluteArrangement.SpaceAround
+                        horizontalArrangement = Arrangement.Absolute.SpaceAround
                     ) {
                         for (i in 0 until childPosition.size) {
                             Container(
@@ -5273,7 +5273,7 @@ class RowColumnTest : LayoutTest() {
             Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Column {
                     Row(
-                        horizontalArrangement = AbsoluteArrangement.spacedBy(space, Alignment.End),
+                        horizontalArrangement = Arrangement.Absolute.spacedBy(space, Alignment.End),
                         modifier = Modifier.size(rowSize).onGloballyPositioned {
                             assertEquals(rowSizePx, it.size.width)
                             latch.countDown()

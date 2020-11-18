@@ -1,24 +1,24 @@
 // Signature format: 4.0
 package androidx.compose.foundation.layout {
 
-  @androidx.compose.runtime.Immutable public final class AbsoluteArrangement {
-    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal aligned(androidx.compose.ui.Alignment.Horizontal alignment);
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal getCenter();
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal getLeft();
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal getRight();
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceAround();
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceBetween();
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceEvenly();
-    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical spacedBy-0680j_4(float space);
-    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Vertical spacedBy-6mHxxJo(float space, androidx.compose.ui.Alignment.Vertical alignment);
-    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal spacedBy-w0p642k(float space, androidx.compose.ui.Alignment.Horizontal alignment);
-    property public final androidx.compose.foundation.layout.Arrangement.Horizontal Center;
-    property public final androidx.compose.foundation.layout.Arrangement.Horizontal Left;
-    property public final androidx.compose.foundation.layout.Arrangement.Horizontal Right;
-    property public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceAround;
-    property public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceBetween;
-    property public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceEvenly;
-    field public static final androidx.compose.foundation.layout.AbsoluteArrangement INSTANCE;
+  @Deprecated @androidx.compose.runtime.Immutable public final class AbsoluteArrangement {
+    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal aligned(androidx.compose.ui.Alignment.Horizontal alignment);
+    method @Deprecated public androidx.compose.foundation.layout.Arrangement.Horizontal getCenter();
+    method @Deprecated public androidx.compose.foundation.layout.Arrangement.Horizontal getLeft();
+    method @Deprecated public androidx.compose.foundation.layout.Arrangement.Horizontal getRight();
+    method @Deprecated public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceAround();
+    method @Deprecated public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceBetween();
+    method @Deprecated public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceEvenly();
+    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical spacedBy-0680j_4(float space);
+    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Vertical spacedBy-6mHxxJo(float space, androidx.compose.ui.Alignment.Vertical alignment);
+    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal spacedBy-w0p642k(float space, androidx.compose.ui.Alignment.Horizontal alignment);
+    property @Deprecated public final androidx.compose.foundation.layout.Arrangement.Horizontal Center;
+    property @Deprecated public final androidx.compose.foundation.layout.Arrangement.Horizontal Left;
+    property @Deprecated public final androidx.compose.foundation.layout.Arrangement.Horizontal Right;
+    property @Deprecated public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceAround;
+    property @Deprecated public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceBetween;
+    property @Deprecated public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceEvenly;
+    field @Deprecated public static final androidx.compose.foundation.layout.AbsoluteArrangement INSTANCE;
   }
 
   public final class AlignmentLineKt {
@@ -52,6 +52,26 @@ package androidx.compose.foundation.layout {
     property public final androidx.compose.foundation.layout.Arrangement.Horizontal Start;
     property public final androidx.compose.foundation.layout.Arrangement.Vertical Top;
     field public static final androidx.compose.foundation.layout.Arrangement INSTANCE;
+  }
+
+  @androidx.compose.runtime.Immutable public static final class Arrangement.Absolute {
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal aligned(androidx.compose.ui.Alignment.Horizontal alignment);
+    method public androidx.compose.foundation.layout.Arrangement.Horizontal getCenter();
+    method public androidx.compose.foundation.layout.Arrangement.Horizontal getLeft();
+    method public androidx.compose.foundation.layout.Arrangement.Horizontal getRight();
+    method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceAround();
+    method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceBetween();
+    method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceEvenly();
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical spacedBy-0680j_4(float space);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Vertical spacedBy-6mHxxJo(float space, androidx.compose.ui.Alignment.Vertical alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal spacedBy-w0p642k(float space, androidx.compose.ui.Alignment.Horizontal alignment);
+    property public final androidx.compose.foundation.layout.Arrangement.Horizontal Center;
+    property public final androidx.compose.foundation.layout.Arrangement.Horizontal Left;
+    property public final androidx.compose.foundation.layout.Arrangement.Horizontal Right;
+    property public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceAround;
+    property public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceBetween;
+    property public final androidx.compose.foundation.layout.Arrangement.Horizontal SpaceEvenly;
+    field public static final androidx.compose.foundation.layout.Arrangement.Absolute INSTANCE;
   }
 
   @androidx.compose.foundation.layout.InternalLayoutApi @androidx.compose.runtime.Immutable public static interface Arrangement.Horizontal {
