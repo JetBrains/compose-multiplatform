@@ -42,7 +42,8 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Soft Wrap") { SoftWrapDemo() },
                 ComposableDemo("Min/Max Lines") { CoreTextFieldMinMaxDemo() },
                 ComposableDemo("Ime SingleLine") { ImeSingleLineDemo() },
-                ComposableDemo("Capitalization/AutoCorrect") { CapitalizationAutoCorrectDemo() }
+                ComposableDemo("Capitalization/AutoCorrect") { CapitalizationAutoCorrectDemo() },
+                ComposableDemo("TextFieldValue") { TextFieldValueDemo() }
             )
         ),
         ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }

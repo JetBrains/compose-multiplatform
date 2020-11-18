@@ -104,9 +104,10 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
      */
     open fun onStateUpdated(
         token: InputSessionToken,
-        value: TextFieldValue
+        oldValue: TextFieldValue?,
+        newValue: TextFieldValue
     ) = ignoreIfExpired(token) {
-        platformTextInputService.onStateUpdated(value)
+        platformTextInputService.onStateUpdated(oldValue, newValue)
     }
 
     /**
@@ -152,7 +153,7 @@ interface PlatformTextInputService {
     /*
      * Notify the new editor model to IME.
      */
-    fun onStateUpdated(value: TextFieldValue)
+    fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue)
 
     /**
      * Notify the focused rectangle to the system.
