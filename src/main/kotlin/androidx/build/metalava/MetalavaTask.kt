@@ -25,6 +25,8 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
@@ -39,19 +41,18 @@ abstract class MetalavaTask @Inject constructor(
     abstract val metalavaClasspath: ConfigurableFileCollection
 
     /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
-    @get:InputFiles
+    @get:Classpath
     lateinit var bootClasspath: Collection<File>
 
     /** Dependencies of [sourcePaths]. */
-    @get:InputFiles
+    @get:Classpath
     lateinit var dependencyClasspath: FileCollection
 
     /** Source files against which API signatures will be validated. */
-    @get:InputFiles
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     var sourcePaths: Collection<File> = emptyList()
 
-    @get:InputFile
-    @get:Optional
+    @get:[Optional InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val manifestPath: RegularFileProperty
 
     fun runWithArgs(args: List<String>) {

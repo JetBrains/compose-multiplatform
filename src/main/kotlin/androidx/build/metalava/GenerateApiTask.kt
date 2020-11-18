@@ -20,25 +20,34 @@ import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
 /** Generate an API signature text file from a set of source files. */
+@CacheableTask
 abstract class GenerateApiTask @Inject constructor(
     workerExecutor: WorkerExecutor
 ) : MetalavaTask(workerExecutor) {
-    /** Text file to which API signatures will be written. */
-    @get:Input
-    abstract val apiLocation: Property<ApiLocation>
-
-    @get:Input
+    @get:Internal // already expressed by getApiLintBaseline()
     abstract val baselines: Property<ApiBaselinesLocation>
+
+    @Optional
+    @PathSensitive(PathSensitivity.NONE)
+    @InputFile
+    fun getApiLintBaseline(): File? {
+        val baseline = baselines.get().apiLintFile
+        return if (baseline.exists()) baseline else null
+    }
 
     @get:Input
     var targetsJavaConsumers: Boolean = true
@@ -46,12 +55,9 @@ abstract class GenerateApiTask @Inject constructor(
     @get:Input
     var generateRestrictToLibraryGroupAPIs = true
 
-    @Optional
-    @InputFile
-    fun getApiLintBaseline(): File? {
-        val baseline = baselines.get().apiLintFile
-        return if (baseline.exists()) baseline else null
-    }
+    /** Text file to which API signatures will be written. */
+    @get:Internal // already expressed by getTaskOutputs()
+    abstract val apiLocation: Property<ApiLocation>
 
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
