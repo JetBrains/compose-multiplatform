@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
@@ -52,7 +52,7 @@ fun DraggableSample() {
             .background(Color.Black)
     ) {
         Box(
-            Modifier.offsetPx(x = offsetPosition).preferredSize(50.dp).background(Color.Red)
+            Modifier.offset(x = { offsetPosition.value }).preferredSize(50.dp).background(Color.Red)
         )
     }
 }

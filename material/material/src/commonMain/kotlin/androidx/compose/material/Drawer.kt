@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
@@ -386,7 +386,7 @@ fun ModalDrawerLayout(
                         maxWidth = constraints.maxWidth.toDp(),
                         maxHeight = constraints.maxHeight.toDp()
                     )
-                }.offsetPx(x = drawerState.offset).padding(end = VerticalDrawerPadding),
+                }.offset(x = { drawerState.offset.value }).padding(end = VerticalDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
@@ -500,7 +500,7 @@ fun BottomDrawerLayout(
                         maxWidth = constraints.maxWidth.toDp(),
                         maxHeight = constraints.maxHeight.toDp()
                     )
-                }.offsetPx(y = drawerState.offset),
+                }.offset(y = { drawerState.offset.value }),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,

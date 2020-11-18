@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -115,7 +115,7 @@ private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() ->
             Modifier
                 .fillMaxHeight()
                 .width(drawerWidth)
-                .offsetPx(x = currentOffset)
+                .offset(x = { currentOffset.value })
                 .background(color = DefaultBackgroundColor)
         ) {
             Text(

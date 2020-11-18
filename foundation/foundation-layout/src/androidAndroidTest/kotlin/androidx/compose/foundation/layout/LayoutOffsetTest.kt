@@ -18,8 +18,6 @@ package androidx.compose.foundation.layout
 
 import android.os.Build
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -196,10 +194,7 @@ class LayoutOffsetTest : LayoutTest() {
             Box(
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
-                    .offsetPx(
-                        remember { mutableStateOf(offsetX) },
-                        remember { mutableStateOf(offsetY) }
-                    )
+                    .offset({ offsetX }, { offsetY })
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x
                         positionY = coordinates.positionInRoot.y
@@ -230,10 +225,7 @@ class LayoutOffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopEnd)
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
-                        .offsetPx(
-                            remember { mutableStateOf(offsetX) },
-                            remember { mutableStateOf(offsetY) }
-                        )
+                        .offset({ offsetX }, { offsetY })
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x
                             positionY = coordinates.positionInRoot.y
@@ -265,10 +257,7 @@ class LayoutOffsetTest : LayoutTest() {
             Box(
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
-                    .absoluteOffsetPx(
-                        remember { mutableStateOf(offsetX) },
-                        remember { mutableStateOf(offsetY) }
-                    )
+                    .absoluteOffset({ offsetX }, { offsetY })
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x
                         positionY = coordinates.positionInRoot.y
@@ -299,10 +288,7 @@ class LayoutOffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopEnd)
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
-                        .absoluteOffsetPx(
-                            remember { mutableStateOf(offsetX) },
-                            remember { mutableStateOf(offsetY) }
-                        )
+                        .absoluteOffset({ offsetX }, { offsetY })
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x
                             positionY = coordinates.positionInRoot.y
@@ -348,9 +334,8 @@ class LayoutOffsetTest : LayoutTest() {
 
     @Test
     fun testOffsetPxInspectableValue() {
-        val modifier = Modifier.offsetPx(mutableStateOf(10.0f), mutableStateOf(20.0f))
-            as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("offsetPx")
+        val modifier = Modifier.offset({ 10.0f }, { 20.0f }) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("offset")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.asIterable())
             .containsExactly("x", "y")
@@ -358,9 +343,8 @@ class LayoutOffsetTest : LayoutTest() {
 
     @Test
     fun testAbsoluteOffsetPxInspectableValue() {
-        val modifier = Modifier.absoluteOffsetPx(mutableStateOf(10.0f), mutableStateOf(20.0f))
-            as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("absoluteOffsetPx")
+        val modifier = Modifier.absoluteOffset({ 10.0f }, { 20.0f }) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("absoluteOffset")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.asIterable())
             .containsExactly("x", "y")

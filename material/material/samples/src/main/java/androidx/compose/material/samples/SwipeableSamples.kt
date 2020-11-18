@@ -19,7 +19,7 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.ExperimentalMaterialApi
@@ -62,7 +62,7 @@ fun SwipeableSample() {
     ) {
         Box(
             Modifier
-                .offsetPx(x = swipeableState.offset)
+                .offset(x = { swipeableState.offset.value })
                 .preferredSize(squareSize)
                 .background(Color.Red),
             alignment = Alignment.Center
