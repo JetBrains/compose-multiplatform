@@ -309,17 +309,6 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
     }
 }
 
-private const val ModifierFqn = "androidx.compose.ui.Modifier"
-private val ModifierShortName = ModifierFqn.split(".").last()
-
-private const val ComposableAnnotation = "androidx.compose.runtime.Composable"
-
-// TODO: KotlinUMethodWithFakeLightDelegate.hasAnnotation() returns null for some reason, so just
-// look at the annotations directly
-// TODO: annotations is deprecated but the replacement uAnnotations isn't available on the
-// version of lint / uast we compile against
-@Suppress("DEPRECATION")
-val UMethod.isComposable get() = annotations.any { it.qualifiedName == ComposableAnnotation }
 /**
  * TODO: UMethod.returnTypeReference is not available in LINT_API_MIN, so instead use this with a
  * [KtCallableDeclaration].
