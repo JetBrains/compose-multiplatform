@@ -83,7 +83,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {
     private val factory = ParameterFactory(InlineClassConverter())
-    private val api = android.os.Build.VERSION.SDK_INT
     private val node = MutableInspectorNode().apply {
         width = 1000
         height = 500
@@ -208,19 +207,6 @@ class ParameterFactoryTest {
                 }
                 parameter("endX", ParameterType.Float, 5.0f)
                 parameter("endY", ParameterType.Float, 10.0f)
-                parameter("shader", ParameterType.String, "LinearGradient") {
-                    parameter("mColor0", ParameterType.Int32, 0)
-                    parameter("mColor1", ParameterType.Int32, 0)
-                    optional("mColors", ParameterType.String, "IntArray", { api <= 28 })
-                    optional("mNativeInstance", ParameterType.Int64, 0L, { api == 26 })
-                    parameter("mTileMode", ParameterType.String, "CLAMP")
-                    optional("mType", ParameterType.Int32, 1, { api <= 26 })
-                    parameter("mX0", ParameterType.Float, 0.0f)
-                    parameter("mX1", ParameterType.Float, 5.0f)
-                    parameter("mY0", ParameterType.Float, 0.5f)
-                    parameter("mY1", ParameterType.Float, 10.0f)
-                    ignore("native_instance", ParameterType.Int64) { api == 23 }
-                }
                 parameter("startX", ParameterType.Float, 0.0f)
                 parameter("startY", ParameterType.Float, 0.5f)
                 parameter("tileMode", ParameterType.String, "Clamp")
@@ -678,30 +664,6 @@ class ParameterValidationReceiver(val parameterIterator: Iterator<NodeParameter>
                 elementNames.add(children.parameterIterator.next().name)
             }
             error("$name: has more elements like: ${elementNames.joinToString()}")
-        }
-    }
-
-    fun optional(
-        name: String,
-        type: ParameterType,
-        value: Any?,
-        condition: () -> Boolean,
-        children: ParameterValidationReceiver.() -> Unit = {}
-    ) {
-        if (condition()) {
-            parameter(name, type, value, children)
-        }
-    }
-
-    fun ignore(
-        name: String,
-        type: ParameterType,
-        condition: () -> Boolean,
-    ) {
-        if (condition()) {
-            val parameter = parameterIterator.next()
-            assertThat(parameter.name).isEqualTo(name)
-            assertWithMessage(name).that(parameter.type).isEqualTo(type)
         }
     }
 }
