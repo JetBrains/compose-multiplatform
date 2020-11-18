@@ -289,8 +289,20 @@ internal class AndroidParagraph constructor(
 
     override fun getLineStart(lineIndex: Int): Int = layout.getLineStart(lineIndex)
 
-    override fun getLineEnd(lineIndex: Int): Int = layout.getLineEnd(lineIndex)
+    override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean): Int =
+        if (visibleEnd) {
+            layout.getLineVisibleEnd(lineIndex)
+        } else {
+            layout.getLineEnd(lineIndex)
+        }
 
+    @Deprecated(
+        "This function will be removed.",
+        replaceWith = ReplaceWith(
+            "getLineEnd(lineIndex, true)",
+            "androidx.compose.ui.text.platform"
+        )
+    )
     override fun getLineVisibleEnd(lineIndex: Int): Int = layout.getLineVisibleEnd(lineIndex)
 
     override fun isLineEllipsized(lineIndex: Int): Boolean = layout.isLineEllipsized(lineIndex)

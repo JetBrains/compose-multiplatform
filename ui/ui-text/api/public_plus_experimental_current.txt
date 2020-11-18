@@ -97,7 +97,7 @@ package androidx.compose.ui.text {
     method public float getLastBaseline();
     method public float getLineBottom(int lineIndex);
     method public int getLineCount();
-    method public int getLineEnd(int lineIndex);
+    method public int getLineEnd(int lineIndex, optional boolean visibleEnd);
     method public int getLineForOffset(int offset);
     method public int getLineForVerticalPosition(float vertical);
     method public float getLineHeight(int lineIndex);
@@ -105,7 +105,7 @@ package androidx.compose.ui.text {
     method public float getLineRight(int lineIndex);
     method public int getLineStart(int lineIndex);
     method public float getLineTop(int lineIndex);
-    method public int getLineVisibleEnd(int lineIndex);
+    method @Deprecated public int getLineVisibleEnd(int lineIndex);
     method public float getLineWidth(int lineIndex);
     method public float getMaxIntrinsicWidth();
     method public int getMaxLines();
@@ -160,7 +160,7 @@ package androidx.compose.ui.text {
     method public float getLastBaseline();
     method public float getLineBottom(int lineIndex);
     method public int getLineCount();
-    method public int getLineEnd(int lineIndex);
+    method public int getLineEnd(int lineIndex, optional boolean visibleEnd);
     method public int getLineForOffset(int offset);
     method public int getLineForVerticalPosition(float vertical);
     method public float getLineHeight(int lineIndex);
@@ -168,7 +168,7 @@ package androidx.compose.ui.text {
     method public float getLineRight(int lineIndex);
     method public int getLineStart(int lineIndex);
     method public float getLineTop(int lineIndex);
-    method public int getLineVisibleEnd(int lineIndex);
+    method @Deprecated public int getLineVisibleEnd(int lineIndex);
     method public float getLineWidth(int lineIndex);
     method public float getMaxIntrinsicWidth();
     method public float getMinIntrinsicWidth();
@@ -375,14 +375,14 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.text.TextLayoutInput getLayoutInput();
     method public float getLineBottom(int lineIndex);
     method public int getLineCount();
-    method public int getLineEnd(int lineIndex);
+    method public int getLineEnd(int lineIndex, optional boolean visibleEnd);
     method public int getLineForOffset(int offset);
     method public int getLineForVerticalPosition(float vertical);
     method public float getLineLeft(int lineIndex);
     method public float getLineRight(int lineIndex);
     method public int getLineStart(int lineIndex);
     method public float getLineTop(int lineIndex);
-    method public int getLineVisibleEnd(int lineIndex);
+    method @Deprecated public int getLineVisibleEnd(int lineIndex);
     method public int getOffsetForPosition-k-4lQ0M(long position);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getParagraphDirection(int offset);
     method public androidx.compose.ui.graphics.Path getPathForRange(int start, int end);

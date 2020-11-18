@@ -122,14 +122,16 @@ interface Paragraph {
     /**
      * Returns the end offset of the given line
      *
-     * If ellipsis happens on the given line, this returns the end of text since ellipsized
-     * characters are counted into the same line.
+     * Characters being ellipsized are treated as invisible characters. So that if visibleEnd is
+     * false, it will return line end including the ellipsized characters and vice verse.
      *
      * @param lineIndex the line number
+     * @param visibleEnd if true, the returned line end will not count trailing whitespaces or
+     * linefeed characters. Otherwise, this function will return the logical line end. By default
+     * it's false.
      * @return an exclusive end offset of the line.
-     * @see getLineVisibleEnd
      */
-    fun getLineEnd(lineIndex: Int): Int
+    fun getLineEnd(lineIndex: Int, visibleEnd: Boolean = false): Int
 
     /**
      * Returns the end of visible offset of the given line.
@@ -142,6 +144,10 @@ interface Paragraph {
      * @return an exclusive line end offset that is visible on the display
      * @see getLineEnd
      */
+    @Deprecated(
+        "This function will be removed.",
+        replaceWith = ReplaceWith("getLineEnd(lineIndex, true)", "androidx.compose.ui.text")
+    )
     fun getLineVisibleEnd(lineIndex: Int): Int
 
     /**
