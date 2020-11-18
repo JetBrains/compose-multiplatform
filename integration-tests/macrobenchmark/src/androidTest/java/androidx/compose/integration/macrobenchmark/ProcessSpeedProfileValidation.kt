@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.macrobenchmark
+package androidx.compose.integration.macrobenchmark
 
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.CpuUsageMetric
