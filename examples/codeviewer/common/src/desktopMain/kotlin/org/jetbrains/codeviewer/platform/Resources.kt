@@ -1,8 +1,8 @@
 package org.jetbrains.codeviewer.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -15,9 +15,9 @@ import java.net.URL
 @Composable
 actual fun imageResource(res: String) = androidx.compose.ui.res.imageResource("drawable/$res.png")
 
-actual suspend fun imageFromUrl(url: String): ImageAsset = withContext(Dispatchers.IO) {
+actual suspend fun imageFromUrl(url: String): ImageBitmap = withContext(Dispatchers.IO) {
     val bytes = URL(url).openStream().buffered().use(InputStream::readBytes)
-    Image.makeFromEncoded(bytes).asImageAsset()
+    Image.makeFromEncoded(bytes).asImageBitmap()
 }
 
 @Composable

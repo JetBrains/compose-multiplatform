@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
@@ -35,7 +35,7 @@ fun StatusBar(settings: Settings) = Box(
 
         Spacer(Modifier.width(8.dp))
 
-        Providers(DensityAmbient provides DensityAmbient.current.scale(0.5f)) {
+        Providers(AmbientDensity provides AmbientDensity.current.scale(0.5f)) {
             Slider(
                 (settings.fontSize - MinFontSize) / (MaxFontSize - MinFontSize),
                 onValueChange = { settings.fontSize = lerp(MinFontSize, MaxFontSize, it) },

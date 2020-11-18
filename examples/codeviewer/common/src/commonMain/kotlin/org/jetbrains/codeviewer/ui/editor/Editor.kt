@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.codeviewer.platform.File
 import org.jetbrains.codeviewer.util.EmptyTextLines
 import org.jetbrains.codeviewer.util.SingleSelection
-import org.jetbrains.codeviewer.util.afterSet
 
 class Editor(
     val fileName: String,
@@ -27,7 +26,7 @@ class Editor(
     interface Lines {
         val lineNumberDigitCount: Int get() = size.toString().length
         val size: Int
-        fun get(index: Int): Line
+        operator fun get(index: Int): Line
     }
 
     class Content(val value: State<String>, val isCode: Boolean)

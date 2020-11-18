@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawOpacity
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -27,14 +27,13 @@ import org.jetbrains.codeviewer.ui.common.AppTheme
 import org.jetbrains.codeviewer.ui.common.Fonts
 import org.jetbrains.codeviewer.ui.common.Settings
 import org.jetbrains.codeviewer.util.LazyColumnFor
-import org.jetbrains.codeviewer.util.loadable
 import org.jetbrains.codeviewer.util.loadableScoped
 import org.jetbrains.codeviewer.util.withoutWidthConstraints
 import kotlin.text.Regex.Companion.fromLiteral
 
 @Composable
 fun EditorView(model: Editor, settings: Settings) = key(model) {
-    with (DensityAmbient.current) {
+    with (AmbientDensity.current) {
         SelectionContainer {
             Surface(
                 Modifier.fillMaxSize(),
@@ -68,7 +67,7 @@ fun EditorView(model: Editor, settings: Settings) = key(model) {
 }
 
 @Composable
-private fun Lines(lines: Editor.Lines, settings: Settings) = with(DensityAmbient.current) {
+private fun Lines(lines: Editor.Lines, settings: Settings) = with(AmbientDensity.current) {
     val maxNum = remember(lines.lineNumberDigitCount) {
         (1..lines.lineNumberDigitCount).joinToString(separator = "") { "9" }
     }
@@ -82,11 +81,8 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(DensityAmbient
             modifier = Modifier.fillMaxSize(),
             state = scrollState,
             itemContent = { index ->
-                val line: Editor.Line? by loadable { lines.get(index) }
                 Box(Modifier.height(lineHeight)) {
-                    if (line != null) {
-                        Line(Modifier.align(Alignment.CenterStart), maxNum, line!!, settings)
-                    }
+                    Line(Modifier.align(Alignment.CenterStart), maxNum, lines[index], settings)
                 }
             }
         )

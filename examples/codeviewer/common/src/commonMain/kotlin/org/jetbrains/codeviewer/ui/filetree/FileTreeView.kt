@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -46,7 +46,7 @@ fun FileTreeViewTabView() = Surface {
 fun FileTreeView(model: FileTree) = Surface(
     modifier = Modifier.fillMaxSize()
 ) {
-    with(DensityAmbient.current) {
+    with(AmbientDensity.current) {
         Box {
             val scrollState = rememberLazyListState()
             val fontSize = 14.sp
