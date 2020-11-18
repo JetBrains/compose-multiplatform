@@ -17,6 +17,7 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -36,6 +37,7 @@ object Arrangement {
      * Used to specify the horizontal arrangement of the layout's children in a [Row].
      */
     @InternalLayoutApi
+    @Immutable
     interface Horizontal {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -65,6 +67,7 @@ object Arrangement {
      * Used to specify the vertical arrangement of the layout's children in a [Column].
      */
     @InternalLayoutApi
+    @Immutable
     interface Vertical {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -92,6 +95,7 @@ object Arrangement {
      * the vertical arrangement of the layout's children in a [Column].
      */
     @InternalLayoutApi
+    @Immutable
     interface HorizontalOrVertical : Horizontal, Vertical {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -103,6 +107,7 @@ object Arrangement {
      * Place children horizontally such that they are as close as possible to the beginning of the
      * main axis.
      */
+    @Stable
     val Start = object : Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -123,6 +128,7 @@ object Arrangement {
      * Place children horizontally such that they are as close as possible to the end of the main
      * axis.
      */
+    @Stable
     val End = object : Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -143,6 +149,7 @@ object Arrangement {
      * Place children vertically such that they are as close as possible to the top of the main
      * axis.
      */
+    @Stable
     val Top = object : Vertical {
         override fun arrange(
             totalSize: Int,
@@ -156,6 +163,7 @@ object Arrangement {
      * Place children vertically such that they are as close as possible to the bottom of the main
      * axis.
      */
+    @Stable
     val Bottom = object : Vertical {
         override fun arrange(
             totalSize: Int,
@@ -168,6 +176,7 @@ object Arrangement {
     /**
      * Place children such that they are as close as possible to the middle of the main axis.
      */
+    @Stable
     val Center = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
@@ -197,6 +206,7 @@ object Arrangement {
      * Place children such that they are spaced evenly across the main axis, including free
      * space before the first child and after the last child.
      */
+    @Stable
     val SpaceEvenly = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
@@ -226,6 +236,7 @@ object Arrangement {
      * Place children such that they are spaced evenly across the main axis, without free
      * space before the first child or after the last child.
      */
+    @Stable
     val SpaceBetween = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
@@ -256,6 +267,7 @@ object Arrangement {
      * space before the first child and after the last child, but half the amount of space
      * existing otherwise between two consecutive children.
      */
+    @Stable
     val SpaceAround = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
@@ -288,6 +300,7 @@ object Arrangement {
      *
      * @param space The space between adjacent children.
      */
+    @Stable
     fun spacedBy(space: Dp): HorizontalOrVertical =
         SpacedAligned(space, true, null)
 
@@ -300,6 +313,7 @@ object Arrangement {
      * @param space The space between adjacent children.
      * @param alignment The alignment of the spaced children inside the parent.
      */
+    @Stable
     fun spacedBy(space: Dp, alignment: Alignment.Horizontal): Horizontal =
         SpacedAligned(space, true) { size, layoutDirection ->
             alignment.align(0, size, layoutDirection)
@@ -314,6 +328,7 @@ object Arrangement {
      * @param space The space between adjacent children.
      * @param alignment The alignment of the spaced children inside the parent.
      */
+    @Stable
     fun spacedBy(space: Dp, alignment: Alignment.Vertical): Vertical =
         SpacedAligned(space, false) { size, _ -> alignment.align(0, size) }
 
@@ -323,6 +338,7 @@ object Arrangement {
      *
      * @param alignment The alignment of the children inside the parent.
      */
+    @Stable
     fun aligned(alignment: Alignment.Horizontal): Horizontal =
         SpacedAligned(0.dp, true) { size, layoutDirection ->
             alignment.align(0, size, layoutDirection)
@@ -334,6 +350,7 @@ object Arrangement {
      *
      * @param alignment The alignment of the children inside the parent.
      */
+    @Stable
     fun aligned(alignment: Alignment.Vertical): Vertical =
         SpacedAligned(0.dp, false) { size, _ -> alignment.align(0, size) }
 
@@ -341,6 +358,7 @@ object Arrangement {
      * Arrangement with spacing between adjacent children and alignment for the spaced group.
      * Should not be instantiated directly, use [spacedBy] instead.
      */
+    @Immutable
     internal data class SpacedAligned(
         val space: Dp,
         val rtlMirror: Boolean,
@@ -465,6 +483,7 @@ object AbsoluteArrangement {
      * Unlike [Arrangement.Start], when the layout direction is RTL, the children will not be
      * mirrored and as such children will appear in the order they are composed inside the [Row].
      */
+    @Stable
     val Left = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -481,6 +500,7 @@ object AbsoluteArrangement {
      * Unlike [Arrangement.Center], when the layout direction is RTL, the children will not be
      * mirrored and as such children will appear in the order they are composed inside the [Row].
      */
+    @Stable
     val Center = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -498,6 +518,7 @@ object AbsoluteArrangement {
      * Unlike [Arrangement.End], when the layout direction is RTL, the children will not be
      * mirrored and as such children will appear in the order they are composed inside the [Row].
      */
+    @Stable
     val Right = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -515,6 +536,7 @@ object AbsoluteArrangement {
      * Unlike [Arrangement.SpaceBetween], when the layout direction is RTL, the children will not be
      * mirrored and as such children will appear in the order they are composed inside the [Row].
      */
+    @Stable
     val SpaceBetween = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -532,6 +554,7 @@ object AbsoluteArrangement {
      * Unlike [Arrangement.SpaceEvenly], when the layout direction is RTL, the children will not be
      * mirrored and as such children will appear in the order they are composed inside the [Row].
      */
+    @Stable
     val SpaceEvenly = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -550,6 +573,7 @@ object AbsoluteArrangement {
      * Unlike [Arrangement.SpaceAround], when the layout direction is RTL, the children will not be
      * mirrored and as such children will appear in the order they are composed inside the [Row].
      */
+    @Stable
     val SpaceAround = object : Arrangement.Horizontal {
         override fun arrange(
             totalSize: Int,
@@ -570,6 +594,7 @@ object AbsoluteArrangement {
      *
      * @param space The space between adjacent children.
      */
+    @Stable
     fun spacedBy(space: Dp): Arrangement.HorizontalOrVertical =
         Arrangement.SpacedAligned(space, false, null)
 
@@ -585,6 +610,7 @@ object AbsoluteArrangement {
      * @param space The space between adjacent children.
      * @param alignment The alignment of the spaced children inside the parent.
      */
+    @Stable
     fun spacedBy(space: Dp, alignment: Alignment.Horizontal): Arrangement.Horizontal =
         Arrangement.SpacedAligned(space, false) { size, layoutDirection ->
             alignment.align(0, size, layoutDirection)
@@ -602,6 +628,7 @@ object AbsoluteArrangement {
      * @param space The space between adjacent children.
      * @param alignment The alignment of the spaced children inside the parent.
      */
+    @Stable
     fun spacedBy(space: Dp, alignment: Alignment.Vertical): Arrangement.Vertical =
         Arrangement.SpacedAligned(space, false) { size, _ -> alignment.align(0, size) }
 
@@ -614,6 +641,7 @@ object AbsoluteArrangement {
      *
      * @param alignment The alignment of the children inside the parent.
      */
+    @Stable
     fun aligned(alignment: Alignment.Horizontal): Arrangement.Horizontal =
         Arrangement.SpacedAligned(0.dp, false) { size, layoutDirection ->
             alignment.align(0, size, layoutDirection)

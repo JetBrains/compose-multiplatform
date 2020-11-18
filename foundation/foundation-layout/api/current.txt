@@ -2,16 +2,16 @@
 package androidx.compose.foundation.layout {
 
   @androidx.compose.runtime.Immutable public final class AbsoluteArrangement {
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal aligned(androidx.compose.ui.Alignment.Horizontal alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal aligned(androidx.compose.ui.Alignment.Horizontal alignment);
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getCenter();
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getLeft();
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getRight();
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceAround();
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceBetween();
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getSpaceEvenly();
-    method public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical spacedBy-0680j_4(float space);
-    method public androidx.compose.foundation.layout.Arrangement.Vertical spacedBy-6mHxxJo(float space, androidx.compose.ui.Alignment.Vertical alignment);
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal spacedBy-w0p642k(float space, androidx.compose.ui.Alignment.Horizontal alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical spacedBy-0680j_4(float space);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Vertical spacedBy-6mHxxJo(float space, androidx.compose.ui.Alignment.Vertical alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal spacedBy-w0p642k(float space, androidx.compose.ui.Alignment.Horizontal alignment);
     property public final androidx.compose.foundation.layout.Arrangement.Horizontal Center;
     property public final androidx.compose.foundation.layout.Arrangement.Horizontal Left;
     property public final androidx.compose.foundation.layout.Arrangement.Horizontal Right;
@@ -30,8 +30,8 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.runtime.Immutable public final class Arrangement {
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal aligned(androidx.compose.ui.Alignment.Horizontal alignment);
-    method public androidx.compose.foundation.layout.Arrangement.Vertical aligned(androidx.compose.ui.Alignment.Vertical alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal aligned(androidx.compose.ui.Alignment.Horizontal alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Vertical aligned(androidx.compose.ui.Alignment.Vertical alignment);
     method public androidx.compose.foundation.layout.Arrangement.Vertical getBottom();
     method public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical getCenter();
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getEnd();
@@ -40,9 +40,9 @@ package androidx.compose.foundation.layout {
     method public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical getSpaceEvenly();
     method public androidx.compose.foundation.layout.Arrangement.Horizontal getStart();
     method public androidx.compose.foundation.layout.Arrangement.Vertical getTop();
-    method public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical spacedBy-0680j_4(float space);
-    method public androidx.compose.foundation.layout.Arrangement.Vertical spacedBy-6mHxxJo(float space, androidx.compose.ui.Alignment.Vertical alignment);
-    method public androidx.compose.foundation.layout.Arrangement.Horizontal spacedBy-w0p642k(float space, androidx.compose.ui.Alignment.Horizontal alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical spacedBy-0680j_4(float space);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Vertical spacedBy-6mHxxJo(float space, androidx.compose.ui.Alignment.Vertical alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.Arrangement.Horizontal spacedBy-w0p642k(float space, androidx.compose.ui.Alignment.Horizontal alignment);
     property public final androidx.compose.foundation.layout.Arrangement.Vertical Bottom;
     property public final androidx.compose.foundation.layout.Arrangement.HorizontalOrVertical Center;
     property public final androidx.compose.foundation.layout.Arrangement.Horizontal End;
@@ -54,17 +54,17 @@ package androidx.compose.foundation.layout {
     field public static final androidx.compose.foundation.layout.Arrangement INSTANCE;
   }
 
-  @androidx.compose.foundation.layout.InternalLayoutApi public static interface Arrangement.Horizontal {
+  @androidx.compose.foundation.layout.InternalLayoutApi @androidx.compose.runtime.Immutable public static interface Arrangement.Horizontal {
     method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing-D9Ej5fM();
     property public default float spacing;
   }
 
-  @androidx.compose.foundation.layout.InternalLayoutApi public static interface Arrangement.HorizontalOrVertical extends androidx.compose.foundation.layout.Arrangement.Horizontal androidx.compose.foundation.layout.Arrangement.Vertical {
+  @androidx.compose.foundation.layout.InternalLayoutApi @androidx.compose.runtime.Immutable public static interface Arrangement.HorizontalOrVertical extends androidx.compose.foundation.layout.Arrangement.Horizontal androidx.compose.foundation.layout.Arrangement.Vertical {
     property public default float spacing;
   }
 
-  @androidx.compose.foundation.layout.InternalLayoutApi public static interface Arrangement.Vertical {
+  @androidx.compose.foundation.layout.InternalLayoutApi @androidx.compose.runtime.Immutable public static interface Arrangement.Vertical {
     method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing-D9Ej5fM();
     property public default float spacing;
