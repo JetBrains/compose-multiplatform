@@ -17,6 +17,7 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -227,8 +228,14 @@ private object MeasuringIntrinsics {
         init {
             measuredSize = IntSize(width, height)
         }
+
         override fun get(line: AlignmentLine): Int = AlignmentLine.Unspecified
-        override fun placeAt(position: IntOffset, zIndex: Float) { }
+        override fun placeAt(
+            position: IntOffset,
+            zIndex: Float,
+            layerBlock: (GraphicsLayerScope.() -> Unit)?
+        ) {
+        }
     }
 
     private enum class IntrinsicMinMax { Min, Max }

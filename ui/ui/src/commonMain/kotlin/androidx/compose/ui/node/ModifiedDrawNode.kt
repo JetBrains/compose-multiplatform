@@ -86,7 +86,7 @@ internal class ModifiedDrawNode(
         }
 
     // This is not thread safe
-    override fun draw(canvas: Canvas) {
+    override fun performDraw(canvas: Canvas) {
         val size = measuredSize.toSize()
         if (cacheDrawModifier != null && invalidateCache) {
             layoutNode.requireOwner().snapshotObserver.observeReads(
@@ -97,12 +97,10 @@ internal class ModifiedDrawNode(
         }
 
         val drawScope = layoutNode.mDrawScope
-        withPositionTranslation(canvas) {
-            drawScope.draw(canvas, size, wrapped) {
-                with(drawScope) {
-                    with(modifier) {
-                        draw()
-                    }
+        drawScope.draw(canvas, size, wrapped) {
+            with(drawScope) {
+                with(modifier) {
+                    draw()
                 }
             }
         }

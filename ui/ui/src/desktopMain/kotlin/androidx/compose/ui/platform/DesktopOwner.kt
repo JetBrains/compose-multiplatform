@@ -22,10 +22,8 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
@@ -96,8 +94,7 @@ class DesktopOwner(
 
     override val root = LayoutNode().also {
         it.measureBlocks = RootMeasureBlocks
-        it.modifier = Modifier.drawLayer()
-            .then(semanticsModifier)
+        it.modifier = semanticsModifier
             .then(_focusManager.modifier)
             .then(keyInputModifier)
     }

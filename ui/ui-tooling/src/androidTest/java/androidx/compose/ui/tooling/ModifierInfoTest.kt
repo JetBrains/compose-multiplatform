@@ -98,7 +98,12 @@ class ModifierInfoTest : ToolingTest() {
                 columnModifierInfo[0].modifier is LayoutModifier
             )
             assertEquals(0f, columnModifierInfo[0].coordinates.positionInRoot.x)
-            assertTrue(columnModifierInfo[1].extra is OwnedLayer)
+            assertTrue(
+                "The second modifier in the column should be a LayoutModifier" +
+                    "but was ${columnModifierInfo[1].modifier}",
+                columnModifierInfo[1].modifier is LayoutModifier
+            )
+            assertTrue(columnModifierInfo[2].extra is OwnedLayer)
             assertEquals(10f, columnModifierInfo[1].coordinates.positionInRoot.x)
             assertTrue(
                 "The third modifier in the column should be a DrawModifier" +

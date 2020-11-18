@@ -43,7 +43,6 @@ import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
 import androidx.compose.ui.autofill.registerCallback
 import androidx.compose.ui.autofill.unregisterCallback
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusManager
@@ -124,7 +123,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     override val root = LayoutNode().also {
         it.measureBlocks = RootMeasureBlocks
         it.modifier = Modifier
-            .drawLayer()
             .then(semanticsModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)

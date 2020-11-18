@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -24,6 +23,7 @@ import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 
 @OptIn(ExperimentalLayoutNodeApi::class)
@@ -67,7 +67,7 @@ internal class ModifiedLayoutNode(
         }
         // Place our wrapped to obtain their position inside ourselves.
         isShallowPlacing = true
-        placeAt(this.position, zIndex = 0f)
+        placeAt(this.position, zIndex = 0f, null)
         isShallowPlacing = false
         return if (line is HorizontalAlignmentLine) {
             positionInWrapped + wrapped.position.y
@@ -76,12 +76,10 @@ internal class ModifiedLayoutNode(
         }
     }
 
-    override fun draw(canvas: Canvas) {
-        withPositionTranslation(canvas) {
-            wrapped.draw(canvas)
-            if (layoutNode.requireOwner().showLayoutBounds) {
-                drawBorder(canvas, modifierBoundsPaint)
-            }
+    override fun performDraw(canvas: Canvas) {
+        wrapped.draw(canvas)
+        if (layoutNode.requireOwner().showLayoutBounds) {
+            drawBorder(canvas, modifierBoundsPaint)
         }
     }
 

@@ -16,16 +16,17 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.nativeClass
@@ -40,10 +41,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 ) : LayoutNodeWrapper(wrapped.layoutNode) {
     override val providedAlignmentLines: Set<AlignmentLine>
         get() = wrapped.providedAlignmentLines
-
-    private var _isAttached = false
-    override val isAttached: Boolean
-        get() = _isAttached && layoutNode.isAttached()
 
     override val measureScope: MeasureScope get() = wrapped.measureScope
 
@@ -68,24 +65,27 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         }
     }
 
-    override fun draw(canvas: Canvas) {
-        withPositionTranslation(canvas) {
-            wrapped.draw(canvas)
-        }
+    override fun performDraw(canvas: Canvas) {
+        wrapped.draw(canvas)
     }
 
     override fun hitTest(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        wrapped.hitTest(pointerPositionRelativeToScreen, hitPointerInputFilters)
+        if (withinLayerBounds(pointerPositionRelativeToScreen)) {
+            wrapped.hitTest(pointerPositionRelativeToScreen, hitPointerInputFilters)
+        }
     }
 
     override fun get(line: AlignmentLine): Int = wrapped[line]
 
-    override fun placeAt(position: IntOffset, zIndex: Float) {
-        this.position = position
-        this.zIndex = zIndex
+    override fun placeAt(
+        position: IntOffset,
+        zIndex: Float,
+        layerBlock: (GraphicsLayerScope.() -> Unit)?
+    ) {
+        super.placeAt(position, zIndex, layerBlock)
 
         // The wrapper only runs their placement block to obtain our position, which allows them
         // to calculate the offset of an alignment line we have already provided a position for.
@@ -156,12 +156,4 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     override fun maxIntrinsicHeight(width: Int) = wrapped.maxIntrinsicHeight(width)
 
     override val parentData: Any? get() = wrapped.parentData
-
-    override fun attach() {
-        _isAttached = true
-    }
-
-    override fun detach() {
-        _isAttached = false
-    }
 }
