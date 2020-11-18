@@ -198,7 +198,7 @@ fun content() {
 
     Box(
         modifier = Modifier.fillMaxSize(),
-        alignment = Alignment.BottomCenter
+        contentAlignment = Alignment.BottomCenter
     ) {
         Box(
             modifier = Modifier.background(color = Color(32, 32, 32))
@@ -275,7 +275,7 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
 fun PopupContent(onDismiss: () -> Unit) {
     Box(
         Modifier.preferredSize(300.dp, 150.dp).background(color = Color(65, 65, 65)),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Column {
             TextBox(text = "Popup demo.")
@@ -289,7 +289,7 @@ fun PopupContent(onDismiss: () -> Unit) {
 fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
     Box(
         Modifier.fillMaxSize().background(color = Color(55, 55, 55)),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Column {
             TextBox(text = "Increment amount?")
@@ -342,7 +342,7 @@ fun Button(
 fun TextBox(text: String = "") {
     Box(
         modifier = Modifier.height(30.dp),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
@@ -355,7 +355,7 @@ fun TextBox(text: String = "") {
 fun RadioButton(text: String, state: MutableState<Boolean>) {
     Box(
         modifier = Modifier.height(30.dp),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         RadioButton(
             selected = state.value,

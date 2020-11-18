@@ -183,13 +183,13 @@ private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
             offset.preferredSize(width = MagnifierWidth, height = MagnifierHeight)
                 .drawOpacity(opacity)
         ) {
-            Box(Modifier.fillMaxWidth(), alignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 MagnifierLabel(Modifier.preferredSize(labelWidth, MagnifierLabelHeight), color)
             }
             Spacer(Modifier.weight(1f))
             Box(
                 Modifier.fillMaxWidth().preferredHeight(SelectionCircleDiameter),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 MagnifierSelectionCircle(Modifier.preferredSize(selectionDiameter), color)
             }

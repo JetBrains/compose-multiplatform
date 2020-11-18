@@ -114,7 +114,7 @@ fun SwipeToDismissListItems() {
 
                 Box(
                     modifier = Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
-                    alignment = alignment
+                    contentAlignment = alignment
                 ) {
                     Icon(icon, Modifier.drawLayer(scaleX = scale, scaleY = scale))
                 }

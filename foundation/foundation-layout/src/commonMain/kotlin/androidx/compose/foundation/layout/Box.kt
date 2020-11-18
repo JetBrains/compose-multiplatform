@@ -41,28 +41,29 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.max
 
 /**
- * A layout composable that positions its children relative to its edges.
- * The component is useful for drawing children that overlap. The children will always be
- * drawn in the order they are specified in the body of the [Box].
- * When children are smaller than the parent, by default they will be positioned inside the [Box]
- * according to the [alignment]. If individual alignment of the children is needed, apply the
- * [BoxScope.align] modifier to a child to specify its alignment.
+ * A layout composable with [content].
+ * The [Box] will size itself to fit the content, subject to the incoming constraints.
+ * When children are smaller than the parent, by default they will be positioned inside
+ * the [Box] according to the [contentAlignment]. For individually specifying the alignments
+ * of the children layouts, use the [BoxScope.align] modifier.
+ * When the content has more than one layout child the layout children will be stacked one
+ * on top of the other (positioned as explained above) in the composition order.
  *
  * Example usage:
- *
- * @2sample androidx.compose.foundation.layout.samples.SimpleBox
+ * @sample androidx.compose.foundation.layout.samples.SimpleBox
  *
  * @param modifier The modifier to be applied to the layout.
- * @param alignment The default alignment inside the Box.
+ * @param contentAlignment The default alignment inside the Box.
+ * @param content The content of the [Box].
  */
 @Composable
 @OptIn(ExperimentalLayoutNodeApi::class)
 inline fun Box(
     modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.TopStart,
-    crossinline content: @Composable BoxScope.() -> Unit
+    contentAlignment: Alignment = Alignment.TopStart,
+    content: @Composable BoxScope.() -> Unit
 ) {
-    val measureBlocks = rememberMeasureBlocks(alignment)
+    val measureBlocks = rememberMeasureBlocks(contentAlignment)
     Layout(
         content = { BoxScope.content() },
         measureBlocks = measureBlocks,
@@ -178,7 +179,7 @@ private fun Placeable.PlacementScope.placeInBox(
 }
 
 /**
- * A convenience box with no content that can participate in layout, drawing, pointer input
+ * A box with no content that can participate in layout, drawing, pointer input
  * due to the [modifier] applied to it.
  *
  * Example usage:

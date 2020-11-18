@@ -208,7 +208,7 @@ private fun Square(index: Int) {
     val width = remember { Random.nextInt(50, 150).dp }
     Box(
         Modifier.preferredWidth(width).fillMaxHeight().background(colors[index % colors.size]),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(index.toString())
     }
@@ -291,7 +291,7 @@ private fun LazyRowScope() {
         itemsIndexed(items) { index, item ->
             Box(
                 modifier = Modifier.background(item).size(40.dp),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Text("$index", fontSize = 30.sp)
             }

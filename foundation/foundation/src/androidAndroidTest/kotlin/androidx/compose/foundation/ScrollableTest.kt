@@ -509,7 +509,7 @@ class ScrollableTest {
         rule.setContent {
             Box {
                 Box(
-                    alignment = Alignment.Center,
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(scrollableBoxTag)
                         .preferredSize(300.dp)

@@ -436,7 +436,7 @@ class RippleIndicationTest {
             Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
-                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRippleIndication())
                         }
                     }
@@ -477,7 +477,7 @@ class RippleIndicationTest {
             Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
-                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRippleIndication())
                         }
                     }
@@ -518,7 +518,7 @@ class RippleIndicationTest {
             Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = Color.Black) {
-                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRippleIndication())
                         }
                     }
@@ -658,7 +658,7 @@ private fun ComposeTestRule.setRippleContent(
 
         MaterialTheme(colors) {
             Surface(contentColor = contentColor) {
-                Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     RippleBox(interactionState, rememberRippleIndication(bounded))
                 }
             }

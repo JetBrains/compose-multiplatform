@@ -38,7 +38,7 @@ class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplenentationTestCas
                 .preferredSize(48.dp)
                 .border(BorderStroke(1.dp, Color.Cyan), CircleShape)
                 .padding(1.dp),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             val innerSize = getInnerSize().value
             Canvas(Modifier.preferredSize(innerSize)) {
