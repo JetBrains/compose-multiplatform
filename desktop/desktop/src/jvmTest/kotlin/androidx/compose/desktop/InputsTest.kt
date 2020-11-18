@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package androidx.ui.desktop
+package androidx.compose.desktop
 
 import androidx.compose.material.Slider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertValueEquals
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import androidx.compose.ui.test.junit4.createComposeRule
 
 @RunWith(JUnit4::class)
 class InputsTest {
