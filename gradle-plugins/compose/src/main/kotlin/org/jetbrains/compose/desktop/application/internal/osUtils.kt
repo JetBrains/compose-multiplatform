@@ -1,7 +1,32 @@
 package org.jetbrains.compose.desktop.application.internal
 
-internal enum class OS {
-    Linux, Windows, MacOS
+internal enum class OS(val id: String) {
+    Linux("linux"),
+    Windows("windows"),
+    MacOS("macos")
+}
+
+internal enum class Arch(val id: String) {
+    X64("x64"),
+    Arm64("arm64")
+}
+
+internal data class Target(val os: OS, val arch: Arch) {
+    val id: String
+        get() = "${os.id}-${arch.id}"
+}
+
+internal val currentTarget by lazy {
+    Target(currentOS, currentArch)
+}
+
+internal val currentArch by lazy {
+    val osArch = System.getProperty("os.arch")
+    when (osArch) {
+        "x86_64" -> Arch.X64
+        "aarch64" -> Arch.Arm64
+        else -> error("Unknown OS arch: $osArch")
+    }
 }
 
 internal val currentOS: OS by lazy {
