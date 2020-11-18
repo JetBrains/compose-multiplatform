@@ -390,6 +390,8 @@ class AndroidXPlugin : Plugin<Project> {
         compileSdkVersion(COMPILE_SDK_VERSION)
         buildToolsVersion = BUILD_TOOLS_VERSION
         defaultConfig.targetSdkVersion(TARGET_SDK_VERSION)
+        ndkVersion = SupportConfig.NDK_VERSION
+        ndkPath = project.getNdkPath().absolutePath
 
         defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
 
