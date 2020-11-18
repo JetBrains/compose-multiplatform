@@ -36,7 +36,6 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
         val gradlePath = sdkPath.absolutePath.replace(File.separator, "/")
         var expectedContents = "sdk.dir=$gradlePath"
         expectedContents += "\ncmake.dir=$gradlePath/cmake"
-        expectedContents += "\nndk.dir=$gradlePath/ndk"
         if (!props.exists() || props.readText(Charsets.UTF_8).trim() != expectedContents) {
             props.printWriter().use { out ->
                 out.println(expectedContents)
@@ -91,6 +90,13 @@ fun Project.getSdkPath(): File {
         // By convention, the SDK prebuilts live under the root checkout directory.
         File(project.getCheckoutRoot(), "prebuilts/fullsdk-$platform")
     }
+}
+
+/**
+ * @return the root project's platform-specific NDK path as a file.
+ */
+fun Project.getNdkPath(): File {
+    return File(getSdkPath(), "ndk")
 }
 
 private fun getSdkPathFromEnvironmentVariable(): File {
