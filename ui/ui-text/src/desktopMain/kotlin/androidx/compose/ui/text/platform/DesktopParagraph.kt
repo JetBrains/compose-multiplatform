@@ -220,8 +220,20 @@ internal class DesktopParagraph(
 
     override fun getLineStart(lineIndex: Int) = para.lineMetrics[lineIndex].startIndex.toInt()
 
-    override fun getLineEnd(lineIndex: Int) = para.lineMetrics[lineIndex].endIndex.toInt()
+    override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean) =
+        if (visibleEnd) {
+            para.lineMetrics[lineIndex].endExcludingWhitespaces.toInt()
+        } else {
+            para.lineMetrics[lineIndex].endIndex.toInt()
+        }
 
+    @Deprecated(
+        "This function will be removed.",
+        replaceWith = ReplaceWith(
+            "getLineEnd(lineIndex, true)",
+            "androidx.compose.ui.text.platform"
+        )
+    )
     override fun getLineVisibleEnd(lineIndex: Int) =
         para.lineMetrics[lineIndex].endExcludingWhitespaces.toInt()
 
