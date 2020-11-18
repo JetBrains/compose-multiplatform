@@ -529,7 +529,9 @@ package androidx.compose.ui.unit {
 
   public static final class Uptime.Companion {
     method public long getBoot-CLVl0cY();
+    method public long getUnspecified-CLVl0cY();
     property public final long Boot;
+    property public final long Unspecified;
   }
 
   public final class UptimeKt {

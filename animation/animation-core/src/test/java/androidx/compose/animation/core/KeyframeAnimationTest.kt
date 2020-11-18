@@ -34,6 +34,7 @@ package androidx.compose.animation.core
 
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -136,5 +137,74 @@ class KeyframeAnimationTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun testEquals() {
+        val config: KeyframesSpec.KeyframesSpecConfig<Float>.() -> Unit = {
+            durationMillis = 500
+            0f at 100
+            0.5f at 200 with FastOutLinearInEasing
+            0.8f at 300
+            1f at durationMillis
+        }
+
+        val animation = keyframes<Float>(config)
+
+        val animationReuseConfig = keyframes<Float>(config)
+
+        val animationRedeclareConfig = keyframes<Float> {
+            durationMillis = 500
+            0f at 100
+            0.5f at 200 with FastOutLinearInEasing
+            0.8f at 300
+            1f at durationMillis
+        }
+
+        assertEquals(animation, animationReuseConfig)
+        assertEquals(animation, animationRedeclareConfig)
+
+        // Also test hashcode() here, since it's already implemented.
+        assertEquals(animation.hashCode(), animationReuseConfig.hashCode())
+        assertEquals(animation.hashCode(), animationRedeclareConfig.hashCode())
+    }
+
+    @Test
+    fun testNotEquals() {
+        val animation = keyframes<Float> {
+            durationMillis = 500
+            0f at 100
+            0.5f at 200 with FastOutLinearInEasing
+            0.8f at 300
+            1f at durationMillis
+        }
+
+        val animationAlteredDuration = keyframes<Float> {
+            durationMillis = 700
+            0f at 100
+            0.5f at 200 with FastOutLinearInEasing
+            0.8f at 300
+            1f at durationMillis
+        }
+
+        val animationAlteredEasing = keyframes<Float> {
+            durationMillis = 500
+            0f at 100 with FastOutSlowInEasing
+            0.5f at 200
+            0.8f at 300
+            1f at durationMillis
+        }
+
+        val animationAlteredKeyframes = keyframes<Float> {
+            durationMillis = 500
+            0f at 100
+            0.3f at 200 with FastOutLinearInEasing
+            0.8f at 400
+            1f at durationMillis
+        }
+
+        assertTrue(animation != animationAlteredDuration)
+        assertTrue(animation != animationAlteredEasing)
+        assertTrue(animation != animationAlteredKeyframes)
     }
 }

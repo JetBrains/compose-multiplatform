@@ -16,11 +16,16 @@
 
 package androidx.compose.animation.demos
 
-import android.util.Log
-import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.fling
+import androidx.compose.animation.core.animateDecay
+import androidx.compose.animation.core.animateTo
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.MutatePriority
+import androidx.compose.foundation.MutatorMutex
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,85 +33,124 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
+import androidx.compose.ui.gesture.ExperimentalPointerInput
+import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun SpringBackScrollingDemo() {
     Column(Modifier.fillMaxHeight()) {
         Text(
             "<== Scroll horizontally ==>",
-            fontSize = 20.sp,
-            modifier = Modifier.padding(40.dp)
+            modifier = Modifier.padding(40.dp),
+            fontSize = 20.sp
         )
-        val animScroll = animatedFloat(0f)
+
+        var scrollPosition by remember { mutableStateOf(0f) }
         val itemWidth = remember { mutableStateOf(0f) }
         val isFlinging = remember { mutableStateOf(false) }
-        val gesture = Modifier.rawDragGestureFilter(
-            dragObserver = object : DragObserver {
-                override fun onDrag(dragDistance: Offset): Offset {
-                    animScroll.snapTo(animScroll.targetValue + dragDistance.x)
-                    return dragDistance
-                }
+        val mutatorMutex = remember { MutatorMutex() }
+        var animation by remember { mutableStateOf(AnimationState(scrollPosition)) }
 
-                override fun onStop(velocity: Offset) {
-                    isFlinging.value = true
-                    animScroll.fling(
-                        velocity.x,
-                        onEnd = { _, _, _ ->
-                            isFlinging.value = false
+        val gesture = Modifier.pointerInput {
+            coroutineScope {
+                while (true) {
+                    val pointerId = handlePointerInput {
+                        awaitFirstDown().id
+                    }
+                    val velocityTracker = VelocityTracker()
+                    mutatorMutex.mutate(MutatePriority.UserInput) {
+                        handlePointerInput {
+                            horizontalDrag(pointerId) {
+                                scrollPosition += it.positionChange().x
+                                velocityTracker.addPosition(
+                                    it.current.uptime!!,
+                                    it.current.position!!
+                                )
+                            }
                         }
-                    )
+                    }
+                    val velocity = velocityTracker.calculateVelocity().pixelsPerSecond.x
+                    // Now finger lifted, get fling going
+                    launch {
+                        mutatorMutex.mutate {
+                            animation = AnimationState(scrollPosition, velocity)
+                            animation.animateDecay(ExponentialDecay()) {
+                                scrollPosition = this.value
+
+                                val springBackTarget = calculateSpringBackTarget(
+                                    targetValue,
+                                    this.velocityVector.value, itemWidth.value
+                                )
+
+                                // Spring back as soon as the target position is crossed.
+                                if ((this.velocityVector.value > 0 && value > springBackTarget) ||
+                                    (this.velocityVector.value < 0 && value < springBackTarget)
+                                ) {
+                                    cancelAnimation()
+                                    launch {
+                                        animation.animateTo(
+                                            springBackTarget,
+                                            SpringSpec(
+                                                dampingRatio = 0.8f,
+                                                stiffness = 200f
+                                            ),
+                                            sequentialAnimation = true
+                                        ) {
+                                            scrollPosition = this.value
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        )
+        }
         Canvas(gesture.fillMaxWidth().preferredHeight(400.dp)) {
             itemWidth.value = size.width / 2f
             if (isFlinging.value) {
                 // Figure out what position to spring back to
-                val target = animScroll.targetValue
-                var rem = target % itemWidth.value
-                if (animScroll.velocity < 0) {
-                    if (rem > 0) {
-                        rem -= itemWidth.value
-                    }
-                } else {
-                    if (rem < 0) {
-                        rem += itemWidth.value
-                    }
-                }
-                val springBackTarget = target - rem
-
-                // Spring back as soon as the target position is crossed.
-                if ((animScroll.velocity > 0 && animScroll.value > springBackTarget) ||
-                    (animScroll.velocity < 0 && animScroll.value < springBackTarget)
-                ) {
-                    animScroll.animateTo(
-                        springBackTarget,
-                        SpringSpec(dampingRatio = 0.8f, stiffness = 200f)
-                    )
-                }
             }
             if (DEBUG) {
-                Log.w(
-                    "Anim",
-                    "Spring back scrolling, redrawing with new" +
-                        " scroll value: ${animScroll.value}"
+                println(
+                    "Anim, Spring back scrolling, redrawing with new" +
+                        " scroll value: $scrollPosition"
                 )
             }
-            drawRects(animScroll.value)
+            drawRects(scrollPosition)
         }
     }
+}
+
+private fun calculateSpringBackTarget(target: Float, velocity: Float, itemWidth: Float): Float {
+    var rem = target % itemWidth
+    if (velocity < 0) {
+        if (rem > 0) {
+            rem -= itemWidth
+        }
+    } else {
+        if (rem < 0) {
+            rem += itemWidth
+        }
+    }
+    return target - rem
 }
 
 private fun DrawScope.drawRects(animScroll: Float) {

@@ -65,7 +65,7 @@ class TransitionAnimation<T>(
     private val UNSET = -1L
     private var fromState: StateImpl<T>
     private var toState: StateImpl<T>
-    private val currentState: AnimationState<T>
+    private val currentState: InternalAnimationState<T>
     private var startTime: Long = UNSET
     private var lastFrameTime: Long = UNSET
     private var pendingState: StateImpl<T>? = null
@@ -113,7 +113,7 @@ class TransitionAnimation<T>(
         } else {
             defaultState = def.states[initState]!!
         }
-        currentState = AnimationState(defaultState, defaultState.name)
+        currentState = InternalAnimationState(defaultState, defaultState.name)
         // Need to come up with a better plan to avoid the foot gun of accidentally modifying state
         fromState = defaultState
         toState = defaultState
@@ -147,7 +147,7 @@ class TransitionAnimation<T>(
             // props in each state.
         }
 
-        fromState = AnimationState(currentState, toState.name)
+        fromState = InternalAnimationState(currentState, toState.name)
         toState = newState
 
         // Start animation should be called after all the setup has been done
@@ -320,7 +320,7 @@ internal fun <T, V : AnimationVector> PropKey<T, V>.createAnimationWrapper(
 /**
  * Private class allows mutation on the prop values.
  */
-private class AnimationState<T>(state: StateImpl<T>, name: T) : StateImpl<T>(name) {
+private class InternalAnimationState<T>(state: StateImpl<T>, name: T) : StateImpl<T>(name) {
 
     init {
         for ((prop, value) in state.props) {
