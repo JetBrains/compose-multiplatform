@@ -31,12 +31,14 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertLabelEquals
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithLabel
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithLabel
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -137,6 +139,34 @@ class SemanticsTests {
         rule.onNodeWithTag(tag2).assertLabelEquals(label2)
     }
 
+    @Test
+    fun clearAndSetSemantics() {
+        val tag1 = "tag1"
+        val tag2 = "tag2"
+        val label1 = "foo"
+        val label2 = "hidden"
+        val label3 = "baz"
+        rule.setContent {
+            SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
+                SimpleTestLayout(Modifier.semantics { accessibilityLabel = label1 }) { }
+                SimpleTestLayout(Modifier.clearAndSetSemantics {}) {
+                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label2 }) { }
+                }
+                SimpleTestLayout(Modifier.clearAndSetSemantics { accessibilityLabel = label3 }) {
+                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label2 }) { }
+                }
+                SimpleTestLayout(
+                    Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)
+                        .clearAndSetSemantics { text = AnnotatedString(label1) }
+                ) {
+                    SimpleTestLayout(Modifier.semantics { text = AnnotatedString(label2) }) { }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(tag1).assertLabelEquals("$label1, $label3")
+        rule.onNodeWithTag(tag2).assertTextEquals(label1)
+    }
     @Test
     fun removingMergedSubtree_updatesSemantics() {
         val label = "foo"

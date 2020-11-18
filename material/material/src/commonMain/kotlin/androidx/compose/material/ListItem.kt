@@ -53,12 +53,15 @@ import kotlin.math.max
  * - three-line items
  * @sample androidx.compose.material.samples.ThreeLineListItems
  *
+ * You can combine this component with a checkbox or switch as in the following examples:
+ * @sample androidx.compose.material.samples.ClickableListItems
+ *
  * @param modifier Modifier to be applied to the list item
  * @param icon The leading supporting visual of the list item
  * @param secondaryText The secondary text of the list item
  * @param singleLineSecondaryText Whether the secondary text is single line
  * @param overlineText The text displayed above the primary text
- * @param trailing The trailing meta text or meta icon of the list item
+ * @param trailing The trailing meta text, icon, switch or checkbox
  * @param text The primary text of the list item
  */
 @Composable
