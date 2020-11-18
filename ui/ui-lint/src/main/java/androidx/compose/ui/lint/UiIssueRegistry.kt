@@ -29,6 +29,7 @@ class UiIssueRegistry : IssueRegistry() {
     override val issues get() = listOf(
         ModifierDeclarationDetector.ComposableModifierFactory,
         ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
-        ModifierDeclarationDetector.ModifierFactoryReturnType
+        ModifierDeclarationDetector.ModifierFactoryReturnType,
+        ModifierParameterDetector.ModifierParameter
     )
 }

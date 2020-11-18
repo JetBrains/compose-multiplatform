@@ -124,7 +124,7 @@ class DrawShadowTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                ShadowContainer(elevation)
+                ShadowContainer(elevation = elevation)
             }
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
@@ -145,7 +145,7 @@ class DrawShadowTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                ShadowContainer(elevation, modifier = Modifier.drawLayer(clip = true))
+                ShadowContainer(modifier = Modifier.drawLayer(clip = true), elevation)
             }
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
@@ -304,8 +304,8 @@ class DrawShadowTest {
 
     @Composable
     private fun ShadowContainer(
-        elevation: State<Dp> = mutableStateOf(8.dp),
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        elevation: State<Dp> = mutableStateOf(8.dp)
     ) {
         AtLeastSize(size = 12, modifier = modifier.then(background(Color.White))) {
             AtLeastSize(
