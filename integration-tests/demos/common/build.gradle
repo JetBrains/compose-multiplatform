@@ -26,11 +26,11 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin projectOrArtifact(":compose:compiler:compiler")
     implementation(KOTLIN_STDLIB)
 
     api "androidx.activity:activity:1.2.0-alpha02"
-    implementation project(":compose:runtime:runtime")
+    implementation projectOrArtifact(":compose:runtime:runtime")
 }
 
 tasks.withType(KotlinCompile).configureEach {
