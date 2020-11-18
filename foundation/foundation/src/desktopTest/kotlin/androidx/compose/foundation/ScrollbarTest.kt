@@ -368,6 +368,6 @@ class ScrollbarTest {
             hoverColor = Color.Red
         ),
         DesktopPlatformAmbient provides DesktopPlatform.MacOS,
-        children = content
+        content = content
     )
 }
