@@ -112,6 +112,7 @@ val CoreDemos = DemoCategory(
         FocusDemos,
         ComposableDemo("KeyInput") { KeyInputDemo() },
         ComposableDemo("Multiple collects measure") { MultipleCollectTest() },
+        ComposableDemo("Dialog") { DialogDemo() },
         ComposableDemo("Popup") { PopupDemo() },
         GraphicsDemos,
         GestureDemos,
