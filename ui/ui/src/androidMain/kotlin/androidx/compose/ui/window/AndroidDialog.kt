@@ -18,11 +18,15 @@ package androidx.compose.ui.window
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Outline
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
@@ -31,12 +35,16 @@ import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.R
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
@@ -77,8 +85,9 @@ internal actual fun ActualDialog(
     content: @Composable () -> Unit
 ) {
     val view = AmbientView.current
+    val density = AmbientDensity.current
 
-    val dialog = remember(view) { DialogWrapper(view) }
+    val dialog = remember(view, density) { DialogWrapper(view, density) }
     dialog.onCloseRequest = onDismissRequest
     remember(properties) { dialog.setProperties(properties) }
 
@@ -113,24 +122,67 @@ interface DialogWindowProvider {
     val window: Window
 }
 
+@Suppress("ViewConstructor")
 private class DialogLayout(
     context: Context,
     override val window: Window
 ) : FrameLayout(context), DialogWindowProvider
 
 private class DialogWrapper(
-    private val composeView: View
-) : Dialog(composeView.context) {
+    private val composeView: View,
+    density: Density
+) : Dialog(
+    /**
+     * [Window.setClipToOutline] is only available from 22+, but the style attribute exists on 21.
+     * So use a wrapped context that sets this attribute for compatibility back to 21.
+     */
+    ContextThemeWrapper(composeView.context, R.style.DialogWindowTheme)
+) {
     lateinit var onCloseRequest: () -> Unit
 
     private val dialogLayout: DialogLayout
     private var composition: Composition? = null
 
+    private val maxSupportedElevation = 30.dp
+
     init {
         val window = window ?: error("Dialog has no window")
         window.requestFeature(Window.FEATURE_NO_TITLE)
         window.setBackgroundDrawableResource(android.R.color.transparent)
-        dialogLayout = DialogLayout(context, window)
+        dialogLayout = DialogLayout(context, window).apply {
+            // Enable children to draw their shadow by not clipping them
+            clipChildren = false
+            // Allocate space for elevation
+            with(density) { elevation = maxSupportedElevation.toPx() }
+            // Simple outline to force window manager to allocate space for shadow.
+            // Note that the outline affects clickable area for the dismiss listener. In case of
+            // shapes like circle the area for dismiss might be to small (rectangular outline
+            // consuming clicks outside of the circle).
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, result: Outline) {
+                    result.setRect(0, 0, view.width, view.height)
+                    // We set alpha to 0 to hide the view's shadow and let the composable to draw
+                    // its own shadow. This still enables us to get the extra space needed in the
+                    // surface.
+                    result.alpha = 0f
+                }
+            }
+        }
+
+        /**
+         * Disables clipping for [this] and all its descendant [ViewGroup]s until we reach a
+         * [DialogLayout] (the [ViewGroup] containing the Compose hierarchy).
+         */
+        fun ViewGroup.disableClipping() {
+            clipChildren = false
+            if (this is DialogLayout) return
+            for (i in 0 until childCount) {
+                (getChildAt(i) as? ViewGroup)?.disableClipping()
+            }
+        }
+
+        // Turn of all clipping so shadows can be drawn outside the window
+        (window.decorView as? ViewGroup)?.disableClipping()
         setContentView(dialogLayout)
         ViewTreeLifecycleOwner.set(dialogLayout, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(dialogLayout, ViewTreeViewModelStoreOwner.get(composeView))
