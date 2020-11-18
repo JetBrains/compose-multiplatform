@@ -29,12 +29,7 @@ internal class ModifiedDrawNode(
     drawModifier: DrawModifier
 ) : DelegatingLayoutNodeWrapper<DrawModifier>(wrapped, drawModifier), OwnerScope {
 
-    private val cacheDrawModifier: DrawCacheModifier? =
-        if (drawModifier is DrawCacheModifier) {
-            drawModifier
-        } else {
-            null
-        }
+    private var cacheDrawModifier: DrawCacheModifier? = updateCacheDrawModifier()
 
     // Flag to determine if the cache should be re-built
     private var invalidateCache = true
@@ -45,6 +40,33 @@ internal class ModifiedDrawNode(
         cacheDrawModifier?.onBuildCache(size, layoutNode.mDrawScope)
         invalidateCache = false
     }
+
+    // Intentionally returning DrawCacheModifier not generic Modifier type
+    // to make sure that we are updating the current DrawCacheModifier in the
+    // event that a new DrawCacheModifier is provided
+    // Suppressing insepctorinfo as relying on the inspector info for
+    // DrawCacheModifier
+    @Suppress(
+        "ModifierInspectorInfo",
+        "ModifierFactoryReturnType",
+        "ModifierFactoryExtensionFunction"
+    )
+    private fun updateCacheDrawModifier(): DrawCacheModifier? {
+        val current = modifier
+        return if (current is DrawCacheModifier) {
+            current
+        } else {
+            null
+        }
+    }
+
+    override var modifier: DrawModifier
+        get() = super.modifier
+        set(value) {
+            super.modifier = value
+            cacheDrawModifier = updateCacheDrawModifier()
+            invalidateCache = true
+        }
 
     override var measureResult: MeasureResult
         get() = super.measureResult
