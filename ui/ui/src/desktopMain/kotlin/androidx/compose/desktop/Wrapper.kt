@@ -67,7 +67,7 @@ internal fun ComposeLayer.setContent(
     onDensityChanged(owner::density::set)
 
     when (parent) {
-        is AppFrame -> parent.onDismissEvents.add(owner::dispose)
+        is AppFrame -> parent.onDispose = owner::dispose
         is ComposePanel -> parent.onDispose = owner::dispose
     }
 
