@@ -16,22 +16,19 @@
 
 package androidx.compose.ui.input.key
 
-/**
- * The native platform-specific keyboard key event.
- */
-expect class NativeKeyEvent
+import java.awt.event.KeyEvent.KEY_PRESSED
+import java.awt.event.KeyEvent.KEY_RELEASED
 
 /**
- * When a user presses a key on a hardware keyboard, a [KeyEvent] is sent to the
- * [KeyInputModifier] that is currently active.
+ * The native desktop [KeyEvent][KeyEventAwt].
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
-inline class KeyEvent(val nativeKeyEvent: NativeKeyEvent)
+actual typealias NativeKeyEvent = java.awt.event.KeyEvent
 
 /**
  * The key that was pressed.
  */
-expect val KeyEvent.key: Key
+actual val KeyEvent.key: Key
+    get() = Key(nativeKeyEvent.keyCode)
 
 /**
  * The UTF16 value corresponding to the key event that was pressed. The unicode character
@@ -49,49 +46,39 @@ expect val KeyEvent.key: Key
  * as a pair of char values, the first from the high-surrogates range, (\uD800-\uDBFF), the
  * second from the low-surrogates range (\uDC00-\uDFFF).
  */
-expect val KeyEvent.utf16CodePoint: Int
+actual val KeyEvent.utf16CodePoint: Int
+    get() = nativeKeyEvent.keyChar.toInt()
 
 /**
  * The [type][KeyEventType] of key event.
  */
-expect val KeyEvent.type: KeyEventType
+actual val KeyEvent.type: KeyEventType
+    get() = when (nativeKeyEvent.id) {
+        KEY_PRESSED -> KeyEventType.KeyDown
+        KEY_RELEASED -> KeyEventType.KeyUp
+        else -> KeyEventType.Unknown
+    }
 
 /**
  * Indicates whether the Alt key is pressed.
  */
-expect val KeyEvent.isAltPressed: Boolean
+actual val KeyEvent.isAltPressed: Boolean
+    get() = nativeKeyEvent.isAltDown || nativeKeyEvent.isAltGraphDown
 
 /**
  * Indicates whether the Ctrl key is pressed.
  */
-expect val KeyEvent.isCtrlPressed: Boolean
+actual val KeyEvent.isCtrlPressed: Boolean
+    get() = nativeKeyEvent.isControlDown
 
 /**
  * Indicates whether the Meta key is pressed.
  */
-expect val KeyEvent.isMetaPressed: Boolean
+actual val KeyEvent.isMetaPressed: Boolean
+    get() = nativeKeyEvent.isMetaDown
 
 /**
  * Indicates whether the Shift key is pressed.
  */
-expect val KeyEvent.isShiftPressed: Boolean
-
-/**
- * The type of Key Event.
- */
-enum class KeyEventType {
-    /**
-     * Unknown key event.
-     */
-    Unknown,
-
-    /**
-     * Type of KeyEvent sent when the user lifts their finger off a key on the keyboard.
-     */
-    KeyUp,
-
-    /**
-     * Type of KeyEvent sent when the user presses down their finger on a key on the keyboard.
-     */
-    KeyDown
-}
+actual val KeyEvent.isShiftPressed: Boolean
+    get() = nativeKeyEvent.isShiftDown

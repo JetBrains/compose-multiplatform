@@ -22,8 +22,14 @@ import androidx.compose.ui.focus.FocusReference
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusReference
 import androidx.compose.ui.focus.setFocusableContent
+import android.view.KeyEvent.KEYCODE_A as KeyCodeA
+import android.view.KeyEvent as AndroidKeyEvent
+import android.view.KeyEvent.ACTION_DOWN
+import android.view.KeyEvent.ACTION_UP
 import androidx.compose.ui.input.key.Key.Companion.A
 import androidx.compose.ui.input.key.KeyEventType.KeyUp
+import androidx.compose.ui.input.key.KeyEventType.KeyDown
+import androidx.compose.ui.input.key.KeyEventType.Unknown
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
@@ -49,7 +55,7 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
     }
 
     @Test(expected = IllegalStateException::class)
@@ -60,7 +66,7 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
     }
 
     @Test(expected = IllegalStateException::class)
@@ -72,14 +78,14 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
     }
 
     @Test
     fun onKeyEvent_triggered() {
         // Arrange.
         val focusReference = FocusReference()
-        lateinit var receivedKeyEvent: KeyEvent
+        var receivedKeyEvent: KeyEvent? = null
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
@@ -96,11 +102,13 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        val keyConsumed = rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        val keyConsumed = rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
 
         // Assert.
         rule.runOnIdle {
-            receivedKeyEvent.assertEqualTo(keyEvent(A, KeyUp))
+            val keyEvent = checkNotNull(receivedKeyEvent)
+            assertThat(keyEvent.key).isEqualTo(A)
+            assertThat(keyEvent.type).isEqualTo(KeyUp)
             assertThat(keyConsumed).isTrue()
         }
     }
@@ -109,7 +117,7 @@ class ProcessKeyInputTest {
     fun onPreviewKeyEvent_triggered() {
         // Arrange.
         val focusReference = FocusReference()
-        lateinit var receivedKeyEvent: KeyEvent
+        var receivedKeyEvent: KeyEvent? = null
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
@@ -126,11 +134,13 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        val keyConsumed = rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        val keyConsumed = rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
 
         // Assert.
         rule.runOnIdle {
-            receivedKeyEvent.assertEqualTo(keyEvent(A, KeyUp))
+            val keyEvent = checkNotNull(receivedKeyEvent)
+            assertThat(keyEvent.key).isEqualTo(A)
+            assertThat(keyEvent.type).isEqualTo(KeyUp)
             assertThat(keyConsumed).isTrue()
         }
     }
@@ -139,7 +149,7 @@ class ProcessKeyInputTest {
     fun onKeyEventNotTriggered_ifOnPreviewKeyEventConsumesEvent() {
         // Arrange.
         val focusReference = FocusReference()
-        lateinit var receivedPreviewKeyEvent: KeyEvent
+        var receivedPreviewKeyEvent: KeyEvent? = null
         var receivedKeyEvent: KeyEvent? = null
         rule.setFocusableContent {
             Box(
@@ -161,11 +171,12 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
 
         // Assert.
         rule.runOnIdle {
-            receivedPreviewKeyEvent.assertEqualTo(keyEvent(A, KeyUp))
+            val keyEvent = checkNotNull(receivedPreviewKeyEvent)
+            assertThat(keyEvent.type).isEqualTo(KeyUp)
             assertThat(receivedKeyEvent).isNull()
         }
     }
@@ -197,7 +208,7 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
 
         // Assert.
         rule.runOnIdle {
@@ -248,7 +259,7 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
 
         // Assert.
         rule.runOnIdle {
@@ -300,7 +311,7 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
 
         // Assert.
         rule.runOnIdle {
@@ -368,7 +379,7 @@ class ProcessKeyInputTest {
         }
 
         // Act.
-        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
 
         // Assert.
         rule.runOnIdle {
@@ -379,5 +390,18 @@ class ProcessKeyInputTest {
             assertThat(parentOnKeyEventTrigger).isEqualTo(5)
             assertThat(grandParentOnKeyEventTrigger).isEqualTo(6)
         }
+    }
+
+    /**
+     * The [KeyEvent] is usually created by the system. This function creates an instance of
+     * [KeyEvent] that can be used in tests.
+     */
+    private fun keyEvent(keycode: Int, keyEventType: KeyEventType): KeyEvent {
+        val action = when (keyEventType) {
+            KeyDown -> ACTION_DOWN
+            KeyUp -> ACTION_UP
+            Unknown -> error("Unknown key event type")
+        }
+        return KeyEvent(AndroidKeyEvent(0L, 0L, action, keycode, 0, 0))
     }
 }

@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.input.key
 
-import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -25,37 +25,28 @@ import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class AndroidKeyTest {
+class KeyTest {
     @Test
     fun androidKeyCode_to_composeKey() {
         // Arrange.
-        val key = Key(KeyEvent.KEYCODE_A)
+        val androidKeyCode = KeyCodeA
+
+        // Act.
+        val composeKey = Key(androidKeyCode)
 
         // Assert.
-        assertThat(key).isEqualTo(Key.A)
+        assertThat(composeKey).isEqualTo(Key.A)
     }
 
     @Test
     fun composeKey_to_androidKeyCode() {
         // Arrange.
-        val key = Key.A
+        val composeKey = Key.A
 
         // Act.
-        val keyCode = key.keyCode
+        val androidKeyCode = composeKey.nativeKeyCode
 
         // Assert.
-        assertThat(keyCode).isEqualTo(KeyEvent.KEYCODE_A)
-    }
-
-    @Test
-    fun UnknownAndroidKeyCodeIsPreserved() {
-        // Arrange.
-        val key = Key(1000)
-
-        // Act.
-        val keyCode = key.keyCode
-
-        // Assert.
-        assertThat(keyCode).isEqualTo(1000)
+        assertThat(androidKeyCode).isEqualTo(KeyCodeA)
     }
 }
