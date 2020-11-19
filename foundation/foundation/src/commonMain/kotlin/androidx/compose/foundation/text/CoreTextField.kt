@@ -208,6 +208,7 @@ fun CoreTextField(
     manager.clipboardManager = AmbientClipboardManager.current
     manager.textToolbar = AmbientTextToolbar.current
     manager.hapticFeedBack = AmbientHapticFeedback.current
+    manager.focusRequester = focusRequester
 
     val focusObserver = Modifier.focusObserver {
         if (state.hasFocus == it.isFocused) {
@@ -371,7 +372,6 @@ fun CoreTextField(
                     manager.exitSelectionMode()
                 } else {
                     manager.enterSelectionMode()
-                    if (!state.hasFocus) focusRequester.requestFocus()
                 }
                 onValueChangeWrapper(TextFieldValue(value.text, TextRange(start, end)))
                 true
@@ -390,7 +390,6 @@ fun CoreTextField(
         }
         onLongClick {
             manager.enterSelectionMode()
-            if (!state.hasFocus) focusRequester.requestFocus()
             true
         }
         if (!value.selection.collapsed) {
