@@ -95,17 +95,22 @@ const val PLAY_CORE = "com.google.android.play:core:1.8.0"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.2.9"
 const val RX_JAVA3 = "io.reactivex.rxjava3:rxjava:3.0.0"
-val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.1.14"
+val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.1.16"
 val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
-val SKIKO_LINUX = "org.jetbrains.skiko:skiko-jvm-runtime-linux:$SKIKO_VERSION"
-val SKIKO_MACOS = "org.jetbrains.skiko:skiko-jvm-runtime-macos:$SKIKO_VERSION"
-val SKIKO_WINDOWS = "org.jetbrains.skiko:skiko-jvm-runtime-windows:$SKIKO_VERSION"
+val SKIKO_LINUX_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION"
+val SKIKO_MACOS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VERSION"
+val SKIKO_MACOS_ARM64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64:$SKIKO_VERSION"
+val SKIKO_WINDOWS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-windows-x64:$SKIKO_VERSION"
 val SKIKO_CURRENT_OS by lazy {
     val os = System.getProperty("os.name")
+    val arch = System.getProperty("os.arch")
     when {
-        os == "Mac OS X" -> SKIKO_MACOS
-        os.startsWith("Win") -> SKIKO_WINDOWS
-        os.startsWith("Linux") -> SKIKO_LINUX
+        os == "Mac OS X" -> when (arch) {
+            "aarch64" -> SKIKO_MACOS_ARM64
+            else -> SKIKO_MACOS_X64
+        }
+        os.startsWith("Win") -> SKIKO_WINDOWS_X64
+        os.startsWith("Linux") -> SKIKO_LINUX_X64
         else -> throw Error("Unsupported OS $os")
     }
 }
