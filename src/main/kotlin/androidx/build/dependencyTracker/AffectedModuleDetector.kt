@@ -484,7 +484,19 @@ class AffectedModuleDetectorImpl constructor(
             setOf(
                 ":compose:ui:ui-graphics",
                 ":compose:material:material"
-            )
+            ),
+            setOf(
+                ":benchmark:integration-tests:macrobenchmark",
+                ":benchmark:integration-tests:macrobenchmark-target"
+            ),
+            setOf(
+                ":benchmark:benchmark-macro",
+                ":benchmark:integration-tests:macrobenchmark-target"
+            ),
+            setOf(
+                ":compose:integration-tests:macrobenchmark",
+                ":compose:integration-tests:demos"
+            ),
         )
     }
 }
