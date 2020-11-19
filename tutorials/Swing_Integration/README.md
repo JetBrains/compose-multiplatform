@@ -6,7 +6,7 @@ In this tutorial, we will show you how to use ComposePanel in your Swing applica
 
 ## Using ComposePanel
 
-ComposePanel lets you create a UI using Compose for Desktop in a Swing-based UI. To achieve that you need to create instance of ComposePanel, add it to your Swing layout and describe composition inside `setContent`. Also you may need to crear the CFD application events via `AppManager.setEvents`.
+ComposePanel lets you create a UI using Compose for Desktop in a Swing-based UI. To achieve that you need to create instance of ComposePanel, add it to your Swing layout and describe composition inside `setContent`. Also you may need to clear the CFD application events via `AppManager.setEvents`.
 
 ```kotlin
 import androidx.compose.desktop.AppManager
