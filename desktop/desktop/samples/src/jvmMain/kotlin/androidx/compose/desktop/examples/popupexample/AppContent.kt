@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonConstants
@@ -49,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.Tray
@@ -116,7 +117,7 @@ fun content() {
                                 title = "Second window",
                                 size = IntSize(400, 200),
                                 undecorated = AppState.undecorated.value,
-                                onDismissEvent = {
+                                onDismissRequest = {
                                     println("Second window is dismissed.")
                                 }
                             ).show {
@@ -231,13 +232,24 @@ fun content() {
             dialogState.value = false
             println("Dialog window is dismissed.")
         }
-        Dialog(
-            title = "Dialog window",
-            size = IntSize(400, 200),
-            onDismissEvent = dismiss
-        ) {
-            WindowContent(AppState.amount, onClose = dismiss)
-        }
+        AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = {
+                Button(text = "OK", onClick = { AppState.amount.value++ })
+            },
+            dismissButton = {
+                Button(text = "Cancel", onClick = dismiss)
+            },
+            title = {
+                TextBox(text = "Alert Dialog")
+            },
+            text = {
+                TextBox(text = "Increment amount?")
+            },
+            shape = RoundedCornerShape(0.dp),
+            backgroundColor = Color(70, 70, 70),
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 

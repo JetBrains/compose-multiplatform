@@ -160,7 +160,7 @@ fun ComposeContent() {
                     AppWindow(
                         title = "Second window",
                         size = IntSize(400, 200),
-                        onDismissEvent = {
+                        onDismissRequest = {
                             println("Second window is dismissed.")
                         }
                     ).show {

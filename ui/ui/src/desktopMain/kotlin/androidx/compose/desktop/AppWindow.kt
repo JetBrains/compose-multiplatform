@@ -38,6 +38,25 @@ import javax.swing.WindowConstants
 
 val AppWindowAmbient = ambientOf<AppWindow?>()
 
+/**
+ * Opens a window with the given content.
+ *
+ * @param title The title of the window.
+ * The title is displayed in the windows's native border.
+ * @param size The initial size of the window.
+ * @param location The initial position of the window in screen space. This parameter is
+ * ignored if [center] is set to true.
+ * @param centered Determines if the window is centered on startup. The default value for the
+ * window is true.
+ * @param icon The icon for the window displayed on the system taskbar.
+ * @param menuBar Window menu bar. The menu bar can be displayed inside a window (Windows,
+ * Linux) or at the top of the screen (Mac OS).
+ * @param undecorated Removes the native window border if set to true. The default value is false.
+ * @param events Allows to describe events of the window.
+ * Supported events: onOpen, onClose, onMinimize, onMaximize, onRestore, onFocusGet, onFocusLost,
+ * onResize, onRelocate.
+ * @param onDismissRequest Executes when the user tries to close the Window.
+ */
 fun Window(
     title: String = "JetpackDesktopWindow",
     size: IntSize = IntSize(800, 600),
@@ -47,7 +66,7 @@ fun Window(
     menuBar: MenuBar? = null,
     undecorated: Boolean = false,
     events: WindowEvents = WindowEvents(),
-    onDismissEvent: (() -> Unit)? = null,
+    onDismissRequest: (() -> Unit)? = null,
     content: @Composable () -> Unit = emptyContent()
 ) = SwingUtilities.invokeLater {
     AppWindow(
@@ -59,12 +78,15 @@ fun Window(
         menuBar = menuBar,
         undecorated = undecorated,
         events = events,
-        onDismissEvent = onDismissEvent
+        onDismissRequest = onDismissRequest
     ).show {
         content()
     }
 }
 
+/**
+ * AppWindow is a class that represents a window.
+ */
 class AppWindow : AppFrame {
 
     override val window: ComposeWindow
@@ -80,7 +102,8 @@ class AppWindow : AppFrame {
             addWindowListener(object : WindowAdapter() {
                 override fun windowClosing(event: WindowEvent) {
                     if (defaultCloseOperation != WindowConstants.DO_NOTHING_ON_CLOSE) {
-                        onDismissEvents.forEach { it.invoke() }
+                        onDispose?.invoke()
+                        onDismiss?.invoke()
                         events.invokeOnClose()
                         AppManager.removeWindow(parent)
                         isClosed = true
@@ -133,11 +156,40 @@ class AppWindow : AppFrame {
         menuBar: MenuBar? = null,
         undecorated: Boolean = false,
         events: WindowEvents = WindowEvents(),
-        onDismissEvent: (() -> Unit)? = null
-    ) : this(title, size, location, centered, icon, menuBar, undecorated, events, onDismissEvent) {
+        onDismissRequest: (() -> Unit)? = null
+    ) : this(
+        title = title,
+        size = size,
+        location = location,
+        centered = centered,
+        icon = icon,
+        menuBar = menuBar,
+        undecorated = undecorated,
+        events = events,
+        onDismissRequest = onDismissRequest
+    ) {
         this.invoker = attached
     }
 
+    /**
+     * Creates an instance of AppWindow. AppWindow is a class that represents a window.
+     *
+     * @param title The title of the window.
+     * The title is displayed in the windows's native border.
+     * @param size The initial size of the window.
+     * @param location The initial position of the window in screen space. This parameter is
+     * ignored if [center] is set to true.
+     * @param centered Determines if the window is centered on startup. The default value for the
+     * window is true.
+     * @param icon The icon for the window displayed on the system taskbar.
+     * @param menuBar Window menu bar. The menu bar can be displayed inside a window (Windows,
+     * Linux) or at the top of the screen (Mac OS).
+     * @param undecorated Removes the native window border if set to true. The default value is false.
+     * @param events Allows to describe events of the window.
+     * Supported events: onOpen, onClose, onMinimize, onMaximize, onRestore, onFocusGet, onFocusLost,
+     * onResize, onRelocate.
+     * @param onDismissRequest Executes when the user tries to close the AppWindow.
+     */
     constructor(
         title: String = "JetpackDesktopWindow",
         size: IntSize = IntSize(800, 600),
@@ -147,7 +199,7 @@ class AppWindow : AppFrame {
         menuBar: MenuBar? = null,
         undecorated: Boolean = false,
         events: WindowEvents = WindowEvents(),
-        onDismissEvent: (() -> Unit)? = null
+        onDismissRequest: (() -> Unit)? = null
     ) {
         AppManager.addWindow(this)
 
@@ -169,9 +221,7 @@ class AppWindow : AppFrame {
         this.events = events
 
         window.setUndecorated(undecorated)
-        if (onDismissEvent != null) {
-            onDismissEvents.add(onDismissEvent)
-        }
+        onDismiss = onDismissRequest
     }
 
     internal var pair: AppFrame? = null
