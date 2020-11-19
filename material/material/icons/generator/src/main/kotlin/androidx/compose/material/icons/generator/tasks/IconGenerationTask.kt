@@ -26,6 +26,8 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -39,6 +41,7 @@ abstract class IconGenerationTask : DefaultTask() {
      * Directory containing raw drawables. These icons will be processed to generate programmatic
      * representations.
      */
+    @PathSensitive(PathSensitivity.RELATIVE)
     @InputDirectory
     val iconDirectory =
         project.rootProject.project(GeneratorProject).projectDir.resolve("raw-icons")
@@ -46,6 +49,7 @@ abstract class IconGenerationTask : DefaultTask() {
     /**
      * Checked-in API file for the generator module, where we will track all the generated icons
      */
+    @PathSensitive(PathSensitivity.NONE)
     @InputFile
     val expectedApiFile =
         project.rootProject.project(GeneratorProject).projectDir.resolve("api/icons.txt")

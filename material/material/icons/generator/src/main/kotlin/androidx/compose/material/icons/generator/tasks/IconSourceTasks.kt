@@ -20,11 +20,13 @@ import androidx.compose.material.icons.generator.CoreIcons
 import androidx.compose.material.icons.generator.IconWriter
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.Project
+import org.gradle.api.tasks.CacheableTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 /**
  * Task responsible for converting core icons from xml to a programmatic representation.
  */
+@CacheableTask
 open class CoreIconGenerationTask : IconGenerationTask() {
     override fun run() =
         IconWriter(loadIcons()).generateTo(generatedSrcMainDirectory) { it in CoreIcons }
@@ -48,6 +50,7 @@ open class CoreIconGenerationTask : IconGenerationTask() {
 /**
  * Task responsible for converting extended icons from xml to a programmatic representation.
  */
+@CacheableTask
 open class ExtendedIconGenerationTask : IconGenerationTask() {
     override fun run() =
         IconWriter(loadIcons()).generateTo(generatedSrcMainDirectory) { it !in CoreIcons }
