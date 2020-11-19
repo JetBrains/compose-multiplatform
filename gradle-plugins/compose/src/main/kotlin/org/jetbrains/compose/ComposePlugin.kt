@@ -8,6 +8,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
+import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -61,20 +62,29 @@ class ComposePlugin : Plugin<Project> {
 
     object DesktopDependencies {
         val common = composeDependency("org.jetbrains.compose.desktop:desktop")
-        val linux = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux")
-        val windows = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows")
-        val macos = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos")
-        val all = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-all")
+        val linux_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-x64")
+        val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
+        val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
+        val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
+
+        @Deprecated(
+            "compose.desktop.linux is deprecated, use compose.desktop.linux_x64 instead",
+            replaceWith = ReplaceWith("linux_x64")
+        )
+        val linux = linux_x64
+        @Deprecated(
+            "compose.desktop.windows is deprecated, use compose.desktop.windows_x64 instead",
+            replaceWith = ReplaceWith("windows_x64")
+        )
+        val windows = windows_x64
+        @Deprecated(
+            "compose.desktop.macos is deprecated, use compose.desktop.macos_x64 instead",
+            replaceWith = ReplaceWith("macos_x64")
+        )
+        val macos = macos_x64
 
         val currentOs by lazy {
-            val os = System.getProperty("os.name")
-            val artifactOs = when {
-                os == "Mac OS X" -> "macos"
-                os.startsWith("Win") -> "windows"
-                os.startsWith("Linux") -> "linux"
-                else -> throw Error("Unsupported OS $os")
-            }
-            composeDependency("org.jetbrains.compose.desktop:desktop-jvm-$artifactOs")
+            composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
         }
     }
 }
