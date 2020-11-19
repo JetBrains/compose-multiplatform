@@ -445,6 +445,35 @@ class AlignmentLineTest : LayoutTest() {
     }
 
     @Test
+    fun testPaddingFromBaseline_textUnit() = with(density) {
+        val sizePx = 30
+        val sizeDp = sizePx.toDp()
+        val baselineOffsetPx = 10
+        val baselineOffsetDp = baselineOffsetPx.toDp()
+        val paddingPx = 20
+        val paddingSp = paddingPx.toSp()
+        val latch = CountDownLatch(1)
+
+        show {
+            Box(
+                Modifier.onSizeChanged { boxSize ->
+                    Assert.assertEquals(
+                        sizeDp.toIntPx() + paddingPx - baselineOffsetPx,
+                        boxSize.height
+                    )
+                    latch.countDown()
+                }
+            ) {
+                Box(Modifier.paddingFromBaseline(paddingSp)) {
+                    AlignmentLineLayout(sizeDp, sizeDp, FirstBaseline, baselineOffsetDp, Modifier)
+                }
+            }
+        }
+
+        Assert.assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun testPaddingFromBaseline_whenMinConstrained() = with(density) {
         val latch = CountDownLatch(1)
         val childSizePx = 20f

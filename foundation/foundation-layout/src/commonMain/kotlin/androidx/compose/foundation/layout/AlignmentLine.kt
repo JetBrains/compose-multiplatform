@@ -153,6 +153,7 @@ fun Modifier.relativePaddingFrom(
  * @sample androidx.compose.foundation.layout.samples.PaddingFromBaselineSampleDp
  */
 @Stable
+@Suppress("ModifierInspectorInfo")
 fun Modifier.paddingFromBaseline(top: Dp = Dp.Unspecified, bottom: Dp = Dp.Unspecified) = this
     .then(if (bottom != Dp.Unspecified) paddingFrom(LastBaseline, after = bottom) else Modifier)
     .then(if (top != Dp.Unspecified) paddingFrom(FirstBaseline, before = top) else Modifier)
@@ -170,6 +171,7 @@ fun Modifier.paddingFromBaseline(top: Dp = Dp.Unspecified, bottom: Dp = Dp.Unspe
  * @sample androidx.compose.foundation.layout.samples.PaddingFromBaselineSampleTextUnit
  */
 @Stable
+@Suppress("ModifierInspectorInfo")
 fun Modifier.paddingFromBaseline(
     top: TextUnit = TextUnit.Unspecified,
     bottom: TextUnit = TextUnit.Unspecified
@@ -231,8 +233,8 @@ private class AlignmentLineOffsetTextUnit(
     ): MeasureResult {
         return alignmentLineOffsetMeasure(
             alignmentLine,
-            if (before.isUnspecified) before.toDp() else Dp.Unspecified,
-            if (after.isUnspecified) after.toDp() else Dp.Unspecified,
+            if (!before.isUnspecified) before.toDp() else Dp.Unspecified,
+            if (!after.isUnspecified) after.toDp() else Dp.Unspecified,
             measurable,
             constraints
         )
