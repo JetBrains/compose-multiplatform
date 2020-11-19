@@ -32,9 +32,11 @@ import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * A layout composable that places its children in a horizontal sequence. For a layout composable
- * that places its children in a vertical sequence, see [Column].
+ * that places its children in a vertical sequence, see [Column]. For a layout that places children
+ * in a horizontal sequence and is also scrollable, see `ScrollableRow`. For a horizontally
+ * scrollable list that only composes and lays out the currently visible items see `LazyRow`.
  *
- * The layout model is able to assign children widths according to their weights provided
+ * The [Row] layout is able to assign children widths according to their weights provided
  * using the [RowScope.weight] modifier. If a child is not provided a weight, it will be
  * asked for its preferred width before the sizes of the children with weights are calculated
  * proportionally to their weight based on the remaining available space.
@@ -61,6 +63,8 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @param verticalAlignment The vertical alignment of the layout's children.
  *
  * @see Column
+ * @see [androidx.compose.foundation.ScrollableRow]
+ * @see [androidx.compose.foundation.lazy.LazyRow]
  */
 @Composable
 @OptIn(ExperimentalLayoutNodeApi::class, InternalLayoutApi::class)
