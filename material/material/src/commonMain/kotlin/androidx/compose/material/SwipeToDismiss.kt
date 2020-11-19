@@ -22,7 +22,7 @@ import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material.DismissDirection.EndToStart
 import androidx.compose.material.DismissDirection.StartToEnd
 import androidx.compose.material.DismissValue.Default
@@ -239,7 +239,7 @@ fun SwipeToDismiss(
         )
         Row(
             content = dismissContent,
-            modifier = Modifier.offsetPx(x = state.offset)
+            modifier = Modifier.offset(x = { state.offset.value })
         )
     }
 }

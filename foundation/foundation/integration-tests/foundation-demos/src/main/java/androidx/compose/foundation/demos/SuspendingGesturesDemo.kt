@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
@@ -345,7 +344,7 @@ fun Drag2DGestures() {
         }.fillMaxSize()
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .background(Color.Blue)
                 .size(50.dp)
                 .pointerInput {
@@ -380,7 +379,7 @@ fun MultitouchArea(
 
     Box(Modifier.fillMaxSize()) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .drawLayer(
                     scaleX = zoom,
                     scaleY = zoom,

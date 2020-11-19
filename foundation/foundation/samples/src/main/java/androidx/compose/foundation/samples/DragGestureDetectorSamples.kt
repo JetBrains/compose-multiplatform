@@ -37,7 +37,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -69,7 +69,7 @@ fun AwaitHorizontalDragOrCancellationSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -114,7 +114,7 @@ fun HorizontalDragSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -158,7 +158,7 @@ fun DetectHorizontalDragGesturesSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -186,7 +186,7 @@ fun AwaitVerticalDragOrCancellationSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -231,7 +231,7 @@ fun VerticalDragSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -275,7 +275,7 @@ fun DetectVerticalDragGesturesSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -303,7 +303,7 @@ fun AwaitDragOrCancellationSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
@@ -360,7 +360,7 @@ fun DragSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
@@ -416,7 +416,7 @@ fun DetectDragGesturesSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offsetPx(offsetX, offsetY)
+            Modifier.offset({ offsetX.value }, { offsetY.value })
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {

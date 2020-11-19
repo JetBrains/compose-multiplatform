@@ -28,16 +28,22 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
  * Offset the content by ([x] dp, [y] dp). The offsets can be positive as well as non-positive.
+ * Applying an offset only changes the position of the content, without interfering with
+ * its size measurement.
+ * This modifier will automatically adjust the horizontal offset according to the layout direction.
+ * For a modifier that offsets without considering layout direction, see [absoluteOffset].
+ *
+ * @see absoluteOffset
  *
  * Example usage:
- * @sample androidx.compose.foundation.layout.samples.LayoutOffsetModifier
+ * @sample androidx.compose.foundation.layout.samples.OffsetModifier
  */
 @Stable
 fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
@@ -55,11 +61,15 @@ fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
 
 /**
  * Offset the content by ([x] dp, [y] dp). The offsets can be positive as well as non-positive.
- * The offsets are applied without regard to the current [LayoutDirection], see [Modifier
- * .offset] to apply relative offsets.
+ * Applying an offset only changes the position of the content, without interfering with
+ * its size measurement.
+ * This modifier will not consider layout direction when calculating the position of the content.
+ * For a modifier that does this, see [offset].
+ *
+ * @see offset
  *
  * Example usage:
- * @sample androidx.compose.foundation.layout.samples.LayoutAbsoluteOffsetModifier
+ * @sample androidx.compose.foundation.layout.samples.AbsoluteOffsetModifier
  */
 @Stable
 fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
@@ -77,52 +87,88 @@ fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
 
 /**
  * Offset the content by ([x] px, [y] px). The offsets can be positive as well as non-positive.
+ * Applying an offset only changes the position of the content, without interfering with
+ * its size measurement.
  * This modifier is designed to be used for offsets that change, possibly due to user interactions.
+ * Note that, even if for convenience the API is accepting [Float] values, these will be rounded
+ * to the closest integer value before applying the offset.
+ * This modifier will automatically adjust the horizontal offset according to the layout direction.
+ * For a modifier that offsets without considering layout direction, see [absoluteOffset].
+ *
+ * @see [absoluteOffset]
  *
  * Example usage:
- * @sample androidx.compose.foundation.layout.samples.LayoutOffsetPxModifier
+ * @sample androidx.compose.foundation.layout.samples.OffsetPxModifier
  */
-fun Modifier.offsetPx(
-    x: State<Float> = mutableStateOf(0f),
-    y: State<Float> = mutableStateOf(0f)
+fun Modifier.offset(
+    x: Density.() -> Float = { 0f },
+    y: Density.() -> Float = { 0f }
 ) = this.then(
     OffsetPxModifier(
         x = x,
         y = y,
         rtlAware = true,
         inspectorInfo = debugInspectorInfo {
-            name = "offsetPx"
+            name = "offset"
             properties["x"] = x
             properties["y"] = y
         }
     )
 )
 
-/**
- * Offset the content by ([x] px, [y] px). The offsets can be positive as well as non-positive.
- * This modifier is designed to be used for offsets that change, possibly due to user interactions.
- *
- * The offsets are applied without regard to the current [LayoutDirection]. To apply relative
- * offsets, use [Modifier.offsetPx] instead.
- *
- * Example usage:
- * @sample androidx.compose.foundation.layout.samples.LayoutAbsoluteOffsetPxModifier
- */
-fun Modifier.absoluteOffsetPx(
+@Deprecated(
+    "offsetPx was deprecated. Please use offset with lambda parameters instead.",
+    ReplaceWith("offset({x.value}, {y.value})", "androidx.compose.foundation.layout.offset")
+)
+@Suppress("ModifierInspectorInfo")
+fun Modifier.offsetPx(
     x: State<Float> = mutableStateOf(0f),
     y: State<Float> = mutableStateOf(0f)
+) = this.offset({ x.value }, { y.value })
+
+/**
+ * Offset the content by ([x] px, [y] px). The offsets can be positive as well as non-positive.
+ * Applying an offset only changes the position of the content, without interfering with
+ * its size measurement.
+ * This modifier is designed to be used for offsets that change, possibly due to user interactions.
+ * Note that, even if for convenience the API is accepting [Float] values, these will be rounded
+ * to the closest integer value before applying the offset.
+ * This modifier will not consider layout direction when calculating the position of the content.
+ * For a modifier that does this, see [offset].
+ *
+ * @see offset
+ *
+ * Example usage:
+ * @sample androidx.compose.foundation.layout.samples.AbsoluteOffsetPxModifier
+ */
+fun Modifier.absoluteOffset(
+    x: Density.() -> Float = { 0f },
+    y: Density.() -> Float = { 0f }
 ) = this.then(
     OffsetPxModifier(
         x = x,
         y = y,
         rtlAware = false,
         inspectorInfo = debugInspectorInfo {
-            name = "absoluteOffsetPx"
+            name = "absoluteOffset"
             properties["x"] = x
             properties["y"] = y
         }
     )
 )
+
+@Deprecated(
+    "absoluteOffsetPx was deprecated. Please use absoluteOffset with lambda parameters instead.",
+    ReplaceWith(
+        "absoluteOffset({x.value}, {y.value})",
+        "androidx.compose.foundation.layout.absoluteOffset"
+    )
+)
+@Suppress("ModifierInspectorInfo")
+fun Modifier.absoluteOffsetPx(
+    x: State<Float> = mutableStateOf(0f),
+    y: State<Float> = mutableStateOf(0f)
+) = this.absoluteOffset({ x.value }, { y.value })
 
 private class OffsetModifier(
     val x: Dp,
@@ -164,8 +210,8 @@ private class OffsetModifier(
 }
 
 private class OffsetPxModifier(
-    val x: State<Float>,
-    val y: State<Float>,
+    val x: Density.() -> Float,
+    val y: Density.() -> Float,
     val rtlAware: Boolean,
     inspectorInfo: InspectorInfo.() -> Unit
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
@@ -176,9 +222,9 @@ private class OffsetPxModifier(
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
             if (rtlAware) {
-                placeable.placeRelative(x.value.roundToInt(), y.value.roundToInt())
+                placeable.placeRelative(x().roundToInt(), y().roundToInt())
             } else {
-                placeable.place(x.value.roundToInt(), y.value.roundToInt())
+                placeable.place(x().roundToInt(), y().roundToInt())
             }
         }
     }

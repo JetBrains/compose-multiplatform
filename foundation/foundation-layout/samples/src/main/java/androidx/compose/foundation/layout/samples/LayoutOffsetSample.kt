@@ -18,10 +18,8 @@ package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.absoluteOffset
-import androidx.compose.foundation.layout.absoluteOffsetPx
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +32,7 @@ import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
-fun LayoutOffsetModifier() {
+fun OffsetModifier() {
     // This text will be offset (10.dp, 20.dp) from the center of the available space. In the
     // right-to-left context, the offset will be (-10.dp, 20.dp).
     Text(
@@ -47,7 +45,7 @@ fun LayoutOffsetModifier() {
 
 @Sampled
 @Composable
-fun LayoutAbsoluteOffsetModifier() {
+fun AbsoluteOffsetModifier() {
     // This text will be offset (10.dp, 20.dp) from the center of the available space.
     Text(
         "Layout offset modifier sample",
@@ -59,7 +57,7 @@ fun LayoutAbsoluteOffsetModifier() {
 
 @Sampled
 @Composable
-fun LayoutOffsetPxModifier() {
+fun OffsetPxModifier() {
     // This text will be offset in steps of 10.dp from the top left of the available space in
     // left-to-right context, and from top right in right-to-left context.
     val offset = remember { mutableStateOf(0f) }
@@ -67,19 +65,19 @@ fun LayoutOffsetPxModifier() {
         "Layout offset modifier sample",
         Modifier
             .tapGestureFilter { offset.value += 10f }
-            .offsetPx(offset, offset)
+            .offset({ offset.value }, { offset.value })
     )
 }
 
 @Sampled
 @Composable
-fun LayoutAbsoluteOffsetPxModifier() {
+fun AbsoluteOffsetPxModifier() {
     // This text will be offset in steps of 10.dp from the top left of the available space.
     val offset = remember { mutableStateOf(0f) }
     Text(
         "Layout offset modifier sample",
         Modifier
             .tapGestureFilter { offset.value += 10f }
-            .absoluteOffsetPx(offset, offset)
+            .absoluteOffset({ offset.value }, { offset.value })
     )
 }

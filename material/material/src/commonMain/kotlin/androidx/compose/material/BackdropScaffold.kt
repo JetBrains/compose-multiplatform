@@ -26,7 +26,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.BackdropValue.Concealed
@@ -329,7 +329,7 @@ fun BackdropScaffold(
 
             // Front layer
             Surface(
-                Modifier.offsetPx(y = scaffoldState.offset).then(swipeable),
+                Modifier.offset(y = { scaffoldState.offset.value }).then(swipeable),
                 shape = frontLayerShape,
                 elevation = frontLayerElevation,
                 color = frontLayerBackgroundColor,

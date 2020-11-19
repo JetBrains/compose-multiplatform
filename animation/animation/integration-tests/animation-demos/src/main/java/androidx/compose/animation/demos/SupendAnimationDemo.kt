@@ -26,7 +26,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
@@ -88,7 +88,7 @@ fun SuspendAnimationDemo() {
     ) {
         Text("Tap anywhere", Modifier.align(Alignment.Center))
         Box(
-            Modifier.offsetPx(animStateX, animStateY).size(40.dp)
+            Modifier.offset({ animStateX.value }, { animStateY.value }).size(40.dp)
                 .background(Color(0xff3c1361), CircleShape)
         )
     }
