@@ -38,7 +38,6 @@ internal class ModifiedFocusRequesterNode(
         }
 
     // Searches for the focus node associated with this focus requester node.
-    @OptIn(ExperimentalLayoutNodeApi::class)
     internal fun findFocusNode(): ModifiedFocusNode? {
         return findNextFocusWrapper() ?: layoutNode.searchChildrenForFocusNode()
     }

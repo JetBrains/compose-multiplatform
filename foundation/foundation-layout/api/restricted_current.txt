@@ -93,7 +93,7 @@ package androidx.compose.foundation.layout {
   public final class BoxKt {
     method @androidx.compose.runtime.Composable public static inline void Box(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void Box(androidx.compose.ui.Modifier modifier);
-    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static androidx.compose.ui.node.LayoutNode.MeasureBlocks rememberMeasureBlocks(androidx.compose.ui.Alignment alignment);
+    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static androidx.compose.ui.node.MeasureBlocks rememberMeasureBlocks(androidx.compose.ui.Alignment alignment);
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface BoxScope {
@@ -121,8 +121,8 @@ package androidx.compose.foundation.layout {
 
   public final class ColumnKt {
     method @androidx.compose.runtime.Composable public static inline void Column(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static androidx.compose.ui.node.LayoutNode.MeasureBlocks columnMeasureBlocks(androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, androidx.compose.ui.Alignment.Horizontal horizontalAlignment);
-    field @kotlin.PublishedApi internal static final androidx.compose.ui.node.LayoutNode.MeasureBlocks DefaultColumnMeasureBlocks;
+    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static androidx.compose.ui.node.MeasureBlocks columnMeasureBlocks(androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, androidx.compose.ui.Alignment.Horizontal horizontalAlignment);
+    field @kotlin.PublishedApi internal static final androidx.compose.ui.node.MeasureBlocks DefaultColumnMeasureBlocks;
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface ColumnScope {
@@ -417,13 +417,13 @@ package androidx.compose.foundation.layout {
   }
 
   public final class RowColumnImplKt {
-    method @kotlin.PublishedApi internal static androidx.compose.ui.node.LayoutNode.MeasureBlocks rowColumnMeasureBlocks-GZ6WFlY(androidx.compose.foundation.layout.LayoutOrientation orientation, kotlin.jvm.functions.Function5<? super java.lang.Integer,? super int[],? super androidx.compose.ui.unit.LayoutDirection,? super androidx.compose.ui.unit.Density,? super int[],kotlin.Unit> arrangement, float arrangementSpacing, androidx.compose.foundation.layout.SizeMode crossAxisSize, androidx.compose.foundation.layout.CrossAxisAlignment crossAxisAlignment);
+    method @kotlin.PublishedApi internal static androidx.compose.ui.node.MeasureBlocks rowColumnMeasureBlocks-GZ6WFlY(androidx.compose.foundation.layout.LayoutOrientation orientation, kotlin.jvm.functions.Function5<? super java.lang.Integer,? super int[],? super androidx.compose.ui.unit.LayoutDirection,? super androidx.compose.ui.unit.Density,? super int[],kotlin.Unit> arrangement, float arrangementSpacing, androidx.compose.foundation.layout.SizeMode crossAxisSize, androidx.compose.foundation.layout.CrossAxisAlignment crossAxisAlignment);
   }
 
   public final class RowKt {
     method @androidx.compose.runtime.Composable public static inline void Row(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static androidx.compose.ui.node.LayoutNode.MeasureBlocks rowMeasureBlocks(androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, androidx.compose.ui.Alignment.Vertical verticalAlignment);
-    field @kotlin.PublishedApi internal static final androidx.compose.ui.node.LayoutNode.MeasureBlocks DefaultRowMeasureBlocks;
+    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static androidx.compose.ui.node.MeasureBlocks rowMeasureBlocks(androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, androidx.compose.ui.Alignment.Vertical verticalAlignment);
+    field @kotlin.PublishedApi internal static final androidx.compose.ui.node.MeasureBlocks DefaultRowMeasureBlocks;
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface RowScope {

@@ -23,10 +23,8 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
-import androidx.compose.ui.node.findClosestParentNode
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
@@ -47,7 +45,6 @@ internal typealias SemanticsNodeVisitor = (node: SemanticsNode) -> Boolean
  * of any other semantics modifiers on the same layout node, and if "mergeDescendants" is
  * specified and enabled, also the "merged" configuration of its subtree.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 class SemanticsNode internal constructor(
     /*
      * This is expected to be the outermost semantics modifier on a layout node.
@@ -67,8 +64,11 @@ class SemanticsNode internal constructor(
 ) {
     internal val unmergedConfig = layoutNodeWrapper.collapsedSemanticsConfiguration()
     val id: Int = layoutNodeWrapper.modifier.id
-    // TODO(aelias): Make this internal and expose the Owner instead
-    val componentNode: LayoutNode = layoutNodeWrapper.layoutNode
+
+    /**
+     * The [LayoutNode] that this is associated with.
+     */
+    val layoutNode: LayoutNode = layoutNodeWrapper.layoutNode
 
     // GEOMETRY
 
@@ -77,7 +77,7 @@ class SemanticsNode internal constructor(
      */
     val size: IntSize
         get() {
-            return componentNode.coordinates.size
+            return this.layoutNode.coordinates.size
         }
 
     /**
@@ -87,7 +87,7 @@ class SemanticsNode internal constructor(
      */
     val boundsInRoot: Rect
         get() {
-            return componentNode.coordinates.boundsInRoot
+            return this.layoutNode.coordinates.boundsInRoot
         }
 
     /**
@@ -96,7 +96,7 @@ class SemanticsNode internal constructor(
      */
     val positionInRoot: Offset
         get() {
-            return componentNode.coordinates.positionInRoot
+            return this.layoutNode.coordinates.positionInRoot
         }
 
     /**
@@ -105,7 +105,7 @@ class SemanticsNode internal constructor(
      */
     val globalBounds: Rect
         get() {
-            return componentNode.coordinates.globalBounds
+            return this.layoutNode.coordinates.globalBounds
         }
 
     /**
@@ -113,7 +113,7 @@ class SemanticsNode internal constructor(
      */
     val globalPosition: Offset
         get() {
-            return componentNode.coordinates.globalPosition
+            return this.layoutNode.coordinates.globalPosition
         }
 
     /**
@@ -121,7 +121,7 @@ class SemanticsNode internal constructor(
      * if the line is not provided.
      */
     fun getAlignmentLinePosition(line: AlignmentLine): Int {
-        return componentNode.coordinates[line]
+        return this.layoutNode.coordinates[line]
     }
 
     // CHILDREN
@@ -167,7 +167,7 @@ class SemanticsNode internal constructor(
     internal fun unmergedChildren(): List<SemanticsNode> {
         val unmergedChildren: MutableList<SemanticsNode> = mutableListOf()
 
-        val semanticsChildren = componentNode.findOneLayerOfSemanticsWrappers()
+        val semanticsChildren = this.layoutNode.findOneLayerOfSemanticsWrappers()
         semanticsChildren.fastForEach { semanticsChild ->
             unmergedChildren.add(SemanticsNode(semanticsChild, mergingEnabled))
         }
@@ -238,7 +238,7 @@ class SemanticsNode internal constructor(
         get() {
             var node: LayoutNode? = null
             if (mergingEnabled) {
-                node = componentNode.findClosestParentNode {
+                node = this.layoutNode.findClosestParentNode {
                     it.outerSemantics
                         ?.collapsedSemanticsConfiguration()
                         ?.isMergingSemanticsOfDescendants == true
@@ -246,7 +246,7 @@ class SemanticsNode internal constructor(
             }
 
             if (node == null) {
-                node = componentNode.findClosestParentNode { it.outerSemantics != null }
+                node = this.layoutNode.findClosestParentNode { it.outerSemantics != null }
             }
 
             val outerSemantics = node?.outerSemantics
@@ -275,7 +275,6 @@ class SemanticsNode internal constructor(
 /**
  * Returns the outermost semantics node on a LayoutNode.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal val LayoutNode.outerSemantics: SemanticsWrapper?
     get() {
         return outerLayoutNodeWrapper.nearestSemantics
@@ -303,7 +302,6 @@ internal fun SemanticsNode.findChildById(id: Int): SemanticsNode? {
     return null
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 private fun LayoutNode.findOneLayerOfSemanticsWrappers(
     list: MutableList<SemanticsWrapper> = mutableListOf<SemanticsWrapper>()
 ): List<SemanticsWrapper> {
@@ -316,4 +314,22 @@ private fun LayoutNode.findOneLayerOfSemanticsWrappers(
         }
     }
     return list
+}
+
+/**
+ * Executes [selector] on every parent of this [LayoutNode] and returns the closest
+ * [LayoutNode] to return `true` from [selector] or null if [selector] returns false
+ * for all ancestors.
+ */
+private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
+    var currentParent = this.parent
+    while (currentParent != null) {
+        if (selector(currentParent)) {
+            return currentParent
+        } else {
+            currentParent = currentParent.parent
+        }
+    }
+
+    return null
 }

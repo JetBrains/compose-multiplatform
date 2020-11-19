@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidOwner
@@ -55,7 +54,6 @@ import org.junit.runners.model.Statement
  */
 @LargeTest
 @RunWith(Parameterized::class)
-@OptIn(ExperimentalLayoutNodeApi::class)
 class LayoutNodeModifierBenchmark(
     private val numberOfModifiers: Int
 ) {

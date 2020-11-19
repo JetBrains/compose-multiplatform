@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ExperimentalLayoutNodeApi::class)
-
 package androidx.compose.ui.platform
 
 import android.annotation.SuppressLint
@@ -24,7 +22,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.viewinterop.AndroidViewHolder

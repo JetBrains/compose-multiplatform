@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class InnerPlaceable(
     layoutNode: LayoutNode
 ) : LayoutNodeWrapper(layoutNode), Density by layoutNode.measureScope {

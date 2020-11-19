@@ -23,7 +23,6 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AmbientClipboardManager
@@ -73,7 +72,6 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class AndroidComposeViewAccessibilityDelegateCompatTest {

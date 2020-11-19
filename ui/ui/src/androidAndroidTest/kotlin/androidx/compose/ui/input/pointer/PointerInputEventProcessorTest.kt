@@ -29,7 +29,6 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
@@ -84,7 +83,6 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalLayoutNodeApi::class)
 class PointerInputEventProcessorTest {
 
     private lateinit var root: LayoutNode
@@ -3094,7 +3092,6 @@ class PointerInputEventProcessorTest {
 abstract class TestOwner : Owner {
     var position: IntOffset? = null
 
-    @ExperimentalLayoutNodeApi
     override val root: LayoutNode
         get() = LayoutNode()
 
@@ -3106,7 +3103,6 @@ abstract class TestOwner : Owner {
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
     PointerInputModifier
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = modifier
@@ -3130,13 +3126,11 @@ private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Mo
         detach()
     }
 
-@ExperimentalLayoutNodeApi
 private fun mockOwner(
     position: IntOffset = IntOffset.Zero,
     targetRoot: LayoutNode = LayoutNode()
 ): Owner = MockOwner(position, targetRoot)
 
-@ExperimentalLayoutNodeApi
 @OptIn(
     ExperimentalFocus::class,
     InternalCoreApi::class

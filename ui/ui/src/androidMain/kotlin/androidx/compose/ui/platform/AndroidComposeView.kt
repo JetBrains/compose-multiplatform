@@ -59,7 +59,6 @@ import androidx.compose.ui.input.pointer.MotionEventAdapter
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.layout.RootMeasureBlocks
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
@@ -92,7 +91,6 @@ import android.view.KeyEvent as AndroidKeyEvent
     ExperimentalComposeApi::class,
     ExperimentalFocus::class,
     ExperimentalKeyInput::class,
-    ExperimentalLayoutNodeApi::class
 )
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) : ViewGroup(context), AndroidOwner {

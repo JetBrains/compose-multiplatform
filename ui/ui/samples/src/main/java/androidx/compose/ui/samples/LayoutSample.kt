@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.measureBlocksOf
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.offset
 
@@ -79,7 +78,6 @@ fun LayoutWithProvidedIntrinsicsUsage(content: @Composable () -> Unit) {
 
 @Sampled
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class)
 fun LayoutWithMeasureBlocksWithIntrinsicUsage(content: @Composable () -> Unit) {
     val measureBlocks = measureBlocksOf(
         minIntrinsicWidthMeasureBlock = { measurables, h ->

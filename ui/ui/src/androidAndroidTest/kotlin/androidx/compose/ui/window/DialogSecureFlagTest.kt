@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
@@ -123,10 +122,9 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     }
 
     private fun isSecureFlagEnabledForDialog(): Boolean {
-        @OptIn(ExperimentalLayoutNodeApi::class)
         val owner = rule
             .onNode(isDialog())
-            .fetchSemanticsNode("").componentNode.owner as View
+            .fetchSemanticsNode("").layoutNode.owner as View
         return (owner.rootView.layoutParams as WindowManager.LayoutParams).flags and
             WindowManager.LayoutParams.FLAG_SECURE != 0
     }

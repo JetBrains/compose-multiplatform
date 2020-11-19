@@ -29,9 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.materialize
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.simpleIdentityToString
@@ -80,7 +80,6 @@ import kotlin.math.max
  */
 @Suppress("ComposableLambdaParameterPosition")
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class)
 fun Layout(
     content: @Composable () -> Unit,
     minIntrinsicWidthMeasureBlock: IntrinsicMeasureBlock,
@@ -101,7 +100,7 @@ fun Layout(
 }
 
 /**
- * Creates an instance of [LayoutNode.MeasureBlocks] to pass to [Layout] given
+ * Creates an instance of [MeasureBlocks] to pass to [Layout] given
  * intrinsic measures and a measure block.
  *
  * @sample androidx.compose.ui.samples.LayoutWithMeasureBlocksWithIntrinsicUsage
@@ -130,15 +129,14 @@ fun Layout(
  * @see Layout
  * @see WithConstraints
  */
-@ExperimentalLayoutNodeApi
 fun measureBlocksOf(
     minIntrinsicWidthMeasureBlock: IntrinsicMeasureBlock,
     minIntrinsicHeightMeasureBlock: IntrinsicMeasureBlock,
     maxIntrinsicWidthMeasureBlock: IntrinsicMeasureBlock,
     maxIntrinsicHeightMeasureBlock: IntrinsicMeasureBlock,
     measureBlock: MeasureBlock
-): LayoutNode.MeasureBlocks {
-    return object : LayoutNode.MeasureBlocks {
+): MeasureBlocks {
+    return object : MeasureBlocks {
         override fun measure(
             measureScope: MeasureScope,
             measurables: List<Measurable>,
@@ -191,7 +189,6 @@ fun measureBlocksOf(
  */
 @Suppress("ComposableLambdaParameterPosition")
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class)
 /*inline*/ fun Layout(
     /*crossinline*/
     content: @Composable () -> Unit,
@@ -218,7 +215,7 @@ fun measureBlocksOf(
  *
  * @param content The children composable to be laid out.
  * @param modifier Modifiers to be applied to the layout.
- * @param measureBlocks An [LayoutNode.MeasureBlocks] instance defining the measurement and
+ * @param measureBlocks An [MeasureBlocks] instance defining the measurement and
  * positioning of the layout.
  *
  * @see Layout
@@ -227,10 +224,9 @@ fun measureBlocksOf(
  */
 
 @Suppress("ComposableLambdaParameterPosition")
-@ExperimentalLayoutNodeApi
 @Composable inline fun Layout(
     content: @Composable () -> Unit,
-    measureBlocks: LayoutNode.MeasureBlocks,
+    measureBlocks: MeasureBlocks,
     modifier: Modifier = Modifier
 ) {
     @OptIn(ExperimentalComposeApi::class)
@@ -246,7 +242,6 @@ fun measureBlocksOf(
     )
 }
 
-@ExperimentalLayoutNodeApi
 @PublishedApi
 internal fun materializerOf(
     modifier: Modifier
@@ -263,7 +258,6 @@ internal fun materializerOf(
     "This composable is temporary to enable quicker prototyping in ConstraintLayout. " +
         "It should not be used in app code directly."
 )
-@OptIn(ExperimentalLayoutNodeApi::class)
 fun MultiMeasureLayout(
     modifier: Modifier = Modifier,
     children: @Composable () -> Unit,
@@ -374,19 +368,17 @@ internal class DefaultIntrinsicMeasurable(
  * call.
  */
 @PublishedApi
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class IntrinsicsMeasureScope(
     density: Density,
     override val layoutDirection: LayoutDirection
 ) : MeasureScope, Density by density
 
 /**
- * Default [LayoutNode.MeasureBlocks] object implementation, providing intrinsic measurements
+ * Default [MeasureBlocks] object implementation, providing intrinsic measurements
  * that use the measure block replacing the measure calls with intrinsic measurement calls.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 fun MeasuringIntrinsicsMeasureBlocks(measureBlock: MeasureBlock) =
-    object : LayoutNode.MeasureBlocks {
+    object : MeasureBlocks {
         override fun measure(
             measureScope: MeasureScope,
             measurables: List<Measurable>,

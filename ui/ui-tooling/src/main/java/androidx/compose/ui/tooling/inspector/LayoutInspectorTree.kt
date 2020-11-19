@@ -19,7 +19,6 @@ package androidx.compose.ui.tooling.inspector
 import android.view.View
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.SlotTable
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.tooling.Group
@@ -58,7 +57,6 @@ private fun packageNameHash(packageName: String) =
 /**
  * Generator of a tree for the Layout Inspector.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 class LayoutInspectorTree {
     private val inlineClassConverter = InlineClassConverter()
     private val parameterFactory = ParameterFactory(inlineClassConverter)

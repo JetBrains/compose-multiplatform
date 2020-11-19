@@ -29,10 +29,10 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
+import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.node.isAttached
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -60,7 +60,7 @@ import androidx.compose.ui.util.fastForEach
  * @param measureBlock Measure block which provides ability to subcompose during the measuring.
  */
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
+@OptIn(ExperimentalComposeApi::class)
 fun SubcomposeLayout(
     modifier: Modifier = Modifier,
     measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult
@@ -102,7 +102,6 @@ interface SubcomposeMeasureScope : MeasureScope {
     fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable>
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 private class SubcomposeLayoutState :
     SubcomposeMeasureScope,
     CompositionLifecycleObserver {
@@ -196,7 +195,7 @@ private class SubcomposeLayoutState :
 
     private fun createMeasureBlocks(
         block: SubcomposeMeasureScope.(Constraints) -> MeasureResult
-    ): LayoutNode.MeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
+    ): MeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
         error = "Intrinsic measurements are not currently supported by SubcomposeLayout"
     ) {
         override fun measure(

@@ -59,7 +59,6 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
@@ -573,7 +572,7 @@ class AndroidViewCompatTest {
     }
 
     @Test
-    @OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
+    @OptIn(ExperimentalComposeApi::class)
     fun testComposeInsideView_attachingAndDetaching() {
         var composeContent by mutableStateOf(true)
         var node: LayoutNode? = null
@@ -783,7 +782,6 @@ class AndroidViewCompatTest {
         }
     }
 
-    @OptIn(ExperimentalLayoutNodeApi::class)
     private val noOpMeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("") {
         override fun measure(
             measureScope: MeasureScope,
