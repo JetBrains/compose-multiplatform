@@ -31,13 +31,19 @@ internal class ModifiedDrawNode(
 
     private var cacheDrawModifier: DrawCacheModifier? = updateCacheDrawModifier()
 
+    // b/173669932 we should not cache this here, however, on subsequent modifier updates
+    // the density provided via layoutNode.density becomes 1
+    private val density = layoutNode.density
+
     // Flag to determine if the cache should be re-built
     private var invalidateCache = true
 
     // Callback used to build the drawing cache
     private val updateCache = {
         val size: Size = measuredSize.toSize()
-        cacheDrawModifier?.onBuildCache(size, layoutNode.mDrawScope)
+        // b/173669932 figure out why layoutNode.mDrawScope density is 1 after observation updates
+        // and use that here instead of the cached density we get in the constructor
+        cacheDrawModifier?.onBuildCache(size, density)
         invalidateCache = false
     }
 
