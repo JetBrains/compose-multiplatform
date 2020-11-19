@@ -38,20 +38,25 @@ fun Project.createTestConfigurationGenerationTask(
     val generateTestConfigurationTask = this.tasks.register(
         "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
         GenerateTestConfigurationTask::class.java
-    ) {
-        it.testFolder.set(artifacts.get(ArtifactType.APK))
-        it.testLoader.set(artifacts.getBuiltArtifactsLoader())
-        it.outputXml.fileValue(
+    ) { task ->
+        task.testFolder.set(artifacts.get(ArtifactType.APK))
+        task.testLoader.set(artifacts.getBuiltArtifactsLoader())
+        task.outputXml.fileValue(
             File(
                 this.getTestConfigDirectory(),
                 "${this.path.asFilenamePrefix()}$variantName.xml"
             )
         )
-        it.minSdk.set(minSdk)
-        it.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
-        it.testRunner.set(testRunner)
-        it.projectPath.set(this.path)
-        AffectedModuleDetector.configureTaskGuard(it)
+        task.minSdk.set(minSdk)
+        task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
+        task.testRunner.set(testRunner)
+        task.projectPath.set(this.path)
+        task.affectedModuleDetectorSubset.set(
+            project.provider {
+                AffectedModuleDetector.getProjectSubset(project)
+            }
+        )
+        AffectedModuleDetector.configureTaskGuard(task)
     }
     // Disable xml generation for projects that have no test sources
     this.afterEvaluate {
@@ -167,7 +172,7 @@ fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
     extensions.getByType<AndroidComponentsExtension<*, *>>().apply {
         androidTest(selector().all()) { androidTest ->
             when {
-                path.contains("media2:version-compat-tests") -> {
+                path.contains("media2:media2-session:version-compat-tests") -> {
                     createOrUpdateMediaTestConfigurationGenerationTask(
                         androidTest.name,
                         androidTest.artifacts,
