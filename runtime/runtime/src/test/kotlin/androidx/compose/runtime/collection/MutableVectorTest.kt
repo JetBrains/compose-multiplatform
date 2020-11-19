@@ -22,7 +22,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCollectionApi::class)
 class MutableVectorTest {
     val list: MutableVector<Int> = mutableVectorOf(1, 2, 3, 4, 5)
 

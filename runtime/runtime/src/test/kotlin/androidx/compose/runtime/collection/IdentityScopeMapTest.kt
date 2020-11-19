@@ -21,7 +21,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-@OptIn(ExperimentalCollectionApi::class)
 class IdentityScopeMapTest {
     private val map = IdentityScopeMap<Scope>()
 

@@ -17,7 +17,6 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -186,7 +185,6 @@ private val DownChangeConsumed = ConsumedData(downChange = true)
 // TODO: Suppressing deprecation for synchronized; need to move to atomicfu wrapper
 @Suppress("DEPRECATION_ERROR")
 @ExperimentalPointerInput
-@OptIn(ExperimentalCollectionApi::class)
 internal class SuspendingPointerInputFilter(
     override val viewConfiguration: ViewConfiguration,
     density: Density = Density(1f)

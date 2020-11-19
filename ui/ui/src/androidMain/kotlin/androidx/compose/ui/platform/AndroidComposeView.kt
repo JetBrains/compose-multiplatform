@@ -35,7 +35,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
 import androidx.compose.ui.autofill.Autofill
@@ -519,7 +518,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     /**
      * Walks the entire LayoutNode sub-hierarchy and marks all nodes as needing measurement.
      */
-    @OptIn(ExperimentalCollectionApi::class)
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
         measureAndLayoutDelegate.requestRemeasure(node)
         node._children.forEach { invalidateLayoutNodeMeasurement(it) }
@@ -528,7 +526,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     /**
      * Walks the entire LayoutNode sub-hierarchy and marks all layers as needing to be redrawn.
      */
-    @OptIn(ExperimentalCollectionApi::class)
     private fun invalidateLayers(node: LayoutNode) {
         node.invalidateLayers()
         node._children.forEach { invalidateLayers(it) }

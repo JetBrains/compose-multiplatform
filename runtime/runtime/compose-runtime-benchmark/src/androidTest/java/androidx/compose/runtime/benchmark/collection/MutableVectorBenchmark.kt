@@ -18,7 +18,6 @@ package androidx.compose.runtime.benchmark.collection
 
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.benchmark.ComposeBenchmarkBase
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.util.fastAny
@@ -35,7 +34,6 @@ import org.junit.runners.MethodSorters
 /**
  * Benchmark that tests the performance of ArrayList and MutableVector.
  */
-@OptIn(ExperimentalCollectionApi::class)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

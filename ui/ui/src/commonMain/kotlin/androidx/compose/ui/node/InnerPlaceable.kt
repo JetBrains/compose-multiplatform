@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
@@ -123,7 +122,6 @@ internal class InnerPlaceable(
         return layoutNode.calculateAlignmentLines()[line] ?: AlignmentLine.Unspecified
     }
 
-    @OptIn(ExperimentalCollectionApi::class)
     override fun draw(canvas: Canvas) {
         withPositionTranslation(canvas) {
             val owner = layoutNode.requireOwner()
@@ -141,7 +139,6 @@ internal class InnerPlaceable(
         }
     }
 
-    @OptIn(ExperimentalCollectionApi::class)
     override fun hitTest(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>

@@ -561,10 +561,7 @@ package androidx.compose.runtime {
 
 package androidx.compose.runtime.collection {
 
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental API for fast access collections and is likely to change " + "before becoming stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalCollectionApi {
-  }
-
-  @androidx.compose.runtime.collection.ExperimentalCollectionApi public final class MutableVector<T> implements java.util.RandomAccess {
+  public final class MutableVector<T> implements java.util.RandomAccess {
     method public boolean add(T? element);
     method public void add(int index, T? element);
     method public boolean addAll(int index, java.util.List<? extends T> elements);
@@ -632,10 +629,10 @@ package androidx.compose.runtime.collection {
   }
 
   public final class MutableVectorKt {
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(optional int capacity);
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf();
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf(T? elements);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(optional int capacity);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf();
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf(T? elements);
   }
 
 }
