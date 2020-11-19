@@ -53,7 +53,7 @@ class AndroidSnapshotTests : BaseComposeTest() {
                 }
             }
             try {
-                repeat(1000) {
+                repeat(100) {
                     activityRule.activity.uiThread {
                         Snapshot.sendApplyNotifications()
                     }
