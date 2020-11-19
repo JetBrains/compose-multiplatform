@@ -772,7 +772,6 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
  * to determine what gets run by our test runner
  */
 fun String.renameApkForTesting(projectPath: String, hasBenchmarkPlugin: Boolean): String {
-
     val name =
         if (projectPath.contains("media") && projectPath.contains("version-compat-tests")) {
             // Exclude media*:version-compat-tests modules from
@@ -780,6 +779,8 @@ fun String.renameApkForTesting(projectPath: String, hasBenchmarkPlugin: Boolean)
             this.replace("-debug-androidTest", "")
         } else if (hasBenchmarkPlugin) {
             this.replace("-androidTest", "-androidBenchmark")
+        } else if (projectPath.endsWith("macrobenchmark")) {
+            this.replace("-androidTest", "-androidMacrobenchmark")
         } else {
             this
         }
