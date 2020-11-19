@@ -25,6 +25,7 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -122,7 +123,7 @@ class ScrollState(
     internal val flingConfig: FlingConfig,
     animationClock: AnimationClockObservable,
     interactionState: InteractionState? = null
-) {
+) : Scrollable {
 
     /**
      * current scroll position value in pixels
@@ -170,8 +171,7 @@ class ScrollState(
      *
      * If [scroll] is called from elsewhere, this will be canceled.
      */
-    @OptIn(ExperimentalFoundationApi::class)
-    suspend fun scroll(
+    override suspend fun scroll(
         block: suspend ScrollScope.() -> Unit
     ): Unit = scrollableController.scroll(block)
 
