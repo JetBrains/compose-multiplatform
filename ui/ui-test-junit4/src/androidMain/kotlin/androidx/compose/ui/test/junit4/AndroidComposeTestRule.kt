@@ -28,7 +28,6 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
-import androidx.compose.ui.test.junit4.android.FirstDrawRegistry
 import androidx.compose.ui.test.junit4.android.IdleAwaiter
 import androidx.compose.ui.test.junit4.android.registerComposeWithEspresso
 import androidx.compose.ui.test.junit4.android.unregisterComposeFromEspresso
@@ -257,7 +256,6 @@ internal constructor(
             @Suppress("DEPRECATION_ERROR")
             blinkingCursorEnabled = false
             AndroidOwnerRegistry.setupRegistry()
-            FirstDrawRegistry.setupRegistry()
             registerComposeWithEspresso()
             @Suppress("DEPRECATION_ERROR")
             textInputServiceFactory = {
@@ -270,7 +268,6 @@ internal constructor(
             @Suppress("DEPRECATION_ERROR")
             blinkingCursorEnabled = true
             AndroidOwnerRegistry.tearDownRegistry()
-            FirstDrawRegistry.tearDownRegistry()
             unregisterComposeFromEspresso()
             // Dispose the content
             if (disposeContentHook != null) {

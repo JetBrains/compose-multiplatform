@@ -48,7 +48,6 @@ internal interface IdlingResourceWithDiagnostics {
  */
 fun registerComposeWithEspresso() {
     ComposeIdlingResource.registerSelfIntoEspresso()
-    FirstDrawIdlingResource.registerSelfIntoEspresso()
 }
 
 /**
@@ -56,7 +55,6 @@ fun registerComposeWithEspresso() {
  */
 fun unregisterComposeFromEspresso() {
     ComposeIdlingResource.unregisterSelfFromEspresso()
-    FirstDrawIdlingResource.unregisterSelfFromEspresso()
 }
 
 /**
@@ -98,6 +96,8 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
     private var hadNoSnapshotChanges = true
     private var hadNoRecomposerChanges = true
     private var lastCompositionAwaiters = 0
+    private var hadNoPendingMeasureLayout = true
+    private var hadNoPendingDraw = true
 
     private var compositionAwaiters = AtomicInteger(0)
 
@@ -112,13 +112,23 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
             hadNoRecomposerChanges = !Recomposer.current().hasInvalidations()
             hadAnimationClocksIdle = areAllClocksIdle()
             lastCompositionAwaiters = compositionAwaiters.get()
+            val owners = AndroidOwnerRegistry.getUnfilteredOwners()
+            hadNoPendingMeasureLayout = !owners.any { it.hasPendingMeasureOrLayout }
+            hadNoPendingDraw = !owners.any {
+                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
+                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
+            }
 
             check(lastCompositionAwaiters >= 0) {
                 "More CompositionAwaiters were removed then added ($lastCompositionAwaiters)"
             }
 
-            hadNoSnapshotChanges && hadNoRecomposerChanges && hadAnimationClocksIdle &&
-                lastCompositionAwaiters == 0
+            hadNoSnapshotChanges &&
+                hadNoRecomposerChanges &&
+                hadAnimationClocksIdle &&
+                lastCompositionAwaiters == 0 &&
+                hadNoPendingMeasureLayout &&
+                hadNoPendingDraw
         }
     }
 
@@ -194,6 +204,8 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
         val hadRunningAnimations = !hadAnimationClocksIdle
         val numCompositionAwaiters = lastCompositionAwaiters
         val wasAwaitingCompositions = numCompositionAwaiters > 0
+        val hadPendingMeasureLayout = !hadNoPendingMeasureLayout
+        val hadPendingDraw = !hadNoPendingDraw
 
         val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges &&
             !hadRunningAnimations && !wasAwaitingCompositions
@@ -217,26 +229,11 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
                 " infinite re-compositions happening in the tested code.\n"
             message += "- Debug: hadRecomposerChanges = $hadRecomposerChanges, "
             message += "hadSnapshotChanges = $hadSnapshotChanges, "
-            message += "numCompositionAwaiters = $numCompositionAwaiters"
+            message += "numCompositionAwaiters = $numCompositionAwaiters, "
+            message += "hadPendingMeasureLayout = $hadPendingMeasureLayout, "
+            message += "hadPendingDraw = $hadPendingDraw"
         }
         return message
-    }
-}
-
-private object FirstDrawIdlingResource : BaseIdlingResource() {
-    override fun getName(): String = "FirstDrawIdlingResource"
-
-    override fun isIdleNow(): Boolean {
-        return FirstDrawRegistry.haveAllDrawn().also {
-            if (!it) {
-                FirstDrawRegistry.setOnDrawnCallback(::transitionToIdle)
-            }
-        }
-    }
-
-    override fun unregisterSelfFromEspresso() {
-        super.unregisterSelfFromEspresso()
-        FirstDrawRegistry.setOnDrawnCallback(null)
     }
 }
 
