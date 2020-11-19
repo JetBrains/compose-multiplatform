@@ -199,14 +199,30 @@ internal class RecordingInputConnection(
             return true // Only interested in KEY_DOWN event.
         }
 
+        // TODO(siyamed): This part does not match to android behavior
+        //  on android key events go up to view system, dispatch to the focused field
+        //  then applied separately.
+        //  we probably need key event modifiers at the textfield layer to handle
+        //  the events.
         val op = when (event.keyCode) {
             KeyEvent.KEYCODE_DEL -> BackspaceKeyEditOp()
             KeyEvent.KEYCODE_DPAD_LEFT -> MoveCursorEditOp(-1)
             KeyEvent.KEYCODE_DPAD_RIGHT -> MoveCursorEditOp(1)
-            else -> CommitTextEditOp(String(Character.toChars(event.getUnicodeChar())), 1)
+            else -> {
+                val unicodeChar = event.unicodeChar
+                if (unicodeChar != 0) {
+                    CommitTextEditOp(String(Character.toChars(unicodeChar)), 1)
+                } else {
+                    // do nothing
+                    // Android BaseInputConnection calls
+                    // inputMethodManager.dispatchKeyEventFromInputMethod(view, event);
+                    // which was added in N, not sure what to call on L and M
+                    null
+                }
+            }
         }
 
-        addEditOpWithBatch(op)
+        if (op != null) addEditOpWithBatch(op)
         return true
     }
 

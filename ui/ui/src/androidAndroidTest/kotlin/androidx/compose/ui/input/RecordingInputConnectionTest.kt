@@ -536,6 +536,13 @@ class RecordingInputConnectionTest {
     }
 
     @Test
+    fun sendKeyEvent_doesNotCommitKeyEventsWithUnicodeCharEqualTo0() {
+        val captor = argumentCaptor<List<EditOperation>>()
+        ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT))
+        verify(listener, never()).onEditOperations(captor.capture())
+    }
+
+    @Test
     fun do_not_callback_empty_edit_ops() {
         ic.beginBatchEdit()
         ic.endBatchEdit()
