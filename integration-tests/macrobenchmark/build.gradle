@@ -30,6 +30,7 @@ plugins {
 android.defaultConfig.minSdkVersion 28
 
 dependencies {
+    androidTestImplementation(project(":benchmark:benchmark-junit4"))
     androidTestImplementation(project(":benchmark:benchmark-macro"))
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)

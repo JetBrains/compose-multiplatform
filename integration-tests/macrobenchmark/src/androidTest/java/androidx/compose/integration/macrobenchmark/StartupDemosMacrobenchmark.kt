@@ -17,30 +17,40 @@
 package androidx.compose.integration.macrobenchmark
 
 import androidx.benchmark.macro.MacrobenchmarkRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Ignore
+import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @LargeTest
-@RunWith(AndroidJUnit4::class)
-class StartupDemosMacrobenchmark {
+@SdkSuppress(minSdkVersion = 29)
+@RunWith(Parameterized::class) // Parameterized to work around timeouts (b/174175784)
+class StartupDemosMacrobenchmark(
+    private val ignored: Boolean
+) {
+
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
-    @Ignore("Not running the test in CI")
     @Test
     fun compiledColdStartup() = benchmarkRule.measureStartup(
         profileCompiled = true,
         coldLaunch = true
     )
 
-    @Ignore("Not running the test in CI")
     @Test
     fun uncompiledColdStartup() = benchmarkRule.measureStartup(
         profileCompiled = false,
         coldLaunch = true
     )
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters
+        fun startupDemosParameters(): List<Array<Any>> {
+            return listOf(arrayOf(false))
+        }
+    }
 }
