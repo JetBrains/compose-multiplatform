@@ -23,7 +23,7 @@ internal val currentTarget by lazy {
 internal val currentArch by lazy {
     val osArch = System.getProperty("os.arch")
     when (osArch) {
-        "x86_64" -> Arch.X64
+        "x86_64", "amd64" -> Arch.X64
         "aarch64" -> Arch.Arm64
         else -> error("Unknown OS arch: $osArch")
     }
