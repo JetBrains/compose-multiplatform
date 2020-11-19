@@ -203,6 +203,8 @@ package androidx.compose.ui {
 
   @androidx.compose.runtime.Immutable public final inline class TransformOrigin {
     ctor public TransformOrigin();
+    method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
+    method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
     method public static long constructor-impl(internal long packedValue);
     method public static long copy-gtC0eh8(long $this, optional float pivotFractionX, optional float pivotFractionY);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
