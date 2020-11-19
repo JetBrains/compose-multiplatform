@@ -57,7 +57,7 @@ fun ZoomableSample() {
                 )
                 .fillMaxSize()
                 .border(1.dp, Color.Green),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 "☠",

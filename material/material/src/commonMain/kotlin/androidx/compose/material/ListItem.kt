@@ -142,14 +142,14 @@ private object OneLine {
                             top = IconVerticalPadding,
                             bottom = IconVerticalPadding
                         ),
-                    alignment = Alignment.CenterStart
+                    contentAlignment = Alignment.CenterStart
                 ) { icon() }
             }
             Box(
                 Modifier.weight(1f)
                     .align(Alignment.CenterVertically)
                     .padding(start = ContentLeftPadding, end = ContentRightPadding),
-                alignment = Alignment.CenterStart
+                contentAlignment = Alignment.CenterStart
             ) { text() }
             if (trailing != null) {
                 Box(
@@ -211,7 +211,7 @@ private object TwoLine {
                             top = IconVerticalPadding,
                             bottom = IconVerticalPadding
                         ),
-                    alignment = Alignment.TopStart
+                    contentAlignment = Alignment.TopStart
                 ) { icon() }
             }
 
@@ -255,7 +255,7 @@ private object TwoLine {
                         // TODO(popam): find way to center and wrap content without minHeight
                         Modifier.preferredHeightIn(min = minHeight)
                             .padding(end = TrailingRightPadding),
-                        alignment = Alignment.Center
+                        contentAlignment = Alignment.Center
                     ) { trailing() }
                 }
             }
@@ -303,7 +303,7 @@ private object ThreeLine {
                             top = IconThreeLineVerticalPadding,
                             bottom = IconThreeLineVerticalPadding
                         ),
-                    alignment = Alignment.CenterStart
+                    contentAlignment = Alignment.CenterStart
                 ) { icon() }
             }
             BaselinesOffsetColumn(

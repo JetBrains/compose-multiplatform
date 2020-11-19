@@ -40,10 +40,10 @@ fun ProgressIndicatorDemo() {
             .fillMaxWidth()
             .border(1.dp, MaterialTheme.colors.primary)
         // Determinate indicators
-        Box(modifier, alignment = Alignment.Center) {
+        Box(modifier, contentAlignment = Alignment.Center) {
             LinearProgressIndicatorSample()
         }
-        Box(modifier, alignment = Alignment.Center) {
+        Box(modifier, contentAlignment = Alignment.Center) {
             CircularProgressIndicatorSample()
         }
         Row(

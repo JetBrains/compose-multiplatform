@@ -101,7 +101,7 @@ fun BackdropScaffoldSample() {
         frontLayerContent = {
             Box(
                 Modifier.fillMaxSize(),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Text("Selection: ${selection.value}")
             }

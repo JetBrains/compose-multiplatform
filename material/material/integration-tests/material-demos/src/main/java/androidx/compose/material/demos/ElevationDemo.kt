@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ElevationDemo() {
     Column {
-        Box(Modifier.padding(20.dp).fillMaxWidth(), alignment = Alignment.Center) {
+        Box(Modifier.padding(20.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
             val text = getMessage(MaterialTheme.colors.isLight)
             Text(text)
         }
@@ -68,7 +68,7 @@ private fun ElevatedCard(elevation: Dp) {
                 .fillMaxWidth()
                 .preferredHeight(150.dp)
                 .clickable(onClick = {}),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text("$elevation", style = MaterialTheme.typography.h4)
         }

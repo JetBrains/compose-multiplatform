@@ -65,7 +65,7 @@ fun SwipeableSample() {
                 .offset(x = { swipeableState.offset.value })
                 .preferredSize(squareSize)
                 .background(Color.Red),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(swipeableState.value, color = Color.White, fontSize = 24.sp)
         }

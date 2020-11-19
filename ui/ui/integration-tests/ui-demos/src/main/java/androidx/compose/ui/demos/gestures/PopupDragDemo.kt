@@ -62,7 +62,7 @@ fun PopupDragDemo() {
                         .dragGestureFilter(observer)
                         .preferredSize(70.dp)
                         .background(Color.Green, CircleShape),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "This is a popup!",

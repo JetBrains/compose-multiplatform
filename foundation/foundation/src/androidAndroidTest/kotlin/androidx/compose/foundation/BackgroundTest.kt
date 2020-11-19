@@ -73,7 +73,7 @@ class BackgroundTest {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Box(Modifier.preferredSize(20f.toDp()).background(Color.White))
                 }
@@ -96,7 +96,7 @@ class BackgroundTest {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Box(
                         Modifier.preferredSize(20f.toDp())

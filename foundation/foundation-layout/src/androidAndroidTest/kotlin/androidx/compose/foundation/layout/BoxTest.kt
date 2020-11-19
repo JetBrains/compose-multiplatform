@@ -417,7 +417,7 @@ class BoxTest : LayoutTest() {
         val positionedLatch = CountDownLatch(1)
         show {
             Box(
-                alignment = Alignment.BottomEnd,
+                contentAlignment = Alignment.BottomEnd,
                 modifier = Modifier.size(outerSize)
             ) {
                 Box(

@@ -82,7 +82,7 @@ class LayoutCoordinatesHelperTest {
         var childCoordinates: LayoutCoordinates? = null
         rule.setContent {
             with(AmbientDensity.current) {
-                Box(Modifier.preferredWidth(40.toDp()), alignment = Alignment.Center) {
+                Box(Modifier.preferredWidth(40.toDp()), contentAlignment = Alignment.Center) {
                     Column(
                         Modifier.preferredWidth(20.toDp())
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->

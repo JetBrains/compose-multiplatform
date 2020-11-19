@@ -52,7 +52,7 @@ fun ScrollableSample() {
                 }
             )
             .background(Color.LightGray),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(offset.value.roundToInt().toString(), style = TextStyle(fontSize = 32.sp))
     }

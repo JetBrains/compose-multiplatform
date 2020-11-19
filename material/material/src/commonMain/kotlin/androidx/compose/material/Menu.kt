@@ -189,7 +189,7 @@ fun DropdownMenuItem(
                 minHeight = DropdownMenuItemDefaultMinHeight
             )
             .padding(horizontal = DropdownMenuHorizontalPadding),
-        alignment = Alignment.CenterStart
+        contentAlignment = Alignment.CenterStart
     ) {
         val typography = MaterialTheme.typography
         ProvideTextStyle(typography.subtitle1) {

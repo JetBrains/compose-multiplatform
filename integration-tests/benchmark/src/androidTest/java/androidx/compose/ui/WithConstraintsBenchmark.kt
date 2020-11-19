@@ -74,7 +74,7 @@ private class NoWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
-        Box(Modifier.preferredSize(300.dp), alignment = Alignment.Center) {
+        Box(Modifier.preferredSize(300.dp), contentAlignment = Alignment.Center) {
             Spacer(Modifier.preferredSize(width = size.value, height = size.value))
         }
     }
@@ -93,7 +93,7 @@ private class WithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         WithConstraints {
-            Box(Modifier.preferredSize(300.dp), alignment = Alignment.Center) {
+            Box(Modifier.preferredSize(300.dp), contentAlignment = Alignment.Center) {
                 Spacer(Modifier.preferredSize(width = size.value, height = size.value))
             }
         }

@@ -84,6 +84,6 @@ private fun LongPressableContainer(
             .background(color)
             .border(BorderStroke(2.dp, BorderColor))
             .padding(2.dp),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) { content() }
 }
