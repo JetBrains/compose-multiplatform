@@ -19,6 +19,7 @@ package androidx.compose.foundation.gestures
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.HandlePointerInputScope
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -36,7 +37,8 @@ import kotlin.math.sign
 /**
  * Waits for drag motion to pass [touch slop][ViewConfiguration.touchSlop], using [pointerId] as
  * the pointer to examine. If [pointerId] is raised, another pointer from those that are down
- * will be chosen to lead the gesture, and if none are down, `null` is returned.
+ * will be chosen to lead the gesture, and if none are down, `null` is returned. If [pointerId]
+ * is not down when [awaitTouchSlopOrCancellation] is called, then `null` is returned.
 
  * [onTouchSlopReached] is called after [ViewConfiguration.touchSlop] motion in the any direction
  * with the change that caused the motion beyond touch slop and the [Offset] beyond touch slop that
@@ -59,6 +61,9 @@ suspend fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (change: PointerInputChange, overSlop: Offset) -> Unit
 ): PointerInputChange? {
+    if (currentEvent.isPointerUp(pointerId)) {
+        return null // The pointer has already been lifted, so the gesture is canceled
+    }
     var offset = Offset.Zero
     val touchSlop = viewConfiguration.touchSlop
 
@@ -144,7 +149,8 @@ suspend fun HandlePointerInputScope.drag(
  * that is down will be used, if available, so the returned [PointerInputChange.id] may
  * differ from [pointerId]. If the position change in the any direction has been
  * consumed by the [PointerEventPass.Main] pass, then the drag is considered canceled and `null`
- * is returned.
+ * is returned.  If [pointerId] is not down when [awaitDragOrCancellation] is called, then
+ * `null` is returned.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.AwaitDragOrCancellationSample
@@ -157,6 +163,9 @@ suspend fun HandlePointerInputScope.drag(
 suspend fun HandlePointerInputScope.awaitDragOrCancellation(
     pointerId: PointerId,
 ): PointerInputChange? {
+    if (currentEvent.isPointerUp(pointerId)) {
+        return null // The pointer has already been lifted, so the gesture is canceled
+    }
     val change = awaitDragOrUp(pointerId) { it.positionChangedIgnoreConsumed() }
     return if (change.anyPositionChangeConsumed()) null else change
 }
@@ -207,7 +216,9 @@ suspend fun PointerInputScope.detectDragGestures(
  * Waits for vertical drag motion to pass [touch slop][ViewConfiguration.touchSlop], using
  * [pointerId] as the pointer to examine. If [pointerId] is raised, another pointer from
  * those that are down will be chosen to lead the gesture, and if none are down, `null` is returned.
-
+ * If [pointerId] is not down when [awaitVerticalTouchSlopOrCancellation] is called, then `null`
+ * is returned.
+ *
  * [onTouchSlopReached] is called after [ViewConfiguration.touchSlop] motion in the vertical
  * direction with the change that caused the motion beyond touch slop and the pixels beyond touch
  * slop. [onTouchSlopReached] should consume the position change if it accepts the motion.
@@ -272,7 +283,8 @@ suspend fun HandlePointerInputScope.verticalDrag(
  * that is down will be used, if available, so the returned [PointerInputChange.id] may
  * differ from [pointerId]. If the position change in the vertical direction has been
  * consumed by the [PointerEventPass.Main] pass, then the drag is considered canceled and `null` is
- * returned.
+ * returned. If [pointerId] is not down when [awaitVerticalDragOrCancellation] is called, then
+ * `null` is returned.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.AwaitVerticalDragOrCancellationSample
@@ -285,6 +297,9 @@ suspend fun HandlePointerInputScope.verticalDrag(
 suspend fun HandlePointerInputScope.awaitVerticalDragOrCancellation(
     pointerId: PointerId,
 ): PointerInputChange? {
+    if (currentEvent.isPointerUp(pointerId)) {
+        return null // The pointer has already been lifted, so the gesture is canceled
+    }
     val change = awaitDragOrUp(pointerId) { it.positionChangeIgnoreConsumed().y != 0f }
     return if (change.consumed.positionChange.y != 0f) null else change
 }
@@ -341,7 +356,8 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
  * direction with the change that caused the motion beyond touch slop and the pixels beyond touch
  * slop. [onTouchSlopReached] should consume the position change if it accepts the motion.
  * If it does, then the method returns that [PointerInputChange]. If not, touch slop detection will
- * continue.
+ * continue. If [pointerId] is not down when [awaitHorizontalTouchSlopOrCancellation] is called,
+ * then `null` is returned.
  *
  * @return The [PointerInputChange] that was consumed in [onTouchSlopReached] or `null` if all
  * pointers are raised before touch slop is detected or another gesture consumed the position
@@ -398,7 +414,8 @@ suspend fun HandlePointerInputScope.horizontalDrag(
  * that is down will be used, if available, so the returned [PointerInputChange.id] may
  * differ from [pointerId]. If the position change in the horizontal direction has been
  * consumed by the [PointerEventPass.Main] pass, then the drag is considered canceled and `null`
- * is returned.
+ * is returned. If [pointerId] is not down when [awaitHorizontalDragOrCancellation] is called,
+ * then `null` is returned.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.AwaitHorizontalDragOrCancellationSample
@@ -411,6 +428,9 @@ suspend fun HandlePointerInputScope.horizontalDrag(
 suspend fun HandlePointerInputScope.awaitHorizontalDragOrCancellation(
     pointerId: PointerId,
 ): PointerInputChange? {
+    if (currentEvent.isPointerUp(pointerId)) {
+        return null // The pointer has already been lifted, so the gesture is canceled
+    }
     val change = awaitDragOrUp(pointerId) { it.positionChangeIgnoreConsumed().x != 0f }
     return if (change.consumed.positionChange.x != 0f) null else change
 }
@@ -475,6 +495,9 @@ private suspend inline fun HandlePointerInputScope.drag(
     motionFromChange: (PointerInputChange) -> Float,
     motionConsumed: (PointerInputChange) -> Boolean
 ): Boolean {
+    if (currentEvent.isPointerUp(pointerId)) {
+        return false // The pointer has already been lifted, so the gesture is canceled
+    }
     var pointer = pointerId
     while (true) {
         val change = awaitDragOrUp(pointer) { motionFromChange(it) != 0f }
@@ -526,7 +549,8 @@ private suspend inline fun HandlePointerInputScope.awaitDragOrUp(
  * Waits for drag motion along one axis based on [getDragDirectionValue] to pass touch slop,
  * using [pointerId] as the pointer to examine. If [pointerId] is raised, another pointer
  * from those that are down will be chosen to lead the gesture, and if none are down,
- * `null` is returned.
+ * `null` is returned. If [pointerId] is not down when [awaitTouchSlopOrCancellation] is called,
+ * then `null` is returned.
  *
  * When touch slop is detected, [onTouchSlopReached] is called with the change and the distance
  * beyond the touch slop. [getDragDirectionValue] should return the position change in the direction
@@ -552,6 +576,9 @@ private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
     consumeMotion: (PointerInputChange, Float) -> Unit,
     getCrossDirectionValue: (Offset) -> Float
 ): PointerInputChange? {
+    if (currentEvent.isPointerUp(pointerId)) {
+        return null // The pointer has already been lifted, so the gesture is canceled
+    }
     val touchSlop = viewConfiguration.touchSlop
     var pointer: PointerId = pointerId
     var totalPositionChange = 0f
@@ -617,3 +644,6 @@ private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
         }
     }
 }
+
+private fun PointerEvent.isPointerUp(pointerId: PointerId): Boolean =
+    changes.firstOrNull { it.id == pointerId }?.current?.down != true

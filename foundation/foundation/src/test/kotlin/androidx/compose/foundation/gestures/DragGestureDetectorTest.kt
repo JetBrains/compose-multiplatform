@@ -57,6 +57,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
     private var gestureEnded = false
     private var gestureCanceled = false
     private var consumePositiveOnly = false
+    private var sloppyDetector = false
 
     private val DragTouchSlopUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         detectDragGestures(
@@ -109,8 +110,8 @@ class DragGestureDetectorTest(dragType: GestureType) {
                         change.consumePositionChange(0f, change.positionChange().y)
                     }
                 }
-                if (slopChange != null) {
-                    var pointer = slopChange.id
+                if (slopChange != null || sloppyDetector) {
+                    var pointer = if (sloppyDetector) down.id else slopChange!!.id
                     do {
                         val change = awaitVerticalDragOrCancellation(pointer)
                         if (change == null) {
@@ -141,8 +142,8 @@ class DragGestureDetectorTest(dragType: GestureType) {
                             change.consumePositionChange(change.positionChange().x, 0f)
                         }
                     }
-                if (slopChange != null) {
-                    var pointer = slopChange.id
+                if (slopChange != null || sloppyDetector) {
+                    var pointer = if (sloppyDetector) down.id else slopChange!!.id
                     do {
                         val change = awaitHorizontalDragOrCancellation(pointer)
                         if (change == null) {
@@ -173,8 +174,8 @@ class DragGestureDetectorTest(dragType: GestureType) {
                         change.consumeAllChanges()
                     }
                 }
-                if (slopChange != null) {
-                    var pointer = slopChange.id
+                if (slopChange != null || sloppyDetector) {
+                    var pointer = if (sloppyDetector) down.id else slopChange!!.id
                     do {
                         val change = awaitDragOrCancellation(pointer)
                         if (change == null) {
@@ -220,6 +221,13 @@ class DragGestureDetectorTest(dragType: GestureType) {
     private val twoAxisDrag = when (dragType) {
         GestureType.DragWithVertical,
         GestureType.DragWithHorizontal,
+        GestureType.AwaitDragOrCancel -> true
+        else -> false
+    }
+
+    private val supportsSloppyGesture = when (dragType) {
+        GestureType.AwaitVerticalDragOrCancel,
+        GestureType.AwaitHorizontalDragOrCancel,
         GestureType.AwaitDragOrCancel -> true
         else -> false
     }
@@ -438,6 +446,29 @@ class DragGestureDetectorTest(dragType: GestureType) {
             assertTrue(dragged)
         } finally {
             consumePositiveOnly = false
+        }
+    }
+
+    /**
+     * When gesture detectors use the wrong pointer for the drag, it should just not
+     * detect the touch.
+     */
+    @Test
+    fun pointerUpTooQuickly() = util.executeInComposition {
+        if (supportsSloppyGesture) {
+            try {
+                sloppyDetector = true
+
+                val finger1 = down()
+                val finger2 = down()
+                finger1.up()
+                finger2.moveBy(dragMotion).up()
+
+                // The sloppy detector doesn't know to look at finger2
+                assertTrue(gestureCanceled)
+            } finally {
+                sloppyDetector = false
+            }
         }
     }
 }
