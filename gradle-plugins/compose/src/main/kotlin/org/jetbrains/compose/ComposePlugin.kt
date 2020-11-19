@@ -78,7 +78,7 @@ class ComposePlugin : Plugin<Project> {
         )
         val windows = windows_x64
         @Deprecated(
-            "compose.desktop.macos is deprecated, use compose.desktop.macosX64 instead",
+            "compose.desktop.macos is deprecated, use compose.desktop.macos_x64 instead",
             replaceWith = ReplaceWith("macos_x64")
         )
         val macos = macos_x64
