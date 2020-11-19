@@ -191,7 +191,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
         canvas.drawRect(
             left = 2f, top = 2f, right = 14f, bottom = 14f,
             paint = Paint().apply {
-                shader = SweepGradient(
+                shader = SweepGradientShader(
                     center = Offset(4f, 8f),
                     colors = listOf(Color.Blue, Color.Green)
                 )
