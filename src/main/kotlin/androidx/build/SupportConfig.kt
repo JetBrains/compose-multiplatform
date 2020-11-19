@@ -24,7 +24,13 @@ object SupportConfig {
     const val DEFAULT_MIN_SDK_VERSION = 14
     const val INSTRUMENTATION_RUNNER = "androidx.test.runner.AndroidJUnitRunner"
     const val BUILD_TOOLS_VERSION = "30.0.2"
-    const val NDK_VERSION = "21.0.6113669"
+    val NDK_VERSION by lazy {
+        // TODO(aurimas) b/173737578 remove when we no longer have divergent versions
+        when (getOperatingSystem()) {
+            OperatingSystem.LINUX -> "21.0.6113669"
+            else -> "21.3.6528147"
+        }
+    }
 
     /**
      * The Android SDK version to use for compilation.
