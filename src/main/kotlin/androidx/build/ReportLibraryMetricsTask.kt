@@ -21,8 +21,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.json.simple.JSONObject
@@ -35,6 +38,7 @@ private const val METRICS_DIRECTORY = "librarymetrics"
 private const val JSON_FILE_EXTENSION = ".json"
 private const val JAR_FILE_EXTENSION = ".jar"
 
+@CacheableTask
 abstract class ReportLibraryMetricsTask : DefaultTask() {
 
     init {
@@ -45,7 +49,7 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
     /**
      * The variants we are interested in gathering metrics for.
      */
-    @get:InputFiles
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     abstract val jarFiles: ConfigurableFileCollection
 
     @get:OutputFile
