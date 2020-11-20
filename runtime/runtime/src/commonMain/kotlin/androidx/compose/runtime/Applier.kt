@@ -147,7 +147,7 @@ abstract class AbstractApplier<T>(val root: T) : Applier<T> {
                 set(from, toEl)
             } else {
                 val fromEl = removeAt(from)
-                insert(dest, fromEl)
+                add(dest, fromEl)
             }
         } else {
             val subView = subList(from, from + count)
