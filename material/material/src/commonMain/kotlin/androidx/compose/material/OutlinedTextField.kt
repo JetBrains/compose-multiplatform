@@ -133,14 +133,14 @@ fun OutlinedTextField(
     inactiveColor: Color = MaterialTheme.colors.onSurface,
     errorColor: Color = MaterialTheme.colors.error
 ) {
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value)) }
-    textFieldValue = textFieldValue.copy(text = value)
+    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+    val textFieldValue = textFieldValueState.copy(text = value)
 
     TextFieldImpl(
         type = TextFieldType.Outlined,
         value = textFieldValue,
         onValueChange = {
-            textFieldValue = it
+            textFieldValueState = it
             if (value != it.text) {
                 onValueChange(it.text)
             }

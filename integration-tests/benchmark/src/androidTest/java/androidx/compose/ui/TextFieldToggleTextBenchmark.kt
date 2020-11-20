@@ -74,8 +74,8 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken to compose a [BaseTextField] composable from scratch with the
-     * given input. This is the time taken to call the [BaseTextField] composable function.
+     * Measure the time taken to compose a [BasicTextField] composable from scratch with the
+     * given input. This is the time taken to call the [BasicTextField] composable function.
      */
     @Test
     @Ignore("b/170960653")
@@ -84,9 +84,9 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken by the first time measure the [BaseTextField] composable with the
+     * Measure the time taken by the first time measure the [BasicTextField] composable with the
      * given input. This is mainly the time used to measure all the [Measurable]s in the
-     * [BaseTextField] composable.
+     * [BasicTextField] composable.
      */
     @Test
     @Ignore("b/170960653")
@@ -95,7 +95,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken by the first time layout the [BaseTextField] composable with the
+     * Measure the time taken by the first time layout the [BasicTextField] composable with the
      * given input.
      */
     @Test
@@ -105,7 +105,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken by first time draw the [BaseTextField] composable with the given
+     * Measure the time taken by first time draw the [BasicTextField] composable with the given
      * input.
      */
     @Test
@@ -115,7 +115,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken by layout the [BaseTextField] composable after the layout
+     * Measure the time taken by layout the [BasicTextField] composable after the layout
      * constrains changed. This is mainly the time used to re-measure and re-layout the composable.
      */
     @Test
@@ -125,7 +125,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken by redrawing the [BaseTextField] composable.
+     * Measure the time taken by redrawing the [BasicTextField] composable.
      */
     @Test
     @Ignore("b/170960653")
@@ -134,7 +134,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken to recompose the [BaseTextField] composable when text gets toggled.
+     * Measure the time taken to recompose the [BasicTextField] composable when text gets toggled.
      */
     @Test
     fun toggleText_recompose() {
@@ -142,7 +142,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken to measure the [BaseTextField] composable when text gets toggled.
+     * Measure the time taken to measure the [BasicTextField] composable when text gets toggled.
      */
     @Test
     fun toggleText_measure() {
@@ -150,7 +150,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken to layout the [BaseTextField] composable when text gets toggled.
+     * Measure the time taken to layout the [BasicTextField] composable when text gets toggled.
      */
     @Test
     fun toggleText_layout() {
@@ -158,7 +158,7 @@ class TextFieldToggleTextBenchmark(
     }
 
     /**
-     * Measure the time taken to draw the [BaseTextField] composable when text gets toggled.
+     * Measure the time taken to draw the [BasicTextField] composable when text gets toggled.
      */
     @Test
     fun toggleText_draw() {
