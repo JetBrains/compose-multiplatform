@@ -26,27 +26,32 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allDemos
 import androidx.compose.integration.demos.common.allLaunchableDemos
-import androidx.test.espresso.Espresso
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.test.espresso.Espresso
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 private val demosWithInifinateAnimations = listOf("Material > Progress Indicators")
+
+private val ignoredDemos = listOf(
+    // TODO(b/168695905, fresen): We don't have a way to pause suspend animations yet.
+    "Animation > Suspend Animation Demos > Infinitely Animating",
+)
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -83,7 +88,7 @@ class DemoTest {
         assertThat(
             SplitDemoCategories.sumBy { it.allLaunchableDemos().size } +
                 AllDemosWithInfiniteAnimations.allLaunchableDemos().size
-        ).isEqualTo(AllDemosCategory.allLaunchableDemos().size)
+        ).isEqualTo(AllButIgnoredDemos.allLaunchableDemos().size)
     }
 
     @Test
@@ -219,13 +224,18 @@ class DemoTest {
     }
 }
 
-private val AllDemosWithoutInfiniteAnimations =
+private val AllButIgnoredDemos =
     AllDemosCategory.filter { path, demo ->
+        demo.navigationTitle(path) !in ignoredDemos
+    }
+
+private val AllDemosWithoutInfiniteAnimations =
+    AllButIgnoredDemos.filter { path, demo ->
         demo.navigationTitle(path) !in demosWithInifinateAnimations
     }
 
 private val AllDemosWithInfiniteAnimations =
-    AllDemosCategory.filter { path, demo ->
+    AllButIgnoredDemos.filter { path, demo ->
         demo.navigationTitle(path) in demosWithInifinateAnimations
     }
 
