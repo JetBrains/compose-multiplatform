@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toComposeRect
-import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
@@ -37,10 +36,16 @@ import androidx.compose.ui.text.SpanStyleRange
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
@@ -371,10 +376,124 @@ internal class DesktopParagraph(
     }
 }
 
+private fun fontSizeInHierarchy(density: Density, base: Float, other: TextUnit): Float {
+    return when {
+        other.isUnspecified -> base
+        other.isEm -> base * other.value
+        other.isSp -> with(density) { other.toPx() }
+        else -> throw UnsupportedOperationException()
+    }
+}
+
+// Computed ComputedStyles always have font/letter size in pixels for particular `density`.
+// It's important because density could be changed in runtime and it should force
+// SkTextStyle to be recalculated. Or we can have different densities in different windows.
+private data class ComputedStyle(
+    var color: Color,
+    var fontSize: Float,
+    var fontWeight: FontWeight?,
+    var fontStyle: FontStyle?,
+    var fontSynthesis: FontSynthesis?,
+    var fontFamily: FontFamily?,
+    var fontFeatureSettings: String?,
+    var letterSpacing: Float?,
+    var baselineShift: BaselineShift?,
+    var textGeometricTransform: TextGeometricTransform?,
+    var localeList: LocaleList?,
+    var background: Color = Color.Unspecified,
+    var textDecoration: TextDecoration?,
+    var shadow: Shadow?
+) {
+
+    constructor(density: Density, spanStyle: SpanStyle) : this(
+        color = spanStyle.color,
+        fontSize = with(density) { spanStyle.fontSize.toPx() },
+        fontWeight = spanStyle.fontWeight,
+        fontStyle = spanStyle.fontStyle,
+        fontSynthesis = spanStyle.fontSynthesis,
+        fontFamily = spanStyle.fontFamily,
+        fontFeatureSettings = spanStyle.fontFeatureSettings,
+        letterSpacing = with(density) { spanStyle.letterSpacing.toPx() },
+        baselineShift = spanStyle.baselineShift,
+        textGeometricTransform = spanStyle.textGeometricTransform,
+        localeList = spanStyle.localeList,
+        background = spanStyle.background,
+        textDecoration = spanStyle.textDecoration,
+        shadow = spanStyle.shadow
+    )
+
+    fun toSkTextStyle(fontLoader: FontLoader): SkTextStyle {
+        val res = SkTextStyle()
+        if (color != Color.Unspecified) {
+            res.color = color.toArgb()
+        }
+        fontFamily?.let {
+            val fontFamilies = fontLoader.ensureRegistered(it)
+            res.setFontFamilies(fontFamilies.toTypedArray())
+        }
+        fontStyle?.let {
+            res.fontStyle = it.toSkFontStyle()
+        }
+        textDecoration?.let {
+            res.decorationStyle = it.toSkDecorationStyle(this.color)
+        }
+        if (background != Color.Unspecified) {
+            res.background = Paint().also {
+                it.color = background.toArgb()
+            }
+        }
+        fontWeight?.let {
+            res.fontStyle = res.fontStyle.withWeight(it.weight)
+        }
+        shadow?.let {
+            res.addShadow(it.toSkShadow())
+        }
+
+        letterSpacing?.let {
+            res.letterSpacing = it
+        }
+
+        res.fontSize = fontSize
+        return res
+    }
+
+    fun merge(density: Density, other: SpanStyle) {
+        val fontSize = fontSizeInHierarchy(density, fontSize, other.fontSize)
+        if (other.color.isSpecified) {
+            color = other.color
+        }
+        other.fontFamily?.let { fontFamily = it }
+        this.fontSize = fontSize
+        other.fontWeight?.let { fontWeight = it }
+        other.fontStyle?.let { fontStyle = it }
+        other.fontSynthesis?.let { fontSynthesis = it }
+        other.fontFeatureSettings?.let { fontFeatureSettings = it }
+        if (!other.letterSpacing.isUnspecified) {
+            when {
+                other.letterSpacing.isEm ->
+                    letterSpacing = fontSize * other.letterSpacing.value
+                other.letterSpacing.isSp ->
+                    letterSpacing = with(density) {
+                        other.letterSpacing.toPx()
+                    }
+                else -> throw UnsupportedOperationException()
+            }
+        }
+        other.baselineShift?.let { baselineShift = it }
+        other.textGeometricTransform?.let { textGeometricTransform = it }
+        other.localeList?.let { localeList = it }
+        if (other.background.isSpecified) {
+            background = other.background
+        }
+        other.textDecoration?.let { textDecoration = it }
+        other.shadow?.let { shadow = it }
+    }
+}
+
 // Building of SkTextStyle is a relatively expensive operation. We enable simple caching by
 // mapping SpanStyle to SkTextStyle. To increase the efficiency of this mapping we are making
 // most of the computations before converting Compose paragraph styles to Skia paragraph
-private val skTextStylesCache = WeakHashMap<SpanStyle, SkTextStyle>()
+private val skTextStylesCache = WeakHashMap<ComputedStyle, SkTextStyle>()
 
 internal class ParagraphBuilder(
     val fontLoader: FontLoader,
@@ -386,7 +505,8 @@ internal class ParagraphBuilder(
     val placeholders: List<AnnotatedString.Range<Placeholder>>,
     val density: Density
 ) {
-    private lateinit var cuts: List<Cut>
+    private lateinit var ops: List<Op>
+
     /**
      * SkParagraph styles model doesn't match Compose's one.
      * SkParagraph has only a stack-based push/pop styles interface that works great with Span
@@ -398,7 +518,7 @@ internal class ParagraphBuilder(
      * of active styles is being compiled into single SkParagraph's style for every chunk of text
      */
     fun build(): SkParagraph {
-        val cuts = makeCuts(
+        ops = makeOps(
             spanStyles,
             placeholders,
             textStyle.toSpanStyle().withDefaultFontSize()
@@ -416,36 +536,35 @@ internal class ParagraphBuilder(
 
         var addText = true
 
-        for (cut in cuts) {
-            if (addText && pos < cut.position) {
-                pb.addText(text.subSequence(pos, cut.position).toString())
+        for (op in ops) {
+            if (addText && pos < op.position) {
+                pb.addText(text.subSequence(pos, op.position).toString())
             }
 
-            when (cut) {
-                is Cut.StyleAdd -> {
-                    pb.pushStyle(makeSkTextStyle(cut.style))
+            when (op) {
+                is Op.StyleAdd -> {
+                    pb.pushStyle(makeSkTextStyle(op.style))
                 }
-                is Cut.PutPlaceholder -> {
+                is Op.PutPlaceholder -> {
                     val placeholderStyle =
-                        with(density) {
-                            PlaceholderStyle(
-                                cut.width!!.toPx(),
-                                cut.height!!.toPx(),
-                                cut.placeholder.placeholderVerticalAlign.toSkPlaceholderAlignment(),
-                                // TODO: figure out how exactly we have to work with BaselineMode & offset
-                                BaselineMode.ALPHABETIC,
-                                0f
-                            )
-                        }
+                        PlaceholderStyle(
+                            op.width,
+                            op.height,
+                            op.cut.placeholder.placeholderVerticalAlign
+                                .toSkPlaceholderAlignment(),
+                            // TODO: figure out how exactly we have to work with BaselineMode & offset
+                            BaselineMode.ALPHABETIC,
+                            0f
+                        )
                     pb.addPlaceholder(placeholderStyle)
                     addText = false
                 }
-                is Cut.EndPlaceholder -> {
+                is Op.EndPlaceholder -> {
                     addText = true
                 }
             }
 
-            pos = cut.position
+            pos = op.position
         }
 
         if (addText && pos < text.length) {
@@ -455,12 +574,35 @@ internal class ParagraphBuilder(
         return pb.build()
     }
 
+    private sealed class Op {
+        abstract val position: Int
+
+        data class StyleAdd(
+            override val position: Int,
+            val style: ComputedStyle
+        ) : Op()
+
+        data class PutPlaceholder(
+            val cut: Cut.PutPlaceholder,
+            var width: Float,
+            var height: Float
+        ) : Op() {
+            override val position: Int by cut::position
+        }
+
+        data class EndPlaceholder(
+            val cut: Cut.EndPlaceholder
+        ) : Op() {
+            override val position: Int by cut::position
+        }
+    }
+
     private sealed class Cut {
         abstract val position: Int
 
         data class StyleAdd(
             override val position: Int,
-            var style: SpanStyle
+            val style: SpanStyle
         ) : Cut()
 
         data class StyleRemove(
@@ -471,109 +613,87 @@ internal class ParagraphBuilder(
         data class PutPlaceholder(
             override val position: Int,
             val placeholder: Placeholder,
-            var width: TextUnit? = null,
-            var height: TextUnit? = null
         ) : Cut()
 
         data class EndPlaceholder(override val position: Int) : Cut()
     }
 
-    private fun makeCuts(
+    private fun makeOps(
         spans: List<SpanStyleRange>,
         placeholders: List<AnnotatedString.Range<Placeholder>>,
         initialStyle: SpanStyle
-    ): List<Cut> {
-        val rawCuts = mutableListOf<Cut>()
+    ): List<Op> {
+        val cuts = mutableListOf<Cut>()
         for (span in spans) {
-            rawCuts.add(Cut.StyleAdd(span.start, span.item))
-            rawCuts.add(Cut.StyleRemove(span.end, span.item))
+            cuts.add(Cut.StyleAdd(span.start, span.item))
+            cuts.add(Cut.StyleRemove(span.end, span.item))
         }
 
         for (placeholder in placeholders) {
-            rawCuts.add(Cut.PutPlaceholder(placeholder.start, placeholder.item))
-            rawCuts.add(Cut.EndPlaceholder(placeholder.end))
+            cuts.add(Cut.PutPlaceholder(placeholder.start, placeholder.item))
+            cuts.add(Cut.EndPlaceholder(placeholder.end))
         }
 
-        val cuts = mutableListOf<Cut>(Cut.StyleAdd(0, initialStyle))
-        rawCuts.sortBy { it.position }
+        val ops = mutableListOf<Op>(Op.StyleAdd(0, ComputedStyle(density, initialStyle)))
+        cuts.sortBy { it.position }
         val activeStyles = mutableListOf(initialStyle)
-        for (rawCut in rawCuts) {
+        for (cut in cuts) {
             when {
-                rawCut is Cut.StyleAdd -> {
-                    activeStyles.add(rawCut.style)
-                    val prev = previousStyleAddAtTheSamePosition(rawCut.position, cuts)
+                cut is Cut.StyleAdd -> {
+                    activeStyles.add(cut.style)
+                    val prev = previousStyleAddAtTheSamePosition(cut.position, ops)
                     if (prev == null) {
-                        rawCut.style = mergeStyle(mergeStyles(activeStyles), rawCut.style)
-                        cuts.add(rawCut)
+                        ops.add(
+                            Op.StyleAdd(
+                                cut.position,
+                                mergeStyles(activeStyles).also { it.merge(density, cut.style) }
+                            )
+                        )
                     } else {
-                        prev.style = mergeStyle(prev.style, rawCut.style)
+                        prev.style.merge(density, cut.style)
                     }
                 }
-                rawCut is Cut.StyleRemove -> {
-                    activeStyles.remove(rawCut.style)
-                    cuts.add(Cut.StyleAdd(rawCut.position, mergeStyles(activeStyles)))
+                cut is Cut.StyleRemove -> {
+                    activeStyles.remove(cut.style)
+                    ops.add(Op.StyleAdd(cut.position, mergeStyles(activeStyles)))
                 }
-                rawCut is Cut.PutPlaceholder -> {
+                cut is Cut.PutPlaceholder -> {
                     val currentStyle = mergeStyles(activeStyles)
-                    rawCut.width =
-                        fontSizeInHierarchy(currentStyle.fontSize, rawCut.placeholder.width)
-                    rawCut.height =
-                        fontSizeInHierarchy(currentStyle.fontSize, rawCut.placeholder.height)
-                    cuts.add(rawCut)
+                    val op = Op.PutPlaceholder(
+                        cut = cut,
+                        width = fontSizeInHierarchy(
+                            density,
+                            currentStyle.fontSize,
+                            cut.placeholder.width
+                        ),
+                        height = fontSizeInHierarchy(
+                            density,
+                            currentStyle.fontSize,
+                            cut.placeholder.width
+                        ),
+                    )
+                    ops.add(op)
                 }
-                else -> cuts.add(rawCut)
+                cut is Cut.EndPlaceholder ->
+                    ops.add(Op.EndPlaceholder(cut))
             }
         }
-        return cuts
+        return ops
     }
 
-    private fun mergeStyles(activeStyles: List<SpanStyle>): SpanStyle {
+    private fun mergeStyles(activeStyles: List<SpanStyle>): ComputedStyle {
         // there is always at least one active style
-        var accStyle = activeStyles[0]
+        val style = ComputedStyle(density, activeStyles[0])
         for (i in 1 until activeStyles.size) {
-            accStyle = mergeStyle(accStyle, activeStyles[i])
+            style.merge(density, activeStyles[i])
         }
-        return accStyle
+        return style
     }
 
-    private fun fontSizeInHierarchy(base: TextUnit, other: TextUnit): TextUnit {
-        return when {
-            other.isUnspecified -> base
-            other.isEm -> base * other.value
-            other.isSp -> other
-            else -> throw UnsupportedOperationException()
-        }
-    }
-
-    // It's almost the same as [SpanStyle.merge] but handles fontSize and letterSpacing with
-    // respect to hierarchy
-    private fun mergeStyle(style: SpanStyle, other: SpanStyle): SpanStyle {
-        val fontSize = fontSizeInHierarchy(style.fontSize, other.fontSize)
-        return SpanStyle(
-            color = other.color.useOrElse { style.color },
-            fontFamily = other.fontFamily ?: style.fontFamily,
-            fontSize = fontSize,
-            fontWeight = other.fontWeight ?: style.fontWeight,
-            fontStyle = other.fontStyle ?: style.fontStyle,
-            fontSynthesis = other.fontSynthesis ?: style.fontSynthesis,
-            fontFeatureSettings = other.fontFeatureSettings ?: style.fontFeatureSettings,
-            letterSpacing = when {
-                other.letterSpacing.isEm -> fontSize * other.letterSpacing.value
-                else -> other.letterSpacing
-            },
-            baselineShift = other.baselineShift ?: style.baselineShift,
-            textGeometricTransform = other.textGeometricTransform ?: style.textGeometricTransform,
-            localeList = other.localeList ?: style.localeList,
-            background = other.background.useOrElse { style.background },
-            textDecoration = other.textDecoration ?: style.textDecoration,
-            shadow = other.shadow ?: style.shadow
-        )
-    }
-
-    private fun previousStyleAddAtTheSamePosition(position: Int, cuts: List<Cut>): Cut.StyleAdd? {
-        for (prevCut in cuts.asReversed()) {
-            if (prevCut.position < position) return null
-            if (prevCut is Cut.StyleAdd) return prevCut
+    private fun previousStyleAddAtTheSamePosition(position: Int, ops: List<Op>): Op.StyleAdd? {
+        for (prevOp in ops.asReversed()) {
+            if (prevOp.position < position) return null
+            if (prevOp is Op.StyleAdd) return prevOp
         }
         return null
     }
@@ -586,9 +706,9 @@ internal class ParagraphBuilder(
         return pStyle
     }
 
-    private fun makeSkTextStyle(style: SpanStyle): SkTextStyle {
+    private fun makeSkTextStyle(style: ComputedStyle): SkTextStyle {
         return skTextStylesCache.getOrPut(style) {
-            style.toSkTextStyle(density, fontLoader)
+            style.toSkTextStyle(fontLoader)
         }
     }
 }
@@ -653,43 +773,4 @@ fun TextAlign.toSkAlignment(): SkAlignment {
         TextAlign.Start -> SkAlignment.START
         TextAlign.End -> SkAlignment.END
     }
-}
-
-private fun SpanStyle.toSkTextStyle(density: Density, fontLoader: FontLoader): SkTextStyle {
-    val res = SkTextStyle()
-    if (this.color != Color.Unspecified) {
-        res.color = this.color.toArgb()
-    }
-    this.fontFamily?.let {
-        val fontFamilies = fontLoader.ensureRegistered(it)
-        res.setFontFamilies(fontFamilies.toTypedArray())
-    }
-    this.fontStyle?.let {
-        res.fontStyle = it.toSkFontStyle()
-    }
-    this.textDecoration?.let {
-        res.decorationStyle = it.toSkDecorationStyle(this.color)
-    }
-    if (this.background != Color.Unspecified) {
-        res.background = Paint().also {
-            it.color = this.background.toArgb()
-        }
-    }
-    this.fontWeight?.let {
-        res.fontStyle = res.fontStyle.withWeight(it.weight)
-    }
-    this.shadow?.let {
-        res.addShadow(it.toSkShadow())
-    }
-
-    if (!this.letterSpacing.isUnspecified) {
-        res.letterSpacing = with(density) {
-            this@toSkTextStyle.letterSpacing.toPx()
-        }
-    }
-
-    res.fontSize = with(density) {
-        this@toSkTextStyle.fontSize.toPx()
-    }
-    return res
 }
