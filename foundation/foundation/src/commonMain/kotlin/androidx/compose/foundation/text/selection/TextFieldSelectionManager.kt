@@ -20,6 +20,8 @@ import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.DragObserver
@@ -50,7 +52,10 @@ import kotlin.math.min
 /**
  * A bridge class between user interaction to the text field selection.
  */
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalFocus::class
+)
 internal class TextFieldSelectionManager() {
 
     /**
@@ -87,6 +92,11 @@ internal class TextFieldSelectionManager() {
      * [HapticFeedback] handle to perform haptic feedback.
      */
     var hapticFeedBack: HapticFeedback? = null
+
+    /**
+     * [FocusRequester] used to request focus for the TextField.
+     */
+    var focusRequester: FocusRequester? = null
 
     /**
      * The beginning position of the drag gesture. Every time a new drag gesture starts, it wil be
@@ -276,6 +286,9 @@ internal class TextFieldSelectionManager() {
      * Is triggered on long press or accessibility action.
      */
     internal fun enterSelectionMode() {
+        if (state?.hasFocus == false) {
+            focusRequester?.requestFocus()
+        }
         oldValue = value
         state?.showFloatingToolbar = true
         setSelectionStatus(true)
