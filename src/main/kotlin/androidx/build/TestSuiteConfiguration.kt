@@ -93,7 +93,9 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
             val task = project.parent!!.tasks.register(
                 "support-$mediaPrefix-test${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}",
                 GenerateMediaTestConfigurationTask::class.java
-            )
+            ) { task ->
+                AffectedModuleDetector.configureTaskGuard(task)
+            }
             project.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                 .dependsOn(task)
             return task
