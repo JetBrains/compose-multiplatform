@@ -1531,16 +1531,16 @@ package androidx.compose.ui.input.pointer {
   }
 
   @androidx.compose.runtime.Immutable public final class PointerInputData {
-    method public androidx.compose.ui.unit.Uptime? component1-T5nwvdw();
-    method public androidx.compose.ui.geometry.Offset? component2-_m7T9-E();
+    method public long component1-CLVl0cY();
+    method public long component2-F1C5BW0();
     method public boolean component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.input.pointer.PointerInputData copy-AGkGHIk(androidx.compose.ui.unit.Uptime? uptime, androidx.compose.ui.geometry.Offset? position, boolean down);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.input.pointer.PointerInputData copy-JMrSy48(long uptime, long position, boolean down);
     method public boolean getDown();
-    method public androidx.compose.ui.geometry.Offset? getPosition-_m7T9-E();
-    method public androidx.compose.ui.unit.Uptime? getUptime-T5nwvdw();
+    method public long getPosition-F1C5BW0();
+    method public long getUptime-CLVl0cY();
     property public final boolean down;
-    property public final androidx.compose.ui.geometry.Offset? position;
-    property public final androidx.compose.ui.unit.Uptime? uptime;
+    property public final long position;
+    property public final long uptime;
   }
 
   public final class PointerInputEvent {

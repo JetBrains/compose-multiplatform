@@ -176,11 +176,11 @@ inline class PointerId(val value: Long)
 @Immutable
 data class PointerInputData(
     @Stable
-    val uptime: Uptime? = null,
+    val uptime: Uptime,
     @Stable
-    val position: Offset? = null,
+    val position: Offset,
     @Stable
-    val down: Boolean = false
+    val down: Boolean
 )
 
 /**
@@ -318,12 +318,7 @@ private fun PointerInputChange.positionChangeInternal(ignoreConsumed: Boolean = 
     val previousPosition = previous.position
     val currentPosition = current.position
 
-    val offset =
-        if (previousPosition == null || currentPosition == null) {
-            Offset(0.0f, 0.0f)
-        } else {
-            currentPosition - previousPosition
-        }
+    val offset = currentPosition - previousPosition
 
     return if (!ignoreConsumed) {
         offset - consumed.positionChange
@@ -383,7 +378,7 @@ fun PointerInputChange.consumeAllChanges() {
  * given bounds.
  */
 fun PointerInputChange.isOutOfBounds(size: IntSize): Boolean {
-    val position = current.position ?: return false
+    val position = current.position
     val x = position.x
     val y = position.y
     val width = size.width

@@ -578,7 +578,7 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
     ) {
         pointerEvent.changes.fastForEach {
             if (it.changedToDown()) {
-                onDown(it.current.position!!)
+                onDown(it.current.position)
                 it.consumeDownChange()
             }
         }

@@ -309,7 +309,7 @@ internal class SuspendingPointerInputFilter(
             if (old.current.down) {
                 PointerInputChange(
                     old.id,
-                    current = old.current.copy(uptime = null, down = false),
+                    current = old.current.copy(down = false),
                     previous = old.current,
                     consumed = DownChangeConsumed
                 )

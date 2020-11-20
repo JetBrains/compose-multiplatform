@@ -34,7 +34,7 @@ import com.google.common.truth.Truth
 internal fun PointerInputEventData(
     id: Int,
     uptime: Uptime,
-    position: Offset?,
+    position: Offset,
     down: Boolean
 ): PointerInputEventData {
     val pointerInputData = PointerInputData(
@@ -48,7 +48,7 @@ internal fun PointerInputEventData(
 internal fun PointerInputEvent(
     id: Int,
     uptime: Uptime,
-    position: Offset?,
+    position: Offset,
     down: Boolean
 ): PointerInputEvent {
     return PointerInputEvent(

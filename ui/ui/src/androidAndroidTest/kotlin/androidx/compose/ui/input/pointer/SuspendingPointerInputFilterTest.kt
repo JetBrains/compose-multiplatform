@@ -163,10 +163,12 @@ class SuspendingPointerInputFilterTest {
                     PointerInputChange(
                         PointerId(0),
                         current = PointerInputData(
+                            uptime = Uptime.Boot,
                             position = Offset(6f, 6f),
                             down = false
                         ),
                         previous = PointerInputData(
+                            uptime = Uptime.Boot,
                             position = Offset(6f, 6f),
                             down = true
                         ),
@@ -216,12 +218,16 @@ private val PointerEvent.firstChange get() = changes.first()
 
 private class PointerInputChangeEmitter(id: Int = 0) {
     val pointerId = PointerId(id.toLong())
-    var previousData = PointerInputData()
+    var previousData = PointerInputData(
+        uptime = Uptime.Boot,
+        position = Offset.Zero,
+        down = false
+    )
 
     fun nextChange(
-        position: Offset? = null,
+        position: Offset = Offset.Zero,
         down: Boolean = true,
-        time: Uptime? = null
+        time: Uptime = Uptime.Boot
     ): PointerInputChange {
         val current = PointerInputData(
             position = position,

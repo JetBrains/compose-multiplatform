@@ -571,8 +571,8 @@ private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
                 pointer = otherDown.id
             }
         } else {
-            val currentPosition = dragEvent.current.position!!
-            val previousPosition = dragEvent.previous.position!!
+            val currentPosition = dragEvent.current.position
+            val previousPosition = dragEvent.previous.position
             val positionChange = getDragDirectionValue(currentPosition) -
                 getDragDirectionValue(previousPosition)
             totalPositionChange += positionChange

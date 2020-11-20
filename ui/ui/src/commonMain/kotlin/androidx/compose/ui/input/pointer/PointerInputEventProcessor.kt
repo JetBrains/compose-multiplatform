@@ -55,7 +55,7 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
             .forEach { (_, pointerInputChange) ->
                 val hitResult: MutableList<PointerInputFilter> = mutableListOf()
                 root.hitTest(
-                    pointerInputChange.current.position!!,
+                    pointerInputChange.current.position,
                     hitResult
                 )
                 if (hitResult.isNotEmpty()) {
@@ -118,7 +118,7 @@ private class PointerInputChangeEventProducer {
                     PointerInputChange(
                         it.id,
                         it.pointerInputData,
-                        previousPointerInputData[it.id] ?: PointerInputData(),
+                        previousPointerInputData[it.id] ?: it.pointerInputData.copy(down = false),
                         ConsumedData()
                     )
                 if (it.pointerInputData.down) {

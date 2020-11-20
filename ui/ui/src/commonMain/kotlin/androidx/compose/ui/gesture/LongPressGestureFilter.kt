@@ -128,7 +128,7 @@ internal class LongPressGestureFilter(
                 // pointer position information to the event we will fire.
                 changes.forEach {
                     if (it.current.down) {
-                        pointerPositions[it.id] = it.current.position!!
+                        pointerPositions[it.id] = it.current.position
                     } else {
                         pointerPositions.remove(it.id)
                     }

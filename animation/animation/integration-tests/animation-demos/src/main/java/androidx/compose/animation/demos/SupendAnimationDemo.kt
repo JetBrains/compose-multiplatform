@@ -62,24 +62,22 @@ fun SuspendAnimationDemo() {
                     val offset = handlePointerInput {
                         awaitFirstDown().current.position
                     }
-                    if (offset != null) {
-                        val x = offset.x
-                        val y = offset.y
-                        mutex.mutate {
-                            launch {
-                                animStateX.animateTo(
-                                    x,
-                                    sequentialAnimation = !animStateX.isFinished,
-                                    animationSpec = spring(stiffness = Spring.StiffnessLow)
-                                )
-                            }
-                            launch {
-                                animStateY.animateTo(
-                                    y,
-                                    sequentialAnimation = !animStateY.isFinished,
-                                    animationSpec = spring(stiffness = Spring.StiffnessLow)
-                                )
-                            }
+                    val x = offset.x
+                    val y = offset.y
+                    mutex.mutate {
+                        launch {
+                            animStateX.animateTo(
+                                x,
+                                sequentialAnimation = !animStateX.isFinished,
+                                animationSpec = spring(stiffness = Spring.StiffnessLow)
+                            )
+                        }
+                        launch {
+                            animStateY.animateTo(
+                                y,
+                                sequentialAnimation = !animStateY.isFinished,
+                                animationSpec = spring(stiffness = Spring.StiffnessLow)
+                            )
                         }
                     }
                 }
