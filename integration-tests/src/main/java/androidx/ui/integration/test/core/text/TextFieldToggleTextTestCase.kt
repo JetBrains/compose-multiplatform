@@ -55,18 +55,16 @@ class TextFieldToggleTextTestCase(
 
     private val textInputService = TextInputService(TestPlatformTextInputService())
 
-    private val texts = mutableStateOf(
-        List(textNumber) {
-            textGenerator.nextParagraph(length = textLength)
-        }
-    )
+    private val texts = List(textNumber) {
+        mutableStateOf(textGenerator.nextParagraph(length = textLength))
+    }
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun MeasuredContent() {
-        for (text in texts.value) {
+        for (text in texts) {
             BasicTextField(
-                value = TextFieldValue(text),
+                value = text.value,
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.Black, fontSize = fontSize),
                 modifier = Modifier.background(color = Color.Cyan).width(width)
@@ -95,8 +93,8 @@ class TextFieldToggleTextTestCase(
     }
 
     override fun toggleState() {
-        texts.value = List(textNumber) {
-            textGenerator.nextParagraph(length = textLength)
+        texts.forEach {
+            it.value = textGenerator.nextParagraph(length = textLength)
         }
     }
 

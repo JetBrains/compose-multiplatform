@@ -84,7 +84,7 @@ import androidx.compose.ui.text.input.VisualTransformation
  * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
- * that this IME action may be different from what you specified in [imeAction].
+ * that this IME action may be different from what you specified in [KeyboardOptions.imeAction].
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
@@ -110,13 +110,13 @@ fun BasicTextField(
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = Color.Black
 ) {
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value)) }
-    textFieldValue = textFieldValue.copy(text = value)
+    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+    val textFieldValue = textFieldValueState.copy(text = value)
 
     BasicTextField(
         value = textFieldValue,
         onValueChange = {
-            textFieldValue = it
+            textFieldValueState = it
             if (value != it.text) {
                 onValueChange(it.text)
             }
@@ -180,7 +180,7 @@ fun BasicTextField(
  * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
- * that this IME action may be different from what you specified in [imeAction].
+ * that this IME action may be different from what you specified in [KeyboardOptions.imeAction].
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
