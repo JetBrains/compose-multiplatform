@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -58,9 +57,7 @@ private fun TextFieldWithFocusRequesters(
     focusRequester: FocusRequester,
     nextFocusRequester: FocusRequester
 ) {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue("Focus Transition Test")
-    }
+    val state = savedInstanceState { "Focus Transition Test" }
     var color by remember { mutableStateOf(Black) }
 
     BasicTextField(

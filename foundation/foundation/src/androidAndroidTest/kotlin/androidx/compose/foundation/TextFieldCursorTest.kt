@@ -41,7 +41,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -78,7 +77,7 @@ class TextFieldCursorTest {
         val latch = CountDownLatch(1)
         rule.setContent {
             BasicTextField(
-                value = TextFieldValue(),
+                value = "",
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White, background = Color.White),
                 modifier = Modifier
@@ -113,7 +112,7 @@ class TextFieldCursorTest {
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
                 BasicTextField(
-                    value = TextFieldValue(),
+                    value = "",
                     onValueChange = {},
                     textStyle = TextStyle(color = Color.White, background = Color.White),
                     modifier = Modifier
@@ -163,7 +162,7 @@ class TextFieldCursorTest {
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
                 BasicTextField(
-                    value = TextFieldValue(),
+                    value = "",
                     onValueChange = {},
                     textStyle = TextStyle(color = Color.White, background = Color.White),
                     modifier = Modifier
@@ -216,7 +215,7 @@ class TextFieldCursorTest {
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
-                val text = remember { mutableStateOf(TextFieldValue("test")) }
+                val text = remember { mutableStateOf("test") }
                 BasicTextField(
                     value = text.value,
                     onValueChange = { text.value = it },

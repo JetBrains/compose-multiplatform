@@ -23,18 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextFieldWithScrollerDemo() {
     ScrollableColumn {
         val state = remember {
-            mutableStateOf(
-                TextFieldValue(
-                    text = List(100) { "Line: $it" }.joinToString("\n")
-                )
-            )
+            mutableStateOf(List(100) { "Line: $it" }.joinToString("\n"))
         }
         BasicTextField(
             value = state.value,

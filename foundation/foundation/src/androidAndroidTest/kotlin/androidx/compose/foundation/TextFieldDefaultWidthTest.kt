@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -197,7 +196,7 @@ private fun DefaultWidthTextField(
     Providers(AmbientDensity provides density) {
         androidx.compose.foundation.layout.Box {
             BasicTextField(
-                value = TextFieldValue(text),
+                value = text,
                 textStyle = TextStyle(fontSize = fontSize, fontFamily = font.asFontFamily()),
                 onValueChange = {},
                 modifier = modifier

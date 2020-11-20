@@ -29,7 +29,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.util.BoundaryNode
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -53,7 +52,7 @@ class TextActionsTest {
         onImeActionPerformed: (ImeAction) -> Unit = {},
         textCallback: (String) -> Unit = {}
     ) {
-        val state = remember { mutableStateOf(TextFieldValue("")) }
+        val state = remember { mutableStateOf("") }
         BasicTextField(
             modifier = Modifier.testTag(fieldTag),
             value = state.value,
@@ -61,7 +60,7 @@ class TextActionsTest {
             onImeActionPerformed = onImeActionPerformed,
             onValueChange = {
                 state.value = it
-                textCallback(it.text)
+                textCallback(it)
             }
         )
     }

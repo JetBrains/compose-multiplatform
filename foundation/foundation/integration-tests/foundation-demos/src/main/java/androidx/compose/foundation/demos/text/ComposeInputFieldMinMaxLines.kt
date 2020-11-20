@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 
 @Composable
 fun CoreTextFieldMinMaxDemo() {
@@ -45,9 +44,7 @@ fun CoreTextFieldMinMaxDemo() {
 @Composable
 @OptIn(InternalTextApi::class)
 private fun TextFieldWithMaxLines(str: String? = null, maxLines: Int) {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue(str ?: "abc ".repeat(20))
-    }
+    val state = savedInstanceState { str ?: "abc ".repeat(20) }
     BasicTextField(
         modifier = demoTextFieldModifiers.clipToBounds(),
         value = state.value,
