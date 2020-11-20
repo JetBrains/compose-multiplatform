@@ -27,7 +27,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.util.fastForEach
 
 /**
@@ -58,7 +58,7 @@ fun <T> Crossfade(
         state.items.clear()
         keys.mapTo(state.items) { key ->
             CrossfadeAnimationItem(key) { children ->
-                val opacity = animatedOpacity(
+                val alpha = animatedAlpha(
                     animation = animation,
                     visible = key == current,
                     onAnimationFinish = {
@@ -69,7 +69,7 @@ fun <T> Crossfade(
                         }
                     }
                 )
-                Box(Modifier.drawOpacity(opacity.value)) {
+                Box(Modifier.alpha(alpha.value)) {
                     children()
                 }
             }
@@ -77,9 +77,9 @@ fun <T> Crossfade(
     }
     Box(modifier) {
         state.invalidate = invalidate
-        state.items.fastForEach { (item, opacity) ->
+        state.items.fastForEach { (item, alpha) ->
             key(item) {
-                opacity {
+                alpha {
                     content(item)
                 }
             }
@@ -102,7 +102,7 @@ private data class CrossfadeAnimationItem<T>(
 private typealias CrossfadeTransition = @Composable (content: @Composable () -> Unit) -> Unit
 
 @Composable
-private fun animatedOpacity(
+private fun animatedAlpha(
     animation: AnimationSpec<Float>,
     visible: Boolean,
     onAnimationFinish: () -> Unit = {}

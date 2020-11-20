@@ -40,7 +40,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
@@ -182,7 +182,7 @@ internal fun TextFieldImpl(
             else -> inactiveColor.applyAlpha(alpha = ContentAlpha.disabled)
         }
 
-    ) { labelProgress, animatedLabelColor, indicatorWidth, indicatorColor, placeholderOpacity ->
+    ) { labelProgress, animatedLabelColor, indicatorWidth, indicatorColor, placeholderAlpha ->
 
         val leadingColor = inactiveColor.applyAlpha(alpha = TrailingLeadingAlpha)
         val trailingColor = if (isErrorValue) errorColor else leadingColor
@@ -206,7 +206,7 @@ internal fun TextFieldImpl(
         val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
             if (placeholder != null && value.text.isEmpty()) {
                 @Composable { modifier ->
-                    Box(modifier.drawOpacity(placeholderOpacity)) {
+                    Box(modifier.alpha(placeholderAlpha)) {
                         Decoration(
                             contentColor = inactiveColor,
                             typography = MaterialTheme.typography.subtitle1,
