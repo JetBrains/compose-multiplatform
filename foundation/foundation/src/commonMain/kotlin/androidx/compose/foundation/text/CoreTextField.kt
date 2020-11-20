@@ -39,6 +39,7 @@ import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.MouseTemporaryApi
 import androidx.compose.ui.input.pointer.isMouseInput
@@ -53,6 +54,7 @@ import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.platform.AmbientHapticFeedback
 import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.AmbientTextToolbar
+import androidx.compose.ui.selection.AmbientTextSelectionColors
 import androidx.compose.ui.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
@@ -161,6 +163,7 @@ fun CoreTextField(
     val textInputService = AmbientTextInputService.current
     val density = AmbientDensity.current
     val resourceLoader = AmbientFontLoader.current
+    val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
 
     // State
     val (visualText, offsetMap) = remember(value, visualTransformation) {
@@ -187,7 +190,8 @@ fun CoreTextField(
         density,
         resourceLoader,
         onValueChange,
-        onImeActionPerformed
+        onImeActionPerformed,
+        selectionBackgroundColor
     )
 
     val onValueChangeWrapper: (TextFieldValue) -> Unit = {
@@ -315,7 +319,7 @@ fun CoreTextField(
                     value,
                     offsetMap,
                     layoutResult,
-                    DefaultSelectionColor
+                    state.selectionPaint
                 )
             }
         }
@@ -534,6 +538,9 @@ internal class TextFieldState(
     var onValueChange: (TextFieldValue) -> Unit = {}
         private set
 
+    /** The paint used to draw highlight background for selected text. */
+    val selectionPaint: Paint = Paint()
+
     fun update(
         visualText: AnnotatedString,
         textStyle: TextStyle,
@@ -541,10 +548,12 @@ internal class TextFieldState(
         density: Density,
         resourceLoader: Font.ResourceLoader,
         onValueChange: (TextFieldValue) -> Unit,
-        onImeActionPerformed: (ImeAction) -> Unit
+        onImeActionPerformed: (ImeAction) -> Unit,
+        selectionBackgroundColor: Color
     ) {
         this.onValueChange = onValueChange
         this.onImeActionPerformed = onImeActionPerformed
+        this.selectionPaint.color = selectionBackgroundColor
 
         textDelegate = updateTextDelegate(
             current = textDelegate,

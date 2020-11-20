@@ -79,7 +79,7 @@ class TextFieldDelegateIntegrationTest {
         TextDelegate.paintBackground(
             0,
             1,
-            Paint().also { it.color = selectionColor },
+            Paint().apply { color = selectionColor },
             expectedCanvas,
             layoutResult
         )
@@ -90,7 +90,7 @@ class TextFieldDelegateIntegrationTest {
         TextFieldDelegate.draw(
             canvas = actualCanvas,
             value = TextFieldValue(text = "Hello, World", selection = selection),
-            selectionColor = selectionColor,
+            selectionPaint = Paint().apply { color = selectionColor },
             offsetMap = OffsetMap.identityOffsetMap,
             textLayoutResult = layoutResult
         )

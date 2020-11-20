@@ -2484,6 +2484,17 @@ package androidx.compose.ui.selection {
   public final class SimpleLayoutKt {
   }
 
+  @androidx.compose.runtime.Immutable public final class TextSelectionColors {
+    method public long getBackgroundColor-0d7_KjU();
+    method public long getHandleColor-0d7_KjU();
+    property public final long backgroundColor;
+    property public final long handleColor;
+  }
+
+  public final class TextSelectionColorsKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.TextSelectionColors> getAmbientTextSelectionColors();
+  }
+
 }
 
 package androidx.compose.ui.semantics {

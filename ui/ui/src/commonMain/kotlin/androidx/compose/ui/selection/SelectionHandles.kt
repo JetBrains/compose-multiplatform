@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.MeasureResult
@@ -53,7 +52,6 @@ import kotlin.math.roundToInt
 
 internal val HANDLE_WIDTH = 25.dp
 internal val HANDLE_HEIGHT = 25.dp
-private val HANDLE_COLOR = Color(0xFF2B28F5.toInt())
 
 /**
  * @suppress
@@ -114,13 +112,14 @@ internal fun DefaultSelectionHandle(
     handlesCrossed: Boolean
 ) {
     val selectionHandleCache = remember { SelectionHandleCache() }
+    val handleColor = AmbientTextSelectionColors.current.handleColor
     HandleDrawLayout(modifier = modifier, width = HANDLE_WIDTH, height = HANDLE_HEIGHT) {
         drawPath(
             selectionHandleCache.createPath(
                 this,
                 isLeft(isStartHandle, directions, handlesCrossed)
             ),
-            HANDLE_COLOR
+            handleColor
         )
     }
 }

@@ -47,7 +47,7 @@ class SelectionHandlesTest {
     val rule = androidx.test.rule.ActivityTestRule<TestActivity>(TestActivity::class.java)
     private lateinit var activity: TestActivity
 
-    private val HANDLE_COLOR = Color(0xFF2B28F5.toInt())
+    private val HANDLE_COLOR = Color(0xFF4286F4)
     // Due to the rendering effect of captured bitmap from activity, if we want the pixels from the
     // corners, we need a little bit offset from the edges of the bitmap.
     private val OFFSET_FROM_EDGE = 5
