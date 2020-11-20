@@ -16,7 +16,7 @@
  */
 
 // Ignore lint warnings in documentation snippets
-@file:Suppress("unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", )
+@file:Suppress("unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE")
 
 package androidx.compose.integration.docs.interoperability
 
@@ -88,7 +88,7 @@ private object InteropSnippet1 {
 
     @Composable
     fun Greeting(name: String) {
-        Text (text = "Hello $name!")
+        Text(text = "Hello $name!")
     }
 }
 

@@ -56,7 +56,7 @@ class WindowManagerAmbientTest {
 
         // Assert.
         windowFocusGain.await(5, SECONDS)
-        assertThat( windowManager.isWindowFocused ).isTrue()
+        assertThat(windowManager.isWindowFocused).isTrue()
     }
 
     @Test
@@ -87,8 +87,8 @@ class WindowManagerAmbientTest {
         rule.waitForIdle()
         assertThat(mainWindowFocusLoss.await(5, SECONDS)).isTrue()
         assertThat(popupFocusGain.await(5, SECONDS)).isTrue()
-        assertThat( mainWindowManager.isWindowFocused ).isFalse()
-        assertThat( popupWindowManager.isWindowFocused ).isTrue()
+        assertThat(mainWindowManager.isWindowFocused).isFalse()
+        assertThat(popupWindowManager.isWindowFocused).isTrue()
     }
 
     @Test

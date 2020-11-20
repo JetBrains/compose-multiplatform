@@ -105,7 +105,7 @@ internal open class PreviewAnimationClock(
     }
 
     override fun unsubscribe(observer: AnimationClockObserver) {
-        synchronized (pendingObserversLock) {
+        synchronized(pendingObserversLock) {
             // unsubscribe is expected to be called once per state update. If There is another
             // call, the animation actually is trying to unsubscribe and we need to process it.
             if (pendingObservers.remove(observer)) {
@@ -165,7 +165,7 @@ internal open class PreviewAnimationClock(
                 animation.toState(seekableAnimation.toState!!)
             }
         }
-        synchronized (pendingObserversLock) {
+        synchronized(pendingObserversLock) {
             pendingObservers.clear()
         }
         // Reset the clock time so all the animations have it as the start time.

@@ -205,7 +205,7 @@ class SkijaLayer(
     override fun updateDisplayList() = Unit
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    fun drawShadow(canvas: DesktopCanvas) = with (owner.density) {
+    fun drawShadow(canvas: DesktopCanvas) = with(owner.density) {
         val path = when (val outline = outlineCache.outline) {
             is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
             is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }

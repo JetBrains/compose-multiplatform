@@ -77,7 +77,7 @@ private object LayoutSnippet3 {
     @Composable
     fun ArtistCard(artist: Artist) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image( /*...*/ )
+            Image( /*...*/)
             Column {
                 Text(artist.name)
                 Text(artist.lastSeenOnline)
@@ -103,7 +103,7 @@ private object LayoutSnippet4 {
 
 private object LayoutSnippet5 {
     @Composable
-    fun ArtistCard( /* ... */ ) {
+    fun ArtistCard( /* ... */) {
         val padding = 16.dp
         Column(
             Modifier
@@ -146,8 +146,8 @@ private object LayoutSnippet7 {
 
 private object LayoutSnippet8 {
     @Composable
-    fun HomeScreen( /*...*/ ) {
-        Scaffold (
+    fun HomeScreen( /*...*/) {
+        Scaffold(
             drawerContent = { /*...*/ },
             topBar = { /*...*/ },
             bodyContent = { /*...*/ }

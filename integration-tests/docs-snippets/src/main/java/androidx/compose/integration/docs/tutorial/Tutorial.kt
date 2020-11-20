@@ -72,7 +72,7 @@ private object TutorialSnippet2 {
 
     @Composable
     fun Greeting(name: String) {
-        Text (text = "Hello $name!")
+        Text(text = "Hello $name!")
     }
 }
 
@@ -83,7 +83,7 @@ Page 3
 private object TutorialSnippet3 {
     @Composable
     fun Greeting(name: String) {
-        Text (text = "Hello $name!")
+        Text(text = "Hello $name!")
     }
 
     @Preview
