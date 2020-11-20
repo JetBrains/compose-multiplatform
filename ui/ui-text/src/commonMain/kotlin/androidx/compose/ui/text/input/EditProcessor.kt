@@ -31,15 +31,17 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 @InternalTextApi
 class EditProcessor {
 
-    // The previous editor state we passed back to the user of this class.
+    // The last known state of the EditingBuffer
     @VisibleForTesting
-    internal var mPreviousValue: TextFieldValue? = null
+    var mBufferState: TextFieldValue = TextFieldValue("", TextRange.Zero, null)
         private set
 
     // The editing buffer used for applying editor commands from IME.
     @VisibleForTesting
-    internal var mBuffer: EditingBuffer =
-        EditingBuffer(initialText = "", initialSelection = TextRange.Zero)
+    internal var mBuffer: EditingBuffer = EditingBuffer(
+        initialText = "",
+        initialSelection = TextRange.Zero
+    )
 
     /**
      * Must be called whenever new editor model arrives.
@@ -52,22 +54,23 @@ class EditProcessor {
         textInputService: TextInputService?,
         token: InputSessionToken
     ) {
-        val oldValue = mPreviousValue
-
-        if (oldValue == null || oldValue.text != value.text) {
+        if (mBufferState.text != value.text) {
             mBuffer = EditingBuffer(
                 initialText = value.text,
                 initialSelection = value.selection
             )
-        } else if (oldValue.selection != value.selection) {
+        } else if (mBufferState.selection != value.selection) {
             mBuffer.setSelection(value.selection.min, value.selection.max)
         }
 
         if (value.composition == null) {
             mBuffer.commitComposition()
+        } else if (!value.composition.collapsed) {
+            mBuffer.setComposition(value.composition.min, value.composition.max)
         }
 
-        mPreviousValue = value
+        val oldValue = mBufferState
+        mBufferState = value
         textInputService?.onStateUpdated(token, oldValue, value)
     }
 
@@ -90,7 +93,7 @@ class EditProcessor {
             }
         )
 
-        mPreviousValue = newState
+        mBufferState = newState
         return newState
     }
 }
