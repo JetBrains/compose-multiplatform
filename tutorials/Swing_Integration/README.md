@@ -6,7 +6,7 @@ In this tutorial, we will show you how to use ComposePanel in your Swing applica
 
 ## Using ComposePanel
 
-ComposePanel lets you create a UI using Compose for Desktop in a Swing-based UI. To achieve that you need to create instance of ComposePanel, add it to your Swing layout and describe composition inside `setContent`. Also you may need to clear the CFD application events via `AppManager.setEvents`.
+ComposePanel lets you create a UI using Compose for Desktop in a Swing-based UI. To achieve this you need to create an instance of ComposePanel, add it to your Swing layout, and describe the composition inside `setContent`. You may also need to clear the CFD application events via `AppManager.setEvents`.
 
 ```kotlin
 import androidx.compose.desktop.AppManager
@@ -107,7 +107,7 @@ fun actionButton(text: String, action: (() -> Unit)? = null): JButton {
 fun ComposeContent() {
     Box(
         modifier = Modifier.fillMaxSize(),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Row {
             Counter("West", westClicks)
@@ -129,14 +129,14 @@ fun Counter(text: String, counter: MutableState<Int>) {
         Column {
             Box(
                 modifier = Modifier.height(30.dp).fillMaxWidth(),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Text(text = "${text}Clicks: ${counter.value}")
             }
             Spacer(modifier = Modifier.height(25.dp))
             Box(
                 modifier = Modifier.fillMaxSize(),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Button(onClick = { counter.value++ }) {
                     Text(text = text, color = Color.White)
