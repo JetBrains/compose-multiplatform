@@ -73,7 +73,7 @@ class EditProcessorTest {
     }
 
     @Test
-    fun textNewState_bufferNotUpdated_ifSameModelStructurally() {
+    fun testNewState_bufferNotUpdated_ifSameModelStructurally() {
         val processor = EditProcessor()
         val textInputService = mock<TextInputService>()
         val token = 10 // mock token value
@@ -96,7 +96,7 @@ class EditProcessorTest {
     }
 
     @Test
-    fun textNewState_new_buffer_created_if_text_is_different() {
+    fun testNewState_new_buffer_created_if_text_is_different() {
         val processor = EditProcessor()
         val textInputService = mock<TextInputService>()
         val token = 10 // mock token value
@@ -119,7 +119,7 @@ class EditProcessorTest {
     }
 
     @Test
-    fun textNewState_buffer_not_recreated_if_selection_is_different() {
+    fun testNewState_buffer_not_recreated_if_selection_is_different() {
         val processor = EditProcessor()
         val textInputService = mock<TextInputService>()
         val token = 10 // mock token value
@@ -144,7 +144,7 @@ class EditProcessorTest {
     }
 
     @Test
-    fun textNewState_buffer_not_recreated_if_composition_is_different() {
+    fun testNewState_buffer_not_recreated_if_composition_is_different() {
         val processor = EditProcessor()
         val textInputService = mock<TextInputService>()
         val token = 10 // mock token value
@@ -170,5 +170,38 @@ class EditProcessorTest {
         assertEquals(initialBuffer, processor.mBuffer)
         assertEquals(processor.mBuffer.compositionStart, EditingBuffer.NOWHERE)
         assertEquals(processor.mBuffer.compositionEnd, EditingBuffer.NOWHERE)
+    }
+
+    @Test
+    fun testNewState_reversedSelection_setsTheSelection() {
+        val processor = EditProcessor()
+        val textInputService = mock<TextInputService>()
+        val token = 10 // mock token value
+        val initialSelection = TextRange(2, 1)
+        val textFieldValue = TextFieldValue("qwerty", initialSelection, TextRange(1))
+
+        // set the initial selection to be reversed
+        processor.onNewState(
+            textFieldValue,
+            textInputService,
+            token
+        )
+        val initialBuffer = processor.mBuffer
+
+        assertEquals(initialBuffer.selectionStart, initialSelection.min)
+        assertEquals(initialBuffer.selectionEnd, initialSelection.max)
+
+        val updatedSelection = TextRange(3, 0)
+        val newTextFieldValue = textFieldValue.copy(selection = updatedSelection)
+        // set the new selection
+        processor.onNewState(
+            newTextFieldValue,
+            textInputService,
+            token
+        )
+
+        assertEquals(initialBuffer, processor.mBuffer)
+        assertEquals(initialBuffer.selectionStart, updatedSelection.min)
+        assertEquals(initialBuffer.selectionEnd, updatedSelection.max)
     }
 }
