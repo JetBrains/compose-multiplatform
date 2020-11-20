@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import java.util.TreeMap
 
 /**
  * Defines a set of keys. Can be used in keys handlers, see
@@ -69,13 +70,18 @@ fun KeysSet(key: Key): KeysSet {
     return KeysSet(setOf(key))
 }
 
+private fun makeHandlers() = TreeMap<KeysSet, () -> Unit>(compareByDescending { it.keys.size })
+
 @ExperimentalKeyInput
 internal class ShortcutsInstance(
-    internal var handlers: MutableMap<KeysSet, () -> Unit> = mutableMapOf()
+    internal var handlers: TreeMap<KeysSet, () -> Unit> = makeHandlers()
 ) {
     private var pressedKeys = mutableSetOf<Key>()
 
     fun process(event: KeyEvent): Boolean {
+        if (event.type == KeyEventType.Unknown) {
+            return false
+        }
         syncPressedKeys(event)
         return findHandler()?.let {
             it()
@@ -128,7 +134,7 @@ fun Modifier.shortcuts(builder: (ShortcutsBuilderScope).() -> Unit) = composed {
 }
 
 class ShortcutsBuilderScope {
-    internal val handlers = mutableMapOf<KeysSet, () -> Unit>()
+    internal val handlers = makeHandlers()
     /**
      * @param keysSet: represents a set of keys that can be simultaneously pressed
      * @param callback: called when all keys in [keysSet] are pressed
