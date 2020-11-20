@@ -287,7 +287,7 @@ class LazyListState constructor(
      * Measures and positions currently visible items using [itemContentFactory] for subcomposing.
      */
     internal fun measure(
-        scope: SubcomposeMeasureScope<DataIndex>,
+        scope: SubcomposeMeasureScope,
         constraints: Constraints,
         isVertical: Boolean,
         horizontalAlignment: Alignment.Horizontal,

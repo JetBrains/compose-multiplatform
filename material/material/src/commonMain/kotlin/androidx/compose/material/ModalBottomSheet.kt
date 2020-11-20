@@ -299,7 +299,7 @@ private fun BottomSheetStack(
     sheetContent: @Composable () -> Unit,
     content: @Composable (constraints: Constraints, sheetHeight: Float) -> Unit
 ) {
-    SubcomposeLayout<BottomSheetStackSlot>(modifier) { constraints ->
+    SubcomposeLayout(modifier) { constraints ->
         val sheetPlaceable =
             subcompose(BottomSheetStackSlot.SheetContent, sheetContent)
                 .first().measure(constraints.copy(minWidth = 0, minHeight = 0))

@@ -430,7 +430,7 @@ private fun BackdropStack(
     calculateBackLayerConstraints: (Constraints) -> Constraints,
     frontLayer: @Composable (Constraints, Float) -> Unit
 ) {
-    SubcomposeLayout<BackdropLayers>(modifier) { constraints ->
+    SubcomposeLayout(modifier) { constraints ->
         val backLayerPlaceable =
             subcompose(BackdropLayers.Back, backLayer).first()
                 .measure(calculateBackLayerConstraints(constraints))

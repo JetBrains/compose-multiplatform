@@ -45,7 +45,7 @@ internal fun LazyList(
     val cachingItemContentFactory = remember { CachingItemContentFactory(itemContentFactory) }
     cachingItemContentFactory.itemContentFactory = itemContentFactory
 
-    SubcomposeLayout<DataIndex>(
+    SubcomposeLayout(
         modifier
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
