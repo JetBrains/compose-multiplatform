@@ -18,6 +18,7 @@ package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.point(point: Point) {
     text("X: ${point.x} Y: ${point.y}")
@@ -29,6 +30,7 @@ fun MockViewValidator.point(point: Point) {
 
 private const val SLPoints = 100
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.points(points: Iterable<Point>) {
     repeat(of = points) {

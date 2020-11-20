@@ -365,7 +365,7 @@ class AndroidViewCompatTest {
         val constraintsHolder = mutableStateOf(Constraints.fixed(1234, 5678))
 
         rule.setContent {
-            Container(LayoutConstraints(constraintsHolder.value)) {
+            Container(Modifier.layoutConstraints(constraintsHolder.value)) {
                 AndroidView(::MeasureSpecSaverView) {
                     it.ref = viewRef
                     it.widthMeasureSpecRef = widthMeasureSpecRef
@@ -390,7 +390,7 @@ class AndroidViewCompatTest {
         val viewRef = Ref<MeasureSpecSaverView>()
         val constraintsHolder = mutableStateOf(Constraints())
         rule.setContent {
-            Container(LayoutConstraints(constraintsHolder.value)) {
+            Container(Modifier.layoutConstraints(constraintsHolder.value)) {
                 AndroidView(::MeasureSpecSaverView) { it.ref = viewRef }
             }
         }
@@ -757,17 +757,18 @@ class AndroidViewCompatTest {
         }
     }
 
-    fun LayoutConstraints(childConstraints: Constraints) = object : LayoutModifier {
-        override fun MeasureScope.measure(
-            measurable: Measurable,
-            constraints: Constraints
-        ): MeasureResult {
-            val placeable = measurable.measure(childConstraints)
-            return layout(placeable.width, placeable.height) {
-                placeable.place(0, 0)
+    fun Modifier.layoutConstraints(childConstraints: Constraints): Modifier =
+        this.then(object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val placeable = measurable.measure(childConstraints)
+                return layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
             }
-        }
-    }
+        })
 
     @Composable
     fun Container(

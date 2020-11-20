@@ -164,7 +164,7 @@ class DrawShadowTest {
     fun opacityAppliedForTheShadow() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                AtLeastSize(size = 12, modifier = background(Color.White)) {
+                AtLeastSize(size = 12, modifier = Modifier.background(Color.White)) {
                     val elevation = with(AmbientDensity.current) { 4.dp.toPx() }
                     AtLeastSize(
                         size = 10,
@@ -197,7 +197,7 @@ class DrawShadowTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                AtLeastSize(size = 12, modifier = background(Color.White)) {
+                AtLeastSize(size = 12, modifier = Modifier.background(Color.White)) {
                     val shadow = if (model.value) {
                         Modifier.drawShadow(8.dp, rectShape)
                     } else {
@@ -307,7 +307,7 @@ class DrawShadowTest {
         modifier: Modifier = Modifier,
         elevation: State<Dp> = mutableStateOf(8.dp)
     ) {
-        AtLeastSize(size = 12, modifier = modifier.then(background(Color.White))) {
+        AtLeastSize(size = 12, modifier = modifier.background(Color.White)) {
             AtLeastSize(
                 size = 10,
                 modifier = Modifier.drawShadow(elevation = elevation.value, shape = rectShape)
@@ -320,7 +320,7 @@ class DrawShadowTest {
         assertNotEquals(color(width / 2, height - 1), Color.White)
     }
 
-    private fun background(color: Color) = Modifier.drawBehind {
+    private fun Modifier.background(color: Color): Modifier = drawBehind {
         drawRect(color)
         drawLatch.countDown()
     }

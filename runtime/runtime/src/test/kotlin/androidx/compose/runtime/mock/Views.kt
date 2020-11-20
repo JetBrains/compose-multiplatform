@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.key
 
+@Suppress("ComposableNaming")
 @Composable
 fun <T : Any> MockComposeScope.repeat(
     of: Iterable<T>,
@@ -32,6 +33,7 @@ fun <T : Any> MockComposeScope.repeat(
     }
 }
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.linear(content: @Composable MockComposeScope.() -> Unit) {
     emit<View, ViewApplier>(
@@ -42,6 +44,7 @@ fun MockComposeScope.linear(content: @Composable MockComposeScope.() -> Unit) {
     }
 }
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.text(value: String) {
     emit<View, ViewApplier>(
@@ -50,6 +53,7 @@ fun MockComposeScope.text(value: String) {
     )
 }
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.edit(value: String) {
     emit<View, ViewApplier>(
@@ -58,6 +62,7 @@ fun MockComposeScope.edit(value: String) {
     )
 }
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.selectBox(
     selected: Boolean,

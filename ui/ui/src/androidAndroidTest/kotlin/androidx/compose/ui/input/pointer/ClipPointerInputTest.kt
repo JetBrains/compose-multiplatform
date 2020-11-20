@@ -98,10 +98,10 @@ class ClipPointerInputTest {
             activity.setContent {
 
                 val children = @Composable {
-                    child(loggingPim1)
-                    child(loggingPim2)
-                    child(loggingPim3)
-                    child(loggingPim4)
+                    Child(loggingPim1)
+                    Child(loggingPim2)
+                    Child(loggingPim3)
+                    Child(loggingPim4)
                 }
 
                 val middle = @Composable {
@@ -227,10 +227,10 @@ class ClipPointerInputTest {
                 with(AmbientDensity.current) {
 
                     val children = @Composable {
-                        child(Modifier.offset((-1f).toDp(), (-1f).toDp()).then(loggingPim1))
-                        child(Modifier.offset(2f.toDp(), (-1f).toDp()).then(loggingPim2))
-                        child(Modifier.offset((-1f).toDp(), 2f.toDp()).then(loggingPim3))
-                        child(Modifier.offset(2f.toDp(), 2f.toDp()).then(loggingPim4))
+                        Child(Modifier.offset((-1f).toDp(), (-1f).toDp()).then(loggingPim1))
+                        Child(Modifier.offset(2f.toDp(), (-1f).toDp()).then(loggingPim2))
+                        Child(Modifier.offset((-1f).toDp(), 2f.toDp()).then(loggingPim3))
+                        Child(Modifier.offset(2f.toDp(), 2f.toDp()).then(loggingPim4))
                     }
 
                     val middle = @Composable {
@@ -315,7 +315,7 @@ class ClipPointerInputTest {
     }
 
     @Composable
-    fun child(modifier: Modifier) {
+    fun Child(modifier: Modifier) {
         Layout(content = emptyContent(), modifier = modifier) { _, _ ->
             layout(2, 2) {}
         }

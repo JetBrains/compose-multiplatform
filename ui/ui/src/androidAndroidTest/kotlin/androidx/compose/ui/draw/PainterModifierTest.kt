@@ -113,7 +113,7 @@ class PainterModifierTest {
     @Test
     fun testPainterModifierColorFilter() {
         rule.setContent {
-            testPainter(colorFilter = ColorFilter(Color.Cyan, BlendMode.SrcIn))
+            TestPainter(colorFilter = ColorFilter(Color.Cyan, BlendMode.SrcIn))
         }
 
         rule.obtainScreenshotBitmap(
@@ -128,7 +128,7 @@ class PainterModifierTest {
     @Test
     fun testPainterModifierAlpha() {
         rule.setContent {
-            testPainter(alpha = 0.5f)
+            TestPainter(alpha = 0.5f)
         }
 
         rule.obtainScreenshotBitmap(
@@ -151,7 +151,7 @@ class PainterModifierTest {
     @Test
     fun testPainterModifierRtl() {
         rule.setContent {
-            testPainter(rtl = true)
+            TestPainter(rtl = true)
         }
 
         rule.obtainScreenshotBitmap(
@@ -672,7 +672,7 @@ class PainterModifierTest {
     }
 
     @Composable
-    private fun testPainter(
+    private fun TestPainter(
         alpha: Float = DefaultAlpha,
         colorFilter: ColorFilter? = null,
         rtl: Boolean = false

@@ -18,6 +18,7 @@ package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.reportsTo(report: Report) {
     text(report.from)
@@ -31,6 +32,7 @@ fun MockViewValidator.reportsTo(report: Report) {
     text(report.to)
 }
 
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.reportsReport(reports: Iterable<Report>) {
     linear {
