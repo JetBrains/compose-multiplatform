@@ -16,15 +16,14 @@
 
 package androidx.compose.ui.test.junit4.android
 
-import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.AndroidOwner
-import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.junit4.isOnUiThread
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResourceTimeoutException
-import androidx.compose.ui.test.ExperimentalTesting
-import androidx.compose.ui.test.junit4.isOnUiThread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -34,46 +33,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.time.ExperimentalTime
 
-/**
- * Collects all [SemanticsNode]s that are part of all compose hierarchies hosted by resumed
- * activities.
- *
- * This operation is performed only after compose is idle via Espresso.
- */
-internal object SynchronizedTreeCollector {
-    /**
-     * Collects all [Owner]s from all compose hierarchies.
-     *
-     * This is a blocking call. Returns only after compose is idle.
-     *
-     * Can crash in case it hits time out. This is not supposed to be handled as it
-     * surfaces only in incorrect tests.
-     */
-    internal fun getOwners(): Set<Owner> {
-        ensureAndroidOwnerRegistryIsSetUp()
+@OptIn(InternalTestingApi::class)
+internal class IdleAwaiter {
 
-        // TODO(pavlis): Instead of returning a flatMap, let all consumers handle a tree
-        //  structure. In case of multiple AndroidOwners, add a fake root
-        waitForIdle()
-
-        return AndroidOwnerRegistry.getOwners().also {
-            // TODO(b/153632210): This check should be done by callers of collectOwners
-            check(it.isNotEmpty()) {
-                "No compose views found in the app. Is your Activity " +
-                    "resumed?"
-            }
-        }
-    }
-
-    /**
-     * Waits for compose to be idle.
-     *
-     * This is a blocking call. Returns only after compose is idle.
-     *
-     * Can crash in case Espresso hits time out. This is not supposed to be handled as it
-     * surfaces only in incorrect tests.
-     */
-    internal fun waitForIdle() {
+    fun waitForIdle() {
         check(!isOnUiThread()) {
             "Functions that involve synchronization (Assertions, Actions, Synchronization; " +
                 "e.g. assertIsSelected(), doClick(), runOnIdle()) cannot be run " +
@@ -81,7 +44,6 @@ internal object SynchronizedTreeCollector {
                 "runOnIdle {}, runOnUiThread {} or setContent {}?"
         }
 
-        registerComposeWithEspresso()
         // First wait until we have an AndroidOwner (in case an Activity is being started)
         waitForAndroidOwners()
         // Then await composition(s)
@@ -92,6 +54,22 @@ internal object SynchronizedTreeCollector {
         //  That means that AndroidOwnerRegistry.getOwners() may still return an empty list
         //  between now and when the new Activity has created its AndroidOwner, even though
         //  waitForAndroidOwners() suggests that we are now guaranteed one.
+    }
+
+    @ExperimentalTesting
+    suspend fun awaitIdle() {
+        // TODO(b/169038516): when we can query AndroidOwners for measure or layout, remove
+        //  runEspressoOnIdle() and replace it with a suspend fun that loops while the
+        //  snapshot or the recomposer has pending changes, clocks are busy or owners have
+        //  pending measures or layouts; and do the await on AndroidUiDispatcher.Main
+        // We use Espresso to wait for composition, measure, layout and draw,
+        // and Espresso needs to be called from a non-ui thread; so use Dispatchers.IO
+        withContext(Dispatchers.IO) {
+            // First wait until we have an AndroidOwner (in case an Activity is being started)
+            awaitAndroidOwners()
+            // Then await composition(s)
+            runEspressoOnIdle()
+        }
     }
 
     // TODO(168223213): Make the CompositionAwaiter a suspend fun, remove ComposeIdlingResource
@@ -117,9 +95,9 @@ internal object SynchronizedTreeCollector {
                 }
                 throw ComposeNotIdleException(
                     "$prefix: possibly due to compose being busy.\n" +
-                        "$diagnosticInfo" +
+                        diagnosticInfo +
                         "All registered idling resources: " +
-                        "${listOfIdlingResources.joinToString(", ")}",
+                        listOfIdlingResources.joinToString(", "),
                     e
                 )
             }
@@ -202,23 +180,6 @@ internal object SynchronizedTreeCollector {
             } finally {
                 AndroidOwnerRegistry.removeOnRegistrationChangedListener(listener)
             }
-        }
-    }
-
-    @ExperimentalTesting
-    internal suspend fun awaitIdle() {
-        // TODO(b/169038516): when we can query AndroidOwners for measure or layout, remove
-        //  runEspressoOnIdle() and replace it with a suspend fun that loops while the
-        //  snapshot or the recomposer has pending changes, clocks are busy or owners have
-        //  pending measures or layouts; and do the await on AndroidUiDispatcher.Main
-        registerComposeWithEspresso()
-        // We use Espresso to wait for composition, measure, layout and draw,
-        // and Espresso needs to be called from a non-ui thread; so use Dispatchers.IO
-        withContext(Dispatchers.IO) {
-            // First wait until we have an AndroidOwner (in case an Activity is being started)
-            awaitAndroidOwners()
-            // Then await composition(s)
-            runEspressoOnIdle()
         }
     }
 

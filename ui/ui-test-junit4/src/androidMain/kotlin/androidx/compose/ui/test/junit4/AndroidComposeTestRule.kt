@@ -16,31 +16,23 @@
 
 package androidx.compose.ui.test.junit4
 
-import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.Owner
-import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
-import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
 import androidx.compose.ui.test.junit4.android.FirstDrawRegistry
-import androidx.compose.ui.test.junit4.android.SynchronizedTreeCollector
+import androidx.compose.ui.test.junit4.android.IdleAwaiter
 import androidx.compose.ui.test.junit4.android.registerComposeWithEspresso
 import androidx.compose.ui.test.junit4.android.unregisterComposeFromEspresso
 import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.input.EditOperation
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -159,7 +151,8 @@ internal constructor(
 
     internal var disposeContentHook: (() -> Unit)? = null
 
-    private val testOwner = AndroidTestOwner()
+    private val idleAwaiter = IdleAwaiter()
+    private val testOwner = AndroidTestOwner(idleAwaiter)
     private val testContext = createTestContext(testOwner)
 
     private var activity: A? = null
@@ -184,7 +177,7 @@ internal constructor(
 
     override fun apply(base: Statement, description: Description?): Statement {
         @Suppress("NAME_SHADOWING")
-        @OptIn(InternalTestingApi::class, ExperimentalTesting::class)
+        @OptIn(ExperimentalTesting::class)
         return RuleChain
             .outerRule(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
@@ -223,12 +216,12 @@ internal constructor(
     }
 
     override fun waitForIdle() {
-        SynchronizedTreeCollector.waitForIdle()
+        idleAwaiter.waitForIdle()
     }
 
     @ExperimentalTesting
     override suspend fun awaitIdle() {
-        SynchronizedTreeCollector.awaitIdle()
+        idleAwaiter.awaitIdle()
     }
 
     override fun <T> runOnUiThread(action: () -> T): T {
@@ -312,57 +305,6 @@ internal constructor(
         useUnmergedTree: Boolean
     ): SemanticsNodeInteractionCollection {
         return SemanticsNodeInteractionCollection(testContext, useUnmergedTree, matcher)
-    }
-
-    private class AndroidTestOwner : TestOwner {
-        @SuppressLint("DocumentExceptions")
-        override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
-            @OptIn(ExperimentalLayoutNodeApi::class)
-            val owner = node.componentNode.owner as AndroidOwner
-
-            @Suppress("DEPRECATION")
-            runOnUiThread {
-                val textInputService = owner.getTextInputServiceOrDie()
-
-                val onEditCommand = textInputService.onEditCommand
-                    ?: throw IllegalStateException("No input session started. Missing a focus?")
-
-                onEditCommand(command)
-            }
-        }
-
-        @SuppressLint("DocumentExceptions")
-        override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-            @OptIn(ExperimentalLayoutNodeApi::class)
-            val owner = node.componentNode.owner as AndroidOwner
-
-            @Suppress("DEPRECATION")
-            runOnUiThread {
-                val textInputService = owner.getTextInputServiceOrDie()
-
-                val onImeActionPerformed = textInputService.onImeActionPerformed
-                    ?: throw IllegalStateException("No input session started. Missing a focus?")
-
-                onImeActionPerformed.invoke(actionSpecified)
-            }
-        }
-
-        @SuppressLint("DocumentExceptions")
-        override fun <T> runOnUiThread(action: () -> T): T {
-            return androidx.compose.ui.test.junit4.runOnUiThread(action)
-        }
-
-        override fun getOwners(): Set<Owner> {
-            return SynchronizedTreeCollector.getOwners()
-        }
-
-        private fun AndroidOwner.getTextInputServiceOrDie(): TextInputServiceForTests {
-            return this.textInputService as TextInputServiceForTests?
-                ?: throw IllegalStateException (
-                    "Text input service wrapper not set up! Did you use " +
-                        "ComposeTestRule?"
-                )
-        }
     }
 }
 
