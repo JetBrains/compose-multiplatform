@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.milliseconds
 import androidx.compose.ui.unit.minus
+import androidx.compose.ui.platform.WindowManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -3153,6 +3154,8 @@ private class MockOwner(
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
+        get() = TODO("Not yet implemented")
+    override val windowManager: WindowManager
         get() = TODO("Not yet implemented")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")

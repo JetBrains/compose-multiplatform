@@ -76,6 +76,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.milliseconds
+import androidx.compose.ui.platform.WindowManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runBlockingTest
@@ -404,6 +405,8 @@ internal class SuspendingGestureTestUtil(
         override val textInputService: TextInputService
             get() = TODO("Not yet implemented")
         override val focusManager: FocusManager
+            get() = TODO("Not yet implemented")
+        override val windowManager: WindowManager
             get() = TODO("Not yet implemented")
         override val fontLoader: Font.ResourceLoader
             get() = TODO("Not yet implemented")

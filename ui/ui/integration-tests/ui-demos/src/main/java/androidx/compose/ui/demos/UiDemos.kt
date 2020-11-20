@@ -43,6 +43,8 @@ import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.ui.demos.focus.FocusInDialog
+import androidx.compose.ui.demos.focus.FocusInPopup
 
 private val GestureDemos = DemoCategory(
     "Gestures",
@@ -93,6 +95,8 @@ private val FocusDemos = DemoCategory(
     "Focus",
     listOf(
         ComposableDemo("Focusable Siblings") { FocusableDemo() },
+        ComposableDemo("Focus Within Dialog") { FocusInDialog() },
+        ComposableDemo("Focus Within Popup") { FocusInPopup() },
         ComposableDemo("Reuse Focus Requester") { ReuseFocusRequester() }
     )
 )

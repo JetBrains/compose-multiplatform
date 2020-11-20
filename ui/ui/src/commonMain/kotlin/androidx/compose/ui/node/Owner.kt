@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.WindowManager
 
 /**
  * Owner implements the connection to the underlying view system. On Android, this connects
@@ -85,6 +86,11 @@ interface Owner {
      */
     @ExperimentalFocus
     val focusManager: FocusManager
+
+    /**
+     * Provide information about the window that hosts this [Owner].
+     */
+    val windowManager: WindowManager
 
     val fontLoader: Font.ResourceLoader
 
