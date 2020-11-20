@@ -17,7 +17,6 @@
 package androidx.compose.integration.macrobenchmark
 
 import androidx.benchmark.macro.CompilationMode
-import androidx.benchmark.macro.CpuUsageMetric
 import androidx.benchmark.macro.MacrobenchmarkConfig
 import androidx.benchmark.macro.MacrobenchmarkRule
 import androidx.benchmark.macro.StartupTimingMetric
@@ -45,7 +44,7 @@ class ProcessSpeedProfileValidation(
     fun start() {
         val config = MacrobenchmarkConfig(
             packageName = PACKAGE_NAME,
-            metrics = listOf(CpuUsageMetric(), StartupTimingMetric()),
+            metrics = listOf(StartupTimingMetric()),
             compilationMode = compilationMode,
             killProcessEachIteration = killProcess,
             iterations = 10
