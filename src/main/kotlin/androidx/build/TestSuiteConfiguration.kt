@@ -172,7 +172,7 @@ fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
     extensions.getByType<AndroidComponentsExtension<*, *>>().apply {
         androidTest(selector().all()) { androidTest ->
             when {
-                path.contains("media2:media2-session:version-compat-tests") -> {
+                path.contains("media2:media2-session:version-compat-tests:") -> {
                     createOrUpdateMediaTestConfigurationGenerationTask(
                         androidTest.name,
                         androidTest.artifacts,
@@ -181,7 +181,7 @@ fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
                         isMedia2 = true
                     )
                 }
-                path.contains("media:version-compat-tests") -> {
+                path.contains("media:version-compat-tests:") -> {
                     createOrUpdateMediaTestConfigurationGenerationTask(
                         androidTest.name,
                         androidTest.artifacts,
