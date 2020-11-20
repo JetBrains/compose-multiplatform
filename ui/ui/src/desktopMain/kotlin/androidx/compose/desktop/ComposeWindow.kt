@@ -15,7 +15,6 @@
  */
 package androidx.compose.desktop
 
-import androidx.compose.ui.unit.Density
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
@@ -31,10 +30,6 @@ class ComposeWindow : JFrame {
     internal val layer = ComposeLayer()
 
     val density get() = layer.density
-
-    fun onDensityChanged(action: ((Density) -> Unit)?) {
-        layer.onDensityChanged = action
-    }
 
     constructor(parent: AppFrame) : super() {
         this.parent = parent

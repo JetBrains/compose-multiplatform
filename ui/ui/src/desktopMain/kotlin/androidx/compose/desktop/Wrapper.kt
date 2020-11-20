@@ -36,21 +36,6 @@ fun ComposeWindow.setContent(content: @Composable () -> Unit): Composition {
     )
 }
 
-/**
- * Sets Compose content of the ComposePanel.
- *
- * @param content Composable content of the ComposePanel.
- *
- * @return Composition of the content.
- */
-fun ComposePanel.setContent(content: @Composable () -> Unit): Composition {
-    return this.layer.setContent(
-        parent = this,
-        invalidate = this::needRedrawLayer,
-        content = content
-    )
-}
-
 internal fun ComposeLayer.setContent(
     parent: Any? = null,
     invalidate: () -> Unit = this::needRedrawLayer,
