@@ -1867,8 +1867,10 @@ class CompositionTests {
             outerInvalidate = invalidate
             outerKeys.add(currentComposer.currentCompoundKeyHash)
             Container {
-                innerInvalidate = invalidate
-                innerKeys.add(currentComposer.currentCompoundKeyHash)
+                linear {
+                    innerInvalidate = invalidate
+                    innerKeys.add(currentComposer.currentCompoundKeyHash)
+                }
             }
             // asserts that the key is correctly rolled back after start and end of Observe
             assertEquals(outerKeys.last(), currentComposer.currentCompoundKeyHash)
