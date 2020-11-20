@@ -5,7 +5,7 @@ package androidx.compose.ui.geometry {
     ctor public CornerRadius();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-kKHJgLs(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Stable public static operator long div-kKHJgLs(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -238,7 +238,7 @@ package androidx.compose.ui.geometry {
     ctor public Size();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-NH-jbRc(long $this, optional float width, optional float height);
     method @androidx.compose.runtime.Stable public static operator long div-NH-jbRc(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
