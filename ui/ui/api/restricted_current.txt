@@ -316,21 +316,32 @@ package androidx.compose.ui.autofill {
 
 package androidx.compose.ui.draw {
 
+  public final class AlphaKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier alpha(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float alpha);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float opacity);
+  }
+
   public final class ClipKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier clip(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Shape shape);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier clipToBounds(androidx.compose.ui.Modifier);
   }
 
-  public final class DrawShadowKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawShadow-HfQes2E(androidx.compose.ui.Modifier, float elevation, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
-  }
-
-  public final class OpacityKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float opacity);
-  }
-
   public final class PainterModifierKt {
     method public static androidx.compose.ui.Modifier paint(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.painter.Painter painter, optional boolean sizeToIntrinsics, optional androidx.compose.ui.Alignment alignment, optional androidx.compose.ui.layout.ContentScale contentScale, optional float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter);
+  }
+
+  public final class RotateKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier rotate(androidx.compose.ui.Modifier, float degrees);
+  }
+
+  public final class ScaleKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier scale(androidx.compose.ui.Modifier, float scaleX, float scaleY);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier scale(androidx.compose.ui.Modifier, float scale);
+  }
+
+  public final class ShadowKt {
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawShadow-HfQes2E(androidx.compose.ui.Modifier, float elevation, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier shadow-HfQes2E(androidx.compose.ui.Modifier, float elevation, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
   }
 
 }

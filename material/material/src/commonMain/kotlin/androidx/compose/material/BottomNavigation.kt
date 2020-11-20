@@ -37,7 +37,7 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.LastBaseline
@@ -241,7 +241,7 @@ private fun BottomNavigationItemBaselineLayout(
             Box(
                 Modifier
                     .layoutId("label")
-                    .drawOpacity(iconPositionAnimationProgress)
+                    .alpha(iconPositionAnimationProgress)
                     .padding(horizontal = BottomNavigationItemHorizontalPadding)
             ) { label() }
         }

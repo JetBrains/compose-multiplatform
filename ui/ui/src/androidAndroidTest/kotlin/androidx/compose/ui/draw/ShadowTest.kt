@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class DrawShadowTest {
+class ShadowTest {
 
     @Suppress("DEPRECATION")
     @get:Rule
@@ -199,7 +199,7 @@ class DrawShadowTest {
             activity.setContent {
                 AtLeastSize(size = 12, modifier = Modifier.background(Color.White)) {
                     val shadow = if (model.value) {
-                        Modifier.drawShadow(8.dp, rectShape)
+                        Modifier.shadow(8.dp, rectShape)
                     } else {
                         Modifier
                     }
@@ -223,8 +223,8 @@ class DrawShadowTest {
     @Test
     fun testInspectorValue() {
         rule.runOnUiThreadIR {
-            val modifier = Modifier.drawShadow(4.0.dp) as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("drawShadow")
+            val modifier = Modifier.shadow(4.0.dp) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("shadow")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.asIterable()).containsExactly(
                 ValueElement("elevation", 4.0.dp),
@@ -310,7 +310,7 @@ class DrawShadowTest {
         AtLeastSize(size = 12, modifier = modifier.background(Color.White)) {
             AtLeastSize(
                 size = 10,
-                modifier = Modifier.drawShadow(elevation = elevation.value, shape = rectShape)
+                modifier = Modifier.shadow(elevation = elevation.value, shape = rectShape)
             ) {
             }
         }

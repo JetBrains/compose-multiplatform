@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,17 @@ package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
-fun OpacitySample() {
-    Box(Modifier.preferredSize(100.dp).drawOpacity(opacity = 0.5f).background(Color.Red))
+fun RotateSample() {
+    Box(
+        Modifier.rotate(45f)
+            .preferredSize(100.dp, 100.dp)
+    )
 }

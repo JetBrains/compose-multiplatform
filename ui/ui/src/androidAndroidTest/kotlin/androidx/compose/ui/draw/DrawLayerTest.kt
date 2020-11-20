@@ -120,6 +120,52 @@ class DrawLayerTest {
     }
 
     @Test
+    fun testScaleConvenienceXY() {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(
+                    10,
+                    Modifier.scale(scaleX = 2f, scaleY = 3f).onGloballyPositioned {
+                        coords = it
+                    }
+                ) {
+                }
+            }
+        }
+
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
+            val bounds = layoutCoordinates.boundsInRoot
+            assertEquals(Rect(5f, 0f, 25f, 30f), bounds)
+            assertEquals(Offset(5f, 0f), layoutCoordinates.positionInRoot)
+        }
+    }
+
+    @Test
+    fun testScaleConvenienceUniform() {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(
+                    10,
+                    Modifier.scale(scale = 2f).onGloballyPositioned {
+                        coords = it
+                    }
+                ) {
+                }
+            }
+        }
+
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
+            val bounds = layoutCoordinates.boundsInRoot
+            assertEquals(Rect(5f, 5f, 25f, 25f), bounds)
+            assertEquals(Offset(5f, 5f), layoutCoordinates.positionInRoot)
+        }
+    }
+
+    @Test
     fun testRotation() {
         var coords: LayoutCoordinates? = null
         rule.setContent {
@@ -139,6 +185,29 @@ class DrawLayerTest {
             val bounds = layoutCoordinates.boundsInRoot
             assertEquals(Rect(0f, 10f, 30f, 20f), bounds)
             assertEquals(Offset(30f, 10f), layoutCoordinates.positionInRoot)
+        }
+    }
+
+    @Test
+    fun testRotationConvenience() {
+        var coords: LayoutCoordinates? = null
+        rule.setContent {
+            Padding(10) {
+                FixedSize(
+                    10,
+                    Modifier.rotate(90f).onGloballyPositioned {
+                        coords = it
+                    }
+                ) {
+                }
+            }
+        }
+
+        rule.onRoot().apply {
+            val layoutCoordinates = coords!!
+            val bounds = layoutCoordinates.boundsInRoot
+            assertEquals(Rect(10.0f, 10f, 20f, 20f), bounds)
+            assertEquals(Offset(20f, 10f), layoutCoordinates.positionInRoot)
         }
     }
 

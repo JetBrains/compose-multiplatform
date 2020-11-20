@@ -35,23 +35,26 @@ import androidx.compose.ui.unit.dp
  * Use [zIndex] modifier if you want to draw the elements with larger [elevation] after all the
  * elements with a smaller one.
  *
+ * Usage of this API renders this composable into a separate graphics layer
+ * @see drawLayer
+ *
  * Example usage:
  *
- * @sample androidx.compose.ui.samples.DrawShadowSample
+ * @sample androidx.compose.ui.samples.ShadowSample
  *
  * @param elevation The elevation for the shadow in pixels
  * @param shape Defines a shape of the physical object
  * @param clip When active, the content drawing clips to the shape.
  */
 @Stable
-fun Modifier.drawShadow(
+fun Modifier.shadow(
     elevation: Dp,
     shape: Shape = RectangleShape,
     clip: Boolean = elevation > 0.dp
 ) = if (elevation > 0.dp || clip) {
     composed(
         inspectorInfo = debugInspectorInfo {
-            name = "drawShadow"
+            name = "shadow"
             properties["elevation"] = elevation
             properties["shape"] = shape
             properties["clip"] = clip
@@ -66,3 +69,32 @@ fun Modifier.drawShadow(
 } else {
     this
 }
+
+/**
+ * Creates a [DrawLayerModifier] that draws the shadow. The [elevation] defines the visual
+ * depth of the physical object. The physical object has a shape specified by [shape].
+ *
+ * Note that [elevation] is only affecting the shadow size and doesn't change the drawing order.
+ * Use [zIndex] modifier if you want to draw the elements with larger [elevation] after all the
+ * elements with a smaller one.
+ *
+ * Example usage:
+ *
+ * @sample androidx.compose.ui.samples.ShadowSample
+ *
+ * @param elevation The elevation for the shadow in pixels
+ * @param shape Defines a shape of the physical object
+ * @param clip When active, the content drawing clips to the shape.
+ */
+@Deprecated(
+    "Use shadow instead",
+    ReplaceWith(
+        "shadow(elevation, shape, clip)", "androidx.compose.ui.draw"
+    )
+)
+@Stable
+fun Modifier.drawShadow(
+    elevation: Dp,
+    shape: Shape = RectangleShape,
+    clip: Boolean = elevation > 0.dp
+) = Modifier.shadow(elevation, shape, clip)
