@@ -16,6 +16,7 @@
 
 package androidx.compose.ui
 
+import androidx.compose.ui.graphics.TransformOrigin
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

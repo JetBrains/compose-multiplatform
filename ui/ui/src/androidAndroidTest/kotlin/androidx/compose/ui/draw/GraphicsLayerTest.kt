@@ -24,9 +24,8 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.background
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -35,6 +34,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
@@ -60,7 +60,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class DrawLayerTest {
+class GraphicsLayerTest {
     @Suppress("DEPRECATION")
     @get:Rule
     val activityTestRule = androidx.test.rule.ActivityTestRule<TestActivity>(
@@ -76,7 +76,7 @@ class DrawLayerTest {
         rule.setContent {
             FixedSize(
                 30,
-                Modifier.padding(10).drawLayer().onGloballyPositioned {
+                Modifier.padding(10).graphicsLayer().onGloballyPositioned {
                     coords = it
                 }
             ) { /* no-op */ }
@@ -103,7 +103,7 @@ class DrawLayerTest {
             Padding(10) {
                 FixedSize(
                     10,
-                    Modifier.drawLayer(scaleX = 2f, scaleY = 3f).onGloballyPositioned {
+                    Modifier.graphicsLayer(scaleX = 2f, scaleY = 3f).onGloballyPositioned {
                         coords = it
                     }
                 ) {
@@ -172,7 +172,7 @@ class DrawLayerTest {
             Padding(10) {
                 FixedSize(
                     10,
-                    Modifier.drawLayer(scaleY = 3f, rotationZ = 90f).onGloballyPositioned {
+                    Modifier.graphicsLayer(scaleY = 3f, rotationZ = 90f).onGloballyPositioned {
                         coords = it
                     }
                 ) {
@@ -218,7 +218,7 @@ class DrawLayerTest {
             Padding(10) {
                 FixedSize(
                     10,
-                    Modifier.drawLayer(
+                    Modifier.graphicsLayer(
                         rotationZ = 90f,
                         transformOrigin = TransformOrigin(1.0f, 1.0f)
                     ).onGloballyPositioned {
@@ -243,7 +243,7 @@ class DrawLayerTest {
             Padding(10) {
                 FixedSize(
                     10,
-                    Modifier.drawLayer(
+                    Modifier.graphicsLayer(
                         translationX = 5.0f,
                         translationY = 8.0f
                     ).onGloballyPositioned {
@@ -266,10 +266,10 @@ class DrawLayerTest {
         var coords: LayoutCoordinates? = null
         rule.setContent {
             Padding(10) {
-                FixedSize(10, Modifier.drawLayer(clip = true)) {
+                FixedSize(10, Modifier.graphicsLayer(clip = true)) {
                     FixedSize(
                         10,
-                        Modifier.drawLayer(scaleX = 2f).onGloballyPositioned {
+                        Modifier.graphicsLayer(scaleX = 2f).onGloballyPositioned {
                             coords = it
                         }
                     ) {
@@ -298,7 +298,7 @@ class DrawLayerTest {
                     modifier = Modifier
                         .size(100.dp)
                         .background(Color.Gray)
-                        .drawLayer(rotationY = 25f, cameraDistance = 1.0f)
+                        .graphicsLayer(rotationY = 25f, cameraDistance = 1.0f)
                         .background(Color.Red)
                 ) {
                     Box(modifier = Modifier.size(100.dp))
@@ -330,7 +330,7 @@ class DrawLayerTest {
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .drawLayer(clip = true, shape = EmptyRectangle)
+                        .graphicsLayer(clip = true, shape = EmptyRectangle)
                         .background(Color.Red)
                 )
             }
@@ -346,7 +346,7 @@ class DrawLayerTest {
         var coords: LayoutCoordinates? = null
         rule.setContent {
             Padding(10) {
-                FixedSize(10, Modifier.drawLayer(clip = true)) {
+                FixedSize(10, Modifier.graphicsLayer(clip = true)) {
                     FixedSize(
                         10,
                         Modifier.padding(20).onGloballyPositioned {

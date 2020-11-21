@@ -21,14 +21,22 @@ import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.graphics.graphicsLayer
+
+// DrawLayerModifier.kt should be removed after we go through a deprecated/remove cycle
+// for compose.
+// This file is kept around to keep the old deprecated Modifier.drawLayer API. Once this API
+// is removed this file can be deleted in favor of GraphicsLayerModifier in the
+// androidx.compose.ui.graphics package
+
+@Deprecated(
+    "Use TransformOrigin in the androidx.compose.ui.graphics package instead",
+    ReplaceWith(
+        "androidx.compose.ui.graphics.TransformOrigin",
+        "androidx.compose.ui.graphics"
+    )
+)
+typealias TransformOrigin = androidx.compose.ui.graphics.TransformOrigin
 
 /**
  * A [Modifier.Element] that makes content draw into a draw layer. The draw layer can be
@@ -59,6 +67,16 @@ import androidx.compose.ui.unit.Constraints
  * @param shape see [GraphicsLayerScope.shape]
  * @param clip see [GraphicsLayerScope.clip]
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Use graphicsLayer instead",
+    ReplaceWith(
+        "graphicsLayer(scaleX, scaleY, alpha, translationX, translationY, " +
+            "shadowElevation, rotationX, rotationY, rotationZ, cameraDistance, transformOrigin, " +
+            "shape, clip)",
+        "androidx.compose.ui"
+    )
+)
 @Stable
 fun Modifier.drawLayer(
     scaleX: Float = 1f,
@@ -74,186 +92,18 @@ fun Modifier.drawLayer(
     transformOrigin: TransformOrigin = TransformOrigin.Center,
     shape: Shape = RectangleShape,
     clip: Boolean = false
-) = this.then(
-    SimpleDrawLayerModifier(
-        scaleX = scaleX,
-        scaleY = scaleY,
-        alpha = alpha,
-        translationX = translationX,
-        translationY = translationY,
-        shadowElevation = shadowElevation,
-        rotationX = rotationX,
-        rotationY = rotationY,
-        rotationZ = rotationZ,
-        cameraDistance = cameraDistance,
-        transformOrigin = transformOrigin,
-        shape = shape,
-        clip = clip,
-        inspectorInfo = debugInspectorInfo {
-            name = "drawLayer"
-            properties["scaleX"] = scaleX
-            properties["scaleY"] = scaleY
-            properties["alpha"] = alpha
-            properties["translationX"] = translationX
-            properties["translationY"] = translationY
-            properties["shadowElevation"] = shadowElevation
-            properties["rotationX"] = rotationX
-            properties["rotationY"] = rotationY
-            properties["rotationZ"] = rotationZ
-            properties["cameraDistance"] = cameraDistance
-            properties["transformOrigin"] = transformOrigin
-            properties["shape"] = shape
-            properties["clip"] = clip
-        }
-    )
+) = graphicsLayer(
+    scaleX,
+    scaleY,
+    alpha,
+    translationX,
+    translationY,
+    shadowElevation,
+    rotationX,
+    rotationY,
+    rotationZ,
+    cameraDistance,
+    transformOrigin,
+    shape,
+    clip
 )
-
-/**
- * A [Modifier.Element] that makes content draw into a draw layer. The draw layer can be
- * invalidated separately from parents. A [drawLayer] should be used when the content
- * updates independently from anything above it to minimize the invalidated content.
- *
- * [drawLayer] can be used to apply effects to content, such as scaling, rotation, opacity,
- * shadow, and clipping.
- * Prefer this version when you have layer properties backed by a
- * [androidx.compose.runtime.State] or an animated value as reading a state inside [block] will
- * only cause the layer properties update without triggering recomposition and relayout.
- *
- * @sample androidx.compose.ui.samples.AnimateFadeIn
- *
- * @param block block on [GraphicsLayerScope] where you define the layer properties.
- */
-@Stable
-fun Modifier.drawLayer(block: GraphicsLayerScope.() -> Unit): Modifier =
-    this.then(
-        BlockDrawLayerModifier(
-            layerBlock = block,
-            inspectorInfo = debugInspectorInfo {
-                name = "drawLayer"
-                properties["block"] = block
-            }
-        )
-    )
-
-private class BlockDrawLayerModifier(
-    private val layerBlock: GraphicsLayerScope.() -> Unit,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
-
-    override fun MeasureScope.measure(
-        measurable: Measurable,
-        constraints: Constraints
-    ): MeasureResult {
-        val placeable = measurable.measure(constraints)
-        return layout(placeable.width, placeable.height) {
-            placeable.placeWithLayer(0, 0, layerBlock = layerBlock)
-        }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is BlockDrawLayerModifier) return false
-        return layerBlock == other.layerBlock
-    }
-
-    override fun hashCode(): Int {
-        return layerBlock.hashCode()
-    }
-
-    override fun toString(): String =
-        "BlockDrawLayerModifier(" +
-            "block=$layerBlock)"
-}
-
-private class SimpleDrawLayerModifier(
-    private val scaleX: Float,
-    private val scaleY: Float,
-    private val alpha: Float,
-    private val translationX: Float,
-    private val translationY: Float,
-    private val shadowElevation: Float,
-    private val rotationX: Float,
-    private val rotationY: Float,
-    private val rotationZ: Float,
-    private val cameraDistance: Float,
-    private val transformOrigin: TransformOrigin,
-    private val shape: Shape,
-    private val clip: Boolean,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
-
-    private val layerBlock: GraphicsLayerScope.() -> Unit = {
-        scaleX = this@SimpleDrawLayerModifier.scaleX
-        scaleY = this@SimpleDrawLayerModifier.scaleY
-        alpha = this@SimpleDrawLayerModifier.alpha
-        translationX = this@SimpleDrawLayerModifier.translationX
-        translationY = this@SimpleDrawLayerModifier.translationY
-        shadowElevation = this@SimpleDrawLayerModifier.shadowElevation
-        rotationX = this@SimpleDrawLayerModifier.rotationX
-        rotationY = this@SimpleDrawLayerModifier.rotationY
-        rotationZ = this@SimpleDrawLayerModifier.rotationZ
-        cameraDistance = this@SimpleDrawLayerModifier.cameraDistance
-        transformOrigin = this@SimpleDrawLayerModifier.transformOrigin
-        shape = this@SimpleDrawLayerModifier.shape
-        clip = this@SimpleDrawLayerModifier.clip
-    }
-
-    override fun MeasureScope.measure(
-        measurable: Measurable,
-        constraints: Constraints
-    ): MeasureResult {
-        val placeable = measurable.measure(constraints)
-        return layout(placeable.width, placeable.height) {
-            placeable.placeWithLayer(0, 0, layerBlock = layerBlock)
-        }
-    }
-
-    override fun hashCode(): Int {
-        var result = scaleX.hashCode()
-        result = 31 * result + scaleY.hashCode()
-        result = 31 * result + alpha.hashCode()
-        result = 31 * result + translationX.hashCode()
-        result = 31 * result + translationY.hashCode()
-        result = 31 * result + shadowElevation.hashCode()
-        result = 31 * result + rotationX.hashCode()
-        result = 31 * result + rotationY.hashCode()
-        result = 31 * result + rotationZ.hashCode()
-        result = 31 * result + cameraDistance.hashCode()
-        result = 31 * result + transformOrigin.hashCode()
-        result = 31 * result + shape.hashCode()
-        result = 31 * result + clip.hashCode()
-        return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-        val otherModifier = other as? SimpleDrawLayerModifier ?: return false
-        return scaleX == otherModifier.scaleX &&
-            scaleY == otherModifier.scaleY &&
-            alpha == otherModifier.alpha &&
-            translationX == otherModifier.translationX &&
-            translationY == otherModifier.translationY &&
-            shadowElevation == otherModifier.shadowElevation &&
-            rotationX == otherModifier.rotationX &&
-            rotationY == otherModifier.rotationY &&
-            rotationZ == otherModifier.rotationZ &&
-            cameraDistance == otherModifier.cameraDistance &&
-            transformOrigin == otherModifier.transformOrigin &&
-            shape == otherModifier.shape &&
-            clip == otherModifier.clip
-    }
-
-    override fun toString(): String =
-        "SimpleDrawLayerModifier(" +
-            "scaleX=$scaleX, " +
-            "scaleY=$scaleY, " +
-            "alpha = $alpha, " +
-            "translationX=$translationX, " +
-            "translationY=$translationY, " +
-            "shadowElevation=$shadowElevation, " +
-            "rotationX=$rotationX, " +
-            "rotationY=$rotationY, " +
-            "rotationZ=$rotationZ, " +
-            "cameraDistance=$cameraDistance, " +
-            "transformOrigin=$transformOrigin, " +
-            "shape=$shape, " +
-            "clip=$clip)"
-}

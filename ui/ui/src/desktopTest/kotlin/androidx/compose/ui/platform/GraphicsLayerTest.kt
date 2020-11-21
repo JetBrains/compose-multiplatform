@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.TransformOrigin
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
@@ -34,7 +34,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class DrawLayerTest {
+class GraphicsLayerTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/core")
 
@@ -44,7 +44,7 @@ class DrawLayerTest {
         window.setContent {
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         scaleX = 2f,
                         scaleY = 0.5f,
                         transformOrigin = TransformOrigin(0f, 0f)
@@ -53,7 +53,7 @@ class DrawLayerTest {
             )
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 10f,
                         translationY = 20f,
                         scaleX = 2f,
@@ -71,7 +71,7 @@ class DrawLayerTest {
         window.setContent {
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 10f,
                         rotationZ = 90f,
                         scaleX = 2f,
@@ -82,7 +82,7 @@ class DrawLayerTest {
             )
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 10f,
                         translationY = 20f,
                         rotationZ = 45f
@@ -100,12 +100,12 @@ class DrawLayerTest {
         window.setContent {
             Box(
                 Modifier
-                    .drawLayer(rotationX = 45f)
+                    .graphicsLayer(rotationX = 45f)
                     .size(10f.dp, 10f.dp).background(Color.Blue)
             )
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 20f,
                         transformOrigin = TransformOrigin(0f, 0f),
                         rotationX = 45f
@@ -122,12 +122,12 @@ class DrawLayerTest {
         window.setContent {
             Box(
                 Modifier
-                    .drawLayer(rotationY = 45f)
+                    .graphicsLayer(rotationY = 45f)
                     .size(10f.dp, 10f.dp).background(Color.Blue)
             )
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 20f,
                         transformOrigin = TransformOrigin(0f, 0f),
                         rotationY = 45f
@@ -144,12 +144,12 @@ class DrawLayerTest {
         window.setContent {
             Box(
                 Modifier
-                    .drawLayer(rotationZ = 45f, translationX = 10f)
+                    .graphicsLayer(rotationZ = 45f, translationX = 10f)
                     .size(20f.dp, 20f.dp).background(Color.Green)
             ) {
                 Box(
                     Modifier
-                        .drawLayer(rotationZ = 45f)
+                        .graphicsLayer(rotationZ = 45f)
                         .size(20f.dp, 20f.dp).background(Color.Blue)
                 )
             }
@@ -163,7 +163,7 @@ class DrawLayerTest {
         window.setContent {
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 10f,
                         translationY = 10f,
                         transformOrigin = TransformOrigin(0f, 0f),
@@ -173,7 +173,7 @@ class DrawLayerTest {
             ) {
                 Box(
                     Modifier
-                        .drawLayer(
+                        .graphicsLayer(
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
@@ -184,7 +184,7 @@ class DrawLayerTest {
 
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 10f,
                         translationY = 30f,
                         transformOrigin = TransformOrigin(0f, 0f),
@@ -194,7 +194,7 @@ class DrawLayerTest {
             ) {
                 Box(
                     Modifier
-                        .drawLayer(
+                        .graphicsLayer(
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
@@ -205,7 +205,7 @@ class DrawLayerTest {
 
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 30f,
                         translationY = 10f,
                         transformOrigin = TransformOrigin(0f, 0f),
@@ -216,7 +216,7 @@ class DrawLayerTest {
             ) {
                 Box(
                     Modifier
-                        .drawLayer(
+                        .graphicsLayer(
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
@@ -235,7 +235,7 @@ class DrawLayerTest {
             Box(
                 Modifier
                     .padding(start = 5.dp)
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = -5f,
                         translationY = 5f,
                         transformOrigin = TransformOrigin(0f, 0f),
@@ -256,13 +256,13 @@ class DrawLayerTest {
             Box(
                 Modifier
                     .padding(start = 15.dp)
-                    .drawLayer(alpha = 0.5f)
+                    .graphicsLayer(alpha = 0.5f)
                     .size(15f.dp, 15f.dp)
                     .background(Color.Red)
             ) {
                 Box(
                     Modifier
-                        .drawLayer(alpha = 0.5f)
+                        .graphicsLayer(alpha = 0.5f)
                         .size(10f.dp, 10f.dp)
                         .background(Color.Blue)
                 )
@@ -270,7 +270,7 @@ class DrawLayerTest {
 
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         alpha = 0f
                     )
                     .size(10f.dp, 10f.dp)
@@ -286,12 +286,12 @@ class DrawLayerTest {
         window.setContent {
             Box(
                 Modifier
-                    .drawLayer(shadowElevation = 5f)
+                    .graphicsLayer(shadowElevation = 5f)
                     .size(20f.dp, 20f.dp)
             )
             Box(
                 Modifier
-                    .drawLayer(translationX = 20f, shadowElevation = 5f)
+                    .graphicsLayer(translationX = 20f, shadowElevation = 5f)
                     .size(20f.dp, 20f.dp)
             ) {
                 Box(
@@ -302,7 +302,7 @@ class DrawLayerTest {
             }
             Box(
                 Modifier
-                    .drawLayer(translationY = 20f, alpha = 0.8f, shadowElevation = 5f)
+                    .graphicsLayer(translationY = 20f, alpha = 0.8f, shadowElevation = 5f)
                     .size(20f.dp, 20f.dp)
             ) {
                 Box(
@@ -313,7 +313,7 @@ class DrawLayerTest {
             }
             Box(
                 Modifier
-                    .drawLayer(
+                    .graphicsLayer(
                         translationX = 20f,
                         translationY = 20f,
                         shadowElevation = 5f,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.graphics
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -33,6 +33,7 @@ inline fun TransformOrigin(pivotFractionX: Float, pivotFractionY: Float): Transf
 /**
  * A two-dimensional position represented as a fraction of the Layer's width and height
  */
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @OptIn(ExperimentalUnsignedTypes::class)
 @Immutable
 inline class TransformOrigin(@PublishedApi internal val packedValue: Long) {
