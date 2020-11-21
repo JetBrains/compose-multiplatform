@@ -1177,7 +1177,7 @@ class ComposableLambda<
 private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
     this == null || !this.valid || this == other || this.anchor == other.anchor
 
-@ComposeCompilerApi
+@OptIn(ComposeCompilerApi::class)
 private typealias CLambda = ComposableLambda<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
     Any, Any, Any, Any, Any, Any, Any, Any, Any>
 

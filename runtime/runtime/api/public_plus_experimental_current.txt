@@ -84,7 +84,7 @@ package androidx.compose.runtime {
   }
 
   public final class Composer<N> {
-    ctor public Composer(androidx.compose.runtime.SlotTable slotTable, @androidx.compose.runtime.ComposeCompilerApi androidx.compose.runtime.Applier<N> applier, androidx.compose.runtime.CompositionReference parentReference);
+    ctor public Composer(androidx.compose.runtime.SlotTable slotTable, @kotlin.PublishedApi androidx.compose.runtime.Applier<N> applier, androidx.compose.runtime.CompositionReference parentReference);
     method @androidx.compose.runtime.InternalComposeApi public void applyChanges();
     method @androidx.compose.runtime.ComposeCompilerApi public inline <T> T! cache(boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(Object? value);
@@ -98,22 +98,16 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(int value);
     method @androidx.compose.runtime.InternalComposeApi public void collectKeySourceInformation();
     method @androidx.compose.runtime.InternalComposeApi public void composeInitial(kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method @androidx.compose.runtime.ComposeCompilerApi public <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
-    method @androidx.compose.runtime.ComposeCompilerApi public void emitNode(Object? node);
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void endMovableGroup();
-    method @androidx.compose.runtime.ComposeCompilerApi public void endNode();
     method @androidx.compose.runtime.ComposeCompilerApi public void endReplaceableGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public androidx.compose.runtime.ScopeUpdateScope? endRestartGroup();
-    method public androidx.compose.runtime.Applier<N> getApplier();
     method @org.jetbrains.annotations.TestOnly public kotlin.coroutines.CoroutineContext getApplyCoroutineContext();
     method public int getCurrentCompoundKeyHash();
     method public boolean getDefaultsInvalid();
-    method public boolean getInserting();
     method public boolean getSkipping();
     method public androidx.compose.runtime.SlotTable getSlotTable();
     method @androidx.compose.runtime.ComposeCompilerApi public Object joinKey(Object? left, Object? right);
-    method @androidx.compose.runtime.ComposeCompilerApi public Object? nextSlot();
     method @androidx.compose.runtime.InternalComposeApi public boolean recompose();
     method @androidx.compose.runtime.InternalComposeApi public void recordModificationsOf(java.util.Set<?> values);
     method @androidx.compose.runtime.InternalComposeApi public void recordReadOf(Object value);
@@ -123,17 +117,13 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void startDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void startMovableGroup(int key, Object? dataKey);
     method @androidx.compose.runtime.ComposeCompilerApi public void startMovableGroup(int key, Object? dataKey, String? sourceInformation);
-    method @androidx.compose.runtime.ComposeCompilerApi public void startNode();
     method @androidx.compose.runtime.ComposeCompilerApi public void startReplaceableGroup(int key);
     method @androidx.compose.runtime.ComposeCompilerApi public void startReplaceableGroup(int key, String? sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key, String? sourceInformation);
-    method @androidx.compose.runtime.ComposeCompilerApi public N! useNode();
-    property public final androidx.compose.runtime.Applier<N> applier;
     property @org.jetbrains.annotations.TestOnly public final kotlin.coroutines.CoroutineContext applyCoroutineContext;
     property public final int currentCompoundKeyHash;
     property public final boolean defaultsInvalid;
-    property public final boolean inserting;
     property public final boolean skipping;
     property public final androidx.compose.runtime.SlotTable slotTable;
   }
