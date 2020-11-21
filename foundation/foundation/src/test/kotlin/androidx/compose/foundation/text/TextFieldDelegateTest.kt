@@ -16,40 +16,36 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.CommitTextEditOp
-import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.EditProcessor
-import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMap
-import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.buildTextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
@@ -103,35 +99,12 @@ class TextFieldDelegateTest {
     }
 
     @Test
-    fun test_on_edit_command() {
-        val ops = listOf(CommitTextEditOp("Hello, World", 1))
-        val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-
-        whenever(processor.onEditCommands(ops)).thenReturn(editorState)
-
-        TextFieldDelegate.onEditCommand(ops, processor, onValueChange)
-
-        verify(onValueChange, times(1)).invoke(
-            eq(
-                TextFieldValue(
-                    text = editorState.text,
-                    selection = editorState.selection
-                )
-            )
-        )
-    }
-
-    @Test
     fun test_setCursorOffset() {
         val position = Offset(100f, 200f)
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-
+        whenever(processor.mBufferState).thenReturn(editorState)
         whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
-
-        val captor = argumentCaptor<List<EditOperation>>()
-
-        whenever(processor.onEditCommands(captor.capture())).thenReturn(editorState)
 
         TextFieldDelegate.setCursorOffset(
             position,
@@ -141,16 +114,8 @@ class TextFieldDelegateTest {
             onValueChange
         )
 
-        assertThat(captor.allValues.size).isEqualTo(1)
-        assertThat(captor.firstValue.size).isEqualTo(1)
-        assertThat(captor.firstValue[0] is SetSelectionEditOp).isTrue()
         verify(onValueChange, times(1)).invoke(
-            eq(
-                TextFieldValue(
-                    text = editorState.text,
-                    selection = editorState.selection
-                )
-            )
+            eq(TextFieldValue(text = editorState.text, selection = TextRange(offset)))
         )
     }
 
@@ -189,10 +154,14 @@ class TextFieldDelegateTest {
 
     @Test
     fun on_blur() {
-        val captor = argumentCaptor<List<EditOperation>>()
         val inputSessionToken = 10 // We are not using this value in this test.
 
-        whenever(processor.onEditCommands(captor.capture())).thenReturn(TextFieldValue())
+        val editorState = buildTextFieldValue(
+            text = "Hello, World",
+            selection = TextRange(1),
+            composition = TextRange(3, 5)
+        )
+        whenever(processor.mBufferState).thenReturn(editorState)
 
         TextFieldDelegate.onBlur(
             textInputService,
@@ -202,19 +171,23 @@ class TextFieldDelegateTest {
             onValueChange
         )
 
-        assertThat(captor.allValues.size).isEqualTo(1)
-        assertThat(captor.firstValue.size).isEqualTo(1)
-        assertThat(captor.firstValue[0] is FinishComposingTextEditOp).isTrue()
         verify(textInputService).stopInput(eq(inputSessionToken))
         verify(textInputService, never()).hideSoftwareKeyboard(any())
+        verify(onValueChange, times(1)).invoke(
+            eq(editorState.commitComposition())
+        )
     }
 
     @Test
     fun on_blur_with_hiding() {
-        val captor = argumentCaptor<List<EditOperation>>()
         val inputSessionToken = 10 // We are not using this value in this test.
 
-        whenever(processor.onEditCommands(captor.capture())).thenReturn(TextFieldValue())
+        val editorState = buildTextFieldValue(
+            text = "Hello, World",
+            selection = TextRange(1),
+            composition = TextRange(3, 5)
+        )
+        whenever(processor.mBufferState).thenReturn(editorState)
 
         TextFieldDelegate.onBlur(
             textInputService,
@@ -224,11 +197,11 @@ class TextFieldDelegateTest {
             onValueChange
         )
 
-        assertThat(captor.allValues.size).isEqualTo(1)
-        assertThat(captor.firstValue.size).isEqualTo(1)
-        assertThat(captor.firstValue[0] is FinishComposingTextEditOp).isTrue()
         verify(textInputService).stopInput(eq(inputSessionToken))
         verify(textInputService).hideSoftwareKeyboard(eq(inputSessionToken))
+        verify(onValueChange, times(1)).invoke(
+            eq(editorState.commitComposition())
+        )
     }
 
     @Test
@@ -324,12 +297,8 @@ class TextFieldDelegateTest {
         val position = Offset(100f, 200f)
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-
+        whenever(processor.mBufferState).thenReturn(editorState)
         whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
-
-        val captor = argumentCaptor<List<EditOperation>>()
-
-        whenever(processor.onEditCommands(captor.capture())).thenReturn(editorState)
 
         TextFieldDelegate.setCursorOffset(
             position,
@@ -339,20 +308,8 @@ class TextFieldDelegateTest {
             onValueChange
         )
 
-        val cursorOffsetInTransformedText = offset / 2
-        assertThat(captor.allValues.size).isEqualTo(1)
-        assertThat(captor.firstValue.size).isEqualTo(1)
-        assertThat(captor.firstValue[0] is SetSelectionEditOp).isTrue()
-        val setSelectionEditOp = captor.firstValue[0] as SetSelectionEditOp
-        assertThat(setSelectionEditOp.start).isEqualTo(cursorOffsetInTransformedText)
-        assertThat(setSelectionEditOp.end).isEqualTo(cursorOffsetInTransformedText)
         verify(onValueChange, times(1)).invoke(
-            eq(
-                TextFieldValue(
-                    text = editorState.text,
-                    selection = editorState.selection
-                )
-            )
+            eq(TextFieldValue(text = editorState.text, selection = TextRange(offset / 2)))
         )
     }
 

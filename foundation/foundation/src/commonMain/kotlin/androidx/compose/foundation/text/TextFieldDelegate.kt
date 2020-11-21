@@ -35,13 +35,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.EditProcessor
-import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.OffsetMap
-import androidx.compose.ui.text.input.SetSelectionEditOp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
@@ -219,7 +217,7 @@ class TextFieldDelegate {
          * @param onValueChange The callback called when the new editor state arrives.
          */
         @JvmStatic
-        internal fun onEditCommand(
+        private fun onEditCommand(
             ops: List<EditOperation>,
             editProcessor: EditProcessor,
             onValueChange: (TextFieldValue) -> Unit
@@ -247,11 +245,7 @@ class TextFieldDelegate {
             val offset = offsetMap.transformedToOriginal(
                 textLayoutResult.getOffsetForPosition(position)
             )
-            onEditCommand(
-                listOf(SetSelectionEditOp(offset, offset)),
-                editProcessor,
-                onValueChange
-            )
+            onValueChange(editProcessor.mBufferState.copy(selection = TextRange(offset)))
         }
 
         /**
@@ -301,7 +295,7 @@ class TextFieldDelegate {
             hasNextClient: Boolean,
             onValueChange: (TextFieldValue) -> Unit
         ) {
-            onEditCommand(listOf(FinishComposingTextEditOp()), editProcessor, onValueChange)
+            onValueChange(editProcessor.mBufferState.commitComposition())
             textInputService?.stopInput(token)
             if (!hasNextClient) {
                 textInputService?.hideSoftwareKeyboard(token)
