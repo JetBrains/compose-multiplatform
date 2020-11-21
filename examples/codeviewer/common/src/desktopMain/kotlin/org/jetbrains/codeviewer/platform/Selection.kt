@@ -12,6 +12,6 @@ actual fun SelectionContainer(children: @Composable () -> Unit) {
     DesktopSelectionContainer(
         selection = selection.value,
         onSelectionChange = { selection.value = it },
-        children = children
+        content = children
     )
 }
