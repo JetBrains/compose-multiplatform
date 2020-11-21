@@ -273,19 +273,6 @@ package androidx.compose.runtime {
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NoLiveLiterals {
   }
 
-  public final class ObserverMap<K, V> {
-    ctor public ObserverMap();
-    method public void add(K key, V value);
-    method public void clear();
-    method public void clearValues(kotlin.jvm.functions.Function1<? super V,java.lang.Boolean> predicate);
-    method public boolean contains(K key, V value);
-    method public operator java.util.List<V> get(Iterable<? extends K> keys);
-    method public java.util.List<V> getValueOf(K key);
-    method public void remove(K key);
-    method public void remove(K key, V value);
-    method public void removeValue(V value);
-  }
-
   public final class ProduceStateKt {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? subject, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);

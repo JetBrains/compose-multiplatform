@@ -45,10 +45,4 @@ internal actual inline fun <R> synchronized(lock: Any, block: () -> R): R {
     }
 }
 
-internal actual typealias Reference<T> = java.lang.ref.Reference<T>
-
-internal actual typealias ReferenceQueue<T> = java.lang.ref.ReferenceQueue<T>
-
-internal actual typealias WeakReference<T> = java.lang.ref.WeakReference<T>
-
 internal actual typealias TestOnly = org.jetbrains.annotations.TestOnly
