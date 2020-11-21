@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package androidx.compose.ui
+package androidx.compose.ui.graphics.drawscope
 
 /**
  * Receiver scope for drawing content into a layout, where the content can
  * be drawn between other canvas operations. If [drawContent] is not called,
  * the contents of the layout will not be drawn.
  */
-@Deprecated(
-    "Use ContentDrawScope in the graphics package instead",
-    ReplaceWith(
-        "ContentDrawScope",
-        "androidx.compose.ui.graphics.drawscope.ContentDrawScope"
-    )
-)
-typealias ContentDrawScope = androidx.compose.ui.graphics.drawscope.ContentDrawScope
+interface ContentDrawScope : DrawScope {
+    /**
+     * Causes child drawing operations to run during the `onPaint` lambda.
+     */
+    fun drawContent()
+}

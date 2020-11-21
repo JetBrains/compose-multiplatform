@@ -885,6 +885,10 @@ package androidx.compose.ui.graphics.drawscope {
   public final class CanvasDrawScopeKt {
   }
 
+  public interface ContentDrawScope extends androidx.compose.ui.graphics.drawscope.DrawScope {
+    method public void drawContent();
+  }
+
   public interface DrawContext {
     method public androidx.compose.ui.graphics.Canvas getCanvas();
     method public long getSize-NH-jbRc();

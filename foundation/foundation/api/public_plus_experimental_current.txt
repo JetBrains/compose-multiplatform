@@ -75,7 +75,7 @@ package androidx.compose.foundation {
   }
 
   public interface IndicationInstance {
-    method public void drawIndication(androidx.compose.ui.ContentDrawScope, androidx.compose.foundation.InteractionState interactionState);
+    method public void drawIndication(androidx.compose.ui.graphics.drawscope.ContentDrawScope, androidx.compose.foundation.InteractionState interactionState);
     method public default void onDispose();
   }
 

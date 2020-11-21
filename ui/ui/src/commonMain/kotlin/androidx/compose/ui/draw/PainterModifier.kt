@@ -17,7 +17,7 @@
 package androidx.compose.ui.draw
 
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
