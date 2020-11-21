@@ -27,7 +27,7 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class Constraints {
     ctor public Constraints();
-    method public static long constructor-impl(internal long value);
+    method public static long constructor-impl(long value);
     method public static long copy-msEJaDk(long $this, optional int minWidth, optional int maxWidth, optional int minHeight, optional int maxHeight);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -294,7 +294,7 @@ package androidx.compose.ui.unit {
     ctor public IntOffset();
     method @androidx.compose.runtime.Stable public static operator int component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator int component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-nOcc-ac(long $this, optional int x, optional int y);
     method @androidx.compose.runtime.Stable public static operator long div-nOcc-ac(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -330,7 +330,7 @@ package androidx.compose.ui.unit {
     ctor public IntSize();
     method @androidx.compose.runtime.Stable public static inline operator int component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator int component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method @androidx.compose.runtime.Stable public static operator long div-YbymL2g(long $this, int other);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -361,7 +361,7 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class Position {
     ctor public Position();
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-ioHfwGI(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);

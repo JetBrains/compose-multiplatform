@@ -368,7 +368,7 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class SlotReader {
-    ctor public SlotReader(internal androidx.compose.runtime.SlotTable table);
+    ctor public SlotReader(androidx.compose.runtime.SlotTable table);
     method public androidx.compose.runtime.Anchor anchor(optional int index);
     method public void beginEmpty();
     method public void close();

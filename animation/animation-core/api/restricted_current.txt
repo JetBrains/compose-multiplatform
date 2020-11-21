@@ -359,7 +359,7 @@ package androidx.compose.animation.core {
   }
 
   public final class ManualFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
-    ctor @Deprecated public ManualFrameClock(long initialTime, internal boolean dispatchOnSubscribe);
+    ctor @Deprecated public ManualFrameClock(long initialTime, boolean dispatchOnSubscribe);
     ctor public ManualFrameClock(long initialTime);
     method public void advanceClock(long nanos);
     method public long getCurrentTime();
@@ -490,7 +490,7 @@ package androidx.compose.animation.core {
   }
 
   public final class TransitionAnimation<T> implements androidx.compose.animation.core.TransitionState {
-    ctor public TransitionAnimation(internal androidx.compose.animation.core.TransitionDefinition<T> def, androidx.compose.animation.core.AnimationClockObservable clock, T? initState, String? label);
+    ctor public TransitionAnimation(androidx.compose.animation.core.TransitionDefinition<T> def, androidx.compose.animation.core.AnimationClockObservable clock, T? initState, String? label);
     method public operator <T, V extends androidx.compose.animation.core.AnimationVector> T! get(androidx.compose.animation.core.PropKey<T,V> propKey);
     method public String? getLabel();
     method public kotlin.jvm.functions.Function1<T,kotlin.Unit>? getOnStateChangeFinished();

@@ -308,7 +308,7 @@ package androidx.compose.runtime {
   }
 
   @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.CompositionLifecycleObserver {
-    ctor public PreCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
+    ctor public PreCommitScopeImpl(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
 
@@ -394,7 +394,7 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class SlotReader {
-    ctor public SlotReader(internal androidx.compose.runtime.SlotTable table);
+    ctor public SlotReader(androidx.compose.runtime.SlotTable table);
     method public androidx.compose.runtime.Anchor anchor(optional int index);
     method public void beginEmpty();
     method public void close();
@@ -590,7 +590,7 @@ package androidx.compose.runtime {
 package androidx.compose.runtime.collection {
 
   public final class MutableVector<T> implements java.util.RandomAccess {
-    ctor @kotlin.PublishedApi internal MutableVector(@kotlin.PublishedApi internal T![] content, int size);
+    ctor @kotlin.PublishedApi internal MutableVector(@kotlin.PublishedApi T![] content, int size);
     method public boolean add(T? element);
     method public void add(int index, T? element);
     method public boolean addAll(int index, java.util.List<? extends T> elements);
