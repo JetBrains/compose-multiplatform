@@ -1366,7 +1366,7 @@ class Composer<N>(
             if (collectKeySources)
                 recordSourceKeyInfo(key)
             when {
-                isNode -> writer.startNode(null)
+                isNode -> writer.startNode(EMPTY)
                 data != null -> writer.startData(key, objectKey ?: EMPTY, data)
                 else -> writer.startGroup(key, objectKey ?: EMPTY)
             }
