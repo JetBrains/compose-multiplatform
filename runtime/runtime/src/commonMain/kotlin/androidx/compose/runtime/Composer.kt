@@ -2568,7 +2568,10 @@ class Composer<N>(
 }
 
 @Suppress("UNCHECKED_CAST")
-/*inline */ class Updater<T>(val composer: Composer<*>, val node: T) {
+/*inline */ class Updater<T> @PublishedApi internal constructor(
+    @PublishedApi internal val composer: Composer<*>,
+    @PublishedApi internal val node: T
+) {
     @OptIn(ComposeCompilerApi::class)
     inline fun set(
         value: Int,
@@ -2632,7 +2635,10 @@ class Composer<N>(
     }
 }
 
-class SkippableUpdater<T>(val composer: Composer<*>, val node: T) {
+class SkippableUpdater<T> @PublishedApi internal constructor(
+    @PublishedApi internal val composer: Composer<*>,
+    @PublishedApi internal val node: T
+) {
     @OptIn(ComposeCompilerApi::class)
     inline fun update(block: Updater<T>.() -> Unit) {
         composer.startReplaceableGroup(0x1e65194f)
