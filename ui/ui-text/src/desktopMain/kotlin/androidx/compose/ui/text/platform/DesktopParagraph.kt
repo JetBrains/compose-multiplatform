@@ -413,7 +413,13 @@ private data class ComputedStyle(
         fontSynthesis = spanStyle.fontSynthesis,
         fontFamily = spanStyle.fontFamily,
         fontFeatureSettings = spanStyle.fontFeatureSettings,
-        letterSpacing = with(density) { spanStyle.letterSpacing.toPx() },
+        letterSpacing = if (spanStyle.letterSpacing.isUnspecified) {
+            null
+        } else {
+            with(density) {
+                spanStyle.letterSpacing.toPx()
+            }
+        },
         baselineShift = spanStyle.baselineShift,
         textGeometricTransform = spanStyle.textGeometricTransform,
         localeList = spanStyle.localeList,
@@ -714,11 +720,19 @@ internal class ParagraphBuilder(
 }
 
 private fun SpanStyle.withDefaultFontSize(): SpanStyle {
-    return when {
-        this.fontSize.isUnspecified -> this.copy(fontSize = DefaultFontSize)
-        this.fontSize.isEm -> this.copy(fontSize = DefaultFontSize * this.fontSize.value)
-        else -> this
+    val fontSize = when {
+        this.fontSize.isUnspecified -> DefaultFontSize
+        this.fontSize.isEm -> DefaultFontSize * this.fontSize.value
+        else -> this.fontSize
     }
+    val letterSpacing = when {
+        this.letterSpacing.isEm -> fontSize * this.letterSpacing.value
+        else -> this.letterSpacing
+    }
+    return this.copy(
+        fontSize = fontSize,
+        letterSpacing = letterSpacing
+    )
 }
 
 fun FontStyle.toSkFontStyle(): SkFontStyle {
