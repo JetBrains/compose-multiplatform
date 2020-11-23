@@ -16,16 +16,17 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -37,8 +38,6 @@ internal class InnerPlaceable(
 
     override val providedAlignmentLines: Set<AlignmentLine>
         get() = layoutNode.providedAlignmentLines.keys
-    override val isAttached: Boolean
-        get() = layoutNode.isAttached()
 
     override val measureScope get() = layoutNode.measureScope
 
@@ -104,9 +103,12 @@ internal class InnerPlaceable(
         )
     }
 
-    override fun placeAt(position: IntOffset, zIndex: Float) {
-        this.position = position
-        this.zIndex = zIndex
+    override fun placeAt(
+        position: IntOffset,
+        zIndex: Float,
+        layerBlock: (GraphicsLayerScope.() -> Unit)?
+    ) {
+        super.placeAt(position, zIndex, layerBlock)
 
         // The wrapper only runs their placement block to obtain our position, which allows them
         // to calculate the offset of an alignment line we have already provided a position for.
@@ -122,20 +124,18 @@ internal class InnerPlaceable(
         return layoutNode.calculateAlignmentLines()[line] ?: AlignmentLine.Unspecified
     }
 
-    override fun draw(canvas: Canvas) {
-        withPositionTranslation(canvas) {
-            val owner = layoutNode.requireOwner()
-            layoutNode.zSortedChildren.forEach { child ->
-                if (child.isPlaced) {
-                    require(child.layoutState == LayoutNode.LayoutState.Ready) {
-                        "$child is not ready. layoutState is ${child.layoutState}"
-                    }
-                    child.draw(canvas)
+    override fun performDraw(canvas: Canvas) {
+        val owner = layoutNode.requireOwner()
+        layoutNode.zSortedChildren.forEach { child ->
+            if (child.isPlaced) {
+                require(child.layoutState == LayoutNode.LayoutState.Ready) {
+                    "$child is not ready. layoutState is ${child.layoutState}"
                 }
+                child.draw(canvas)
             }
-            if (owner.showLayoutBounds) {
-                drawBorder(canvas, innerBoundsPaint)
-            }
+        }
+        if (owner.showLayoutBounds) {
+            drawBorder(canvas, innerBoundsPaint)
         }
     }
 
@@ -143,21 +143,15 @@ internal class InnerPlaceable(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        // Any because as soon as true is returned, we know we have found a hit path and we must
-        // not add PointerInputFilters on different paths so we should not even go looking.
-        val originalSize = hitPointerInputFilters.size
-        layoutNode.zSortedChildren.reversedAny { child ->
-            callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
-            hitPointerInputFilters.size > originalSize
+        if (withinLayerBounds(pointerPositionRelativeToScreen)) {
+            // Any because as soon as true is returned, we know we have found a hit path and we must
+            // not add PointerInputFilters on different paths so we should not even go looking.
+            val originalSize = hitPointerInputFilters.size
+            layoutNode.zSortedChildren.reversedAny { child ->
+                callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
+                hitPointerInputFilters.size > originalSize
+            }
         }
-    }
-
-    override fun attach() {
-        // Do nothing. InnerPlaceable only is attached when the LayoutNode is attached.
-    }
-
-    override fun detach() {
-        // Do nothing. InnerPlaceable only is detached when the LayoutNode is detached.
     }
 
     internal companion object {

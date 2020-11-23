@@ -53,13 +53,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.platform.WindowManager
 import androidx.compose.ui.zIndex
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -1642,25 +1638,6 @@ class LayoutNodeTest {
         assertFalse(node2.isAttached())
         assertEquals(0, owner.onRequestMeasureParams.count { it === node1 })
         assertEquals(0, owner.onRequestMeasureParams.count { it === node2 })
-    }
-
-    @Test
-    fun updatingModifierToTheEmptyOneClearsReferenceToThePreviousModifier() {
-        val root = LayoutNode()
-        root.attach(
-            mock {
-                on { createLayer(anyOrNull(), anyOrNull()) } doReturn mock()
-                on { snapshotObserver } doReturn OwnerSnapshotObserver { it.invoke() }
-            }
-        )
-
-        root.modifier = Modifier.drawLayer()
-
-        assertNotNull(root.innerLayerWrapper)
-
-        root.modifier = Modifier
-
-        assertNull(root.innerLayerWrapper)
     }
 
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {

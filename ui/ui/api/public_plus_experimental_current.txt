@@ -1813,7 +1813,7 @@ package androidx.compose.ui.layout {
     method protected final long getMeasuredSize-YbymL2g();
     method protected final long getMeasurementConstraints-msEJaDk();
     method public final int getWidth();
-    method protected abstract void placeAt-iGa6aRc(long position, float zIndex);
+    method protected abstract void placeAt-rMeLuDI(long position, float zIndex, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit>? layerBlock);
     method protected final void setMeasuredSize-ozmzZPI(long value);
     method protected final void setMeasurementConstraints-BRTryo0(long p);
     property protected final long apparentToRealOffset;
@@ -1833,8 +1833,15 @@ package androidx.compose.ui.layout {
     method public final void placeRelative(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex);
     method @Deprecated public final void placeRelative-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
     method public final void placeRelative-z2mxYZE(androidx.compose.ui.layout.Placeable, long position, optional float zIndex);
+    method public final void placeRelativeWithLayer(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
+    method public final void placeRelativeWithLayer-muyPCdA(androidx.compose.ui.layout.Placeable, long position, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
+    method public final void placeWithLayer(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
+    method public final void placeWithLayer-muyPCdA(androidx.compose.ui.layout.Placeable, long position, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
     property protected abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
     property protected abstract int parentWidth;
+  }
+
+  public final class PlaceableKt {
   }
 
   public interface Remeasurement {

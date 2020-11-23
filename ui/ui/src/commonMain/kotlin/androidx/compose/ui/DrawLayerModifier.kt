@@ -21,9 +21,14 @@ import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.Constraints
 
 /**
  * A [Modifier.Element] that makes content draw into a draw layer. The draw layer can be
@@ -122,7 +127,7 @@ fun Modifier.drawLayer(
 fun Modifier.drawLayer(block: GraphicsLayerScope.() -> Unit): Modifier =
     this.then(
         BlockDrawLayerModifier(
-            block = block,
+            layerBlock = block,
             inspectorInfo = debugInspectorInfo {
                 name = "drawLayer"
                 properties["block"] = block
@@ -130,27 +135,33 @@ fun Modifier.drawLayer(block: GraphicsLayerScope.() -> Unit): Modifier =
         )
     )
 
-internal interface DrawLayerModifier : Modifier.Element {
-    val block: GraphicsLayerScope.() -> Unit
-}
-
 private class BlockDrawLayerModifier(
-    override val block: GraphicsLayerScope.() -> Unit,
+    private val layerBlock: GraphicsLayerScope.() -> Unit,
     inspectorInfo: InspectorInfo.() -> Unit
-) : DrawLayerModifier, InspectorValueInfo(inspectorInfo) {
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
+
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0, layerBlock = layerBlock)
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is BlockDrawLayerModifier) return false
-        return block == other.block
+        return layerBlock == other.layerBlock
     }
 
     override fun hashCode(): Int {
-        return block.hashCode()
+        return layerBlock.hashCode()
     }
 
     override fun toString(): String =
         "BlockDrawLayerModifier(" +
-            "block=$block)"
+            "block=$layerBlock)"
 }
 
 private class SimpleDrawLayerModifier(
@@ -168,9 +179,9 @@ private class SimpleDrawLayerModifier(
     private val shape: Shape,
     private val clip: Boolean,
     inspectorInfo: InspectorInfo.() -> Unit
-) : DrawLayerModifier, InspectorValueInfo(inspectorInfo) {
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
 
-    override val block: GraphicsLayerScope.() -> Unit = {
+    private val layerBlock: GraphicsLayerScope.() -> Unit = {
         scaleX = this@SimpleDrawLayerModifier.scaleX
         scaleY = this@SimpleDrawLayerModifier.scaleY
         alpha = this@SimpleDrawLayerModifier.alpha
@@ -184,6 +195,16 @@ private class SimpleDrawLayerModifier(
         transformOrigin = this@SimpleDrawLayerModifier.transformOrigin
         shape = this@SimpleDrawLayerModifier.shape
         clip = this@SimpleDrawLayerModifier.clip
+    }
+
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0, layerBlock = layerBlock)
+        }
     }
 
     override fun hashCode(): Int {
