@@ -77,7 +77,7 @@ const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
     "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
 const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.1"
 const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.1"
-const val KSP_VERSION = "1.4.10-dev-experimental-20201110"
+const val KSP_VERSION = "1.4.10-dev-experimental-20201120"
 const val KOTLIN_KSP_API = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
 const val KOTLIN_KSP = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.20"
