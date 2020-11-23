@@ -61,11 +61,11 @@ import androidx.compose.ui.util.fastForEach
  */
 @Composable
 @OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
-fun <T> SubcomposeLayout(
+fun SubcomposeLayout(
     modifier: Modifier = Modifier,
-    measureBlock: SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult
+    measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult
 ) {
-    val state = remember { SubcomposeLayoutState<T>() }
+    val state = remember { SubcomposeLayoutState() }
     state.compositionRef = compositionReference()
 
     val materialized = currentComposer.materialize(modifier)
@@ -87,7 +87,7 @@ fun <T> SubcomposeLayout(
  * The receiver scope of a [SubcomposeLayout]'s measure lambda which adds ability to dynamically
  * subcompose a content during the measuring on top of the features provided by [MeasureScope].
  */
-interface SubcomposeMeasureScope<T> : MeasureScope {
+interface SubcomposeMeasureScope : MeasureScope {
     /**
      * Performs subcomposition of the provided [content] with given [slotId].
      *
@@ -99,12 +99,12 @@ interface SubcomposeMeasureScope<T> : MeasureScope {
      * @param content the composable content which defines the slot. It could emit multiple
      * layouts, in this case the returned list of [Measurable]s will have multiple elements.
      */
-    fun subcompose(slotId: T, content: @Composable () -> Unit): List<Measurable>
+    fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable>
 }
 
 @OptIn(ExperimentalLayoutNodeApi::class)
-private class SubcomposeLayoutState<T> :
-    SubcomposeMeasureScope<T>,
+private class SubcomposeLayoutState :
+    SubcomposeMeasureScope,
     CompositionLifecycleObserver {
     var compositionRef: CompositionReference? = null
 
@@ -116,16 +116,16 @@ private class SubcomposeLayoutState<T> :
     // Pre-allocated lambdas to update LayoutNode
     val setRoot: LayoutNode.(Unit) -> Unit = { root = this }
     val setMeasureBlock:
-        LayoutNode.(SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult) -> Unit =
+        LayoutNode.(SubcomposeMeasureScope.(Constraints) -> MeasureResult) -> Unit =
             { measureBlocks = createMeasureBlocks(it) }
 
     // inner state
     private var root: LayoutNode? = null
     private var currentIndex = 0
-    private val nodeToNodeState = mutableMapOf<LayoutNode, NodeState<T>>()
-    private val slodIdToNode = mutableMapOf<T, LayoutNode>()
+    private val nodeToNodeState = mutableMapOf<LayoutNode, NodeState>()
+    private val slodIdToNode = mutableMapOf<Any?, LayoutNode>()
 
-    override fun subcompose(slotId: T, content: @Composable () -> Unit): List<Measurable> {
+    override fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable> {
         val root = root!!
         val layoutState = root.layoutState
         check(layoutState == LayoutState.Measuring || layoutState == LayoutState.LayingOut) {
@@ -169,7 +169,7 @@ private class SubcomposeLayoutState<T> :
         }
     }
 
-    private fun subcompose(node: LayoutNode, nodeState: NodeState<T>) {
+    private fun subcompose(node: LayoutNode, nodeState: NodeState) {
         node.ignoreModelReads {
             val content = nodeState.content
             nodeState.composition = subcomposeInto(
@@ -195,7 +195,7 @@ private class SubcomposeLayoutState<T> :
     }
 
     private fun createMeasureBlocks(
-        block: SubcomposeMeasureScope<T>.(Constraints) -> MeasureResult
+        block: SubcomposeMeasureScope.(Constraints) -> MeasureResult
     ): LayoutNode.MeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
         error = "Intrinsic measurements are not currently supported by SubcomposeLayout"
     ) {
@@ -239,8 +239,8 @@ private class SubcomposeLayoutState<T> :
         slodIdToNode.clear()
     }
 
-    private class NodeState<T>(
-        val slotId: T,
+    private class NodeState(
+        val slotId: Any?,
         var content: @Composable () -> Unit,
         var composition: Composition? = null
     )

@@ -1883,11 +1883,11 @@ package androidx.compose.ui.layout {
   }
 
   public final class SubcomposeLayoutKt {
-    method @androidx.compose.runtime.Composable public static <T> void SubcomposeLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope<T>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
+    method @androidx.compose.runtime.Composable public static void SubcomposeLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
   }
 
-  public interface SubcomposeMeasureScope<T> extends androidx.compose.ui.layout.MeasureScope {
-    method public java.util.List<androidx.compose.ui.layout.Measurable> subcompose(T? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  public interface SubcomposeMeasureScope extends androidx.compose.ui.layout.MeasureScope {
+    method public java.util.List<androidx.compose.ui.layout.Measurable> subcompose(Object? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class VerticalAlignmentLine extends androidx.compose.ui.layout.AlignmentLine {
