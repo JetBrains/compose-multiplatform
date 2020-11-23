@@ -36,7 +36,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -129,7 +128,6 @@ class BoundsTest : ToolingTest() {
         }
     }
 
-    @Ignore("b/174030267")
     @Test
     @LargeTest
     fun testDisposeWithComposeTables() {
