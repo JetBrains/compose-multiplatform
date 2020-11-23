@@ -58,7 +58,7 @@ class FontLoader() : uiFont.ResourceLoader {
             else -> throw IllegalArgumentException("Unknown font family type: $fontFamily")
         }
 
-    private val registered = mutableSetOf<String>()
+    private val registered = mutableMapOf<String, Typeface>()
     override fun load(font: uiFont): String {
         when (font) {
             is Font -> {
@@ -66,12 +66,23 @@ class FontLoader() : uiFont.ResourceLoader {
                     if (!registered.contains(font.alias)) {
                         val typeface = typefaceResource(font.path)
                         fontProvider.registerTypeface(typeface, font.alias)
-                        registered.add(font.alias)
+                        registered[font.alias] = typeface
                     }
                 }
                 return font.alias
             }
             else -> throw IllegalArgumentException("Unknown font type: $font")
+        }
+    }
+
+    internal fun defaultTypeface(fontFamily: FontFamily): Typeface {
+        return when (fontFamily) {
+            is FontListFontFamily -> {
+                val alias = load(fontFamily.fonts.first())
+                return registered[alias]!!
+            }
+            FontFamily.Default -> Typeface.makeDefault()
+            else -> throw IllegalArgumentException("Unknown font family type: $fontFamily")
         }
     }
 }
