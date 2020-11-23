@@ -17,7 +17,6 @@
 package androidx.compose.animation.core
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
-import androidx.compose.animation.core.AnimationConstants.Infinite
 import kotlin.math.min
 
 /**
@@ -107,13 +106,23 @@ interface VectorizedAnimationSpec<V : AnimationVector> {
 }
 
 /**
+ * All the finite [VectorizedAnimationSpec]s implement this interface, including:
+ * [VectorizedKeyframesSpec], [VectorizedTweenSpec], [VectorizedRepeatableSpec],
+ * [VectorizedSnapSpec], [VectorizedSpringSpec], etc. The [VectorizedAnimationSpec] that does
+ * __not__ implement this is: [InfiniteRepeatableSpec].
+ */
+interface VectorizedFiniteAnimationSpec<V : AnimationVector> : VectorizedAnimationSpec<V>
+
+/**
  * Base class for [VectorizedAnimationSpec]s that are based on a fixed [durationMillis].
  */
-interface VectorizedDurationBasedAnimationSpec<V : AnimationVector> : VectorizedAnimationSpec<V> {
+interface VectorizedDurationBasedAnimationSpec<V : AnimationVector> :
+    VectorizedFiniteAnimationSpec<V> {
     /**
      * duration is the amount of time while animation is not yet finished.
      */
     val durationMillis: Int
+
     /**
      * delay defines the amount of time that animation can be delayed.
      */
@@ -265,19 +274,41 @@ class VectorizedSnapSpec<V : AnimationVector>(
         get() = 0
 }
 
+private const val InfiniteIterations: Int = Int.MAX_VALUE
+
 /**
  * This animation takes another [VectorizedDurationBasedAnimationSpec] and plays it
- * [iterations] times.
+ * __infinite__ times.
  *
- * @param iterations the count of iterations. Should be at least 1. [Infinite] can
- *                   be used to have an infinity repeating animation.
  * @param animation the [VectorizedAnimationSpec] describing each repetition iteration.
+ * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
+ *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
+ */
+class VectorizedInfiniteRepeatableSpec<V : AnimationVector>(
+    private val animation: VectorizedDurationBasedAnimationSpec<V>,
+    private val repeatMode: RepeatMode = RepeatMode.Restart
+) : VectorizedAnimationSpec<V> by
+    VectorizedRepeatableSpec<V>(InfiniteIterations, animation, repeatMode)
+
+/**
+ * This animation takes another [VectorizedDurationBasedAnimationSpec] and plays it
+ * [iterations] times. For infinitely repeating animation spec, [VectorizedInfiniteRepeatableSpec]
+ * is recommended.
+ *
+ * __Note__: When repeating in the [RepeatMode.Reverse] mode, it's highly recommended to have an
+ * __odd__ number of iterations. Otherwise, the animation may jump to the end value when it finishes
+ * the last iteration.
+ *
+ * @param iterations the count of iterations. Should be at least 1.
+ * @param animation the [VectorizedAnimationSpec] describing each repetition iteration.
+ * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
+ *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
  */
 class VectorizedRepeatableSpec<V : AnimationVector>(
     private val iterations: Int,
     private val animation: VectorizedDurationBasedAnimationSpec<V>,
     private val repeatMode: RepeatMode = RepeatMode.Restart
-) : VectorizedAnimationSpec<V> {
+) : VectorizedFiniteAnimationSpec<V> {
 
     init {
         if (iterations < 1) {
@@ -345,15 +376,18 @@ object Spring {
      * Stiffness constant for extremely stiff spring
      */
     const val StiffnessHigh = 10_000f
+
     /**
      * Stiffness constant for medium stiff spring. This is the default stiffness for spring
      * force.
      */
     const val StiffnessMedium = 1500f
+
     /**
      * Stiffness constant for a spring with low stiffness.
      */
     const val StiffnessLow = 200f
+
     /**
      * Stiffness constant for a spring with very low stiffness.
      */
@@ -364,23 +398,27 @@ object Spring {
      * (i.e. damping ratio < 1), the lower the damping ratio, the more bouncy the spring.
      */
     const val DampingRatioHighBouncy = 0.2f
+
     /**
      * Damping ratio for a medium bouncy spring. This is also the default damping ratio for
      * spring force. Note for under-damped springs (i.e. damping ratio < 1), the lower the
      * damping ratio, the more bouncy the spring.
      */
     const val DampingRatioMediumBouncy = 0.5f
+
     /**
      * Damping ratio for a spring with low bounciness. Note for under-damped springs
      * (i.e. damping ratio < 1), the lower the damping ratio, the higher the bounciness.
      */
     const val DampingRatioLowBouncy = 0.75f
+
     /**
      * Damping ratio for a spring with no bounciness. This damping ratio will create a
      * critically damped spring that returns to equilibrium within the shortest amount of time
      * without oscillating.
      */
     const val DampingRatioNoBouncy = 1f
+
     /**
      * Default cutoff for rounding off physics based animations
      */
@@ -401,7 +439,7 @@ class VectorizedSpringSpec<V : AnimationVector> private constructor(
     val dampingRatio: Float,
     val stiffness: Float,
     anims: Animations
-) : VectorizedAnimationSpec<V> by VectorizedFloatAnimationSpec<V>(anims) {
+) : VectorizedFiniteAnimationSpec<V> by VectorizedFloatAnimationSpec<V>(anims) {
 
     /**
      * Creates a [VectorizedSpringSpec] that uses the same spring constants (i.e. [dampingRatio] and
@@ -482,7 +520,7 @@ class VectorizedTweenSpec<V : AnimationVector>(
  */
 class VectorizedFloatAnimationSpec<V : AnimationVector> internal constructor(
     private val anims: Animations
-) : VectorizedAnimationSpec<V> {
+) : VectorizedFiniteAnimationSpec<V> {
     private lateinit var valueVector: V
     private lateinit var velocityVector: V
     private lateinit var endVelocityVector: V

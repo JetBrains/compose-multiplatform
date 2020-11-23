@@ -16,10 +16,9 @@
 
 package androidx.compose.animation.demos
 
-import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,8 +41,7 @@ fun InfiniteAnimationDemo() {
         animate(
             initialValue = 1f,
             targetValue = 0f,
-            animationSpec = repeatable(
-                iterations = AnimationConstants.Infinite,
+            animationSpec = infiniteRepeatable(
                 animation = tween(1000),
                 repeatMode = RepeatMode.Reverse
             )

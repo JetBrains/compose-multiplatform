@@ -17,7 +17,6 @@
 package androidx.compose.animation.core
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
-import androidx.compose.animation.core.AnimationConstants.Infinite
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastFirstOrNull
 
@@ -149,11 +148,11 @@ fun <T> keyframes(
  * [TweenSpec], [KeyframesSpec]) the amount of iterations specified by [iterations].
  *
  * The iteration count describes the amount of times the animation will run.
- * 1 means no repeat. Use [Infinite] to create an infinity repeating animation.
+ * 1 means no repeat. Recommend [infiniteRepeatable] for creating an infinity repeating animation.
  *
  * __Note__: When repeating in the [RepeatMode.Reverse] mode, it's highly recommended to have an
- * __odd__ number of iterations, or [AnimationConstants.Infinite] iterations. Otherwise, the
- * animation may jump to the end value when it finishes the last iteration.
+ * __odd__ number of iterations. Otherwise, the animation may jump to the end value when it finishes
+ * the last iteration.
  *
  * @param iterations the total count of iterations, should be greater than 1 to repeat.
  * @param animation animation that will be repeated
@@ -165,8 +164,25 @@ fun <T> repeatable(
     iterations: Int,
     animation: DurationBasedAnimationSpec<T>,
     repeatMode: RepeatMode = RepeatMode.Restart
-): AnimationSpec<T> =
+): RepeatableSpec<T> =
     RepeatableSpec(iterations, animation, repeatMode)
+
+/**
+ * Creates a [InfiniteRepeatableSpec] that plays a [DurationBasedAnimationSpec] (e.g.
+ * [TweenSpec], [KeyframesSpec]) infinite amount of iterations.
+ *
+ * For non-infinitely repeating animations, consider [repeatable].
+ *
+ * @param animation animation that will be repeated
+ * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
+ *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
+ */
+@Stable
+fun <T> infiniteRepeatable(
+    animation: DurationBasedAnimationSpec<T>,
+    repeatMode: RepeatMode = RepeatMode.Restart
+): AnimationSpec<T> =
+    InfiniteRepeatableSpec(animation, repeatMode)
 
 /**
  * Creates a Snap animation for immediately switching the animating value to the end value.
@@ -174,7 +190,7 @@ fun <T> repeatable(
  * @param delayMillis the number of milliseconds to wait before the animation runs. 0 by default.
  */
 @Stable
-fun <T> snap(delayMillis: Int = 0): AnimationSpec<T> = SnapSpec(delayMillis)
+fun <T> snap(delayMillis: Int = 0) = SnapSpec<T>(delayMillis)
 
 /**
  * [TransitionDefinition] contains all the animation related configurations that will be used in
