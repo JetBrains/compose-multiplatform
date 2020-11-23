@@ -106,17 +106,6 @@ package androidx.compose.ui {
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment.Vertical copy(float bias);
   }
 
-  public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
-    method public float getDensity();
-    method public float getFontScale();
-    method public long getSize-NH-jbRc();
-    method public androidx.compose.ui.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method public androidx.compose.ui.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> block);
-    property public float density;
-    property public float fontScale;
-    property public final long size;
-  }
-
   public final class CombinedModifier implements androidx.compose.ui.Modifier {
     ctor public CombinedModifier(androidx.compose.ui.Modifier outer, androidx.compose.ui.Modifier inner);
     method public boolean all(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
@@ -134,25 +123,14 @@ package androidx.compose.ui {
     method public void drawContent();
   }
 
-  public interface DrawCacheModifier extends androidx.compose.ui.DrawModifier {
-    method public void onBuildCache-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
-  }
-
   public final class DrawLayerModifierKt {
     method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawLayer-i_P0lGk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
   }
 
-  public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
-    method public void draw(androidx.compose.ui.ContentDrawScope);
-  }
-
   public final class DrawModifierKt {
-    method public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
-    method public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.CacheDrawScope,androidx.compose.ui.DrawResult> onBuildDrawCache);
-    method public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> onDraw);
-  }
-
-  public final class DrawResult {
+    method @Deprecated public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
+    method @Deprecated public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.draw.CacheDrawScope,androidx.compose.ui.draw.DrawResult> onBuildDrawCache);
+    method @Deprecated public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> onDraw);
   }
 
   public final class FocusModifierKt {
@@ -296,9 +274,37 @@ package androidx.compose.ui.draw {
     method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float opacity);
   }
 
+  public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
+    method public float getDensity();
+    method public float getFontScale();
+    method public long getSize-NH-jbRc();
+    method public androidx.compose.ui.draw.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public androidx.compose.ui.draw.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> block);
+    property public float density;
+    property public float fontScale;
+    property public final long size;
+  }
+
   public final class ClipKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier clip(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Shape shape);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier clipToBounds(androidx.compose.ui.Modifier);
+  }
+
+  public interface DrawCacheModifier extends androidx.compose.ui.draw.DrawModifier {
+    method public void onBuildCache-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
+  }
+
+  public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
+    method public void draw(androidx.compose.ui.ContentDrawScope);
+  }
+
+  public final class DrawModifierKt {
+    method public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
+    method public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.draw.CacheDrawScope,androidx.compose.ui.draw.DrawResult> onBuildDrawCache);
+    method public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> onDraw);
+  }
+
+  public final class DrawResult {
   }
 
   public final class PainterModifierKt {

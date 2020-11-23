@@ -18,7 +18,7 @@ package androidx.compose.ui.node
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawModifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.FocusObserverModifier
 import androidx.compose.ui.FocusRequesterModifier

@@ -23,7 +23,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color

@@ -34,7 +34,7 @@ import androidx.compose.ui.Scroller
 import androidx.compose.ui.SquareModel
 import androidx.compose.ui.assertRect
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.node.Ref

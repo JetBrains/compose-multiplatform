@@ -23,7 +23,7 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.ExperimentalKeyInput
