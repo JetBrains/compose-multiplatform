@@ -18,8 +18,12 @@ package androidx.compose.foundation.layout
 
 import android.os.Build
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawBehind
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -348,5 +352,29 @@ class LayoutOffsetTest : LayoutTest() {
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.asIterable())
             .containsExactly("x", "y")
+    }
+
+    @Test
+    fun contentNotRedrawnWhenOffsetPxChanges() {
+        var contentRedrawsCount = 0
+        var offset by mutableStateOf(0f)
+        rule.setContent {
+            Box(
+                Modifier
+                    .size(10.dp)
+                    .offset(x = { offset })
+                    .drawBehind {
+                        contentRedrawsCount ++
+                    }
+            )
+        }
+
+        rule.runOnIdle {
+            offset = 5f
+        }
+
+        rule.runOnIdle {
+            assertEquals(1, contentRedrawsCount)
+        }
     }
 }

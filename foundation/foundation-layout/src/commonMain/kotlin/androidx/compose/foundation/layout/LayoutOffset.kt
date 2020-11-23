@@ -222,9 +222,9 @@ private class OffsetPxModifier(
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
             if (rtlAware) {
-                placeable.placeRelative(x().roundToInt(), y().roundToInt())
+                placeable.placeRelativeWithLayer(x().roundToInt(), y().roundToInt())
             } else {
-                placeable.place(x().roundToInt(), y().roundToInt())
+                placeable.placeWithLayer(x().roundToInt(), y().roundToInt())
             }
         }
     }
