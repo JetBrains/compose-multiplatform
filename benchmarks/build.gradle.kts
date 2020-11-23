@@ -3,10 +3,12 @@ import kotlinx.benchmark.gradle.*
 import org.jetbrains.kotlin.allopen.gradle.*
 
 plugins {
-    kotlin("jvm") version "1.4.0"
+    // __KOTLIN_COMPOSE_VERSION__
+    kotlin("jvm") version "1.4.20"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.1.0-build113"
-    kotlin("plugin.allopen") version "1.4.0"
+    id("org.jetbrains.compose") version "0.2.0-build128"
+    // __KOTLIN_COMPOSE_VERSION__
+    kotlin("plugin.allopen") version "1.4.20"
     id("kotlinx.benchmark") version "0.2.0-dev-20"
 }
 

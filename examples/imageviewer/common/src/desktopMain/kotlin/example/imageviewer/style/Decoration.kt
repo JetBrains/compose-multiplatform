@@ -1,43 +1,42 @@
 package example.imageviewer.style
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.res.imageResource
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 
 @Composable
-fun icEmpty(): ImageAsset = imageResource("images/empty.png")
+fun icEmpty() = imageResource("images/empty.png")
 
 @Composable
-fun icBack(): ImageAsset = imageResource("images/back.png")
+fun icBack() = imageResource("images/back.png")
 
 @Composable
-fun icRefresh(): ImageAsset = imageResource("images/refresh.png")
+fun icRefresh() = imageResource("images/refresh.png")
 
 @Composable
-fun icDots(): ImageAsset = imageResource("images/dots.png")
+fun icDots() = imageResource("images/dots.png")
 
 @Composable
-fun icFilterGrayscaleOn(): ImageAsset = imageResource("images/grayscale_on.png")
+fun icFilterGrayscaleOn() = imageResource("images/grayscale_on.png")
 
 @Composable
-fun icFilterGrayscaleOff(): ImageAsset = imageResource("images/grayscale_off.png")
+fun icFilterGrayscaleOff() = imageResource("images/grayscale_off.png")
 
 @Composable
-fun icFilterPixelOn(): ImageAsset = imageResource("images/pixel_on.png")
+fun icFilterPixelOn() = imageResource("images/pixel_on.png")
 
 @Composable
-fun icFilterPixelOff(): ImageAsset = imageResource("images/pixel_off.png")
+fun icFilterPixelOff() = imageResource("images/pixel_off.png")
 
 @Composable
-fun icFilterBlurOn(): ImageAsset = imageResource("images/blur_on.png")
+fun icFilterBlurOn() = imageResource("images/blur_on.png")
 
 @Composable
-fun icFilterBlurOff(): ImageAsset = imageResource("images/blur_off.png")
+fun icFilterBlurOff() = imageResource("images/blur_off.png")
 
 @Composable
-fun icFilterUnknown(): ImageAsset = imageResource("images/filter_unknown.png")
+fun icFilterUnknown() = imageResource("images/filter_unknown.png")
 
 private var icon: BufferedImage? = null
 fun icAppRounded(): BufferedImage {

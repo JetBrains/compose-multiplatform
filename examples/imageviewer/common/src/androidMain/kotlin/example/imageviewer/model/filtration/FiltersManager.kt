@@ -50,8 +50,5 @@ private fun getFilter(type: FilterType, context: Context): BitmapFilter {
         FilterType.GrayScale -> GrayScaleFilter()
         FilterType.Pixel -> PixelFilter()
         FilterType.Blur -> BlurFilter(context)
-        else -> {
-            EmptyFilter()
-        }
     }
 }

@@ -138,7 +138,7 @@ class IssuesRepositoryImpl(
             }
 
             override fun onResponse(response: Response<IssueQuery.Data>) {
-                val issue = response.data()?.repository?.issue
+                val issue = response.data?.repository?.issue
                 if (issue == null) {
                     callback(Result.Error(UnknownIssue()))
                 } else {

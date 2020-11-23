@@ -1,11 +1,9 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onActive
@@ -22,6 +20,7 @@ import kotlinx.coroutines.GlobalScope
 import example.imageviewer.style.ToastBackground
 import example.imageviewer.style.Foreground
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 
 enum class ToastDuration(val value: Int) {
     Short(1000), Long(3000)
@@ -43,14 +42,14 @@ fun Toast(
         isShown = true
         Box(
             modifier = Modifier.fillMaxSize().padding(bottom = 20.dp),
-            alignment = Alignment.BottomCenter
+            contentAlignment = Alignment.BottomCenter
         ) {
             Surface(
                 modifier = Modifier.preferredSize(300.dp, 70.dp),
                 color = ToastBackground,
                 shape = RoundedCornerShape(4.dp)
             ) {
-                Box(alignment = Alignment.Center) {
+                Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = text,
                         color = Foreground

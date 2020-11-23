@@ -14,19 +14,15 @@
 
 package androidx.ui.examples.jetissues.view
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.WithConstraints
@@ -109,7 +105,7 @@ fun SingleColumnLayout(currentIssue: MutableState<IssuesQuery.Node?>) {
 @Composable
 fun TwoColumnsLayout(currentIssue: MutableState<IssuesQuery.Node?>) {
     Row(Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxWidth(0.4f), alignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxWidth(0.4f), contentAlignment = Alignment.Center) {
             IssuesList(currentIssue)
         }
         CurrentIssue(currentIssue.value)
@@ -138,7 +134,7 @@ fun CurrentIssue(
 
 @Composable
 fun CurrentIssueStatus(content: @Composable () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         content()
     }
 }
@@ -218,6 +214,7 @@ fun OrderButton(order: MutableState<OrderDirection>, scroll: ScrollState) {
             }) {
                 Text("DESC")
             }
+        else -> Error("Unknown direction")
     }
 }
 
@@ -257,7 +254,7 @@ fun ListBody(
                     for (iss in it.data.nodes) {
                         Box(modifier = Modifier.clickable {
                             currentIssue.value = iss
-                        }, alignment = Alignment.CenterStart) {
+                        }, contentAlignment = Alignment.CenterStart) {
                             ListItem(iss)
                         }
                     }
@@ -342,7 +339,7 @@ fun MoreButton(issues: MutableState<UiState<Issues>>) {
 
     var loading by remember { mutableStateOf(false) }
     Box(
-        gravity = ContentGravity.Center,
+        contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth().padding(10.dp)
     ) {
         if (loading) {
@@ -373,9 +370,10 @@ fun Labels(labels: IssuesQuery.Labels?) {
             val color = parseColor(it.color)
             val textColor = if (color.luminance() > 0.5) Color.Black else Color.White
             Box(
-                shape = RoundedCornerShape(3.dp),
-                modifier = Modifier.padding(3.dp),
-                backgroundColor = color
+                modifier = Modifier
+                    .padding(3.dp)
+                    .background(color = color)
+                    .clip(shape = RoundedCornerShape(3.dp))
             ) {
                 Text(
                     text = it.name,
@@ -390,7 +388,7 @@ fun Labels(labels: IssuesQuery.Labels?) {
 @Composable
 fun Loader() {
     Box(
-        gravity = ContentGravity.Center,
+        contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth().padding(20.dp)
     ) {
         CircularProgressIndicator()
@@ -400,7 +398,7 @@ fun Loader() {
 @Composable
 fun Error(err: String) {
     Box(
-        gravity = ContentGravity.Center,
+        contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth().padding(20.dp)
     ) {
         Text(text = err, style = TextStyle(color = MaterialTheme.colors.error, fontWeight = FontWeight.Bold))

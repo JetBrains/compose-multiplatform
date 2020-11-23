@@ -2,10 +2,8 @@ package example.imageviewer.view
 
 import java.awt.image.BufferedImage
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -19,14 +17,15 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -57,7 +56,6 @@ import example.imageviewer.utils.cropImage
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
-import org.jetbrains.skija.Image
 import org.jetbrains.skija.IRect
 import java.awt.event.KeyEvent
 import java.awt.Rectangle
@@ -193,15 +191,12 @@ fun FilterButton(
 }
 
 @Composable
-fun getFilterImage(type: FilterType, content: ContentState): ImageAsset {
+fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
 
     return when (type) {
         FilterType.GrayScale -> if (content.isFilterEnabled(type)) icFilterGrayscaleOn() else icFilterGrayscaleOff()
         FilterType.Pixel -> if (content.isFilterEnabled(type)) icFilterPixelOn() else icFilterPixelOff()
         FilterType.Blur -> if (content.isFilterEnabled(type)) icFilterBlurOn() else icFilterBlurOff()
-        else -> {
-            icFilterUnknown()
-        }
     }
 }
 
@@ -232,7 +227,7 @@ fun setImage(content: ContentState) {
             ) {
                 val bitmap = imageByGesture(content, scale, drag)
                 Image(
-                    asset = bitmap.asImageAsset(),
+                    bitmap = bitmap,
                     contentScale = ContentScale.Fit
                 )
             }
@@ -245,9 +240,9 @@ fun imageByGesture(
     content: ContentState,
     scale: ScaleHandler,
     drag: DragHandler
-): Image {
+): ImageBitmap {
     val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)
-    return Image.makeFromEncoded(toByteArray(bitmap))
+    return org.jetbrains.skija.Image.makeFromEncoded(toByteArray(bitmap)).asImageBitmap()
 }
 
 private fun cropBitmapByScale(bitmap: BufferedImage, scale: Float, drag: DragHandler): BufferedImage {

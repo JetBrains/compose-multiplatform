@@ -2,7 +2,6 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.runtime.Composable
@@ -26,13 +25,14 @@ import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.material.Surface
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -76,7 +76,6 @@ fun setMainScreen(content: ContentState) {
 
 @Composable
 private fun setLoadingScreen(content: ContentState) {
-
     Box {
         Column {
             setTopContent(content)
@@ -170,9 +169,9 @@ fun setPreviewImageUI(content: ContentState) {
             Image(
                 if (content.isMainImageEmpty())
                     icEmpty()
-                else Image.makeFromEncoded(
+                else org.jetbrains.skija.Image.makeFromEncoded(
                     toByteArray(content.getSelectedImage())
-                ).asImageAsset(),
+                ).asImageBitmap(),
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
                 contentScale = ContentScale.Fit
@@ -212,9 +211,9 @@ fun setMiniatureUI(
                 }
             ) {
                 Image(
-                    Image.makeFromEncoded(
+                    org.jetbrains.skija.Image.makeFromEncoded(
                         toByteArray(picture.image)
-                    ).asImageAsset(),
+                    ).asImageBitmap(),
                     modifier = Modifier.preferredHeight(70.dp)
                         .preferredWidth(90.dp)
                         .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 1.dp),
