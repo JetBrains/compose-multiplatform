@@ -16,18 +16,19 @@
 
 package androidx.compose.animation.demos
 
-import androidx.compose.animation.ColorPropKey
-import androidx.compose.animation.RectPropKey
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateRect
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -36,33 +37,42 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun MultiDimensionalAnimationDemo() {
-    val currentState = remember { mutableStateOf(AnimState.Collapsed) }
+    var currentState by remember { mutableStateOf(AnimState.Collapsed) }
     val onClick = {
         // Cycle through states when clicked.
-        currentState.value = when (currentState.value) {
+        currentState = when (currentState) {
             AnimState.Collapsed -> AnimState.Expanded
             AnimState.Expanded -> AnimState.PutAway
             AnimState.PutAway -> AnimState.Collapsed
         }
     }
 
-    val width = remember { mutableStateOf(0f) }
-    val height = remember { mutableStateOf(0f) }
-    val state = transition(
-        definition = remember(width.value, height.value) {
-            createTransDef(width.value, height.value)
-        },
-        toState = currentState.value
-    )
-    Canvas(modifier = Modifier.fillMaxSize().clickable(onClick = onClick, indication = null)) {
-        width.value = size.width
-        height.value = size.height
+    var width by remember { mutableStateOf(0f) }
+    var height by remember { mutableStateOf(0f) }
+    val transition = updateTransition(currentState)
+    val rect by transition.animateRect({ spring(stiffness = 100f) }) {
+        when (it) {
+            AnimState.Collapsed -> Rect(600f, 600f, 900f, 900f)
+            AnimState.Expanded -> Rect(0f, 400f, width, height - 400f)
+            AnimState.PutAway -> Rect(width - 300f, height - 300f, width, height)
+        }
+    }
 
-        val bounds = state[bounds]
+    val color by transition.animateColor(transitionSpec = { tween(durationMillis = 500) }) {
+        when (it) {
+            AnimState.Collapsed -> Color.LightGray
+            AnimState.Expanded -> Color(0xFFd0fff8)
+            AnimState.PutAway -> Color(0xFFe3ffd9)
+        }
+    }
+    Canvas(modifier = Modifier.fillMaxSize().clickable(onClick = onClick, indication = null)) {
+        width = size.width
+        height = size.height
+
         drawRect(
-            state[background],
-            topLeft = Offset(bounds.left, bounds.top),
-            size = Size(bounds.width, bounds.height)
+            color,
+            topLeft = Offset(rect.left, rect.top),
+            size = Size(rect.width, rect.height)
         )
     }
 }
@@ -72,35 +82,3 @@ private enum class AnimState {
     Expanded,
     PutAway
 }
-
-// Both PropKeys below are multi-dimensional property keys. That means each dimension's
-// value and velocity will be tracked independently. In the case of a color, each color
-// channel is a separate dimension. For rectangles, the dimensions are: top, left,
-// right and bottom.
-private val background = ColorPropKey()
-private val bounds = RectPropKey()
-
-private fun createTransDef(width: Float, height: Float) =
-    transitionDefinition<AnimState> {
-        state(AnimState.Collapsed) {
-            this[background] = Color.LightGray
-            this[bounds] = Rect(600f, 600f, 900f, 900f)
-        }
-        state(AnimState.Expanded) {
-            this[background] = Color(0xFFd0fff8)
-            this[bounds] = Rect(0f, 400f, width, height - 400f)
-        }
-        state(AnimState.PutAway) {
-            this[background] = Color(0xFFe3ffd9)
-            this[bounds] = Rect(width - 300f, height - 300f, width, height)
-        }
-
-        transition {
-            bounds using spring(
-                stiffness = 100f
-            )
-            background using tween(
-                durationMillis = 500
-            )
-        }
-    }

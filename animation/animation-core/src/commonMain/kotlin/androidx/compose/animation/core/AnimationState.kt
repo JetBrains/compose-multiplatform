@@ -54,7 +54,8 @@ class AnimationState<T, V : AnimationVector>(
     /**
      * Current velocity vector of the [AnimationState].
      */
-    var velocityVector: V = initialVelocityVector ?: typeConverter.createZeroVector(initialValue)
+    var velocityVector: V =
+        initialVelocityVector ?: typeConverter.createZeroVectorFrom(initialValue)
         internal set
 
     /**
@@ -243,5 +244,11 @@ fun AnimationState(
     )
 }
 
-private fun <T, V : AnimationVector> TwoWayConverter<T, V>.createZeroVector(value: T) =
+/**
+ * Creates an AnimationVector with all the values set to 0 using the provided [TwoWayConverter]
+ * and the [value].
+ *
+ * @return a new AnimationVector instance of type [V].
+ */
+fun <T, V : AnimationVector> TwoWayConverter<T, V>.createZeroVectorFrom(value: T) =
     convertToVector(value).newInstance()
