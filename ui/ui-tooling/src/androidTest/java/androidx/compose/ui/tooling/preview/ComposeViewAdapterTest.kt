@@ -18,7 +18,6 @@ package androidx.compose.ui.tooling.preview
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.ViewTreeObserver
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.TransitionAnimation
 import androidx.compose.ui.tooling.compositionCount
@@ -28,11 +27,13 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ComposeViewAdapterTest {
     @Suppress("DEPRECATION")
@@ -45,8 +46,7 @@ class ComposeViewAdapterTest {
 
     @Before
     fun setup() {
-        composeViewAdapter =
-            activityTestRule.activity.findViewById(R.id.compose_view_adapter)
+        composeViewAdapter = activityTestRule.activity.findViewById(R.id.compose_view_adapter)
     }
 
     /**
@@ -102,34 +102,25 @@ class ComposeViewAdapterTest {
     @OptIn(InternalAnimationApi::class)
     private fun checkComposableAnimationIsSubscribed(composableName: String) {
         val clock = PreviewAnimationClock()
-        val laidOutLatch = CountDownLatch(1)
 
         activityTestRule.runOnUiThread {
             composeViewAdapter.init(
                 "androidx.compose.ui.tooling.TestAnimationPreviewKt",
                 composableName
             )
-
-            composeViewAdapter.viewTreeObserver.addOnPreDrawListener(
-                object : ViewTreeObserver.OnPreDrawListener {
-                    override fun onPreDraw(): Boolean {
-                        laidOutLatch.countDown()
-                        composeViewAdapter.viewTreeObserver.removeOnPreDrawListener(this)
-                        return true
-                    }
-                }
-            )
+            composeViewAdapter.clock = clock
+            assertFalse(composeViewAdapter.hasAnimations())
+            assertTrue(clock.observersToAnimations.isEmpty())
         }
 
-        assertTrue(laidOutLatch.await(1, TimeUnit.SECONDS))
+        waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
+            // Handle the case where onLayout was called too soon. Calling requestLayout will
+            // make sure onLayout will be called again.
+            composeViewAdapter.requestLayout()
+            composeViewAdapter.hasAnimations()
+        }
 
         activityTestRule.runOnUiThread {
-            composeViewAdapter.clock = clock
-            assertTrue(clock.observersToAnimations.isEmpty())
-
-            composeViewAdapter.findAndSubscribeTransitions()
-            assertTrue(composeViewAdapter.hasAnimations())
-
             val observer = clock.observersToAnimations.keys.single()
             val transitionAnimation =
                 (observer as TransitionAnimation<*>.TransitionAnimationClockObserver).animation
@@ -288,6 +279,30 @@ class ComposeViewAdapterTest {
         }
         // Draw will keep happening so, eventually this will hit 0
         assertTrue(drawCountDownLatch.await(10, TimeUnit.SECONDS))
+    }
+
+    /**
+     * Waits for a given condition to be satisfied within a given timeout. Fails the test when
+     * timing out. The condition is evaluated on the UI thread.
+     */
+    private fun waitFor(
+        conditionLabel: String,
+        timeout: Long,
+        timeUnit: TimeUnit,
+        conditionExpression: () -> Boolean
+    ) {
+        val conditionSatisfied = AtomicBoolean(false)
+        val now = System.nanoTime()
+        val timeoutNanos = timeUnit.toNanos(timeout)
+        while (!conditionSatisfied.get()) {
+            activityTestRule.runOnUiThread {
+                conditionSatisfied.set(conditionExpression())
+            }
+            if ((System.nanoTime() - now) > timeoutNanos) {
+                fail("Timed out while waiting for condition <$conditionLabel> to be satisfied.")
+            }
+            Thread.sleep(200)
+        }
     }
 
     companion object {
