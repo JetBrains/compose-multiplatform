@@ -17,17 +17,20 @@ package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwnersAmbient
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.round
 
 @Composable
 internal actual fun ActualPopup(
@@ -49,6 +52,24 @@ private fun PopupLayout(
 ) {
     val owners = DesktopOwnersAmbient.current
     val density = AmbientDensity.current
+
+    var parentBounds = remember { mutableStateOf(IntBounds(0, 0, 0, 0)) }
+
+    // getting parent bounds
+    Layout(
+        content = {},
+        modifier = Modifier.onGloballyPositioned { childCoordinates ->
+            val coordinates = childCoordinates.parentCoordinates!!
+            parentBounds.value = IntBounds(
+                coordinates.localToGlobal(Offset.Zero).round(),
+                coordinates.size
+            )
+        },
+        measureBlock = { _, _ ->
+            layout(0, 0) {}
+        }
+    )
+
     val owner = remember {
         val owner = DesktopOwner(owners, density)
         owner.setContent {
@@ -60,16 +81,24 @@ private fun PopupLayout(
                     }
                 },
                 measureBlock = { measurables, constraints ->
-                    val width = owner.size.width
-                    val height = owner.size.height
-                    layout(width, height) {
+                    val width = constraints.maxWidth
+                    val height = constraints.maxHeight
+
+                    val windowBounds = IntBounds(
+                        left = 0,
+                        top = 0,
+                        right = width,
+                        bottom = height
+                    )
+
+                    layout(constraints.maxWidth, constraints.maxHeight) {
                         measurables.forEach {
                             val placeable = it.measure(constraints)
                             val offset = popupPositionProvider.calculatePosition(
-                                IntBounds(0, 0, width, height),
-                                IntBounds(0, 0, width, height),
-                                LayoutDirection.Ltr,
-                                IntSize(placeable.width, placeable.height)
+                                parentGlobalBounds = parentBounds.value,
+                                windowGlobalBounds = windowBounds,
+                                layoutDirection = layoutDirection,
+                                popupContentSize = IntSize(placeable.width, placeable.height)
                             )
                             placeable.place(offset.x, offset.y)
                         }

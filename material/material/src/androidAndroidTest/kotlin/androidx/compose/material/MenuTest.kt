@@ -217,6 +217,35 @@ class MenuTest {
     }
 
     @Test
+    fun menu_positioning_top() {
+        val screenWidth = 500
+        val screenHeight = 1000
+        val density = Density(1f)
+        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val anchorPosition = IntOffset(0, 0)
+        val anchorSize = IntSize(50, 20)
+        val popupSize = IntSize(150, 500)
+
+        // The min margin above and below the menu, relative to the screen.
+        val MenuVerticalMargin = 32.dp
+        val verticalMargin = with(density) { MenuVerticalMargin.toIntPx() }
+
+        val position = DropdownMenuPositionProvider(
+            Position(0.dp, 0.dp),
+            density
+        ).calculatePosition(
+            IntBounds(anchorPosition, anchorSize),
+            windowBounds,
+            LayoutDirection.Ltr,
+            popupSize
+        )
+
+        assertThat(position.y).isEqualTo(
+            verticalMargin
+        )
+    }
+
+    @Test
     fun menu_positioning_callback() {
         val screenWidth = 500
         val screenHeight = 1000

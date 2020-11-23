@@ -318,7 +318,7 @@ internal data class DropdownMenuPositionProvider(
         } ?: toLeft
 
         // Compute vertical position.
-        val toBottom = parentGlobalBounds.bottom + contentOffsetY
+        val toBottom = maxOf(parentGlobalBounds.bottom + contentOffsetY, verticalMargin)
         val toTop = parentGlobalBounds.top - contentOffsetY - popupContentSize.height
         val toCenter = parentGlobalBounds.top - popupContentSize.height / 2
         val toDisplayBottom = windowGlobalBounds.height - popupContentSize.height - verticalMargin
