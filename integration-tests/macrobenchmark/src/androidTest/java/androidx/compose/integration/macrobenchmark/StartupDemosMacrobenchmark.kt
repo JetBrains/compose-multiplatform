@@ -28,7 +28,7 @@ import org.junit.runners.Parameterized
 @SdkSuppress(minSdkVersion = 29)
 @RunWith(Parameterized::class) // Parameterized to work around timeouts (b/174175784)
 class StartupDemosMacrobenchmark(
-    private val ignored: Boolean
+    @Suppress("unused") private val ignored: Boolean
 ) {
 
     @get:Rule
