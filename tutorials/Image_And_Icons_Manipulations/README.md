@@ -340,11 +340,11 @@ fun asImageAsset(image: BufferedImage): ImageAsset {
 
 ## Loading XML vector images
 Compose for Desktop supports XML vector images.
-XML vector images are came from [Android world](https://developer.android.com/guide/topics/graphics/vector-drawable-resources).
-We implented it on desktop so we can use common resources in a crossplatform application.
+XML vector images come from the world of [Android](https://developer.android.com/guide/topics/graphics/vector-drawable-resources).
+We implemented it on the desktop so we can use common resources in a cross-platform application.
 
 SVG files can be converted to XML with [Android Studio](https://developer.android.com/studio/write/vector-asset-studio#svg) or with [third-party tools](https://www.google.com/search?q=svg+to+xml).
-Suppose we have a XML image that is placed in the `resources/images` directory in our project.
+Suppose we have an XML image placed in the `resources/images` directory in our project.
 
 SVG example: ![SVG](compose.svg)
 
