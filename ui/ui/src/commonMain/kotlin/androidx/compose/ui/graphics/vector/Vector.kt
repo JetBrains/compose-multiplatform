@@ -136,7 +136,7 @@ internal class VectorComponent : VNode() {
      * Cached lambda used to avoid allocating the lambda on each draw invocation
      */
     private val drawVectorBlock: DrawScope.() -> Unit = {
-        with (root) { draw() }
+        with(root) { draw() }
     }
 
     fun DrawScope.draw(alpha: Float, colorFilter: ColorFilter?) {

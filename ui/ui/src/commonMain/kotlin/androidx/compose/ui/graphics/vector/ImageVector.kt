@@ -362,7 +362,7 @@ data class ImageVector internal constructor(
          * Internal helper class to help assist with in progress creation of
          * a vector group before creating the immutable result
          */
-        private class GroupParams (
+        private class GroupParams(
             var name: String = DefaultGroupName,
             var rotate: Float = DefaultRotation,
             var pivotX: Float = DefaultPivotX,

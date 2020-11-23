@@ -59,7 +59,7 @@ import androidx.compose.ui.graphics.useOrElse
  * use [primary] by default for its background color, when in a dark theme it will use [surface].
  */
 @Stable
-class Colors (
+class Colors(
     primary: Color,
     primaryVariant: Color,
     secondary: Color,

@@ -207,7 +207,7 @@ class VectorPainter internal constructor() : Painter() {
         get() = size
 
     override fun DrawScope.onDraw() {
-        with (vector) { draw(currentAlpha, currentColorFilter) }
+        with(vector) { draw(currentAlpha, currentColorFilter) }
         // This conditional is necessary to obtain invalidation callbacks as the state is
         // being read here which adds this callback to the snapshot observation
         if (isDirty) {

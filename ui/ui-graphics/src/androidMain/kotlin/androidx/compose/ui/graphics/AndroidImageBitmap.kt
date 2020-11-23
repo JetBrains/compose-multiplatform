@@ -101,7 +101,7 @@ internal class AndroidImageBitmap(internal val bitmap: Bitmap) : ImageBitmap {
 
     override val colorSpace: ColorSpace
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            with (Api26Bitmap) {
+            with(Api26Bitmap) {
                 bitmap.composeColorSpace()
             }
         } else {

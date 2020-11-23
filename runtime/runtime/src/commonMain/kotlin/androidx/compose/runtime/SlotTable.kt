@@ -360,7 +360,7 @@ class SlotTable {
         append(") key=")
         append(groups.key(index))
         fun dataIndex(index: Int) =
-            if (index >= groupsSize) slotsSize else groups.dataAnchor (index)
+            if (index >= groupsSize) slotsSize else groups.dataAnchor(index)
 
         val groupSize = groups.groupSize(index)
         append(", nodes=")

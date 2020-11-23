@@ -159,7 +159,7 @@ class TextInputServiceTest {
 
         val editorModel = TextFieldValue()
         textInputService.onStateUpdated(firstToken, null, editorModel)
-        verify(platformService, times(1)).onStateUpdated( eq(null), eq(editorModel))
+        verify(platformService, times(1)).onStateUpdated(eq(null), eq(editorModel))
     }
 
     @Test
