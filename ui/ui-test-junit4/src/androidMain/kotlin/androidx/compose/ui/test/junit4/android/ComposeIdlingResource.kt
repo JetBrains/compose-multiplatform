@@ -22,11 +22,14 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.TestAnimationClock
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.runOnUiThread
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
-import androidx.compose.ui.test.TestAnimationClock
-import androidx.compose.ui.test.junit4.runOnUiThread
-import java.util.concurrent.atomic.AtomicBoolean
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -46,46 +49,76 @@ internal interface IdlingResourceWithDiagnostics {
  * [createAndroidComposeRule]. If you for some reasons want to only use Espresso but still have it
  * wait for Compose being idle you can use this function.
  */
-fun registerComposeWithEspresso() {
-    ComposeIdlingResource.registerSelfIntoEspresso()
-}
+@Deprecated(
+    message = "Global (un)registration of ComposeIdlingResource is no longer supported. Use " +
+        "createAndroidComposeRule() and registration will happen when needed",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("")
+)
+@Suppress("DocumentExceptions")
+fun registerComposeWithEspresso(): Unit = throw UnsupportedOperationException(
+    "Global (un)registration of ComposeIdlingResource is no longer supported"
+)
 
 /**
  * Unregisters resource registered as part of [registerComposeWithEspresso].
  */
-fun unregisterComposeFromEspresso() {
-    ComposeIdlingResource.unregisterSelfFromEspresso()
-}
+@Deprecated(
+    message = "Global (un)registration of ComposeIdlingResource is no longer supported. Use " +
+        "createAndroidComposeRule() and registration will happen when needed",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("")
+)
+@Suppress("DocumentExceptions")
+fun unregisterComposeFromEspresso(): Unit = throw UnsupportedOperationException(
+    "Global (un)registration of ComposeIdlingResource is no longer supported"
+)
 
 /**
  * Registers the given [clock] so Espresso can await the animations subscribed to that clock.
  */
+@Deprecated(
+    message = "Global (un)registration of TestAnimationClocks is no longer supported. Use the " +
+        "member function ComposeIdlingResource.registerTestClock(clock) instead",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("composeIdlingResource.registerTestClock(clock)")
+)
 @ExperimentalTesting
-fun registerTestClock(clock: TestAnimationClock) {
-    ComposeIdlingResource.registerTestClock(clock)
-}
+@Suppress("UNUSED_PARAMETER", "DocumentExceptions")
+fun registerTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
+    "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
+        "directly on an instance of ComposeIdlingResource instead"
+)
 
 /**
  * Unregisters the [clock] that was registered with [registerTestClock].
  */
+@Deprecated(
+    message = "Global (un)registration of TestAnimationClocks is no longer supported. Use the " +
+        "member function ComposeIdlingResource.unregisterTestClock(clock) instead",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("composeIdlingResource.unregisterTestClock(clock)")
+)
 @ExperimentalTesting
-fun unregisterTestClock(clock: TestAnimationClock) {
-    ComposeIdlingResource.unregisterTestClock(clock)
-}
+@Suppress("UNUSED_PARAMETER", "DocumentExceptions")
+fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
+    "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
+        "directly on an instance of ComposeIdlingResource instead"
+)
 
 /**
  * Provides an idle check to be registered into Espresso.
  *
  * This makes sure that Espresso is able to wait for any pending changes in Compose. This
  * resource is automatically registered when any compose testing APIs are used including
- * [createAndroidComposeRule]. If you for some reasons want to only use Espresso but still have it
- * wait for Compose being idle you can register this yourself via [registerSelfIntoEspresso].
+ * [createAndroidComposeRule].
  */
-internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWithDiagnostics {
+internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnostics {
 
     override fun getName(): String = "ComposeIdlingResource"
 
     private var isIdleCheckScheduled = false
+    private var resourceCallback: IdlingResource.ResourceCallback? = null
 
     @OptIn(ExperimentalTesting::class)
     private val clocks = mutableSetOf<TestAnimationClock>()
@@ -161,6 +194,14 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
         }
     }
 
+    private fun transitionToIdle() {
+        resourceCallback?.onTransitionToIdle()
+    }
+
+    override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
+        resourceCallback = callback
+    }
+
     /**
      * Called by [CompositionAwaiter] to indicate that this [ComposeIdlingResource] should report
      * busy to Espresso while that [CompositionAwaiter] is checking idleness.
@@ -178,14 +219,14 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
     }
 
     @OptIn(ExperimentalTesting::class)
-    internal fun registerTestClock(clock: TestAnimationClock) {
+    fun registerTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.add(clock)
         }
     }
 
     @OptIn(ExperimentalTesting::class)
-    internal fun unregisterTestClock(clock: TestAnimationClock) {
+    fun unregisterTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.remove(clock)
         }
@@ -237,37 +278,19 @@ internal object ComposeIdlingResource : BaseIdlingResource(), IdlingResourceWith
     }
 }
 
-internal sealed class BaseIdlingResource : IdlingResource {
-    private val isRegistered = AtomicBoolean(false)
-    private var resourceCallback: IdlingResource.ResourceCallback? = null
+internal class ComposeIdlingResourceTestRule() : TestRule {
+    val idlingResource = ComposeIdlingResource()
 
-    final override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
-        resourceCallback = callback
-    }
-
-    protected fun transitionToIdle() {
-        resourceCallback?.onTransitionToIdle()
-    }
-
-    /**
-     * Registers this resource into Espresso.
-     *
-     * Can be called multiple times.
-     */
-    internal fun registerSelfIntoEspresso() {
-        if (isRegistered.compareAndSet(false, true)) {
-            IdlingRegistry.getInstance().register(this)
-        }
-    }
-
-    /**
-     * Unregisters this resource from Espresso.
-     *
-     * Can be called multiple times.
-     */
-    internal open fun unregisterSelfFromEspresso() {
-        if (isRegistered.compareAndSet(true, false)) {
-            IdlingRegistry.getInstance().unregister(this)
+    override fun apply(base: Statement, description: Description): Statement {
+        return object : Statement() {
+            override fun evaluate() {
+                try {
+                    IdlingRegistry.getInstance().register(idlingResource)
+                    base.evaluate()
+                } finally {
+                    IdlingRegistry.getInstance().unregister(idlingResource)
+                }
+            }
         }
     }
 }
