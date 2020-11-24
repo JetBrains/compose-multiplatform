@@ -35,6 +35,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+const val composeSourceOption =
+    "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
+
 /**
  * Plugin to apply options across all of the androidx.ui projects
  */
@@ -77,6 +80,20 @@ class AndroidXUiPlugin : Plugin<Project> {
                             if (!conf.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
                                     "-Xplugin=${kotlinPlugin.first()}"
+                            }
+                        }
+                    }
+
+                    project.afterEvaluate {
+                        val androidXExtension =
+                            project.extensions.findByType(AndroidXExtension::class.java)
+                        if (androidXExtension != null) {
+                            if (!conf.isEmpty && androidXExtension.publish.shouldPublish()) {
+                                project.tasks.withType(KotlinCompile::class.java)
+                                    .configureEach { compile ->
+                                        compile.kotlinOptions.freeCompilerArgs +=
+                                            listOf("-P", composeSourceOption)
+                                    }
                             }
                         }
                     }
