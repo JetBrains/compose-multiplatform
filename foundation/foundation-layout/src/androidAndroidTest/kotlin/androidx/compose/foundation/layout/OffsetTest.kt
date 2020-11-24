@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -198,7 +199,7 @@ class OffsetTest : LayoutTest() {
             Box(
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
-                    .offset({ offsetX }, { offsetY })
+                    .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x
                         positionY = coordinates.positionInRoot.y
@@ -217,11 +218,11 @@ class OffsetTest : LayoutTest() {
     @Test
     fun offsetPx_positionIsModified_rtl() = with(density) {
         val containerWidth = 30.dp
-        val boxSize = 1f
-        val offsetX = 10f
-        val offsetY = 20f
-        var positionX = 0f
-        var positionY = 0f
+        val boxSize = 1
+        val offsetX = 10
+        val offsetY = 20
+        var positionX = 0
+        var positionY = 0
         rule.setContent {
             Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
@@ -229,10 +230,10 @@ class OffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopEnd)
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
-                        .offset({ offsetX }, { offsetY })
+                        .offset { IntOffset(offsetX, offsetY) }
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            positionX = coordinates.positionInRoot.x
-                            positionY = coordinates.positionInRoot.y
+                            positionX = coordinates.positionInRoot.x.roundToInt()
+                            positionY = coordinates.positionInRoot.y.roundToInt()
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
@@ -244,7 +245,7 @@ class OffsetTest : LayoutTest() {
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
             Assert.assertEquals(
-                containerWidth.toIntPx() - offsetX.roundToInt() - boxSize,
+                containerWidth.toIntPx() - offsetX - boxSize,
                 positionX
             )
             Assert.assertEquals(offsetY, positionY)
@@ -253,18 +254,18 @@ class OffsetTest : LayoutTest() {
 
     @Test
     fun absoluteOffsetPx_positionIsModified() = with(density) {
-        val offsetX = 10f
-        val offsetY = 20f
-        var positionX = 0f
-        var positionY = 0f
+        val offsetX = 10
+        val offsetY = 20
+        var positionX = 0
+        var positionY = 0
         rule.setContent {
             Box(
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
-                    .absoluteOffset({ offsetX }, { offsetY })
+                    .absoluteOffset { IntOffset(offsetX, offsetY) }
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        positionX = coordinates.positionInRoot.x
-                        positionY = coordinates.positionInRoot.y
+                        positionX = coordinates.positionInRoot.x.roundToInt()
+                        positionY = coordinates.positionInRoot.y.roundToInt()
                     }
             ) {
             }
@@ -280,11 +281,11 @@ class OffsetTest : LayoutTest() {
     @Test
     fun absoluteOffsetPx_positionIsModified_rtl() = with(density) {
         val containerWidth = 30.dp
-        val boxSize = 1f
-        val offsetX = 10f
-        val offsetY = 20f
-        var positionX = 0f
-        var positionY = 0f
+        val boxSize = 1
+        val offsetX = 10
+        val offsetY = 20
+        var positionX = 0
+        var positionY = 0
         rule.setContent {
             Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
@@ -292,10 +293,10 @@ class OffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopEnd)
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
-                        .absoluteOffset({ offsetX }, { offsetY })
+                        .absoluteOffset { IntOffset(offsetX, offsetY) }
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            positionX = coordinates.positionInRoot.x
-                            positionY = coordinates.positionInRoot.y
+                            positionX = coordinates.positionInRoot.x.roundToInt()
+                            positionY = coordinates.positionInRoot.y.roundToInt()
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
@@ -307,7 +308,7 @@ class OffsetTest : LayoutTest() {
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
             Assert.assertEquals(
-                containerWidth.toIntPx() - boxSize + offsetX.roundToInt(),
+                containerWidth.toIntPx() - boxSize + offsetX,
                 positionX
             )
             Assert.assertEquals(offsetY, positionY)
@@ -338,20 +339,20 @@ class OffsetTest : LayoutTest() {
 
     @Test
     fun testOffsetPxInspectableValue() {
-        val modifier = Modifier.offset({ 10.0f }, { 20.0f }) as InspectableValue
+        val modifier = Modifier.offset { IntOffset(10, 20) } as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("offset")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.asIterable())
-            .containsExactly("x", "y")
+            .containsExactly("offset")
     }
 
     @Test
     fun testAbsoluteOffsetPxInspectableValue() {
-        val modifier = Modifier.absoluteOffset({ 10.0f }, { 20.0f }) as InspectableValue
+        val modifier = Modifier.absoluteOffset { IntOffset(10, 20) } as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("absoluteOffset")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.asIterable())
-            .containsExactly("x", "y")
+            .containsExactly("offset")
     }
 
     @Test
@@ -362,7 +363,7 @@ class OffsetTest : LayoutTest() {
             Box(
                 Modifier
                     .size(10.dp)
-                    .offset(x = { offset })
+                    .offset { IntOffset(offset.roundToInt(), 0) }
                     .drawBehind {
                         contentRedrawsCount ++
                     }

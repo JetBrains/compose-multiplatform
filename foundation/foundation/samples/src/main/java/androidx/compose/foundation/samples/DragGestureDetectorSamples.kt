@@ -53,8 +53,10 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import kotlin.math.roundToInt
 
 @Composable
 @Sampled
@@ -67,7 +69,7 @@ fun AwaitHorizontalDragOrCancellationSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -111,7 +113,7 @@ fun HorizontalDragSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -154,7 +156,7 @@ fun DetectHorizontalDragGesturesSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -181,7 +183,7 @@ fun AwaitVerticalDragOrCancellationSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -225,7 +227,7 @@ fun VerticalDragSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -268,7 +270,7 @@ fun DetectVerticalDragGesturesSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -295,7 +297,7 @@ fun AwaitDragOrCancellationSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
@@ -351,7 +353,7 @@ fun DragSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
@@ -406,7 +408,7 @@ fun DetectDragGesturesSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {

@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.fastForEach
@@ -334,7 +335,9 @@ fun BackdropScaffold(
 
             // Front layer
             Surface(
-                Modifier.offset(y = { scaffoldState.offset.value }).then(swipeable),
+                Modifier
+                    .offset { IntOffset(0, scaffoldState.offset.value.roundToInt()) }
+                    .then(swipeable),
                 shape = frontLayerShape,
                 elevation = frontLayerElevation,
                 color = frontLayerBackgroundColor,

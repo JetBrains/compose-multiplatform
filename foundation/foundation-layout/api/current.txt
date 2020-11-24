@@ -357,10 +357,10 @@ package androidx.compose.foundation.layout {
   }
 
   public final class OffsetKt {
-    method public static androidx.compose.ui.Modifier absoluteOffset(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,java.lang.Float> x, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,java.lang.Float> y);
+    method public static androidx.compose.ui.Modifier absoluteOffset(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,androidx.compose.ui.unit.IntOffset> offset);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier absoluteOffset-S2lCeAQ(androidx.compose.ui.Modifier, optional float x, optional float y);
     method @Deprecated public static androidx.compose.ui.Modifier absoluteOffsetPx(androidx.compose.ui.Modifier, optional androidx.compose.runtime.State<java.lang.Float> x, optional androidx.compose.runtime.State<java.lang.Float> y);
-    method public static androidx.compose.ui.Modifier offset(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,java.lang.Float> x, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,java.lang.Float> y);
+    method public static androidx.compose.ui.Modifier offset(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,androidx.compose.ui.unit.IntOffset> offset);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier offset-S2lCeAQ(androidx.compose.ui.Modifier, optional float x, optional float y);
     method @Deprecated public static androidx.compose.ui.Modifier offsetPx(androidx.compose.ui.Modifier, optional androidx.compose.runtime.State<java.lang.Float> x, optional androidx.compose.runtime.State<java.lang.Float> y);
   }
