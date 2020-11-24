@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
@@ -124,7 +124,7 @@ fun AnnotatedStringBuilderWithStyleSample() {
 @Sampled
 fun AnnotatedStringBuilderLambdaSample() {
     // create an AnnotatedString using the lambda builder
-    annotatedString {
+    buildAnnotatedString {
         // append "Hello" with red text color
         withStyle(SpanStyle(color = Color.Red)) {
             append("Hello")

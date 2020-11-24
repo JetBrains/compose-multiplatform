@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TestFontResourceLoader
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -62,7 +62,7 @@ class AndroidAccessibilitySpannableStringTest {
     @Test
     fun toAccessibilitySpannableString_with_locale() {
         val languageTag = "en-GB"
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(localeList = LocaleList(languageTag))) {
                 append("world")
@@ -84,7 +84,7 @@ class AndroidAccessibilitySpannableStringTest {
     @Test
     fun toAccessibilitySpannableString_with_color() {
         val color = Color.Black
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(color = color)) {
                 append("world")
@@ -105,7 +105,7 @@ class AndroidAccessibilitySpannableStringTest {
     @Test
     fun toAccessibilitySpannableString_with_fontSizeInSp() {
         val fontSize = 12.sp
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(fontSize = fontSize)) {
                 append("world")
@@ -126,7 +126,7 @@ class AndroidAccessibilitySpannableStringTest {
     @Test
     fun toAccessibilitySpannableString_with_fontSizeInEm() {
         val fontSize = 2.em
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(fontSize = fontSize)) {
                 append("world")
@@ -146,7 +146,7 @@ class AndroidAccessibilitySpannableStringTest {
 
     @Test
     fun toAccessibilitySpannableString_with_fontWeightBold() {
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                 append("world")
@@ -166,7 +166,7 @@ class AndroidAccessibilitySpannableStringTest {
 
     @Test
     fun toAccessibilitySpannableString_with_italic() {
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
                 append("world")
@@ -187,7 +187,7 @@ class AndroidAccessibilitySpannableStringTest {
     @Test
     fun toAccessibilitySpannableString_with_fontFamily() {
         val fontFamily = FontFamily.Monospace
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(fontFamily = fontFamily)) {
                 append("world")
@@ -207,7 +207,7 @@ class AndroidAccessibilitySpannableStringTest {
 
     @Test
     fun toAccessibilitySpannableString_with_underline() {
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
                 append("world")
@@ -225,7 +225,7 @@ class AndroidAccessibilitySpannableStringTest {
 
     @Test
     fun toAccessibilitySpannableString_with_lineThrough() {
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(textDecoration = TextDecoration.LineThrough)) {
                 append("world")
@@ -244,7 +244,7 @@ class AndroidAccessibilitySpannableStringTest {
     @Test
     fun toAccessibilitySpannableString_with_scaleX() {
         val scaleX = 1.2f
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(
                 style = SpanStyle(textGeometricTransform = TextGeometricTransform(scaleX = scaleX))
@@ -267,7 +267,7 @@ class AndroidAccessibilitySpannableStringTest {
     @Test
     fun toAccessibilitySpannableString_with_background() {
         val backgroundColor = Color.Red
-        val annotatedString = annotatedString {
+        val annotatedString = buildAnnotatedString {
             append("hello")
             withStyle(style = SpanStyle(background = backgroundColor)) {
                 append("world")

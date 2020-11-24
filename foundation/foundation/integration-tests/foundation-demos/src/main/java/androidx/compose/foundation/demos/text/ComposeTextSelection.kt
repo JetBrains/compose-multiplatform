@@ -29,7 +29,7 @@ import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.selection.SelectionContainer
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
@@ -61,7 +61,7 @@ fun TextDemoSelection() {
                 fontWeight = FontWeight.W200,
                 fontStyle = FontStyle.Italic
             ),
-            text = annotatedString {
+            text = buildAnnotatedString {
                 append(text = "$displayText   ")
                 append(text = "$displayTextArabic   ")
                 append(text = "$displayTextChinese   ")

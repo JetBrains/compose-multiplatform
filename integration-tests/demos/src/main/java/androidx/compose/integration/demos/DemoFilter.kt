@@ -44,8 +44,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.annotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 
 /**
@@ -132,7 +132,7 @@ private fun FilteredDemoListItem(
     onNavigate: (Demo) -> Unit
 ) {
     val primary = MaterialTheme.colors.primary
-    val annotatedString = annotatedString {
+    val annotatedString = buildAnnotatedString {
         val title = demo.title
         var currentIndex = 0
         val pattern = filterText.toRegex(option = RegexOption.IGNORE_CASE)

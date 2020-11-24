@@ -58,7 +58,7 @@ class MultiParagraphIntrinsics(
     }
 
     /**
-     * [ParagraphIntrinsics] for each paragraph included in the [annotatedString]. For empty string
+     * [ParagraphIntrinsics] for each paragraph included in the [buildAnnotatedString]. For empty string
      * there will be a single empty paragraph intrinsics info.
      */
     internal val infoList: List<ParagraphIntrinsicInfo>

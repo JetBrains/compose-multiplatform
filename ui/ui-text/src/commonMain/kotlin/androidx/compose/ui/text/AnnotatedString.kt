@@ -743,10 +743,10 @@ fun AnnotatedString(
  * @param builder lambda to modify [AnnotatedString.Builder]
  */
 @Deprecated(
-    message = "Renamed to annotatedString.",
-    replaceWith = ReplaceWith("annotatedString")
+    message = "Renamed to buildAnnotatedString.",
+    replaceWith = ReplaceWith("buildAnnotatedString")
 )
-inline fun AnnotatedString(builder: (Builder).() -> Unit): AnnotatedString =
+inline fun annotatedString(builder: (Builder).() -> Unit): AnnotatedString =
     Builder().apply(builder).toAnnotatedString()
 
 /**
@@ -757,7 +757,7 @@ inline fun AnnotatedString(builder: (Builder).() -> Unit): AnnotatedString =
  *
  * @param builder lambda to modify [AnnotatedString.Builder]
  */
-inline fun annotatedString(builder: (Builder).() -> Unit): AnnotatedString =
+inline fun buildAnnotatedString(builder: (Builder).() -> Unit): AnnotatedString =
     Builder().apply(builder).toAnnotatedString()
 
 /**

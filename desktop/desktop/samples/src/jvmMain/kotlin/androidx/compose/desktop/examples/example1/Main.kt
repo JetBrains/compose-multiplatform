@@ -83,7 +83,7 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.text.style.TextAlign
@@ -179,7 +179,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
         val inlineIndicatorId = "indicator"
 
         Text(
-            text = annotatedString {
+            text = buildAnnotatedString {
                 append("The quick ")
                 if (animation.value) {
                     appendInlineContent(inlineIndicatorId)
