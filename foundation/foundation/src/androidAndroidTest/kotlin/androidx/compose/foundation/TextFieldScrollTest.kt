@@ -22,8 +22,10 @@ import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.foundation.text.TextFieldScrollerPosition
+import androidx.compose.foundation.text.maxLinesHeight
 import androidx.compose.foundation.text.textFieldScroll
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -102,9 +104,9 @@ class TextFieldScrollTest {
                 onValueChange = {},
                 onTextLayout = { textLayoutResultRef.value = it },
                 softWrap = false,
-                maxLines = 1,
                 modifier = Modifier
                     .preferredSize(width = 300.dp, height = 50.dp)
+                    .maxLinesHeight(1, TextStyle.Default)
                     .textFieldScroll(
                         orientation = Orientation.Horizontal,
                         remember { scrollerPosition },
@@ -134,6 +136,37 @@ class TextFieldScrollTest {
                 onTextLayout = { textLayoutResultRef.value = it },
                 modifier = Modifier
                     .preferredSize(width = 300.dp, height = 50.dp)
+                    .maxLinesHeight(Int.MAX_VALUE, TextStyle.Default)
+                    .textFieldScroll(
+                        orientation = Orientation.Vertical,
+                        remember { scrollerPosition },
+                        value,
+                        VisualTransformation.None,
+                        textLayoutResultRef,
+                    )
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(scrollerPosition.maximum).isLessThan(Float.POSITIVE_INFINITY)
+            assertThat(scrollerPosition.maximum).isGreaterThan(0f)
+        }
+    }
+
+    @Test
+    fun testTextField_verticallyScrollable_withLongInput_whenMaxLinesProvided() {
+        val scrollerPosition = TextFieldScrollerPosition()
+        val value = TextFieldValue(longText)
+
+        rule.setContent {
+            val textLayoutResultRef: Ref<TextLayoutResult?> = remember { Ref() }
+            CoreTextField(
+                value = value,
+                onValueChange = {},
+                onTextLayout = { textLayoutResultRef.value = it },
+                modifier = Modifier
+                    .preferredWidth(100.dp)
+                    .maxLinesHeight(3, TextStyle.Default)
                     .textFieldScroll(
                         orientation = Orientation.Vertical,
                         remember { scrollerPosition },
@@ -162,9 +195,9 @@ class TextFieldScrollTest {
                 onValueChange = {},
                 onTextLayout = { textLayoutResultRef.value = it },
                 softWrap = false,
-                maxLines = 1,
                 modifier = Modifier
                     .preferredSize(width = 300.dp, height = 50.dp)
+                    .maxLinesHeight(1, TextStyle.Default)
                     .textFieldScroll(
                         orientation = Orientation.Horizontal,
                         remember { scrollerPosition },
@@ -231,7 +264,6 @@ class TextFieldScrollTest {
                         onValueChange = {},
                         onTextLayout = { textLayoutResultRef.value = it },
                         softWrap = false,
-                        maxLines = 1,
                         modifier = Modifier
                             .preferredSize(textFieldSize.toDp())
                             .textFieldScroll(
@@ -312,11 +344,11 @@ class TextFieldScrollTest {
                 value = value,
                 onValueChange = {},
                 onTextLayout = { textLayoutResultRef.value = it },
-                maxLines = 1,
                 softWrap = false,
                 modifier = Modifier
                     .preferredSize(width = 300.dp, height = 50.dp)
                     .testTag(TextfieldTag)
+                    .maxLinesHeight(1, TextStyle.Default)
                     .textFieldScroll(
                         Orientation.Horizontal,
                         remember { scrollerPosition },
@@ -408,11 +440,11 @@ class TextFieldScrollTest {
                 value = value,
                 onValueChange = {},
                 onTextLayout = { textLayoutResultRef.value = it },
-                maxLines = 1,
                 softWrap = false,
                 modifier = Modifier
                     .preferredSize(width = 300.dp, height = 50.dp)
                     .testTag(TextfieldTag)
+                    .maxLinesHeight(1, TextStyle.Default)
                     .textFieldScroll(
                         Orientation.Horizontal,
                         scrollerPosition,

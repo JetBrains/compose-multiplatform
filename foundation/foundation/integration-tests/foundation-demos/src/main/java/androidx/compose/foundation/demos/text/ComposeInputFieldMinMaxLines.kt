@@ -26,7 +26,7 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 
 @Composable
-fun CoreTextFieldMinMaxDemo() {
+fun BasicTextFieldMinMaxDemo() {
     ScrollableColumn {
         TagLine("empty text, no maxLines")
         TextFieldWithMaxLines("", maxLines = Int.MAX_VALUE)

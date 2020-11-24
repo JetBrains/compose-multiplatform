@@ -54,7 +54,7 @@ import kotlin.math.roundToInt
 
 // visible for testing
 internal const val DefaultWidthCharCount = 10 // min width for TextField is 10 chars long
-private val EmptyTextReplacement = "H".repeat(DefaultWidthCharCount) // just a reference character.
+internal val EmptyTextReplacement = "H".repeat(DefaultWidthCharCount) // just a reference character.
 
 /**
  * Computed the default width and height for TextField.
@@ -67,16 +67,18 @@ private val EmptyTextReplacement = "H".repeat(DefaultWidthCharCount) // just a r
  *
  * Until we have font metrics APIs, use the height of reference text as a workaround.
  */
-internal fun computeSizeForEmptyText(
+internal fun computeSizeForDefaultText(
     style: TextStyle,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    resourceLoader: Font.ResourceLoader,
+    text: String = EmptyTextReplacement,
+    maxLines: Int = 1
 ): IntSize {
     val paragraph = Paragraph(
-        text = EmptyTextReplacement,
+        text = text,
         style = style,
         spanStyles = listOf(),
-        maxLines = 1,
+        maxLines = maxLines,
         ellipsis = false,
         density = density,
         resourceLoader = resourceLoader,
@@ -107,27 +109,10 @@ class TextFieldDelegate {
             textDelegate: TextDelegate,
             constraints: Constraints,
             layoutDirection: LayoutDirection,
-            maxLines: Int = Int.MAX_VALUE,
             prevResultText: TextLayoutResult? = null
         ): Triple<Int, Int, TextLayoutResult> {
             val layoutResult = textDelegate.layout(constraints, layoutDirection, prevResultText)
-
-            val height = constrainWithMaxLines(maxLines, layoutResult.size.height, layoutResult)
-            val width = layoutResult.size.width
-
-            return Triple(width, height, layoutResult)
-        }
-
-        private fun constrainWithMaxLines(
-            maxLines: Int,
-            height: Int,
-            layoutResult: TextLayoutResult
-        ): Int {
-            return if (maxLines == Int.MAX_VALUE || layoutResult.lineCount <= maxLines) {
-                height
-            } else {
-                ceil(layoutResult.getLineBottom(maxLines - 1)).toInt()
-            }
+            return Triple(layoutResult.size.width, layoutResult.size.height, layoutResult)
         }
 
         /**
@@ -194,7 +179,7 @@ class TextFieldDelegate {
                     offsetMap.originalToTransformed(value.selection.max) - 1
                 )
             } else {
-                val defaultSize = computeSizeForEmptyText(
+                val defaultSize = computeSizeForDefaultText(
                     textDelegate.style,
                     textDelegate.density,
                     textDelegate.resourceLoader
