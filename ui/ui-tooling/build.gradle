@@ -67,8 +67,5 @@ androidx {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         useIR = true
-        freeCompilerArgs += [
-                "-P", "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
-        ]
     }
 }

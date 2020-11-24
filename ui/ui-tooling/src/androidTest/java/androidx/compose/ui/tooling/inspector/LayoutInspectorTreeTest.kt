@@ -463,6 +463,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
     @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29:  b/171519437
     @Test
+    @Ignore("b/174152464")
     fun testTextId() {
         val slotTableRecord = SlotTableRecord.create()
 
