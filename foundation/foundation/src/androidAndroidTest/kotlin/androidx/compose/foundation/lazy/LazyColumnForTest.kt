@@ -20,7 +20,6 @@ import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -73,7 +72,6 @@ import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -334,46 +332,6 @@ class LazyColumnForTest {
 
         rule.onNodeWithTag(thirdTag)
             .assertIsDisplayed()
-    }
-
-    @Ignore("This test is not fully working. To be fixed in b/167913500")
-    @Test
-    fun contentPaddingIsApplied() = with(rule.density) {
-        val itemTag = "item"
-
-        rule.setContent {
-            LazyColumnFor(
-                items = listOf(1),
-                modifier = Modifier.size(100.dp)
-                    .testTag(LazyColumnForTag),
-                contentPadding = PaddingValues(
-                    start = 10.dp,
-                    top = 50.dp,
-                    end = 10.dp,
-                    bottom = 50.dp
-                )
-            ) {
-                Spacer(Modifier.fillParentMaxWidth().preferredHeight(50.dp).testTag(itemTag))
-            }
-        }
-
-        var itemBounds = rule.onNodeWithTag(itemTag)
-            .getUnclippedBoundsInRoot()
-
-        assertThat(itemBounds.top.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
-        assertThat(itemBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
-        assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(10.dp.toIntPx())
-        assertThat(itemBounds.right.toIntPx())
-            .isWithin1PixelFrom(100.dp.toIntPx() - 10.dp.toIntPx())
-
-        rule.onNodeWithTag(LazyColumnForTag)
-            .scrollBy(y = 51.dp, density = rule.density)
-
-        itemBounds = rule.onNodeWithTag(itemTag)
-            .getUnclippedBoundsInRoot()
-
-        assertThat(itemBounds.top.toIntPx()).isWithin1PixelFrom(0)
-        assertThat(itemBounds.bottom.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
     }
 
     @Test
