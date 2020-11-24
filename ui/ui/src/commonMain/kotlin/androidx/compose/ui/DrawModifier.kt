@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
     "Use DrawModifier from the androidx.compose.ui.draw package instead",
     ReplaceWith(
         "DrawModifier",
-        "androidx.compose.ui.draw"
+        "androidx.compose.ui.draw.DrawModifier"
     )
 )
 typealias DrawModifier = androidx.compose.ui.draw.DrawModifier
@@ -50,7 +50,7 @@ typealias DrawModifier = androidx.compose.ui.draw.DrawModifier
     "Use DrawCacheModifier from the androidx.compose.ui.draw package instead",
     ReplaceWith(
         "DrawCacheModifier",
-        "androidx.compose.ui.draw"
+        "androidx.compose.ui.draw.DrawCacheModifier"
     )
 )
 typealias DrawCacheModifier = androidx.compose.ui.draw.DrawCacheModifier
@@ -62,7 +62,7 @@ typealias DrawCacheModifier = androidx.compose.ui.draw.DrawCacheModifier
     "Use drawBehind from the androidx.compose.ui.draw package instead",
     ReplaceWith(
         "drawBehind(onDraw)",
-        "androidx.compose.ui.draw"
+        "androidx.compose.ui.draw.drawBehind"
     )
 )
 fun Modifier.drawBehind(onDraw: DrawScope.() -> Unit) = drawBehind(onDraw)
@@ -87,7 +87,7 @@ fun Modifier.drawBehind(onDraw: DrawScope.() -> Unit) = drawBehind(onDraw)
     "Use the drawWithCache from the androidx.compose.ui.draw package instead",
     ReplaceWith(
         "drawWithCache(onBuildCache)",
-        "androidx.compose.ui.draw"
+        "androidx.compose.ui.draw.drawWithCache"
     )
 )
 fun Modifier.drawWithCache(onBuildDrawCache: CacheDrawScope.() -> DrawResult) =
@@ -103,7 +103,7 @@ fun Modifier.drawWithCache(onBuildDrawCache: CacheDrawScope.() -> DrawResult) =
  */
 @Deprecated(
     "Use CacheDrawScope from the androidx.compose.ui.draw package instead",
-    ReplaceWith("CacheDrawScope", "androidx.compose.ui.draw")
+    ReplaceWith("CacheDrawScope", "androidx.compose.ui.draw.CacheDrawScope")
 )
 typealias CacheDrawScope = androidx.compose.ui.draw.CacheDrawScope
 
@@ -113,12 +113,15 @@ typealias CacheDrawScope = androidx.compose.ui.draw.CacheDrawScope
  */
 @Deprecated(
     "Use DrawResult from the androidx.compose.ui.draw package instead",
-    ReplaceWith("DrawResult", "androidx.compose.ui.draw")
+    ReplaceWith("DrawResult", "androidx.compose.ui.draw.DrawResult")
 )
 typealias DrawResult = androidx.compose.ui.draw.DrawResult
 
 @Deprecated(
     "Use drawWithContent from the androidx.compose.ui.draw package instead",
-    ReplaceWith("drawWithContent(onDraw)", "androidx.compose.ui.draw")
+    ReplaceWith(
+        "drawWithContent(onDraw)",
+        "androidx.compose.ui.draw.drawWithContent"
+    )
 )
 fun Modifier.drawWithContent(onDraw: ContentDrawScope.() -> Unit) = drawWithContent(onDraw)
