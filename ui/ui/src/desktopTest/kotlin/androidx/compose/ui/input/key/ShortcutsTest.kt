@@ -195,5 +195,90 @@ class ShortcutsTest {
             Truth.assertThat(enterTriggered).isEqualTo(0)
             Truth.assertThat(shortcutTriggered).isEqualTo(1)
         }
+
+        rule.onRoot().performKeyPress(
+            keyEvent(
+                Key.Enter, KeyEventType.KeyUp
+            )
+        )
+
+        rule.onRoot().performKeyPress(
+            keyEvent(
+                Key.ShiftLeft, KeyEventType.KeyUp
+            )
+        )
+
+        rule.onRoot().performKeyPress(
+            keyEvent(
+                Key.Enter, KeyEventType.KeyDown
+            )
+        )
+
+        rule.runOnIdle {
+            Truth.assertThat(enterTriggered).isEqualTo(1)
+            Truth.assertThat(shortcutTriggered).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun shortcuts_multiple() {
+        val focusRequester = FocusRequester()
+        var aTriggered = 0
+        var cTriggered = 0
+        rule.setContent {
+            Box(
+                modifier = Modifier
+                    .size(10.dp, 10.dp)
+                    .focusRequester(focusRequester)
+                    .focus()
+                    .shortcuts {
+                        on(Key.MetaLeft + Key.A) {
+                            aTriggered += 1
+                        }
+
+                        on(Key.MetaLeft + Key.C) {
+                            cTriggered += 1
+                        }
+                    }
+            )
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        rule.onRoot().performKeyPress(
+            keyEvent(
+                Key.MetaLeft, KeyEventType.KeyDown
+            )
+        )
+
+        rule.onRoot().performKeyPress(
+            keyEvent(
+                Key.C, KeyEventType.KeyDown
+            )
+        )
+
+        rule.runOnIdle {
+            Truth.assertThat(aTriggered).isEqualTo(0)
+            Truth.assertThat(cTriggered).isEqualTo(1)
+        }
+
+        rule.onRoot().performKeyPress(
+            keyEvent(
+                Key.C, KeyEventType.KeyUp
+            )
+        )
+
+        rule.onRoot().performKeyPress(
+            keyEvent(
+                Key.A, KeyEventType.KeyDown
+            )
+        )
+
+        rule.runOnIdle {
+            Truth.assertThat(aTriggered).isEqualTo(1)
+            Truth.assertThat(cTriggered).isEqualTo(1)
+        }
     }
 }
