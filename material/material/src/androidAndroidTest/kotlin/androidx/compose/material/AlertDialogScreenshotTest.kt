@@ -17,10 +17,15 @@
 package androidx.compose.material
 
 import android.os.Build
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.testutils.assertAgainstGolden
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -88,5 +93,129 @@ class AlertDialogScreenshotTest {
         rule.onNode(isDialog())
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "dialog_stackedButtons")
+    }
+
+    @Test
+    fun onlyTitle() {
+        rule.setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text("Title") },
+                confirmButton = {
+                    TextButton(onClick = {}) {
+                        Text("Ok")
+                    }
+                }
+            )
+        }
+
+        rule.onNode(isDialog())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "dialog_onlyTitle")
+    }
+
+    @Test
+    fun onlyText() {
+        rule.setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                text = { Text("Text") },
+                confirmButton = {
+                    TextButton(onClick = {}) {
+                        Text("Ok")
+                    }
+                }
+            )
+        }
+
+        rule.onNode(isDialog())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "dialog_onlyText")
+    }
+
+    @Test
+    fun noTitleOrText() {
+        rule.setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                confirmButton = {
+                    TextButton(onClick = {}) {
+                        Text("Ok")
+                    }
+                }
+            )
+        }
+
+        rule.onNode(isDialog())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "dialog_noTitleOrText")
+    }
+
+    @Test
+    fun titleWithoutTextBaseline() {
+        rule.setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                title = {
+                    Box(Modifier.size(75.dp, 25.dp).background(MaterialTheme.colors.primary))
+                },
+                text = { Text("Text") },
+                confirmButton = {
+                    TextButton(onClick = {}) {
+                        Text("Ok")
+                    }
+                }
+            )
+        }
+
+        rule.onNode(isDialog())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "dialog_titleWithoutTextBaseline")
+    }
+
+    @Test
+    fun textWithoutTextBaseline() {
+        rule.setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text("Title") },
+                text = {
+                    Box(Modifier.size(300.dp, 50.dp).background(MaterialTheme.colors.primary))
+                },
+                confirmButton = {
+                    TextButton(onClick = {}) {
+                        Text("Ok")
+                    }
+                }
+            )
+        }
+
+        rule.onNode(isDialog())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "dialog_textWithoutTextBaseline")
+    }
+
+    @Test
+    fun titleAndTextWithoutTextBaselines() {
+        rule.setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                title = {
+                    Box(Modifier.size(75.dp, 25.dp).background(MaterialTheme.colors.primary))
+                },
+                text = {
+                    Box(Modifier.size(300.dp, 50.dp).background(MaterialTheme.colors.primary))
+                },
+                confirmButton = {
+                    TextButton(onClick = {}) {
+                        Text("Ok")
+                    }
+                }
+            )
+        }
+
+        rule.onNode(isDialog())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "dialog_titleAndTextWithoutTextBaselines")
     }
 }
