@@ -27,6 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
@@ -35,7 +38,9 @@ import androidx.compose.ui.test.centerLeft
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
@@ -411,5 +416,83 @@ class DrawerTest {
         rule.runOnIdle {
             assertThat(drawerState.value).isEqualTo(BottomDrawerValue.Closed)
         }
+    }
+
+    @Test
+    @LargeTest
+    fun modalDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen() {
+        lateinit var drawerState: DrawerState
+        rule.setMaterialContent {
+            drawerState = rememberDrawerState(DrawerValue.Closed)
+            ModalDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                bodyContent = emptyContent()
+            )
+        }
+
+        // Drawer should start in closed state and have no dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Dismiss))
+
+        // When the drawer state is set to Opened
+        rule.runOnIdle {
+            drawerState.open()
+        }
+        // Then the drawer should be opened and have dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+
+        // When the drawer state is set to Closed using dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+        // Then the drawer should be closed and have no dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Dismiss))
+    }
+
+    @Test
+    @LargeTest
+    fun bottomDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen() {
+        lateinit var drawerState: BottomDrawerState
+        rule.setMaterialContent {
+            drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
+            BottomDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                bodyContent = emptyContent()
+            )
+        }
+
+        // Drawer should start in closed state and have no dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Dismiss))
+
+        // When the drawer state is set to Opened
+        rule.runOnIdle {
+            drawerState.open()
+        }
+        // Then the drawer should be opened and have dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+
+        // When the drawer state is set to Closed using dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+        // Then the drawer should be closed and have no dismiss action
+        rule.onNodeWithTag("drawer", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Dismiss))
     }
 }

@@ -460,6 +460,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
+        semanticsNode.config.getOrNull(SemanticsActions.Dismiss)?.let {
+            info.addAction(
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_DISMISS,
+                    it.label
+                )
+            )
+        }
+
         if (semanticsNode.config.contains(CustomActions)) {
             val customActions = semanticsNode.config[CustomActions]
             if (customActions.size >= AccessibilityActionsResourceIds.size) {
@@ -888,6 +897,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
             AccessibilityNodeInfoCompat.ACTION_CUT -> {
                 return node.config.getOrNull(SemanticsActions.CutText)?.let {
+                    it.action()
+                } ?: false
+            }
+            AccessibilityNodeInfoCompat.ACTION_DISMISS -> {
+                return node.config.getOrNull(SemanticsActions.Dismiss)?.let {
                     it.action()
                 } ?: false
             }

@@ -42,6 +42,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -386,7 +388,14 @@ fun ModalDrawerLayout(
                         maxWidth = constraints.maxWidth.toDp(),
                         maxHeight = constraints.maxHeight.toDp()
                     )
-                }.offset(x = { drawerState.offset.value }).padding(end = VerticalDrawerPadding),
+                }
+                    .semantics {
+                        if (drawerState.isOpen) {
+                            dismiss(action = { drawerState.close(); true })
+                        }
+                    }
+                    .offset(x = { drawerState.offset.value })
+                    .padding(end = VerticalDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
@@ -500,7 +509,13 @@ fun BottomDrawerLayout(
                         maxWidth = constraints.maxWidth.toDp(),
                         maxHeight = constraints.maxHeight.toDp()
                     )
-                }.offset(y = { drawerState.offset.value }),
+                }
+                    .semantics {
+                        if (drawerState.isOpen) {
+                            dismiss(action = { drawerState.close(); true })
+                        }
+                    }
+                    .offset(y = { drawerState.offset.value }),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
