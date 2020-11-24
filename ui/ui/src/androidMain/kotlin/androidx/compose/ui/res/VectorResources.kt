@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.res
 
-import android.annotation.SuppressLint
 import android.content.res.Resources
+import android.content.res.XmlResourceParser
 import android.util.TypedValue
 import android.util.Xml
 import androidx.annotation.DrawableRes
@@ -39,6 +39,8 @@ import org.xmlpull.v1.XmlPullParserException
  * based off of it's dimensions appropriately
  *
  * Note: This API is transient and will be likely removed for encouraging async resource loading.
+ *
+ * For loading generic loading of rasterized or vector assets see [painterResource]
  */
 @Composable
 fun vectorResource(@DrawableRes id: Int): ImageVector {
@@ -56,6 +58,8 @@ fun vectorResource(@DrawableRes id: Int): ImageVector {
  * Until resource loading complete, this function returns deferred vector drawable resource with
  * [PendingResource]. Once the loading finishes, recompose is scheduled and this function will
  * return deferred vector drawable resource with [LoadedResource] or [FailedResource].
+ *
+ * For loading generic loading of rasterized or vector assets see [painterResource]
  *
  * @param id the resource identifier
  * @param pendingResource an optional resource to be used during loading instead.
@@ -90,11 +94,23 @@ fun loadVectorResource(
 internal fun loadVectorResource(
     theme: Resources.Theme? = null,
     res: Resources,
-    resId: Int
+    resId: Int,
+): ImageVector =
+    loadVectorResourceInner(theme, res, res.getXml(resId).apply { seekToStartTag() })
+
+/**
+ * Helper method that parses a vector asset from the given [XmlResourceParser] position.
+ * This method assumes the parser is already been positioned to the start tag
+ */
+@Throws(XmlPullParserException::class)
+@SuppressWarnings("RestrictedApi")
+internal fun loadVectorResourceInner(
+    theme: Resources.Theme? = null,
+    res: Resources,
+    parser: XmlResourceParser
 ): ImageVector {
-    @SuppressLint("ResourceType") val parser = res.getXml(resId)
     val attrs = Xml.asAttributeSet(parser)
-    val builder = parser.seekToStartTag().createVectorImageBuilder(res, theme, attrs)
+    val builder = parser.createVectorImageBuilder(res, theme, attrs)
 
     var nestedGroups = 0
     while (!parser.isAtEnd()) {
