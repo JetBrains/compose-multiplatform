@@ -39,6 +39,7 @@ import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.platform.testTag
@@ -1017,6 +1018,67 @@ class LazyColumnForTest {
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(3)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun itemsAreNotRedrawnDuringScroll() {
+        val items = (0..20).toList()
+        val redrawCount = Array(6) { 0 }
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(
+                    Modifier.size(20.dp)
+                        .drawBehind { redrawCount[it]++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 10.dp, density = rule.density)
+
+        rule.runOnIdle {
+            redrawCount.forEachIndexed { index, i ->
+                assertWithMessage("Item with index $index was redrawn $i times")
+                    .that(i).isEqualTo(1)
+            }
+        }
+    }
+
+    @Test
+    fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
+        val items = (0..1).toList()
+        val redrawCount = Array(2) { 0 }
+        var stateUsedInDrawScope by mutableStateOf(false)
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(
+                    Modifier.size(50.dp)
+                        .drawBehind {
+                            redrawCount[it]++
+                            if (it == 1) {
+                                stateUsedInDrawScope.hashCode()
+                            }
+                        }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            stateUsedInDrawScope = true
+        }
+
+        rule.runOnIdle {
+            assertWithMessage("First items is not expected to be redrawn")
+                .that(redrawCount[0]).isEqualTo(1)
+            assertWithMessage("Second items is expected to be redrawn")
+                .that(redrawCount[1]).isEqualTo(2)
         }
     }
 
