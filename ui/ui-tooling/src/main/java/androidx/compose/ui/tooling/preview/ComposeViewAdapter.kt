@@ -244,11 +244,6 @@ internal class ComposeViewAdapter : FrameLayout {
                 walkTable(it)
             }
         }
-
-        if (composableName.isNotEmpty()) {
-            // TODO(b/160126628): support other APIs, e.g. animate
-            findAndSubscribeTransitions()
-        }
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -259,6 +254,11 @@ internal class ComposeViewAdapter : FrameLayout {
             // it to the user.
             throw exception
         }
+
+        if (composableName.isNotEmpty()) {
+            // TODO(b/160126628): support other APIs, e.g. animate
+            findAndSubscribeTransitions()
+        }
     }
 
     /**
@@ -267,8 +267,7 @@ internal class ComposeViewAdapter : FrameLayout {
      * the ones we've got source information for.
      */
     @OptIn(InternalAnimationApi::class)
-    @VisibleForTesting
-    internal fun findAndSubscribeTransitions() {
+    private fun findAndSubscribeTransitions() {
         val slotTrees = slotTableRecord.store.map { it.asTree() }
         val observers = mutableSetOf<AnimationClockObserver>()
         // Check all the slot tables, since some animations might not be present in the same
@@ -400,8 +399,8 @@ internal class ComposeViewAdapter : FrameLayout {
      * [clock] instead of the default clock, setting this value as the clock's initial time.
      * @param forceCompositionInvalidation if true, the composition will be invalidated on every
      * draw, forcing it to recompose on next render.
-     * @param onDraw callback invoked after every draw of the adapter. Only for test use.
      * @param onCommit callback invoked after every commit of the preview composable.
+     * @param onDraw callback invoked after every draw of the adapter. Only for test use.
      */
     @VisibleForTesting
     internal fun init(
