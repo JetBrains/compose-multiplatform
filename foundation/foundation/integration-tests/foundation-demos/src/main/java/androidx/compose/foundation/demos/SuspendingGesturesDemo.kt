@@ -46,14 +46,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
@@ -273,7 +273,7 @@ fun TouchSlopDragGestures() {
                 Modifier.height(50.dp)
                     .fillMaxWidth()
                     .align(Alignment.TopStart)
-                    .drawLayer(
+                    .graphicsLayer(
                         rotationZ = 90f,
                         transformOrigin = TransformOrigin(0f, 1f)
                     )
@@ -380,7 +380,7 @@ fun MultitouchArea(
     Box(Modifier.fillMaxSize()) {
         Box(
             Modifier.offset({ offsetX.value }, { offsetY.value })
-                .drawLayer(
+                .graphicsLayer(
                     scaleX = zoom,
                     scaleY = zoom,
                     rotationZ = angle

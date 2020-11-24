@@ -68,7 +68,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -406,9 +406,9 @@ private fun RightColumn(modifier: Modifier) = Box {
     val itemCount = 100000
     val itemHeight = 20.dp
 
-    LazyColumn(modifier.drawLayer(alpha = 0.5f), state = state) {
+    LazyColumn(modifier.graphicsLayer(alpha = 0.5f), state = state) {
         items((1..itemCount).toList()) { x ->
-            Text(x.toString(), Modifier.drawLayer(alpha = 0.5f).height(itemHeight))
+            Text(x.toString(), Modifier.graphicsLayer(alpha = 0.5f).height(itemHeight))
         }
     }
 

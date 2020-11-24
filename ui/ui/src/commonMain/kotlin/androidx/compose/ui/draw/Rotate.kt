@@ -18,7 +18,7 @@ package androidx.compose.ui.draw
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 
 /**
  * Sets the degrees the view is rotated around the center of the composable. Increasing values
@@ -26,10 +26,11 @@ import androidx.compose.ui.drawLayer
  * direction
  *
  * Usage of this API renders this composable into a separate graphics layer.
- * @see drawLayer
+ * @see graphicsLayer
  *
  * Example usage:
  * @sample androidx.compose.ui.samples.RotateSample
  */
 @Stable
-fun Modifier.rotate(degrees: Float) = if (degrees != 0f) drawLayer(rotationZ = degrees) else this
+fun Modifier.rotate(degrees: Float) =
+    if (degrees != 0f) graphicsLayer(rotationZ = degrees) else this

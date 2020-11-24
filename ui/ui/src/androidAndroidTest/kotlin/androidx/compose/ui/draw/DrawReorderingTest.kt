@@ -30,9 +30,8 @@ import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.padding
@@ -89,7 +88,7 @@ class DrawReorderingTest {
                         )
                         FixedSize(
                             30,
-                            Modifier.drawLayer()
+                            Modifier.graphicsLayer()
                                 .background(Color.Red)
                                 .drawLatchModifier()
                         )
@@ -129,7 +128,7 @@ class DrawReorderingTest {
                         )
                         FixedSize(
                             30,
-                            Modifier.drawLayer()
+                            Modifier.graphicsLayer()
                                 .background(Color.Red)
                                 .drawLatchModifier()
                         )
@@ -169,7 +168,7 @@ class DrawReorderingTest {
                         )
                         FixedSize(
                             30,
-                            Modifier.drawLayer()
+                            Modifier.graphicsLayer()
                                 .background(Color.Red)
                                 .zIndex(1f)
                                 .drawLatchModifier()
@@ -210,7 +209,7 @@ class DrawReorderingTest {
                         )
                         FixedSize(
                             30,
-                            Modifier.drawLayer()
+                            Modifier.graphicsLayer()
                                 .background(Color.Red)
                                 .zIndex(1f)
                                 .drawLatchModifier()
@@ -246,7 +245,7 @@ class DrawReorderingTest {
                     content = {
                         FixedSize(
                             30,
-                            Modifier.drawLayer()
+                            Modifier.graphicsLayer()
                                 .background(Color.Red)
                                 .drawLatchModifier()
                         )
@@ -257,7 +256,7 @@ class DrawReorderingTest {
                         )
                         FixedSize(
                             30,
-                            Modifier.drawLayer()
+                            Modifier.graphicsLayer()
                                 .background(Color.Blue)
                                 .drawLatchModifier()
                         )
@@ -328,7 +327,7 @@ class DrawReorderingTest {
                     )
                     FixedSize(
                         30,
-                        Modifier.drawLayer()
+                        Modifier.graphicsLayer()
                             .background(Color.Red)
                             .drawLatchModifier()
                     )
@@ -575,7 +574,7 @@ class DrawReorderingTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testChangingZOrderUncle() {
         val state = mutableStateOf(0f)
-        val elevation = Modifier.drawLayer {
+        val elevation = Modifier.graphicsLayer {
             shadowElevation = state.value
         }
         val view = View(activity)
@@ -801,12 +800,12 @@ class DrawReorderingTest {
                     FixedSize(
                         10,
                         Modifier.padding(10)
-                            .drawLayer(shadowElevation = 1f)
+                            .graphicsLayer(shadowElevation = 1f)
                             .background(Color.White)
                     )
                     FixedSize(
                         30,
-                        Modifier.drawLayer()
+                        Modifier.graphicsLayer()
                             .background(Color.Red)
                             .drawLatchModifier()
                     )

@@ -17,10 +17,10 @@
 package androidx.compose.ui.draw
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.TransformOrigin
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -29,7 +29,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class DrawLayerModifierTest {
+class GraphicsLayerModifierTest {
 
     @Before
     fun before() {
@@ -43,8 +43,8 @@ class DrawLayerModifierTest {
 
     @Test
     fun testInspectable() {
-        val modifier = Modifier.drawLayer(rotationX = 2.0f) as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("drawLayer")
+        val modifier = Modifier.graphicsLayer(rotationX = 2.0f) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("graphicsLayer")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
             ValueElement("scaleX", 1.0f),
@@ -66,7 +66,7 @@ class DrawLayerModifierTest {
     @Test
     fun testEquals() {
         assertThat(
-            Modifier.drawLayer(
+            Modifier.graphicsLayer(
                 scaleX = 1.0f,
                 scaleY = 2.0f,
                 alpha = 0.75f,
@@ -78,11 +78,11 @@ class DrawLayerModifierTest {
                 rotationZ = 8.0f,
                 transformOrigin = TransformOrigin.Center,
                 shape = RectangleShape,
-                clip = true,
+                clip = true
             )
         )
             .isEqualTo(
-                Modifier.drawLayer(
+                Modifier.graphicsLayer(
                     scaleX = 1.0f,
                     scaleY = 2.0f,
                     alpha = 0.75f,
@@ -94,7 +94,7 @@ class DrawLayerModifierTest {
                     rotationZ = 8.0f,
                     transformOrigin = TransformOrigin.Center,
                     shape = RectangleShape,
-                    clip = true,
+                    clip = true
                 )
             )
     }

@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.DrawCacheModifier
-import androidx.compose.ui.DrawModifier
+import androidx.compose.ui.draw.DrawCacheModifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.layout.MeasureResult

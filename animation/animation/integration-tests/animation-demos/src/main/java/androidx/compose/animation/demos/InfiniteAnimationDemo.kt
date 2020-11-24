@@ -32,8 +32,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 
 @Composable
 fun InfiniteAnimationDemo() {
@@ -55,7 +55,11 @@ fun InfiniteAnimationDemo() {
         Icon(
             Icons.Filled.Favorite,
             Modifier.align(Alignment.Center)
-                .drawLayer(alpha = alpha.value, scaleX = 3.0f, scaleY = 3.0f),
+                .graphicsLayer(
+                    scaleX = 3.0f,
+                    scaleY = 3.0f,
+                    alpha = alpha.value
+                ),
             tint = Color.Red
         )
     }

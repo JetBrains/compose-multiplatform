@@ -43,8 +43,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.TransformOrigin
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntBounds
@@ -127,7 +127,7 @@ fun DropdownMenu(
                     }
                 )
                 Card(
-                    modifier = Modifier.drawLayer {
+                    modifier = Modifier.graphicsLayer {
                         val scale = state[Scale]
                         scaleX = scale
                         scaleY = scale

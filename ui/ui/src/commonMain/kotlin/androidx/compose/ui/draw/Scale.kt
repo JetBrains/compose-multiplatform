@@ -18,7 +18,7 @@ package androidx.compose.ui.draw
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 
 /**
  * Scale the contents of the composable by the following scale factors along the horizontal
@@ -29,7 +29,7 @@ import androidx.compose.ui.drawLayer
  * @sample androidx.compose.ui.samples.ScaleNonUniformSample
  *
  * Usage of this API renders this composable into a separate graphics layer
- * @see drawLayer
+ * @see graphicsLayer
  *
  * @param scaleX Multiplier to scale content along the horizontal axis
  * @param scaleY Multiplier to scale content along the vertical axis
@@ -37,7 +37,7 @@ import androidx.compose.ui.drawLayer
 @Stable
 fun Modifier.scale(scaleX: Float, scaleY: Float) =
     if (scaleX != 1.0f || scaleY != 1.0f) {
-        drawLayer(scaleX = scaleX, scaleY = scaleY)
+        graphicsLayer(scaleX = scaleX, scaleY = scaleY)
     } else {
         this
     }
@@ -46,7 +46,7 @@ fun Modifier.scale(scaleX: Float, scaleY: Float) =
  * Scale the contents of both the horizontal and vertical axis uniformly by the same scale factor.
  *
  * Usage of this API renders this composable into a separate graphics layer
- * @see drawLayer
+ * @see graphicsLayer
  *
  * Example usage:
  * @sample androidx.compose.ui.samples.ScaleUniformSample

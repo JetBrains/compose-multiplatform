@@ -28,13 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.IntrinsicMeasureBlock
 import androidx.compose.ui.layout.LastBaseline
@@ -202,7 +202,7 @@ private class TextController(val state: TextState) {
         this.selectionRegistrar = selectionRegistrar
     }
 
-    val modifiers = Modifier.drawLayer().drawBehind {
+    val modifiers = Modifier.graphicsLayer().drawBehind {
         state.layoutResult?.let { layoutResult ->
             drawIntoCanvas { canvas ->
                 state.selectionRange?.let {

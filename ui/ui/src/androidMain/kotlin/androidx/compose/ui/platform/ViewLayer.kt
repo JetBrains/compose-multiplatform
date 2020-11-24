@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.setFrom
@@ -54,7 +54,7 @@ internal class ViewLayer(
     private val canvasHolder = CanvasHolder()
 
     /**
-     * Local copy of the transform origin as DrawLayerModifier can be implemented
+     * Local copy of the transform origin as GraphicsLayerModifier can be implemented
      * as a model object. Update this field within [updateLayerProperties] and use it
      * in [resize] or other methods
      */

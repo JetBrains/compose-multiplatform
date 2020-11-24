@@ -46,10 +46,10 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Align
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -174,7 +174,7 @@ class AndroidViewCompatTest {
         var expectedColor = Color.Blue
         rule.setContent {
             Align {
-                Container(Modifier.testTag("content").drawLayer()) {
+                Container(Modifier.testTag("content").graphicsLayer()) {
                     AndroidView(::ColoredSquareView) {
                         it.color = colorModel.value
                         it.ref = squareRef
@@ -409,7 +409,7 @@ class AndroidViewCompatTest {
     fun testRedrawing_onSubsequentRemeasuring() {
         var size by mutableStateOf(20)
         rule.setContent {
-            Box(Modifier.drawLayer().fillMaxSize()) {
+            Box(Modifier.graphicsLayer().fillMaxSize()) {
                 val context = AmbientContext.current
                 val view = remember { View(context) }
                 AndroidView({ view }, Modifier.testTag("view"))

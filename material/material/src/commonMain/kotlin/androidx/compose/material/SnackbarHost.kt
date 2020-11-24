@@ -35,7 +35,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.delay
@@ -279,10 +279,10 @@ private fun FadeInFadeOutWithScale(
                 )
                 Box(
                     Modifier
-                        .drawLayer(
-                            alpha = opacity.value,
+                        .graphicsLayer(
+                            scaleX = scale.value,
                             scaleY = scale.value,
-                            scaleX = scale.value
+                            alpha = opacity.value
                         )
                 ) {
                     children()

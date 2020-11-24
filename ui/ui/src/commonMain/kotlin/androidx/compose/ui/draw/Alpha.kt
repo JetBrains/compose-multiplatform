@@ -18,14 +18,14 @@ package androidx.compose.ui.draw
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * Draw content with modified alpha that may be less than 1.
  *
  * Usage of this API renders this composable into a separate graphics layer
- * @see drawLayer
+ * @see graphicsLayer
  *
  * Example usage:
  * @sample androidx.compose.ui.samples.AlphaSample
@@ -35,7 +35,7 @@ import androidx.compose.ui.util.annotation.FloatRange
 @Stable
 fun Modifier.alpha(
     @FloatRange(from = 0.0, to = 1.0) alpha: Float
-) = if (alpha != 1.0f) drawLayer(alpha = alpha, clip = true) else this
+) = if (alpha != 1.0f) graphicsLayer(alpha = alpha, clip = true) else this
 
 /**
  * Draw content with modified alpha that may be less than 1.

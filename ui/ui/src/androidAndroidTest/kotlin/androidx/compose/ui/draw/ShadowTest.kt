@@ -23,8 +23,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
@@ -32,6 +30,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
@@ -107,7 +106,7 @@ class ShadowTest {
     fun shadowDrawnInsideRenderNode() {
         rule.runOnUiThreadIR {
             activity.setContent {
-                ShadowContainer(modifier = Modifier.drawLayer())
+                ShadowContainer(modifier = Modifier.graphicsLayer())
             }
         }
 
@@ -145,7 +144,7 @@ class ShadowTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                ShadowContainer(modifier = Modifier.drawLayer(clip = true), elevation)
+                ShadowContainer(modifier = Modifier.graphicsLayer(clip = true), elevation)
             }
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
@@ -168,7 +167,7 @@ class ShadowTest {
                     val elevation = with(AmbientDensity.current) { 4.dp.toPx() }
                     AtLeastSize(
                         size = 10,
-                        modifier = Modifier.drawLayer(
+                        modifier = Modifier.graphicsLayer(
                             shadowElevation = elevation,
                             shape = rectShape,
                             alpha = 0.5f
@@ -239,10 +238,10 @@ class ShadowTest {
         val elevation = mutableStateOf(0f)
         val color = mutableStateOf(Color.Blue)
         val underColor = mutableStateOf(Color.Transparent)
-        val modifier = Modifier.drawLayer()
+        val modifier = Modifier.graphicsLayer()
             .background(underColor)
             .drawLatchModifier()
-            .drawLayer {
+            .graphicsLayer {
                 shadowElevation = elevation.value
             }
             .background(color)

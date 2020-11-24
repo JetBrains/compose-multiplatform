@@ -19,16 +19,16 @@ package androidx.compose.ui.draw
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Creates a [DrawLayerModifier] that draws the shadow. The [elevation] defines the visual
+ * Creates a [GraphicsLayerModifier] that draws the shadow. The [elevation] defines the visual
  * depth of the physical object. The physical object has a shape specified by [shape].
  *
  * Note that [elevation] is only affecting the shadow size and doesn't change the drawing order.
@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
  * elements with a smaller one.
  *
  * Usage of this API renders this composable into a separate graphics layer
- * @see drawLayer
+ * @see graphicsLayer
  *
  * Example usage:
  *
@@ -60,7 +60,7 @@ fun Modifier.shadow(
             properties["clip"] = clip
         }
     ) {
-        drawLayer(
+        graphicsLayer(
             shadowElevation = with(AmbientDensity.current) { elevation.toPx() },
             shape = shape,
             clip = clip
@@ -71,7 +71,7 @@ fun Modifier.shadow(
 }
 
 /**
- * Creates a [DrawLayerModifier] that draws the shadow. The [elevation] defines the visual
+ * Creates a [GraphicsLayerModifier] that draws the shadow. The [elevation] defines the visual
  * depth of the physical object. The physical object has a shape specified by [shape].
  *
  * Note that [elevation] is only affecting the shadow size and doesn't change the drawing order.

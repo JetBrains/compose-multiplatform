@@ -23,8 +23,8 @@ import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.GOLDEN_UI
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDialog
@@ -55,10 +55,7 @@ class DialogScreenshotTest {
             Dialog(onDismissRequest = {}) {
                 Box(
                     Modifier
-                        .drawLayer(
-                            shape = RoundedCornerShape(percent = 15),
-                            clip = true
-                        )
+                        .graphicsLayer(shape = RoundedCornerShape(percent = 15), clip = true)
                         .preferredSize(200.dp)
                         .background(Color(0xFFA896B0))
                 )
@@ -77,7 +74,7 @@ class DialogScreenshotTest {
                 val elevation = with(AmbientDensity.current) { 16.dp.toPx() }
                 Box(
                     Modifier
-                        .drawLayer(
+                        .graphicsLayer(
                             shadowElevation = elevation,
                             shape = RoundedCornerShape(percent = 15),
                             clip = true

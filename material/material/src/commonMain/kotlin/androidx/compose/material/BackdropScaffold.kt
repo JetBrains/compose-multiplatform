@@ -38,11 +38,11 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
@@ -405,7 +405,7 @@ private fun BackLayerTransition(
 
     Box {
         Box(
-            Modifier.zIndex(appBarFloat).drawLayer(
+            Modifier.zIndex(appBarFloat).graphicsLayer(
                 alpha = appBarFloat,
                 translationY = (1 - appBarFloat) * animationSlideOffset
             )
@@ -413,7 +413,7 @@ private fun BackLayerTransition(
             appBar()
         }
         Box(
-            Modifier.zIndex(contentFloat).drawLayer(
+            Modifier.zIndex(contentFloat).graphicsLayer(
                 alpha = contentFloat,
                 translationY = (1 - contentFloat) * -animationSlideOffset
             )
