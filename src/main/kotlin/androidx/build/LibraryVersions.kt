@@ -95,7 +95,7 @@ object LibraryVersions {
     val REMOTECALLBACK = Version("1.0.0-alpha02")
     val ROOM = Version("2.3.0-alpha04")
     val SAVEDSTATE = Version("1.1.0-beta01")
-    val SECURITY = Version("1.1.0-alpha02")
+    val SECURITY = Version("1.1.0-alpha03")
     val SECURITY_BIOMETRIC = Version("1.0.0-alpha01")
     val SECURITY_IDENTITY_CREDENTIAL = Version("1.0.0-alpha01")
     val SERIALIZATION = Version("1.0.0-alpha01")
