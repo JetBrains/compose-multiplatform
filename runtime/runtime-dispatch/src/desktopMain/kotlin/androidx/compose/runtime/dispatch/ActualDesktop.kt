@@ -18,6 +18,7 @@ package androidx.compose.runtime.dispatch
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
+import java.awt.DisplayMode
 import java.awt.GraphicsEnvironment
 
 // TODO implement local Recomposer in each Window, so each Window can have own MonotonicFrameClock.
@@ -32,14 +33,17 @@ actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
             if (GraphicsEnvironment.isHeadless()) {
                 yield()
             } else {
-                val defaultRefreshRate = GraphicsEnvironment
-                    .getLocalGraphicsEnvironment()
-                    .defaultScreenDevice
-                    .displayMode
-                    .refreshRate
-                delay(1000L / defaultRefreshRate)
+                delay(1000L / getFramesPerSecond())
             }
             return onFrame(System.nanoTime())
+        }
+
+        private fun getFramesPerSecond(): Int {
+            val refreshRate = GraphicsEnvironment
+                .getLocalGraphicsEnvironment()
+                .screenDevices.maxOfOrNull { it.displayMode.refreshRate }
+                ?: DisplayMode.REFRESH_RATE_UNKNOWN
+            return if (refreshRate != DisplayMode.REFRESH_RATE_UNKNOWN) refreshRate else 60
         }
     }
 }
