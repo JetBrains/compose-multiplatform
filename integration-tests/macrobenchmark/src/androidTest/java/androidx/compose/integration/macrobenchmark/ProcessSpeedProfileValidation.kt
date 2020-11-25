@@ -19,6 +19,7 @@ package androidx.compose.integration.macrobenchmark
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.MacrobenchmarkConfig
 import androidx.benchmark.macro.MacrobenchmarkRule
+import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -35,37 +36,36 @@ import org.junit.runners.Parameterized
 @RunWith(Parameterized::class)
 class ProcessSpeedProfileValidation(
     private val compilationMode: CompilationMode,
-    private val killProcess: Boolean
+    private val startupMode: StartupMode
 ) {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
     @Test
-    fun start() {
-        val config = MacrobenchmarkConfig(
+    fun start() = benchmarkRule.measureStartupRepeated(
+        MacrobenchmarkConfig(
             packageName = PACKAGE_NAME,
             metrics = listOf(StartupTimingMetric()),
             compilationMode = compilationMode,
-            killProcessEachIteration = killProcess,
-            iterations = 10
-        )
-        benchmarkRule.measureRepeated(config) {
-            pressHome()
-            launchPackageAndWait()
-        }
+            iterations = 3
+        ),
+        startupMode
+    ) {
+        pressHome()
+        launchPackageAndWait()
     }
 
     companion object {
         private const val PACKAGE_NAME = "androidx.compose.integration.demos"
 
-        @Parameterized.Parameters(name = "compilation_mode={0}, kill_process={1}")
+        @Parameterized.Parameters(name = "compilation_mode={0}, startup_mode={1}")
         @JvmStatic
         fun kilProcessParameters(): List<Array<Any>> {
             val compilationModes = listOf(
                 CompilationMode.None,
                 CompilationMode.SpeedProfile(warmupIterations = 3)
             )
-            val processKillOptions = listOf(true, false)
+            val processKillOptions = listOf(StartupMode.WARM, StartupMode.COLD)
             return compilationModes.zip(processKillOptions).map {
                 arrayOf(it.first, it.second)
             }
