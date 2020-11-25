@@ -89,6 +89,13 @@ internal class DesktopAnimationClockTestRule : AnimationClockTestRule {
     }
 }
 
+@Deprecated(
+    message = "AnimationClockTestRule is no longer supported as a standalone solution. Retrieve " +
+        "it from your ComposeTestRule instead",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("composeTestRule.clockTestRule")
+)
 @ExperimentalTesting
+@Suppress("DocumentExceptions")
 actual fun createAnimationClockRule(): AnimationClockTestRule =
-    DesktopAnimationClockTestRule()
+    throw UnsupportedOperationException()

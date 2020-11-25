@@ -20,10 +20,8 @@ import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestAnimationClock
-import androidx.test.espresso.IdlingResource
-import androidx.compose.ui.test.junit4.android.registerTestClock
-import androidx.compose.ui.test.junit4.android.unregisterTestClock
 import androidx.compose.ui.test.junit4.android.AndroidTestAnimationClock
+import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -31,30 +29,15 @@ import org.junit.runners.model.Statement
 /**
  * A [TestRule] to monitor and take over the animation clock in the composition. It substitutes
  * the ambient animation clock provided at the root of the composition tree with a
- * [TestAnimationClock] and registers it with [registerTestClock].
- *
- * Usually you don't need to create this rule by yourself, it is done for you in
- * [ComposeTestRule]. If you don't use [ComposeTestRule], use this rule in your test and make
- * sure it is run _before_ your activity is created.
- *
- * If your app provides a custom animation clock somewhere in your composition, make sure to have
- * it implement [TestAnimationClock] and register it with [registerTestClock]. Alternatively,
- * if you use Espresso you can create your own [IdlingResource] to let Espresso await your
- * animations. Otherwise, built in steps that make sure the UI is stable when performing actions
- * or assertions will fail to work.
+ * [TestAnimationClock].
  */
 @ExperimentalTesting
-internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
+internal class AndroidAnimationClockTestRule(
+    private val composeIdlingResource: ComposeIdlingResource
+) : AnimationClockTestRule {
 
     /** Backing property for [clock] */
     private val _clock = AndroidTestAnimationClock()
-
-    /**
-     * The ambient animation clock that is provided at the root of the composition tree.
-     * Typically, apps will only use this clock. If your app provides another clock in the tree,
-     * make sure to let it implement [TestAnimationClock] and register it with
-     * [registerTestClock].
-     */
     override val clock: TestAnimationClock get() = _clock
 
     override fun apply(base: Statement, description: Description?): Statement {
@@ -65,7 +48,7 @@ internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
     private inner class AnimationClockStatement(private val base: Statement) : Statement() {
         override fun evaluate() {
             val oldFactory = rootAnimationClockFactory
-            registerTestClock(clock)
+            composeIdlingResource.registerTestClock(clock)
             rootAnimationClockFactory = { clock }
             try {
                 base.evaluate()
@@ -74,13 +57,20 @@ internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
                     _clock.dispose()
                 } finally {
                     rootAnimationClockFactory = oldFactory
-                    unregisterTestClock(clock)
+                    composeIdlingResource.unregisterTestClock(clock)
                 }
             }
         }
     }
 }
 
+@Deprecated(
+    message = "AnimationClockTestRule is no longer supported as a standalone solution. Retrieve " +
+        "it from your ComposeTestRule instead",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("composeTestRule.clockTestRule")
+)
 @ExperimentalTesting
+@Suppress("DocumentExceptions")
 actual fun createAnimationClockRule(): AnimationClockTestRule =
-    AndroidAnimationClockTestRule()
+    throw UnsupportedOperationException()

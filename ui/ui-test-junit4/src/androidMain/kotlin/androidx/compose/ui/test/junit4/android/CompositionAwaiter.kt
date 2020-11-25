@@ -24,7 +24,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.test.junit4.runOnUiThread
 
-internal class CompositionAwaiter {
+internal class CompositionAwaiter(private val composeIdlingResource: ComposeIdlingResource) {
 
     private enum class State {
         Initialized, Running, Finished, Cancelled
@@ -62,11 +62,11 @@ internal class CompositionAwaiter {
     }
 
     private fun startIdlingResource() {
-        ComposeIdlingResource.addCompositionAwaiter()
+        composeIdlingResource.addCompositionAwaiter()
     }
 
     private fun stopIdlingResource() {
-        ComposeIdlingResource.removeCompositionAwaiter()
+        composeIdlingResource.removeCompositionAwaiter()
     }
 
     /**

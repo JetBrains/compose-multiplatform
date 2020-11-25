@@ -17,6 +17,7 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.activity.ComponentActivity
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
@@ -28,10 +29,8 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
-import androidx.compose.ui.test.junit4.android.FirstDrawRegistry
+import androidx.compose.ui.test.junit4.android.ComposeIdlingResourceTestRule
 import androidx.compose.ui.test.junit4.android.IdleAwaiter
-import androidx.compose.ui.test.junit4.android.registerComposeWithEspresso
-import androidx.compose.ui.test.junit4.android.unregisterComposeFromEspresso
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
@@ -141,17 +140,22 @@ internal constructor(
         activityProvider: (R) -> A
     ) : this(activityRule, activityProvider, false)
 
+    @VisibleForTesting
+    private val composeIdlingResourceRule = ComposeIdlingResourceTestRule()
+    @VisibleForTesting
+    internal val composeIdlingResource = composeIdlingResourceRule.idlingResource
+
     @ExperimentalTesting
     override val clockTestRule: AnimationClockTestRule =
         if (!driveClockByMonotonicFrameClock) {
-            AndroidAnimationClockTestRule()
+            AndroidAnimationClockTestRule(composeIdlingResource)
         } else {
-            MonotonicFrameClockTestRule()
+            MonotonicFrameClockTestRule(composeIdlingResource)
         }
 
     internal var disposeContentHook: (() -> Unit)? = null
 
-    private val idleAwaiter = IdleAwaiter()
+    private val idleAwaiter = IdleAwaiter(composeIdlingResource)
     private val testOwner = AndroidTestOwner(idleAwaiter)
     private val testContext = createTestContext(testOwner)
 
@@ -179,7 +183,8 @@ internal constructor(
         @Suppress("NAME_SHADOWING")
         @OptIn(ExperimentalTesting::class)
         return RuleChain
-            .outerRule(clockTestRule)
+            .outerRule(composeIdlingResourceRule)
+            .around(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
             .around(activityRule)
             .apply(base, description)
@@ -257,8 +262,6 @@ internal constructor(
             @Suppress("DEPRECATION_ERROR")
             blinkingCursorEnabled = false
             AndroidOwnerRegistry.setupRegistry()
-            FirstDrawRegistry.setupRegistry()
-            registerComposeWithEspresso()
             @Suppress("DEPRECATION_ERROR")
             textInputServiceFactory = {
                 TextInputServiceForTests(it)
@@ -270,8 +273,6 @@ internal constructor(
             @Suppress("DEPRECATION_ERROR")
             blinkingCursorEnabled = true
             AndroidOwnerRegistry.tearDownRegistry()
-            FirstDrawRegistry.tearDownRegistry()
-            unregisterComposeFromEspresso()
             // Dispose the content
             if (disposeContentHook != null) {
                 runOnUiThread {
