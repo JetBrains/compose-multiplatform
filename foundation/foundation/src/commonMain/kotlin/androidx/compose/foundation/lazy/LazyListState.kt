@@ -323,6 +323,9 @@ class LazyListState constructor(
             val minOffset = -startContentPadding
             val maxOffset = mainAxisMaxSize
 
+            // max of cross axis sizes of all visible items
+            var maxCrossAxis = 0
+
             // we had scrolled backward or we compose items in the start padding area, which means
             // items before current firstItemScrollOffset should be visible. compose them and update
             // firstItemScrollOffset
@@ -330,6 +333,7 @@ class LazyListState constructor(
                 val previous = DataIndex(currentFirstItemIndex.value - 1)
                 val measuredItem = itemProvider.getAndMeasure(previous)
                 visibleItems.add(0, measuredItem)
+                maxCrossAxis = maxOf(maxCrossAxis, measuredItem.crossAxisSize)
                 currentFirstItemScrollOffset += measuredItem.mainAxisSize
                 currentFirstItemIndex = previous
             }
@@ -351,11 +355,9 @@ class LazyListState constructor(
             var index = goingForwardInitialIndex
             val maxMainAxis = maxOffset + endContentPadding
             var mainAxisUsed = -goingForwardInitialScrollOffset
-            var maxCrossAxis = 0
             while (mainAxisUsed <= maxMainAxis && index.value < itemsCount) {
                 val measuredItem = itemProvider.getAndMeasure(index)
                 mainAxisUsed += measuredItem.mainAxisSize
-                maxCrossAxis = maxOf(maxCrossAxis, measuredItem.crossAxisSize)
 
                 if (mainAxisUsed < minOffset) {
                     // this item is offscreen and will not be placed. advance firstVisibleItemIndex
@@ -368,6 +370,7 @@ class LazyListState constructor(
                     }
                     notUsedButComposedItems.add(measuredItem)
                 } else {
+                    maxCrossAxis = maxOf(maxCrossAxis, measuredItem.crossAxisSize)
                     visibleItems.add(measuredItem)
                 }
 
@@ -389,6 +392,7 @@ class LazyListState constructor(
                         itemProvider.getAndMeasure(previous)
                     }
                     visibleItems.add(0, measuredItem)
+                    maxCrossAxis = maxOf(maxCrossAxis, measuredItem.crossAxisSize)
                     currentFirstItemScrollOffset += measuredItem.mainAxisSize
                     currentFirstItemIndex = previous
                 }
