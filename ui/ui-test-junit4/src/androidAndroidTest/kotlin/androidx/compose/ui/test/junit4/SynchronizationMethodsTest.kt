@@ -94,7 +94,7 @@ class SynchronizationMethodsTest {
     fun runOnIdle_assert_fails() {
         rule.runOnIdle {
             expectError<IllegalStateException> {
-                rule.onNodeWithTag("dummy").assertExists()
+                rule.onNodeWithTag("placeholder").assertExists()
             }
         }
     }
