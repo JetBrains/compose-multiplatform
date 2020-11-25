@@ -20,12 +20,6 @@ import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 
 class ComposeWindow : JFrame {
-    companion object {
-        init {
-            initCompose()
-        }
-    }
-
     val parent: AppFrame
     internal val layer = ComposeLayer()
 
