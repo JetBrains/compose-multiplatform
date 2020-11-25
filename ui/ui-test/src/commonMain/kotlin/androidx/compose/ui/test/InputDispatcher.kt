@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.milliseconds
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-internal expect fun InputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher
+internal expect fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher
 
 /**
  * Dispatcher to inject full and partial gestures. An [InputDispatcher] is created at the
@@ -36,9 +36,6 @@ internal expect fun InputDispatcher(testContext: TestContext, owner: Owner): Inp
  * (enqueued), using the `enqueue*` methods, and in the second stage all events are injected.
  * Clients of [InputDispatcher] should only call methods for the first stage listed below, the
  * second stage is handled by [performGesture].
- *
- * Implementations of [InputDispatcher] must derive from [PersistingInputDispatcher], which
- * handles state restoration.
  *
  * Full gestures:
  * * [enqueueClick]
@@ -56,7 +53,10 @@ internal expect fun InputDispatcher(testContext: TestContext, owner: Owner): Inp
  * Chaining methods:
  * * [enqueueDelay]
  */
-internal abstract class InputDispatcher {
+internal abstract class InputDispatcher(
+    private val testContext: TestContext,
+    private val owner: Owner?
+) {
     companion object {
         /**
          * Whether or not injection of events should be suspended in between events until [now]
@@ -123,6 +123,26 @@ internal abstract class InputDispatcher {
      * The current time, in the time scale used by gesture events.
      */
     protected abstract val now: Long
+
+    init {
+        val state = testContext.states.remove(owner)
+        if (state?.partialGesture != null) {
+            nextDownTime = state.nextDownTime
+            gestureLateness = state.gestureLateness
+            partialGesture = state.partialGesture
+        }
+    }
+
+    protected open fun saveState(owner: Owner?) {
+        if (owner != null) {
+            testContext.states[owner] =
+                InputDispatcherState(
+                    nextDownTime,
+                    gestureLateness,
+                    partialGesture
+                )
+        }
+    }
 
     /**
      * Generates the downTime of the next gesture with the given [duration]. The gesture's
@@ -549,7 +569,12 @@ internal abstract class InputDispatcher {
     /**
      * Called when this [InputDispatcher] is about to be discarded, from [GestureScope.dispose].
      */
-    abstract fun dispose()
+    fun dispose() {
+        saveState(owner)
+        onDispose()
+    }
+
+    protected open fun onDispose() {}
 }
 
 /**
@@ -565,3 +590,22 @@ internal class PartialGesture(val downTime: Long, startPosition: Offset, pointer
     val lastPositions = mutableMapOf(Pair(pointerId, startPosition))
     var hasPointerUpdates: Boolean = false
 }
+
+/**
+ * The state of an [InputDispatcher], saved when the [GestureScope] is disposed and restored
+ * when the [GestureScope] is recreated.
+ *
+ * @param nextDownTime The downTime of the start of the next gesture, when chaining gestures.
+ * This property will only be restored if an incomplete gesture was in progress when the
+ * state of the [InputDispatcher] was saved.
+ * @param gestureLateness The time difference in milliseconds between enqueuing the first
+ * event of the gesture and dispatching it. Depending on the implementation of
+ * [InputDispatcher], this may or may not be used.
+ * @param partialGesture The state of an incomplete gesture. If no gesture was in progress
+ * when the state of the [InputDispatcher] was saved, this will be `null`.
+ */
+internal data class InputDispatcherState(
+    val nextDownTime: Long,
+    var gestureLateness: Long?,
+    val partialGesture: PartialGesture?
+)

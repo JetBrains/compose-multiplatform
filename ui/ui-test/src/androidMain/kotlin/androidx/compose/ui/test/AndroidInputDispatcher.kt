@@ -34,7 +34,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
-internal actual fun InputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
+internal actual fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
     require(owner is AndroidOwner) {
         "InputDispatcher currently only supports dispatching to AndroidOwner, not to " +
             owner::class.java.simpleName
@@ -47,7 +47,7 @@ internal class AndroidInputDispatcher(
     testContext: TestContext,
     owner: AndroidOwner?,
     private val sendEvent: (MotionEvent) -> Unit
-) : PersistingInputDispatcher(testContext, owner) {
+) : InputDispatcher(testContext, owner) {
 
     private val batchLock = Any()
     // Batched events are generated just-in-time, given the "lateness" of the dispatching (see
