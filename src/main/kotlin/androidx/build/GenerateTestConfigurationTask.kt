@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.dependencyTracker.ProjectSubset
 import com.android.build.api.variant.BuiltArtifactsLoader
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -86,11 +87,30 @@ const val SELF_INSTRUMENTING_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?
         <option name="cleanup-apks" value="true" />
         <option name="test-file-name" value="TEST_FILE_NAME" />
         </target_preparer>
-        <test class="com.android.tradefed.testtype.AndroidJUnitTest">
+        TEST_BLOCK
+        </configuration>"""
+
+const val FULL_TEST = """
+    <test class="com.android.tradefed.testtype.AndroidJUnitTest">
         <option name="runner" value="TEST_RUNNER"/>
         <option name="package" value="APPLICATION_ID" />
-        </test>
-        </configuration>"""
+    </test>
+"""
+
+const val DEPENDENT_TESTS = """
+    <test class="com.android.tradefed.testtype.AndroidJUnitTest">
+        <option name="runner" value="TEST_RUNNER"/>
+        <option name="package" value="APPLICATION_ID" />
+        <option name="size" value="small" />
+        <option name="test-timeout" value="300" />
+    </test>
+    <test class="com.android.tradefed.testtype.AndroidJUnitTest">
+        <option name="runner" value="TEST_RUNNER"/>
+        <option name="package" value="APPLICATION_ID" />
+        <option name="size" value="medium" />
+        <option name="test-timeout" value="1500" />
+    </test>
+"""
 
 /**
  * Writes a configuration file in
@@ -125,6 +145,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Input
     abstract val projectPath: Property<String>
 
+    @get:Input
+    abstract val affectedModuleDetectorSubset: Property<ProjectSubset>
+
     @get:OutputFile
     abstract val outputXml: RegularFileProperty
 
@@ -148,6 +171,20 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             TEMPLATE.replace("APP_FILE_NAME", appName)
         } else {
             SELF_INSTRUMENTING_TEMPLATE
+        }
+        configContent = when (affectedModuleDetectorSubset.get()) {
+            ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
+                configContent.replace("TEST_BLOCK", FULL_TEST)
+            }
+            ProjectSubset.DEPENDENT_PROJECTS -> {
+                configContent.replace("TEST_BLOCK", DEPENDENT_TESTS)
+            }
+            else -> {
+                throw IllegalStateException(
+                    "$name should not be running if the AffectedModuleDetector is returning " +
+                        "${affectedModuleDetectorSubset.get()} for this project."
+                )
+            }
         }
         val tag = if (hasBenchmarkPlugin.get()) "MetricTests" else "androidx_unit_tests"
         val testApk = testLoader.get().load(testFolder.get())

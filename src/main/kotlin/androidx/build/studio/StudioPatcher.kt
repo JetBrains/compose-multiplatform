@@ -31,15 +31,15 @@ typealias StudioPatcher = (
 val NoopStudioPatcher: StudioPatcher = fun (_: StudioTask, _: Project, _: File) {}
 
 /**
- * Patch studio with the Kotlin 1.4.10 plugin, downloaded from Jetbrains
+ * Patch studio with the Performance Testing 202.6948.5 plugin, downloaded from Jetbrains
  */
-val KotlinStudioPatcher: StudioPatcher = fun (
+val PerformancePluginStudioPatcher: StudioPatcher = fun (
     studioTask: StudioTask,
     project: Project,
     studioInstallationDir: File
 ) {
-    val url = "https://plugins.jetbrains.com/plugin/download?rel=true&updateId=96650"
-    val tmpZip = File("${studioInstallationDir.absolutePath}/kotlinPlugin.zip")
+    val url = "https://plugins.jetbrains.com/plugin/download?rel=true&updateId=94393"
+    val tmpZip = File("${studioInstallationDir.absolutePath}/performanceTestingPlugin.zip")
         .absolutePath
 
     println("Downloading $url to $tmpZip")
@@ -52,7 +52,7 @@ val KotlinStudioPatcher: StudioPatcher = fun (
 
     val platformUtilities = StudioPlatformUtilities.get(project.rootDir, studioInstallationDir)
     val pluginsDir = with(platformUtilities) { studioTask.pluginsDirectory }
-    File(pluginsDir, "Kotlin").deleteRecursively()
+    File(pluginsDir, "performanceTesting").deleteRecursively()
 
     project.exec { execSpec ->
         with(execSpec) {

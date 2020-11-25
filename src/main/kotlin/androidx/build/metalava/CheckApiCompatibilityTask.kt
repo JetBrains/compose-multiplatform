@@ -18,9 +18,14 @@ package androidx.build.metalava
 
 import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
+import androidx.build.logging.TERMINAL_RED
+import androidx.build.logging.TERMINAL_RESET
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import java.io.File
@@ -30,21 +35,23 @@ import javax.inject.Inject
  * This task validates that the API described in one signature txt file is compatible with the API
  * in another.
  */
+@CacheableTask
 abstract class CheckApiCompatibilityTask @Inject constructor(
     workerExecutor: WorkerExecutor
 ) : MetalavaTask(workerExecutor) {
     // Text file from which the API signatures will be obtained.
-    @get:Input
+    @get:Internal // already expressed by getTaskInputs()
     abstract val referenceApi: Property<ApiLocation>
 
     // Text file representing the current API surface to check.
-    @get:Input
+    @get:Internal // already expressed by getTaskInputs()
     abstract val api: Property<ApiLocation>
 
     // Text file listing violations that should be ignored.
-    @get:Input
+    @get:Internal // already expressed by getTaskInputs()
     abstract val baselines: Property<ApiBaselinesLocation>
 
+    @PathSensitive(PathSensitivity.RELATIVE)
     @InputFiles
     fun getTaskInputs(): List<File> {
         val apiLocation = api.get()
@@ -108,6 +115,9 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
             "--check-compatibility:api:released",
             oldApi.toString(),
 
+            "--error-message:compatibility:released",
+            CompatibilityCheckError,
+
             "--warnings-as-errors",
             "--format=v3"
         )
@@ -123,3 +133,10 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
         runWithArgs(args)
     }
 }
+
+private const val CompatibilityCheckError = """
+    ${TERMINAL_RED}Your change has API compatibility issues. Fix the code according to the messages above.$TERMINAL_RESET
+
+    If you *intentionally* want to break compatibility, you can suppress it with
+    ./gradlew ignoreApiChange && ./gradlew updateApi
+"""

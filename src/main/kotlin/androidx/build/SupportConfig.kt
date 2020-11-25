@@ -24,6 +24,13 @@ object SupportConfig {
     const val DEFAULT_MIN_SDK_VERSION = 14
     const val INSTRUMENTATION_RUNNER = "androidx.test.runner.AndroidJUnitRunner"
     const val BUILD_TOOLS_VERSION = "30.0.2"
+    val NDK_VERSION by lazy {
+        // TODO(aurimas) b/173737578 remove when we no longer have divergent versions
+        when (getOperatingSystem()) {
+            OperatingSystem.LINUX -> "21.0.6113669"
+            else -> "21.3.6528147"
+        }
+    }
 
     /**
      * The Android SDK version to use for compilation.
@@ -45,21 +52,10 @@ object SupportConfig {
      * set to a pre-release version, tests will only be able to run on pre-release devices.
      */
     const val TARGET_SDK_VERSION = 30
-
-    @JvmStatic
-    fun getJavaToolsJarPath() = System.getenv("JAVA_TOOLS_JAR")
 }
 
 fun Project.getExternalProjectPath(): File {
     return File(project.getCheckoutRoot(), "external")
-}
-
-fun distSubdir(): String {
-    val subdir = System.getenv("DIST_SUBDIR")
-    if (subdir != null && subdir.isNotEmpty()) {
-        return subdir.substring(1) + "/"
-    }
-    return ""
 }
 
 fun Project.getKeystore(): File {

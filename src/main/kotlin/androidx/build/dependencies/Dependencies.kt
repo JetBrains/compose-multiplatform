@@ -16,6 +16,9 @@
 
 package androidx.build.dependencies
 
+import androidx.build.OperatingSystem
+import androidx.build.getOperatingSystem
+
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.3.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.2"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.2"
@@ -74,10 +77,10 @@ const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
     "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
 const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.1"
 const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.1"
-const val KSP_VERSION = "1.4.10-dev-experimental-20201009"
+const val KSP_VERSION = "1.4.10-dev-experimental-20201120"
 const val KOTLIN_KSP_API = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
 const val KOTLIN_KSP = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
-const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0-rc"
+const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.20"
 
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0"
@@ -95,18 +98,22 @@ const val PLAY_CORE = "com.google.android.play:core:1.8.0"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.2.9"
 const val RX_JAVA3 = "io.reactivex.rxjava3:rxjava:3.0.0"
-val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.1.10"
+val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.1.16"
 val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
-val SKIKO_LINUX = "org.jetbrains.skiko:skiko-jvm-runtime-linux:$SKIKO_VERSION"
-val SKIKO_MACOS = "org.jetbrains.skiko:skiko-jvm-runtime-macos:$SKIKO_VERSION"
-val SKIKO_WINDOWS = "org.jetbrains.skiko:skiko-jvm-runtime-windows:$SKIKO_VERSION"
+val SKIKO_LINUX_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION"
+val SKIKO_MACOS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VERSION"
+val SKIKO_MACOS_ARM64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64:$SKIKO_VERSION"
+val SKIKO_WINDOWS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-windows-x64:$SKIKO_VERSION"
 val SKIKO_CURRENT_OS by lazy {
-    val os = System.getProperty("os.name")
-    when {
-        os == "Mac OS X" -> SKIKO_MACOS
-        os.startsWith("Win") -> SKIKO_WINDOWS
-        os.startsWith("Linux") -> SKIKO_LINUX
-        else -> throw Error("Unsupported OS $os")
+    val os = getOperatingSystem()
+    val arch = System.getProperty("os.arch")
+    when (os) {
+        OperatingSystem.MAC -> when (arch) {
+            "aarch64" -> SKIKO_MACOS_ARM64
+            else -> SKIKO_MACOS_X64
+        }
+        OperatingSystem.WINDOWS -> SKIKO_WINDOWS_X64
+        OperatingSystem.LINUX -> SKIKO_LINUX_X64
     }
 }
 const val TRUTH = "com.google.truth:truth:1.0.1"

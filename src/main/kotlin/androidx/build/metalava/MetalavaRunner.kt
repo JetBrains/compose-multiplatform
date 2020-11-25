@@ -18,6 +18,8 @@ package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
+import androidx.build.logging.TERMINAL_RED
+import androidx.build.logging.TERMINAL_RESET
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
@@ -130,7 +132,6 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
             "StreamFiles",
             "AbstractInner",
             "NotCloseable",
-            "ArrayReturn",
             "MethodNameTense",
             "UseIcu",
             "NoByteOrShort",
@@ -143,9 +144,9 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
         ).joinToString()
     )
     if (targetsJavaConsumers) {
-        args.addAll(listOf("--error", "MissingJvmstatic"))
+        args.addAll(listOf("--error", "MissingJvmstatic", "--error", "ArrayReturn"))
     } else {
-        args.addAll(listOf("--hide", "MissingJvmstatic"))
+        args.addAll(listOf("--hide", "MissingJvmstatic", "--hide", "ArrayReturn"))
     }
     return args
 }
@@ -204,7 +205,7 @@ fun generateApi(
 }
 
 // Gets arguments for generating the specified api file
-fun generateApi(
+private fun generateApi(
     metalavaClasspath: FileCollection,
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
@@ -313,7 +314,16 @@ fun getGenerateApiArgs(
                     "--error",
                     "DeprecationMismatch", // Enforce deprecation mismatch
                     "--error",
-                    "ReferencesDeprecated"
+                    "ReferencesDeprecated",
+                    "--error-message:api-lint",
+                    """
+    ${TERMINAL_RED}Your change has API lint issues. Fix the code according to the messages above.$TERMINAL_RESET
+
+    If a check is broken, suppress it in code with @Suppress("id")/@SuppressWarnings("id")
+    and file bug to https://issuetracker.google.com/issues/new?component=739152&template=1344623
+
+    If you are doing a refactoring or suppression above does not work, use ./gradlew updateApiLintBaseline
+"""
                 )
             )
         }

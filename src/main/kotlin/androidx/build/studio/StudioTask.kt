@@ -59,13 +59,18 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected open val installParentDir: File = project.rootDir
 
+    private val OurStudioVersions: StudioVersions
+        get() {
+            return StudioVersions.loadFrom(installParentDir)
+        }
+
     /**
      * Directory name (not path) that Studio will be unzipped into.
      */
     private val studioDirectoryName: String
         get() {
             val osName = StudioPlatformUtilities.osName
-            with(StudioVersions) {
+            with(OurStudioVersions) {
                 return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
             }
         }
@@ -115,11 +120,6 @@ abstract class StudioTask : DefaultTask() {
         File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
     }
 
-    /**
-     * Allows for the patching of a Studio installation (including replacing plugins).
-     * TODO: Consider removing after Studio has switched to Kotlin 1.4
-     * b/162414740
-     */
     @get:Internal
     protected open val studioPatcher = NoopStudioPatcher
 
@@ -133,14 +133,14 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(project, StudioVersions, studioArchiveName, studioArchivePath)
+            studioArchiveCreator(project, OurStudioVersions, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
             with(platformUtilities) { updateJvmHeapSize() }
             // Finish install process
             successfulInstallFile.createNewFile()
         }
-        val successfulStudioPatch = File("$studioInstallationDir/PATCH_SUCCESSFUL")
+        val successfulStudioPatch = File("$studioInstallationDir/PLUGIN_PATCH_SUCCESSFUL")
         if (!successfulStudioPatch.exists()) {
             studioPatcher(this, project, studioInstallationDir)
             // Finish patch process
@@ -235,7 +235,7 @@ abstract class StudioTask : DefaultTask() {
  */
 open class RootStudioTask : StudioTask() {
     override val studioArchiveCreator = UrlArchiveCreator
-    override val studioPatcher: StudioPatcher = KotlinStudioPatcher
+    override val studioPatcher: StudioPatcher = PerformancePluginStudioPatcher
     override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
 }
 

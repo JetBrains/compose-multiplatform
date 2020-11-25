@@ -38,6 +38,12 @@ const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
 const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
 
 /**
+ * Check that version extra meets the specified rules
+ * (version is in format major.minor.patch-extra)
+ */
+const val VERSION_EXTRA_CHECK_ENABLED = "androidx.versionExtraCheckEnabled"
+
+/**
  * Setting this property enables multiplatform builds of Compose
  */
 const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
@@ -92,6 +98,7 @@ const val EXPERIMENTAL_KOTLIN_BACKEND_ENABLED = "androidx.experimentalKotlinBack
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
+    VERSION_EXTRA_CHECK_ENABLED,
     COMPOSE_MPP_ENABLED,
     COVERAGE_ENABLED,
     DISPLAY_TEST_OUTPUT,
@@ -111,6 +118,13 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_DOKKA_BUILD_ID,
     EXPERIMENTAL_KOTLIN_BACKEND_ENABLED
 )
+
+/**
+ * Check that version extra meets the specified rules
+ * (version is in format major.minor.patch-extra)
+ */
+fun Project.isVersionExtraCheckEnabled(): Boolean =
+    (project.findProperty(VERSION_EXTRA_CHECK_ENABLED) as? String)?.toBoolean() ?: true
 
 /**
  * Validates that all properties passed by the user of the form "-Pandroidx.*" are not misspelled

@@ -38,7 +38,6 @@ object LibraryGroups {
     val CAR_APP = LibraryGroup("androidx.car.app", LibraryVersions.CAR_APP)
     val COLLECTION = LibraryGroup("androidx.collection", LibraryVersions.COLLECTION)
     val CONCURRENT = LibraryGroup("androidx.concurrent", LibraryVersions.FUTURES)
-    val CONTENTACCESS = LibraryGroup("androidx.contentaccess", LibraryVersions.CONTENTACCESS)
     val CONTENTPAGER = LibraryGroup("androidx.contentpager", LibraryVersions.CONTENTPAGER)
     val COORDINATORLAYOUT = LibraryGroup("androidx.coordinatorlayout", LibraryVersions.COORDINATORLAYOUT)
     val CORE = LibraryGroup("androidx.core", null)
@@ -93,7 +92,7 @@ object LibraryGroups {
     val TRACING = LibraryGroup("androidx.tracing", LibraryVersions.TRACING)
     val TRANSITION = LibraryGroup("androidx.transition", LibraryVersions.TRANSITION)
     val TVPROVIDER = LibraryGroup("androidx.tvprovider", LibraryVersions.TVPROVIDER)
-    val UI = LibraryGroup("androidx.ui", null)
+    val UI = LibraryGroup(System.getenv("COMPOSE_CUSTOM_GROUP_UI") ?: "androidx.ui", LibraryVersions.COMPOSE)
     val VECTORDRAWABLE = LibraryGroup("androidx.vectordrawable", null)
     val VERSIONEDPARCELABLE = LibraryGroup("androidx.versionedparcelable", null)
     val VIEWPAGER = LibraryGroup("androidx.viewpager", LibraryVersions.VIEWPAGER)
@@ -104,12 +103,14 @@ object LibraryGroups {
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)
 
     object Compose {
-        val ANIMATION = LibraryGroup("androidx.compose.animation", null)
-        val COMPILER = LibraryGroup("androidx.compose.compiler", null)
-        val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
-        val MATERIAL = LibraryGroup("androidx.compose.material", null)
-        val RUNTIME = LibraryGroup("androidx.compose.runtime", null)
-        val UI = LibraryGroup("androidx.compose.ui", null)
+        private val group = System.getenv("COMPOSE_CUSTOM_GROUP") ?: "androidx.compose"
+        val ANIMATION = LibraryGroup("$group.animation", LibraryVersions.COMPOSE)
+        val COMPILER = LibraryGroup("$group.compiler", LibraryVersions.COMPOSE)
+        val DESKTOP = LibraryGroup("$group.desktop", LibraryVersions.COMPOSE)
+        val FOUNDATION = LibraryGroup("$group.foundation", LibraryVersions.COMPOSE)
+        val MATERIAL = LibraryGroup("$group.material", LibraryVersions.COMPOSE)
+        val RUNTIME = LibraryGroup("$group.runtime", LibraryVersions.COMPOSE)
+        val UI = LibraryGroup("$group.ui", LibraryVersions.COMPOSE)
     }
 }
 

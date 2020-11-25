@@ -24,6 +24,9 @@ import com.android.build.gradle.TestedExtension
 import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.invoke
@@ -31,6 +34,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+const val composeSourceOption =
+    "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
 
 /**
  * Plugin to apply options across all of the androidx.ui projects
@@ -54,15 +60,40 @@ class AndroidXUiPlugin : Plugin<Project> {
                 is KotlinBasePluginWrapper -> {
                     val conf = project.configurations.create("kotlinPlugin")
 
+                    val kotlinPlugin = conf.incoming.artifactView { view ->
+                        view.attributes { attributes ->
+                            attributes.attribute(
+                                Attribute.of("artifactType", String::class.java),
+                                ArtifactTypeDefinition.JAR_TYPE
+                            )
+                        }
+                    }.files
+
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs +=
                             "-Xopt-in=kotlin.RequiresOptIn"
-                        compile.dependsOn(conf)
+                        compile.inputs.files(kotlinPlugin)
+                            .withPropertyName("composeCompilerExtension")
+                            .withNormalizer(ClasspathNormalizer::class.java)
                         compile.doFirst {
                             if (!conf.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
-                                    "-Xplugin=${conf.files.first()}"
+                                    "-Xplugin=${kotlinPlugin.first()}"
+                            }
+                        }
+                    }
+
+                    project.afterEvaluate {
+                        val androidXExtension =
+                            project.extensions.findByType(AndroidXExtension::class.java)
+                        if (androidXExtension != null) {
+                            if (!conf.isEmpty && androidXExtension.publish.shouldPublish()) {
+                                project.tasks.withType(KotlinCompile::class.java)
+                                    .configureEach { compile ->
+                                        compile.kotlinOptions.freeCompilerArgs +=
+                                            listOf("-P", composeSourceOption)
+                                    }
                             }
                         }
                     }
@@ -108,6 +139,16 @@ class AndroidXUiPlugin : Plugin<Project> {
                 // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
                 // remove these accessors
                 disable("SyntheticAccessor")
+                // Composable naming is normally a warning, but we ignore (in AndroidX)
+                // warnings in Lint, so we make it an error here so it will fail the build.
+                // Note that this causes 'UnknownIssueId' lint warnings in the build log when
+                // Lint tries to apply this rule to modules that do not have this lint check.
+                // Unfortunately suppressing this doesn't seem to work, and disabling it causes
+                // it just to log `Lint: Unknown issue id "ComposableNaming"`, which will still
+                // cause the build log simplifier to fail.
+                error("ComposableNaming")
+                error("ComposableLambdaParameterNaming")
+                error("ComposableLambdaParameterPosition")
             }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars

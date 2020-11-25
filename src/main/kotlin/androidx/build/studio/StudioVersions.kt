@@ -16,23 +16,29 @@
 
 package androidx.build.studio
 
+import java.io.File
+import java.io.FileInputStream
+import java.util.Properties
+
 /**
  * Studio version information used for setting up the correct version of Android Studio.
- *
- * Note: Android Gradle Plugin version is needed as part of configuring the build, so it is
- * defined separately in build_dependencies.gradle.
- *
- * Once you have a chosen version of AGP to upgrade to, go to
- * https://developer.android.com/studio/archive and find the matching version of Studio.
- * For example, if you are upgrading to AGP 3.6 alpha 05, look for the Studio 3.6 canary 5 build.
- * (alpha maps to canary, beta to beta, rc to rc, and no suffix for stable in both cases)
- *
- * The download url should contain: ...ide-zips/3.6.0.5/android-studio-ide-191.5721125-linux...
- * From this, the first number (3.6.0.5) is [studioVersion], the first number in the filename (192)
- * is the [ideaMajorVersion] and the last number (5721125) is the [studioBuildNumber].
  */
-object StudioVersions {
-    val studioVersion = "4.2.0.6"
-    val ideaMajorVersion = "201"
-    val studioBuildNumber = "6712195"
+class StudioVersions(
+    val studioVersion: String,
+    val ideaMajorVersion: String,
+    val studioBuildNumber: String
+) {
+    companion object {
+        fun loadFrom(supportRoot: File): StudioVersions {
+            val versionsFile = File(supportRoot, "buildSrc/studio_versions.properties")
+            val inputStream = FileInputStream(versionsFile)
+            val properties = Properties()
+            properties.load(inputStream)
+            return StudioVersions(
+                properties.get("studio_version")!!.toString(),
+                properties.get("idea_major_version")!!.toString(),
+                properties.get("studio_build_number")!!.toString()
+            )
+        }
+    }
 }
