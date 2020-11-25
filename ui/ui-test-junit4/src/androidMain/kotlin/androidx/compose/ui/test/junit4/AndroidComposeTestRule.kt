@@ -23,12 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
+import androidx.compose.ui.test.junit4.android.EspressoLink
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
@@ -138,8 +140,13 @@ internal constructor(
         activityProvider: (R) -> A
     ) : this(activityRule, activityProvider, false)
 
+    private val idlingResourceRegistry = IdlingResourceRegistry()
+    private val espressoLink = EspressoLink(idlingResourceRegistry)
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val composeIdlingResource = ComposeIdlingResource()
+    internal val composeIdlingResource = ComposeIdlingResource().also {
+        registerIdlingResource(it)
+    }
 
     @ExperimentalTesting
     override val clockTestRule: AnimationClockTestRule =
@@ -174,11 +181,13 @@ internal constructor(
         }
     }
 
-    override fun apply(base: Statement, description: Description?): Statement {
+    override fun apply(base: Statement, description: Description): Statement {
         @Suppress("NAME_SHADOWING")
         @OptIn(ExperimentalTesting::class)
         return RuleChain
             .outerRule { base, _ -> composeIdlingResource.getStatementFor(base) }
+            .around { base, _ -> idlingResourceRegistry.getStatementFor(base) }
+            .around { base, _ -> espressoLink.getStatementFor(base) }
             .around(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
             .around(activityRule)
@@ -233,6 +242,14 @@ internal constructor(
         waitForIdle()
         // Execute the action on ui thread in a blocking way.
         return runOnUiThread(action)
+    }
+
+    override fun registerIdlingResource(idlingResource: IdlingResource) {
+        idlingResourceRegistry.registerIdlingResource(idlingResource)
+    }
+
+    override fun unregisterIdlingResource(idlingResource: IdlingResource) {
+        idlingResourceRegistry.unregisterIdlingResource(idlingResource)
     }
 
     inner class AndroidComposeStatement(

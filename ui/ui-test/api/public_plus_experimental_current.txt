@@ -179,6 +179,12 @@ package androidx.compose.ui.test {
     method public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
   }
 
+  public interface IdlingResource {
+    method public default String? getDiagnosticMessageIfBusy();
+    method public boolean isIdleNow();
+    property public abstract boolean isIdleNow;
+  }
+
   @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestingApi {
   }
 

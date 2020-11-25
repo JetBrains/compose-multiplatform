@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -128,6 +129,14 @@ class DesktopComposeTestRule : ComposeTestRule {
         // stabilization of the new rendering/dispatching model
         waitForIdle()
         return action().also { waitForIdle() }
+    }
+
+    override fun registerIdlingResource(idlingResource: IdlingResource) {
+        // TODO: implement
+    }
+
+    override fun unregisterIdlingResource(idlingResource: IdlingResource) {
+        // TODO: implement
     }
 
     override fun setContent(composable: @Composable () -> Unit) {

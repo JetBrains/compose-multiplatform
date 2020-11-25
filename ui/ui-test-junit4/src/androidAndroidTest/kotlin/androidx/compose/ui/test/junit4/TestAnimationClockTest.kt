@@ -87,7 +87,7 @@ class TestAnimationClockTest {
             animationState.value = AnimationStates.To
 
             // Changes need to trickle down the animation system, so compose should be non-idle
-            assertThat(composeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Await recomposition
@@ -101,7 +101,7 @@ class TestAnimationClockTest {
         // Advance first half of the animation (.5 sec)
         rule.runOnIdle {
             clockTestRule.advanceClock(halfDuration)
-            assertThat(composeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Await next animation frame
@@ -115,7 +115,7 @@ class TestAnimationClockTest {
         // Advance second half of the animation (.5 sec)
         rule.runOnIdle {
             clockTestRule.advanceClock(halfDuration)
-            assertThat(composeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Await next animation frame
@@ -150,7 +150,7 @@ class TestAnimationClockTest {
             animationState.value = AnimationStates.To
 
             // Changes need to trickle down the animation system, so compose should be non-idle
-            assertThat(composeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Perform a single recomposition by awaiting the same signal as the Recomposer
