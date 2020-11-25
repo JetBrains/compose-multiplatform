@@ -66,38 +66,50 @@ class TextSelectionBackgroundColorTest(
         }.toTypedArray()
     }
 
+    /**
+     * In light theme the default background color is white, with black text and a medium content
+     * alpha of 74%.
+     */
     @Test
-    fun assertContrast_blackTextOnWhiteBackground() {
+    fun assertContrast_lightTheme_backgroundBackground() {
         assertContrastRatio(
             selectionColor = color,
             textColor = Color.Black,
+            textAlpha = 0.74f,
             backgroundColor = Color.White
         )
     }
 
+    /**
+     * In dark theme the default background color is #121212, with white text and a medium content
+     * alpha of 60%.
+     */
     @Test
-    fun assertContrast_whiteTextOnBlackBackground() {
+    fun assertContrast_darkTheme_backgroundBackground() {
         assertContrastRatio(
             selectionColor = color,
             textColor = Color.White,
-            backgroundColor = Color.Black
+            textAlpha = 0.6f,
+            backgroundColor = Color(0xFF121212)
         )
     }
 
     @Test
-    fun assertContrast_blackTextOnPrimaryBackground() {
+    fun assertContrast_lightTheme_primaryBackground() {
         assertContrastRatio(
             selectionColor = color,
             textColor = Color.Black,
+            textAlpha = 0.74f,
             backgroundColor = color
         )
     }
 
     @Test
-    fun assertContrast_whiteTextOnPrimaryBackground() {
+    fun assertContrast_darkTheme_primaryBackground() {
         assertContrastRatio(
             selectionColor = color,
             textColor = Color.White,
+            textAlpha = 0.6f,
             backgroundColor = color
         )
     }
@@ -106,11 +118,13 @@ class TextSelectionBackgroundColorTest(
 private fun assertContrastRatio(
     selectionColor: Color,
     textColor: Color,
+    textAlpha: Float,
     backgroundColor: Color
 ) {
+    val textColorWithAlpha = textColor.copy(alpha = textAlpha)
     val selectionBackgroundColor = calculateSelectionBackgroundColor(
         selectionColor = selectionColor,
-        textColor = textColor,
+        textColor = textColorWithAlpha,
         backgroundColor = backgroundColor
     )
 
@@ -118,7 +132,7 @@ private fun assertContrastRatio(
     // using the default alpha for consistency with the spec.
     val minimumCompositeBackground = selectionBackgroundColor.copy(alpha = MinimumSelectionAlpha)
         .compositeOver(backgroundColor)
-    val minimumCompositeTextColor = textColor.compositeOver(minimumCompositeBackground)
+    val minimumCompositeTextColor = textColorWithAlpha.compositeOver(minimumCompositeBackground)
     val minimumContrastRatio = calculateContrastRatio(
         foreground = minimumCompositeTextColor,
         background = minimumCompositeBackground
@@ -131,7 +145,7 @@ private fun assertContrastRatio(
 
     // Otherwise, ensure that the value we choose is accessible
     val compositeBackground = selectionBackgroundColor.compositeOver(backgroundColor)
-    val compositeTextColor = textColor.compositeOver(compositeBackground)
+    val compositeTextColor = textColorWithAlpha.compositeOver(compositeBackground)
     val contrastRatio = calculateContrastRatio(
         foreground = compositeTextColor,
         background = compositeBackground
@@ -143,7 +157,7 @@ private fun assertContrastRatio(
         // If we searched for a new alpha, this alpha should be the maximal alpha that meets
         // contrast requirements, so the contrast ratio should be just above 4.5f in order to
         // maximize alpha
-        assertThat(contrastRatio).isWithin(0.05f).of(RequiredContrastRatio)
+        assertThat(contrastRatio).isWithin(0.1f).of(RequiredContrastRatio)
     }
 }
 
