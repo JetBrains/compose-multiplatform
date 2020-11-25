@@ -20,7 +20,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.annotation.IntRange
 import kotlin.reflect.KProperty
@@ -155,7 +155,7 @@ object SemanticsProperties {
             if (parentValue == null) {
                 childValue
             } else {
-                annotatedString {
+                buildAnnotatedString {
                     append(parentValue)
                     append(", ")
                     append(childValue)

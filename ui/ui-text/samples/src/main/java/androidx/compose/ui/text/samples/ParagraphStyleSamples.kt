@@ -21,7 +21,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.sp
@@ -57,7 +57,7 @@ fun ParagraphStyleAnnotatedStringsSample() {
     )
 
     Text(
-        text = annotatedString {
+        text = buildAnnotatedString {
             append(text)
             addStyle(paragraphStyle1, 0, text.indexOf('\n') + 1)
             addStyle(paragraphStyle2, text.indexOf('\n') + 1, text.length)
