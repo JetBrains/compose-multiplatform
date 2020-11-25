@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.test
+package androidx.compose.desktop
 
 internal class TestThread(private val _run: () -> Unit) : Thread() {
     private var exception: Exception? = null
