@@ -89,7 +89,7 @@ internal fun LazyList(
             )
         }
 
-        val measureResult = state.measure(
+        val measureResult = measureLazyList(
             itemsCount,
             itemProvider,
             mainAxisMaxSize,
