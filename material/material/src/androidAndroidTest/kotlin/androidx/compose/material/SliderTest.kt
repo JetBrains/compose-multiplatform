@@ -159,6 +159,16 @@ class SliderTest {
     }
 
     @Test
+    fun slider_semantics_focusable() {
+        rule.setMaterialContent {
+            Slider(value = 0f, onValueChange = {}, modifier = Modifier.testTag(tag))
+        }
+
+        rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Focused))
+    }
+
+    @Test
     fun slider_drag() {
         val state = mutableStateOf(0f)
 
