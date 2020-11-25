@@ -133,7 +133,18 @@ class LazyListState constructor(
      * The amount of scroll to be consumed in the next layout pass.  Scrolling forward is negative
      * - that is, it is the amount that the items are offset in y
      */
-    private var scrollToBeConsumed = 0f
+    internal var scrollToBeConsumed = 0f
+        private set
+
+    /**
+     * The same as [firstVisibleItemIndex] but the read will not trigger remeasure.
+     */
+    internal val firstVisibleItemIndexNonObservable: DataIndex get() = scrollPosition.index
+
+    /**
+     * The same as [firstVisibleItemScrollOffset] but the read will not trigger remeasure.
+     */
+    internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
 
     /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
@@ -158,6 +169,7 @@ class LazyListState constructor(
      */
     @VisibleForTesting
     internal var numMeasurePasses: Int = 0
+        private set
 
     /**
      * The modifier which provides [remeasurement].
@@ -270,23 +282,28 @@ class LazyListState constructor(
         itemProvider: LazyMeasuredItemProvider,
         mainAxisMaxSize: Int,
         startContentPadding: Int,
-        endContentPadding: Int
+        endContentPadding: Int,
+        firstVisibleItemIndex: DataIndex,
+        firstVisibleItemScrollOffset: Int,
+        scrollToBeConsumed: Float
     ): LazyListMeasureResult {
-        numMeasurePasses++
         require(startContentPadding >= 0)
         require(endContentPadding >= 0)
         if (itemsCount <= 0) {
             // empty data set. reset the current scroll and report zero size
-            scrollPosition.update(
-                index = DataIndex(0),
-                scrollOffset = 0,
-                canScrollForward = false
+            return LazyListMeasureResult(
+                mainAxisSize = 0,
+                crossAxisSize = 0,
+                items = emptyList(),
+                itemsScrollOffset = 0,
+                firstVisibleItemIndex = DataIndex(0),
+                firstVisibleItemScrollOffset = 0,
+                canScrollForward = false,
+                consumedScroll = 0f
             )
-            return LazyListMeasureResult(0, 0, emptyList(), 0)
         } else {
-            var currentFirstItemIndex = scrollPosition.index
-            var currentFirstItemScrollOffset = scrollPosition.scrollOffset
-
+            var currentFirstItemIndex = firstVisibleItemIndex
+            var currentFirstItemScrollOffset = firstVisibleItemScrollOffset
             if (currentFirstItemIndex.value >= itemsCount) {
                 // the data set has been updated and now we have less items that we were
                 // scrolled to before
@@ -408,12 +425,12 @@ class LazyListState constructor(
             // scrollToBeConsumed if there were not enough items to fill the offered space or it
             // can be larger if items were resized, or if, for example, we were previously
             // displaying the item 15, but now we have only 10 items in total in the data set.
-            if (scrollToBeConsumed.roundToInt().sign == scrollDelta.sign &&
+            val consumedScroll = if (scrollToBeConsumed.roundToInt().sign == scrollDelta.sign &&
                 abs(scrollToBeConsumed.roundToInt()) >= abs(scrollDelta)
             ) {
-                scrollToBeConsumed -= scrollDelta
+                scrollDelta.toFloat()
             } else {
-                scrollToBeConsumed = 0f
+                scrollToBeConsumed
             }
 
             // the initial offset for items from visibleItems list
@@ -437,20 +454,30 @@ class LazyListState constructor(
                 }
             }
 
-            // update state with the new calculated scroll position
-            scrollPosition.update(
-                index = currentFirstItemIndex,
-                scrollOffset = currentFirstItemScrollOffset,
-                canScrollForward = mainAxisUsed > maxOffset
-            )
-
             return LazyListMeasureResult(
                 mainAxisSize = mainAxisUsed + startContentPadding,
                 crossAxisSize = maxCrossAxis,
                 items = visibleItems,
-                itemsScrollOffset = firstItemOffset
+                itemsScrollOffset = firstItemOffset,
+                firstVisibleItemIndex = currentFirstItemIndex,
+                firstVisibleItemScrollOffset = currentFirstItemScrollOffset,
+                canScrollForward = mainAxisUsed > maxOffset,
+                consumedScroll = consumedScroll
             )
         }
+    }
+
+    /**
+     *  Updates the state with the new calculated scroll position and consumed scroll.
+     */
+    internal fun applyMeasureResult(measureResult: LazyListMeasureResult) {
+        scrollPosition.update(
+            index = measureResult.firstVisibleItemIndex,
+            scrollOffset = measureResult.firstVisibleItemScrollOffset,
+            canScrollForward = measureResult.canScrollForward
+        )
+        scrollToBeConsumed -= measureResult.consumedScroll
+        numMeasurePasses++
     }
 
     companion object {

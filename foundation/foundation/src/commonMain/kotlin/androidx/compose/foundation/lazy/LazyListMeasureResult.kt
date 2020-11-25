@@ -27,5 +27,13 @@ internal class LazyListMeasureResult(
     /** The list of items to be placed during the layout pass.*/
     val items: List<LazyMeasuredItem>,
     /** The main axis offset to be used for the first item in the [items] list.*/
-    val itemsScrollOffset: Int
+    val itemsScrollOffset: Int,
+    /** The new value for [LazyListState.firstVisibleItemIndex].*/
+    val firstVisibleItemIndex: DataIndex,
+    /** The new value for [LazyListState.firstVisibleItemScrollOffset].*/
+    val firstVisibleItemScrollOffset: Int,
+    /** True if there is some space available to continue scrolling in the forward direction.*/
+    val canScrollForward: Boolean,
+    /** The amount of scroll consumed during the measure pass.*/
+    val consumedScroll: Float
 )

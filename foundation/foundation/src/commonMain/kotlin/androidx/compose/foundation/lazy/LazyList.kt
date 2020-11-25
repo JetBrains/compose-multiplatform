@@ -95,7 +95,12 @@ internal fun LazyList(
             mainAxisMaxSize,
             startContentPaddingPx,
             endContentPaddingPx,
+            state.firstVisibleItemIndexNonObservable,
+            state.firstVisibleItemScrollOffsetNonObservable,
+            state.scrollToBeConsumed
         )
+
+        state.applyMeasureResult(measureResult)
 
         val layoutWidth = constraints.constrainWidth(
             if (isVertical) measureResult.crossAxisSize else measureResult.mainAxisSize
