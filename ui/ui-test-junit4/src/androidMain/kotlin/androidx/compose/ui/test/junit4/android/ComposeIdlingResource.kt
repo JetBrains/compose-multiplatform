@@ -18,17 +18,23 @@ package androidx.compose.ui.test.junit4.android
 
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.node.Owner
 import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.isOnUiThread
 import androidx.compose.ui.test.junit4.runOnUiThread
+import androidx.test.espresso.AppNotIdleException
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
-import org.junit.rules.TestRule
-import org.junit.runner.Description
+import androidx.test.espresso.IdlingResourceTimeoutException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.junit.runners.model.Statement
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -120,6 +126,9 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
     private var isIdleCheckScheduled = false
     private var resourceCallback: IdlingResource.ResourceCallback? = null
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val androidOwnerRegistry = AndroidOwnerRegistry()
+
     @OptIn(ExperimentalTesting::class)
     private val clocks = mutableSetOf<TestAnimationClock>()
 
@@ -145,7 +154,7 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
             hadNoRecomposerChanges = !Recomposer.current().hasInvalidations()
             hadAnimationClocksIdle = areAllClocksIdle()
             lastCompositionAwaiters = compositionAwaiters.get()
-            val owners = AndroidOwnerRegistry.getUnfilteredOwners()
+            val owners = androidOwnerRegistry.getUnfilteredOwners()
             hadNoPendingMeasureLayout = !owners.any { it.hasPendingMeasureOrLayout }
             hadNoPendingDraw = !owners.any {
                 val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
@@ -276,21 +285,152 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
         }
         return message
     }
-}
 
-internal class ComposeIdlingResourceTestRule() : TestRule {
-    val idlingResource = ComposeIdlingResource()
+    fun waitForIdle() {
+        check(!isOnUiThread()) {
+            "Functions that involve synchronization (Assertions, Actions, Synchronization; " +
+                "e.g. assertIsSelected(), doClick(), runOnIdle()) cannot be run " +
+                "from the main thread. Did you nest such a function inside " +
+                "runOnIdle {}, runOnUiThread {} or setContent {}?"
+        }
 
-    override fun apply(base: Statement, description: Description): Statement {
-        return object : Statement() {
-            override fun evaluate() {
-                try {
-                    IdlingRegistry.getInstance().register(idlingResource)
-                    base.evaluate()
-                } finally {
-                    IdlingRegistry.getInstance().unregister(idlingResource)
-                }
+        // First wait until we have an AndroidOwner (in case an Activity is being started)
+        androidOwnerRegistry.waitForAndroidOwners()
+        // Then await composition(s)
+        runEspressoOnIdle()
+
+        // TODO(b/155774664): waitForAndroidOwners() may be satisfied by an AndroidOwner from an
+        //  Activity that is about to be paused, in cases where a new Activity is being started.
+        //  That means that AndroidOwnerRegistry.getOwners() may still return an empty list
+        //  between now and when the new Activity has created its AndroidOwner, even though
+        //  waitForAndroidOwners() suggests that we are now guaranteed one.
+    }
+
+    @ExperimentalTesting
+    suspend fun awaitIdle() {
+        // TODO(b/169038516): when we can query AndroidOwners for measure or layout, remove
+        //  runEspressoOnIdle() and replace it with a suspend fun that loops while the
+        //  snapshot or the recomposer has pending changes, clocks are busy or owners have
+        //  pending measures or layouts; and do the await on AndroidUiDispatcher.Main
+        // We use Espresso to wait for composition, measure, layout and draw,
+        // and Espresso needs to be called from a non-ui thread; so use Dispatchers.IO
+        withContext(Dispatchers.IO) {
+            // First wait until we have an AndroidOwner (in case an Activity is being started)
+            androidOwnerRegistry.awaitAndroidOwners()
+            // Then await composition(s)
+            runEspressoOnIdle()
+        }
+    }
+
+    fun getOwners(): Set<Owner> {
+        // TODO(pavlis): Instead of returning a flatMap, let all consumers handle a tree
+        //  structure. In case of multiple AndroidOwners, add a fake root
+        waitForIdle()
+
+        return androidOwnerRegistry.getOwners().also {
+            // TODO(b/153632210): This check should be done by callers of collectOwners
+            check(it.isNotEmpty()) {
+                "No compose views found in the app. Is your Activity resumed?"
             }
         }
     }
+
+    fun getStatementFor(base: Statement): Statement {
+        return androidOwnerRegistry.getStatementFor(
+            object : Statement() {
+                override fun evaluate() {
+                    try {
+                        IdlingRegistry.getInstance().register(this@ComposeIdlingResource)
+                        base.evaluate()
+                    } finally {
+                        IdlingRegistry.getInstance().unregister(this@ComposeIdlingResource)
+                    }
+                }
+            }
+        )
+    }
 }
+
+// TODO(b/168223213): Make the CompositionAwaiter a suspend fun, remove ComposeIdlingResource
+//  and blocking await Espresso.onIdle().
+internal fun ComposeIdlingResource.runEspressoOnIdle() {
+    val compositionAwaiter = CompositionAwaiter(this)
+    try {
+        compositionAwaiter.start()
+        Espresso.onIdle()
+    } catch (e: Throwable) {
+        compositionAwaiter.cancel()
+
+        // Happens on the global time out, usually when global idling time out is less
+        // or equal to dynamic idling time out or when the timeout is not due to individual
+        // idling resource. This does not necessary mean that it can't be due to idling
+        // resource being busy. So we try to check if it failed due to compose being busy and
+        // add some extra information to the developer.
+        val appNotIdleMaybe = tryToFindCause<AppNotIdleException>(e)
+        if (appNotIdleMaybe != null) {
+            rethrowWithMoreInfo(appNotIdleMaybe, wasGlobalTimeout = true)
+        }
+
+        // Happens on idling resource taking too long. Espresso gives out which resources caused
+        // it but it won't allow us to give any extra information. So we check if it was our
+        // resource and give more info if we can.
+        val resourceNotIdleMaybe = tryToFindCause<IdlingResourceTimeoutException>(e)
+        if (resourceNotIdleMaybe != null) {
+            rethrowWithMoreInfo(resourceNotIdleMaybe, wasGlobalTimeout = false)
+        }
+
+        // No match, rethrow
+        throw e
+    }
+}
+
+private fun rethrowWithMoreInfo(e: Throwable, wasGlobalTimeout: Boolean) {
+    var diagnosticInfo = ""
+    val listOfIdlingResources = mutableListOf<String>()
+    IdlingRegistry.getInstance().resources.forEach { resource ->
+        if (resource is IdlingResourceWithDiagnostics) {
+            val message = resource.getDiagnosticMessageIfBusy()
+            if (message != null) {
+                diagnosticInfo += "$message \n"
+            }
+        }
+        listOfIdlingResources.add(resource.name)
+    }
+    if (diagnosticInfo.isNotEmpty()) {
+        val prefix = if (wasGlobalTimeout) {
+            "Global time out"
+        } else {
+            "Idling resource timed out"
+        }
+        throw ComposeNotIdleException(
+            "$prefix: possibly due to compose being busy.\n" +
+                diagnosticInfo +
+                "All registered idling resources: " +
+                listOfIdlingResources.joinToString(", "),
+            e
+        )
+    }
+    // No extra info, re-throw the original exception
+    throw e
+}
+
+/**
+ * Tries to find if the given exception or any of its cause is of the type of the provided
+ * throwable T. Returns null if there is no match. This is required as some exceptions end up
+ * wrapped in Runtime or Concurrent exceptions.
+ */
+private inline fun <reified T : Throwable> tryToFindCause(e: Throwable): Throwable? {
+    var causeToCheck: Throwable? = e
+    while (causeToCheck != null) {
+        if (causeToCheck is T) {
+            return causeToCheck
+        }
+        causeToCheck = causeToCheck.cause
+    }
+    return null
+}
+
+/**
+ * Thrown in cases where Compose can't get idle in Espresso's defined time limit.
+ */
+class ComposeNotIdleException(message: String?, cause: Throwable?) : Throwable(message, cause)

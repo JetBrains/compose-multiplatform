@@ -26,16 +26,21 @@ import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 
 @LargeTest
 class AndroidOwnerRegistryTest {
 
+    private val activityRule = ActivityScenarioRule(ComponentActivity::class.java)
+    private val androidOwnerRegistry = AndroidOwnerRegistry()
+
     @get:Rule
-    val activityRule = ActivityScenarioRule(ComponentActivity::class.java)
+    val testRule: RuleChain = RuleChain
+        .outerRule { base, _ -> androidOwnerRegistry.getStatementFor(base) }
+        .around(activityRule)
 
     private val onRegistrationChangedListener =
         object : AndroidOwnerRegistry.OnRegistrationChangedListener {
@@ -47,24 +52,14 @@ class AndroidOwnerRegistryTest {
 
     @Before
     fun setUp() {
-        assertThat(AndroidOwnerRegistry.isSetUp).isFalse()
-        assertThat(AndroidOwnerRegistry.getUnfilteredOwners()).isEmpty()
-        AndroidOwnerRegistry.setupRegistry()
-        AndroidOwnerRegistry.addOnRegistrationChangedListener(onRegistrationChangedListener)
-    }
-
-    @After
-    fun tearDown() {
-        AndroidOwnerRegistry.removeOnRegistrationChangedListener(onRegistrationChangedListener)
-        AndroidOwnerRegistry.tearDownRegistry()
-        assertThat(AndroidOwnerRegistry.isSetUp).isFalse()
-        assertThat(AndroidOwnerRegistry.getUnfilteredOwners()).isEmpty()
+        assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
+        androidOwnerRegistry.addOnRegistrationChangedListener(onRegistrationChangedListener)
     }
 
     @Test
     fun registryIsSetUpAndEmpty() {
-        assertThat(AndroidOwnerRegistry.isSetUp).isTrue()
-        assertThat(AndroidOwnerRegistry.getUnfilteredOwners()).isEmpty()
+        assertThat(androidOwnerRegistry.isSetUp).isTrue()
+        assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
     }
 
     @Test
@@ -75,8 +70,8 @@ class AndroidOwnerRegistryTest {
             val owner = activity.findOwner()
 
             // Then it is registered
-            assertThat(AndroidOwnerRegistry.getUnfilteredOwners()).isEqualTo(setOf(owner))
-            assertThat(AndroidOwnerRegistry.getOwners()).isEqualTo(setOf(owner))
+            assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEqualTo(setOf(owner))
+            assertThat(androidOwnerRegistry.getOwners()).isEqualTo(setOf(owner))
             // And our listener was notified
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(Pair(owner, true))
@@ -95,8 +90,8 @@ class AndroidOwnerRegistryTest {
             activity.setContentView(View(activity))
 
             // Then it is not registered now
-            assertThat(AndroidOwnerRegistry.getUnfilteredOwners()).isEmpty()
-            assertThat(AndroidOwnerRegistry.getOwners()).isEmpty()
+            assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
+            assertThat(androidOwnerRegistry.getOwners()).isEmpty()
             // But our listener was notified of addition and removal
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(
@@ -115,11 +110,11 @@ class AndroidOwnerRegistryTest {
             val owner = activity.findOwner()
 
             // When we tear down the registry
-            AndroidOwnerRegistry.tearDownRegistry()
+            androidOwnerRegistry.tearDownRegistry()
 
             // Then the registry is empty
-            assertThat(AndroidOwnerRegistry.getUnfilteredOwners()).isEmpty()
-            assertThat(AndroidOwnerRegistry.getOwners()).isEmpty()
+            assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
+            assertThat(androidOwnerRegistry.getOwners()).isEmpty()
             // And our listener was notified of addition and removal
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(

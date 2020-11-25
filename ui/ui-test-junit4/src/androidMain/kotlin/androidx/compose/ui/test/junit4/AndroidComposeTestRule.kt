@@ -28,9 +28,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
-import androidx.compose.ui.test.junit4.android.ComposeIdlingResourceTestRule
-import androidx.compose.ui.test.junit4.android.IdleAwaiter
+import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
@@ -140,10 +138,8 @@ internal constructor(
         activityProvider: (R) -> A
     ) : this(activityRule, activityProvider, false)
 
-    @VisibleForTesting
-    private val composeIdlingResourceRule = ComposeIdlingResourceTestRule()
-    @VisibleForTesting
-    internal val composeIdlingResource = composeIdlingResourceRule.idlingResource
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val composeIdlingResource = ComposeIdlingResource()
 
     @ExperimentalTesting
     override val clockTestRule: AnimationClockTestRule =
@@ -155,8 +151,7 @@ internal constructor(
 
     internal var disposeContentHook: (() -> Unit)? = null
 
-    private val idleAwaiter = IdleAwaiter(composeIdlingResource)
-    private val testOwner = AndroidTestOwner(idleAwaiter)
+    private val testOwner = AndroidTestOwner(composeIdlingResource)
     private val testContext = createTestContext(testOwner)
 
     private var activity: A? = null
@@ -183,7 +178,7 @@ internal constructor(
         @Suppress("NAME_SHADOWING")
         @OptIn(ExperimentalTesting::class)
         return RuleChain
-            .outerRule(composeIdlingResourceRule)
+            .outerRule { base, _ -> composeIdlingResource.getStatementFor(base) }
             .around(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
             .around(activityRule)
@@ -221,12 +216,12 @@ internal constructor(
     }
 
     override fun waitForIdle() {
-        idleAwaiter.waitForIdle()
+        composeIdlingResource.waitForIdle()
     }
 
     @ExperimentalTesting
     override suspend fun awaitIdle() {
-        idleAwaiter.awaitIdle()
+        composeIdlingResource.awaitIdle()
     }
 
     override fun <T> runOnUiThread(action: () -> T): T {
@@ -247,50 +242,38 @@ internal constructor(
         override fun evaluate() {
             @Suppress("DEPRECATION_ERROR")
             val oldTextInputFactory = textInputServiceFactory
-            beforeEvaluate()
             try {
+                @Suppress("DEPRECATION_ERROR")
+                blinkingCursorEnabled = false
+                @Suppress("DEPRECATION_ERROR")
+                textInputServiceFactory = {
+                    TextInputServiceForTests(it)
+                }
                 base.evaluate()
             } finally {
-                afterEvaluate()
+                @Suppress("DEPRECATION_ERROR")
+                blinkingCursorEnabled = true
                 @Suppress("DEPRECATION_ERROR")
                 textInputServiceFactory = oldTextInputFactory
-            }
-        }
-
-        @OptIn(InternalTextApi::class)
-        private fun beforeEvaluate() {
-            @Suppress("DEPRECATION_ERROR")
-            blinkingCursorEnabled = false
-            AndroidOwnerRegistry.setupRegistry()
-            @Suppress("DEPRECATION_ERROR")
-            textInputServiceFactory = {
-                TextInputServiceForTests(it)
-            }
-        }
-
-        @OptIn(InternalTextApi::class)
-        private fun afterEvaluate() {
-            @Suppress("DEPRECATION_ERROR")
-            blinkingCursorEnabled = true
-            AndroidOwnerRegistry.tearDownRegistry()
-            // Dispose the content
-            if (disposeContentHook != null) {
-                runOnUiThread {
-                    // NOTE: currently, calling dispose after an exception that happened during
-                    // composition is not a safe call. Compose runtime should fix this, and then
-                    // this call will be okay. At the moment, however, calling this could
-                    // itself produce an exception which will then obscure the original
-                    // exception. To fix this, we will just wrap this call in a try/catch of
-                    // its own
-                    try {
-                        disposeContentHook!!()
-                    } catch (e: Exception) {
-                        // ignore
+                // Dispose the content
+                if (disposeContentHook != null) {
+                    runOnUiThread {
+                        // NOTE: currently, calling dispose after an exception that happened during
+                        // composition is not a safe call. Compose runtime should fix this, and then
+                        // this call will be okay. At the moment, however, calling this could
+                        // itself produce an exception which will then obscure the original
+                        // exception. To fix this, we will just wrap this call in a try/catch of
+                        // its own
+                        try {
+                            disposeContentHook!!()
+                        } catch (e: Exception) {
+                            // ignore
+                        }
+                        disposeContentHook = null
                     }
-                    disposeContentHook = null
                 }
+                activity = null
             }
-            activity = null
         }
     }
 
