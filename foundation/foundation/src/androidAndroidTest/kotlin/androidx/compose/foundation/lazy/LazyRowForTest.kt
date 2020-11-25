@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
@@ -32,7 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -50,9 +50,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -169,46 +169,6 @@ class LazyRowForTest {
 
         rule.onNodeWithTag("4")
             .assertIsDisplayed()
-    }
-
-    @Ignore("This test is not fully working. To be fixed in b/167913500")
-    @Test
-    fun contentPaddingIsApplied() = with(rule.density) {
-        val itemTag = "item"
-
-        rule.setContent {
-            LazyRowFor(
-                items = listOf(1),
-                modifier = Modifier.size(100.dp)
-                    .testTag(LazyRowForTag),
-                contentPadding = PaddingValues(
-                    start = 50.dp,
-                    top = 10.dp,
-                    end = 50.dp,
-                    bottom = 10.dp
-                )
-            ) {
-                Spacer(Modifier.fillParentMaxHeight().preferredWidth(50.dp).testTag(itemTag))
-            }
-        }
-
-        var itemBounds = rule.onNodeWithTag(itemTag)
-            .getUnclippedBoundsInRoot()
-
-        assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
-        assertThat(itemBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
-        assertThat(itemBounds.top.toIntPx()).isWithin1PixelFrom(10.dp.toIntPx())
-        assertThat(itemBounds.bottom.toIntPx())
-            .isWithin1PixelFrom(100.dp.toIntPx() - 10.dp.toIntPx())
-
-        rule.onNodeWithTag(LazyRowForTag)
-            .scrollBy(x = 51.dp, density = rule.density)
-
-        itemBounds = rule.onNodeWithTag(itemTag)
-            .getUnclippedBoundsInRoot()
-
-        assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(0)
-        assertThat(itemBounds.right.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
     }
 
     @Test
@@ -457,7 +417,7 @@ class LazyRowForTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.preferredWidth(100.dp)) {
                     LazyRowFor(items, Modifier.testTag(LazyRowForTag)) {
                         Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
@@ -813,6 +773,67 @@ class LazyRowForTest {
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(3)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun itemsAreNotRedrawnDuringScroll() {
+        val items = (0..20).toList()
+        val redrawCount = Array(6) { 0 }
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(
+                    Modifier.size(20.dp)
+                        .drawBehind { redrawCount[it]++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = 10.dp, density = rule.density)
+
+        rule.runOnIdle {
+            redrawCount.forEachIndexed { index, i ->
+                Truth.assertWithMessage("Item with index $index was redrawn $i times")
+                    .that(i).isEqualTo(1)
+            }
+        }
+    }
+
+    @Test
+    fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
+        val items = (0..1).toList()
+        val redrawCount = Array(2) { 0 }
+        var stateUsedInDrawScope by mutableStateOf(false)
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(
+                    Modifier.size(50.dp)
+                        .drawBehind {
+                            redrawCount[it]++
+                            if (it == 1) {
+                                stateUsedInDrawScope.hashCode()
+                            }
+                        }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            stateUsedInDrawScope = true
+        }
+
+        rule.runOnIdle {
+            Truth.assertWithMessage("First items is not expected to be redrawn")
+                .that(redrawCount[0]).isEqualTo(1)
+            Truth.assertWithMessage("Second items is expected to be redrawn")
+                .that(redrawCount[1]).isEqualTo(2)
         }
     }
 }

@@ -176,11 +176,11 @@ inline class PointerId(val value: Long)
 @Immutable
 data class PointerInputData(
     @Stable
-    val uptime: Uptime? = null,
+    val uptime: Uptime,
     @Stable
-    val position: Offset? = null,
+    val position: Offset,
     @Stable
-    val down: Boolean = false
+    val down: Boolean
 )
 
 /**
@@ -318,12 +318,7 @@ private fun PointerInputChange.positionChangeInternal(ignoreConsumed: Boolean = 
     val previousPosition = previous.position
     val currentPosition = current.position
 
-    val offset =
-        if (previousPosition == null || currentPosition == null) {
-            Offset(0.0f, 0.0f)
-        } else {
-            currentPosition - previousPosition
-        }
+    val offset = currentPosition - previousPosition
 
     return if (!ignoreConsumed) {
         offset - consumed.positionChange
@@ -375,4 +370,18 @@ fun PointerInputChange.consumeAllChanges() {
     val remainingPositionChange = this.positionChange()
     this.consumeDownChange()
     this.consumePositionChange(remainingPositionChange.x, remainingPositionChange.y)
+}
+
+/**
+ * Returns `true` if the pointer has moved outside of the region of
+ * `(0, 0, size.width, size.height)` or `false` if the current pointer is up or it is inside the
+ * given bounds.
+ */
+fun PointerInputChange.isOutOfBounds(size: IntSize): Boolean {
+    val position = current.position
+    val x = position.x
+    val y = position.y
+    val width = size.width
+    val height = size.height
+    return x < 0f || x > width || y < 0f || y > height
 }

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.ui.integration.test.RandomTextGenerator
 import androidx.ui.integration.test.TextBenchmarkTestRule
@@ -176,7 +176,7 @@ class TextDelegateBenchmark(
                             layoutDirection
                         )
                         val canvas = Canvas(
-                            ImageAsset(
+                            ImageBitmap(
                                 layoutResult.size.width,
                                 layoutResult.size.height
                             )
@@ -201,7 +201,7 @@ class TextDelegateBenchmark(
                 layoutDirection
             )
             val canvas = Canvas(
-                ImageAsset(layoutResult.size.width, layoutResult.size.height)
+                ImageBitmap(layoutResult.size.width, layoutResult.size.height)
             )
 
             benchmarkRule.measureRepeated {

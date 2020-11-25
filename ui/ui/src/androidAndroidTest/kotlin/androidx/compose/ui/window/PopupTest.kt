@@ -30,7 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -71,7 +71,7 @@ class PopupTest {
             SimpleContainer {
                 PopupTestTag(testTag) {
                     Popup(alignment = Alignment.Center) {
-                        SimpleContainer(Modifier.preferredSize(50.dp), children = emptyContent())
+                        SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
                     }
                 }
             }
@@ -96,7 +96,7 @@ class PopupTest {
                         SimpleContainer(
                             width = popupWidthDp,
                             height = popupHeightDp,
-                            children = emptyContent()
+                            content = emptyContent()
                         )
                     }
                 }
@@ -215,9 +215,9 @@ class PopupTest {
     fun preservesLayoutDirection() {
         var value = LayoutDirection.Ltr
         rule.setContent {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Popup {
-                    value = LayoutDirectionAmbient.current
+                    value = AmbientLayoutDirection.current
                 }
             }
         }

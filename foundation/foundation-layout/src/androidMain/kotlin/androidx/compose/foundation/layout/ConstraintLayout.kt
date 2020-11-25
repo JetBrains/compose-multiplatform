@@ -18,17 +18,19 @@ package androidx.compose.foundation.layout
 
 import android.util.Log
 import androidx.annotation.FloatRange
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.MultiMeasureLayout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
+import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -61,7 +63,7 @@ import androidx.constraintlayout.core.widgets.analyzer.BasicMeasure
 @Composable
 fun ConstraintLayout(
     modifier: Modifier = Modifier,
-    children: @Composable ConstraintLayoutScope.() -> Unit
+    content: @Composable ConstraintLayoutScope.() -> Unit
 ) {
     val measurer = remember { Measurer() }
     val scope = remember { ConstraintLayoutScope() }
@@ -71,7 +73,7 @@ fun ConstraintLayout(
         modifier = modifier,
         children = {
             scope.reset()
-            scope.children()
+            scope.content()
         }
     ) { measurables, constraints ->
         val constraintSet = object : ConstraintSet {
@@ -115,13 +117,13 @@ fun ConstraintLayout(
 fun ConstraintLayout(
     constraintSet: ConstraintSet,
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val measurer = remember { Measurer() }
     @Suppress("Deprecation")
     MultiMeasureLayout(
         modifier,
-        children
+        content
     ) { measurables, constraints ->
         val layoutSize = measurer.performMeasure(
             constraints,
@@ -530,10 +532,17 @@ class ConstraintLayoutScope internal constructor() : ConstraintLayoutBaseScope()
         constrainBlock: ConstrainScope.() -> Unit
     ): Modifier {
         // TODO(popam, b/157782492): make equals comparable modifiers here.
-        return this.then(object : ParentDataModifier {
-            override fun Density.modifyParentData(parentData: Any?) =
-                ConstraintLayoutParentData(ref, constrainBlock)
-        })
+        return this.then(
+            object : ParentDataModifier, InspectorValueInfo(
+                debugInspectorInfo {
+                    name = "constrainAs"
+                    properties["ref"] = ref
+                    properties["constrainBlock"] = constrainBlock
+                }
+            ) {
+                override fun Density.modifyParentData(parentData: Any?) =
+                    ConstraintLayoutParentData(ref, constrainBlock)
+            })
     }
 }
 
@@ -1087,7 +1096,7 @@ interface ConstraintSet {
 fun ConstraintSet(description: ConstraintSetScope.() -> Unit) = object : ConstraintSet {
     override fun applyTo(state: State, measurables: List<Measurable>) {
         measurables.forEach { measurable ->
-            state.map((measurable.id ?: createId()), measurable)
+            state.map((measurable.layoutId ?: createId()), measurable)
         }
         val scope = ConstraintSetScope()
         scope.description()
@@ -1145,7 +1154,7 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
         if (DEBUG) {
             Log.d(
                 "CCL",
-                "Measuring ${measurable.id} with: " +
+                "Measuring ${measurable.layoutId} with: " +
                     constraintWidget.toDebugString() + "\n" + measure.toDebugString()
             )
         }
@@ -1191,13 +1200,16 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
             constraintWidget.mMatchConstraintDefaultHeight != MATCH_CONSTRAINT_SPREAD
         ) {
             if (DEBUG) {
-                Log.d("CCL", "Measuring ${measurable.id} with $constraints")
+                Log.d("CCL", "Measuring ${measurable.layoutId} with $constraints")
             }
             val placeable = with(measureScope) {
                 measurable.measure(constraints).also { placeables[measurable] = it }
             }
             if (DEBUG) {
-                Log.d("CCL", "${measurable.id} is size ${placeable.width} ${placeable.height}")
+                Log.d(
+                    "CCL",
+                    "${measurable.layoutId} is size ${placeable.width} ${placeable.height}"
+                )
             }
             if (wrappingWidth) {
                 constraintWidget.wrapMeasure[0] = placeable.width
@@ -1232,7 +1244,7 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
             }
             if (remeasure) {
                 if (DEBUG) {
-                    Log.d("CCL", "Remeasuring coerced ${measurable.id} with $constraints")
+                    Log.d("CCL", "Remeasuring coerced ${measurable.layoutId} with $constraints")
                 }
                 with(measureScope) {
                     measurable.measure(constraints).also { placeables[measurable] = it }
@@ -1335,7 +1347,8 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
         if (DEBUG) {
             root.debugName = "ConstraintLayout"
             root.children.forEach { child ->
-                child.debugName = (child.companionWidget as? Measurable)?.id?.toString() ?: "NOTAG"
+                child.debugName =
+                    (child.companionWidget as? Measurable)?.layoutId?.toString() ?: "NOTAG"
             }
             Log.d("CCL", "ConstraintLayout is asked to measure with $constraints")
             Log.d("CCL", root.toDebugString())
@@ -1357,7 +1370,7 @@ private class Measurer internal constructor() : BasicMeasure.Measurer {
                 if (DEBUG) {
                     Log.d(
                         "CCL",
-                        "Final measurement for ${measurable.id} " +
+                        "Final measurement for ${measurable.layoutId} " +
                             "to confirm size ${child.width} ${child.height}"
                     )
                 }

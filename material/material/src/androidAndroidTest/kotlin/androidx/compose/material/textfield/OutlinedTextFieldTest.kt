@@ -45,8 +45,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -60,7 +61,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -81,7 +81,7 @@ import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFocus::class)
+@OptIn(ExperimentalFocus::class, ExperimentalTesting::class)
 class OutlinedTextFieldTest {
     private val ExpectedMinimumTextFieldHeight = 56.dp
     private val ExpectedPadding = 16.dp
@@ -599,9 +599,9 @@ class OutlinedTextFieldTest {
         val textInputService = mock<TextInputService>()
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
-                var text = remember { mutableStateOf(TextFieldValue("")) }
+                var text = remember { mutableStateOf("") }
                 OutlinedTextField(
                     modifier = Modifier.testTag(TextfieldTag),
                     value = text.value,

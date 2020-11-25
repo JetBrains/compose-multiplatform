@@ -38,6 +38,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
@@ -150,7 +151,14 @@ fun Modifier.rawDragGestureFilter(
     dragObserver: DragObserver,
     canStartDragging: (() -> Boolean)? = null,
     orientation: Orientation? = null
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "rawDragGestureFilter"
+        properties["dragObserver"] = dragObserver
+        properties["canStartDragging"] = canStartDragging
+        properties["orientation"] = orientation
+    }
+) {
     val filter = remember { RawDragGestureFilter() }
     filter.dragObserver = dragObserver
     filter.canStartDragging = canStartDragging
@@ -261,11 +269,11 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                         velocityTrackers[it.id] = VelocityTracker()
                             .apply {
                                 addPosition(
-                                    it.current.uptime!!,
-                                    it.current.position!!
+                                    it.current.uptime,
+                                    it.current.position
                                 )
                             }
-                        downPositions[it.id] = it.current.position!!
+                        downPositions[it.id] = it.current.position
                     }
                 }
             }
@@ -284,8 +292,8 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                 // TODO(b/162269614): Should be update to only have one velocity tracker that
                 //  tracks the average change overtime, instead of one for each finger.
                 velocityTrackers[it.id]?.addPosition(
-                    it.current.uptime!!,
-                    it.current.position!!
+                    it.current.uptime,
+                    it.current.position
                 )
             }
 

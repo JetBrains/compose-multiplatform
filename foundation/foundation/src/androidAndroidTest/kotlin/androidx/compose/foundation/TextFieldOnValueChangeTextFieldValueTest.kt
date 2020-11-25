@@ -21,9 +21,9 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.test.click
-import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.TextRange
@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.FinishComposingTextEditOp
 import androidx.compose.ui.text.input.SetComposingRegionEditOp
 import androidx.compose.ui.text.input.SetComposingTextEditOp
 import androidx.compose.ui.text.input.SetSelectionEditOp
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -72,11 +73,11 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 val state = remember {
                     mutableStateOf(
-                        androidx.compose.ui.text.input.TextFieldValue(
+                        TextFieldValue(
                             "abcde",
                             TextRange.Zero
                         )
@@ -93,7 +94,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         }
 
         // Perform click to focus in.
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .performGesture { click(Offset(1f, 1f)) }
 
         rule.runOnIdle {
@@ -128,7 +129,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
             verify(onValueChange, times(1))
                 .invoke(
                     eq(
-                        androidx.compose.ui.text.input.TextFieldValue(
+                        TextFieldValue(
                             "ABCDEabcde",
                             TextRange(5)
                         )
@@ -139,36 +140,30 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
     @Test
     fun setComposingRegion_onValueChange_call_once() {
+        val textFieldValueCaptor = argumentCaptor<TextFieldValue>()
         // Composition change will be reported as a change
         performEditOperation(SetComposingRegionEditOp(0, 5))
+
         rule.runOnIdle {
-            verify(onValueChange, times(1)).invoke(
-                eq(
-                    androidx.compose.ui.text.input.TextFieldValue(
-                        text = "abcde",
-                        selection = TextRange.Zero,
-                        composition = TextRange(0, 5)
-                    )
-                )
-            )
+            verify(onValueChange, times(1)).invoke(textFieldValueCaptor.capture())
+            assertThat(textFieldValueCaptor.firstValue.text).isEqualTo("abcde")
+            assertThat(textFieldValueCaptor.firstValue.selection).isEqualTo(TextRange.Zero)
+            assertThat(textFieldValueCaptor.firstValue.composition).isEqualTo(TextRange(0, 5))
         }
     }
 
     @Test
     fun setComposingText_onValueChange_call_once() {
+        val textFieldValueCaptor = argumentCaptor<TextFieldValue>()
         val composingText = "ABCDE"
+
         performEditOperation(SetComposingTextEditOp(composingText, 1))
+
         rule.runOnIdle {
-            verify(onValueChange, times(1))
-                .invoke(
-                    eq(
-                        androidx.compose.ui.text.input.TextFieldValue(
-                            text = "ABCDEabcde",
-                            selection = TextRange(5),
-                            composition = TextRange(0, 5)
-                        )
-                    )
-                )
+            verify(onValueChange, times(1)).invoke(textFieldValueCaptor.capture())
+            assertThat(textFieldValueCaptor.firstValue.text).isEqualTo("ABCDEabcde")
+            assertThat(textFieldValueCaptor.firstValue.selection).isEqualTo(TextRange(5))
+            assertThat(textFieldValueCaptor.firstValue.composition).isEqualTo(TextRange(0, 5))
         }
     }
 
@@ -179,7 +174,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(
                 eq(
-                    androidx.compose.ui.text.input.TextFieldValue(
+                    TextFieldValue(
                         "abcde",
                         TextRange(1)
                     )
@@ -190,24 +185,29 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
     @Test
     fun clearComposition_onValueChange_call_once() {
+        val textFieldValueCaptor = argumentCaptor<TextFieldValue>()
         val composingText = "ABCDE"
+
         performEditOperation(SetComposingTextEditOp(composingText, 1))
-        val expectedTextFieldValue = androidx.compose.ui.text.input.TextFieldValue(
-            text = "ABCDEabcde",
-            selection = TextRange(5),
-            composition = TextRange(0, composingText.length)
-        )
+
         rule.runOnIdle {
-            verify(onValueChange, times(1)).invoke(eq(expectedTextFieldValue))
+            verify(onValueChange, times(1)).invoke(textFieldValueCaptor.capture())
+            assertThat(textFieldValueCaptor.firstValue.text).isEqualTo("ABCDEabcde")
+            assertThat(textFieldValueCaptor.firstValue.selection).isEqualTo(TextRange(5))
+            assertThat(textFieldValueCaptor.firstValue.composition).isEqualTo(
+                TextRange(0, composingText.length)
+            )
         }
 
         // Composition change will be reported as a change
         clearInvocations(onValueChange)
+        val compositionClearCaptor = argumentCaptor<TextFieldValue>()
         performEditOperation(FinishComposingTextEditOp())
         rule.runOnIdle {
-            verify(onValueChange, times(1)).invoke(
-                eq(expectedTextFieldValue.copy(composition = null))
-            )
+            verify(onValueChange, times(1)).invoke(compositionClearCaptor.capture())
+            assertThat(compositionClearCaptor.firstValue.text).isEqualTo("ABCDEabcde")
+            assertThat(compositionClearCaptor.firstValue.selection).isEqualTo(TextRange(5))
+            assertThat(compositionClearCaptor.firstValue.composition).isNull()
         }
     }
 
@@ -217,7 +217,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(
                 eq(
-                    androidx.compose.ui.text.input.TextFieldValue(
+                    TextFieldValue(
                         "bcde",
                         TextRange.Zero
                     )

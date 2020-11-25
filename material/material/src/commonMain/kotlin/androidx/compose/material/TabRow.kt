@@ -120,7 +120,7 @@ fun TabRow(
     tabs: @Composable () -> Unit
 ) {
     Surface(modifier = modifier, color = backgroundColor, contentColor = contentColor) {
-        SubcomposeLayout<TabSlots>(Modifier.fillMaxWidth()) { constraints ->
+        SubcomposeLayout(Modifier.fillMaxWidth()) { constraints ->
             val tabRowWidth = constraints.maxWidth
             val tabMeasurables = subcompose(TabSlots.Tabs, tabs)
             val tabCount = tabMeasurables.size
@@ -208,7 +208,7 @@ fun ScrollableTabRow(
                 selectedTab = selectedTabIndex
             )
         }
-        SubcomposeLayout<TabSlots>(
+        SubcomposeLayout(
             Modifier.fillMaxWidth()
                 .wrapContentSize(align = Alignment.CenterStart)
                 .horizontalScroll(scrollState)

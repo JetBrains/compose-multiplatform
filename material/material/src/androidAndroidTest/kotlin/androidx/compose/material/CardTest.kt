@@ -59,7 +59,7 @@ class CardTest {
                     Providers(AmbientShapes provides Shapes(medium = shape)) {
                         Card(
                             modifier = Modifier
-                                .semantics(mergeAllDescendants = true) {}
+                                .semantics(mergeDescendants = true) {}
                                 .testTag("card"),
                             elevation = 0.dp
                         ) {

@@ -31,8 +31,8 @@ import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeightIn
@@ -41,12 +41,11 @@ import androidx.compose.foundation.layout.preferredWidthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SliderConstants.InactiveTrackColorAlpha
 import androidx.compose.material.SliderConstants.TickColorAlpha
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
@@ -54,9 +53,10 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.accessibilityValueRange
@@ -127,19 +127,19 @@ fun Slider(
     activeTickColor: Color = MaterialTheme.colors.onPrimary.copy(alpha = TickColorAlpha),
     inactiveTickColor: Color = activeTrackColor.copy(alpha = TickColorAlpha)
 ) {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     val position = remember(valueRange, steps) {
         SliderPosition(value, valueRange, steps, clock, onValueChange)
     }
     position.onValueChange = onValueChange
     position.scaledValue = value
     WithConstraints(modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)) {
-        val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
         val minPx = 0f
         position.setBounds(minPx, maxPx)
 
-        val flingConfig = SliderFlingConfig(position, position.anchorsPx)
+        val flingConfig = sliderFlingConfig(position, position.anchorsPx)
         val gestureEndAction = { velocity: Float ->
             if (flingConfig != null) {
                 position.holder.fling(velocity, flingConfig) { reason, endValue, _ ->
@@ -220,7 +220,7 @@ private fun SliderImpl(
     interactionState: InteractionState,
     modifier: Modifier
 ) {
-    val widthDp = with(DensityAmbient.current) {
+    val widthDp = with(AmbientDensity.current) {
         width.toDp()
     }
     Box(modifier.then(DefaultSliderConstraints)) {
@@ -230,7 +230,7 @@ private fun SliderImpl(
 
         val trackStrokeWidth: Float
         val thumbPx: Float
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             trackStrokeWidth = TrackHeight.toPx()
             thumbPx = ThumbRadius.toPx()
         }
@@ -259,9 +259,9 @@ private fun SliderImpl(
                 elevation = elevation,
                 modifier = Modifier.indication(
                     interactionState = interactionState,
-                    indication = RippleIndication(
-                        radius = ThumbRippleRadius,
-                        bounded = false
+                    indication = rememberRippleIndication(
+                        bounded = false,
+                        radius = ThumbRippleRadius
                     )
                 )
             ) {
@@ -325,7 +325,7 @@ private fun calcFraction(a: Float, b: Float, pos: Float) =
     (if (b - a == 0f) 0f else (pos - a) / (b - a)).coerceIn(0f, 1f)
 
 @Composable
-private fun SliderFlingConfig(
+private fun sliderFlingConfig(
     value: SliderPosition,
     anchors: List<Float>
 ): FlingConfig? {

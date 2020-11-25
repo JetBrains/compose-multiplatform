@@ -19,6 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth
@@ -44,15 +45,12 @@ internal fun createDelegate(
                 delegate.requestRemeasure(it.arguments[0] as LayoutNode)
                 Unit
             }
-            on { observeMeasureModelReads(any(), any()) } doAnswer {
-                (it.arguments[1] as () -> Unit).invoke()
-            }
-            on { observeLayoutModelReads(any(), any()) } doAnswer {
-                (it.arguments[1] as () -> Unit).invoke()
-            }
             on { measureAndLayout() } doAnswer {
                 delegate.measureAndLayout()
                 Unit
+            }
+            on { snapshotObserver } doAnswer {
+                OwnerSnapshotObserver { it.invoke() }
             }
         }
     )
@@ -221,6 +219,12 @@ internal var LayoutNode.childrenDirection: LayoutDirection?
     set(value) {
         (measureBlocks as SmartMeasureBlock).childrenLayoutDirection = value
     }
+@ExperimentalLayoutNodeApi
+internal var LayoutNode.shouldPlaceChildren: Boolean
+    get() = (measureBlocks as SmartMeasureBlock).shouldPlaceChildren
+    set(value) {
+        (measureBlocks as SmartMeasureBlock).shouldPlaceChildren = value
+    }
 
 internal val TestAlignmentLine = HorizontalAlignmentLine(::min)
 
@@ -239,6 +243,7 @@ internal abstract class SmartMeasureBlock : LayoutNode.NoIntrinsicsMeasureBlocks
     var childrenLayoutDirection: LayoutDirection? = null
     // child size is used when null
     var size: Int? = null
+    var shouldPlaceChildren = true
 }
 
 @OptIn(ExperimentalLayoutNodeApi::class)
@@ -278,8 +283,10 @@ internal class MeasureInMeasureBlock : SmartMeasureBlock() {
             layoutsCount++
             preLayoutCallback?.invoke()
             preLayoutCallback = null
-            placeables.forEach { placeable ->
-                placeable.placeRelative(0, 0)
+            if (shouldPlaceChildren) {
+                placeables.forEach { placeable ->
+                    placeable.placeRelative(0, 0)
+                }
             }
         }
     }
@@ -326,8 +333,10 @@ internal class MeasureInLayoutBlock : SmartMeasureBlock() {
             preLayoutCallback = null
             layoutsCount++
             measurables.forEach {
-                it.measure(childConstraints)
-                    .placeRelative(0, 0)
+                val placeable = it.measure(childConstraints)
+                if (shouldPlaceChildren) {
+                    placeable.placeRelative(0, 0)
+                }
             }
         }
     }

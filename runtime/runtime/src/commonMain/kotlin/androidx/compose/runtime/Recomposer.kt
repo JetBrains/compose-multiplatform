@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(
-    ExperimentalComposeApi::class,
-    InternalComposeApi::class
-)
 package androidx.compose.runtime
 
 import androidx.compose.runtime.dispatch.BroadcastFrameClock
@@ -25,15 +21,20 @@ import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.snapshots.SnapshotApplyObserver
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedSendChannelException
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -69,9 +70,12 @@ suspend fun <R> withRunningRecomposer(
 // RedundantVisibilityModifier suppressed because metalava picks up internal function overrides
 // if 'internal' is not explicitly specified - b/171342041
 @Suppress("RedundantVisibilityModifier")
+@OptIn(
+    ExperimentalComposeApi::class,
+    InternalComposeApi::class
+)
 class Recomposer(
-    effectCoroutineContext: CoroutineContext,
-    val embeddingContext: EmbeddingContext = EmbeddingContext(),
+    effectCoroutineContext: CoroutineContext
 ) : CompositionReference() {
 
     /**
@@ -105,7 +109,6 @@ class Recomposer(
 
     /**
      * A [Job] used as a parent of any effects created by this [Recomposer]'s compositions.
-     *
      */
     private val effectJob = Job(effectCoroutineContext[Job]).apply {
         invokeOnCompletion { throwable ->
@@ -126,6 +129,37 @@ class Recomposer(
         effectCoroutineContext + broadcastFrameClock + effectJob
 
     /**
+     * This collection is its own lock. When a composer performs initial composition it is added
+     * to this collection; when it is unregistered it is removed. Any composers in this set will
+     * receive state modification events from this [Recomposer] when snapshots change.
+     */
+    private val recomposableComposers = mutableSetOf<Composer<*>>()
+
+    /**
+     * Record any changes in [snapshotChanges] with the currently registered
+     * [recomposableComposers], then drains [appliedChanges] of any further snapshot change sets
+     * and records them with the composers before returning.
+     */
+    private fun recordModificationsForComposers(
+        snapshotChanges: Set<Any>,
+        appliedChanges: ReceiveChannel<Set<Any>>
+    ) {
+        synchronized(recomposableComposers) {
+            recomposableComposers.forEach {
+                it.recordModificationsOf(snapshotChanges)
+            }
+            // Strange loop to keep nullability smart casts happy
+            while (true) {
+                appliedChanges.poll()?.also { additionalChanges ->
+                    recomposableComposers.forEach {
+                        it.recordModificationsOf(additionalChanges)
+                    }
+                } ?: break
+            }
+        }
+    }
+
+    /**
      * Await the invalidation of any associated [Composer]s, recompose them, and apply their
      * changes to their associated [Composition]s if recomposition is successful.
      *
@@ -134,6 +168,7 @@ class Recomposer(
      *
      * This method never returns. Cancel the calling [CoroutineScope] to stop.
      */
+    @Suppress("DEPRECATION") // Remove once recomposeAndApplyChanges is removed from API
     suspend fun runRecomposeAndApplyChanges(): Nothing {
         recomposeAndApplyChanges(Long.MAX_VALUE)
         error("this function never returns")
@@ -150,6 +185,7 @@ class Recomposer(
      * if the [Recomposer] is [shutDown] or if the [effectCoroutineContext] used to construct the
      * [Recomposer] is cancelled.
      */
+    @Deprecated("Drive the calling MonotonicFrameClock to control recomposition by frame")
     suspend fun recomposeAndApplyChanges(frameCount: Long) {
         val parentFrameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
         withContext(broadcastFrameClock) {
@@ -166,15 +202,54 @@ class Recomposer(
             var framesRemaining = frameCount
             val toRecompose = mutableListOf<Composer<*>>()
 
+            // Due to a breaking change in Coroutines 1.4.0, some update events might be dropped.
+            // see: https://github.com/Kotlin/kotlinx.coroutines/releases/tag/1.4.0-M1
+            // For Compose, we prefer them not to be lost hence we try to re-offer them back to
+            // the channel.
+            // see: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-channel/
+            var addChangeBack: ((value: Set<Any>) -> Unit)? = null
+            val appliedChanges = Channel<Set<Any>>(Channel.UNLIMITED) { undeliveredChanges ->
+                addChangeBack?.invoke(undeliveredChanges)
+            }
+            addChangeBack = {
+                try {
+                    appliedChanges.offer(it)
+                } catch (ignored: ClosedSendChannelException) {}
+            }
+            // unregisterApplyObserver is called as part of the big finally below
+            val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
+                appliedChanges.offer(changed)
+            }
+
             try {
                 idlingLatch.closeLatch()
+                synchronized(recomposableComposers) {
+                    // Invalidate everyone we know about since we weren't listening
+                    // for snapshot changes while the recomposer wasn't running
+                    recomposableComposers.forEach { it.invalidateAll() }
+                }
                 while (frameCount == Long.MAX_VALUE || framesRemaining-- > 0L) {
                     // Don't hold the monitor lock across suspension.
                     val hasInvalidComposers = synchronized(invalidComposers) {
                         invalidComposers.isNotEmpty()
                     }
                     if (!hasInvalidComposers && !broadcastFrameClock.hasAwaiters) {
-                        // Suspend until we have something to do
+                        // Listen for snapshot invalidations while we're suspending for reasons
+                        // to perform a frame. Recording modifications with a composer might
+                        // make us wake up. invalidator will cancelAndJoin below after wakeup
+                        // ensuring we will not work with any one composer in parallel during
+                        // the frame.
+                        val invalidator = launch {
+                            for (snapshotChanges in appliedChanges) {
+                                recordModificationsForComposers(snapshotChanges, appliedChanges)
+                            }
+                        }
+                        // Suspend until we have something to do. Work might come from:
+                        // * Waking up for new invalidations as a result of the launched
+                        //   invalidator job above
+                        // * Waking up for new invalidations as a result of other external
+                        //   composer invalidate calls, e.g. the manual invalidate composable
+                        // * Waking up for new broadcast frame awaiters
                         suspendCancellableCoroutine<Unit> { co ->
                             synchronized(invalidComposers) {
                                 if (invalidComposers.isEmpty()) {
@@ -195,6 +270,12 @@ class Recomposer(
                                 }
                             }
                         }
+                        // Stop listening to frame invalidations for now, we'll catch the rest
+                        // when we actually reach the next frame below. It's important that we not
+                        // modify/operate a composer in parallel with itself, which might happen
+                        // with recording changes vs. recomposing if we are on a parallel
+                        // dispatcher.
+                        invalidator.cancelAndJoin()
                     }
 
                     // Align work with the next frame to coalesce changes.
@@ -212,10 +293,10 @@ class Recomposer(
                             // Ensure any global changes are observed
                             Snapshot.sendApplyNotifications()
 
-                            // ...and make sure we know about any pending invalidations the commit
-                            // may have caused before recomposing - Handler messages can't run
-                            // between input processing and the frame clock pulse!
-                            FrameManager.synchronize()
+                            // Drain any composer invalidations from snapshot changes
+                            appliedChanges.poll()?.let { snapshotChanges ->
+                                recordModificationsForComposers(snapshotChanges, appliedChanges)
+                            }
 
                             // ...and pick up any stragglers as a result of the above snapshot sync
                             synchronized(invalidComposers) {
@@ -223,6 +304,7 @@ class Recomposer(
                                 invalidComposers.clear()
                             }
 
+                            // Actually perform recomposition for any invalidated composers
                             if (toRecompose.isNotEmpty()) {
                                 for (i in 0 until toRecompose.size) {
                                     performRecompose(toRecompose[i])
@@ -233,6 +315,7 @@ class Recomposer(
                     }
                 }
             } finally {
+                unregisterApplyObserver()
                 // Only replace the value if it currently matches; a new caller may have already
                 // set its own job as a replacement before we resume to cancel.
                 runningRecomposeJobOrException.compareAndSet(myJob, null)
@@ -265,12 +348,6 @@ class Recomposer(
         composer: Composer<*>,
         composable: @Composable () -> Unit
     ) {
-        if (composer.disposeHook == null) {
-            // This will eventually move to the recomposer once it tracks active compositions.
-            // After this is moved the disposeHook should be removed as well.
-            composer.disposeHook = Snapshot.registerApplyObserver(applyObserverOf(composer))
-        }
-
         val composerWasComposing = composer.isComposing
         composing(composer) {
             composer.composeInitial(composable)
@@ -280,6 +357,10 @@ class Recomposer(
             Snapshot.notifyObjectsInitialized()
         }
         composer.applyChanges()
+
+        synchronized(recomposableComposers) {
+            recomposableComposers.add(composer)
+        }
 
         if (!composerWasComposing) {
             // Ensure that any state objects created during applyChanges are seen as changed
@@ -304,18 +385,6 @@ class Recomposer(
 
     private fun writeObserverOf(composer: Composer<*>): SnapshotWriteObserver {
         return { value -> composer.recordWriteOf(value) }
-    }
-
-    private fun applyObserverOf(composer: Composer<*>): SnapshotApplyObserver {
-        return { values, _ ->
-            if (embeddingContext.isMainThread())
-                composer.recordModificationsOf(values)
-            else {
-                FrameManager.schedule {
-                    composer.recordModificationsOf(values)
-                }
-            }
-        }
     }
 
     private inline fun <T> composing(composer: Composer<*>, block: () -> T): T {
@@ -364,6 +433,24 @@ class Recomposer(
     internal override val collectingKeySources: Boolean
         get() = false
 
+    internal override fun recordInspectionTable(table: MutableSet<SlotTable>) {
+        // TODO: The root recomposer might be a better place to set up inspection
+        // than the current configuration with an ambient
+    }
+
+    internal override fun registerComposerWithRoot(composer: Composer<*>) {
+        // Do nothing.
+    }
+
+    internal override fun unregisterComposerWithRoot(composer: Composer<*>) {
+        synchronized(recomposableComposers) {
+            recomposableComposers.remove(composer)
+        }
+        synchronized(invalidComposers) {
+            invalidComposers.remove(composer)
+        }
+    }
+
     internal override fun invalidate(composer: Composer<*>) {
         synchronized(invalidComposers) {
             invalidComposers.add(composer)
@@ -376,14 +463,19 @@ class Recomposer(
     }
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
         private val mainRecomposer: Recomposer by lazy {
             val embeddingContext = EmbeddingContext()
             val mainScope = CoroutineScope(
                 NonCancellable + embeddingContext.mainThreadCompositionContext()
             )
 
-            Recomposer(mainScope.coroutineContext, embeddingContext).also {
-                mainScope.launch {
+            Recomposer(mainScope.coroutineContext).also {
+                // NOTE: Launching undispatched so that compositions created with the
+                // Recomposer.current() singleton instance can assume the recomposer is running
+                // when they perform initial composition. The relevant Recomposer code is
+                // appropriately thread-safe for this.
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     it.runRecomposeAndApplyChanges()
                 }
             }

@@ -158,11 +158,14 @@ internal class AndroidParagraph constructor(
             getSpans(0, length, PlaceholderSpan::class.java).map { span ->
                 val start = getSpanStart(span)
                 val end = getSpanEnd(span)
+                // The line index of the PlaceholderSpan. In the case where PlaceholderSpan is
+                // truncated due to maxLines limitation. It will return the index of last line.
                 val line = layout.getLineForOffset(start)
-                // This Placeholder is ellipsized, return null instead.
-                if (layout.getLineEllipsisCount(line) > 0 &&
+                val isPlaceholderSpanEllipsized = layout.getLineEllipsisCount(line) > 0 &&
                     end > layout.getLineEllipsisOffset(line)
-                ) {
+                val isPlaceholderSpanTruncated = end > layout.getLineEnd(line)
+                // This Placeholder is ellipsized or truncated, return null instead.
+                if (isPlaceholderSpanEllipsized || isPlaceholderSpanTruncated) {
                     return@map null
                 }
 
@@ -286,8 +289,20 @@ internal class AndroidParagraph constructor(
 
     override fun getLineStart(lineIndex: Int): Int = layout.getLineStart(lineIndex)
 
-    override fun getLineEnd(lineIndex: Int): Int = layout.getLineEnd(lineIndex)
+    override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean): Int =
+        if (visibleEnd) {
+            layout.getLineVisibleEnd(lineIndex)
+        } else {
+            layout.getLineEnd(lineIndex)
+        }
 
+    @Deprecated(
+        "This function will be removed.",
+        replaceWith = ReplaceWith(
+            "getLineEnd(lineIndex, true)",
+            "androidx.compose.ui.text.platform"
+        )
+    )
     override fun getLineVisibleEnd(lineIndex: Int): Int = layout.getLineVisibleEnd(lineIndex)
 
     override fun isLineEllipsized(lineIndex: Int): Boolean = layout.isLineEllipsized(lineIndex)

@@ -21,6 +21,7 @@ package androidx.compose.foundation
 
 import android.os.Build
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
@@ -42,9 +43,9 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.TextInputServiceAmbient
+import androidx.compose.ui.platform.AmbientTextInputService
+import androidx.compose.ui.platform.AmbientTextToolbar
 import androidx.compose.ui.platform.TextToolbar
-import androidx.compose.ui.platform.TextToolbarAmbient
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -55,7 +56,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasImeAction
-import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.isNotFocused
 import androidx.compose.ui.test.junit4.StateRestorationTester
@@ -66,11 +67,9 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
@@ -80,6 +79,7 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.length
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -113,9 +113,9 @@ class TextFieldTest {
 
         var isFocused = false
         rule.setContent {
-            val state = remember { mutableStateOf(TextFieldValue("")) }
+            val state = remember { mutableStateOf("") }
             Providers(
-                TextInputServiceAmbient provides inputService
+                AmbientTextInputService provides inputService
             ) {
                 BasicTextField(
                     value = state.value,
@@ -125,7 +125,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         rule.runOnIdle {
             assertThat(isFocused).isTrue()
@@ -134,7 +134,7 @@ class TextFieldTest {
 
     @Composable
     private fun TextFieldApp() {
-        val state = remember { mutableStateOf(TextFieldValue("")) }
+        val state = remember { mutableStateOf("") }
         BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
@@ -154,13 +154,13 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 TextFieldApp()
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
         rule.runOnIdle {
@@ -194,7 +194,7 @@ class TextFieldTest {
         rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
             verify(textInputService, atLeastOnce())
-                .onStateUpdated(eq(inputSessionToken), stateCaptor.capture())
+                .onStateUpdated(eq(inputSessionToken), any(), stateCaptor.capture())
 
             // Don't care about the intermediate state update. It should eventually be "1a2b3".
             assertThat(stateCaptor.lastValue.text).isEqualTo("1a2b3")
@@ -203,12 +203,12 @@ class TextFieldTest {
 
     @Composable
     private fun OnlyDigitsApp() {
-        val state = remember { mutableStateOf(TextFieldValue("")) }
+        val state = remember { mutableStateOf("") }
         BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
             onValueChange = {
-                if (it.text.all { it.isDigit() }) {
+                if (it.all { it.isDigit() }) {
                     state.value = it
                 }
             }
@@ -225,13 +225,13 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
                 OnlyDigitsApp()
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
         rule.runOnIdle {
@@ -265,7 +265,7 @@ class TextFieldTest {
         rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
             verify(textInputService, atLeastOnce())
-                .onStateUpdated(eq(inputSessionToken), stateCaptor.capture())
+                .onStateUpdated(eq(inputSessionToken), any(), stateCaptor.capture())
 
             // Don't care about the intermediate state update. It should eventually be "123" since
             // the rejects if the incoming model contains alphabets.
@@ -284,9 +284,9 @@ class TextFieldTest {
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
         rule.setContent {
             Providers(
-                TextInputServiceAmbient provides textInputService
+                AmbientTextInputService provides textInputService
             ) {
-                val state = remember { mutableStateOf(TextFieldValue("")) }
+                val state = remember { mutableStateOf("") }
                 BasicTextField(
                     value = state.value,
                     modifier = Modifier.fillMaxSize(),
@@ -298,7 +298,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
         rule.runOnIdle {
@@ -345,7 +345,7 @@ class TextFieldTest {
             Box(Modifier.preferredSize(parentSize)) {
                 Row {
                     BasicTextField(
-                        value = TextFieldValue(),
+                        value = "",
                         onValueChange = {},
                         modifier = Modifier
                             .weight(1f)
@@ -369,9 +369,7 @@ class TextFieldTest {
 
         val restorationTester = StateRestorationTester(rule)
         restorationTester.setContent {
-            state = savedInstanceState(saver = Saver) {
-                TextFieldValue()
-            }
+            state = savedInstanceState(saver = Saver) { TextFieldValue() }
         }
 
         rule.runOnIdle {
@@ -395,7 +393,7 @@ class TextFieldTest {
     fun textFieldNotFocused_cursorNotRendered() {
         rule.setContent {
             BasicTextField(
-                value = TextFieldValue(),
+                value = "",
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White),
                 modifier = Modifier.preferredSize(10.dp, 20.dp).background(color = Color.White),
@@ -403,7 +401,7 @@ class TextFieldTest {
             )
         }
 
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -419,7 +417,7 @@ class TextFieldTest {
         rule.setContent {
             BasicTextField(
                 modifier = Modifier.testTag("textField"),
-                value = TextFieldValue(),
+                value = "",
                 onValueChange = {}
             )
         }
@@ -427,7 +425,7 @@ class TextFieldTest {
         rule.onNodeWithTag("textField")
             .assertTextEquals("")
             .assertHasClickAction()
-            .assert(hasInputMethodsSupport())
+            .assert(hasSetTextAction())
             .assert(hasImeAction(ImeAction.Unspecified))
             .assert(isNotFocused())
             .assert(
@@ -449,7 +447,7 @@ class TextFieldTest {
     @Test
     fun semantics_clickAction() {
         rule.setContent {
-            var value by remember { mutableStateOf(TextFieldValue()) }
+            var value by remember { mutableStateOf("") }
             BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
@@ -467,9 +465,9 @@ class TextFieldTest {
     @Test
     fun semantics_setTextSetSelectionActions() {
         rule.setContent {
-            var value by remember { mutableStateOf(TextFieldValue()) }
+            var value by remember { mutableStateOf("") }
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
@@ -503,13 +501,13 @@ class TextFieldTest {
     fun setImeAction_isReflectedInSemantics() {
         rule.setContent {
             BasicTextField(
-                value = TextFieldValue(),
+                value = "",
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 onValueChange = {}
             )
         }
 
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .assert(hasImeAction(ImeAction.Search))
     }
 
@@ -520,7 +518,7 @@ class TextFieldTest {
 
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
@@ -537,23 +535,29 @@ class TextFieldTest {
     @Test
     fun semantics_pasteTextAction() {
         val text = "Hello World"
-        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 5)))
+        var value by mutableStateOf(TextFieldValue(text, TextRange(0, 6)))
 
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
         }
 
+        // copy text to the clipboard
         rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.CopyText) { it() }
+        rule.runOnIdle {
+            assertThat(value.selection.collapsed).isTrue()
+            assertThat(value.selection.start).isEqualTo(6)
+        }
+
+        // paste text from the clipboard
         rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.PasteText) { it() }
-
         rule.runOnIdle {
-            assertThat(value.text).isEqualTo("HelloHello World")
+            assertThat(value.text).isEqualTo("Hello Hello World")
         }
     }
 
@@ -564,7 +568,7 @@ class TextFieldTest {
 
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
@@ -579,6 +583,7 @@ class TextFieldTest {
         }
     }
 
+    @LargeTest
     @Test
     fun semantics_longClick() {
         val text = "Hello World"
@@ -586,7 +591,7 @@ class TextFieldTest {
         var toolbar: TextToolbar? = null
 
         rule.setContent {
-            toolbar = TextToolbarAmbient.current
+            toolbar = AmbientTextToolbar.current
             BasicTextField(
                 modifier = Modifier.testTag(Tag),
                 value = value,
@@ -611,7 +616,7 @@ class TextFieldTest {
         var lastSeenText = ""
         rule.setContent {
             var text by remember { mutableStateOf("") }
-            TextFieldStringOverride(
+            BasicTextField(
                 value = text,
                 onValueChange = {
                     text = it
@@ -635,32 +640,4 @@ class TextFieldTest {
             assertThat(lastSeenText).isEqualTo("")
         }
     }
-}
-
-@Composable
-@OptIn(InternalTextApi::class, ExperimentalFoundationApi::class)
-private fun TextFieldStringOverride(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var selection by remember { mutableStateOf(TextRange.Zero) }
-    var composition by remember { mutableStateOf<TextRange?>(null) }
-    val textFieldValue = TextFieldValue(
-        text = value,
-        selection = selection.constrain(0, value.length),
-        composition = composition?.constrain(0, value.length)
-    )
-
-    BasicTextField(
-        value = textFieldValue,
-        onValueChange = {
-            selection = it.selection
-            composition = it.composition
-            if (textFieldValue.text != it.text) {
-                onValueChange(it.text)
-            }
-        },
-        modifier = modifier.width(100.dp)
-    )
 }

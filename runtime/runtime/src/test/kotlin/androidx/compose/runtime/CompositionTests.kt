@@ -51,7 +51,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-@Composable fun Container(body: @Composable () -> Unit) = body()
+@Composable fun Container(content: @Composable () -> Unit) = content()
 
 @Stable
 @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
@@ -1867,8 +1867,10 @@ class CompositionTests {
             outerInvalidate = invalidate
             outerKeys.add(currentComposer.currentCompoundKeyHash)
             Container {
-                innerInvalidate = invalidate
-                innerKeys.add(currentComposer.currentCompoundKeyHash)
+                linear {
+                    innerInvalidate = invalidate
+                    innerKeys.add(currentComposer.currentCompoundKeyHash)
+                }
             }
             // asserts that the key is correctly rolled back after start and end of Observe
             assertEquals(outerKeys.last(), currentComposer.currentCompoundKeyHash)
@@ -2104,8 +2106,8 @@ class CompositionTests {
         }
 
         @Composable
-        fun MockComposeScope.wrapper(children: @Composable () -> Unit) {
-            children()
+        fun MockComposeScope.wrapper(content: @Composable () -> Unit) {
+            content()
         }
 
         @Composable
@@ -2503,8 +2505,8 @@ class CompositionTests {
     }
 }
 
-@Composable fun Wrap(block: @Composable () -> Unit) {
-    block()
+@Composable fun Wrap(content: @Composable () -> Unit) {
+    content()
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {

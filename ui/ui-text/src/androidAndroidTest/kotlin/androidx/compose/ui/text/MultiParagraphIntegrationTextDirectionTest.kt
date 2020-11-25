@@ -253,7 +253,7 @@ class MultiParagraphIntegrationTextDirectionTest {
 
     private fun multiParagraphIntrinsics(
         text: AnnotatedString,
-        fontSize: TextUnit = TextUnit.Inherit,
+        fontSize: TextUnit = TextUnit.Unspecified,
         placeholders: List<AnnotatedString.Range<Placeholder>> = listOf()
     ): MultiParagraphIntrinsics {
         return MultiParagraphIntrinsics(
@@ -272,7 +272,7 @@ class MultiParagraphIntegrationTextDirectionTest {
         text: AnnotatedString,
         localeList: LocaleList? = null,
         textDirection: TextDirection? = null,
-        fontSize: TextUnit = TextUnit.Inherit,
+        fontSize: TextUnit = TextUnit.Unspecified,
         width: Float = Float.MAX_VALUE
     ): MultiParagraph {
         return MultiParagraph(

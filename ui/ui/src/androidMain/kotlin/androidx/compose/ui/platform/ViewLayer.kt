@@ -26,9 +26,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
 import java.lang.reflect.Field
@@ -40,7 +40,6 @@ import java.lang.reflect.Method
 internal class ViewLayer(
     val ownerView: AndroidComposeView,
     val container: ViewLayerContainer,
-    drawLayerModifier: DrawLayerModifier,
     val drawBlock: (Canvas) -> Unit,
     val invalidateParentLayer: () -> Unit
 ) : View(ownerView.context), OwnedLayer {
@@ -54,16 +53,8 @@ internal class ViewLayer(
     private var drawnWithZ = false
     private val canvasHolder = CanvasHolder()
 
-    override var modifier: DrawLayerModifier = drawLayerModifier
-        set(value) {
-            if (value !== field) {
-                field = value
-                updateLayerProperties()
-            }
-        }
-
     /**
-     * Local copy of the transform origin as DrawLayerModifier can be implemented
+     * Local copy of the transform origin as GraphicsLayerModifier can be implemented
      * as a model object. Update this field within [updateLayerProperties] and use it
      * in [resize] or other methods
      */
@@ -74,9 +65,6 @@ internal class ViewLayer(
         id = generateViewId()
         container.addView(this)
     }
-
-    override val isValid: Boolean
-        get() = isAttachedToWindow
 
     override val layerId: Long
         get() = id.toLong()
@@ -97,22 +85,34 @@ internal class ViewLayer(
             cameraDistance = value * resources.displayMetrics.densityDpi
         }
 
-    override fun updateLayerProperties() {
-        this.mTransformOrigin = modifier.transformOrigin
-        this.scaleX = modifier.scaleX
-        this.scaleY = modifier.scaleY
-        this.alpha = modifier.alpha
-        this.translationX = modifier.translationX
-        this.translationY = modifier.translationY
-        this.elevation = modifier.shadowElevation
-        this.rotation = modifier.rotationZ
-        this.rotationX = modifier.rotationX
-        this.rotationY = modifier.rotationY
+    override fun updateLayerProperties(
+        scaleX: Float,
+        scaleY: Float,
+        alpha: Float,
+        translationX: Float,
+        translationY: Float,
+        shadowElevation: Float,
+        rotationX: Float,
+        rotationY: Float,
+        rotationZ: Float,
+        cameraDistance: Float,
+        transformOrigin: TransformOrigin,
+        shape: Shape,
+        clip: Boolean
+    ) {
+        this.mTransformOrigin = transformOrigin
+        this.scaleX = scaleX
+        this.scaleY = scaleY
+        this.alpha = alpha
+        this.translationX = translationX
+        this.translationY = translationY
+        this.elevation = shadowElevation
+        this.rotation = rotationZ
+        this.rotationX = rotationX
+        this.rotationY = rotationY
         this.pivotX = mTransformOrigin.pivotFractionX * width
         this.pivotY = mTransformOrigin.pivotFractionY * height
-        this.cameraDistancePx = modifier.cameraDistance
-        val shape = modifier.shape
-        val clip = modifier.clip
+        this.cameraDistancePx = cameraDistance
         this.clipToBounds = clip && shape === RectangleShape
         resetClipBounds()
         val wasClippingManually = manualClipPath != null
@@ -197,9 +197,7 @@ internal class ViewLayer(
                 save()
                 clipPath(clipPath)
             }
-            ownerView.observeLayerModelReads(this@ViewLayer) {
-                drawBlock(this)
-            }
+            drawBlock(this)
             if (clipPath != null) {
                 restore()
             }

@@ -27,7 +27,7 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class Constraints {
     ctor public Constraints();
-    method public static long constructor-impl(internal long value);
+    method public static long constructor-impl(long value);
     method public static long copy-msEJaDk(long $this, optional int minWidth, optional int maxWidth, optional int minHeight, optional int maxHeight);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -294,7 +294,7 @@ package androidx.compose.ui.unit {
     ctor public IntOffset();
     method @androidx.compose.runtime.Stable public static operator int component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator int component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-nOcc-ac(long $this, optional int x, optional int y);
     method @androidx.compose.runtime.Stable public static operator long div-nOcc-ac(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -312,9 +312,7 @@ package androidx.compose.ui.unit {
   }
 
   public static final class IntOffset.Companion {
-    method @Deprecated public long getOrigin-nOcc-ac();
     method public long getZero-nOcc-ac();
-    property @Deprecated public final long Origin;
     property public final long Zero;
   }
 
@@ -332,7 +330,7 @@ package androidx.compose.ui.unit {
     ctor public IntSize();
     method @androidx.compose.runtime.Stable public static inline operator int component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator int component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method @androidx.compose.runtime.Stable public static operator long div-YbymL2g(long $this, int other);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -363,7 +361,7 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class Position {
     ctor public Position();
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-ioHfwGI(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -377,27 +375,6 @@ package androidx.compose.ui.unit {
   }
 
   public static final class Position.Companion {
-  }
-
-  @Deprecated @androidx.compose.runtime.Immutable public final class PxBounds {
-    ctor @Deprecated public PxBounds(float left, float top, float right, float bottom);
-    method @Deprecated public float component1();
-    method @Deprecated public float component2();
-    method @Deprecated public float component3();
-    method @Deprecated public float component4();
-    method @Deprecated @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.PxBounds copy(float left, float top, float right, float bottom);
-    method @Deprecated public float getBottom();
-    method @Deprecated public float getLeft();
-    method @Deprecated public float getRight();
-    method @Deprecated public float getTop();
-    property public final float bottom;
-    property public final float left;
-    property public final float right;
-    property public final float top;
-    field @Deprecated public static final androidx.compose.ui.unit.PxBounds.Companion Companion;
-  }
-
-  @Deprecated public static final class PxBounds.Companion {
   }
 
   @androidx.compose.runtime.Immutable public final inline class PxCubed implements java.lang.Comparable<androidx.compose.ui.unit.PxCubed> {
@@ -437,15 +414,8 @@ package androidx.compose.ui.unit {
   }
 
   public final class PxKt {
-    method @Deprecated @androidx.compose.runtime.Stable public static inline androidx.compose.ui.unit.PxBounds PxBounds-MrV732k(long topLeft, long size);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long center(androidx.compose.ui.unit.PxBounds);
     method @androidx.compose.runtime.Stable public static long center-uvyYCjk(long);
-    method @Deprecated public static inline float getHeight(androidx.compose.ui.unit.PxBounds);
-    method @Deprecated public static inline float getWidth(androidx.compose.ui.unit.PxBounds);
     method @androidx.compose.runtime.Stable public static inline long round-k-4lQ0M(long);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.PxBounds toBounds-uvyYCjk(long);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.PxBounds);
-    method @Deprecated @androidx.compose.runtime.Stable public static long toSize(androidx.compose.ui.unit.PxBounds);
   }
 
   @androidx.compose.runtime.Immutable public final inline class PxSquared implements java.lang.Comparable<androidx.compose.ui.unit.PxSquared> {
@@ -482,8 +452,9 @@ package androidx.compose.ui.unit {
     method public static float getValue-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method public static boolean isEm-impl(long $this);
-    method public static boolean isInherit-impl(long $this);
+    method @Deprecated public static boolean isInherit-impl(long $this);
     method public static boolean isSp-impl(long $this);
+    method public static boolean isUnspecified-impl(long $this);
     method public static inline operator long minus--R2X_6o(long $this, long other);
     method public static inline operator long plus--R2X_6o(long $this, long other);
     method public static inline operator long times-XSAIIZE(long $this, float other);
@@ -502,8 +473,10 @@ package androidx.compose.ui.unit {
     method public long Sp-XSAIIZE(int value);
     method public long Sp-XSAIIZE(float value);
     method public long Sp-XSAIIZE(double value);
-    method public long getInherit-XSAIIZE();
-    property public final long Inherit;
+    method @Deprecated public long getInherit-XSAIIZE();
+    method public long getUnspecified-XSAIIZE();
+    property @Deprecated public final long Inherit;
+    property public final long Unspecified;
   }
 
   public final class TextUnitKt {
@@ -529,9 +502,12 @@ package androidx.compose.ui.unit {
   }
 
   public enum TextUnitType {
+    method public final int getValue();
+    property public final int value;
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Em;
-    enum_constant public static final androidx.compose.ui.unit.TextUnitType Inherit;
+    enum_constant @Deprecated public static final androidx.compose.ui.unit.TextUnitType Inherit;
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Sp;
+    enum_constant public static final androidx.compose.ui.unit.TextUnitType Unspecified;
   }
 
   @androidx.compose.runtime.Immutable public final inline class Uptime implements java.lang.Comparable<androidx.compose.ui.unit.Uptime> {
@@ -553,7 +529,9 @@ package androidx.compose.ui.unit {
 
   public static final class Uptime.Companion {
     method public long getBoot-CLVl0cY();
+    method public long getUnspecified-CLVl0cY();
     property public final long Boot;
+    property public final long Unspecified;
   }
 
   public final class UptimeKt {

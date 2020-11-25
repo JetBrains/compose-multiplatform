@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2019 The Android Open Source Project
  *
@@ -27,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -72,7 +73,7 @@ class BackgroundTest {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Box(Modifier.preferredSize(20f.toDp()).background(Color.White))
                 }
@@ -95,7 +96,7 @@ class BackgroundTest {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Box(
                         Modifier.preferredSize(20f.toDp())
@@ -190,9 +191,9 @@ class BackgroundTest {
     }
 
     @Composable
-    private fun SemanticParent(children: @Composable Density.() -> Unit) {
+    private fun SemanticParent(content: @Composable Density.() -> Unit) {
         Box(Modifier.testTag(contentTag)) {
-            DensityAmbient.current.children()
+            AmbientDensity.current.content()
         }
     }
 }

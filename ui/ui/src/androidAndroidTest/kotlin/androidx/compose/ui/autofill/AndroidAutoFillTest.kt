@@ -23,9 +23,9 @@ import android.view.autofill.AutofillValue
 import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
 import androidx.compose.testutils.fake.FakeViewStructure
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.platform.AutofillAmbient
-import androidx.compose.ui.platform.AutofillTreeAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientAutofill
+import androidx.compose.ui.platform.AmbientAutofillTree
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
@@ -49,9 +49,9 @@ class AndroidAutoFillTest {
     @Before
     fun setup() {
         rule.setContent {
-            ownerView = ViewAmbient.current
-            autofill = AutofillAmbient.current
-            autofillTree = AutofillTreeAmbient.current
+            ownerView = AmbientView.current
+            autofill = AmbientAutofill.current
+            autofillTree = AmbientAutofillTree.current
         }
     }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha06" client="gradle" variant="debug" version="4.2.0-alpha06">
+<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        bitmap = Bitmap.createBitmap("
         errorLine2="                        ~~~~~~~~~~~~">
         <location
@@ -14,7 +14,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAsset is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmap is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="            bitmap.colorSpace?.toComposeColorSpace() ?: ColorSpaces.Srgb"
         errorLine2="                   ~~~~~~~~~~">
         <location
@@ -25,7 +25,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="    return android.graphics.ColorSpace.get(frameworkNamedSpace)"
         errorLine2="                                       ~~~">
         <location
@@ -36,7 +36,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)"
         errorLine2="                                    ~~~">
         <location
@@ -47,7 +47,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ACES)"
         errorLine2="                                    ~~~">
         <location
@@ -58,7 +58,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ACESCG)"
         errorLine2="                                    ~~~">
         <location
@@ -69,7 +69,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ADOBE_RGB)"
         errorLine2="                                    ~~~">
         <location
@@ -80,7 +80,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.BT2020)"
         errorLine2="                                    ~~~">
         <location
@@ -91,7 +91,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.BT709)"
         errorLine2="                                    ~~~">
         <location
@@ -102,7 +102,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.CIE_LAB)"
         errorLine2="                                    ~~~">
         <location
@@ -113,7 +113,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.CIE_XYZ)"
         errorLine2="                                    ~~~">
         <location
@@ -124,7 +124,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.DCI_P3)"
         errorLine2="                                    ~~~">
         <location
@@ -135,7 +135,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.DISPLAY_P3)"
         errorLine2="                                    ~~~">
         <location
@@ -146,7 +146,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.EXTENDED_SRGB)"
         errorLine2="                                    ~~~">
         <location
@@ -157,7 +157,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.LINEAR_EXTENDED_SRGB)"
         errorLine2="                                    ~~~">
         <location
@@ -168,7 +168,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.LINEAR_SRGB)"
         errorLine2="                                    ~~~">
         <location
@@ -179,7 +179,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.NTSC_1953)"
         errorLine2="                                    ~~~">
         <location
@@ -190,7 +190,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.PRO_PHOTO_RGB)"
         errorLine2="                                    ~~~">
         <location
@@ -201,7 +201,7 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageAssetKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.graphics.AndroidImageBitmapKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="        android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SMPTE_C)"
         errorLine2="                                    ~~~">
         <location

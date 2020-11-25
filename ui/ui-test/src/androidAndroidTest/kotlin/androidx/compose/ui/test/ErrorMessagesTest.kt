@@ -342,11 +342,11 @@ class ErrorMessagesTest {
     fun TestButton(
         modifier: Modifier = Modifier,
         onClick: (() -> Unit)? = null,
-        children: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
         Surface {
             Box(modifier.clickable(onClick = onClick ?: {}, enabled = onClick != null)) {
-                Box { children() }
+                Box { content() }
             }
         }
     }

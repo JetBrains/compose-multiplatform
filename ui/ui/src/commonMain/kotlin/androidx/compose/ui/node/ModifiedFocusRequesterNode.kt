@@ -16,14 +16,12 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.ui.FocusRequesterModifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 
 @OptIn(
-    ExperimentalCollectionApi::class,
     ExperimentalFocus::class
 )
 internal class ModifiedFocusRequesterNode(

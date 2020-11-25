@@ -18,13 +18,14 @@ package androidx.compose.material
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
@@ -45,6 +46,7 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+@OptIn(ExperimentalTesting::class)
 class CheckboxScreenshotTest {
 
     @get:Rule

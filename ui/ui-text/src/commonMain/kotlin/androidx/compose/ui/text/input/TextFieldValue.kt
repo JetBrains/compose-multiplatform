@@ -17,10 +17,11 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.listSaver
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.substring
 import kotlin.math.max
 import kotlin.math.min
@@ -81,45 +82,70 @@ data class EditorValue(
  * represents those values and it is possible to observe changes to those values in the text
  * editing composables.
  *
- * Input service composition is an instance of text produced by IME. An example visual for the
- * composition is that the currently composed word is visually separated from others with
- * underline, or text background. For description of
- * composition please check [W3C IME Composition](https://www.w3.org/TR/ime-api/#ime-composition)
- *
  * This class stores a snapshot of the input state of the edit buffer and provide utility functions
  * for answering IME requests such as getTextBeforeCursor, getSelectedText.
  *
  * @param text the text will be rendered
  * @param selection the selection range. If the selection is collapsed, it represents cursor
- * location. Selection range must be within the bounds of the [text], otherwise an exception will be
- * thrown.
- * @param composition A composition range visible to IME. If null, there is no composition range.
- * Composition range must be within the bounds of the [text], otherwise an exception will be
- * thrown. For description of composition please check [W3C IME Composition](https://www.w3
- * .org/TR/ime-api/#ime-composition).
+ * location. When selection range is out of bounds, it is constrained with the text length.
  */
 @Immutable
-data class TextFieldValue(
-    @Stable
+class TextFieldValue internal constructor(
     val text: String = "",
-    @Stable
-    val selection: TextRange = TextRange.Zero,
-    @Stable
-    val composition: TextRange? = null
+    selection: TextRange = TextRange.Zero,
+    composition: TextRange? = null
 ) {
-    init {
-        // TextRange end is exclusive therefore can be at the end of the text
-        require(selection.end <= text.length) {
-            "Selection is out of bounds. [selection: $selection, text.length = ${text.length}]"
-        }
+    constructor(
+        text: String = "",
+        selection: TextRange = TextRange.Zero
+    ) : this(text, selection, null)
 
-        // TextRange end is exclusive therefore can be at the end of the text
-        composition?.let {
-            require(composition.end <= text.length) {
-                "Composition is out of bounds. " +
-                    "[composition: $selection, text.length = ${text.length}]"
-            }
-        }
+    @OptIn(InternalTextApi::class)
+    val selection = selection.constrain(0, text.length)
+
+    /**
+     * Composition range created by  IME. If null, there is no composition range.
+     *
+     * Input service composition is an instance of text produced by IME. An example visual for the
+     * composition is that the currently composed word is visually separated from others with
+     * underline, or text background. For description of
+     * composition please check [W3C IME Composition](https://www.w3.org/TR/ime-api/#ime-composition)
+     */
+    @OptIn(InternalTextApi::class)
+    val composition: TextRange? = composition?.constrain(0, text.length)
+
+    /**
+     * Returns a copy of the TextField.
+     */
+    fun copy(text: String = this.text, selection: TextRange = this.selection): TextFieldValue {
+        return TextFieldValue(text, selection, composition)
+    }
+
+    /**
+     * Returns a copy of [TextFieldValue] in which composition ranges are cleared. For the
+     * returned value the composed text will be submitted to the editing buffer.
+     */
+    fun commitComposition() = TextFieldValue(
+        text = text,
+        selection = selection,
+        composition = null
+    )
+
+    // auto generated equals method
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TextFieldValue) return false
+        return text == other.text &&
+            selection == other.selection &&
+            composition == other.composition
+    }
+
+    // auto generated hashCode method
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + selection.hashCode()
+        result = 31 * result + (composition?.hashCode() ?: 0)
+        return result
     }
 
     companion object {
@@ -153,3 +179,16 @@ fun TextFieldValue.getTextAfterSelection(maxChars: Int): String =
  * Helper function for getting text currently selected.
  */
 fun TextFieldValue.getSelectedText(): String = text.substring(selection)
+
+/**
+ * Temporary constructor until we figure out how to enforce composition for internal values
+ * while enforcing higher level API not to accept composition modification.
+ *
+ * @suppress
+ */
+@InternalTextApi
+fun buildTextFieldValue(
+    text: String,
+    selection: TextRange,
+    composition: TextRange?
+): TextFieldValue = TextFieldValue(text, selection, composition)

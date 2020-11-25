@@ -172,19 +172,19 @@ fun ControlledScrollableRowSample() {
 private fun Square(index: Int) {
     Box(
         Modifier.preferredSize(75.dp, 200.dp).background(colors[index % colors.size]),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(index.toString())
     }
 }
 
 @Composable
-private fun Button(onClick: () -> Unit, text: @Composable () -> Unit) {
+private fun Button(onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         Modifier.padding(5.dp)
             .preferredSize(120.dp, 60.dp)
             .clickable(onClick = onClick)
             .background(color = Color.LightGray),
-        alignment = Alignment.Center
-    ) { text() }
+        contentAlignment = Alignment.Center
+    ) { content() }
 }

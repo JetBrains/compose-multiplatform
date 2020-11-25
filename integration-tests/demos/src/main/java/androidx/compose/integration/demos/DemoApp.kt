@@ -47,9 +47,8 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
@@ -67,7 +66,7 @@ fun DemoApp(
 ) {
     val navigationIcon = (@Composable { AppBarIcons.Back(onNavigateUp) }).takeIf { canNavigateUp }
 
-    var filterText by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    var filterText by savedInstanceState { "" }
 
     Scaffold(
         topBar = {
@@ -84,7 +83,7 @@ fun DemoApp(
         }
     ) { innerPadding ->
         val modifier = Modifier.padding(innerPadding)
-        DemoContent(modifier, currentDemo, isFiltering, filterText.text, onNavigateToDemo)
+        DemoContent(modifier, currentDemo, isFiltering, filterText, onNavigateToDemo)
     }
 }
 
@@ -140,13 +139,14 @@ private fun DisplayDemoCategory(category: DemoCategory, onNavigate: (Demo) -> Un
     }
 }
 
+@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 @Composable
 private fun DemoAppBar(
     title: String,
     navigationIcon: @Composable (() -> Unit)?,
     isFiltering: Boolean,
-    filterText: TextFieldValue,
-    onFilter: (TextFieldValue) -> Unit,
+    filterText: String,
+    onFilter: (String) -> Unit,
     onStartFiltering: () -> Unit,
     onEndFiltering: () -> Unit,
     launchSettings: () -> Unit
@@ -174,7 +174,7 @@ private fun DemoAppBar(
 private object AppBarIcons {
     @Composable
     fun Back(onClick: () -> Unit) {
-        val icon = when (LayoutDirectionAmbient.current) {
+        val icon = when (AmbientLayoutDirection.current) {
             LayoutDirection.Ltr -> Icons.Filled.ArrowBack
             LayoutDirection.Rtl -> Icons.Filled.ArrowForward
         }

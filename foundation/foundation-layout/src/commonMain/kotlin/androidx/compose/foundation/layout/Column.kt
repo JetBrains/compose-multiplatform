@@ -21,19 +21,21 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.VerticalAlignmentLine
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measured
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * A layout composable that places its children in a vertical sequence. For a layout composable
- * that places its children in a horizontal sequence, see [Row].
+ * that places its children in a horizontal sequence, see [Row]. For a layout that places children
+ * in a vertical sequence and is also scrollable, see `ScrollableColumn`. For a vertically
+ * scrollable list that only composes and lays out the currently visible items see `LazyColumn`.
  *
- * The layout model is able to assign children heights according to their weights provided
+ * The [Column] layout is able to assign children heights according to their weights provided
  * using the [ColumnScope.weight] modifier. If a child is not provided a weight, it will be
  * asked for its preferred height before the sizes of the children with weights are calculated
  * proportionally to their weight based on the remaining available space.
@@ -59,7 +61,9 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @param verticalArrangement The vertical arrangement of the layout's children.
  * @param horizontalAlignment The horizontal alignment of the layout's children.
  *
- * @see Column
+ * @see Row
+ * @see [androidx.compose.foundation.ScrollableColumn]
+ * @see [androidx.compose.foundation.lazy.LazyColumn]
  */
 @Composable
 @OptIn(ExperimentalLayoutNodeApi::class, InternalLayoutApi::class)
@@ -67,11 +71,11 @@ inline fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    children: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     val measureBlocks = columnMeasureBlocks(verticalArrangement, horizontalAlignment)
     Layout(
-        children = { ColumnScope.children() },
+        content = { ColumnScope.content() },
         measureBlocks = measureBlocks,
         modifier = modifier
     )
@@ -134,10 +138,6 @@ interface ColumnScope {
             }
         )
     )
-
-    @Stable
-    @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
-    fun Modifier.gravity(align: Alignment.Horizontal) = align(align)
 
     /**
      * Position the element horizontally such that its [alignmentLine] aligns with sibling elements

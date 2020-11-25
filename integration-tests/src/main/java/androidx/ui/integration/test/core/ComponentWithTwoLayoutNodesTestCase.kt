@@ -32,13 +32,13 @@ import androidx.compose.ui.unit.dp
 
 class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplenentationTestCase() {
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         Box(
             modifier = Modifier
                 .preferredSize(48.dp)
                 .border(BorderStroke(1.dp, Color.Cyan), CircleShape)
                 .padding(1.dp),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             val innerSize = getInnerSize().value
             Canvas(Modifier.preferredSize(innerSize)) {

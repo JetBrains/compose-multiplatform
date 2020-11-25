@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
@@ -39,7 +39,7 @@ import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -166,7 +166,7 @@ class ModalBottomSheetState(
 @ExperimentalMaterialApi
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
-    clock: AnimationClockObservable = AnimationClockAmbient.current,
+    clock: AnimationClockObservable = AmbientAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ): ModalBottomSheetState {
@@ -230,13 +230,13 @@ fun ModalBottomSheetLayout(
         Surface(
             Modifier
                 .fillMaxWidth()
-                .offsetPx(y = sheetState.offset),
+                .offset(y = { sheetState.offset.value }),
             shape = sheetShape,
             elevation = sheetElevation,
             color = sheetBackgroundColor,
             contentColor = sheetContentColor
         ) {
-            Column(children = sheetContent)
+            Column(content = sheetContent)
         }
     },
     content = { constraints, sheetHeight ->
@@ -299,7 +299,7 @@ private fun BottomSheetStack(
     sheetContent: @Composable () -> Unit,
     content: @Composable (constraints: Constraints, sheetHeight: Float) -> Unit
 ) {
-    SubcomposeLayout<BottomSheetStackSlot>(modifier) { constraints ->
+    SubcomposeLayout(modifier) { constraints ->
         val sheetPlaceable =
             subcompose(BottomSheetStackSlot.SheetContent, sheetContent)
                 .first().measure(constraints.copy(minWidth = 0, minHeight = 0))

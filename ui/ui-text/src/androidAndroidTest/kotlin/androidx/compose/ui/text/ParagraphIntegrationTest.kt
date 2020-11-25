@@ -19,8 +19,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.ImageAssetConfig
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shadow
@@ -1874,16 +1874,16 @@ class ParagraphIntegrationTest {
             // Make sure the maxLine is applied correctly
             assertThat(paragraphNoMaxLine.height).isGreaterThan(paragraphWithMaxLine.height)
 
-            val imageNoMaxLine = ImageAsset(
+            val imageNoMaxLine = ImageBitmap(
                 paragraphNoMaxLine.width.roundToInt(),
                 paragraphNoMaxLine.height.roundToInt(),
-                ImageAssetConfig.Argb8888
+                ImageBitmapConfig.Argb8888
             )
             // Same size with imageNoMaxLine for comparison
-            val imageWithMaxLine = ImageAsset(
+            val imageWithMaxLine = ImageBitmap(
                 paragraphNoMaxLine.width.roundToInt(),
                 paragraphNoMaxLine.height.roundToInt(),
-                ImageAssetConfig.Argb8888
+                ImageBitmapConfig.Argb8888
             )
 
             paragraphNoMaxLine.paint(Canvas(imageNoMaxLine))
@@ -2622,11 +2622,11 @@ class ParagraphIntegrationTest {
 
         assertThat(paragraph.lineCount).isEqualTo(2)
         assertThat(paragraph.getLineEnd(0)).isEqualTo(4)
-        assertThat(paragraph.getLineVisibleEnd(0)).isEqualTo(3) // "\n" is excluded
+        assertThat(paragraph.getLineEnd(0, true)).isEqualTo(3) // "\n" is excluded
         assertThat(paragraph.isLineEllipsized(0)).isFalse()
 
         assertThat(paragraph.getLineEnd(1)).isEqualTo(text.length)
-        assertThat(paragraph.getLineVisibleEnd(1)).isEqualTo(7) // "\n" is excluded
+        assertThat(paragraph.getLineEnd(1, true)).isEqualTo(7) // "\n" is excluded
         assertThat(paragraph.isLineEllipsized(1)).isTrue()
     }
 
@@ -2651,14 +2651,14 @@ class ParagraphIntegrationTest {
             assertThat(paragraph.isLineEllipsized(0)).isFalse()
             assertThat(paragraph.getLineStart(0)).isEqualTo(0)
             assertThat(paragraph.getLineEnd(0)).isEqualTo(5)
-            assertThat(paragraph.getLineVisibleEnd(0)).isEqualTo(5)
+            assertThat(paragraph.getLineEnd(0, true)).isEqualTo(5)
 
             assertThat(paragraph.isLineEllipsized(1)).isTrue()
             assertThat(paragraph.getLineStart(1)).isEqualTo(5)
             assertThat(paragraph.getLineEnd(1)).isEqualTo(text.length)
             // The ellipsizer may reserve multiple characters for drawing HORIZONTAL ELLIPSIS
             // character (U+2026). We can only expect the visible end is not the end of the line.
-            assertThat(paragraph.getLineVisibleEnd(1)).isNotEqualTo(text.length)
+            assertThat(paragraph.getLineEnd(1, true)).isNotEqualTo(text.length)
         }
     }
 

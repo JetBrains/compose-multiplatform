@@ -39,7 +39,7 @@ import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import kotlin.random.Random
 
 /**
@@ -50,7 +50,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     private lateinit var scrollState: ScrollState
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         scrollState = rememberScrollState()
         MaterialTheme {
             Surface {
@@ -75,7 +75,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
         val playStoreColor = Color(red = 0x00, green = 0x00, blue = 0x80)
         val content: @Composable RowScope.() -> Unit = {
             repeat(6) {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     Column(Modifier.fillMaxHeight()) {
                         val color = remember {
                             val red = Random.nextInt(256)
@@ -107,9 +107,9 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
             }
         }
         if (useScrollerPosition) {
-            ScrollableRow(scrollState = scrollState, children = content)
+            ScrollableRow(scrollState = scrollState, content = content)
         } else {
-            ScrollableRow(children = content)
+            ScrollableRow(content = content)
         }
     }
 }

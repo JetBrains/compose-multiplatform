@@ -100,7 +100,7 @@ private fun DynamicThemeApp(scrollFraction: ScrollFraction, palette: Colors) {
             bodyContent = { innerPadding ->
                 ScrollableColumn(
                     scrollState = scrollState,
-                    children = {
+                    content = {
                         Column(Modifier.padding(innerPadding)) {
                             repeat(20) { index ->
                                 Card(index)
@@ -132,7 +132,7 @@ private fun Card(index: Int) {
     Box(
         Modifier.padding(25.dp).fillMaxWidth().preferredHeight(150.dp)
             .background(shapeColor, RoundedCornerShape(10.dp)),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text("Card ${index + 1}", color = textColor)
     }

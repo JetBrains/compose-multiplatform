@@ -16,15 +16,17 @@
 
 package androidx.compose.ui.semantics
 
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.annotation.IntRange
 import kotlin.reflect.KProperty
 
 /**
- * General semantics properties, mainly used for accessibility.
+ * General semantics properties, mainly used for accessibility and testing.
  */
 object SemanticsProperties {
     /**
@@ -39,7 +41,7 @@ object SemanticsProperties {
             if (parentValue == null) {
                 childValue
             } else {
-                parentValue + ", " + childValue
+                "$parentValue, $childValue"
             }
         }
     )
@@ -171,12 +173,35 @@ object SemanticsProperties {
     val TextSelectionRange = SemanticsPropertyKey<TextRange>("TextSelectionRange")
 
     /**
+     * Contains the IME action provided by the node.
+     *
+     *  @see SemanticsPropertyReceiver.imeAction
+     */
+    val ImeAction = SemanticsPropertyKey<ImeAction>("ImeAction")
+
+    /**
      * The vertical scroll state of this node if this node is scrollable.
      *
      * @see SemanticsPropertyReceiver.verticalAccessibilityScrollState
      */
     val VerticalAccessibilityScrollState =
         SemanticsPropertyKey<AccessibilityScrollState>("VerticalAccessibilityScrollState")
+
+    /**
+     * Whether this element is selected (out of a list of possible selections).
+     * The presence of this property indicates that the element is selectable.
+     *
+     * @see SemanticsPropertyReceiver.selected
+     */
+    val Selected = SemanticsPropertyKey<Boolean>("Selected")
+
+    /**
+     * The state of a toggleable component.
+     * The presence of this property indicates that the element is toggleable.
+     *
+     * @see SemanticsPropertyReceiver.toggleableState
+     */
+    val ToggleableState = SemanticsPropertyKey<ToggleableState>("ToggleableState")
 }
 
 /**
@@ -210,13 +235,13 @@ object SemanticsActions {
     /**
      * Action to scroll to a specified position.
      *
-     * @see SemanticsPropertyReceiver.ScrollBy
+     * @see SemanticsPropertyReceiver.scrollBy
      */
     val ScrollBy =
         SemanticsPropertyKey<AccessibilityAction<(x: Float, y: Float) -> Boolean>>("ScrollBy")
 
     /**
-     * Action to set slider progress.
+     * Action to set progress.
      *
      * @see SemanticsPropertyReceiver.setProgress
      */
@@ -255,11 +280,20 @@ object SemanticsActions {
     val CutText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CutText")
 
     /**
-     * Action to paste the text from the clipboard.
+     * Action to paste the text from the clipboard. Add it to indicate that element is open for
+     * accepting paste data from the clipboard.
+     * The element setting this property should also set the [SemanticsProperties.Focused] property.
      *
      * @see SemanticsPropertyReceiver.pasteText
      */
     val PasteText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("PasteText")
+
+    /**
+     * Action to dismiss a dismissible node.
+     *
+     * @see SemanticsPropertyReceiver.dismiss
+     */
+    val Dismiss = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Dismiss")
 
     /**
      * Custom actions which are defined by app developers.
@@ -282,12 +316,12 @@ class SemanticsPropertyKey<T>(
     /**
      * Method implementing the semantics merge policy of a particular key.
      *
-     * When mergeAllDescendants is set on a semantics node, then this function will called for each
+     * When mergeDescendants is set on a semantics node, then this function will called for each
      * descendant node of a given key in depth-first-search order.  The parent
      * value accumulates the result of merging the values seen so far, similar to reduce().
      *
      * The default implementation returns the parent value if one exists, otherwise uses the
-     * child element.  This means by default, a SemanticsNode with mergeAllDescendants = true
+     * child element.  This means by default, a SemanticsNode with mergeDescendants = true
      * winds up with the first value found for each key in its subtree in depth-first-search order.
      */
     fun merge(parentValue: T?, childValue: T): T? {
@@ -480,6 +514,30 @@ var SemanticsPropertyReceiver.text by SemanticsProperties.Text
 var SemanticsPropertyReceiver.textSelectionRange by SemanticsProperties.TextSelectionRange
 
 /**
+ * Contains the IME action provided by the node.
+ *
+ *  @see SemanticsProperties.ImeAction
+ */
+var SemanticsPropertyReceiver.imeAction by SemanticsProperties.ImeAction
+
+/**
+ * Whether this element is selected (out of a list of possible selections).
+ * The presence of this property indicates that the element is selectable.
+ *
+ * @see SemanticsProperties.Selected
+ */
+var SemanticsPropertyReceiver.selected by SemanticsProperties.Selected
+
+/**
+ * The state of a toggleable component.
+ * The presence of this property indicates that the element is toggleable.
+ *
+ * @see SemanticsProperties.ToggleableState
+ */
+var SemanticsPropertyReceiver.toggleableState
+by SemanticsProperties.ToggleableState
+
+/**
  * Custom actions which are defined by app developers.
  *
  * @see SemanticsPropertyReceiver.customActions
@@ -599,13 +657,32 @@ fun SemanticsPropertyReceiver.cutText(
 
 /**
  * This function adds the [SemanticsActions.PasteText] to the [SemanticsPropertyReceiver].
+ * Use it to indicate that element is open for accepting paste data from the clipboard. There is
+ * no need to check if the clipboard data available as this is done by the framework.
+ * For this action to be triggered, the element must also have the [SemanticsProperties.Focused]
+ * property set.
  *
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.PasteText] is called.
+ *
+ * @see focused
  */
 fun SemanticsPropertyReceiver.pasteText(
     label: String? = null,
     action: () -> Boolean
 ) {
     this[SemanticsActions.PasteText] = AccessibilityAction(label, action)
+}
+
+/**
+ * This function adds the [SemanticsActions.Dismiss] to the [SemanticsPropertyReceiver].
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.Dismiss] is called.
+ */
+fun SemanticsPropertyReceiver.dismiss(
+    label: String? = null,
+    action: () -> Boolean
+) {
+    this[SemanticsActions.Dismiss] = AccessibilityAction(label, action)
 }

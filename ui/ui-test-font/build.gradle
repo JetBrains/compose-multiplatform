@@ -28,7 +28,6 @@ plugins {
 androidx {
     name = "Compose Test Font resources"
     publish = Publish.NONE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Fonts designed for testing text capabilities"

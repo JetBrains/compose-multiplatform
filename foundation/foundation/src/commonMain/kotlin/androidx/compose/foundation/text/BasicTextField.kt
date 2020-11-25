@@ -20,16 +20,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -74,11 +75,16 @@ import androidx.compose.ui.text.input.VisualTransformation
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling
+ * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
+ * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
+ * maxLines attribute will be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
+ * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
+ * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
- * that this IME action may be different from what you specified in [imeAction].
+ * that this IME action may be different from what you specified in [KeyboardOptions.imeAction].
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
@@ -96,6 +102,7 @@ fun BasicTextField(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -103,20 +110,13 @@ fun BasicTextField(
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = Color.Black
 ) {
-    var selection by remember { mutableStateOf(TextRange.Zero) }
-    var composition by remember { mutableStateOf<TextRange?>(null) }
+    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+    val textFieldValue = textFieldValueState.copy(text = value)
 
-    @OptIn(InternalTextApi::class)
-    val textFieldValue = TextFieldValue(
-        text = value,
-        selection = selection.constrain(0, value.length),
-        composition = composition?.constrain(0, value.length)
-    )
     BasicTextField(
         value = textFieldValue,
         onValueChange = {
-            selection = it.selection
-            composition = it.composition
+            textFieldValueState = it
             if (value != it.text) {
                 onValueChange(it.text)
             }
@@ -129,7 +129,8 @@ fun BasicTextField(
         visualTransformation = visualTransformation,
         onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
-        cursorColor = cursorColor
+        cursorColor = cursorColor,
+        singleLine = singleLine
     )
 }
 
@@ -170,11 +171,16 @@ fun BasicTextField(
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling
+ * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
+ * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
+ * maxLines attribute will be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
+ * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
+ * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed Called when the input service requested an IME action. When the
  * input service emitted an IME action, this callback is called with the emitted IME action. Note
- * that this IME action may be different from what you specified in [imeAction].
+ * that this IME action may be different from what you specified in [KeyboardOptions.imeAction].
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
@@ -192,6 +198,7 @@ fun BasicTextField(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -199,17 +206,36 @@ fun BasicTextField(
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = Color.Black
 ) {
+    // We use it to get the cursor position
+    val textLayoutResult: Ref<TextLayoutResult?> = remember { Ref() }
+
+    val orientation = if (singleLine) Orientation.Horizontal else Orientation.Vertical
+    val scrollerPosition = rememberSavedInstanceState(saver = TextFieldScrollerPosition.Saver) {
+        TextFieldScrollerPosition()
+    }
+
     CoreTextField(
         value = value,
-        modifier = modifier,
         onValueChange = onValueChange,
         textStyle = textStyle,
         onImeActionPerformed = onImeActionPerformed,
         visualTransformation = visualTransformation,
-        onTextLayout = onTextLayout,
+        onTextLayout = {
+            textLayoutResult.value = it
+            onTextLayout(it)
+        },
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor,
-        imeOptions = keyboardOptions.toImeOptions(),
-        maxLines = maxLines
+        imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
+        softWrap = !singleLine,
+        modifier = modifier
+            .maxLinesHeight(if (singleLine) 1 else maxLines, textStyle)
+            .textFieldScroll(
+                orientation,
+                scrollerPosition,
+                value,
+                visualTransformation,
+                textLayoutResult
+            )
     )
 }

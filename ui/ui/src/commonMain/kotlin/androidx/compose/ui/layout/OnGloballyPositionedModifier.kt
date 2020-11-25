@@ -24,8 +24,9 @@ import androidx.compose.ui.Modifier
  * Note that it will be called **after** a composition when the coordinates are finalized.
  *
  * Usage example:
- * @sample androidx.compose.ui.samples.onGloballyPositionedSample
+ * @sample androidx.compose.ui.samples.OnGloballyPositioned
  */
+@Suppress("ModifierInspectorInfo") // cannot access crossinline parameter
 inline fun Modifier.onGloballyPositioned(
     crossinline onGloballyPositioned: (LayoutCoordinates) -> Unit
 ) = this.then(object : OnGloballyPositionedModifier {
@@ -34,36 +35,13 @@ inline fun Modifier.onGloballyPositioned(
     }
 })
 
-@Deprecated(
-    "Use onGloballyPositioned() instead",
-    replaceWith = ReplaceWith("this.onGloballyPositioned(onPositioned)")
-)
-fun Modifier.onPositioned(
-    onPositioned: (LayoutCoordinates) -> Unit
-) = onGloballyPositioned(onPositioned)
-
-@Deprecated(
-    "Use OnGloballyPositionedModifier instead",
-    replaceWith = ReplaceWith("onGlobalPositionChangedModifier")
-)
-interface OnPositionedModifier : OnGloballyPositionedModifier {
-    override fun onGloballyPositioned(coordinates: LayoutCoordinates) = onPositioned(coordinates)
-    /**
-     * Called with the final LayoutCoordinates of the Layout after measuring.
-     * Note that it will be called after a composition when the coordinates are finalized.
-     * The position in the modifier chain makes no difference in either
-     * the [LayoutCoordinates] argument or when the [onPositioned] is called.
-     */
-    fun onPositioned(coordinates: LayoutCoordinates)
-}
-
 /**
  * A modifier whose [onGloballyPositioned] is called with the final LayoutCoordinates of the
  * Layout when the global position of the content may have changed.
  * Note that it will be called after a composition when the coordinates are finalized.
  *
  * Usage example:
- * @sample androidx.compose.ui.samples.onGloballyPositionedSample
+ * @sample androidx.compose.ui.samples.OnGloballyPositioned
  */
 interface OnGloballyPositionedModifier : Modifier.Element {
     /**

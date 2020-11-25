@@ -68,7 +68,7 @@ fun <T : Any> rememberSavedInstanceState(
     @Suppress("UNCHECKED_CAST")
     (saver as Saver<T, Any>)
 
-    val registry = UiSavedStateRegistryAmbient.current
+    val registry = AmbientUiSavedStateRegistry.current
     // value is restored using the registry or created via [init] lambda
     val value = remember(*inputs) {
         // TODO not restore when the input values changed (use hashKeys?) b/152014032

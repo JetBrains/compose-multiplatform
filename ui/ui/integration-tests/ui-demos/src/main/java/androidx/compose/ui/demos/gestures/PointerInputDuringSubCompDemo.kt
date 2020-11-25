@@ -74,7 +74,7 @@ fun PointerInputDuringSubComp() {
                 Modifier.fillParentMaxSize()
                     .border(width = 1.dp, color = Color.Black)
                     .pointerCounterGestureFilter { newCount -> pointerCount.value = newCount },
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     "${pointerCount.value}",

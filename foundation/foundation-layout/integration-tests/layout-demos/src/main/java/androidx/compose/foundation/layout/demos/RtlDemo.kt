@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -43,13 +43,13 @@ import androidx.compose.ui.unit.dp
 fun RtlDemo() {
     Column(verticalArrangement = Arrangement.SpaceEvenly) {
         Text("TEXT", Modifier.align(Alignment.CenterHorizontally))
-        testText()
+        TestText()
         Text("ROW", Modifier.align(Alignment.CenterHorizontally))
-        testRow()
+        TestRow()
         Text("ROW WITH LTR ROW IN BETWEEN", Modifier.align(Alignment.CenterHorizontally))
-        testRow_modifier()
+        TestRowWithModifier()
         Text("RELATIVE TO SIBLINGS", Modifier.align(Alignment.CenterHorizontally))
-        testSiblings()
+        TestSiblings()
         Text(
             "PLACE WITH AUTO RTL SUPPORT IN CUSTOM LAYOUT",
             Modifier.align(Alignment.CenterHorizontally)
@@ -61,10 +61,10 @@ fun RtlDemo() {
         )
         CustomLayout(false)
         Text("WITH CONSTRAINTS", Modifier.align(Alignment.CenterHorizontally))
-        Providers(LayoutDirectionAmbient provides LayoutDirection.Ltr) {
+        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
             LayoutWithConstraints("LD: set LTR via ambient")
         }
-        Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+        Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
             LayoutWithConstraints("LD: set RTL via ambient")
         }
         LayoutWithConstraints(text = "LD: locale")
@@ -89,10 +89,9 @@ fun StackExample() {
 }
 
 private val boxSize = Modifier.preferredSize(50.dp, 20.dp)
-private val size = Modifier.preferredSize(10.dp, 10.dp)
 
 @Composable
-private fun testRow() {
+private fun TestRow() {
     Row {
         Box(boxSize.background(color = Color.Red)) {}
         Box(boxSize.background(color = Color.Green)) {}
@@ -106,11 +105,11 @@ private fun testRow() {
 }
 
 @Composable
-private fun testRow_modifier() {
+private fun TestRowWithModifier() {
     Row {
         Box(boxSize.background(Color.Red)) {}
         Box(boxSize.background(Color.Green)) {}
-        Providers(LayoutDirectionAmbient provides LayoutDirection.Ltr) {
+        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
             Row {
                 Box(boxSize.background(Color.Magenta)) {}
                 Box(boxSize.background(Color.Yellow)) {}
@@ -122,7 +121,7 @@ private fun testRow_modifier() {
 }
 
 @Composable
-private fun testText() {
+private fun TestText() {
     Column {
         Text("Text.")
         Text("Text filling max width.", Modifier.fillMaxWidth())
@@ -134,7 +133,7 @@ private fun testText() {
 }
 
 @Composable
-private fun testSiblings() {
+private fun TestSiblings() {
     Column {
         Box(
             boxSize.background(color = Color.Red).alignBy { p -> p.width }
@@ -151,7 +150,7 @@ private fun testSiblings() {
 @Composable
 private fun CustomLayout(rtlSupport: Boolean) {
     Layout(
-        children = @Composable {
+        content = @Composable {
             Box(boxSize.background(color = Color.Red)) {}
             Box(boxSize.background(color = Color.Green)) {}
             Box(boxSize.background(color = Color.Blue)) {}
@@ -180,7 +179,7 @@ private fun CustomLayout(rtlSupport: Boolean) {
 private fun LayoutWithConstraints(text: String) {
     WithConstraints {
         val w = maxWidth / 3
-        val color = if (LayoutDirectionAmbient.current == LayoutDirection.Ltr) {
+        val color = if (AmbientLayoutDirection.current == LayoutDirection.Ltr) {
             Color.Red
         } else {
             Color.Magenta

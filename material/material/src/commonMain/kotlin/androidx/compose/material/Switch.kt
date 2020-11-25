@@ -24,13 +24,13 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -45,8 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
@@ -78,9 +78,9 @@ fun Switch(
     colors: SwitchColors = SwitchConstants.defaultColors()
 ) {
     val minBound = 0f
-    val maxBound = with(DensityAmbient.current) { ThumbPathLength.toPx() }
+    val maxBound = with(AmbientDensity.current) { ThumbPathLength.toPx() }
     val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange, AnimationSpec)
-    val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+    val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
     Box(
         modifier
             .toggleable(
@@ -168,10 +168,10 @@ private fun BoxScope.SwitchImpl(
         elevation = elevation,
         modifier = Modifier
             .align(Alignment.CenterStart)
-            .offsetPx(x = thumbValue)
+            .offset(x = { thumbValue.value })
             .indication(
                 interactionState = interactionState,
-                indication = RippleIndication(radius = ThumbRippleRadius, bounded = false)
+                indication = rememberRippleIndication(bounded = false, radius = ThumbRippleRadius)
             )
             .size(ThumbDiameter),
         content = emptyContent()

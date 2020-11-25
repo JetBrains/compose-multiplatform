@@ -31,10 +31,10 @@ import androidx.compose.ui.unit.Uptime
 import com.google.common.truth.Truth.assertThat
 
 data class DataPoint(val id: PointerId, val data: PointerInputData) {
-    val timestamp get() = data.uptime!!
-    val position get() = data.position!!
-    val x get() = data.position!!.x
-    val y get() = data.position!!.y
+    val timestamp get() = data.uptime
+    val position get() = data.position
+    val x get() = data.position.x
+    val y get() = data.position.y
     val down get() = data.down
 }
 
@@ -48,7 +48,7 @@ class SinglePointerInputRecorder : PointerInputModifier {
     override val pointerInputFilter = RecordingFilter { changes ->
         changes.forEach {
             _events.add(DataPoint(it.id, it.current))
-            velocityTracker.addPosition(it.current.uptime!!, it.current.position!!)
+            velocityTracker.addPosition(it.current.uptime, it.current.position)
         }
     }
 }

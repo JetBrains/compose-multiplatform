@@ -33,7 +33,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
@@ -42,10 +42,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.TransformOrigin
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
@@ -86,6 +86,7 @@ import kotlin.math.min
  * @param dropdownOffset Offset to be added to the position of the menu
  * @param dropdownModifier Modifier to be applied to the menu content
  */
+@Suppress("ModifierParameter")
 @Composable
 fun DropdownMenu(
     toggle: @Composable () -> Unit,
@@ -103,13 +104,13 @@ fun DropdownMenu(
         toggle()
 
         if (visibleMenu) {
-            var transformOrigin by remember { mutableStateOf(TransformOrigin.Center) }
-            val density = DensityAmbient.current
+            val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
+            val density = AmbientDensity.current
             val popupPositionProvider = DropdownMenuPositionProvider(
                 dropdownOffset,
                 density
             ) { parentBounds, menuBounds ->
-                transformOrigin = calculateTransformOrigin(parentBounds, menuBounds)
+                transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
             }
 
             Popup(
@@ -125,20 +126,22 @@ fun DropdownMenu(
                         visibleMenu = it
                     }
                 )
-                val drawLayer = remember {
-                    MenuDrawLayerModifier(
-                        { state[Scale] },
-                        { state[Alpha] },
-                        { transformOrigin }
-                    )
-                }
-                Card(modifier = drawLayer, elevation = MenuElevation) {
+                Card(
+                    modifier = Modifier.graphicsLayer {
+                        val scale = state[Scale]
+                        scaleX = scale
+                        scaleY = scale
+                        alpha = state[Alpha]
+                        transformOrigin = transformOriginState.value
+                    },
+                    elevation = MenuElevation
+                ) {
                     @OptIn(ExperimentalLayout::class)
                     ScrollableColumn(
                         modifier = dropdownModifier
                             .padding(vertical = DropdownMenuVerticalPadding)
                             .preferredWidth(IntrinsicSize.Max),
-                        children = dropdownContent
+                        content = dropdownContent
                     )
                 }
             }
@@ -176,7 +179,7 @@ fun DropdownMenuItem(
                 enabled = enabled,
                 onClick = onClick,
                 interactionState = interactionState,
-                indication = RippleIndication(true)
+                indication = rememberRippleIndication(true)
             )
             .fillMaxWidth()
             // Preferred min and max width used during the intrinsic measurement.
@@ -186,12 +189,12 @@ fun DropdownMenuItem(
                 minHeight = DropdownMenuItemDefaultMinHeight
             )
             .padding(horizontal = DropdownMenuHorizontalPadding),
-        alignment = Alignment.CenterStart
+        contentAlignment = Alignment.CenterStart
     ) {
         val typography = MaterialTheme.typography
         ProvideTextStyle(typography.subtitle1) {
             val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-            Providers(AmbientContentAlpha provides contentAlpha, children = content)
+            Providers(AmbientContentAlpha provides contentAlpha, content = content)
         }
     }
 }
@@ -242,17 +245,6 @@ private val DropdownMenuOpenCloseTransition = transitionDefinition<Boolean> {
             durationMillis = OutTransitionDuration
         )
     }
-}
-
-private class MenuDrawLayerModifier(
-    val scaleProvider: () -> Float,
-    val alphaProvider: () -> Float,
-    val transformOriginProvider: () -> TransformOrigin
-) : DrawLayerModifier {
-    override val scaleX: Float get() = scaleProvider()
-    override val scaleY: Float get() = scaleProvider()
-    override val alpha: Float get() = alphaProvider()
-    override val transformOrigin: TransformOrigin get() = transformOriginProvider()
 }
 
 private fun calculateTransformOrigin(

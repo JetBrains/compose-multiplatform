@@ -112,7 +112,7 @@ fun SimplePreferredHeightModifier() {
 @Sampled
 @Composable
 fun SimpleFillWidthModifier() {
-    Box(Modifier.fillMaxWidth().background(Color.Red), alignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().background(Color.Red), contentAlignment = Alignment.Center) {
         Box(Modifier.preferredSize(100.dp).background(color = Color.Magenta))
     }
 }
@@ -120,7 +120,7 @@ fun SimpleFillWidthModifier() {
 @Sampled
 @Composable
 fun FillHalfWidthModifier() {
-    Box(Modifier.size(100.dp).background(Color.Red), alignment = Alignment.Center) {
+    Box(Modifier.size(100.dp).background(Color.Red), contentAlignment = Alignment.Center) {
         // The inner Box will be (50.dp x 30.dp).
         Box(
             Modifier.fillMaxWidth(fraction = 0.5f)
@@ -133,7 +133,7 @@ fun FillHalfWidthModifier() {
 @Sampled
 @Composable
 fun SimpleFillHeightModifier() {
-    Box(Modifier.fillMaxHeight().background(Color.Red), alignment = Alignment.Center) {
+    Box(Modifier.fillMaxHeight().background(Color.Red), contentAlignment = Alignment.Center) {
         Box(Modifier.preferredSize(100.dp).background(color = Color.Magenta))
     }
 }
@@ -141,7 +141,7 @@ fun SimpleFillHeightModifier() {
 @Sampled
 @Composable
 fun FillHalfHeightModifier() {
-    Box(Modifier.size(100.dp).background(Color.Red), alignment = Alignment.Center) {
+    Box(Modifier.size(100.dp).background(Color.Red), contentAlignment = Alignment.Center) {
         // The inner Box will be (30.dp x 50.dp).
         Box(
             Modifier.width(30.dp)
@@ -154,7 +154,7 @@ fun FillHalfHeightModifier() {
 @Sampled
 @Composable
 fun SimpleFillModifier() {
-    Box(Modifier.fillMaxSize().background(Color.Red), alignment = Alignment.Center) {
+    Box(Modifier.fillMaxSize().background(Color.Red), contentAlignment = Alignment.Center) {
         Box(Modifier.preferredSize(100.dp).background(color = Color.Magenta))
     }
 }
@@ -162,7 +162,7 @@ fun SimpleFillModifier() {
 @Sampled
 @Composable
 fun FillHalfSizeModifier() {
-    Box(Modifier.size(100.dp).background(Color.Red), alignment = Alignment.Center) {
+    Box(Modifier.size(100.dp).background(Color.Red), contentAlignment = Alignment.Center) {
         // The inner Box will be (50.dp x 50.dp).
         Box(
             Modifier.width(30.dp)

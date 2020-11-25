@@ -48,19 +48,19 @@ fun VectorGraphicsDemo() {
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val vectorAsset = loadVectorResource(R.drawable.ic_crane)
-        vectorAsset.resource.resource?.let {
+        val imageVector = loadVectorResource(R.drawable.ic_crane)
+        imageVector.resource.resource?.let {
             Image(
-                asset = it,
+                imageVector = it,
                 modifier = Modifier.preferredSize(200.dp, 200.dp),
                 contentScale = ContentScale.Inside
             )
         }
 
-        val complexVectorAsset = loadVectorResource(R.drawable.ic_hourglass)
-        complexVectorAsset.resource.resource?.let {
+        val complexImageVector = loadVectorResource(R.drawable.ic_hourglass)
+        complexImageVector.resource.resource?.let {
             Image(
-                asset = it,
+                imageVector = it,
                 modifier = Modifier.preferredSize(64.dp, 64.dp),
                 contentScale = ContentScale.Fit
             )

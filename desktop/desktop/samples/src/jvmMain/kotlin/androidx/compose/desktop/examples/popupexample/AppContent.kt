@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonConstants
@@ -49,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.Tray
@@ -116,7 +117,7 @@ fun content() {
                                 title = "Second window",
                                 size = IntSize(400, 200),
                                 undecorated = AppState.undecorated.value,
-                                onDismissEvent = {
+                                onDismissRequest = {
                                     println("Second window is dismissed.")
                                 }
                             ).show {
@@ -197,7 +198,7 @@ fun content() {
 
     Box(
         modifier = Modifier.fillMaxSize(),
-        alignment = Alignment.BottomCenter
+        contentAlignment = Alignment.BottomCenter
     ) {
         Box(
             modifier = Modifier.background(color = Color(32, 32, 32))
@@ -231,13 +232,24 @@ fun content() {
             dialogState.value = false
             println("Dialog window is dismissed.")
         }
-        Dialog(
-            title = "Dialog window",
-            size = IntSize(400, 200),
-            onDismissEvent = dismiss
-        ) {
-            WindowContent(AppState.amount, onClose = dismiss)
-        }
+        AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = {
+                Button(text = "OK", onClick = { AppState.amount.value++ })
+            },
+            dismissButton = {
+                Button(text = "Cancel", onClick = dismiss)
+            },
+            title = {
+                TextBox(text = "Alert Dialog")
+            },
+            text = {
+                TextBox(text = "Increment amount?")
+            },
+            shape = RoundedCornerShape(0.dp),
+            backgroundColor = Color(70, 70, 70),
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 
@@ -263,7 +275,7 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
 fun PopupContent(onDismiss: () -> Unit) {
     Box(
         Modifier.preferredSize(300.dp, 150.dp).background(color = Color(65, 65, 65)),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Column {
             TextBox(text = "Popup demo.")
@@ -277,7 +289,7 @@ fun PopupContent(onDismiss: () -> Unit) {
 fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
     Box(
         Modifier.fillMaxSize().background(color = Color(55, 55, 55)),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Column {
             TextBox(text = "Increment amount?")
@@ -330,7 +342,7 @@ fun Button(
 fun TextBox(text: String = "") {
     Box(
         modifier = Modifier.height(30.dp),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
@@ -343,7 +355,7 @@ fun TextBox(text: String = "") {
 fun RadioButton(text: String, state: MutableState<Boolean>) {
     Box(
         modifier = Modifier.height(30.dp),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         RadioButton(
             selected = state.value,

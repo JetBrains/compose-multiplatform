@@ -79,7 +79,7 @@ fun NestedScrollingDemo() {
  * A very simple ScrollView like implementation that allows for vertical scrolling.
  */
 @Composable
-private fun Scrollable(children: @Composable () -> Unit) {
+private fun Scrollable(content: @Composable () -> Unit) {
     val offset = remember { mutableStateOf(0f) }
     val maxOffset = remember { mutableStateOf(0f) }
 
@@ -112,7 +112,7 @@ private fun Scrollable(children: @Composable () -> Unit) {
     }
 
     Layout(
-        children = children,
+        content = content,
         modifier = Modifier
             .scrollGestureFilter(scrollObserver, Orientation.Vertical, canDrag)
             .clipToBounds(),
@@ -184,10 +184,10 @@ private fun Pressable(
  * times.
  */
 @Composable
-private fun RepeatingColumn(repetitions: Int, row: @Composable () -> Unit) {
+private fun RepeatingColumn(repetitions: Int, content: @Composable () -> Unit) {
     Column(Modifier.border(border = BorderStroke(2.dp, BorderColor))) {
         for (i in 1..repetitions) {
-            row()
+            content()
             if (i != repetitions) {
                 Box(
                     Modifier

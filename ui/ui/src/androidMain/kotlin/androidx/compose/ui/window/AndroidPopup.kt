@@ -39,8 +39,8 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
@@ -87,14 +87,14 @@ internal actual fun ActualPopup(
     properties: PopupProperties?,
     content: @Composable () -> Unit
 ) {
-    val view = ViewAmbient.current
-    val density = DensityAmbient.current
+    val view = AmbientView.current
+    val density = AmbientDensity.current
 
     val popupLayout = remember { PopupLayout(view, density) }
 
     // Refresh anything that might have changed
     popupLayout.onDismissRequest = onDismissRequest
-    popupLayout.testTag = PopupTestTagAmbient.current
+    popupLayout.testTag = AmbientPopupTestTag.current
     remember(popupPositionProvider) { popupLayout.setPositionProvider(popupPositionProvider) }
     remember(isFocusable) { popupLayout.setIsFocusable(isFocusable) }
     remember(properties) { popupLayout.setProperties(properties) }
@@ -105,7 +105,7 @@ internal actual fun ActualPopup(
     // used instead of this custom Layout
     // Get the parent's global position, size and layout direction
     Layout(
-        children = emptyContent(),
+        content = emptyContent(),
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
             // Get the global position of the parent
@@ -132,7 +132,7 @@ internal actual fun ActualPopup(
                     // Update the popup's position
                     popupLayout.updatePosition()
                 },
-                children = content
+                content = content
             )
         }
     }
@@ -148,8 +148,8 @@ internal actual fun ActualPopup(
 // Popup's SimpleStack and Box.
 @Suppress("NOTHING_TO_INLINE")
 @Composable
-private inline fun SimpleStack(modifier: Modifier, noinline children: @Composable () -> Unit) {
-    Layout(children = children, modifier = modifier) { measurables, constraints ->
+private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable () -> Unit) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
         when (measurables.size) {
             0 -> layout(0, 0) {}
             1 -> {

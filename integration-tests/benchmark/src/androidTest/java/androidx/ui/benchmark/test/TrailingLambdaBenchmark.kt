@@ -68,7 +68,7 @@ private sealed class TrailingLambdaTestCase : ComposeTestCase, ToggleableTestCas
     var numberState: MutableState<Int>? = null
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val number = remember { mutableStateOf(5) }
         numberState = number
 
@@ -78,7 +78,7 @@ private sealed class TrailingLambdaTestCase : ComposeTestCase, ToggleableTestCas
 
         Column {
             repeat(10) {
-                emitContent(number = number.value, content = content)
+                Content(number = number.value, content = content)
             }
         }
     }
@@ -90,12 +90,12 @@ private sealed class TrailingLambdaTestCase : ComposeTestCase, ToggleableTestCas
     }
 
     @Composable
-    abstract fun emitContent(number: Int, content: @Composable () -> Unit)
+    abstract fun Content(number: Int, content: @Composable () -> Unit)
 }
 
 private class WithTrailingLambdas : TrailingLambdaTestCase() {
     @Composable
-    override fun emitContent(number: Int, content: @Composable () -> Unit) {
+    override fun Content(number: Int, content: @Composable () -> Unit) {
         EmptyComposable(number = number) {
             content()
         }
@@ -104,12 +104,12 @@ private class WithTrailingLambdas : TrailingLambdaTestCase() {
 
 private class WithoutTrailingLambdas : TrailingLambdaTestCase() {
     @Composable
-    override fun emitContent(number: Int, content: @Composable () -> Unit) {
-        EmptyComposable(number = number, children = content)
+    override fun Content(number: Int, content: @Composable () -> Unit) {
+        EmptyComposable(number = number, content = content)
     }
 }
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
-private fun EmptyComposable(number: Int, children: @Composable () -> Unit) {
+private fun EmptyComposable(number: Int, content: @Composable () -> Unit) {
 }

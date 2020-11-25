@@ -39,13 +39,13 @@ dependencies {
          */
 
         api "androidx.activity:activity:1.2.0-alpha02"
+        api project(":compose:ui:ui-test-junit4")
         api project(":test-screenshot")
 
         implementation(KOTLIN_STDLIB_COMMON)
         implementation project(":benchmark:benchmark-junit4")
         implementation project(":compose:runtime:runtime")
         implementation project(":compose:ui:ui")
-        implementation project(":ui:ui-test")
         implementation(ANDROIDX_TEST_RULES)
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
@@ -72,11 +72,12 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":benchmark:benchmark-junit4")
                 implementation project(":compose:runtime:runtime")
                 implementation project(":compose:ui:ui")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
             }
 
             androidMain.dependencies {
                 api "androidx.activity:activity:1.2.0-alpha02"
+                api project(":compose:ui:ui-test-junit4")
                 api project(":test-screenshot")
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.

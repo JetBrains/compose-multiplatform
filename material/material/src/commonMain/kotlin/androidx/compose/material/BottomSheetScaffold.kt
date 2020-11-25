@@ -44,8 +44,8 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
@@ -167,7 +167,7 @@ fun rememberBottomSheetState(
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
-    val disposableClock = AnimationClockAmbient.current.asDisposableClock()
+    val disposableClock = AmbientAnimationClock.current.asDisposableClock()
     return rememberSavedInstanceState(
         disposableClock,
         saver = BottomSheetState.Saver(
@@ -296,7 +296,7 @@ fun BottomSheetScaffold(
 ) {
     WithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
-        val peekHeightPx = with(DensityAmbient.current) { sheetPeekHeight.toPx() }
+        val peekHeightPx = with(AmbientDensity.current) { sheetPeekHeight.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
 
         val swipeable = Modifier.swipeable(
@@ -335,7 +335,7 @@ fun BottomSheetScaffold(
                         elevation = sheetElevation,
                         color = sheetBackgroundColor,
                         contentColor = sheetContentColor,
-                        content = { Column(children = sheetContent) }
+                        content = { Column(content = sheetContent) }
                     )
                 },
                 floatingActionButton = {
@@ -380,7 +380,7 @@ private fun BottomSheetScaffoldStack(
     floatingActionButtonPosition: FabPosition
 ) {
     Layout(
-        children = {
+        content = {
             body()
             bottomSheet()
             floatingActionButton()

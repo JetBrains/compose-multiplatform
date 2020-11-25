@@ -59,7 +59,7 @@ fun CrossfadeDemo() {
         }
         val restorableStateHolder = rememberRestorableStateHolder<Int>()
         Crossfade(current = current) { current ->
-            restorableStateHolder.withRestorableState(current) {
+            restorableStateHolder.RestorableStateProvider(current) {
                 val tab = tabs[current]
                 tab.lastInt = rememberSavedInstanceState { Random.nextInt() }
                 Box(Modifier.fillMaxSize().background(tab.color))

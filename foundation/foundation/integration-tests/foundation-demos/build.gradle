@@ -39,6 +39,7 @@ dependencies {
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-text")
+    implementation project(":compose:ui:ui-text:ui-text-samples")
     implementation project(":paging:paging-compose:integration-tests:paging-demos")
 }
 

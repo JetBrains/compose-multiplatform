@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 
 interface LongPressDragObserver {
@@ -118,7 +119,12 @@ interface LongPressDragObserver {
  */
 fun Modifier.longPressDragGestureFilter(
     longPressDragObserver: LongPressDragObserver
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "longPressDragGestureFilter"
+        properties["longPressDragObserver"] = longPressDragObserver
+    }
+) {
     val glue = remember { LongPressDragGestureDetectorGlue() }
     glue.longPressDragObserver = longPressDragObserver
 

@@ -187,5 +187,6 @@ fun LaunchedTask(
     vararg keys: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
+    @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
     LaunchedEffect(subjects = keys, block)
 }

@@ -16,16 +16,12 @@
 
 package androidx.compose.foundation.selection
 
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.AmbientIndication
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.indication
-import androidx.compose.foundation.selection.ToggleableState.Indeterminate
-import androidx.compose.foundation.selection.ToggleableState.Off
-import androidx.compose.foundation.selection.ToggleableState.On
-import androidx.compose.foundation.semantics.toggleableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
@@ -38,6 +34,11 @@ import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.state.ToggleableState.Indeterminate
+import androidx.compose.ui.state.ToggleableState.Off
+import androidx.compose.ui.state.ToggleableState.On
 
 /**
  * Configure component to make it toggleable via input and accessibility events
@@ -56,6 +57,8 @@ import androidx.compose.ui.semantics.semantics
  * @param indication indication to be shown when modified element is pressed. Be default,
  * indication from [AmbientIndication] will be used. Pass `null` to show no indication
  */
+// TODO: b/172938345
+@Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.toggleable(
     value: Boolean,
@@ -103,6 +106,8 @@ fun Modifier.toggleable(
  * @param indication indication to be shown when modified element is pressed. Be default,
  * indication from [AmbientIndication] will be used. Pass `null` to show no indication
  */
+// TODO: b/172938345
+@Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.triStateToggleable(
     state: ToggleableState,
@@ -122,16 +127,16 @@ fun Modifier.triStateToggleable(
     factory = { toggleableImpl(state, enabled, interactionState, indication, onClick) }
 )
 
-@Composable
-private fun toggleableImpl(
+@Suppress("ModifierInspectorInfo")
+private fun Modifier.toggleableImpl(
     state: ToggleableState,
     enabled: Boolean,
     interactionState: InteractionState,
     indication: Indication?,
     onClick: () -> Unit
-): Modifier {
+): Modifier = composed {
     // TODO(pavlis): Handle multiple states for Semantics
-    val semantics = Modifier.semantics(mergeAllDescendants = true) {
+    val semantics = Modifier.semantics(mergeDescendants = true) {
         this.accessibilityValue = when (state) {
             // TODO(ryanmentley): These should be set by Checkbox, Switch, etc.
             On -> Strings.Checked
@@ -163,33 +168,9 @@ private fun toggleableImpl(
             interactionState.removeInteraction(Interaction.Pressed)
         }
     }
-    return semantics
+    this
+        .then(semantics)
         .indication(interactionState, indication)
         .then(interactionUpdate)
         .then(click)
 }
-
-/**
- * Enum that represents possible toggleable states.
- */
-enum class ToggleableState {
-    /**
-     * State that means a component is on
-     */
-    On,
-    /**
-     * State that means a component is off
-     */
-    Off,
-    /**
-     * State that means that on/off value of a component cannot be determined
-     */
-    Indeterminate
-}
-
-/**
- * Return corresponding ToggleableState based on a Boolean representation
- *
- * @param value whether the ToggleableState is on or off
- */
-fun ToggleableState(value: Boolean) = if (value) On else Off

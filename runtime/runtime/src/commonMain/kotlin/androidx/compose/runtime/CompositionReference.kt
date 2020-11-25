@@ -16,8 +16,8 @@
 
 package androidx.compose.runtime
 
-import kotlin.coroutines.CoroutineContext
 import kotlinx.collections.immutable.persistentHashMapOf
+import kotlin.coroutines.CoroutineContext
 
 private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
 
@@ -41,10 +41,17 @@ abstract class CompositionReference internal constructor() {
     internal abstract fun invalidate(composer: Composer<*>)
 
     internal open fun recordInspectionTable(table: MutableSet<SlotTable>) {}
+    internal open fun registerComposer(composer: Composer<*>) {
+        registerComposerWithRoot(composer)
+    }
+    internal open fun unregisterComposer(composer: Composer<*>) {
+        unregisterComposerWithRoot(composer)
+    }
+    internal abstract fun registerComposerWithRoot(composer: Composer<*>)
+    internal abstract fun unregisterComposerWithRoot(composer: Composer<*>)
+
     internal open fun <T> getAmbient(key: Ambient<T>): T = key.defaultValueHolder.value
     internal open fun getAmbientScope(): AmbientMap = EmptyAmbientMap
-    internal open fun registerComposer(composer: Composer<*>) {}
-    internal open fun unregisterComposer(composer: Composer<*>) {}
     internal open fun startComposing() {}
     internal open fun doneComposing() {}
 }

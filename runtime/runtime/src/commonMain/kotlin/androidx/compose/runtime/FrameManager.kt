@@ -30,6 +30,10 @@ import kotlinx.coroutines.launch
  * composition the state read occur. If any of the state objects are modified it will
  * invalidate the composition causing the associated [Recomposer] to schedule a recomposition.
  */
+@Deprecated(
+    "Platform/framework-specific code should schedule Snapshot.sendApplyNotifications dispatch in" +
+        " response to a Snapshot globalWriteObserver in a platform-appropriate manner"
+)
 object FrameManager {
     private var started = false
     private var commitPending = false
@@ -39,8 +43,7 @@ object FrameManager {
      * TODO: This will be merged later with the scopes used by [Recomposer]
      */
     private val scheduleScope = CoroutineScope(
-        Recomposer.current().embeddingContext
-            .mainThreadCompositionContext() + SupervisorJob()
+        EmbeddingContext().mainThreadCompositionContext() + SupervisorJob()
     )
 
     @OptIn(ExperimentalComposeApi::class)
@@ -81,7 +84,7 @@ object FrameManager {
      * Synchronously executes any outstanding callbacks and brings the [FrameManager] into a
      * consistent, updated state.
      */
-    internal fun synchronize() {
+    private fun synchronize() {
         synchronized(scheduledCallbacks) {
             scheduledCallbacks.forEach { it.invoke() }
             scheduledCallbacks.clear()

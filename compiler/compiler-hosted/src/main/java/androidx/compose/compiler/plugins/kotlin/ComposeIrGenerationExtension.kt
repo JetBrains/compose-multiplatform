@@ -17,9 +17,9 @@
 package androidx.compose.compiler.plugins.kotlin
 
 import androidx.compose.compiler.plugins.kotlin.lower.ClassStabilityTransformer
+import androidx.compose.compiler.plugins.kotlin.lower.ComposableFunInterfaceLowering
 import androidx.compose.compiler.plugins.kotlin.lower.ComposableFunctionBodyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.ComposerIntrinsicTransformer
-import androidx.compose.compiler.plugins.kotlin.lower.ComposableFunInterfaceLowering
 import androidx.compose.compiler.plugins.kotlin.lower.ComposerLambdaMemoization
 import androidx.compose.compiler.plugins.kotlin.lower.ComposerParamTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
@@ -27,6 +27,7 @@ import androidx.compose.compiler.plugins.kotlin.lower.LiveLiteralTransformer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
@@ -38,6 +39,7 @@ class ComposeIrGenerationExtension(
     private val sourceInformationEnabled: Boolean = true,
     private val intrinsicRememberEnabled: Boolean = false,
 ) : IrGenerationExtension {
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun generate(
         moduleFragment: IrModuleFragment,
         pluginContext: IrPluginContext
@@ -47,7 +49,6 @@ class ComposeIrGenerationExtension(
         VersionChecker(pluginContext).check()
 
         // TODO: refactor transformers to work with just BackendContext
-        @Suppress("DEPRECATION")
         val bindingTrace = DelegatingBindingTrace(
             pluginContext.bindingContext,
             "trace in " +
@@ -85,8 +86,6 @@ class ComposeIrGenerationExtension(
             bindingTrace
         ).lower(moduleFragment)
 
-        generateSymbols(pluginContext)
-
         // transform calls to the currentComposer to just use the local parameter from the
         // previous transform
         ComposerIntrinsicTransformer(pluginContext).lower(moduleFragment)
@@ -117,6 +116,7 @@ val SymbolTable.allUnbound: List<IrSymbol>
         return r
     }
 
+@OptIn(ObsoleteDescriptorBasedAPI::class)
 @Suppress("UNUSED_PARAMETER", "DEPRECATION")
 fun generateSymbols(pluginContext: IrPluginContext) {
     lateinit var unbound: List<IrSymbol>

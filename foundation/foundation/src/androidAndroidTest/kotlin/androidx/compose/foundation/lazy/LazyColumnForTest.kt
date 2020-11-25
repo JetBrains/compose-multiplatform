@@ -20,7 +20,6 @@ import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +38,7 @@ import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.platform.testTag
@@ -72,7 +72,6 @@ import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -333,46 +332,6 @@ class LazyColumnForTest {
 
         rule.onNodeWithTag(thirdTag)
             .assertIsDisplayed()
-    }
-
-    @Ignore("This test is not fully working. To be fixed in b/167913500")
-    @Test
-    fun contentPaddingIsApplied() = with(rule.density) {
-        val itemTag = "item"
-
-        rule.setContent {
-            LazyColumnFor(
-                items = listOf(1),
-                modifier = Modifier.size(100.dp)
-                    .testTag(LazyColumnForTag),
-                contentPadding = PaddingValues(
-                    start = 10.dp,
-                    top = 50.dp,
-                    end = 10.dp,
-                    bottom = 50.dp
-                )
-            ) {
-                Spacer(Modifier.fillParentMaxWidth().preferredHeight(50.dp).testTag(itemTag))
-            }
-        }
-
-        var itemBounds = rule.onNodeWithTag(itemTag)
-            .getUnclippedBoundsInRoot()
-
-        assertThat(itemBounds.top.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
-        assertThat(itemBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
-        assertThat(itemBounds.left.toIntPx()).isWithin1PixelFrom(10.dp.toIntPx())
-        assertThat(itemBounds.right.toIntPx())
-            .isWithin1PixelFrom(100.dp.toIntPx() - 10.dp.toIntPx())
-
-        rule.onNodeWithTag(LazyColumnForTag)
-            .scrollBy(y = 51.dp, density = rule.density)
-
-        itemBounds = rule.onNodeWithTag(itemTag)
-            .getUnclippedBoundsInRoot()
-
-        assertThat(itemBounds.top.toIntPx()).isWithin1PixelFrom(0)
-        assertThat(itemBounds.bottom.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
     }
 
     @Test
@@ -1017,6 +976,67 @@ class LazyColumnForTest {
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(3)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun itemsAreNotRedrawnDuringScroll() {
+        val items = (0..20).toList()
+        val redrawCount = Array(6) { 0 }
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(
+                    Modifier.size(20.dp)
+                        .drawBehind { redrawCount[it]++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 10.dp, density = rule.density)
+
+        rule.runOnIdle {
+            redrawCount.forEachIndexed { index, i ->
+                assertWithMessage("Item with index $index was redrawn $i times")
+                    .that(i).isEqualTo(1)
+            }
+        }
+    }
+
+    @Test
+    fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
+        val items = (0..1).toList()
+        val redrawCount = Array(2) { 0 }
+        var stateUsedInDrawScope by mutableStateOf(false)
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag)
+            ) {
+                Spacer(
+                    Modifier.size(50.dp)
+                        .drawBehind {
+                            redrawCount[it]++
+                            if (it == 1) {
+                                stateUsedInDrawScope.hashCode()
+                            }
+                        }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            stateUsedInDrawScope = true
+        }
+
+        rule.runOnIdle {
+            assertWithMessage("First items is not expected to be redrawn")
+                .that(redrawCount[0]).isEqualTo(1)
+            assertWithMessage("Second items is expected to be redrawn")
+                .that(redrawCount[1]).isEqualTo(2)
         }
     }
 

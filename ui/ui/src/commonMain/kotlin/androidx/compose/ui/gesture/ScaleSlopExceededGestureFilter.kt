@@ -23,7 +23,8 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.absoluteValue
 
@@ -48,8 +49,13 @@ import kotlin.math.absoluteValue
  */
 fun Modifier.scaleSlopExceededGestureFilter(
     onScaleSlopExceeded: () -> Unit
-): Modifier = composed {
-    val scaleSlop = with(DensityAmbient.current) { ScaleSlop.toPx() }
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "scaleSlopExceededGestureFilter"
+        properties["onScaleSlopExceeded"] = onScaleSlopExceeded
+    }
+) {
+    val scaleSlop = with(AmbientDensity.current) { ScaleSlop.toPx() }
     val filter = remember { ScaleSlopExceededGestureFilter(scaleSlop) }
     // TODO(b/129784010): Consider also allowing onStart, onScale, and onEnd to be set individually.
     filter.onScaleSlopExceeded = onScaleSlopExceeded

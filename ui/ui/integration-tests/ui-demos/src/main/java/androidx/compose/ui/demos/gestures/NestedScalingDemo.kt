@@ -45,7 +45,7 @@ fun NestedScalingDemo() {
                 "Or you can just scale the outer region (Scale out to get started)"
         )
         Layout(
-            children = {
+            content = {
                 Scalable(.66666666f, Color(0xFFffeb3b.toInt())) {
                     Scalable(.5f, Color(0xFF4caf50.toInt())) {}
                 }
@@ -67,7 +67,7 @@ fun NestedScalingDemo() {
 private fun Scalable(
     minPercent: Float,
     color: Color,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
 
     val currentPercent = remember { mutableStateOf(1f) }
@@ -86,7 +86,7 @@ private fun Scalable(
     }
 
     Layout(
-        children = children,
+        content = content,
         modifier = Modifier.wrapContentSize(Alignment.Center)
             .rawScaleGestureFilter(outerScaleObserver)
             .background(color = color),

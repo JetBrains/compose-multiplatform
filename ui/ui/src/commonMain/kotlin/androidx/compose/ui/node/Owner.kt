@@ -15,7 +15,6 @@
  */
 package androidx.compose.ui.node
 
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -26,12 +25,14 @@ import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.WindowManager
 
 /**
  * Owner implements the connection to the underlying view system. On Android, this connects
@@ -85,6 +86,11 @@ interface Owner {
      */
     @ExperimentalFocus
     val focusManager: FocusManager
+
+    /**
+     * Provide information about the window that hosts this [Owner].
+     */
+    val windowManager: WindowManager
 
     val fontLoader: Font.ResourceLoader
 
@@ -149,42 +155,14 @@ interface Owner {
     fun sendKeyEvent(keyEvent: KeyEvent): Boolean
 
     /**
-     * Observing the model reads are temporary disabled during the [block] execution.
-     * For example if we are currently within the measure stage and we want some code block to
-     * be skipped from the observing we disable if before calling the block, execute block and
-     * then enable it again.
-     */
-    fun pauseModelReadObserveration(block: () -> Unit)
-
-    /**
-     * Observe model reads during layout of [node], executed in [block].
-     */
-    fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit)
-
-    /**
-     * Observe model reads during measure of [node], executed in [block].
-     */
-    fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit)
-
-    /**
-     * Observe model reads for any target, allowing consumers to determine how to respond
-     * to state changes
-     */
-    fun <T : OwnerScope> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit)
-
-    /**
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out
      */
     fun measureAndLayout()
 
     /**
-     * Creates and returns an [OwnedLayer] for the given [drawLayerModifier].
+     * Creates an [OwnedLayer] which will be drawing the passed [drawBlock].
      */
-    fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
-        drawBlock: (Canvas) -> Unit,
-        invalidateParentLayer: () -> Unit
-    ): OwnedLayer
+    fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit): OwnedLayer
 
     /**
      * The semantics have changed. This function will be called when a SemanticsNode is added to
@@ -194,6 +172,17 @@ interface Owner {
     fun onSemanticsChange()
 
     val measureIteration: Long
+
+    /**
+     * The [ViewConfiguration] to use in the application.
+     */
+    val viewConfiguration: ViewConfiguration
+
+    /**
+     * Performs snapshot observation for blocks like draw and layout which should be re-invoked
+     * automatically when the snapshot value has been changed.
+     */
+    val snapshotObserver: OwnerSnapshotObserver
 
     companion object {
         /**

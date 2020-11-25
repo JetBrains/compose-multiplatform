@@ -34,7 +34,7 @@ import com.google.common.truth.Truth
 internal fun PointerInputEventData(
     id: Int,
     uptime: Uptime,
-    position: Offset?,
+    position: Offset,
     down: Boolean
 ): PointerInputEventData {
     val pointerInputData = PointerInputData(
@@ -48,7 +48,7 @@ internal fun PointerInputEventData(
 internal fun PointerInputEvent(
     id: Int,
     uptime: Uptime,
-    position: Offset?,
+    position: Offset,
     down: Boolean
 ): PointerInputEvent {
     return PointerInputEvent(
@@ -264,18 +264,18 @@ internal sealed class LogEntry
 
 internal class OnInitEntry : LogEntry()
 
-internal data class OnPointerEventEntry (
+internal data class OnPointerEventEntry(
     val pointerInputFilter: PointerInputFilter,
     val pointerEvent: PointerEvent,
     val pass: PointerEventPass,
     val bounds: IntSize
 ) : LogEntry()
 
-internal class OnCancelEntry (
+internal class OnCancelEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 
-internal data class OnCustomEventEntry (
+internal data class OnCustomEventEntry(
     val pointerInputFilter: PointerInputFilter,
     val customEvent: CustomEvent,
     val pass: PointerEventPass

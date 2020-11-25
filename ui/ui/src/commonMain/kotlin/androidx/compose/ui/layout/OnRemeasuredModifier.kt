@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.unit.IntSize
@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.IntSize
  * Example usage:
  * @sample androidx.compose.ui.samples.OnSizeChangedSample
  */
+@Suppress("ModifierInspectorInfo") // cannot access crossinline parameter
 inline fun Modifier.onSizeChanged(
     crossinline onSizeChanged: (IntSize) -> Unit
 ) = composed {

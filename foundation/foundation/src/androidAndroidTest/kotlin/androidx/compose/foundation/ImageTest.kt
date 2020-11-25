@@ -25,13 +25,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.test.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.test.captureToImage
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.testutils.assertPixels
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -78,8 +78,8 @@ class ImageTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private fun createImageAsset(): ImageAsset {
-        val image = ImageAsset(imageWidth, imageHeight)
+    private fun createImageBitmap(): ImageBitmap {
+        val image = ImageBitmap(imageWidth, imageHeight)
         val path = Path().apply {
             lineTo(imageWidth.toFloat(), imageHeight.toFloat())
             lineTo(0.0f, imageHeight.toFloat())
@@ -102,13 +102,13 @@ class ImageTest {
     @Test
     fun testImage() {
         rule.setContent {
-            val size = (containerSize / DensityAmbient.current.density).dp
+            val size = (containerSize / AmbientDensity.current.density).dp
             Box(
                 Modifier.preferredSize(size)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
-                Image(modifier = Modifier.testTag(contentTag), asset = createImageAsset())
+                Image(modifier = Modifier.testTag(contentTag), bitmap = createImageBitmap())
             }
         }
 
@@ -143,7 +143,7 @@ class ImageTest {
         val subsectionWidth = imageWidth / 2
         val subsectionHeight = imageHeight / 2
         rule.setContent {
-            val size = (containerSize / DensityAmbient.current.density).dp
+            val size = (containerSize / AmbientDensity.current.density).dp
             Box(
                 Modifier.preferredSize(size)
                     .background(color = Color.White)
@@ -151,7 +151,7 @@ class ImageTest {
             ) {
                 Image(
                     ImagePainter(
-                        createImageAsset(),
+                        createImageBitmap(),
                         IntOffset(
                             imageWidth / 2 - subsectionWidth / 2,
                             imageHeight / 2 - subsectionHeight / 2
@@ -241,7 +241,7 @@ class ImageTest {
         val imageComposableWidth = imageWidth * 2
         val imageComposableHeight = imageHeight * 2
         rule.setContent {
-            val density = DensityAmbient.current.density
+            val density = AmbientDensity.current.density
             val size = (containerSize * 2 / density).dp
             Box(
                 Modifier.preferredSize(size)
@@ -249,10 +249,10 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 // The resultant Image composable should be twice the size of the underlying
-                // ImageAsset that is to be drawn and will stretch the content to fit
+                // ImageBitmap that is to be drawn and will stretch the content to fit
                 // the bounds
                 Image(
-                    asset = createImageAsset(),
+                    bitmap = createImageBitmap(),
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -301,13 +301,13 @@ class ImageTest {
         val imageComposableHeight = imageHeight * 7
 
         rule.setContent {
-            val density = DensityAmbient.current
+            val density = AmbientDensity.current
             val size = (containerSize * 2 / density.density).dp
-            val imageAsset = ImageAsset(imageWidth, imageHeight)
+            val ImageBitmap = ImageBitmap(imageWidth, imageHeight)
             CanvasDrawScope().draw(
                 density,
                 LayoutDirection.Ltr,
-                Canvas(imageAsset),
+                Canvas(ImageBitmap),
                 Size(imageWidth.toFloat(), imageHeight.toFloat())
             ) {
                 drawRect(color = Color.Blue)
@@ -318,7 +318,7 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 Image(
-                    asset = imageAsset,
+                    bitmap = ImageBitmap,
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -340,7 +340,7 @@ class ImageTest {
         val imageComposableWidth = imageWidth * 2
         val imageComposableHeight = imageHeight * 2
         rule.setContent {
-            val density = DensityAmbient.current.density
+            val density = AmbientDensity.current.density
             val size = (containerSize * 2 / density).dp
             Box(
                 Modifier.preferredSize(size)
@@ -348,16 +348,16 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 // The resultant Image composable should be twice the size of the underlying
-                // ImageAsset that is to be drawn in the bottom end section of the composable
+                // ImageBitmap that is to be drawn in the bottom end section of the composable
                 Image(
-                    asset = createImageAsset(),
+                    bitmap = createImageBitmap(),
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
                             (imageComposableWidth / density).dp,
                             (imageComposableHeight / density).dp
                         ),
-                    // Intentionally do not scale up the contents of the ImageAsset
+                    // Intentionally do not scale up the contents of the ImageBitmap
                     contentScale = ContentScale.Inside,
                     alignment = Alignment.BottomEnd
                 )
@@ -399,7 +399,7 @@ class ImageTest {
         // latch used to wait until vector resource is loaded asynchronously
         val vectorLatch = CountDownLatch(1)
         rule.setContent {
-            val density = DensityAmbient.current.density
+            val density = AmbientDensity.current.density
             val size = (boxWidth * 2 / density).dp
             val minWidth = (boxWidth / density).dp
             val minHeight = (boxHeight / density).dp
@@ -409,7 +409,7 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 // This is an async call to parse the VectorDrawable xml asset into
-                // a VectorAsset, update the latch once we receive this callback
+                // a ImageVector, update the latch once we receive this callback
                 // and draw the Image composable
                 loadVectorResource(R.drawable.ic_vector_asset_test).resource.resource?.let {
                     Image(
@@ -485,7 +485,7 @@ class ImageTest {
     fun testContentScaleCropRespectsMaxDimension() {
         val testTag = "testTag"
         rule.setContent {
-            val asset = with(ImageAsset(100, 100)) {
+            val asset = with(ImageBitmap(100, 100)) {
                 with(Canvas(this)) {
                     val paint = Paint().apply { this.color = Color.Blue }
                     drawRect(0f, 0f, 100f, 100f, paint)
@@ -496,7 +496,7 @@ class ImageTest {
                 }
                 this
             }
-            val heightDp = asset.height / DensityAmbient.current.density
+            val heightDp = asset.height / AmbientDensity.current.density
             Image(
                 asset,
                 modifier = Modifier

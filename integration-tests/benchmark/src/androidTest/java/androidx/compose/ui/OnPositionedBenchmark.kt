@@ -17,7 +17,6 @@
 package androidx.compose.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -57,11 +56,11 @@ private class DeepHierarchyOnPositionedTestCase :
     private lateinit var state: MutableState<Dp>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         Box {
-            Box(Modifier.preferredSize(size.value), alignment = Alignment.Center) {
+            Box(Modifier.preferredSize(size.value), contentAlignment = Alignment.Center) {
                 StaticChildren(100)
             }
         }
@@ -75,7 +74,10 @@ private class DeepHierarchyOnPositionedTestCase :
             } else {
                 Modifier
             }
-            Box(Modifier.preferredSize(100.dp).then(modifier), alignment = Alignment.Center) {
+            Box(
+                Modifier.preferredSize(100.dp).then(modifier),
+                contentAlignment = Alignment.Center
+            ) {
                 StaticChildren(count - 1)
             }
         }

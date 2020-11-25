@@ -16,29 +16,32 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.DrawModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
@@ -47,15 +50,12 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.WindowManager
 import androidx.compose.ui.zIndex
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -64,7 +64,6 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mockito.times
 
 @RunWith(JUnit4::class)
 @OptIn(ExperimentalLayoutNodeApi::class)
@@ -703,10 +702,15 @@ class LayoutNodeTest {
     // even with multiple LayoutNodeWrappers for one modifier.
     @Test
     fun layoutNodeWrapperSameWithReplacementMultiModifier() {
-        class TestModifier : DrawModifier, DrawLayerModifier {
+        class TestModifier : DrawModifier, LayoutModifier {
             override fun ContentDrawScope.draw() {
                 drawContent()
             }
+
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ) = layout(0, 0) {}
         }
         val layoutNode = LayoutNode()
 
@@ -733,7 +737,7 @@ class LayoutNodeTest {
         layoutNode.attach(MockOwner())
         assertTrue(oldLayoutNodeWrapper.isAttached)
 
-        layoutNode.modifier = Modifier.drawLayer()
+        layoutNode.modifier = Modifier.graphicsLayer()
         val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
         assertTrue(newLayoutNodeWrapper.isAttached)
         assertFalse(oldLayoutNodeWrapper.isAttached)
@@ -1575,7 +1579,11 @@ class LayoutNodeTest {
         val parent = LayoutNode(
             0, 0, 2, 2
         ).apply {
-            attach(MockOwner())
+            attach(
+                MockOwner().apply {
+                    measureIteration = 1L
+                }
+            )
         }
         parent.insertAt(
             0,
@@ -1595,6 +1603,8 @@ class LayoutNodeTest {
                 )
             )
         )
+        parent.remeasure()
+        parent.replace()
 
         val hit = mutableListOf<PointerInputFilter>()
 
@@ -1628,24 +1638,6 @@ class LayoutNodeTest {
         assertFalse(node2.isAttached())
         assertEquals(0, owner.onRequestMeasureParams.count { it === node1 })
         assertEquals(0, owner.onRequestMeasureParams.count { it === node2 })
-    }
-
-    @Test
-    fun updatingModifierToTheEmptyOneClearsReferenceToThePreviousModifier() {
-        val root = LayoutNode()
-        root.attach(
-            mock {
-                on { createLayer(anyOrNull(), anyOrNull(), anyOrNull()) } doReturn mock()
-            }
-        )
-
-        root.modifier = Modifier.drawLayer()
-
-        assertNotNull(root.innerLayerWrapper)
-
-        root.modifier = Modifier
-
-        assertNull(root.innerLayerWrapper)
     }
 
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
@@ -1694,17 +1686,22 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
         get() = TODO("Not yet implemented")
+    override val windowManager: WindowManager
+        get() = TODO("Not yet implemented")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")
     override val layoutDirection: LayoutDirection
         get() = LayoutDirection.Ltr
     override var showLayoutBounds: Boolean = false
+    override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         onRequestMeasureParams += layoutNode
+        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRemeasure
     }
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
+        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
     }
 
     override val hasPendingMeasureOrLayout = false
@@ -1724,43 +1721,32 @@ private class MockOwner(
     @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
-    override fun pauseModelReadObserveration(block: () -> Unit) {
-        block()
-    }
-
-    override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun <T : OwnerScope> observeReads(
-        target: T,
-        onChanged: (T) -> Unit,
-        block: () -> Unit
-    ) {
-        block()
-    }
-
     override fun measureAndLayout() {
     }
 
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
         return object : OwnedLayer {
             override val layerId: Long
                 get() = 0
-            @Suppress("UNUSED_PARAMETER")
-            override var modifier: DrawLayerModifier
-                get() = drawLayerModifier
-                set(value) {}
 
-            override fun updateLayerProperties() {
+            override fun updateLayerProperties(
+                scaleX: Float,
+                scaleY: Float,
+                alpha: Float,
+                translationX: Float,
+                translationY: Float,
+                shadowElevation: Float,
+                rotationX: Float,
+                rotationY: Float,
+                rotationZ: Float,
+                cameraDistance: Float,
+                transformOrigin: TransformOrigin,
+                shape: Shape,
+                clip: Boolean
+            ) {
             }
 
             override fun move(position: IntOffset) {
@@ -1784,20 +1770,19 @@ private class MockOwner(
 
             override fun getMatrix(matrix: Matrix) {
             }
-
-            override val isValid: Boolean
-                get() = true
         }
     }
 
     override fun onSemanticsChange() {
     }
 
-    override val measureIteration: Long = 0
+    override var measureIteration: Long = 0
+    override val viewConfiguration: ViewConfiguration
+        get() = TODO("Not yet implemented")
 }
 
 @OptIn(ExperimentalLayoutNodeApi::class)
-internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
+fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = modifier
         measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("not supported") {
@@ -1806,7 +1791,9 @@ internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = M
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult =
-                measureScope.layout(x2 - x, y2 - y) {}
+                measureScope.layout(x2 - x, y2 - y) {
+                    measurables.forEach { it.measure(constraints).place(0, 0) }
+                }
         }
         attach(MockOwner())
         layoutState = LayoutNode.LayoutState.NeedsRemeasure

@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -63,7 +64,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTesting::class)
 class RippleIndicationTest {
 
     @get:Rule
@@ -435,8 +436,8 @@ class RippleIndicationTest {
             Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
-                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
-                            RippleBox(interactionState, RippleIndication())
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            RippleBox(interactionState, rememberRippleIndication())
                         }
                     }
                 }
@@ -476,8 +477,8 @@ class RippleIndicationTest {
             Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
-                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
-                            RippleBox(interactionState, RippleIndication())
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            RippleBox(interactionState, rememberRippleIndication())
                         }
                     }
                 }
@@ -517,8 +518,8 @@ class RippleIndicationTest {
             Providers(AmbientRippleTheme provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = Color.Black) {
-                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
-                            RippleBox(interactionState, RippleIndication())
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            RippleBox(interactionState, rememberRippleIndication())
                         }
                     }
                 }
@@ -623,7 +624,7 @@ class RippleIndicationTest {
  */
 @Composable
 private fun RippleBox(interactionState: InteractionState, rippleIndication: RippleIndication) {
-    Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(Tag)) {
+    Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         Surface(
             Modifier.padding(25.dp),
             color = RippleBoxBackgroundColor, shape = RoundedCornerShape(20)
@@ -657,8 +658,8 @@ private fun ComposeTestRule.setRippleContent(
 
         MaterialTheme(colors) {
             Surface(contentColor = contentColor) {
-                Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
-                    RippleBox(interactionState, RippleIndication(bounded))
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    RippleBox(interactionState, rememberRippleIndication(bounded))
                 }
             }
         }

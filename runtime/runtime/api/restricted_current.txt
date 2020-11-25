@@ -29,7 +29,7 @@ package androidx.compose.runtime {
   }
 
   public final class AmbientKt {
-    method @androidx.compose.runtime.Composable public static void Providers(androidx.compose.runtime.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method @androidx.compose.runtime.Composable public static void Providers(androidx.compose.runtime.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public static <T> androidx.compose.runtime.ProvidableAmbient<T> ambientOf(optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
     method public static <T> androidx.compose.runtime.ProvidableAmbient<T> staticAmbientOf(optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
   }
@@ -214,8 +214,8 @@ package androidx.compose.runtime {
 
   public final class EmitKt {
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
-    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> children);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> children);
+    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
     method @kotlin.PublishedApi internal static void invalidApplier();
   }
 
@@ -230,9 +230,9 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
   }
 
-  public final class FrameManager {
-    method public void ensureStarted();
-    field public static final androidx.compose.runtime.FrameManager INSTANCE;
+  @Deprecated public final class FrameManager {
+    method @Deprecated public void ensureStarted();
+    field @Deprecated public static final androidx.compose.runtime.FrameManager INSTANCE;
   }
 
   @androidx.compose.runtime.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface Immutable {
@@ -308,7 +308,7 @@ package androidx.compose.runtime {
   }
 
   @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.CompositionLifecycleObserver {
-    ctor public PreCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
+    ctor public PreCommitScopeImpl(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
 
@@ -339,15 +339,13 @@ package androidx.compose.runtime {
   }
 
   public final class Recomposer extends androidx.compose.runtime.CompositionReference {
-    ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext, androidx.compose.runtime.EmbeddingContext embeddingContext);
+    ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext);
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public androidx.compose.runtime.EmbeddingContext getEmbeddingContext();
     method public boolean hasInvalidations();
     method public suspend Object? join(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @Deprecated public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
     method public void shutDown();
-    property public final androidx.compose.runtime.EmbeddingContext embeddingContext;
     field public static final androidx.compose.runtime.Recomposer.Companion Companion;
   }
 
@@ -396,7 +394,7 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class SlotReader {
-    ctor public SlotReader(internal androidx.compose.runtime.SlotTable table);
+    ctor public SlotReader(androidx.compose.runtime.SlotTable table);
     method public androidx.compose.runtime.Anchor anchor(optional int index);
     method public void beginEmpty();
     method public void close();
@@ -591,11 +589,8 @@ package androidx.compose.runtime {
 
 package androidx.compose.runtime.collection {
 
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental API for fast access collections and is likely to change " + "before becoming stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalCollectionApi {
-  }
-
-  @androidx.compose.runtime.collection.ExperimentalCollectionApi public final class MutableVector<T> implements java.util.RandomAccess {
-    ctor @kotlin.PublishedApi internal MutableVector(@kotlin.PublishedApi internal T![] content, int size);
+  public final class MutableVector<T> implements java.util.RandomAccess {
+    ctor @kotlin.PublishedApi internal MutableVector(@kotlin.PublishedApi T![] content, int size);
     method public boolean add(T? element);
     method public void add(int index, T? element);
     method public boolean addAll(int index, java.util.List<? extends T> elements);
@@ -664,10 +659,10 @@ package androidx.compose.runtime.collection {
   }
 
   public final class MutableVectorKt {
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(optional int capacity);
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf();
-    method @androidx.compose.runtime.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf(T? elements);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(optional int capacity);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf();
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf(T? elements);
   }
 
 }

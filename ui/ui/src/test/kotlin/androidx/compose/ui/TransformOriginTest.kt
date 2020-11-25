@@ -16,6 +16,7 @@
 
 package androidx.compose.ui
 
+import androidx.compose.ui.graphics.TransformOrigin
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,5 +45,13 @@ class TransformOriginTest {
         val copy = position.copy(pivotFractionY = 0.1f)
         assertEquals(0.4f, copy.pivotFractionX)
         assertEquals(0.1f, copy.pivotFractionY)
+    }
+
+    @Test
+    fun testDestructuringComponents() {
+        val transformOrigin = TransformOrigin(0.1f, 0.2f)
+        val (pivotX, pivotY) = transformOrigin
+        assertEquals(0.1f, pivotX)
+        assertEquals(0.2f, pivotY)
     }
 }

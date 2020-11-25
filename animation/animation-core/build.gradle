@@ -44,6 +44,7 @@ dependencies {
 
         implementation project(":compose:runtime:runtime")
         implementation project(":compose:runtime:runtime-dispatch")
+        implementation project(":compose:ui:ui-unit")
         implementation project(":compose:ui:ui-util")
         implementation (KOTLIN_STDLIB)
 
@@ -72,6 +73,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation project(":compose:runtime:runtime")
                 implementation project(":compose:runtime:runtime-dispatch")
+                implementation project(":compose:ui:ui-unit")
                 implementation project(":compose:ui:ui-util")
                 implementation(KOTLIN_STDLIB_COMMON)
             }
@@ -103,7 +105,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Animation Core"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.ANIMATION
     inceptionYear = "2019"
     description = "Animation engine and animation primitives that are the building blocks of the Compose animation library"

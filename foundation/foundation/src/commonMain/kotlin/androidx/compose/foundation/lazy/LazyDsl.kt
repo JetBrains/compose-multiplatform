@@ -194,8 +194,7 @@ fun LazyRow(
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
         isVertical = false
-    ) {
-        index ->
+    ) { index ->
         scope.contentFor(index, this)
     }
 }

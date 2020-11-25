@@ -35,8 +35,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AndroidOwner
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -190,8 +190,8 @@ open class LayoutTest {
     }
 
     @Composable
-    internal fun WithInfiniteConstraints(children: @Composable () -> Unit) {
-        Layout(children) { measurables, _ ->
+    internal fun WithInfiniteConstraints(content: @Composable () -> Unit) {
+        Layout(content) { measurables, _ ->
             val placeables = measurables.map { it.measure(Constraints()) }
             layout(0, 0) {
                 placeables.forEach { it.placeRelative(0, 0) }
@@ -203,12 +203,12 @@ open class LayoutTest {
     internal fun ConstrainedBox(
         constraints: DpConstraints,
         modifier: Modifier = Modifier,
-        children: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
-        with(DensityAmbient.current) {
+        with(AmbientDensity.current) {
             val pxConstraints = Constraints(constraints)
             Layout(
-                children,
+                content,
                 modifier = modifier,
                 minIntrinsicWidthMeasureBlock = { measurables, h ->
                     val width = measurables.firstOrNull()?.minIntrinsicWidth(h) ?: 0
@@ -363,9 +363,9 @@ open class LayoutTest {
         constraints: DpConstraints = DpConstraints(),
         width: Dp? = null,
         height: Dp? = null,
-        children: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
-        Layout(children, modifier) { measurables, incomingConstraints ->
+        Layout(content, modifier) { measurables, incomingConstraints ->
             val containerConstraints = Constraints(constraints)
                 .copy(
                     width?.toIntPx() ?: constraints.minWidth.toIntPx(),
@@ -401,10 +401,9 @@ open class LayoutTest {
                 val p = placeable ?: measurables.firstOrNull()?.measure(childConstraints)
                 p?.let {
                     val position = alignment.align(
-                        IntSize(
-                            containerWidth - it.width - totalHorizontal,
-                            containerHeight - it.height - totalVertical
-                        )
+                        IntSize(it.width + totalHorizontal, it.height + totalVertical),
+                        IntSize(containerWidth, containerHeight),
+                        layoutDirection
                     )
                     it.placeRelative(
                         padding.start.toIntPx() + position.x,

@@ -27,7 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
@@ -255,7 +255,7 @@ private fun AnimatedVisibilityImpl(
         }
     }
 
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     val animations = remember(clock, enter, exit) {
         // TODO: Should we delay changing enter/exit after on-going animations are finished?
         TransitionAnimations(enter, exit, clock) {
@@ -270,7 +270,7 @@ private fun AnimatedVisibilityImpl(
     }
 
     Layout(
-        children = content,
+        content = content,
         modifier = modifier.then(animations.modifier)
     ) { measureables, constraints ->
 

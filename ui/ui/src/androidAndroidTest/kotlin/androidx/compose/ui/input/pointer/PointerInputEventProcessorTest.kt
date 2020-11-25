@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -36,9 +35,10 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.milliseconds
 import androidx.compose.ui.unit.minus
+import androidx.compose.ui.platform.WindowManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -120,7 +121,7 @@ class PointerInputEventProcessorTest {
         val events = arrayOf(
             PointerInputEvent(8712, Uptime.Boot + 3.milliseconds, offset, true),
             PointerInputEvent(8712, Uptime.Boot + 11.milliseconds, offset2, true),
-            PointerInputEvent(8712, Uptime.Boot + 13.milliseconds, null, false)
+            PointerInputEvent(8712, Uptime.Boot + 13.milliseconds, offset2, false)
         )
 
         val down = down(8712, 3.milliseconds, offset.x, offset.y)
@@ -191,8 +192,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    offsets[index] - childOffset,
                     false
                 ),
                 consumed = ConsumedData()
@@ -555,8 +556,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset - additionalOffset,
                     false
                 ),
                 consumed = ConsumedData()
@@ -569,8 +570,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset - middleOffset - additionalOffset,
                     false
                 ),
                 consumed = ConsumedData()
@@ -583,8 +584,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset - middleOffset - childOffset - additionalOffset,
                     false
                 ),
                 consumed = ConsumedData()
@@ -740,8 +741,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    offset1,
                     false
                 ),
                 consumed = ConsumedData()
@@ -755,8 +756,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    offset2 - Offset(50f, 50f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -903,8 +904,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    offset1,
                     false
                 ),
                 consumed = ConsumedData()
@@ -918,8 +919,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    offset2 - Offset(50f, 50f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -933,8 +934,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    offset3 - Offset(100f, 100f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -1094,8 +1095,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset1,
                     false
                 ),
                 consumed = ConsumedData()
@@ -1109,8 +1110,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset2 - Offset(25f, 50f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -1124,8 +1125,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset3,
                     false
                 ),
                 consumed = ConsumedData()
@@ -1226,8 +1227,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 11.milliseconds,
+                    offset1,
                     false
                 ),
                 consumed = ConsumedData()
@@ -1241,8 +1242,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 11.milliseconds,
+                    offset2 - Offset(50f, 25f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -1256,8 +1257,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 11.milliseconds,
+                    offset3,
                     false
                 ),
                 consumed = ConsumedData()
@@ -1418,8 +1419,11 @@ class PointerInputEventProcessorTest {
                         true
                     ),
                     previous = PointerInputData(
-                        null,
-                        null,
+                        Uptime.Boot + 11.milliseconds,
+                        Offset(
+                            offsetsTopLeft[it].x,
+                            offsetsTopLeft[it].y
+                        ),
                         false
                     ),
                     consumed = ConsumedData()
@@ -1439,8 +1443,11 @@ class PointerInputEventProcessorTest {
                         true
                     ),
                     previous = PointerInputData(
-                        null,
-                        null,
+                        Uptime.Boot + 11.milliseconds,
+                        Offset(
+                            offsetsTopRight[it].x - 3f,
+                            offsetsTopRight[it].y
+                        ),
                         false
                     ),
                     consumed = ConsumedData()
@@ -1460,8 +1467,11 @@ class PointerInputEventProcessorTest {
                         true
                     ),
                     previous = PointerInputData(
-                        null,
-                        null,
+                        Uptime.Boot + 11.milliseconds,
+                        Offset(
+                            offsetsBottomLeft[it].x,
+                            offsetsBottomLeft[it].y - 3f
+                        ),
                         false
                     ),
                     consumed = ConsumedData()
@@ -1481,8 +1491,11 @@ class PointerInputEventProcessorTest {
                         true
                     ),
                     previous = PointerInputData(
-                        null,
-                        null,
+                        Uptime.Boot + 11.milliseconds,
+                        Offset(
+                            offsetsBottomRight[it].x - 3f,
+                            offsetsBottomRight[it].y - 3f
+                        ),
                         false
                     ),
                     consumed = ConsumedData()
@@ -1592,8 +1605,8 @@ class PointerInputEventProcessorTest {
                         true
                     ),
                     previous = PointerInputData(
-                        null,
-                        null,
+                        Uptime.Boot + 11.milliseconds,
+                        offsetsThatHit[it] - Offset(1f, 1f),
                         false
                     ),
                     consumed = ConsumedData()
@@ -1653,8 +1666,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset1 - Offset(25f, 50f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -1739,8 +1752,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset1 - Offset(1f + 2f + 3f + 4f, 5f + 6f + 7f + 8f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -1824,8 +1837,11 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 3.milliseconds,
+                    offset1 - Offset(
+                        1f + 2f + 3f + 4f + 5f,
+                        6f + 7f + 8f + 9f + 10f
+                    ),
                     false
                 ),
                 consumed = ConsumedData()
@@ -1840,8 +1856,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 3.milliseconds,
+                    offset1 - Offset(3f + 4f + 5f, 8f + 9f + 10f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -1993,8 +2009,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    Offset(250f, 250f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -2076,8 +2092,8 @@ class PointerInputEventProcessorTest {
                         true
                     ),
                     previous = PointerInputData(
-                        null,
-                        null,
+                        Uptime.Boot + 5.milliseconds,
+                        Offset(200f, 200f),
                         false
                     ),
                     consumed = ConsumedData()
@@ -2108,8 +2124,8 @@ class PointerInputEventProcessorTest {
                         true
                     ),
                     previous = PointerInputData(
-                        null,
-                        null,
+                        Uptime.Boot + 10.milliseconds,
+                        Offset(300f, 300f),
                         false
                     ),
                     consumed = ConsumedData()
@@ -2200,8 +2216,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    Offset(100f, 100f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -2216,8 +2232,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    Offset(100f, 100f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -2296,8 +2312,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    Offset(200f, 200f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -2383,8 +2399,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    Offset(200f, 200f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -2455,8 +2471,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 5.milliseconds,
+                    Offset(200f, 200f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -2471,8 +2487,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 10.milliseconds,
+                    Offset(200f, 200f),
                     false
                 ),
                 consumed = ConsumedData()
@@ -2537,7 +2553,7 @@ class PointerInputEventProcessorTest {
         val offset = Offset(50f, 50f)
 
         val down = PointerInputEvent(0, Uptime.Boot + 7.milliseconds, offset, true)
-        val up = PointerInputEvent(0, Uptime.Boot + 11.milliseconds, null, false)
+        val up = PointerInputEvent(0, Uptime.Boot + 11.milliseconds, offset, false)
 
         val expectedDownChange =
             PointerInputChange(
@@ -2548,8 +2564,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset,
                     false
                 ),
                 consumed = ConsumedData()
@@ -2560,7 +2576,7 @@ class PointerInputEventProcessorTest {
                 id = PointerId(0),
                 current = PointerInputData(
                     Uptime.Boot + 11.milliseconds,
-                    null,
+                    offset,
                     false
                 ),
                 previous = PointerInputData(
@@ -2660,7 +2676,7 @@ class PointerInputEventProcessorTest {
         val down =
             PointerInputEvent(0, Uptime.Boot + 7.milliseconds, Offset(50f, 50f), true)
 
-        val up = PointerInputEvent(0, Uptime.Boot + 11.milliseconds, null, false)
+        val up = PointerInputEvent(0, Uptime.Boot + 11.milliseconds, Offset(50f, 50f), false)
 
         // Act
 
@@ -2701,7 +2717,7 @@ class PointerInputEventProcessorTest {
         val offset = Offset(50f, 50f)
 
         val down = PointerInputEvent(0, Uptime.Boot + 7.milliseconds, offset, true)
-        val up = PointerInputEvent(0, Uptime.Boot + 11.milliseconds, null, false)
+        val up = PointerInputEvent(0, Uptime.Boot + 11.milliseconds, offset, false)
 
         val expectedDownChange =
             PointerInputChange(
@@ -2712,8 +2728,8 @@ class PointerInputEventProcessorTest {
                     true
                 ),
                 previous = PointerInputData(
-                    null,
-                    null,
+                    Uptime.Boot + 7.milliseconds,
+                    offset,
                     false
                 ),
                 consumed = ConsumedData()
@@ -2724,7 +2740,7 @@ class PointerInputEventProcessorTest {
                 id = PointerId(0),
                 current = PointerInputData(
                     Uptime.Boot + 11.milliseconds,
-                    null,
+                    offset,
                     false
                 ),
                 previous = PointerInputData(
@@ -2824,7 +2840,8 @@ class PointerInputEventProcessorTest {
         val down =
             PointerInputEvent(0, Uptime.Boot + 7.milliseconds, Offset(50f, 50f), true)
 
-        val up = PointerInputEvent(0, Uptime.Boot + 11.milliseconds, null, false)
+        val up =
+            PointerInputEvent(0, Uptime.Boot + 11.milliseconds, Offset(50f, 50f), false)
 
         // Act
 
@@ -3134,10 +3151,6 @@ private class MockOwner(
     @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
-    override fun pauseModelReadObserveration(block: () -> Unit) {
-        block()
-    }
-
     override val root: LayoutNode
         get() = targetRoot
     override val hapticFeedBack: HapticFeedback
@@ -3157,6 +3170,8 @@ private class MockOwner(
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
+        get() = TODO("Not yet implemented")
+    override val windowManager: WindowManager
         get() = TODO("Not yet implemented")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")
@@ -3180,23 +3195,10 @@ private class MockOwner(
     override fun onDetach(node: LayoutNode) {
     }
 
-    override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
-
-    override fun <T : OwnerScope> observeReads(
-        target: T,
-        onChanged: (T) -> Unit,
-        block: () -> Unit
-    ) {
-        block()
-    }
-
     override fun measureAndLayout() {
     }
 
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
@@ -3209,9 +3211,9 @@ private class MockOwner(
     override val measureIteration: Long
         get() = 0
 
-    override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-        block()
-    }
+    override val viewConfiguration: ViewConfiguration
+        get() = TODO("Not yet implemented")
+    override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 }
 
 private fun List<LogEntry>.verifyOnPointerEventCall(

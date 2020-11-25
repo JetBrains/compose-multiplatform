@@ -35,23 +35,6 @@ import androidx.compose.ui.util.unpackFloat2
 inline fun CornerRadius(x: Float, y: Float = x) = CornerRadius(packFloats(x, y))
 
 /**
- * Constructs a Radius with the given [x] and [y] parameters for the
- * size of the radius along the x and y axis respectively. By default
- * the radius along the Y axis matches that of the given x-axis
- * unless otherwise specified
- */
-@Suppress("NOTHING_TO_INLINE")
-@Stable
-@Deprecated(
-    "Use CornerRadius(x, y) instead",
-    ReplaceWith(
-        "CornerRadius(x, y)",
-        "androidx.compose.ui.geometry"
-    )
-)
-inline fun Radius(x: Float, y: Float = x) = CornerRadius(packFloats(x, y))
-
-/**
  * A radius for either circular or elliptical (oval) shapes.
  *
  * Note consumers should create an instance of this class through the corresponding

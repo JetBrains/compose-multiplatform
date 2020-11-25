@@ -71,11 +71,11 @@ internal fun LazyGrid(
 
 @Composable
 private fun GridRow(
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     // TODO: Implement customisable column widths.
     Layout(
-        children = children
+        content = content
     ) { measurables, constraints ->
 
         // TODO: Avoid int rounding to fill all the width pixels.

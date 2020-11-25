@@ -108,7 +108,7 @@ class ComposedModifierTest {
     @Test
     fun recomposeComposedModifier() = runBlocking {
         // Manually invalidate the composition of the modifier instead of using mutableStateOf
-        // Frame-based recomposition requires the FrameManager be up and running.
+        // Snapshot-based recomposition requires explicit snapshot commits/global write observers.
         var value = 0
         lateinit var invalidator: () -> Unit
 
@@ -206,7 +206,7 @@ class ComposedModifierTest {
 }
 
 @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
-private fun compose(
+fun compose(
     recomposer: Recomposer,
     block: @Composable () -> Unit
 ): Composer<Unit> {
@@ -225,7 +225,7 @@ private fun compose(
     }
 }
 
-private class TestFrameClock : MonotonicFrameClock {
+internal class TestFrameClock : MonotonicFrameClock {
 
     private val frameCh = Channel<Long>()
 

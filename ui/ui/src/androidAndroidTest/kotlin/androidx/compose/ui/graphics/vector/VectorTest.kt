@@ -39,7 +39,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -95,7 +95,7 @@ class VectorTest {
         val latch2 = CountDownLatch(1)
         val testCase = VectorInvalidationTestCase(latch1)
         rule.setContent {
-            testCase.createTestVector()
+            testCase.TestVector()
         }
 
         latch1.await()
@@ -177,13 +177,13 @@ class VectorTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun testVectorAssetChangeOnStateChange() {
+    fun testImageVectorChangeOnStateChange() {
         val defaultWidth = 24.dp
         val defaultHeight = 24.dp
         val viewportWidth = 24f
         val viewportHeight = 24f
 
-        val icon1 = VectorAssetBuilder(
+        val icon1 = ImageVector.Builder(
             defaultWidth = defaultWidth,
             defaultHeight = defaultHeight,
             viewportWidth = viewportWidth,
@@ -199,7 +199,7 @@ class VectorTest {
                 }
             ).build()
 
-        val icon2 = VectorAssetBuilder(
+        val icon2 = ImageVector.Builder(
             defaultWidth = defaultWidth,
             defaultHeight = defaultHeight,
             viewportWidth = viewportWidth,
@@ -219,7 +219,7 @@ class VectorTest {
         rule.setContent {
             val clickState = remember { mutableStateOf(false) }
             Image(
-                asset = if (clickState.value) icon1 else icon2,
+                imageVector = if (clickState.value) icon1 else icon2,
                 modifier = Modifier
                     .testTag(testTag)
                     .preferredSize(icon1.defaultWidth, icon1.defaultHeight)
@@ -309,11 +309,11 @@ class VectorTest {
     @Composable
     private fun createTestVectorPainter(size: Int = 200): VectorPainter {
         val sizePx = size.toFloat()
-        val sizeDp = (size / DensityAmbient.current.density).dp
+        val sizeDp = (size / AmbientDensity.current.density).dp
         return rememberVectorPainter(
             defaultWidth = sizeDp,
             defaultHeight = sizeDp,
-            children = { _, _ ->
+            content = { _, _ ->
                 Path(
                     pathData = PathData {
                         lineTo(sizePx, 0.0f)
@@ -334,7 +334,7 @@ class VectorTest {
         alignment: Alignment = Alignment.Center
     ) {
         val sizePx = size.toFloat()
-        val sizeDp = (size / DensityAmbient.current.density).dp
+        val sizeDp = (size / AmbientDensity.current.density).dp
         val background = Modifier.paint(
             rememberVectorPainter(
                 defaultWidth = sizeDp,
@@ -387,7 +387,7 @@ class VectorTest {
         alignment: Alignment = Alignment.Center
     ) {
         val sizePx = size.toFloat()
-        val sizeDp = (size / DensityAmbient.current.density).dp
+        val sizeDp = (size / AmbientDensity.current.density).dp
         val background = Modifier.paint(
             rememberVectorPainter(
                 defaultWidth = sizeDp,

@@ -18,13 +18,11 @@ package androidx.compose.ui.layout
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,12 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.PaddingModifier
 import androidx.compose.ui.SimpleRow
 import androidx.compose.ui.Wrap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.padding
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -160,7 +159,7 @@ class OnGloballyPositionedTest {
                             measurables[0].measure(constraints).place(position, 0)
                         }
                     },
-                    children = {
+                    content = {
                         Wrap(
                             minWidth = 10,
                             minHeight = 10
@@ -203,7 +202,7 @@ class OnGloballyPositionedTest {
                             measurables[1].measure(constraints).place(0, 0)
                         }
                     },
-                    children = {
+                    content = {
                         Wrap(
                             minWidth = 10,
                             minHeight = 10,
@@ -245,7 +244,7 @@ class OnGloballyPositionedTest {
             activity.setContent {
                 FixedSize(
                     10,
-                    PaddingModifier(5).then(
+                    Modifier.padding(5).then(
                         Modifier.onGloballyPositioned {
                             coordinates = it
                             positionedLatch.countDown()
@@ -278,7 +277,7 @@ class OnGloballyPositionedTest {
             activity.setContent {
                 FixedSize(
                     10,
-                    PaddingModifier(5).then(
+                    Modifier.padding(5).then(
                         Modifier.onGloballyPositioned {
                             coordinates = it
                             positionedLatch.countDown()
@@ -307,14 +306,14 @@ class OnGloballyPositionedTest {
         var positionedLatch = CountDownLatch(1)
         var coordinates: LayoutCoordinates? = null
         var scrollView: ScrollView? = null
-        var frameLayout: FrameLayout? = null
+        var view: ComposeView? = null
 
         rule.runOnUiThread {
             scrollView = ScrollView(rule.activity)
             activity.setContentView(scrollView, ViewGroup.LayoutParams(100, 100))
-            frameLayout = FrameLayout(rule.activity)
-            scrollView!!.addView(frameLayout)
-            frameLayout?.setContent(Recomposer.current()) {
+            view = ComposeView(rule.activity)
+            scrollView!!.addView(view)
+            view?.setContent {
                 Layout(
                     {},
                     modifier = Modifier.onGloballyPositioned {
@@ -341,7 +340,7 @@ class OnGloballyPositionedTest {
         // pixels off of the start position, even though we've scrolled by 50 pixels.
         val position = intArrayOf(0, 0)
         rule.runOnUiThread {
-            frameLayout?.getLocationOnScreen(position)
+            view?.getLocationOnScreen(position)
         }
         assertEquals(position[1].toFloat(), coordinates!!.globalPosition.y)
     }
@@ -358,9 +357,9 @@ class OnGloballyPositionedTest {
             activity.setContentView(linearLayout, ViewGroup.LayoutParams(100, 200))
             topView = View(rule.activity)
             linearLayout.addView(topView!!, ViewGroup.LayoutParams(100, 100))
-            val frameLayout = FrameLayout(rule.activity)
-            linearLayout.addView(frameLayout, ViewGroup.LayoutParams(100, 100))
-            frameLayout.setContent(Recomposer.current()) {
+            val view = ComposeView(rule.activity)
+            linearLayout.addView(view, ViewGroup.LayoutParams(100, 100))
+            view.setContent {
                 Layout(
                     {},
                     modifier = Modifier.onGloballyPositioned {
@@ -396,7 +395,7 @@ class OnGloballyPositionedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
                     DelayedMeasure(50) {
                         Box(Modifier.size(25.toDp())) {
                             Box(
@@ -437,9 +436,9 @@ class OnGloballyPositionedTest {
 fun DelayedMeasure(
     size: Int,
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = emptyContent()
 ) {
-    Layout(children = children, modifier = modifier) { measurables, _ ->
+    Layout(content = content, modifier = modifier) { measurables, _ ->
         layout(size, size) {
             val newConstraints = Constraints(maxWidth = size, maxHeight = size)
             val placeables = measurables.map { m ->

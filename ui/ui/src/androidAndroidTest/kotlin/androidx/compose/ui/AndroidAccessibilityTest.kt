@@ -27,7 +27,6 @@ import android.view.accessibility.AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_SELECTION
 import android.view.accessibility.AccessibilityNodeProvider
-import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -35,7 +34,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -102,7 +99,7 @@ class AndroidAccessibilityTest {
     val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var androidComposeView: AndroidComposeView
-    private lateinit var container: ViewGroup
+    private lateinit var container: OpenComposeView
     private lateinit var delegate: AndroidComposeViewAccessibilityDelegateCompat
     private lateinit var provider: AccessibilityNodeProvider
     private lateinit var textLayoutResult: TextLayoutResult
@@ -124,7 +121,7 @@ class AndroidAccessibilityTest {
         InstrumentationRegistry.getInstrumentation().uiAutomation
 
         rule.activityRule.scenario.onActivity { activity ->
-            container = spy(FrameLayout(activity)) {
+            container = spy(OpenComposeView(activity)) {
                 on { onRequestSendAccessibilityEvent(any(), any()) } doReturn false
             }.apply {
                 layoutParams = ViewGroup.LayoutParams(
@@ -134,7 +131,7 @@ class AndroidAccessibilityTest {
             }
 
             activity.setContentView(container)
-            container.setContent(Recomposer.current()) {
+            container.setContent {
                 var checked by remember { mutableStateOf(true) }
                 var value by remember { mutableStateOf(TextFieldValue(InitialText)) }
                 Column {
@@ -142,7 +139,7 @@ class AndroidAccessibilityTest {
                         Modifier
                             .toggleable(value = checked, onValueChange = { checked = it })
                             .testTag(ToggleableTag),
-                        children = {
+                        content = {
                             BasicText("ToggleableText")
                         }
                     )

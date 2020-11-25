@@ -34,8 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ZoomableSample() {
     Box(
-        Modifier.preferredSize(300.dp).clipToBounds().background(Color.LightGray)
+        Modifier.preferredSize(200.dp).clipToBounds().background(Color.LightGray)
     ) {
         var scale by remember { mutableStateOf(1f) }
         val zoomableController = rememberZoomableController { scale *= it }
@@ -57,12 +57,15 @@ fun ZoomableSample() {
                 )
                 .fillMaxSize()
                 .border(1.dp, Color.Green),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 "☠",
                 fontSize = 32.sp,
-                modifier = Modifier.drawLayer(scaleX = scale, scaleY = scale)
+                modifier = Modifier.graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale
+                )
             )
         }
     }

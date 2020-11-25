@@ -288,7 +288,7 @@ class DraggableTest {
         rule.setContent {
             Box {
                 Box(
-                    alignment = Alignment.Center,
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(draggableBoxTag)
                         .preferredSize(300.dp)

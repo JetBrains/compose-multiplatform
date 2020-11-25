@@ -30,7 +30,7 @@ import java.awt.MouseInfo
 @Composable
 fun WindowDraggableArea(
     modifier: Modifier = Modifier,
-    children: @Composable() () -> Unit = emptyContent()
+    content: @Composable() () -> Unit = emptyContent()
 ) {
     Box(
         modifier = modifier.dragGestureFilter(
@@ -38,7 +38,7 @@ fun WindowDraggableArea(
             startDragImmediately = true
         )
     ) {
-        children()
+        content()
     }
 }
 

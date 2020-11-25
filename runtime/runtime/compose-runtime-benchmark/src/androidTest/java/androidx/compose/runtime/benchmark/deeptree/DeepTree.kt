@@ -42,11 +42,11 @@ fun Terminal(style: Int) {
 }
 
 @Composable
-fun Stack(vertical: Boolean, children: @Composable () -> Unit) {
+fun Stack(vertical: Boolean, content: @Composable () -> Unit) {
     if (vertical) {
-        Column(Modifier.fillMaxHeight()) { children() }
+        Column(Modifier.fillMaxHeight()) { content() }
     } else {
-        Row(Modifier.fillMaxWidth()) { children() }
+        Row(Modifier.fillMaxWidth()) { content() }
     }
 }
 

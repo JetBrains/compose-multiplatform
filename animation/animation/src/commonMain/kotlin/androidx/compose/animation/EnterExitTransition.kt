@@ -30,11 +30,12 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 
@@ -685,7 +686,7 @@ private class AlignmentBasedSizeAnimation(
 
     override val offset: (IntSize) -> IntOffset
         get() = {
-            alignment.align(anim.value - it)
+            alignment.align(it, anim.value, LayoutDirection.Ltr)
         }
 
     override fun animateTo(
@@ -748,7 +749,7 @@ private class RectBasedSizeAnimation(
         spec: AnimationSpec<IntSize>,
         clock: AnimationClockObservable
     ): SizeAnimation {
-        val targetOffSet = alignment.align(target - fullSize)
+        val targetOffSet = alignment.align(fullSize, target, LayoutDirection.Ltr)
         if (offsetAnim.targetValue != targetOffSet) {
             offsetAnim.animateTo(targetOffSet, onEnd = listener)
         }
@@ -774,7 +775,7 @@ internal interface TransitionAnimation {
 }
 
 /**
- * This class animates alpha through a draw layer modifier.
+ * This class animates alpha through a graphics layer modifier.
  */
 private class FadeTransition(
     val enter: Fade? = null,
@@ -786,9 +787,9 @@ private class FadeTransition(
         get() = alphaAnim.isRunning
     override val modifier: Modifier
         get() = if (alphaAnim.isRunning || (state == AnimStates.Exiting && exit != null)) {
-            // Only add draw layer if the animation is running, or if it's waiting for other exit
-            // animations to finish.
-            Modifier.drawLayer(alpha = alphaAnim.value)
+            // Only add graphics layer if the animation is running, or if it's waiting for other
+            // exit animations to finish.
+            Modifier.graphicsLayer(alpha = alphaAnim.value)
         } else {
             Modifier
         }

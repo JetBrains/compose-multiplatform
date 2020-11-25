@@ -18,6 +18,7 @@ package androidx.compose.material.textfield
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.GOLDEN_MATERIAL
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -25,7 +26,8 @@ import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.Providers
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.captureToImage
@@ -60,7 +62,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_withInput() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "Text",
                     onValueChange = {},
@@ -75,7 +77,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_notFocused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
@@ -90,7 +92,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_focused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
@@ -110,8 +112,8 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_focused_rtl() {
         rule.setMaterialContent {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
-                Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                     OutlinedTextField(
                         value = "",
                         onValueChange = {},
@@ -132,7 +134,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_error_focused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "Input",
                     onValueChange = {},
@@ -153,7 +155,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_error_notFocused() {
         rule.setMaterialContent {
-            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
@@ -164,6 +166,21 @@ class OutlinedTextFieldScreenshotTest {
         }
 
         assertAgainstGolden("outlined_textField_notFocused_errorState")
+    }
+
+    @Test
+    fun outlinedTextField_textColor_fallbackToContentColor() {
+        rule.setMaterialContent {
+            Providers(AmbientContentColor provides Color.Magenta) {
+                OutlinedTextField(
+                    value = "Hello, world!",
+                    onValueChange = {},
+                    modifier = Modifier.testTag(TextFieldTag)
+                )
+            }
+        }
+
+        assertAgainstGolden("outlined_textField_textColor_defaultContentColor")
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {

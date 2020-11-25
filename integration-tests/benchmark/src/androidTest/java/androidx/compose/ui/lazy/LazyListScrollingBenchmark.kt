@@ -40,7 +40,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
@@ -297,13 +296,13 @@ class ListRemeasureTestCase(
     }
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         content()
     }
 
     @Composable
     fun RegularItem() {
-        Box(Modifier.drawLayer().size(20.dp).background(Color.Red, RoundedCornerShape(8.dp)))
+        Box(Modifier.size(20.dp).background(Color.Red, RoundedCornerShape(8.dp)))
     }
 
     fun prepareForToggle() {

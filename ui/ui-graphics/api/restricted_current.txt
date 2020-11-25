@@ -13,8 +13,8 @@ package androidx.compose.ui.graphics {
     method public void disableZ();
     method public void drawArc(float left, float top, float right, float bottom, float startAngle, float sweepAngle, boolean useCenter, androidx.compose.ui.graphics.Paint paint);
     method public void drawCircle-tVKstsI(long center, float radius, androidx.compose.ui.graphics.Paint paint);
-    method public void drawImage-YdY9XZw(androidx.compose.ui.graphics.ImageAsset image, long topLeftOffset, androidx.compose.ui.graphics.Paint paint);
-    method public void drawImageRect-iaf9M94(androidx.compose.ui.graphics.ImageAsset image, long srcOffset, long srcSize, long dstOffset, long dstSize, androidx.compose.ui.graphics.Paint paint);
+    method public void drawImage-uwcbMjI(androidx.compose.ui.graphics.ImageBitmap image, long topLeftOffset, androidx.compose.ui.graphics.Paint paint);
+    method public void drawImageRect-bgE79EM(androidx.compose.ui.graphics.ImageBitmap image, long srcOffset, long srcSize, long dstOffset, long dstSize, androidx.compose.ui.graphics.Paint paint);
     method public void drawLine-bYPfCD8(long p1, long p2, androidx.compose.ui.graphics.Paint paint);
     method public void drawOval(float left, float top, float right, float bottom, androidx.compose.ui.graphics.Paint paint);
     method public void drawPath(androidx.compose.ui.graphics.Path path, androidx.compose.ui.graphics.Paint paint);
@@ -40,10 +40,11 @@ package androidx.compose.ui.graphics {
     method public static android.graphics.Canvas getNativeCanvas(androidx.compose.ui.graphics.Canvas);
   }
 
-  public final class AndroidImageAssetKt {
-    method public static android.graphics.Bitmap asAndroidBitmap(androidx.compose.ui.graphics.ImageAsset);
-    method public static androidx.compose.ui.graphics.ImageAsset asImageAsset(android.graphics.Bitmap);
-    method public static androidx.compose.ui.graphics.ImageAsset imageFromResource(android.content.res.Resources res, int resId);
+  public final class AndroidImageBitmapKt {
+    method public static android.graphics.Bitmap asAndroidBitmap(androidx.compose.ui.graphics.ImageBitmap);
+    method @Deprecated public static androidx.compose.ui.graphics.ImageBitmap asImageAsset(android.graphics.Bitmap);
+    method public static androidx.compose.ui.graphics.ImageBitmap asImageBitmap(android.graphics.Bitmap);
+    method public static androidx.compose.ui.graphics.ImageBitmap imageFromResource(android.content.res.Resources res, int resId);
   }
 
   public final class AndroidMatrixConversionsKt {
@@ -204,6 +205,8 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient LinearGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startX, float startY, float endX, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-PvDSl28(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, long center);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-acbAMd8(java.util.List<androidx.compose.ui.graphics.Color> colors, long center);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
   }
@@ -218,8 +221,8 @@ package androidx.compose.ui.graphics {
     method public void drawArc(float left, float top, float right, float bottom, float startAngle, float sweepAngle, boolean useCenter, androidx.compose.ui.graphics.Paint paint);
     method public default void drawArcRad(androidx.compose.ui.geometry.Rect rect, float startAngleRad, float sweepAngleRad, boolean useCenter, androidx.compose.ui.graphics.Paint paint);
     method public void drawCircle-tVKstsI(long center, float radius, androidx.compose.ui.graphics.Paint paint);
-    method public void drawImage-YdY9XZw(androidx.compose.ui.graphics.ImageAsset image, long topLeftOffset, androidx.compose.ui.graphics.Paint paint);
-    method public void drawImageRect-iaf9M94(androidx.compose.ui.graphics.ImageAsset image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, androidx.compose.ui.graphics.Paint paint);
+    method public void drawImage-uwcbMjI(androidx.compose.ui.graphics.ImageBitmap image, long topLeftOffset, androidx.compose.ui.graphics.Paint paint);
+    method public void drawImageRect-bgE79EM(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, androidx.compose.ui.graphics.Paint paint);
     method public void drawLine-bYPfCD8(long p1, long p2, androidx.compose.ui.graphics.Paint paint);
     method public default void drawOval(androidx.compose.ui.geometry.Rect rect, androidx.compose.ui.graphics.Paint paint);
     method public void drawOval(float left, float top, float right, float bottom, androidx.compose.ui.graphics.Paint paint);
@@ -248,7 +251,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class CanvasKt {
-    method public static androidx.compose.ui.graphics.Canvas Canvas(androidx.compose.ui.graphics.ImageAsset image);
+    method public static androidx.compose.ui.graphics.Canvas Canvas(androidx.compose.ui.graphics.ImageBitmap image);
     method public static void rotate(androidx.compose.ui.graphics.Canvas, float degrees, float pivotX, float pivotY);
     method public static void rotateRad(androidx.compose.ui.graphics.Canvas, float radians, optional float pivotX, optional float pivotY);
     method public static void scale(androidx.compose.ui.graphics.Canvas, float sx, optional float sy, float pivotX, float pivotY);
@@ -296,7 +299,6 @@ package androidx.compose.ui.graphics {
     method public long getMagenta-0d7_KjU();
     method public long getRed-0d7_KjU();
     method public long getTransparent-0d7_KjU();
-    method @Deprecated public long getUnset-0d7_KjU();
     method public long getUnspecified-0d7_KjU();
     method public long getWhite-0d7_KjU();
     method public long getYellow-0d7_KjU();
@@ -310,7 +312,6 @@ package androidx.compose.ui.graphics {
     property public final long Magenta;
     property public final long Red;
     property public final long Transparent;
-    property @Deprecated public final long Unset;
     property public final long Unspecified;
     property public final long White;
     property public final long Yellow;
@@ -337,9 +338,7 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static long Color(long color);
     method @androidx.compose.runtime.Stable public static long Color(@IntRange(from=0, to=255) int red, @IntRange(from=0, to=255) int green, @IntRange(from=0, to=255) int blue, optional @IntRange(from=0, to=255) int alpha);
     method @androidx.compose.runtime.Stable public static long compositeOver-6xK2E-Q(long, long background);
-    method @Deprecated public static inline boolean isSet-8_81llA(long);
     method public static inline boolean isSpecified-8_81llA(long);
-    method @Deprecated public static inline boolean isUnset-8_81llA(long);
     method public static inline boolean isUnspecified-8_81llA(long);
     method @androidx.compose.runtime.Stable public static long lerp-m18UwgE(long start, long stop, @FloatRange(from=0.0, to=1.0) float fraction);
     method @androidx.compose.runtime.Stable public static float luminance-8_81llA(long);
@@ -361,36 +360,36 @@ package androidx.compose.ui.graphics {
   public final class Float16Kt {
   }
 
-  public interface ImageAsset {
+  public interface ImageBitmap {
     method public androidx.compose.ui.graphics.colorspace.ColorSpace getColorSpace();
-    method public androidx.compose.ui.graphics.ImageAssetConfig getConfig();
+    method public androidx.compose.ui.graphics.ImageBitmapConfig getConfig();
     method public boolean getHasAlpha();
     method public int getHeight();
     method public int getWidth();
     method public void prepareToDraw();
     method public void readPixels(int[] buffer, optional int startX, optional int startY, optional int width, optional int height, optional int bufferOffset, optional int stride);
     property public abstract androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace;
-    property public abstract androidx.compose.ui.graphics.ImageAssetConfig config;
+    property public abstract androidx.compose.ui.graphics.ImageBitmapConfig config;
     property public abstract boolean hasAlpha;
     property public abstract int height;
     property public abstract int width;
   }
 
-  public enum ImageAssetConfig {
-    enum_constant public static final androidx.compose.ui.graphics.ImageAssetConfig Alpha8;
-    enum_constant public static final androidx.compose.ui.graphics.ImageAssetConfig Argb8888;
-    enum_constant public static final androidx.compose.ui.graphics.ImageAssetConfig F16;
-    enum_constant public static final androidx.compose.ui.graphics.ImageAssetConfig Gpu;
-    enum_constant public static final androidx.compose.ui.graphics.ImageAssetConfig Rgb565;
+  public enum ImageBitmapConfig {
+    enum_constant public static final androidx.compose.ui.graphics.ImageBitmapConfig Alpha8;
+    enum_constant public static final androidx.compose.ui.graphics.ImageBitmapConfig Argb8888;
+    enum_constant public static final androidx.compose.ui.graphics.ImageBitmapConfig F16;
+    enum_constant public static final androidx.compose.ui.graphics.ImageBitmapConfig Gpu;
+    enum_constant public static final androidx.compose.ui.graphics.ImageBitmapConfig Rgb565;
   }
 
-  public final class ImageAssetKt {
-    method public static androidx.compose.ui.graphics.ImageAsset ImageAsset(int width, int height, optional androidx.compose.ui.graphics.ImageAssetConfig config, optional boolean hasAlpha, optional androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace);
-    method public static androidx.compose.ui.graphics.PixelMap toPixelMap(androidx.compose.ui.graphics.ImageAsset, optional int startX, optional int startY, optional int width, optional int height, optional int[] buffer, optional int bufferOffset, optional int stride);
+  public final class ImageBitmapKt {
+    method @Deprecated public static androidx.compose.ui.graphics.ImageBitmap ImageAsset(int width, int height, optional androidx.compose.ui.graphics.ImageBitmapConfig config, optional boolean hasAlpha, optional androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace);
+    method public static androidx.compose.ui.graphics.ImageBitmap ImageBitmap(int width, int height, optional androidx.compose.ui.graphics.ImageBitmapConfig config, optional boolean hasAlpha, optional androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace);
+    method public static androidx.compose.ui.graphics.PixelMap toPixelMap(androidx.compose.ui.graphics.ImageBitmap, optional int startX, optional int startY, optional int width, optional int height, optional int[] buffer, optional int bufferOffset, optional int stride);
   }
 
   @androidx.compose.runtime.Immutable public final class LinearGradient extends androidx.compose.ui.graphics.ShaderBrush {
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.LinearGradient copy(java.util.List<androidx.compose.ui.graphics.Color> colors, java.util.List<java.lang.Float>? stops, float startX, float startY, float endX, float endY, androidx.compose.ui.graphics.TileMode tileMode);
   }
 
   public final inline class Matrix {
@@ -513,7 +512,6 @@ package androidx.compose.ui.graphics {
     method public void addArcRad(androidx.compose.ui.geometry.Rect oval, float startAngleRadians, float sweepAngleRadians);
     method public void addOval(androidx.compose.ui.geometry.Rect oval);
     method public void addPath-ej0GBII(androidx.compose.ui.graphics.Path path, optional long offset);
-    method @Deprecated public default void addRRect(androidx.compose.ui.geometry.RoundRect rrect);
     method public void addRect(androidx.compose.ui.geometry.Rect rect);
     method public void addRoundRect(androidx.compose.ui.geometry.RoundRect roundRect);
     method public void arcTo(androidx.compose.ui.geometry.Rect rect, float startAngleDegrees, float sweepAngleDegrees, boolean forceMoveTo);
@@ -534,7 +532,6 @@ package androidx.compose.ui.graphics {
     method public void relativeQuadraticBezierTo(float dx1, float dy1, float dx2, float dy2);
     method public void reset();
     method public void setFillType(androidx.compose.ui.graphics.PathFillType p);
-    method @Deprecated public default void shift-k-4lQ0M(long offset);
     method public void translate-k-4lQ0M(long offset);
     property public abstract androidx.compose.ui.graphics.PathFillType fillType;
     property public abstract boolean isConvex;
@@ -588,7 +585,6 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public final class RadialGradient extends androidx.compose.ui.graphics.ShaderBrush {
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.RadialGradient copy(java.util.List<androidx.compose.ui.graphics.Color> colors, java.util.List<java.lang.Float>? stops, float centerX, float centerY, float radius, androidx.compose.ui.graphics.TileMode tileMode);
   }
 
   public final class RectHelperKt {
@@ -609,9 +605,10 @@ package androidx.compose.ui.graphics {
   }
 
   public final class ShaderKt {
-    method public static android.graphics.Shader ImageShader(androidx.compose.ui.graphics.ImageAsset image, optional androidx.compose.ui.graphics.TileMode tileModeX, optional androidx.compose.ui.graphics.TileMode tileModeY);
+    method public static android.graphics.Shader ImageShader(androidx.compose.ui.graphics.ImageBitmap image, optional androidx.compose.ui.graphics.TileMode tileModeX, optional androidx.compose.ui.graphics.TileMode tileModeY);
     method public static android.graphics.Shader LinearGradientShader-GfyHbQM(long from, long to, java.util.List<androidx.compose.ui.graphics.Color> colors, optional java.util.List<java.lang.Float>? colorStops, optional androidx.compose.ui.graphics.TileMode tileMode);
     method public static android.graphics.Shader RadialGradientShader-cY6o93o(long center, float radius, java.util.List<androidx.compose.ui.graphics.Color> colors, optional java.util.List<java.lang.Float>? colorStops, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method public static android.graphics.Shader SweepGradientShader-GpNgDDw(long center, java.util.List<androidx.compose.ui.graphics.Color> colors, optional java.util.List<java.lang.Float>? colorStops);
   }
 
   @androidx.compose.runtime.Immutable public final class Shadow {
@@ -643,8 +640,6 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public final class SolidColor extends androidx.compose.ui.graphics.Brush {
     method public void applyTo(androidx.compose.ui.graphics.Paint p, float alpha);
-    method public long component1-0d7_KjU();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.SolidColor copy-8_81llA(long value);
     method public long getValue-0d7_KjU();
     property public final long value;
   }
@@ -659,6 +654,9 @@ package androidx.compose.ui.graphics {
     enum_constant public static final androidx.compose.ui.graphics.StrokeJoin Bevel;
     enum_constant public static final androidx.compose.ui.graphics.StrokeJoin Miter;
     enum_constant public static final androidx.compose.ui.graphics.StrokeJoin Round;
+  }
+
+  @androidx.compose.runtime.Immutable public final class SweepGradient extends androidx.compose.ui.graphics.ShaderBrush {
   }
 
   public enum TileMode {
@@ -892,8 +890,8 @@ package androidx.compose.ui.graphics.drawscope {
     method public void drawArc-C-Io9bM(androidx.compose.ui.graphics.Brush brush, float startAngle, float sweepAngle, boolean useCenter, long topLeft, long size, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawCircle-NGaRamM(long color, float radius, long center, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawCircle-m-UMHxE(androidx.compose.ui.graphics.Brush brush, float radius, long center, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawImage-WFpWo7g(androidx.compose.ui.graphics.ImageAsset image, long topLeft, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawImage-oX8chH0(androidx.compose.ui.graphics.ImageAsset image, long srcOffset, long srcSize, long dstOffset, long dstSize, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawImage-JUiai_k(androidx.compose.ui.graphics.ImageBitmap image, long topLeft, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawImage-Yc2aOMw(androidx.compose.ui.graphics.ImageBitmap image, long srcOffset, long srcSize, long dstOffset, long dstSize, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawLine-1-s4MmQ(long color, long start, long end, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, android.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawLine-IQGCKvc(androidx.compose.ui.graphics.Brush brush, long start, long end, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, android.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawOval-0a6MmAQ(androidx.compose.ui.graphics.Brush brush, long topLeft, long size, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
@@ -958,8 +956,8 @@ package androidx.compose.ui.graphics.drawscope {
     method public void drawArc-C-Io9bM(androidx.compose.ui.graphics.Brush brush, float startAngle, float sweepAngle, boolean useCenter, optional long topLeft, optional long size, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawCircle-NGaRamM(long color, optional float radius, optional long center, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawCircle-m-UMHxE(androidx.compose.ui.graphics.Brush brush, optional float radius, optional long center, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawImage-WFpWo7g(androidx.compose.ui.graphics.ImageAsset image, optional long topLeft, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawImage-oX8chH0(androidx.compose.ui.graphics.ImageAsset image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawImage-JUiai_k(androidx.compose.ui.graphics.ImageBitmap image, optional long topLeft, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawImage-Yc2aOMw(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawLine-1-s4MmQ(long color, long start, long end, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional android.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawLine-IQGCKvc(androidx.compose.ui.graphics.Brush brush, long start, long end, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional android.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawOval-0a6MmAQ(androidx.compose.ui.graphics.Brush brush, optional long topLeft, optional long size, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
@@ -997,7 +995,6 @@ package androidx.compose.ui.graphics.drawscope {
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float inset, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, optional float horizontal, optional float vertical, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void rotate-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float degrees, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method @Deprecated public static inline void rotateRad(androidx.compose.ui.graphics.drawscope.DrawScope, float radians, optional float pivotX, optional float pivotY, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void rotateRad-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float radians, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void scale-FvlOZkk(androidx.compose.ui.graphics.drawscope.DrawScope, float scale, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void scale-LCqtnZ0(androidx.compose.ui.graphics.drawscope.DrawScope, float scaleX, float scaleY, optional long pivot, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
@@ -1082,7 +1079,7 @@ package androidx.compose.ui.graphics.painter {
   }
 
   public final class ImagePainter extends androidx.compose.ui.graphics.painter.Painter {
-    method public androidx.compose.ui.graphics.painter.ImagePainter copy-rHaiP50(androidx.compose.ui.graphics.ImageAsset image, long srcOffset, long srcSize);
+    method public androidx.compose.ui.graphics.painter.ImagePainter copy-MHcbwps(androidx.compose.ui.graphics.ImageBitmap image, long srcOffset, long srcSize);
     method public long getIntrinsicSize-NH-jbRc();
     method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
     property public long intrinsicSize;

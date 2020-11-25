@@ -16,7 +16,6 @@
 
 package androidx.compose.material.demos
 
-import android.graphics.SweepGradient
 import androidx.compose.animation.DpPropKey
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.transitionDefinition
@@ -51,7 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
@@ -59,14 +58,15 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.SweepGradient
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -100,7 +100,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         val colorWheel = remember(diameter) { ColorWheel(diameter) }
 
         var isDragging by remember { mutableStateOf(false) }
-        val inputModifier = SimplePointerInput(
+        val inputModifier = Modifier.simplePointerInput(
             position = position,
             onPositionChange = { newPosition ->
                 // Work out if the new position is inside the circle we are drawing, and has a
@@ -115,7 +115,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         )
 
         Box(Modifier.fillMaxSize()) {
-            Image(modifier = inputModifier, asset = colorWheel.image)
+            Image(modifier = inputModifier, bitmap = colorWheel.image)
             val color = colorWheel.colorForPosition(position)
             if (color.isSpecified) {
                 Magnifier(visible = isDragging, position = position, color = color)
@@ -133,8 +133,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
  * the current / last input event, [onPositionChange] is called with the new position when the
  * pointer moves, and [onDragStateChange] is called when dragging starts / stops.
  */
-@Composable
-private fun SimplePointerInput(
+private fun Modifier.simplePointerInput(
     position: Offset,
     onPositionChange: (Offset) -> Unit,
     onDragStateChange: (Boolean) -> Unit
@@ -159,7 +158,7 @@ private fun SimplePointerInput(
         }
     }
 
-    return Modifier.dragGestureFilter(observer, startDragImmediately = true)
+    return dragGestureFilter(observer, startDragImmediately = true)
 }
 
 /**
@@ -167,7 +166,7 @@ private fun SimplePointerInput(
  */
 @Composable
 private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
-    val offset = with(DensityAmbient.current) {
+    val offset = with(AmbientDensity.current) {
         Modifier.offset(
             position.x.toDp() - MagnifierWidth / 2,
             // Align with the center of the selection circle
@@ -179,18 +178,18 @@ private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
         MagnifierWidth,
         SelectionCircleDiameter
     ) { labelWidth: Dp, selectionDiameter: Dp,
-        opacity: Float ->
+        alpha: Float ->
         Column(
             offset.preferredSize(width = MagnifierWidth, height = MagnifierHeight)
-                .drawOpacity(opacity)
+                .alpha(alpha)
         ) {
-            Box(Modifier.fillMaxWidth(), alignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 MagnifierLabel(Modifier.preferredSize(labelWidth, MagnifierLabelHeight), color)
             }
             Spacer(Modifier.weight(1f))
             Box(
                 Modifier.fillMaxWidth().preferredHeight(SelectionCircleDiameter),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 MagnifierSelectionCircle(Modifier.preferredSize(selectionDiameter), color)
             }
@@ -205,36 +204,36 @@ private val SelectionCircleDiameter = 30.dp
 
 /**
  * [transition] that animates between [visible] states of the magnifier by animating the width of
- * the label, diameter of the selection circle, and opacity of the overall magnifier
+ * the label, diameter of the selection circle, and alpha of the overall magnifier
  */
 @Composable
 private fun MagnifierTransition(
     visible: Boolean,
     maxWidth: Dp,
     maxDiameter: Dp,
-    children: @Composable (labelWidth: Dp, selectionDiameter: Dp, opacity: Float) -> Unit
+    content: @Composable (labelWidth: Dp, selectionDiameter: Dp, alpha: Float) -> Unit
 ) {
     val transitionDefinition = remember {
         transitionDefinition<Boolean> {
             state(false) {
                 this[LabelWidthPropKey] = 0.dp
                 this[MagnifierDiameterPropKey] = 0.dp
-                this[OpacityPropKey] = 0f
+                this[AlphaPropKey] = 0f
             }
             state(true) {
                 this[LabelWidthPropKey] = maxWidth
                 this[MagnifierDiameterPropKey] = maxDiameter
-                this[OpacityPropKey] = 1f
+                this[AlphaPropKey] = 1f
             }
             transition(false to true) {
                 LabelWidthPropKey using tween()
                 MagnifierDiameterPropKey using tween()
-                OpacityPropKey using tween()
+                AlphaPropKey using tween()
             }
             transition(true to false) {
                 LabelWidthPropKey using tween()
                 MagnifierDiameterPropKey using tween()
-                OpacityPropKey using tween(
+                AlphaPropKey using tween(
                     delayMillis = 100,
                     durationMillis = 200
                 )
@@ -242,12 +241,12 @@ private fun MagnifierTransition(
         }
     }
     val state = transition(transitionDefinition, visible)
-    children(state[LabelWidthPropKey], state[MagnifierDiameterPropKey], state[OpacityPropKey])
+    content(state[LabelWidthPropKey], state[MagnifierDiameterPropKey], state[AlphaPropKey])
 }
 
 private val LabelWidthPropKey = DpPropKey()
 private val MagnifierDiameterPropKey = DpPropKey()
-private val OpacityPropKey = FloatPropKey()
+private val AlphaPropKey = FloatPropKey()
 
 /**
  * Label representing the currently selected [color], with [Text] representing the hex code and a
@@ -305,31 +304,29 @@ private val MagnifierPopupShape = GenericShape { size ->
 }
 
 /**
- * A color wheel with an [ImageAsset] that draws a circular color wheel of the specified diameter.
+ * A color wheel with an [ImageBitmap] that draws a circular color wheel of the specified diameter.
  */
 private class ColorWheel(diameter: Int) {
     private val radius = diameter / 2f
 
     // TODO: b/152063545 - replace with Compose SweepGradient when it is available
-    private val sweepShader = SweepGradient(
-        radius,
-        radius,
-        intArrayOf(
-            android.graphics.Color.RED,
-            android.graphics.Color.MAGENTA,
-            android.graphics.Color.BLUE,
-            android.graphics.Color.CYAN,
-            android.graphics.Color.GREEN,
-            android.graphics.Color.YELLOW,
-            android.graphics.Color.RED
+    private val sweepGradient = SweepGradient(
+        listOf(
+            Color.Red,
+            Color.Magenta,
+            Color.Blue,
+            Color.Cyan,
+            Color.Green,
+            Color.Yellow,
+            Color.Red
         ),
-        null
+        Offset(radius, radius)
     )
 
-    val image = ImageAsset(diameter, diameter).also { asset ->
-        val canvas = Canvas(asset)
+    val image = ImageBitmap(diameter, diameter).also { imageBitmap ->
+        val canvas = Canvas(imageBitmap)
         val center = Offset(radius, radius)
-        val paint = Paint().apply { shader = sweepShader }
+        val paint = Paint().apply { sweepGradient.applyTo(this, 1.0f) }
         canvas.drawCircle(center, radius, paint)
     }
 }

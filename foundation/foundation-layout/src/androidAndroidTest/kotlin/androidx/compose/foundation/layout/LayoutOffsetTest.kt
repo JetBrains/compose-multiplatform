@@ -18,15 +18,17 @@ package androidx.compose.foundation.layout
 
 import android.os.Build
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -101,7 +103,7 @@ class LayoutOffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
+            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -161,7 +163,7 @@ class LayoutOffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
+            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -196,10 +198,7 @@ class LayoutOffsetTest : LayoutTest() {
             Box(
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
-                    .offsetPx(
-                        remember { mutableStateOf(offsetX) },
-                        remember { mutableStateOf(offsetY) }
-                    )
+                    .offset({ offsetX }, { offsetY })
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x
                         positionY = coordinates.positionInRoot.y
@@ -224,16 +223,13 @@ class LayoutOffsetTest : LayoutTest() {
         var positionX = 0f
         var positionY = 0f
         rule.setContent {
-            Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
+            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
-                        .offsetPx(
-                            remember { mutableStateOf(offsetX) },
-                            remember { mutableStateOf(offsetY) }
-                        )
+                        .offset({ offsetX }, { offsetY })
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x
                             positionY = coordinates.positionInRoot.y
@@ -265,10 +261,7 @@ class LayoutOffsetTest : LayoutTest() {
             Box(
                 Modifier.testTag("box")
                     .wrapContentSize(Alignment.TopStart)
-                    .absoluteOffsetPx(
-                        remember { mutableStateOf(offsetX) },
-                        remember { mutableStateOf(offsetY) }
-                    )
+                    .absoluteOffset({ offsetX }, { offsetY })
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
                         positionX = coordinates.positionInRoot.x
                         positionY = coordinates.positionInRoot.y
@@ -293,16 +286,13 @@ class LayoutOffsetTest : LayoutTest() {
         var positionX = 0f
         var positionY = 0f
         rule.setContent {
-            Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
+            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
                         .preferredWidth(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
-                        .absoluteOffsetPx(
-                            remember { mutableStateOf(offsetX) },
-                            remember { mutableStateOf(offsetY) }
-                        )
+                        .absoluteOffset({ offsetX }, { offsetY })
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
                             positionX = coordinates.positionInRoot.x
                             positionY = coordinates.positionInRoot.y
@@ -348,9 +338,8 @@ class LayoutOffsetTest : LayoutTest() {
 
     @Test
     fun testOffsetPxInspectableValue() {
-        val modifier = Modifier.offsetPx(mutableStateOf(10.0f), mutableStateOf(20.0f))
-            as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("offsetPx")
+        val modifier = Modifier.offset({ 10.0f }, { 20.0f }) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("offset")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.asIterable())
             .containsExactly("x", "y")
@@ -358,11 +347,34 @@ class LayoutOffsetTest : LayoutTest() {
 
     @Test
     fun testAbsoluteOffsetPxInspectableValue() {
-        val modifier = Modifier.absoluteOffsetPx(mutableStateOf(10.0f), mutableStateOf(20.0f))
-            as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("absoluteOffsetPx")
+        val modifier = Modifier.absoluteOffset({ 10.0f }, { 20.0f }) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("absoluteOffset")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.map { it.name }.asIterable())
             .containsExactly("x", "y")
+    }
+
+    @Test
+    fun contentNotRedrawnWhenOffsetPxChanges() {
+        var contentRedrawsCount = 0
+        var offset by mutableStateOf(0f)
+        rule.setContent {
+            Box(
+                Modifier
+                    .size(10.dp)
+                    .offset(x = { offset })
+                    .drawBehind {
+                        contentRedrawsCount ++
+                    }
+            )
+        }
+
+        rule.runOnIdle {
+            offset = 5f
+        }
+
+        rule.runOnIdle {
+            assertEquals(1, contentRedrawsCount)
+        }
     }
 }

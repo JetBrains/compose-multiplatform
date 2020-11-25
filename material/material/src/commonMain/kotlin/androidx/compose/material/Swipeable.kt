@@ -43,8 +43,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -336,7 +336,7 @@ fun <T : Any> rememberSwipeableState(
     animationSpec: AnimationSpec<Float> = DefaultAnimationSpec,
     confirmStateChange: (newValue: T) -> Boolean = { true }
 ): SwipeableState<T> {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     return rememberSavedInstanceState(
         clock,
         saver = SwipeableState.Saver(
@@ -455,7 +455,7 @@ fun <T> Modifier.swipeable(
     require(anchors.values.distinct().count() == anchors.size) {
         "You cannot have two anchors mapped to the same state."
     }
-    val density = DensityAmbient.current
+    val density = AmbientDensity.current
     onCommit(anchors) {
         state.anchors = anchors
         state.thresholds = { a, b ->

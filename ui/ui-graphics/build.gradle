@@ -50,7 +50,7 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         testImplementation(TRUTH)
 
         androidTestImplementation project(":compose:ui:ui-graphics:ui-graphics-samples")
-        androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(ESPRESSO_CORE)
@@ -96,7 +96,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation project(":compose:ui:ui-graphics:ui-graphics-samples")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(ESPRESSO_CORE)
@@ -106,7 +106,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             desktopTest {
                 resources.srcDirs += "src/desktopTest/res"
                 dependencies {
-                    implementation project(":ui:ui-test")
+                    implementation project(":compose:ui:ui-test-junit4")
                     implementation(JUNIT)
                     implementation(TRUTH)
                     implementation(SKIKO_CURRENT_OS)
@@ -119,7 +119,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Graphics"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Compose graphics"

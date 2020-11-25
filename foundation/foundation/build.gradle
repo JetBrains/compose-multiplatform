@@ -47,17 +47,22 @@ dependencies {
 
         implementation(KOTLIN_STDLIB_COMMON)
         implementation project(':compose:foundation:foundation-layout')
-        implementation project(':compose:foundation:foundation-text')
-        implementation project(':compose:ui:ui-text')
+        implementation project(":compose:ui:ui-text")
         implementation project(':compose:ui:ui-util')
+
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
         testImplementation(JUNIT)
         testImplementation(TRUTH)
+        testImplementation(KOTLIN_COROUTINES_TEST)
+        testImplementation(MOCKITO_CORE)
+        testImplementation(KOTLIN_REFLECT)
+        testImplementation MOCKITO_KOTLIN, {
+            exclude group: 'org.mockito' // to keep control on the mockito version
+        }
 
         androidTestImplementation project(":compose:test-utils")
-        androidTestImplementation project(':ui:ui-test')
         androidTestImplementation project(":compose:ui:ui-test-font")
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
@@ -90,10 +95,9 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 api project(':compose:runtime:runtime')
                 api project(':compose:runtime:runtime-saved-instance-state')
                 api project(':compose:ui:ui')
+                implementation project(":compose:ui:ui-text")
+                implementation project(":compose:ui:ui-util")
                 implementation project(':compose:foundation:foundation-layout')
-                implementation project(':compose:foundation:foundation-text')
-                implementation project(':compose:ui:ui-text')
-                implementation project(':compose:ui:ui-util')
             }
             androidMain.dependencies {
                 api "androidx.annotation:annotation:1.1.0"
@@ -107,11 +111,20 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(JUNIT)
+                implementation(MOCKITO_CORE)
+                implementation(TRUTH)
+                implementation(KOTLIN_REFLECT)
+                implementation MOCKITO_KOTLIN, {
+                    exclude group: 'org.mockito' // to keep control on the mockito version
+                }
+            }
+
+            commonTest.dependencies {
+                implementation(KOTLIN_COROUTINES_TEST)
             }
 
             androidAndroidTest.dependencies {
                 implementation project(":compose:test-utils")
-                implementation project(':ui:ui-test')
                 implementation project(":compose:ui:ui-test-font")
 
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
@@ -130,10 +143,14 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopTest.dependencies {
-                implementation project(':ui:ui-test')
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation(TRUTH)
                 implementation(JUNIT)
                 implementation(SKIKO_CURRENT_OS)
+                implementation(MOCKITO_CORE)
+                implementation MOCKITO_KOTLIN, {
+                    exclude group: 'org.mockito' // to keep control on the mockito version
+                }
             }
         }
     }
@@ -142,7 +159,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Foundation"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.FOUNDATION
     inceptionYear = "2018"
     description = "Higher level abstractions of the Compose UI primitives. This library is design system agnostic, providing the high-level building blocks for both application and design-system developers"

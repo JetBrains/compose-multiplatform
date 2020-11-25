@@ -25,19 +25,19 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class PlaceholderTest {
     @Test(expected = IllegalArgumentException::class)
-    fun width_isInherit() {
+    fun width_isUnspecified() {
         Placeholder(
-            width = TextUnit.Inherit,
+            width = TextUnit.Unspecified,
             height = 1.em,
             placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun height_isInherit() {
+    fun height_isUnspecified() {
         Placeholder(
             width = 1.em,
-            height = TextUnit.Inherit,
+            height = TextUnit.Unspecified,
             placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
         )
     }

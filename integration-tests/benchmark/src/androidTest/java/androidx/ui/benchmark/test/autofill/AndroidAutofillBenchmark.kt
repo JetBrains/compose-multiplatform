@@ -25,8 +25,8 @@ import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.platform.AutofillTreeAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientAutofillTree
+import androidx.compose.ui.platform.AmbientView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -53,8 +53,8 @@ class AndroidAutofillBenchmark {
     @Before
     fun setup() {
         composeTestRule.setContent {
-            autofillTree = AutofillTreeAmbient.current
-            composeView = ViewAmbient.current
+            autofillTree = AmbientAutofillTree.current
+            composeView = AmbientView.current
         }
     }
 

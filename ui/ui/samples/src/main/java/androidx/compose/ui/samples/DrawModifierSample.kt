@@ -28,7 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ContentDrawScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawWithCache
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.LinearGradient

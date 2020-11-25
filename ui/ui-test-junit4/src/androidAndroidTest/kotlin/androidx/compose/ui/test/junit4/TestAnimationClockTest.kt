@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.test.junit4
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.snap
@@ -28,31 +29,43 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
+import androidx.compose.runtime.dispatch.AndroidUiDispatcher
+import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
+@OptIn(ExperimentalTesting::class)
 class TestAnimationClockTest {
+
+    companion object {
+        private const val startValue = 0f
+        private const val middleValue = 25f
+        private const val endValue = 50f
+        private const val duration = 1000L
+        private const val halfDuration = 500L
+    }
 
     private var animationRunning = false
     private val recordedAnimatedValues = mutableListOf<Float>()
     private var hasRecomposed = false
 
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createAndroidComposeRule<ComponentActivity>()
     private val clockTestRule = rule.clockTestRule
 
     /**
@@ -82,12 +95,12 @@ class TestAnimationClockTest {
 
         // Did one recomposition, but no animation frames
         recordedAnimatedValues.forEach {
-            assertThat(it).isIn(listOf(0f))
+            assertThat(it).isIn(listOf(startValue))
         }
 
         // Advance first half of the animation (.5 sec)
         rule.runOnIdle {
-            clockTestRule.advanceClock(500)
+            clockTestRule.advanceClock(halfDuration)
             assertThat(ComposeIdlingResource.isIdle()).isFalse()
         }
 
@@ -96,12 +109,12 @@ class TestAnimationClockTest {
 
         // Did one animation frame
         recordedAnimatedValues.forEach {
-            assertThat(it).isIn(listOf(0f, 25f))
+            assertThat(it).isIn(listOf(startValue, middleValue))
         }
 
         // Advance second half of the animation (.5 sec)
         rule.runOnIdle {
-            clockTestRule.advanceClock(500)
+            clockTestRule.advanceClock(halfDuration)
             assertThat(ComposeIdlingResource.isIdle()).isFalse()
         }
 
@@ -111,7 +124,7 @@ class TestAnimationClockTest {
         // Did last animation frame
         assertThat(animationRunning).isFalse()
         recordedAnimatedValues.forEach {
-            assertThat(it).isIn(listOf(0f, 25f, 50f))
+            assertThat(it).isIn(listOf(startValue, middleValue, endValue))
         }
     }
 
@@ -122,7 +135,6 @@ class TestAnimationClockTest {
     @Test
     fun testAnimation_manuallyAdvanceClock_resumed() = runBlocking {
         val animationState = mutableStateOf(AnimationStates.From)
-        val recomposer = Recomposer.current()
         rule.setContent {
             Ui(animationState)
         }
@@ -139,19 +151,16 @@ class TestAnimationClockTest {
 
             // Changes need to trickle down the animation system, so compose should be non-idle
             assertThat(ComposeIdlingResource.isIdle()).isFalse()
-
-            // Force model changes down the pipeline
-            @OptIn(ExperimentalComposeApi::class)
-            Snapshot.sendApplyNotifications()
         }
 
-        recomposer.awaitIdle()
+        // Perform a single recomposition by awaiting the same signal as the Recomposer
+        withContext(AndroidUiDispatcher.Main) { withFrameNanos {} }
 
         // After we kicked off the animation, the test clock should be non-idle
         assertThat(clockTestRule.clock.isIdle).isFalse()
 
         // Animation is running, fast-forward it because we don't want to wait on it
-        clockTestRule.advanceClock(1000)
+        clockTestRule.advanceClock(duration)
 
         // Force the clock forwarding through the pipeline
         // Avoid synchronization steps when doing this: if we would synchronize, we would never
@@ -160,8 +169,6 @@ class TestAnimationClockTest {
             @OptIn(ExperimentalComposeApi::class)
             Snapshot.sendApplyNotifications()
         }
-
-        recomposer.awaitIdle()
 
         // After the animation is finished, ...
         assertThat(animationRunning).isFalse()
@@ -174,7 +181,7 @@ class TestAnimationClockTest {
         // So the clock has now been pumped both by the test and the Choreographer, so there is
         // really no way to tell in which states the animation has been rendered. Only that we
         // rendered the final state.
-        assertThat(recordedAnimatedValues).contains(50f)
+        assertThat(recordedAnimatedValues).contains(endValue)
     }
 
     @Composable
@@ -206,15 +213,15 @@ class TestAnimationClockTest {
 
     private val animationDefinition = transitionDefinition<AnimationStates> {
         state(AnimationStates.From) {
-            this[x] = 0f
+            this[x] = startValue
         }
         state(AnimationStates.To) {
-            this[x] = 50f
+            this[x] = endValue
         }
         transition(AnimationStates.From to AnimationStates.To) {
             x using tween(
                 easing = LinearEasing,
-                durationMillis = 1000
+                durationMillis = duration.toInt()
             )
         }
         transition(AnimationStates.To to AnimationStates.From) {

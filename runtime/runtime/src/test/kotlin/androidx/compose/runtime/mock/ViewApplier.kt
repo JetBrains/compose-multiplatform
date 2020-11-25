@@ -62,7 +62,7 @@ class ViewApplier(root: View) : AbstractApplier<View>(root) {
 class MockComposeScope
 
 // TODO(lmr): we should really remove this from our tests
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable
 fun <P1> MockComposeScope.memoize(

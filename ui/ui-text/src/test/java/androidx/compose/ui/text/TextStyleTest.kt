@@ -48,10 +48,10 @@ class TextStyleTest {
         val style = TextStyle()
 
         assertThat(style.color).isEqualTo(Color.Unspecified)
-        assertThat(style.fontSize.isInherit).isTrue()
+        assertThat(style.fontSize.isUnspecified).isTrue()
         assertThat(style.fontWeight).isNull()
         assertThat(style.fontStyle).isNull()
-        assertThat(style.letterSpacing.isInherit).isTrue()
+        assertThat(style.letterSpacing.isUnspecified).isTrue()
         assertThat(style.localeList).isNull()
         assertThat(style.background).isEqualTo(Color.Unspecified)
         assertThat(style.textDecoration).isNull()
@@ -158,7 +158,7 @@ class TextStyleTest {
     }
 
     @Test
-    fun `merge with other's color is null should use this' color`() {
+    fun `merge with other's color is unspecified should use this' color`() {
         val style = TextStyle(color = Color.Red)
 
         val newStyle = style.merge(TextStyle(color = Color.Unspecified))
@@ -196,10 +196,10 @@ class TextStyleTest {
     }
 
     @Test
-    fun `merge with other's fontSize is null should use this' fontSize`() {
+    fun `merge with other's fontSize is unspecified should use this' fontSize`() {
         val style = TextStyle(fontSize = 3.5.sp)
 
-        val newStyle = style.merge(TextStyle(fontSize = TextUnit.Inherit))
+        val newStyle = style.merge(TextStyle(fontSize = TextUnit.Unspecified))
 
         assertThat(newStyle.fontSize).isEqualTo(style.fontSize)
     }
@@ -291,10 +291,10 @@ class TextStyleTest {
     }
 
     @Test
-    fun `merge with other's letterSpacing is null should use this' letterSpacing`() {
+    fun `merge with other's letterSpacing is unspecified should use this' letterSpacing`() {
         val style = TextStyle(letterSpacing = 1.2.em)
 
-        val newStyle = style.merge(TextStyle(letterSpacing = TextUnit.Inherit))
+        val newStyle = style.merge(TextStyle(letterSpacing = TextUnit.Unspecified))
 
         assertThat(newStyle.letterSpacing).isEqualTo(style.letterSpacing)
     }
@@ -452,21 +452,21 @@ class TextStyleTest {
     }
 
     @Test
-    fun `merge lineHeight other Inherit, return original`() {
+    fun `merge lineHeight other unspecified, return original`() {
         val style = TextStyle(lineHeight = 12.sp)
 
-        val newStyle = style.merge(TextStyle(lineHeight = TextUnit.Inherit))
+        val newStyle = style.merge(TextStyle(lineHeight = TextUnit.Unspecified))
 
         assertThat(newStyle.lineHeight).isEqualTo(style.lineHeight)
     }
 
     @Test
-    fun `merge lineHeight both inherit returns inherit`() {
-        val style = TextStyle(lineHeight = TextUnit.Inherit)
+    fun `merge lineHeight both unspecified returns unspecified`() {
+        val style = TextStyle(lineHeight = TextUnit.Unspecified)
 
-        val newStyle = style.merge(TextStyle(lineHeight = TextUnit.Inherit))
+        val newStyle = style.merge(TextStyle(lineHeight = TextUnit.Unspecified))
 
-        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Inherit)
+        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Unspecified)
     }
 
     @Test
@@ -566,7 +566,7 @@ class TextStyleTest {
     }
 
     @Test
-    fun `lerp color with a and b are not Null`() {
+    fun `lerp color with a and b are specified`() {
         val color1 = Color.Red
         val color2 = Color.Green
         val t = 0.3f
@@ -946,7 +946,7 @@ class TextStyleTest {
     }
 
     @Test
-    fun `lerp lineHeight with a and b are not inherit`() {
+    fun `lerp lineHeight with a and b are specified`() {
         val style1 = TextStyle(lineHeight = 10.sp)
         val style2 = TextStyle(lineHeight = 20.sp)
         val fraction = 0.4f
@@ -959,13 +959,13 @@ class TextStyleTest {
     }
 
     @Test
-    fun `lerp lineHeight with a and b are inherit`() {
-        val style1 = TextStyle(lineHeight = TextUnit.Inherit)
-        val style2 = TextStyle(lineHeight = TextUnit.Inherit)
+    fun `lerp lineHeight with a and b are unspecified`() {
+        val style1 = TextStyle(lineHeight = TextUnit.Unspecified)
+        val style2 = TextStyle(lineHeight = TextUnit.Unspecified)
 
         val newStyle = lerp(start = style1, stop = style2, fraction = 0.4f)
 
-        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Inherit)
+        assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Unspecified)
     }
 
     @Test

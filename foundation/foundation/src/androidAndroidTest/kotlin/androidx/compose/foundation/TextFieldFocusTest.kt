@@ -28,7 +28,6 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -47,7 +46,7 @@ class TextFieldFocusTest {
     @Composable
     private fun TextFieldApp(dataList: List<FocusTestData>) {
         for (data in dataList) {
-            val editor = remember { mutableStateOf(TextFieldValue()) }
+            val editor = remember { mutableStateOf("") }
             BasicTextField(
                 value = editor.value,
                 modifier = Modifier

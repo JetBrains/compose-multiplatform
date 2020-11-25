@@ -32,12 +32,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
@@ -64,7 +64,7 @@ fun RallyTopAppBar(
 @Composable
 private fun RallyTab(
     text: String,
-    icon: VectorAsset,
+    icon: ImageVector,
     onSelected: () -> Unit,
     selected: Boolean
 ) {
@@ -76,7 +76,7 @@ private fun RallyTab(
                 .selectable(
                     selected = selected,
                     onClick = onSelected,
-                    indication = RippleIndication(bounded = false)
+                    indication = rememberRippleIndication(bounded = false)
                 )
         ) {
             Icon(icon, tint = tabTintColor)
@@ -91,7 +91,7 @@ private fun RallyTab(
 @Composable
 private fun TabTransition(
     selected: Boolean,
-    children: @Composable (color: Color) -> Unit
+    content: @Composable (color: Color) -> Unit
 ) {
     val color = MaterialTheme.colors.onSurface
     val transitionDefinition = remember {
@@ -122,7 +122,7 @@ private fun TabTransition(
         }
     }
     val state = transition(transitionDefinition, selected)
-    children(state[TabTintColorKey])
+    content(state[TabTintColorKey])
 }
 
 private val TabTintColorKey = ColorPropKey()

@@ -26,12 +26,12 @@ interface ComposeTestCase {
     /**
      * This method is guaranteed to be called only once per class lifetime. In case a benchmark
      * needs to measure initial composition / measure / layout / draw it re-creates this class
-     * every time it needs to call emitContent again. This ensures that any setup you do in this
+     * every time it needs to call Content again. This ensures that any setup you do in this
      * class is not shared between multiple calls of this method. So the init method is a good place
      * to setup / clean your caches.
      */
     @Composable
-    fun emitContent()
+    fun Content()
 }
 
 /**
@@ -46,30 +46,30 @@ interface LayeredComposeTestCase : ComposeTestCase {
      * to setup / clean your caches.
      */
     @Composable
-    override fun emitContent() {
-        emitContentWrappers {
-            emitMeasuredContent()
+    override fun Content() {
+        ContentWrappers {
+            MeasuredContent()
         }
     }
 
     /**
      * This method should emit content that is supposed to be measured. Any other helper containers,
-     * ambients and themes should be set in [emitContentWrappers].
+     * ambients and themes should be set in [ContentWrappers].
      *
-     * The lifecycle rules for this method are same as for [emitContent]
+     * The lifecycle rules for this method are same as for [Content]
      */
     @Composable
-    fun emitMeasuredContent()
+    fun MeasuredContent()
 
     /**
-     * Receives the result of [emitMeasuredContent].
+     * Receives the result of [MeasuredContent].
      *
      * In "first" benchmarks this method's content is set up before the content from
-     * [emitMeasuredContent] gets introduced to be measured. This helps to avoid measuring helper
+     * [MeasuredContent] gets introduced to be measured. This helps to avoid measuring helper
      * containers or ambients setups.
      *
-     * The lifecycle rules for this method are same as for [emitContent]
+     * The lifecycle rules for this method are same as for [Content]
      */
     @Composable
-    fun emitContentWrappers(content: @Composable () -> Unit)
+    fun ContentWrappers(content: @Composable () -> Unit)
 }

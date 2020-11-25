@@ -62,10 +62,10 @@ class EmptyFirstFastBenchmark {
 
 class EmptyLayeredTestCase : LayeredComposeTestCase {
     @Composable
-    override fun emitMeasuredContent() {}
+    override fun MeasuredContent() {}
 
     @Composable
-    override fun emitContentWrappers(content: @Composable () -> Unit) {
+    override fun ContentWrappers(content: @Composable () -> Unit) {
         Box {
             content()
         }

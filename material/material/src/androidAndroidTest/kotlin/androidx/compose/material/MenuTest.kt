@@ -26,8 +26,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isPopup
@@ -50,6 +51,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTesting::class)
 class MenuTest {
     @get:Rule
     val rule = createComposeRule()
@@ -93,7 +95,7 @@ class MenuTest {
     @Test
     fun menu_hasExpectedSize() {
         rule.setContent {
-            with(DensityAmbient.current) {
+            with(AmbientDensity.current) {
                 DropdownMenu(
                     expanded = true,
                     toggle = {

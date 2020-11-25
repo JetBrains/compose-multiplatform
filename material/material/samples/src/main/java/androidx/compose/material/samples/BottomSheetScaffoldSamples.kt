@@ -68,7 +68,7 @@ fun BottomSheetScaffoldSample() {
         sheetContent = {
             Box(
                 Modifier.fillMaxWidth().preferredHeight(128.dp),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Text("Swipe up to expand sheet")
             }

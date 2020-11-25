@@ -36,7 +36,6 @@ import kotlin.math.sign
  *
  * @see [AnimatedValue]
  * @see [androidx.compose.animation.transition]
- * @suppress
  */
 interface Animation<T, V : AnimationVector> {
     /**
@@ -50,6 +49,11 @@ interface Animation<T, V : AnimationVector> {
      * data object independently (e.g. x/y dimensions of the position data).
      */
     val converter: TwoWayConverter<T, V>
+
+    /**
+     * This is the value that the [Animation] will reach when it finishes uninterrupted.
+     */
+    val targetValue: T
 
     /**
      * Returns the value of the animation at the given play time.
@@ -88,31 +92,31 @@ internal fun <T, V : AnimationVector> Animation<T, V>.getVelocity(playTime: Long
  * convenient method is intended for when the value being animated (i.e. start value, end value,
  * etc) is of [AnimationVector] type.
  *
- * @param startValue the value that the animation will start from
- * @param endValue the value that the animation will end at
- * @param startVelocity the initial velocity to start the animation at
+ * @param initialValue the value that the animation will start from
+ * @param targetValue the value that the animation will end at
+ * @param initialVelocity the initial velocity to start the animation at
  * @suppress
  */
 @VisibleForTesting(otherwise = 3 /*PACKAGE_PRIVATE*/)
 fun <V : AnimationVector> VectorizedAnimationSpec<V>.createAnimation(
-    startValue: V,
-    endValue: V,
-    startVelocity: V
+    initialValue: V,
+    targetValue: V,
+    initialVelocity: V
 ): TargetBasedAnimation<V, V> =
     TargetBasedAnimation(
         animationSpec = this,
-        startValue = startValue,
-        endValue = endValue,
-        startVelocityVector = startVelocity,
+        initialValue = initialValue,
+        targetValue = targetValue,
+        initialVelocityVector = initialVelocity,
         converter = TwoWayConverter({ it }, { it })
     )
 
 /**
  * Creates a [TargetBasedAnimation] from a given [VectorizedAnimationSpec] of [AnimationVector] type.
  *
- * @param startValue the value that the animation will start from
- * @param endValue the value that the animation will end at
- * @param startVelocityVector the initial velocity (in the form of [AnimationVector]) to start the
+ * @param initialValue the value that the animation will start from
+ * @param targetValue the value that the animation will end at
+ * @param initialVelocityVector the initial velocity (in the form of [AnimationVector]) to start the
  *                            animation at.
  * @param converter a [TwoWayConverter] that converts the from [AnimationVector] to the animation
  *                  data type [T], and vice versa.
@@ -120,15 +124,15 @@ fun <V : AnimationVector> VectorizedAnimationSpec<V>.createAnimation(
  * @see TargetBasedAnimation
  */
 internal fun <T, V : AnimationVector> VectorizedAnimationSpec<V>.createAnimation(
-    startValue: T,
-    endValue: T,
-    startVelocityVector: V,
+    initialValue: T,
+    targetValue: T,
+    initialVelocityVector: V,
     converter: TwoWayConverter<T, V>
 ) = TargetBasedAnimation<T, V>(
     animationSpec = this,
-    startValue = startValue,
-    endValue = endValue,
-    startVelocityVector = startVelocityVector,
+    initialValue = initialValue,
+    targetValue = targetValue,
+    initialVelocityVector = initialVelocityVector,
     converter = converter
 )
 
@@ -148,23 +152,23 @@ internal fun <T, V : AnimationVector> VectorizedAnimationSpec<V>.createAnimation
  * built-in animation lifecycle management.
  *
  * @param animationSpec the [AnimationSpec] that will be used to calculate value/velocity
- * @param startValue the start value of the animation
- * @param endValue the end value of the animation
- * @param startVelocity the start velocity (of type [T] of the animation
+ * @param initialValue the start value of the animation
+ * @param targetValue the end value of the animation
+ * @param initialVelocity the start velocity (of type [T] of the animation
  * @param converter the [TwoWayConverter] that is used to convert animation type [T] from/to [V]
  */
 fun <T, V : AnimationVector> TargetBasedAnimation(
     animationSpec: AnimationSpec<T>,
-    startValue: T,
-    endValue: T,
-    startVelocity: T,
+    initialValue: T,
+    targetValue: T,
+    initialVelocity: T,
     converter: TwoWayConverter<T, V>
 ) = TargetBasedAnimation(
     animationSpec,
-    startValue,
-    endValue,
+    initialValue,
+    targetValue,
     converter,
-    converter.convertToVector(startVelocity)
+    converter.convertToVector(initialVelocity)
 )
 
 /**
@@ -182,10 +186,10 @@ fun <T, V : AnimationVector> TargetBasedAnimation(
  * built-in animation lifecycle management.
  *
  * @param animationSpec the [VectorizedAnimationSpec] that will be used to calculate value/velocity
- * @param startValue the start value of the animation
- * @param endValue the end value of the animation
+ * @param initialValue the start value of the animation
+ * @param targetValue the end value of the animation
  * @param converter the [TwoWayConverter] that is used to convert animation type [T] from/to [V]
- * @param startVelocityVector the start velocity of the animation in the form of [AnimationVector]
+ * @param initialVelocityVector the start velocity of the animation in the form of [AnimationVector]
  *
  * @see [TransitionAnimation]
  * @see [androidx.compose.animation.transition]
@@ -193,10 +197,10 @@ fun <T, V : AnimationVector> TargetBasedAnimation(
  */
 class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
     internal val animationSpec: VectorizedAnimationSpec<V>,
-    startValue: T,
-    val endValue: T,
+    initialValue: T,
+    override val targetValue: T,
     override val converter: TwoWayConverter<T, V>,
-    startVelocityVector: V? = null
+    initialVelocityVector: V? = null
 ) : Animation<T, V> {
 
     /**
@@ -215,62 +219,62 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
      * built-in animation lifecycle management.
      *
      * @param animationSpec the [AnimationSpec] that will be used to calculate value/velocity
-     * @param startValue the start value of the animation
-     * @param endValue the end value of the animation
+     * @param initialValue the start value of the animation
+     * @param targetValue the end value of the animation
      * @param converter the [TwoWayConverter] that is used to convert animation type [T] from/to [V]
-     * @param startVelocityVector the start velocity vector, null by default (meaning 0 velocity).
+     * @param initialVelocityVector the start velocity vector, null by default (meaning 0 velocity).
      */
     constructor(
         animationSpec: AnimationSpec<T>,
-        startValue: T,
-        endValue: T,
+        initialValue: T,
+        targetValue: T,
         converter: TwoWayConverter<T, V>,
-        startVelocityVector: V? = null
+        initialVelocityVector: V? = null
     ) : this(
         animationSpec.vectorize(converter),
-        startValue,
-        endValue,
+        initialValue,
+        targetValue,
         converter,
-        startVelocityVector
+        initialVelocityVector
     )
 
-    private val startValueVector = converter.convertToVector.invoke(startValue)
-    private val endValueVector = converter.convertToVector.invoke(endValue)
-    private val startVelocityVector =
-        startVelocityVector ?: converter.convertToVector.invoke(startValue).newInstance()
+    private val initialValueVector = converter.convertToVector.invoke(initialValue)
+    private val targetValueVector = converter.convertToVector.invoke(targetValue)
+    private val initialVelocityVector =
+        initialVelocityVector ?: converter.convertToVector.invoke(initialValue).newInstance()
 
     override fun getValue(playTime: Long): T {
         return if (playTime < durationMillis) {
             converter.convertFromVector.invoke(
                 animationSpec.getValue(
-                    playTime, startValueVector,
-                    endValueVector, startVelocityVector
+                    playTime, initialValueVector,
+                    targetValueVector, initialVelocityVector
                 )
             )
         } else {
-            endValue
+            targetValue
         }
     }
 
     override val durationMillis: Long = animationSpec.getDurationMillis(
-        start = startValueVector,
-        end = endValueVector,
-        startVelocity = this.startVelocityVector
+        start = initialValueVector,
+        end = targetValueVector,
+        startVelocity = this.initialVelocityVector
     )
 
     private val endVelocity = animationSpec.getEndVelocity(
-        startValueVector,
-        endValueVector,
-        this.startVelocityVector
+        initialValueVector,
+        targetValueVector,
+        this.initialVelocityVector
     )
 
     override fun getVelocityVector(playTime: Long): V {
         return if (playTime < durationMillis) {
             animationSpec.getVelocity(
                 playTime,
-                startValueVector,
-                endValueVector,
-                startVelocityVector
+                initialValueVector,
+                targetValueVector,
+                initialVelocityVector
             )
         } else {
             endVelocity
@@ -283,15 +287,15 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
  * velocity never change throughout the animation.
  *
  * @param anim decay animation that will be used
- * @param startValue starting value that will be passed to the decay animation
- * @param startVelocity starting velocity for the decay animation
+ * @param initialValue starting value that will be passed to the decay animation
+ * @param initialVelocity starting velocity for the decay animation
  */
 class DecayAnimation(
     private val anim: FloatDecayAnimationSpec,
-    private val startValue: Float,
-    private val startVelocity: Float = 0f
+    private val initialValue: Float,
+    private val initialVelocity: Float = 0f
 ) : Animation<Float, AnimationVector1D> {
-    private val target: Float = anim.getTarget(startValue, startVelocity)
+    override val targetValue: Float = anim.getTarget(initialValue, initialVelocity)
     private val velocityVector: AnimationVector1D = AnimationVector1D(0f)
     override val converter: TwoWayConverter<Float, AnimationVector1D>
         get() = Float.VectorConverter
@@ -300,20 +304,20 @@ class DecayAnimation(
     @Suppress("AutoBoxing", "MissingNullability")
     override fun getValue(playTime: Long): Float {
         if (!isFinished(playTime)) {
-            return anim.getValue(playTime, startValue, startVelocity)
+            return anim.getValue(playTime, initialValue, initialVelocity)
         } else {
-            return target
+            return targetValue
         }
     }
 
     override fun getVelocityVector(playTime: Long): AnimationVector1D {
         if (!isFinished(playTime)) {
-            velocityVector.value = anim.getVelocity(playTime, startValue, startVelocity)
+            velocityVector.value = anim.getVelocity(playTime, initialValue, initialVelocity)
         } else {
-            velocityVector.value = anim.absVelocityThreshold * sign(startVelocity)
+            velocityVector.value = anim.absVelocityThreshold * sign(initialVelocity)
         }
         return velocityVector
     }
 
-    override val durationMillis: Long = anim.getDurationMillis(startValue, startVelocity)
+    override val durationMillis: Long = anim.getDurationMillis(initialValue, initialVelocity)
 }

@@ -37,7 +37,7 @@ dependencies {
     api "androidx.lifecycle:lifecycle-livedata:2.2.0"
     implementation project(":compose:ui:ui")
 
-    androidTestImplementation project(':ui:ui-test')
+    androidTestImplementation project(":compose:ui:ui-test-junit4")
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(TRUTH)
@@ -46,7 +46,6 @@ dependencies {
 androidx {
     name = "Compose LiveData integration"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"
     description = "Compose integration with LiveData"

@@ -51,7 +51,7 @@ MissingGetterMatchingBuilder: androidx.compose.ui.graphics.vector.VectorAssetBui
     androidx.compose.ui.graphics.vector.VectorAsset does not declare a `getPaths()` method matching method androidx.compose.ui.graphics.vector.VectorAssetBuilder.addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>,androidx.compose.ui.graphics.PathFillType,String,androidx.compose.ui.graphics.Brush,float,androidx.compose.ui.graphics.Brush,float,float,androidx.compose.ui.graphics.StrokeCap,androidx.compose.ui.graphics.StrokeJoin,float,float,float,float)
 
 
-MissingNullability: androidx.compose.ui.TransformOrigin#toString-impl(long):
+MissingNullability: androidx.compose.ui.graphics.TransformOrigin#toString-impl(long):
     Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.input.pointer.PointerId#toString-impl(long):
     Missing nullability on method `toString-impl` return

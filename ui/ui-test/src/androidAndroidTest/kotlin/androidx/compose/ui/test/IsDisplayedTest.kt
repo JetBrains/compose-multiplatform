@@ -30,14 +30,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -90,8 +89,8 @@ class IsDisplayedTest(val config: TestConfig) {
     }
 
     @Composable
-    fun PlaceConditionally(place: Boolean, child: @Composable () -> Unit) {
-        Layout(children = child) { measurables, constraints ->
+    fun PlaceConditionally(place: Boolean, content: @Composable () -> Unit) {
+        Layout(content = content) { measurables, constraints ->
             if (place) {
                 val placeable = measurables[0].measure(constraints)
                 layout(placeable.width, placeable.height) {
@@ -191,11 +190,11 @@ class IsDisplayedTest(val config: TestConfig) {
         rule.activityRule.scenario.onActivity { activity ->
             // FrameLayout(id=100, w=100, h=100)
             // '- AndroidComposeView
-            androidComposeView = FrameLayout(activity).apply {
+            androidComposeView = ComposeView(activity).apply {
                 id = 100
                 layoutParams = ViewGroup.MarginLayoutParams(100, 100)
                 activity.setContentView(this)
-                setContent(Recomposer.current()) {
+                setContent {
                     Item(0)
                 }
             }.getChildAt(0)
@@ -223,11 +222,11 @@ class IsDisplayedTest(val config: TestConfig) {
             // FrameLayout
             // '- FrameLayout(id=100, w=100, h=100) -> composeContainer
             //    '- AndroidComposeView
-            composeContainer = FrameLayout(activity).apply {
+            composeContainer = ComposeView(activity).apply {
                 id = 100
                 layoutParams = ViewGroup.MarginLayoutParams(100, 100)
                 activity.setContentView(FrameLayout(activity).also { it.addView(this) })
-                setContent(Recomposer.current()) {
+                setContent {
                     Item(0)
                 }
             }

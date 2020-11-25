@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.measureBlocksOf
@@ -34,11 +33,11 @@ import androidx.compose.ui.unit.offset
 
 @Sampled
 @Composable
-fun LayoutWithProvidedIntrinsicsUsage(children: @Composable () -> Unit) {
+fun LayoutWithProvidedIntrinsicsUsage(content: @Composable () -> Unit) {
     // We build a layout that will occupy twice as much space as its children,
     // and will position them to be bottom right aligned.
     Layout(
-        children,
+        content,
         minIntrinsicWidthMeasureBlock = { measurables, h ->
             // The min intrinsic width of this layout will be twice the largest min intrinsic
             // width of a child. Note that we call minIntrinsicWidth with h / 2 for children,
@@ -81,7 +80,7 @@ fun LayoutWithProvidedIntrinsicsUsage(children: @Composable () -> Unit) {
 @Sampled
 @Composable
 @OptIn(ExperimentalLayoutNodeApi::class)
-fun LayoutWithMeasureBlocksWithIntrinsicUsage(children: @Composable () -> Unit) {
+fun LayoutWithMeasureBlocksWithIntrinsicUsage(content: @Composable () -> Unit) {
     val measureBlocks = measureBlocksOf(
         minIntrinsicWidthMeasureBlock = { measurables, h ->
             // The min intrinsic width of this layout will be twice the largest min intrinsic
@@ -120,15 +119,15 @@ fun LayoutWithMeasureBlocksWithIntrinsicUsage(children: @Composable () -> Unit) 
             }
         }
     }
-    Layout(children = children, measureBlocks = measureBlocks)
+    Layout(content = content, measureBlocks = measureBlocks)
 }
 
 @Sampled
 @Composable
-fun LayoutUsage(children: @Composable () -> Unit) {
+fun LayoutUsage(content: @Composable () -> Unit) {
     // We build a layout that will occupy twice as much space as its children,
     // and will position them to be bottom right aligned.
-    Layout(children) { measurables, constraints ->
+    Layout(content) { measurables, constraints ->
         // measurables contains one element corresponding to each of our layout children.
         // constraints are the constraints that our parent is currently measuring us with.
         val childConstraints = Constraints(
@@ -162,7 +161,7 @@ fun LayoutTagChildrenUsage(header: @Composable () -> Unit, footer: @Composable (
         Box(Modifier.layoutId("footer")) { footer() }
     }) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
-            when (measurable.id) {
+            when (measurable.layoutId) {
                 // You should use appropriate constraints. Here we measure fake constraints.
                 "header" -> measurable.measure(Constraints.fixed(100, 100))
                 "footer" -> measurable.measure(constraints)

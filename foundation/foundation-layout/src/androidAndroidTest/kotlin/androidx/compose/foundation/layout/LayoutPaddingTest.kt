@@ -25,8 +25,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
@@ -125,7 +125,7 @@ class LayoutPaddingTest : LayoutTest() {
     fun paddingAllAppliedToChild() = with(density) {
         val padding = 10.dp
         testPaddingIsAppliedImplementation(padding) { child: @Composable () -> Unit ->
-            TestBox(modifier = Modifier.padding(padding), body = child)
+            TestBox(modifier = Modifier.padding(padding), content = child)
         }
     }
 
@@ -140,7 +140,7 @@ class LayoutPaddingTest : LayoutTest() {
         testPaddingWithDifferentInsetsImplementation(
             padding.start, padding.top, padding.end, padding.bottom
         ) { child: @Composable () -> Unit ->
-            TestBox(modifier = Modifier.padding(padding), body = child)
+            TestBox(modifier = Modifier.padding(padding), content = child)
         }
     }
 
@@ -162,7 +162,7 @@ class LayoutPaddingTest : LayoutTest() {
             paddingRight,
             paddingBottom
         ) { child: @Composable () -> Unit ->
-            TestBox(modifier = padding, body = child)
+            TestBox(modifier = padding, content = child)
         }
     }
 
@@ -177,7 +177,7 @@ class LayoutPaddingTest : LayoutTest() {
     fun insufficientSpaceAvailable() = with(density) {
         val padding = 30.dp
         testPaddingWithInsufficientSpaceImplementation(padding) { child: @Composable () -> Unit ->
-            TestBox(modifier = Modifier.padding(padding), body = child)
+            TestBox(modifier = Modifier.padding(padding), content = child)
         }
     }
 
@@ -260,7 +260,7 @@ class LayoutPaddingTest : LayoutTest() {
         // ltr: P1 S P2 | S P3 | P1 S
         // rtl:    S P1 | P3 S | P2 S P1
         show {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
                     Box(
                         Modifier.padding(start = padding1Dp, end = padding2Dp)
@@ -336,7 +336,7 @@ class LayoutPaddingTest : LayoutTest() {
         // ltr: P1 S P2 | S P3
         // rtl:    S P3 | P1 S P2
         show {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
                     Box(
                         Modifier.absolutePadding(left = padding1Dp, right = padding2Dp)
@@ -435,7 +435,7 @@ class LayoutPaddingTest : LayoutTest() {
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)
                 ) {
-                    val children = @Composable {
+                    val content = @Composable {
                         Container(
                             Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
@@ -445,7 +445,7 @@ class LayoutPaddingTest : LayoutTest() {
                         ) {
                         }
                     }
-                    paddingContainer(children)
+                    paddingContainer(content)
                 }
             }
         }
@@ -483,7 +483,7 @@ class LayoutPaddingTest : LayoutTest() {
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
                     modifier = Modifier.align(Alignment.Center)
                 ) {
-                    val children = @Composable {
+                    val content = @Composable {
                         Container(
                             Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
@@ -493,7 +493,7 @@ class LayoutPaddingTest : LayoutTest() {
                         ) {
                         }
                     }
-                    paddingContainer(children)
+                    paddingContainer(content)
                 }
             }
         }
@@ -567,8 +567,8 @@ class LayoutPaddingTest : LayoutTest() {
      * with the same constraints it received.
      */
     @Composable
-    private fun TestBox(modifier: Modifier = Modifier, body: @Composable () -> Unit) {
-        Layout(children = body, modifier = modifier) { measurables, constraints ->
+    private fun TestBox(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+        Layout(content = content, modifier = modifier) { measurables, constraints ->
             require(measurables.size == 1) {
                 "TestBox received ${measurables.size} children; must have exactly 1"
             }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
 
@@ -33,7 +34,7 @@ class FrameDispatcher(
     private val onFrame: suspend (nanoTime: Long) -> Unit,
     private val framesPerSecond: () -> Float,
     private val nanoTime: () -> Long = System::nanoTime,
-    context: CoroutineContext = Dispatchers.Main
+    context: CoroutineContext = Dispatchers.Swing
 ) {
     private var needFrame = CompletableDeferred<Unit>()
 

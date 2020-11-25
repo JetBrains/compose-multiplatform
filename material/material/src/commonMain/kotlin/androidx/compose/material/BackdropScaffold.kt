@@ -26,7 +26,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.BackdropValue.Concealed
@@ -38,14 +38,14 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -176,7 +176,7 @@ class BackdropScaffoldState(
 @ExperimentalMaterialApi
 fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
-    clock: AnimationClockObservable = AnimationClockAmbient.current,
+    clock: AnimationClockObservable = AmbientAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -284,8 +284,8 @@ fun BackdropScaffold(
     backLayerContent: @Composable () -> Unit,
     frontLayerContent: @Composable () -> Unit
 ) {
-    val peekHeightPx = with(DensityAmbient.current) { peekHeight.toPx() }
-    val headerHeightPx = with(DensityAmbient.current) { headerHeight.toPx() }
+    val peekHeightPx = with(AmbientDensity.current) { peekHeight.toPx() }
+    val headerHeightPx = with(AmbientDensity.current) { headerHeight.toPx() }
 
     val backLayer = @Composable {
         if (persistentAppBar) {
@@ -329,7 +329,7 @@ fun BackdropScaffold(
 
             // Front layer
             Surface(
-                Modifier.offsetPx(y = scaffoldState.offset).then(swipeable),
+                Modifier.offset(y = { scaffoldState.offset.value }).then(swipeable),
                 shape = frontLayerShape,
                 elevation = frontLayerElevation,
                 color = frontLayerBackgroundColor,
@@ -354,7 +354,7 @@ fun BackdropScaffold(
                             revealedHeight == fullHeight - headerHeightPx
                         ) headerHeight else 0.dp
                     ),
-                alignment = Alignment.BottomCenter
+                contentAlignment = Alignment.BottomCenter
             ) {
                 snackbarHost(scaffoldState.snackbarHostState)
             }
@@ -398,14 +398,14 @@ private fun BackLayerTransition(
     val animationProgress = animate(
         target = if (target == Revealed) 0f else 2f, animSpec = TweenSpec()
     )
-    val animationSlideOffset = with(DensityAmbient.current) { AnimationSlideOffset.toPx() }
+    val animationSlideOffset = with(AmbientDensity.current) { AnimationSlideOffset.toPx() }
 
     val appBarFloat = (animationProgress - 1).coerceIn(0f, 1f)
     val contentFloat = (1 - animationProgress).coerceIn(0f, 1f)
 
     Box {
         Box(
-            Modifier.zIndex(appBarFloat).drawLayer(
+            Modifier.zIndex(appBarFloat).graphicsLayer(
                 alpha = appBarFloat,
                 translationY = (1 - appBarFloat) * animationSlideOffset
             )
@@ -413,7 +413,7 @@ private fun BackLayerTransition(
             appBar()
         }
         Box(
-            Modifier.zIndex(contentFloat).drawLayer(
+            Modifier.zIndex(contentFloat).graphicsLayer(
                 alpha = contentFloat,
                 translationY = (1 - contentFloat) * -animationSlideOffset
             )
@@ -430,7 +430,7 @@ private fun BackdropStack(
     calculateBackLayerConstraints: (Constraints) -> Constraints,
     frontLayer: @Composable (Constraints, Float) -> Unit
 ) {
-    SubcomposeLayout<BackdropLayers>(modifier) { constraints ->
+    SubcomposeLayout(modifier) { constraints ->
         val backLayerPlaceable =
             subcompose(BackdropLayers.Back, backLayer).first()
                 .measure(calculateBackLayerConstraints(constraints))

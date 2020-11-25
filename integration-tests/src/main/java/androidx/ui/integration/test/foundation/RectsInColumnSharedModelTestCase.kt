@@ -43,7 +43,7 @@ class RectsInColumnSharedModelTestCase(
     private val color = mutableStateOf(Color.Black)
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         MaterialTheme {
             Column {
                 repeat(amountOfRectangles) { i ->

@@ -43,7 +43,7 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
@@ -177,7 +177,7 @@ private fun Scrollbar(
     style: ScrollbarStyle,
     interactionState: InteractionState,
     isVertical: Boolean
-) = with(DensityAmbient.current) {
+) = with(AmbientDensity.current) {
     onDispose {
         interactionState.removeInteraction(Interaction.Dragged)
     }
@@ -305,7 +305,7 @@ fun rememberScrollbarAdapter(
     itemCount: Int,
     averageItemSize: Dp
 ): ScrollbarAdapter {
-    val averageItemSizePx = with(DensityAmbient.current) {
+    val averageItemSizePx = with(AmbientDensity.current) {
         averageItemSize.toPx()
     }
     return remember(scrollState, itemCount, averageItemSizePx) {
@@ -390,19 +390,26 @@ private class LazyScrollbarAdapter(
     private val itemCount: Int,
     private val averageItemSize: Float
 ) : ScrollbarAdapter {
+    init {
+        require(itemCount >= 0f) { "itemCount should be non-negative ($itemCount)" }
+        require(averageItemSize > 0f) { "averageItemSize should be positive ($averageItemSize)" }
+    }
+
     override val scrollOffset: Float
         get() = scrollState.firstVisibleItemIndex * averageItemSize +
             scrollState.firstVisibleItemScrollOffset
 
     override suspend fun scrollTo(containerSize: Int, scrollOffset: Float) {
-        val index = (scrollOffset / averageItemSize)
+        val scrollOffsetCoerced = scrollOffset.coerceIn(0f, maxScrollOffset(containerSize))
+
+        val index = (scrollOffsetCoerced / averageItemSize)
             .toInt()
             .coerceAtLeast(0)
             .coerceAtMost(itemCount - 1)
 
         scrollState.snapToItemIndex(
             index = index,
-            scrollOffset = (scrollOffset - index * averageItemSize).toInt()
+            scrollOffset = (scrollOffsetCoerced - index * averageItemSize).toInt()
         )
     }
 

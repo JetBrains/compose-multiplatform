@@ -22,6 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -37,7 +40,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,6 +56,16 @@ class SemanticsTests {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
+    }
 
     private fun executeUpdateBlocking(updateFunction: () -> Unit) {
         val latch = CountDownLatch(1)
@@ -88,7 +103,7 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(
                 Modifier.testTag(TestTag)
-                    .semantics(mergeAllDescendants = true) { accessibilityLabel = root }
+                    .semantics(mergeDescendants = true) { accessibilityLabel = root }
             ) {
                 SimpleTestLayout(Modifier.semantics { accessibilityLabel = child1 }) {
                     SimpleTestLayout(Modifier.semantics { accessibilityLabel = grandchild1 }) { }
@@ -110,9 +125,9 @@ class SemanticsTests {
         val label1 = "foo"
         val label2 = "bar"
         rule.setContent {
-            SimpleTestLayout(Modifier.semantics(mergeAllDescendants = true) {}.testTag(tag1)) {
+            SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
                 SimpleTestLayout(Modifier.semantics { accessibilityLabel = label1 }) { }
-                SimpleTestLayout(Modifier.semantics(mergeAllDescendants = true) {}.testTag(tag2)) {
+                SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)) {
                     SimpleTestLayout(Modifier.semantics { accessibilityLabel = label2 }) { }
                 }
             }
@@ -127,7 +142,7 @@ class SemanticsTests {
         val label = "foo"
         val showSubtree = mutableStateOf(true)
         rule.setContent {
-            SimpleTestLayout(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TestTag)) {
+            SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(TestTag)) {
                 if (showSubtree.value) {
                     SimpleTestLayout(Modifier.semantics { accessibilityLabel = label }) { }
                 }
@@ -150,7 +165,7 @@ class SemanticsTests {
         val value = "bar"
         val showNewNode = mutableStateOf(false)
         rule.setContent {
-            SimpleTestLayout(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TestTag)) {
+            SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(TestTag)) {
                 SimpleTestLayout(Modifier.semantics { accessibilityLabel = label }) { }
                 if (showNewNode.value) {
                     SimpleTestLayout(Modifier.semantics { accessibilityValue = value }) { }
@@ -265,7 +280,7 @@ class SemanticsTests {
         val isAfter = mutableStateOf(false)
 
         rule.setContent {
-            SimpleTestLayout(Modifier.testTag(TestTag).semantics(mergeAllDescendants = true) {}) {
+            SimpleTestLayout(Modifier.testTag(TestTag).semantics(mergeDescendants = true) {}) {
                 SimpleTestLayout(
                     Modifier.semantics {
                         accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
@@ -282,11 +297,11 @@ class SemanticsTests {
     }
 
     @Test
-    fun mergeAllDescendants_doesNotCrossLayoutNodesUpward() {
+    fun mergeDescendants_doesNotCrossLayoutNodesUpward() {
         val label = "label"
         rule.setContent {
             SimpleTestLayout(Modifier.testTag(TestTag)) {
-                SimpleTestLayout(Modifier.semantics(mergeAllDescendants = true) {}) {
+                SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}) {
                     SimpleTestLayout(Modifier.semantics { accessibilityLabel = label }) { }
                 }
             }
@@ -367,6 +382,21 @@ class SemanticsTests {
         // pivotal properties
         assertThat(nodeCount).isEqualTo(1)
     }
+
+    @Test
+    fun testInspectorValue() {
+        val properties: SemanticsPropertyReceiver.() -> Unit = {}
+        rule.setContent {
+            val modifier = Modifier.semantics(true, properties) as InspectableValue
+
+            assertThat(modifier.nameFallback).isEqualTo("semantics")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                ValueElement("mergeDescendants", true),
+                ValueElement("properties", properties)
+            )
+        }
+    }
 }
 
 private fun SemanticsNodeInteraction.assertDoesNotHaveProperty(property: SemanticsPropertyKey<*>) {
@@ -381,7 +411,7 @@ private class Counter(var count: Int)
 private fun CountingLayout(modifier: Modifier, counter: Counter) {
     Layout(
         modifier = modifier,
-        children = {}
+        content = {}
     ) { _, constraints ->
         counter.count++
         layout(constraints.minWidth, constraints.minHeight) {}
@@ -393,8 +423,8 @@ private fun CountingLayout(modifier: Modifier, counter: Counter) {
  * children reasonably.  Useful for Semantics hierarchy testing
  */
 @Composable
-private fun SimpleTestLayout(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
-    Layout(modifier = modifier, children = children) { measurables, constraints ->
+private fun SimpleTestLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(modifier = modifier, content = content) { measurables, constraints ->
         if (measurables.isEmpty()) {
             layout(constraints.minWidth, constraints.minHeight) {}
         } else {

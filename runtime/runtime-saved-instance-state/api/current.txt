@@ -17,8 +17,8 @@ package androidx.compose.runtime.savedinstancestate {
   }
 
   @androidx.compose.runtime.savedinstancestate.ExperimentalRestorableStateHolder public interface RestorableStateHolder<T> {
+    method @androidx.compose.runtime.Composable public void RestorableStateProvider(T key, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public void removeState(T key);
-    method @androidx.compose.runtime.Composable public void withRestorableState(T key, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class RestorableStateHolderKt {
@@ -53,7 +53,8 @@ package androidx.compose.runtime.savedinstancestate {
 
   public final class UiSavedStateRegistryKt {
     method public static androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry UiSavedStateRegistry(java.util.Map<java.lang.String,? extends java.util.List<?>>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry> getUiSavedStateRegistryAmbient();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry> getAmbientUiSavedStateRegistry();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry>! getUiSavedStateRegistryAmbient();
   }
 
 }

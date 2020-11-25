@@ -24,7 +24,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,6 +55,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -68,7 +68,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -78,10 +78,15 @@ import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorXmlResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.font.fontFamily
+import androidx.compose.ui.text.platform.font
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.style.TextOverflow
@@ -91,6 +96,8 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 private const val title = "Desktop Compose Elements"
+
+val italicFont = fontFamily(font("Noto Italic", "NotoSans-Italic.ttf"))
 
 fun main() {
     Window(title, IntSize(1024, 850)) {
@@ -233,6 +240,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
         Text(
             text = lorem,
             color = loremColors[loremColor],
+            textAlign = TextAlign.Center,
             textDecoration = loremDecorations[loremDecoration],
             modifier = Modifier.clickable {
                 if (loremColor < loremColors.size - 1) {
@@ -256,7 +264,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
         )
 
         var overText by remember { mutableStateOf("Move mouse over text:") }
-        Text(overText)
+        Text(overText, style = TextStyle(letterSpacing = 10.sp))
 
         Text(
             text = "fun <T : Comparable<T>> List<T>.quickSort(): List<T> = when {\n" +
@@ -267,6 +275,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
                 "    smaller.quickSort() + pivot + greater.quickSort()\n" +
                 "   }\n" +
                 "}",
+            fontFamily = italicFont,
             modifier = Modifier.padding(10.dp).pointerMoveFilter(
                 onMove = {
                     overText = "Move position: $it"
@@ -341,7 +350,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
             onValueChange = { text.value = it },
             label = { Text(text = "Input2") },
             placeholder = {
-                Text(text = "Important input" )
+                Text(text = "Important input")
             },
             modifier = Modifier.shortcuts {
                 on(Key.MetaLeft + Key.ShiftLeft + Key.Enter) {
@@ -353,7 +362,18 @@ private fun ScrollableContent(scrollState: ScrollState) {
             }
         )
 
-        Image(imageResource("androidx/compose/desktop/example/circus.jpg"), Modifier.size(200.dp))
+        Row {
+            Image(
+                imageResource("androidx/compose/desktop/example/circus.jpg"),
+                Modifier.size(200.dp)
+            )
+
+            Icon(
+                vectorXmlResource("androidx/compose/desktop/example/ic_baseline_deck_24.xml"),
+                Modifier.size(100.dp).align(Alignment.CenterVertically),
+                tint = Color.Blue.copy(alpha = 0.5f)
+            )
+        }
     }
 }
 
@@ -386,9 +406,9 @@ private fun RightColumn(modifier: Modifier) = Box {
     val itemCount = 100000
     val itemHeight = 20.dp
 
-    LazyColumn(modifier.drawLayer(alpha = 0.5f), state = state) {
+    LazyColumn(modifier.graphicsLayer(alpha = 0.5f), state = state) {
         items((1..itemCount).toList()) { x ->
-            Text(x.toString(), Modifier.drawLayer(alpha = 0.5f).height(itemHeight))
+            Text(x.toString(), Modifier.graphicsLayer(alpha = 0.5f).height(itemHeight))
         }
     }
 

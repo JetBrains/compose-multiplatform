@@ -19,7 +19,7 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.ExperimentalMaterialApi
@@ -32,7 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -46,7 +46,7 @@ fun SwipeableSample() {
     val squareSize = 50.dp
 
     val swipeableState = rememberSwipeableState("A")
-    val sizePx = with(DensityAmbient.current) { (width - squareSize).toPx() }
+    val sizePx = with(AmbientDensity.current) { (width - squareSize).toPx() }
     val anchors = mapOf(0f to "A", sizePx / 2 to "B", sizePx to "C")
 
     Box(
@@ -62,10 +62,10 @@ fun SwipeableSample() {
     ) {
         Box(
             Modifier
-                .offsetPx(x = swipeableState.offset)
+                .offset(x = { swipeableState.offset.value })
                 .preferredSize(squareSize)
                 .background(Color.Red),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(swipeableState.value, color = Color.White, fontSize = 24.sp)
         }

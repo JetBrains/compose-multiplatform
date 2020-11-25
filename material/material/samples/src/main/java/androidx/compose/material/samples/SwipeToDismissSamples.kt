@@ -46,7 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -114,9 +114,9 @@ fun SwipeToDismissListItems() {
 
                 Box(
                     modifier = Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
-                    alignment = alignment
+                    contentAlignment = alignment
                 ) {
-                    Icon(icon, Modifier.drawLayer(scaleX = scale, scaleY = scale))
+                    Icon(icon, Modifier.scale(scale))
                 }
             },
             dismissContent = {

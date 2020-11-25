@@ -62,7 +62,10 @@ import org.junit.Test
 class ScrollbarTest {
     @get:Rule
     val rule = createComposeRule()
-    private val canvas = Surface.makeRasterN32Premul(100, 100).canvas
+
+    // don't inline, surface controls canvas life time
+    private val surface = Surface.makeRasterN32Premul(100, 100)
+    private val canvas = surface.canvas
 
     @Test
     fun `drag slider to the middle`() {
@@ -276,6 +279,41 @@ class ScrollbarTest {
         }
     }
 
+    @Suppress("SameParameterValue")
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test(timeout = 3000)
+    fun `scroll outside of scrollbar bounds in lazy list`() {
+        runBlocking(Dispatchers.Main) {
+            lateinit var state: LazyListState
+
+            rule.setContent {
+                state = rememberLazyListState()
+                LazyTestBox(
+                    state,
+                    size = 100.dp,
+                    childSize = 20.dp,
+                    childCount = 20,
+                    scrollbarWidth = 10.dp
+                )
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performGesture {
+                swipe(start = Offset(0f, 0f), end = Offset(0f, 10000f), duration = 1.milliseconds)
+            }
+            onFrame()
+            assertEquals(15, state.firstVisibleItemIndex)
+            assertEquals(0, state.firstVisibleItemScrollOffset)
+
+            rule.onNodeWithTag("scrollbar").performGesture {
+                swipe(start = Offset(0f, 99f), end = Offset(0f, -10000f), duration = 1.milliseconds)
+            }
+            onFrame()
+            assertEquals(0, state.firstVisibleItemIndex)
+            assertEquals(0, state.firstVisibleItemScrollOffset)
+        }
+    }
+
     private suspend fun tryUntilSucceeded(block: suspend () -> Unit) {
         while (true) {
             try {
@@ -368,6 +406,6 @@ class ScrollbarTest {
             hoverColor = Color.Red
         ),
         DesktopPlatformAmbient provides DesktopPlatform.MacOS,
-        children = content
+        content = content
     )
 }

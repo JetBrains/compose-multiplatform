@@ -28,13 +28,13 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.SetComposingTextEditOp
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.substring
+import androidx.compose.ui.unit.Density
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
 import java.awt.font.TextHitInfo
 import java.awt.im.InputMethodRequests
-import java.lang.UnsupportedOperationException
 import java.text.AttributedCharacterIterator
 import java.text.AttributedString
 import java.text.CharacterIterator
@@ -45,7 +45,9 @@ import kotlin.math.min
 interface DesktopInputComponent {
     fun enableInput(inputMethodRequests: InputMethodRequests)
     fun disableInput()
-    fun locationOnScreen(): Point
+    // Input service needs to know this information to implement Input Method support
+    val locationOnScreen: Point
+    val density: Density
 }
 
 @OptIn(ExperimentalTextApi::class)
@@ -91,9 +93,9 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
         println("DesktopPlatformInput.hideSoftwareKeyboard")
     }
 
-    override fun onStateUpdated(value: TextFieldValue) {
+    override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
         currentInput?.let { input ->
-            input.value = value
+            input.value = newValue
         }
     }
 
@@ -184,7 +186,12 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
     fun methodRequestsForInput(input: CurrentInput) =
         object : InputMethodRequests {
             override fun getLocationOffset(x: Int, y: Int): TextHitInfo? {
-                throw UnsupportedOperationException()
+                if (input.value.composition != null) {
+                    // TODO: to properly implement this method we need to somehow have access to
+                    //  Paragraph at this point
+                    return TextHitInfo.leading(0)
+                }
+                return null
             }
 
             override fun cancelLatestCommittedText(
@@ -220,14 +227,15 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
                 return AttributedString(str).iterator
             }
 
-            override fun getTextLocation(offset: TextHitInfo) =
-                input.focusedRect?.let {
-                    Rectangle(
-                        it.right.toInt() + component.locationOnScreen().x,
-                        it.bottom.toInt() + component.locationOnScreen().y,
-                        0, 0
-                    )
+            override fun getTextLocation(offset: TextHitInfo): Rectangle? {
+                return input.focusedRect?.let {
+                    val x = (it.right / component.density.density).toInt() +
+                        component.locationOnScreen.x
+                    val y = (it.top / component.density.density).toInt() +
+                        component.locationOnScreen.y
+                    Rectangle(x, y, it.width.toInt(), it.height.toInt())
                 }
+            }
 
             override fun getCommittedText(
                 beginIndex: Int,

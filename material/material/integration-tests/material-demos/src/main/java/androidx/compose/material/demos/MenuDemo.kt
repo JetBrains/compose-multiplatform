@@ -50,10 +50,11 @@ fun MenuDemo() {
                         object : Alignment {
                             override fun align(
                                 size: IntSize,
+                                space: IntSize,
                                 layoutDirection: LayoutDirection
                             ) = IntOffset(
-                                (size.width * i / 10f).roundToInt(),
-                                (size.height * j / 10f).roundToInt()
+                                (space.width * i / 10f).roundToInt(),
+                                (space.height * j / 10f).roundToInt()
                             )
                         }
                     )

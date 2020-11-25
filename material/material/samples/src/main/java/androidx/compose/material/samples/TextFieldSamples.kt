@@ -49,7 +49,8 @@ fun SimpleTextFieldSample() {
     TextField(
         value = text,
         onValueChange = { text = it },
-        label = { Text("Label") }
+        label = { Text("Label") },
+        singleLine = true
     )
 }
 

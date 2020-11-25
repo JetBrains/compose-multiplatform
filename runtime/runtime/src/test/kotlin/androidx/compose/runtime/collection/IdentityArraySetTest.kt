@@ -24,7 +24,6 @@ import kotlin.test.assertNotSame
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCollectionApi::class)
 class IdentityArraySetTest {
     private val set: IdentityArraySet<Stuff> = IdentityArraySet()
 

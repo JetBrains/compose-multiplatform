@@ -30,7 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.captureToImage
@@ -647,7 +647,7 @@ private fun ScreenshotScaffold(
     val fab = @Composable {
         if (showFab) {
             FloatingActionButton(
-                icon = { Icon(Icons.Filled.Favorite) },
+                content = { Icon(Icons.Filled.Favorite) },
                 onClick = {}
             )
         }
@@ -655,12 +655,12 @@ private fun ScreenshotScaffold(
 
     val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 
-    Providers(LayoutDirectionAmbient provides layoutDirection) {
+    Providers(AmbientLayoutDirection provides layoutDirection) {
         Box(
             Modifier
                 .fillMaxSize(0.5f)
                 .wrapContentSize()
-                .semantics(mergeAllDescendants = true) {}
+                .semantics(mergeDescendants = true) {}
                 .testTag(Tag)
         ) {
             Scaffold(

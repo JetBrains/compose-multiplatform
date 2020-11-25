@@ -19,7 +19,7 @@ package androidx.compose.foundation.layout
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -43,7 +43,7 @@ class TextLayoutDirectionModifierTest : LayoutTest() {
         var layoutDirection: LayoutDirection? = null
 
         show {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 BasicTextField(
                     value = TextFieldValue("..."),
                     onValueChange = {},
@@ -65,7 +65,7 @@ class TextLayoutDirectionModifierTest : LayoutTest() {
         val latch = CountDownLatch(1)
         var layoutDirection: LayoutDirection? = null
         show {
-            Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 BasicText(
                     text = AnnotatedString("..."),
                     style = TextStyle.Default,

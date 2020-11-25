@@ -29,7 +29,6 @@ fun createAmbient() {
 }
 
 @Sampled
-@Composable
 fun ambientProvider() {
     @Composable
     fun App(user: User) {
@@ -40,7 +39,6 @@ fun ambientProvider() {
 }
 
 @Sampled
-@Composable
 fun someScreenSample() {
     @Composable
     fun SomeScreen() {
@@ -49,7 +47,6 @@ fun someScreenSample() {
 }
 
 @Sampled
-@Composable
 fun consumeAmbient() {
     @Composable
     fun UserPhoto() {

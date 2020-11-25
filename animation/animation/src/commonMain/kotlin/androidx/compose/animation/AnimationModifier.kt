@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -69,7 +69,7 @@ fun Modifier.animateContentSize(
     }
 ) {
     // TODO: Listener could be a fun interface after 1.4
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     val animModifier = remember {
         SizeAnimationModifier(animSpec, clock)
     }

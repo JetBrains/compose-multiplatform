@@ -26,6 +26,7 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
@@ -54,7 +55,14 @@ fun Modifier.rawPressStartGestureFilter(
     onPressStart: (Offset) -> Unit,
     enabled: Boolean = false,
     executionPass: PointerEventPass = PointerEventPass.Main
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "rawPressStartGestureFilter"
+        properties["onPressStart"] = onPressStart
+        properties["enabled"] = enabled
+        properties["executionPass"] = executionPass
+    }
+) {
     val filter = remember { RawPressStartGestureFilter() }
     filter.onPressStart = onPressStart
     filter.setEnabled(enabled = enabled)
@@ -82,7 +90,7 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
                 // If we have not yet started and all of the changes changed to down, we are
                 // starting.
                 active = true
-                onPressStart(changes.first().current.position!!)
+                onPressStart(changes.first().current.position)
             } else if (changes.all { it.changedToUp() }) {
                 // If we have started and all of the changes changed to up, we are stopping.
                 active = false

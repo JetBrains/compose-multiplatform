@@ -18,13 +18,13 @@ package androidx.compose.ui.platform
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.IntSize
 @RequiresApi(Build.VERSION_CODES.M)
 internal class RenderNodeLayer(
     val ownerView: AndroidComposeView,
-    drawLayerModifier: DrawLayerModifier,
     val drawBlock: (Canvas) -> Unit,
     val invalidateParentLayer: () -> Unit
 ) : OwnedLayer {
@@ -53,7 +52,7 @@ internal class RenderNodeLayer(
     private val canvasHolder = CanvasHolder()
 
     /**
-     * Local copy of the transform origin as DrawLayerModifier can be implemented
+     * Local copy of the transform origin as GraphicsLayerModifier can be implemented
      * as a model object. Update this field within [updateLayerProperties] and use it
      * in [resize] or other methods
      */
@@ -64,37 +63,39 @@ internal class RenderNodeLayer(
     } else {
         RenderNodeApi23(ownerView)
     }.apply { setHasOverlappingRendering(true) }
-    override val isValid: Boolean
-        get() = !isDestroyed
 
     override val layerId: Long
         get() = renderNode.uniqueId
 
-    override var modifier: DrawLayerModifier = drawLayerModifier
-        set(value) {
-            if (field !== value) {
-                field = value
-                updateLayerProperties()
-            }
-        }
-
-    override fun updateLayerProperties() {
-        transformOrigin = modifier.transformOrigin
+    override fun updateLayerProperties(
+        scaleX: Float,
+        scaleY: Float,
+        alpha: Float,
+        translationX: Float,
+        translationY: Float,
+        shadowElevation: Float,
+        rotationX: Float,
+        rotationY: Float,
+        rotationZ: Float,
+        cameraDistance: Float,
+        transformOrigin: TransformOrigin,
+        shape: Shape,
+        clip: Boolean
+    ) {
+        this.transformOrigin = transformOrigin
         val wasClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
-        renderNode.scaleX = modifier.scaleX
-        renderNode.scaleY = modifier.scaleY
-        renderNode.alpha = modifier.alpha
-        renderNode.translationX = modifier.translationX
-        renderNode.translationY = modifier.translationY
-        renderNode.elevation = modifier.shadowElevation
-        renderNode.rotationZ = modifier.rotationZ
-        renderNode.rotationX = modifier.rotationX
-        renderNode.rotationY = modifier.rotationY
-        renderNode.cameraDistance = modifier.cameraDistance
+        renderNode.scaleX = scaleX
+        renderNode.scaleY = scaleY
+        renderNode.alpha = alpha
+        renderNode.translationX = translationX
+        renderNode.translationY = translationY
+        renderNode.elevation = shadowElevation
+        renderNode.rotationZ = rotationZ
+        renderNode.rotationX = rotationX
+        renderNode.rotationY = rotationY
+        renderNode.cameraDistance = cameraDistance
         renderNode.pivotX = transformOrigin.pivotFractionX * renderNode.width
         renderNode.pivotY = transformOrigin.pivotFractionY * renderNode.height
-        val shape = modifier.shape
-        val clip = modifier.clip
         renderNode.clipToOutline = clip && shape !== RectangleShape
         renderNode.clipToBounds = clip && shape === RectangleShape
         val shapeChanged = outlineResolver.update(
@@ -189,7 +190,7 @@ internal class RenderNodeLayer(
         if (isDirty || !renderNode.hasDisplayList) {
             val clipPath = if (renderNode.clipToOutline) outlineResolver.clipPath else null
 
-            renderNode.record(canvasHolder, clipPath, this, drawBlock)
+            renderNode.record(canvasHolder, clipPath, drawBlock)
 
             isDirty = false
         }

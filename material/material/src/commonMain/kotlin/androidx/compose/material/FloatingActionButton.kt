@@ -42,7 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
  * @param contentColor The preferred content color for content inside this FAB
  * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
  * in different states. This controls the size of the shadow below the FAB.
- * @param icon the content of this FAB
+ * @param content the content of this FAB - this is typically an [Icon].
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -80,7 +80,7 @@ fun FloatingActionButton(
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonConstants.defaultElevation(),
-    icon: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     // TODO(aelias): Avoid manually managing the ripple once http://b/157687898
     // is fixed and we have more flexibility to move the clickable modifier
@@ -102,8 +102,8 @@ fun FloatingActionButton(
                     modifier = Modifier
                         .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
                         .indication(interactionState, AmbientIndication.current()),
-                    alignment = Alignment.Center
-                ) { icon() }
+                    contentAlignment = Alignment.Center
+                ) { content() }
             }
         }
     }
@@ -170,7 +170,7 @@ fun ExtendedFloatingActionButton(
                 start = ExtendedFabTextPadding,
                 end = ExtendedFabTextPadding
             ),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             if (icon == null) {
                 text()
@@ -224,7 +224,7 @@ object FloatingActionButtonConstants {
         // focused: Dp = 8.dp,
         // hovered: Dp = 8.dp,
     ): FloatingActionButtonElevation {
-        val clock = AnimationClockAmbient.current.asDisposableClock()
+        val clock = AmbientAnimationClock.current.asDisposableClock()
         return remember(defaultElevation, pressedElevation, clock) {
             DefaultFloatingActionButtonElevation(
                 defaultElevation = defaultElevation,

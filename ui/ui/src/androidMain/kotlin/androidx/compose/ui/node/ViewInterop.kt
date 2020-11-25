@@ -20,7 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RestrictTo
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter

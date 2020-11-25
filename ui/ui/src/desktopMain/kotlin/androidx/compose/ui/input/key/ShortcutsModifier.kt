@@ -20,12 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import java.util.TreeMap
 
 /**
  * Defines a set of keys. Can be used in keys handlers, see
  * [androidx.compose.ui.platform.Keyboard] and [Modifier.shortcuts]
  */
-class KeysSet(internal val keys: Set<Key>) {
+class KeysSet(internal val keys: Set<Key>) : Comparable<KeysSet> {
     /**
      * Returns a new [KeysSet] consists of current keys set + additional key
      *
@@ -53,6 +54,14 @@ class KeysSet(internal val keys: Set<Key>) {
     override fun toString(): String {
         return "KeysSet(keys=$keys)"
     }
+
+    override fun compareTo(other: KeysSet): Int {
+        return when {
+            other.keys == keys -> 0
+            other.keys.size < keys.size -> 1
+            else -> -1
+        }
+    }
 }
 
 /**
@@ -69,13 +78,18 @@ fun KeysSet(key: Key): KeysSet {
     return KeysSet(setOf(key))
 }
 
+private fun makeHandlers() = TreeMap<KeysSet, () -> Unit>()
+
 @ExperimentalKeyInput
 internal class ShortcutsInstance(
-    internal var handlers: MutableMap<KeysSet, () -> Unit> = mutableMapOf()
+    internal var handlers: TreeMap<KeysSet, () -> Unit> = makeHandlers()
 ) {
     private var pressedKeys = mutableSetOf<Key>()
 
     fun process(event: KeyEvent): Boolean {
+        if (event.type == KeyEventType.Unknown) {
+            return false
+        }
         syncPressedKeys(event)
         return findHandler()?.let {
             it()
@@ -104,7 +118,7 @@ internal class ShortcutsInstance(
     }
 
     private fun findHandler(): (() -> Unit)? {
-        handlers.forEach { (keysSet, handler) ->
+        handlers.descendingMap().forEach { (keysSet, handler) ->
             if (pressedKeys.containsAll(keysSet.keys)) {
                 return handler
             }
@@ -128,7 +142,7 @@ fun Modifier.shortcuts(builder: (ShortcutsBuilderScope).() -> Unit) = composed {
 }
 
 class ShortcutsBuilderScope {
-    internal val handlers = mutableMapOf<KeysSet, () -> Unit>()
+    internal val handlers = makeHandlers()
     /**
      * @param keysSet: represents a set of keys that can be simultaneously pressed
      * @param callback: called when all keys in [keysSet] are pressed

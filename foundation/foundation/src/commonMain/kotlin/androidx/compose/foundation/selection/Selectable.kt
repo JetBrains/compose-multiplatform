@@ -16,20 +16,19 @@
 
 package androidx.compose.foundation.selection
 
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.AmbientIndication
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.semantics.inMutuallyExclusiveGroup
-import androidx.compose.foundation.semantics.selected
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.accessibilityValue
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 
 /**
@@ -53,6 +52,8 @@ import androidx.compose.ui.semantics.semantics
  * @param indication indication to be shown when the modified element is pressed. By default,
  * the indication from [AmbientIndication] will be used. Set to `null` to show no indication
  */
+// TODO: b/172938345
+@Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.selectable(
     selected: Boolean,
@@ -69,7 +70,6 @@ fun Modifier.selectable(
             indication = indication,
             onClick = onClick
         ).semantics {
-            this.inMutuallyExclusiveGroup = inMutuallyExclusiveGroup
             this.selected = selected
             this.accessibilityValue = if (selected) Strings.Selected else Strings.NotSelected
         }

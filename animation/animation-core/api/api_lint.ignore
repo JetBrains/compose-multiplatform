@@ -7,6 +7,8 @@ ArrayReturn: androidx.compose.animation.core.TransitionDefinition#transition(kot
 
 AutoBoxing: androidx.compose.animation.core.CubicBezierEasing#invoke(float):
     Must avoid boxed primitives (`java.lang.Float`)
+AutoBoxing: androidx.compose.animation.core.DecayAnimation#getTargetValue():
+    Must avoid boxed primitives (`java.lang.Float`)
 
 
 CallbackName: androidx.compose.animation.core.AnimationClockObserver:
@@ -15,6 +17,8 @@ CallbackName: androidx.compose.animation.core.AnimationClockObserver:
 
 MissingNullability: androidx.compose.animation.core.CubicBezierEasing#invoke(float):
     Missing nullability on method `invoke` return
+MissingNullability: androidx.compose.animation.core.DecayAnimation#getTargetValue():
+    Missing nullability on method `getTargetValue` return
 
 
 NotCloseable: androidx.compose.animation.core.BaseAnimatedValue:

@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.node.ModifiedFocusRequesterNode
@@ -32,7 +31,6 @@ private val focusRequesterNotInitialized = "FocusRequester is not initialized. O
  *
  * @see androidx.compose.ui.focusRequester
  */
-@OptIn(ExperimentalCollectionApi::class)
 @ExperimentalFocus
 class FocusRequester {
 

@@ -21,6 +21,6 @@ import androidx.compose.testutils.ComposeTestCase
 
 class EmptyTestCase : ComposeTestCase {
     @Composable
-    override fun emitContent() {
+    override fun Content() {
     }
 }

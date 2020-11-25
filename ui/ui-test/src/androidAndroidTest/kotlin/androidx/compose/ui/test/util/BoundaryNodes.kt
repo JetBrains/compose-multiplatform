@@ -24,9 +24,9 @@ import androidx.compose.ui.platform.testTag
 @Composable
 fun BoundaryNode(
     testTag: String,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
-    Column(Modifier.testTag(testTag)) { children() }
+    Column(Modifier.testTag(testTag)) { content() }
 }
 
 @Composable

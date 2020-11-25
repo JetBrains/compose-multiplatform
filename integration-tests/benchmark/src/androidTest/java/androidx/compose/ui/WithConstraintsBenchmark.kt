@@ -71,10 +71,10 @@ private class NoWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     private lateinit var state: MutableState<Dp>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
-        Box(Modifier.preferredSize(300.dp), alignment = Alignment.Center) {
+        Box(Modifier.preferredSize(300.dp), contentAlignment = Alignment.Center) {
             Spacer(Modifier.preferredSize(width = size.value, height = size.value))
         }
     }
@@ -89,11 +89,11 @@ private class WithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     private lateinit var state: MutableState<Dp>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         WithConstraints {
-            Box(Modifier.preferredSize(300.dp), alignment = Alignment.Center) {
+            Box(Modifier.preferredSize(300.dp), contentAlignment = Alignment.Center) {
                 Spacer(Modifier.preferredSize(width = size.value, height = size.value))
             }
         }
@@ -109,7 +109,7 @@ private class ChangingConstraintsTestCase : ComposeTestCase, ToggleableTestCase 
     private lateinit var state: MutableState<Int>
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val size = remember { mutableStateOf(100) }
         this.state = size
         ChangingConstraintsLayout(state) {
@@ -125,8 +125,8 @@ private class ChangingConstraintsTestCase : ComposeTestCase, ToggleableTestCase 
 }
 
 @Composable
-private fun ChangingConstraintsLayout(size: State<Int>, children: @Composable () -> Unit) {
-    Layout(children) { measurables, _ ->
+private fun ChangingConstraintsLayout(size: State<Int>, content: @Composable () -> Unit) {
+    Layout(content) { measurables, _ ->
         val constraints = Constraints.fixed(size.value, size.value)
         with(PlacementScope) { measurables.first().measure(constraints).placeRelative(0, 0) }
         layout(100, 100) {}

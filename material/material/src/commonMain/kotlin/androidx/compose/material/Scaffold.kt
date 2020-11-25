@@ -225,7 +225,7 @@ private fun ScaffoldLayout(
     fab: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 ) {
-    SubcomposeLayout<ScaffoldLayoutContent> { constraints ->
+    SubcomposeLayout { constraints ->
         val layoutWidth = constraints.maxWidth
         val layoutHeight = constraints.maxHeight
 
@@ -280,7 +280,7 @@ private fun ScaffoldLayout(
             val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar) {
                 Providers(
                     AmbientFabPlacement provides fabPlacement,
-                    children = bottomBar
+                    content = bottomBar
                 )
             }.fastMap { it.measure(looseConstraints) }
 

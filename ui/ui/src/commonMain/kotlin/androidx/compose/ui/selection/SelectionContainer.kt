@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -27,9 +28,9 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.ClipboardManagerAmbient
-import androidx.compose.ui.platform.HapticFeedBackAmbient
-import androidx.compose.ui.platform.TextToolbarAmbient
+import androidx.compose.ui.platform.AmbientClipboardManager
+import androidx.compose.ui.platform.AmbientHapticFeedback
+import androidx.compose.ui.platform.AmbientTextToolbar
 import androidx.compose.ui.text.InternalTextApi
 
 /**
@@ -40,7 +41,7 @@ import androidx.compose.ui.text.InternalTextApi
 @Suppress("DEPRECATION")
 @OptIn(InternalTextApi::class)
 @Composable
-fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
+fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     var selection by remember { mutableStateOf<Selection?>(null) }
     SelectionContainer(
         modifier = modifier,
@@ -48,7 +49,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -
         onSelectionChange = {
             selection = it
         },
-        children = children
+        children = content
     )
 }
 
@@ -61,8 +62,8 @@ fun SelectionContainer(modifier: Modifier = Modifier, children: @Composable () -
 @Composable
 fun DisableSelection(content: @Composable () -> Unit) {
     Providers(
-        SelectionRegistrarAmbient provides null,
-        children = content
+        AmbientSelectionRegistrar provides null,
+        content = content
     )
 }
 
@@ -72,6 +73,7 @@ fun DisableSelection(content: @Composable () -> Unit) {
  * The selection composable wraps composables and let them to be selectable. It paints the selection
  * area with start and end handles.
  */
+@Suppress("ComposableLambdaParameterNaming")
 @OptIn(InternalTextApi::class)
 @Deprecated("Please use SelectionContainer with no callback")
 @InternalTextApi
@@ -88,9 +90,9 @@ fun SelectionContainer(
     val registrarImpl = remember { SelectionRegistrarImpl() }
     val manager = remember { SelectionManager(registrarImpl) }
 
-    manager.hapticFeedBack = HapticFeedBackAmbient.current
-    manager.clipboardManager = ClipboardManagerAmbient.current
-    manager.textToolbar = TextToolbarAmbient.current
+    manager.hapticFeedBack = AmbientHapticFeedback.current
+    manager.clipboardManager = AmbientClipboardManager.current
+    manager.textToolbar = AmbientTextToolbar.current
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
 
@@ -110,7 +112,7 @@ fun SelectionContainer(
         }
     }
 
-    Providers(SelectionRegistrarAmbient provides registrarImpl) {
+    Providers(AmbientSelectionRegistrar provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
         SimpleLayout(
@@ -136,6 +138,10 @@ fun SelectionContainer(
                 SelectionFloatingToolBar(manager = manager)
             }
         }
+    }
+
+    onDispose {
+        manager.selection = null
     }
 }
 

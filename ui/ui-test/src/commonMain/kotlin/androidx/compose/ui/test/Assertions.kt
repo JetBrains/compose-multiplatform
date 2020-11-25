@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 
 /**
@@ -137,11 +137,33 @@ fun SemanticsNodeInteraction.assertIsSelectable(): SemanticsNodeInteraction =
     assert(isSelectable())
 
 /**
+ * Asserts that the current semantics node has a focus.
+ *
+ * Throws [AssertionError] if the node is not in the focus or does not defined the property at all.
+ */
+fun SemanticsNodeInteraction.assertIsFocused(): SemanticsNodeInteraction =
+    assert(isFocused())
+
+/**
+ * Asserts that the current semantics node does not have a focus.
+ *
+ * Throws [AssertionError] if the node is in the focus or does not defined the property at all.
+ */
+fun SemanticsNodeInteraction.assertIsNotFocused(): SemanticsNodeInteraction =
+    assert(isNotFocused())
+
+/**
  * Asserts the semantics node is in a mutually exclusive group. This is used by radio groups to
  * assert only one is selected at a given time.
+ *
+ * @Deprecated Replaced with androidx.compose.ui.test.assertIsSelectable
  */
+@Deprecated(
+    "Replaced with androidx.compose.ui.test.assertIsSelectable",
+    ReplaceWith("assertIsSelectable()", "androidx.compose.ui.test")
+)
 fun SemanticsNodeInteraction.assertIsInMutuallyExclusiveGroup(): SemanticsNodeInteraction =
-    assert(isInMutuallyExclusiveGroup())
+    assertIsSelectable()
 
 /**
  * Asserts the node's label equals the given String.
@@ -175,8 +197,7 @@ fun SemanticsNodeInteraction.assertValueEquals(value: String): SemanticsNodeInte
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
  */
 fun SemanticsNodeInteraction.assertRangeInfoEquals(value: AccessibilityRangeInfo):
-    SemanticsNodeInteraction =
-        assert(hasRangeInfo(value))
+    SemanticsNodeInteraction = assert(hasRangeInfo(value))
 
 /**
  * Asserts that the current semantics node has a click action.

@@ -35,9 +35,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
-import androidx.compose.runtime.snapshots.SnapshotStateObserver
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
 import androidx.compose.ui.autofill.Autofill
@@ -46,7 +43,6 @@ import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
 import androidx.compose.ui.autofill.registerCallback
 import androidx.compose.ui.autofill.unregisterCallback
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusManager
@@ -69,7 +65,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
-import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.InternalTextApi
@@ -108,13 +104,17 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
 
     private val semanticsModifier = SemanticsModifierCore(
         id = SemanticsModifierCore.generateSemanticsId(),
-        mergeAllDescendants = false,
+        mergeDescendants = false,
         properties = {}
     )
 
     private val _focusManager: FocusManagerImpl = FocusManagerImpl()
     override val focusManager: FocusManager
         get() = _focusManager
+
+    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
+    override val windowManager: WindowManager
+        get() = _windowManager
 
     private val keyInputModifier = KeyInputModifier(null, null)
 
@@ -123,7 +123,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     override val root = LayoutNode().also {
         it.measureBlocks = RootMeasureBlocks
         it.modifier = Modifier
-            .drawLayer()
             .then(semanticsModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
@@ -164,37 +163,11 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
      */
     override val clipboardManager = AndroidClipboardManager(context)
 
-    private val snapshotObserver = SnapshotStateObserver { command ->
+    override val snapshotObserver = OwnerSnapshotObserver { command ->
         if (handler?.looper === Looper.myLooper()) {
             command()
         } else {
             handler?.post(command)
-        }
-    }
-
-    private val onCommitAffectingMeasure: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
-            onRequestMeasure(layoutNode)
-        }
-    }
-
-    private val onCommitAffectingLayout: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid && measureAndLayoutDelegate.requestRelayout(layoutNode)) {
-            scheduleMeasureAndLayout()
-        }
-    }
-
-    private val onCommitAffectingLayer: (OwnedLayer) -> Unit = { layer ->
-        if (layer.isValid) {
-            layer.invalidate()
-        }
-    }
-
-    private val onCommitAffectingLayerParams: (OwnedLayer) -> Unit = { layer ->
-        if (layer.isValid) {
-            handler?.postAtFrontOfQueue {
-                updateLayerProperties(layer)
-            }
         }
     }
 
@@ -204,7 +177,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     private val clearInvalidObservations: Runnable = Runnable {
         if (observationClearRequested) {
             observationClearRequested = false
-            snapshotObserver.removeObservationsFor { !(it as OwnerScope).isValid }
+            snapshotObserver.clearInvalidObservations()
         }
     }
 
@@ -242,6 +215,8 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
+    override val viewConfiguration: ViewConfiguration =
+        AndroidViewConfiguration(android.view.ViewConfiguration.get(context))
 
     override val hasPendingMeasureOrLayout
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
@@ -320,24 +295,26 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        _windowManager.isWindowFocused = hasWindowFocus
+        super.onWindowFocusChanged(hasWindowFocus)
+    }
+
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
         return keyInputModifier.processKeyInput(keyEvent)
     }
 
-    override fun dispatchKeyEvent(event: AndroidKeyEvent): Boolean {
-        return sendKeyEvent(KeyEventAndroid(event))
-    }
-
-    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        super.onWindowFocusChanged(hasWindowFocus)
-
-        if (hasWindowFocus) {
-            accessibilityDelegate.clipBoardManagerText = clipboardManager.getText()
+    override fun dispatchKeyEvent(event: AndroidKeyEvent) =
+        if (isFocused) {
+            // Focus lies within the Compose hierarchy, so we dispatch the key event to the
+            // appropriate place.
+            sendKeyEvent(KeyEventAndroid(event))
+        } else {
+            // This Owner has a focused child view, which is a view interop use case,
+            // so we use the default ViewGroup behavior which will route tke key event to the
+            // focused view.
+            super.dispatchKeyEvent(event)
         }
-    }
-
-    override fun pauseModelReadObserveration(block: () -> Unit) =
-        snapshotObserver.pauseObservingReads(block)
 
     override fun onAttach(node: LayoutNode) {
     }
@@ -474,41 +451,10 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks(forceDispatch = positionChanged)
     }
 
-    override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-        snapshotObserver.observeReads(node, onCommitAffectingLayout, block)
-    }
-
-    override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-        snapshotObserver.observeReads(node, onCommitAffectingMeasure, block)
-    }
-
-    override fun <T : OwnerScope> observeReads(
-        target: T,
-        onChanged: (T) -> Unit,
-        block: () -> Unit
-    ) {
-        snapshotObserver.observeReads(target, onChanged, block)
-    }
-
-    fun observeLayerModelReads(layer: OwnedLayer, block: () -> Unit) {
-        snapshotObserver.observeReads(layer, onCommitAffectingLayer, block)
-    }
-
     override fun onDraw(canvas: android.graphics.Canvas) {
     }
 
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
-        drawBlock: (Canvas) -> Unit,
-        invalidateParentLayer: () -> Unit
-    ): OwnedLayer {
-        val layer = instantiateLayer(drawLayerModifier, drawBlock, invalidateParentLayer)
-        updateLayerProperties(layer)
-        return layer
-    }
-
-    private fun instantiateLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
@@ -520,7 +466,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
             try {
                 return RenderNodeLayer(
                     this,
-                    drawLayerModifier,
                     drawBlock,
                     invalidateParentLayer
                 )
@@ -531,7 +476,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         return ViewLayer(
             this,
             viewLayersContainer,
-            drawLayerModifier,
             drawBlock,
             invalidateParentLayer
         )
@@ -539,12 +483,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
 
     override fun onSemanticsChange() {
         accessibilityDelegate.onSemanticsChange()
-    }
-
-    private fun updateLayerProperties(layer: OwnedLayer) {
-        snapshotObserver.observeReads(layer, onCommitAffectingLayerParams) {
-            layer.updateLayerProperties()
-        }
     }
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
@@ -578,7 +516,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     /**
      * Walks the entire LayoutNode sub-hierarchy and marks all nodes as needing measurement.
      */
-    @OptIn(ExperimentalCollectionApi::class)
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
         measureAndLayoutDelegate.requestRemeasure(node)
         node._children.forEach { invalidateLayoutNodeMeasurement(it) }
@@ -587,7 +524,6 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     /**
      * Walks the entire LayoutNode sub-hierarchy and marks all layers as needing to be redrawn.
      */
-    @OptIn(ExperimentalCollectionApi::class)
     private fun invalidateLayers(node: LayoutNode) {
         node.invalidateLayers()
         node._children.forEach { invalidateLayers(it) }
@@ -602,7 +538,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         invalidateLayoutNodeMeasurement(root)
         invalidateLayers(root)
         showLayoutBounds = getIsShowingLayoutBounds()
-        snapshotObserver.enableStateUpdatesObserving(true)
+        snapshotObserver.startObserving()
         ifDebug { if (autofillSupported()) _autofill?.registerCallback() }
 
         if (viewTreeOwners == null) {
@@ -633,8 +569,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        snapshotObserver.clear()
-        snapshotObserver.enableStateUpdatesObserving(false)
+        snapshotObserver.stopObserving()
         ifDebug { if (autofillSupported()) _autofill?.unregisterCallback() }
         if (measureAndLayoutScheduled) {
             measureAndLayoutHandler.removeMessages(0)

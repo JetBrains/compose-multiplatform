@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
@@ -32,11 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -77,7 +76,7 @@ class SubcomposeLayoutTest {
         val secondTag = "second"
 
         rule.setContent {
-            SubcomposeLayout<Int> { constraints ->
+            SubcomposeLayout { constraints ->
                 val first = subcompose(0) {
                     Spacer(Modifier.size(50.dp).testTag(firstTag))
                 }.first().measure(constraints)
@@ -114,7 +113,7 @@ class SubcomposeLayoutTest {
         val layoutTag = "layout"
 
         rule.setContent {
-            SubcomposeLayout<Unit>(Modifier.testTag(layoutTag)) { constraints ->
+            SubcomposeLayout(Modifier.testTag(layoutTag)) { constraints ->
                 val placeables = subcompose(Unit) {
                     Spacer(Modifier.size(50.dp).testTag(firstTag))
                     Spacer(Modifier.size(30.dp).testTag(secondTag))
@@ -157,7 +156,7 @@ class SubcomposeLayoutTest {
         var recompositionsCount2 = 0
 
         rule.setContent {
-            SubcomposeLayout<Unit> { constraints ->
+            SubcomposeLayout { constraints ->
                 measuresCount++
                 val placeable = subcompose(Unit) {
                     recompositionsCount1++
@@ -183,8 +182,8 @@ class SubcomposeLayoutTest {
     }
 
     @Composable
-    private fun NonInlineBox(modifier: Modifier, children: @Composable () -> Unit) {
-        Box(modifier = modifier) { children() }
+    private fun NonInlineBox(modifier: Modifier, content: @Composable () -> Unit) {
+        Box(modifier = modifier) { content() }
     }
 
     @Test
@@ -194,7 +193,7 @@ class SubcomposeLayoutTest {
         var recompositionsCount2 = 0
 
         rule.setContent {
-            SubcomposeLayout<Int> {
+            SubcomposeLayout {
                 subcompose(1) {
                     recompositionsCount1++
                     model.value // model read
@@ -223,7 +222,7 @@ class SubcomposeLayoutTest {
         val layoutTag = "layout"
 
         rule.setContent {
-            SubcomposeLayout<Unit>(Modifier.testTag(layoutTag)) { constraints ->
+            SubcomposeLayout(Modifier.testTag(layoutTag)) { constraints ->
                 val placeables = subcompose(Unit) {
                     if (addChild.value) {
                         Spacer(Modifier.size(20.dp).testTag(childTag))
@@ -280,9 +279,9 @@ class SubcomposeLayoutTest {
     }
 
     @Composable
-    private fun MySubcomposeLayout(slotContent: @Composable () -> Unit) {
-        SubcomposeLayout<Unit> { constraints ->
-            val placeables = subcompose(Unit, slotContent).map { it.measure(constraints) }
+    private fun MySubcomposeLayout(content: @Composable () -> Unit) {
+        SubcomposeLayout { constraints ->
+            val placeables = subcompose(Unit, content).map { it.measure(constraints) }
             val maxWidth = placeables.maxByOrNull { it.width }!!.width
             val height = placeables.sumBy { it.height }
             layout(maxWidth, height) {
@@ -298,7 +297,7 @@ class SubcomposeLayoutTest {
         var disposed = false
 
         rule.setContent {
-            SubcomposeLayout<Unit> {
+            SubcomposeLayout {
                 if (addSlot.value) {
                     subcompose(Unit) {
                         onActive {
@@ -331,7 +330,7 @@ class SubcomposeLayoutTest {
         val layoutTag = "layout"
 
         rule.setContent {
-            SubcomposeLayout<Color>(Modifier.testTag(layoutTag)) { constraints ->
+            SubcomposeLayout(Modifier.testTag(layoutTag)) { constraints ->
                 val first = subcompose(Color.Red) {
                     Spacer(Modifier.size(10.dp).background(Color.Red))
                 }.first().measure(constraints)
@@ -359,7 +358,7 @@ class SubcomposeLayoutTest {
         val firstSlotIsRed = mutableStateOf(true)
 
         rule.setContent {
-            SubcomposeLayout<Color>(Modifier.testTag(layoutTag)) { constraints ->
+            SubcomposeLayout(Modifier.testTag(layoutTag)) { constraints ->
                 val firstColor = if (firstSlotIsRed.value) Color.Red else Color.Green
                 val secondColor = if (firstSlotIsRed.value) Color.Green else Color.Red
                 val first = subcompose(firstColor) {
@@ -394,7 +393,7 @@ class SubcomposeLayoutTest {
         val layoutTag = "layout"
 
         rule.setContent {
-            SubcomposeLayout<Color>(Modifier.testTag(layoutTag)) { constraints ->
+            SubcomposeLayout(Modifier.testTag(layoutTag)) { constraints ->
                 val first = subcompose(Color.Red) {
                     Spacer(Modifier.size(10.dp).background(Color.Red).zIndex(1f))
                 }.first().measure(constraints)
@@ -421,7 +420,7 @@ class SubcomposeLayoutTest {
 
         rule.setContent {
             if (addLayout.value) {
-                SubcomposeLayout<Int> {
+                SubcomposeLayout {
                     subcompose(0) {
                         onDispose {
                             firstDisposed = true
@@ -456,8 +455,8 @@ class SubcomposeLayoutTest {
             val size = 50.dp
             val density = Density(3f)
             val sizeIpx = with(density) { size.toIntPx() }
-            Providers(DensityAmbient provides density) {
-                SubcomposeLayout<Unit>(
+            Providers(AmbientDensity provides density) {
+                SubcomposeLayout(
                     Modifier.size(size).onGloballyPositioned {
                         assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
                     }
@@ -475,7 +474,7 @@ class SubcomposeLayoutTest {
         val layoutTag = "layout"
 
         rule.setContent {
-            SubcomposeLayout<Color>(Modifier.testTag(layoutTag)) { constraints ->
+            SubcomposeLayout(Modifier.testTag(layoutTag)) { constraints ->
                 val first = subcompose(Color.Red) {
                     Spacer(Modifier.size(10.dp).background(Color.Red))
                 }.first().measure(constraints)
@@ -507,17 +506,17 @@ class SubcomposeLayoutTest {
         val scenario = rule.activityRule.scenario
 
         lateinit var container1: FrameLayout
-        lateinit var container2: FrameLayout
+        lateinit var container2: ComposeView
         val state = mutableStateOf(10.dp)
         var stateUsedLatch = CountDownLatch(1)
 
         scenario.onActivity {
             container1 = FrameLayout(it)
-            container2 = FrameLayout(it)
+            container2 = ComposeView(it)
             it.setContentView(container1)
             container1.addView(container2)
-            container2.setContent(Recomposer.current()) {
-                SubcomposeLayout<Unit> { constraints ->
+            container2.setContent {
+                SubcomposeLayout { constraints ->
                     val first = subcompose(Unit) {
                         stateUsedLatch.countDown()
                         Box(Modifier.size(state.value))
@@ -552,6 +551,6 @@ class SubcomposeLayoutTest {
     }
 }
 
-fun ImageAsset.assertCenterPixelColor(expectedColor: Color) {
+fun ImageBitmap.assertCenterPixelColor(expectedColor: Color) {
     asAndroidBitmap().assertColor(expectedColor, width / 2, height / 2)
 }

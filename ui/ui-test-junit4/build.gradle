@@ -45,7 +45,7 @@ dependencies {
         implementation(ANDROIDX_TEST_RUNNER)
         implementation(ESPRESSO_CORE)
         implementation project(":compose:animation:animation")
-        implementation project(":compose:foundation:foundation-text")
+        implementation project(":compose:foundation:foundation")
 
         testImplementation(TRUTH)
 
@@ -71,7 +71,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 api project(":compose:ui:ui-test")
                 implementation project(":compose:animation:animation")
-                implementation project(":compose:foundation:foundation-text")
+                implementation project(":compose:foundation:foundation")
 
                 implementation(KOTLIN_STDLIB_COMMON)
             }
@@ -132,7 +132,6 @@ android {
 androidx {
     name = "Compose Testing for JUnit4"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Compose testing integration with JUnit4"

@@ -41,7 +41,7 @@ interface TwoWayConverter<T, V : AnimationVector> {
  * [AnimationVector] type.
  *
  * @param convertToVector converts from type [T] to [AnimationVector]
- * @param convertFromVector converts from [AnimatedVector] to type [T]
+ * @param convertFromVector converts from [AnimationVector] to type [T]
  */
 fun <T, V : AnimationVector> TwoWayConverter(
     convertToVector: (T) -> V,

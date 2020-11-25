@@ -23,6 +23,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -47,15 +48,19 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.demos.PagingDemos
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 val LazyListDemos = listOf(
@@ -113,13 +118,62 @@ private fun ListAddRemoveItemsDemo() {
 private fun ListHoistedStateDemo() {
     val interactionState = remember { InteractionState() }
     val state = rememberLazyListState(interactionState = interactionState)
+    var lastScrollDescription: String by remember { mutableStateOf("") }
     Column {
-        Text(
-            "First item: ${state.firstVisibleItemIndex}",
-            fontSize = 30.sp
-        )
-        Text("Dragging: ${interactionState.contains(Interaction.Dragged)}", fontSize = 30.sp)
-        Text("Flinging: ${state.isAnimationRunning}", fontSize = 30.sp)
+        FlowRow {
+            val buttonModifier = Modifier.padding(8.dp)
+            val density = AmbientDensity.current
+            val coroutineScope = rememberCoroutineScope()
+            Button(
+                modifier = buttonModifier,
+                onClick = {
+                    coroutineScope.launch {
+                        state.snapToItemIndex(state.firstVisibleItemIndex - 1)
+                    }
+                }
+            ) {
+                Text("Previous")
+            }
+            Button(
+                modifier = buttonModifier,
+                onClick = {
+                    coroutineScope.launch {
+                        state.snapToItemIndex(state.firstVisibleItemIndex + 1)
+                    }
+                }
+            ) {
+                Text("Next")
+            }
+            Button(
+                modifier = buttonModifier,
+                onClick = {
+                    with(density) {
+                        coroutineScope.launch {
+                            val requestedScroll = 3000.dp.toPx()
+                            lastScrollDescription = try {
+                                val actualScroll = state.smoothScrollBy(requestedScroll)
+                                "$actualScroll/$requestedScroll px"
+                            } catch (_: CancellationException) {
+                                "Interrupted!"
+                            }
+                        }
+                    }
+                }
+            ) {
+                Text("Scroll")
+            }
+        }
+        Column {
+            Text(
+                "First item: ${state.firstVisibleItemIndex}, Last scroll: $lastScrollDescription",
+                fontSize = 20.sp
+            )
+            Text(
+                "Dragging: ${interactionState.contains(Interaction.Dragged)}, " +
+                    "Flinging: ${state.isAnimationRunning}",
+                fontSize = 20.sp
+            )
+        }
         LazyColumnFor(
             (0..1000).toList(),
             Modifier.fillMaxWidth(),
@@ -131,16 +185,14 @@ private fun ListHoistedStateDemo() {
 }
 
 @Composable
-fun Button(modifier: Modifier, onClick: () -> Unit, children: @Composable () -> Unit) {
+fun Button(modifier: Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         modifier
             .clickable(onClick = onClick)
             .background(Color(0xFF6200EE), RoundedCornerShape(4.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Providers(AmbientContentColor provides Color.White) {
-            children()
-        }
+        Providers(AmbientContentColor provides Color.White, content = content)
     }
 }
 
@@ -156,7 +208,7 @@ private fun Square(index: Int) {
     val width = remember { Random.nextInt(50, 150).dp }
     Box(
         Modifier.preferredWidth(width).fillMaxHeight().background(colors[index % colors.size]),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(index.toString())
     }
@@ -177,7 +229,7 @@ private fun ListWithIndexSample() {
 
 @Composable
 private fun RtlListDemo() {
-    Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
+    Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
         LazyRowForIndexed((0..100).toList(), Modifier.fillMaxWidth()) { index, item ->
             Text(
                 "$item",
@@ -237,7 +289,10 @@ private fun LazyRowScope() {
 
         val items = listOf(Color.Cyan, Color.Blue, Color.Magenta)
         itemsIndexed(items) { index, item ->
-            Box(modifier = Modifier.background(item).size(40.dp), alignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.background(item).size(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 Text("$index", fontSize = 30.sp)
             }
         }

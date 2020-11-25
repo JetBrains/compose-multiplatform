@@ -30,10 +30,10 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
@@ -65,7 +65,7 @@ const val XmlTestTag = "Xml"
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @RunWith(Parameterized::class)
 class IconComparisonTest(
-    private val iconSublist: List<Pair<KProperty0<VectorAsset>, String>>,
+    private val iconSublist: List<Pair<KProperty0<ImageVector>, String>>,
     private val debugParameterName: String
 ) {
 
@@ -98,15 +98,15 @@ class IconComparisonTest(
     private val matcher = MSSIMMatcher(threshold = 0.99)
 
     @Test
-    fun compareVectorAssets() {
+    fun compareImageVectors() {
         iconSublist.forEach { (property, drawableName) ->
-            var xmlVector: VectorAsset? = null
+            var xmlVector: ImageVector? = null
             val programmaticVector = property.get()
             var composition: Composition? = null
 
             rule.activityRule.scenario.onActivity {
                 composition = it.setContent {
-                    xmlVector = drawableName.toVectorAsset()
+                    xmlVector = drawableName.toImageVector()
                     DrawVectors(programmaticVector, xmlVector!!)
                 }
             }
@@ -115,12 +115,12 @@ class IconComparisonTest(
 
             val iconName = property.javaGetter!!.declaringClass.canonicalName!!
 
-            // The XML inflated VectorAsset doesn't have a name, and we set a name in the
-            // programmatic VectorAsset. This doesn't affect how the VectorAsset is drawn, so we
+            // The XML inflated ImageVector doesn't have a name, and we set a name in the
+            // programmatic ImageVector. This doesn't affect how the ImageVector is drawn, so we
             // make sure the names match so the comparison does not fail.
             xmlVector = xmlVector!!.copy(name = programmaticVector.name)
 
-            assertVectorAssetsAreEqual(xmlVector!!, programmaticVector, iconName)
+            assertImageVectorsAreEqual(xmlVector!!, programmaticVector, iconName)
 
             matcher.assertBitmapsAreEqual(
                 rule.onNodeWithTag(XmlTestTag).captureToImage().asAndroidBitmap(),
@@ -137,28 +137,28 @@ class IconComparisonTest(
 }
 
 /**
- * @return the [VectorAsset] matching the drawable with [this] name.
+ * @return the [ImageVector] matching the drawable with [this] name.
  */
 @Composable
-private fun String.toVectorAsset(): VectorAsset {
-    val context = ContextAmbient.current
+private fun String.toImageVector(): ImageVector {
+    val context = AmbientContext.current
     val resId = context.resources.getIdentifier(this, "drawable", context.packageName)
     return vectorResource(resId)
 }
 
 /**
- * Compares two [VectorAsset]s and ensures that they are deeply equal, comparing all children
+ * Compares two [ImageVector]s and ensures that they are deeply equal, comparing all children
  * recursively.
  */
-private fun assertVectorAssetsAreEqual(
-    xmlVector: VectorAsset,
-    programmaticVector: VectorAsset,
+private fun assertImageVectorsAreEqual(
+    xmlVector: ImageVector,
+    programmaticVector: ImageVector,
     iconName: String
 ) {
     try {
         Truth.assertThat(programmaticVector).isEqualTo(xmlVector)
     } catch (e: AssertionError) {
-        val message = "VectorAsset comparison failed for $iconName\n" + e.localizedMessage
+        val message = "ImageVector comparison failed for $iconName\n" + e.localizedMessage
         throw AssertionError(message, e)
     }
 }
@@ -209,13 +209,13 @@ private fun MSSIMMatcher.assertBitmapsAreEqual(
  * [XmlTestTag] for [programmaticVector] and [xmlVector].
  */
 @Composable
-private fun DrawVectors(programmaticVector: VectorAsset, xmlVector: VectorAsset) {
+private fun DrawVectors(programmaticVector: ImageVector, xmlVector: ImageVector) {
     Box {
         // Ideally these icons would be 24 dp, but due to density changes across devices we test
         // against in CI, on some devices using DP here causes there to be anti-aliasing issues.
         // Using ipx directly ensures that we will always have a consistent layout / drawing
         // story, so anti-aliasing should be identical.
-        val layoutSize = with(DensityAmbient.current) {
+        val layoutSize = with(AmbientDensity.current) {
             Modifier.preferredSize(72.toDp())
         }
         Row(Modifier.align(Alignment.Center)) {

@@ -148,7 +148,7 @@ fun AnimateContentSizeOption(state: MutableState<Boolean>) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HorizontalTransition(visible: Boolean, children: @Composable () -> Unit) {
+fun HorizontalTransition(visible: Boolean, content: @Composable () -> Unit) {
     AnimatedVisibility(
         visible = visible,
         enter = expandHorizontally(
@@ -165,13 +165,13 @@ fun HorizontalTransition(visible: Boolean, children: @Composable () -> Unit) {
             animSpec = tween(durationMillis = 400)
         ) + fadeOut()
     ) {
-        children()
+        content()
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SlideTransition(visible: Boolean, children: @Composable () -> Unit) {
+fun SlideTransition(visible: Boolean, content: @Composable () -> Unit) {
     AnimatedVisibility(
         visible = visible,
         enter = slideInHorizontally(
@@ -189,13 +189,13 @@ fun SlideTransition(visible: Boolean, children: @Composable () -> Unit) {
             animSpec = spring(stiffness = Spring.StiffnessHigh)
         ) + fadeOut()
     ) {
-        children()
+        content()
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun FadeTransition(visible: Boolean, children: @Composable () -> Unit) {
+fun FadeTransition(visible: Boolean, content: @Composable () -> Unit) {
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(
@@ -207,13 +207,13 @@ fun FadeTransition(visible: Boolean, children: @Composable () -> Unit) {
             animSpec = tween(durationMillis = 250)
         )
     ) {
-        children()
+        content()
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun FullyLoadedTransition(visible: Boolean, children: @Composable () -> Unit) {
+fun FullyLoadedTransition(visible: Boolean, content: @Composable () -> Unit) {
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(
@@ -225,6 +225,6 @@ fun FullyLoadedTransition(visible: Boolean, children: @Composable () -> Unit) {
         ) + fadeIn(initialAlpha = 0.3f),
         exit = slideOutVertically() + shrinkVertically() + fadeOut()
     ) {
-        children()
+        content()
     }
 }

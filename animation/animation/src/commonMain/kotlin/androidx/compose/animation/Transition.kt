@@ -30,7 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
@@ -76,7 +76,7 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 fun <T> transition(
     definition: TransitionDefinition<T>,
     toState: T,
-    clock: AnimationClockObservable = AnimationClockAmbient.current,
+    clock: AnimationClockObservable = AmbientAnimationClock.current,
     initState: T = toState,
     label: String? = null,
     onStateChangeFinished: ((T) -> Unit)? = null

@@ -21,6 +21,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -32,6 +33,7 @@ import kotlin.reflect.KClass
     minSdk = 23,
     maxSdk = 23
 )
+@Ignore("b/173733968")
 class ComposeCallLoweringTests : AbstractLoweringTests() {
 
     @Test
@@ -164,8 +166,8 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
                 import androidx.compose.runtime.*
 
                 @Composable
-                fun test(children: @Composable () -> Unit) {
-                    children()
+                fun test(content: @Composable () -> Unit) {
+                    content()
                 }
             """
         )
@@ -205,7 +207,7 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
         codegenNoImports(
             """
             import androidx.compose.runtime.Composable
-            import androidx.compose.ui.graphics.vector.VectorAsset
+            import androidx.compose.ui.graphics.vector.ImageVector
             import androidx.compose.ui.Modifier
             import androidx.compose.foundation.layout.Row
 
@@ -223,8 +225,8 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
             fun TodoItemInput(
                 text: String,
                 onTextChange: (String) -> Unit,
-                icon: VectorAsset,
-                onIconChange: (VectorAsset) -> Unit,
+                icon: ImageVector,
+                onIconChange: (ImageVector) -> Unit,
                 primaryAction: () -> Unit,
                 iconsVisible: Boolean,
                 modifier: Modifier = Modifier,
@@ -340,8 +342,8 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
             """
                 class TextSpanScope
 
-                @Composable fun TextSpanScope.Foo(children: @Composable TextSpanScope.() -> Unit) {
-                    children()
+                @Composable fun TextSpanScope.Foo(content: @Composable TextSpanScope.() -> Unit) {
+                    content()
                 }
             """
         )
@@ -376,11 +378,11 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
 
                 @Composable
                 inline fun PointerInputWrapper(
-                    crossinline children: @Composable () -> Unit
+                    crossinline content: @Composable () -> Unit
                 ) {
                     // Hide the internals of PointerInputNode
                     LinearLayout {
-                        children()
+                        content()
                     }
                 }
             """
@@ -417,17 +419,17 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
             """
         @Composable
         inline fun PointerInputWrapper(
-            crossinline children: @Composable () -> Unit
+            crossinline content: @Composable () -> Unit
         ) {
             LinearLayout {
-                children()
+                content()
             }
         }
 
         @Composable
-        fun PressReleasedGestureDetector(children: @Composable () -> Unit) {
+        fun PressReleasedGestureDetector(content: @Composable () -> Unit) {
             PointerInputWrapper {
-                children()
+                content()
             }
         }
             """.trimIndent()
@@ -439,14 +441,14 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
         codegen(
             """
         @Composable
-        inline fun Foo(crossinline children: @Composable () -> Unit) {
-                children()
+        inline fun Foo(crossinline content: @Composable () -> Unit) {
+                content()
         }
 
-        @Composable fun test(children: @Composable () -> Unit) {
+        @Composable fun test(content: @Composable () -> Unit) {
             Foo {
                 println("hello world")
-                children()
+                content()
             }
         }
             """
@@ -498,7 +500,7 @@ fun <T> B(foo: T, bar: String) { }
         codegen(
             """
 
-            @Composable fun SomeThing(children: @Composable () -> Unit) {}
+            @Composable fun SomeThing(content: @Composable () -> Unit) {}
 
             @Composable
             fun Example() {
@@ -643,8 +645,8 @@ fun <T> B(foo: T, bar: String) { }
                 }
 
                 @Composable
-                fun FancyBox2(children: @Composable ()->Unit) {
-                    children()
+                fun FancyBox2(content: @Composable ()->Unit) {
+                    content()
                 }
             """,
             "SimpleComposable(state=remember { mutableStateOf(0) })"
@@ -1043,8 +1045,8 @@ fun <T> B(foo: T, bar: String) { }
     fun testInline_NonComposable_Identity(): Unit = ensureSetup {
         compose(
             """
-            @Composable inline fun InlineWrapper(base: Int, children: @Composable ()->Unit) {
-              children()
+            @Composable inline fun InlineWrapper(base: Int, content: @Composable ()->Unit) {
+              content()
             }
             """,
             """
@@ -1075,9 +1077,9 @@ fun <T> B(foo: T, bar: String) { }
         compose(
             """
             @Composable
-            inline fun InlineWrapper(base: Int, crossinline children: @Composable ()->Unit) {
+            inline fun InlineWrapper(base: Int, crossinline content: @Composable ()->Unit) {
               LinearLayout(id = base + 0) {
-                children()
+                content()
               }
             }
             """,
@@ -1279,8 +1281,8 @@ fun <T> B(foo: T, bar: String) { }
         compose(
             """
                 @Composable
-                fun Foo(x: Double, children: @Composable Double.() -> Unit) {
-                  x.children()
+                fun Foo(x: Double, content: @Composable Double.() -> Unit) {
+                  x.content()
                 }
             """,
             """
@@ -1723,8 +1725,8 @@ fun <T> B(foo: T, bar: String) { }
         compose(
             """
                 @Composable
-                fun Block(children: @Composable () -> Unit) {
-                    children()
+                fun Block(content: @Composable () -> Unit) {
+                    content()
                 }
             """,
             """
@@ -1945,6 +1947,7 @@ fun <T> B(foo: T, bar: String) { }
         }
     }
 
+    @Ignore("b/171801506")
     @Test
     fun testEffects3(): Unit = ensureSetup {
         val log = StringBuilder()
@@ -1988,6 +1991,7 @@ fun <T> B(foo: T, bar: String) { }
         }
     }
 
+    @Ignore("b/171801506")
     @Test
     fun testEffects4(): Unit = ensureSetup {
         val log = StringBuilder()
@@ -2241,9 +2245,9 @@ fun <T> B(foo: T, bar: String) { }
                 }
 
                 @Composable
-                fun Box(children: @Composable ()->Unit) {
+                fun Box(content: @Composable ()->Unit) {
                     LinearLayout(orientation=LinearLayout.VERTICAL) {
-                        children()
+                        content()
                     }
                 }
             """,
@@ -2326,13 +2330,14 @@ fun <T> B(foo: T, bar: String) { }
                 @Composable
                 fun DefineAction(
                     onAction: Action = Action(param = 1) {},
-                    children: @Composable ()->Unit
+                    content: @Composable ()->Unit
                  ) { }
             """,
             """"""
         )
     }
 
+    @Ignore("b/171801506")
     @Test
     fun testStableParameters_Various(): Unit = ensureSetup {
         val output = ArrayList<String>()
@@ -2505,9 +2510,9 @@ fun <T> B(foo: T, bar: String) { }
             fun log(msg: String) { output.add(msg) }
 
             @Composable
-            fun Container(children: @Composable () -> Unit) {
+            fun Container(content: @Composable () -> Unit) {
               log("Container")
-              children()
+              content()
             }
 
             @Composable
@@ -2579,13 +2584,13 @@ fun <T> B(foo: T, bar: String) { }
             val m = mutableStateOf(0)
 
             @Composable
-            inline fun InlineContainer(children: @Composable () -> Unit) {
-                children()
+            inline fun InlineContainer(content: @Composable () -> Unit) {
+                content()
             }
 
             @Composable
-            fun Container(children: @Composable () -> Unit) {
-                children()
+            fun Container(content: @Composable () -> Unit) {
+                content()
             }
 
             @Composable
@@ -2633,8 +2638,8 @@ fun <T> B(foo: T, bar: String) { }
             class Receiver { var r: Int = 0 }
 
             @Composable
-            fun Container(children: @Composable Receiver.() -> Unit) {
-                Receiver().children()
+            fun Container(content: @Composable Receiver.() -> Unit) {
+                Receiver().content()
             }
 
             @Composable

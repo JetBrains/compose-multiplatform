@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
@@ -39,9 +39,11 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -276,7 +278,7 @@ fun rememberDrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ): DrawerState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     return rememberSavedInstanceState(
         clock,
         saver = DrawerState.Saver(clock, confirmStateChange)
@@ -296,7 +298,7 @@ fun rememberBottomDrawerState(
     initialValue: BottomDrawerValue,
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
 ): BottomDrawerState {
-    val clock = AnimationClockAmbient.current.asDisposableClock()
+    val clock = AmbientAnimationClock.current.asDisposableClock()
     return rememberSavedInstanceState(
         clock,
         saver = BottomDrawerState.Saver(clock, confirmStateChange)
@@ -356,7 +358,7 @@ fun ModalDrawerLayout(
         val maxValue = 0f
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
-        val isRtl = LayoutDirectionAmbient.current == LayoutDirection.Rtl
+        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         Box(
             Modifier.swipeable(
                 state = drawerState,
@@ -379,20 +381,27 @@ fun ModalDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = with(DensityAmbient.current) {
+                modifier = with(AmbientDensity.current) {
                     Modifier.preferredSizeIn(
                         minWidth = constraints.minWidth.toDp(),
                         minHeight = constraints.minHeight.toDp(),
                         maxWidth = constraints.maxWidth.toDp(),
                         maxHeight = constraints.maxHeight.toDp()
                     )
-                }.offsetPx(x = drawerState.offset).padding(end = VerticalDrawerPadding),
+                }
+                    .semantics {
+                        if (drawerState.isOpen) {
+                            dismiss(action = { drawerState.close(); true })
+                        }
+                    }
+                    .offset(x = { drawerState.offset.value })
+                    .padding(end = VerticalDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), children = drawerContent)
+                Column(Modifier.fillMaxSize(), content = drawerContent)
             }
         }
     }
@@ -493,20 +502,26 @@ fun BottomDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = with(DensityAmbient.current) {
+                modifier = with(AmbientDensity.current) {
                     Modifier.preferredSizeIn(
                         minWidth = constraints.minWidth.toDp(),
                         minHeight = constraints.minHeight.toDp(),
                         maxWidth = constraints.maxWidth.toDp(),
                         maxHeight = constraints.maxHeight.toDp()
                     )
-                }.offsetPx(y = drawerState.offset),
+                }
+                    .semantics {
+                        if (drawerState.isOpen) {
+                            dismiss(action = { drawerState.close(); true })
+                        }
+                    }
+                    .offset(y = { drawerState.offset.value }),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), children = drawerContent)
+                Column(Modifier.fillMaxSize(), content = drawerContent)
             }
         }
     }

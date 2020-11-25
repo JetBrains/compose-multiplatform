@@ -114,9 +114,9 @@ class PhysicsAnimationTest {
         )
         val criticalWrapper = TargetBasedAnimation(
             criticalSpec,
-            startValue = startValue,
-            endValue = endValue,
-            startVelocity = startVelocity,
+            initialValue = startValue,
+            targetValue = endValue,
+            initialVelocity = startVelocity,
             converter = Float.VectorConverter
         )
 
@@ -147,9 +147,9 @@ class PhysicsAnimationTest {
         )
         val overWrapper = TargetBasedAnimation(
             overSpec,
-            startValue = startValue,
-            endValue = endValue,
-            startVelocity = startVelocity,
+            initialValue = startValue,
+            targetValue = endValue,
+            initialVelocity = startVelocity,
             converter = Float.VectorConverter
         )
 
@@ -180,9 +180,9 @@ class PhysicsAnimationTest {
         )
         val underWrapper = TargetBasedAnimation(
             underSpec,
-            startValue = startValue,
-            endValue = endValue,
-            startVelocity = startVelocity,
+            initialValue = startValue,
+            targetValue = endValue,
+            initialVelocity = startVelocity,
             converter = Float.VectorConverter
         )
 
@@ -307,9 +307,9 @@ class PhysicsAnimationTest {
         endValue: Float
     ): Animation<Float, AnimationVector1D> {
         return this.createAnimation(
-            startValue = startValue,
-            endValue = endValue,
-            startVelocityVector = AnimationVector(startVelocity),
+            initialValue = startValue,
+            targetValue = endValue,
+            initialVelocityVector = AnimationVector(startVelocity),
             converter = Float.VectorConverter
         )
     }

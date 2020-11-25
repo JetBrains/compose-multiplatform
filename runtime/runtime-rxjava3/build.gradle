@@ -36,7 +36,7 @@ dependencies {
     api project(":compose:runtime:runtime")
     api(RX_JAVA3)
 
-    androidTestImplementation project(':ui:ui-test')
+    androidTestImplementation project(":compose:ui:ui-test-junit4")
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(TRUTH)
@@ -45,7 +45,6 @@ dependencies {
 androidx {
     name = "Compose RxJava 3 integration"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"
     description = "Compose integration with RxJava 3"

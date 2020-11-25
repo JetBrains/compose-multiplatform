@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.Constraints
 
@@ -40,15 +39,15 @@ fun HeaderFooterLayout(
         Box(Modifier.layoutId("footer")) { footer() }
         content()
     }) { measurables, constraints ->
-        val headerPlaceable = measurables.first { it.id == "header" }.measure(
+        val headerPlaceable = measurables.first { it.layoutId == "header" }.measure(
             Constraints.fixed(constraints.maxWidth, 100)
         )
         val footerPadding = 50
-        val footerPlaceable = measurables.first { it.id == "footer" }.measure(
+        val footerPlaceable = measurables.first { it.layoutId == "footer" }.measure(
             Constraints.fixed(constraints.maxWidth - footerPadding * 2, 100)
         )
 
-        val contentMeasurables = measurables.filter { it.id == null }
+        val contentMeasurables = measurables.filter { it.layoutId == null }
         val itemHeight =
             (constraints.maxHeight - headerPlaceable.height - footerPlaceable.height) /
                 contentMeasurables.size

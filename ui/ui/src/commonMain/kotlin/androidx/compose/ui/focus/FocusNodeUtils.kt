@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
@@ -45,7 +44,6 @@ internal fun LayoutNode.focusableChildren2(): List<ModifiedFocusNode> {
  * @param queue a mutable list used as a queue for breadth-first search.
  */
 @OptIn(
-    ExperimentalCollectionApi::class,
     ExperimentalLayoutNodeApi::class
 )
 internal fun LayoutNode.searchChildrenForFocusNode(

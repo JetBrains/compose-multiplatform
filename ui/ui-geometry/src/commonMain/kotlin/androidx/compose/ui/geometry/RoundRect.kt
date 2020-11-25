@@ -307,42 +307,6 @@ fun RoundRect(
     bottomLeftCornerRadius = bottomLeft
 )
 
-/** The top-left [CornerRadius]. */
-@Deprecated(
-    "use topLeftRadius instead",
-    ReplaceWith("topLeftRadius", "androidx.compose.ui.geometry")
-)
-fun RoundRect.topLeftRadius(): CornerRadius = topLeftCornerRadius
-
-/**  The top-right [CornerRadius]. */
-@Deprecated(
-    "Use topRightRadius instead",
-    ReplaceWith("topRightRadius", "androidx.compose.ui.geometry")
-)
-fun RoundRect.topRightRadius(): CornerRadius = topRightCornerRadius
-
-/**  The bottom-right [CornerRadius]. */
-@Deprecated(
-    "Use bottomRightRadius instead",
-    ReplaceWith("bottomRightRadius", "androidx.compose.ui.geometry")
-)
-fun RoundRect.bottomRightRadius(): CornerRadius = bottomRightCornerRadius
-
-/**  The bottom-right [CornerRadius]. */
-@Deprecated(
-    "Use bottomLeftRadius instead",
-    ReplaceWith("bottomLeftRadius", "androidx.compose.ui.geometry")
-)
-/** The bottom-left [CornerRadius]. */
-fun RoundRect.bottomLeftRadius(): CornerRadius = bottomLeftCornerRadius
-
-/** Returns a new [RoundRect] translated by the given offset. */
-@Deprecated(
-    "Use translate(offset) instead",
-    ReplaceWith("translate(offset)", "androidx.compose.ui.RoundRect")
-)
-fun RoundRect.shift(offset: Offset): RoundRect = translate(offset)
-
 /** Returns a new [RoundRect] translated by the given offset. */
 fun RoundRect.translate(offset: Offset): RoundRect = RoundRect(
     left = left + offset.x,
@@ -355,27 +319,8 @@ fun RoundRect.translate(offset: Offset): RoundRect = RoundRect(
     bottomLeftCornerRadius = bottomLeftCornerRadius
 )
 
-@Deprecated(
-    "Use outerRect instead",
-    ReplaceWith("boundingRect", "androidx.compose.ui.RoundRect")
-)
-/** The bounding box of this rounded rectangle (the rectangle with no rounded corners). */
-fun RoundRect.outerRect(): Rect = boundingRect
-
 /** The bounding box of this rounded rectangle (the rectangle with no rounded corners). */
 val RoundRect.boundingRect: Rect get() = Rect(left, top, right, bottom)
-
-/**
- * The non-rounded rectangle that is constrained by the smaller of the two
- * diagonals, with each diagonal traveling through the middle of the curve
- * corners. The middle of a corner is the intersection of the curve with its
- * respective quadrant bisector.
- */
-@Deprecated(
-    "Use safeInnerRect instead",
-    ReplaceWith("safeInnerRect", "androidx.compose.ui.RoundRect")
-)
-fun RoundRect.safeInnerRect(): Rect = safeInnerRect
 
 /**
  * The non-rounded rectangle that is constrained by the smaller of the two
@@ -438,39 +383,9 @@ val RoundRect.isCircle get() = width == height && isEllipse
  * The lesser of the magnitudes of the [RoundRect.width] and the [RoundRect.height] of this
  * rounded rectangle.
  */
-@Deprecated(
-    "Use minDimension instead",
-    ReplaceWith("minDimension", "androidx.compose.ui.RoundRect")
-)
-val RoundRect.shortestSide get(): Float = minDimension
-
-/**
- * The lesser of the magnitudes of the [RoundRect.width] and the [RoundRect.height] of this
- * rounded rectangle.
- */
 val RoundRect.minDimension get(): Float = min(width.absoluteValue, height.absoluteValue)
 
-/**
- * The greater of the magnitudes of the [RoundRect.width] and the [RoundRect.height] of this
- * rounded rectangle.
- */
-@Deprecated(
-    "Use maxDimension instead",
-    ReplaceWith("maxDimension", "androidx.compose.ui.RoundRect")
-)
-val RoundRect.longestSide get(): Float = maxDimension
-
 val RoundRect.maxDimension get(): Float = max(width.absoluteValue, height.absoluteValue)
-
-/**
- * The offset to the point halfway between the left and right and the top and
- * bottom edges of this rectangle.
- */
-@Deprecated(
-    "Use center instead",
-    ReplaceWith("center", "androidx.compose.ui.RoundRect")
-)
-fun RoundRect.center(): Offset = Offset((left + width / 2.0f), (top + height / 2.0f))
 
 /**
  * The offset to the point halfway between the left and right and the top and

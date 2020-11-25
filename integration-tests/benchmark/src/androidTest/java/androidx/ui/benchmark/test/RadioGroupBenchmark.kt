@@ -107,7 +107,7 @@ internal class RadioGroupTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         MaterialTheme {
             Column {
                 options.forEach { item ->

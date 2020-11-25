@@ -34,7 +34,7 @@ class TestMonotonicFrameClockTest {
         val frameDelayNanos = 16_000_000L
         withContext(TestMonotonicFrameClock(this, frameDelayNanos)) {
             val startTime = currentTime
-            val expectedFrameTime = startTime + frameDelayNanos
+            val expectedFrameTime = startTime + frameDelayNanos / 1_000_000
             val counter = TestCounter()
             launch {
                 withFrameNanos {

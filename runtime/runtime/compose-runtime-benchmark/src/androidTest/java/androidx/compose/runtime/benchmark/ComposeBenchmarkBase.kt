@@ -34,7 +34,12 @@ import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.DelayController
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 
 @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
@@ -75,21 +80,82 @@ abstract class ComposeBenchmarkBase {
         require(composer != null) { "Composer was null" }
         val readObserver: SnapshotReadObserver = { composer.recordReadOf(it) }
         val writeObserver: SnapshotWriteObserver = { composer.recordWriteOf(it) }
-        benchmarkRule.measureRepeated {
+        val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
+            composer.recordModificationsOf(changed)
+        }
+        try {
+            benchmarkRule.measureRepeated {
+                runWithTimingDisabled {
+                    receiver.updateModelCb()
+                    Snapshot.sendApplyNotifications()
+                }
+                val didSomething = composer.performRecompose(readObserver, writeObserver)
+                assertTrue(didSomething)
+                runWithTimingDisabled {
+                    receiver.resetCb()
+                    Snapshot.sendApplyNotifications()
+                    composer.performRecompose(readObserver, writeObserver)
+                }
+            }
+        } finally {
+            unregisterApplyObserver()
+            composition.dispose()
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    suspend fun DelayController.measureRecomposeSuspending(
+        block: RecomposeReceiver.() -> Unit
+    ) = coroutineScope {
+        val receiver = RecomposeReceiver()
+        receiver.block()
+
+        val activity = activityRule.activity
+
+        val recomposer = Recomposer(coroutineContext)
+        launch { recomposer.runRecomposeAndApplyChanges() }
+
+        val composition = activity.setContent(recomposer) {
+            receiver.composeCb()
+        }
+
+        var iterations = 0
+        benchmarkRule.measureRepeatedSuspendable {
             runWithTimingDisabled {
                 receiver.updateModelCb()
                 Snapshot.sendApplyNotifications()
             }
-            val didSomething = composer.performRecompose(readObserver, writeObserver)
-            assertTrue(didSomething)
+            assertTrue(
+                "recomposer does not have invalidations for frame",
+                recomposer.hasInvalidations()
+            )
+            advanceUntilIdle()
+            assertFalse(
+                "recomposer has invalidations for frame",
+                recomposer.hasInvalidations()
+            )
             runWithTimingDisabled {
                 receiver.resetCb()
                 Snapshot.sendApplyNotifications()
-                composer.performRecompose(readObserver, writeObserver)
+                advanceUntilIdle()
             }
+            iterations++
         }
 
         composition.dispose()
+        recomposer.shutDown()
+    }
+}
+
+inline fun BenchmarkRule.measureRepeatedSuspendable(block: BenchmarkRule.Scope.() -> Unit) {
+    // Note: this is an extension function to discourage calling from Java.
+
+    // Extract members to locals, to ensure we check #applied, and we don't hit accessors
+    val localState = getState()
+    val localScope = scope
+
+    while (localState.keepRunningInline()) {
+        block(localScope)
     }
 }
 

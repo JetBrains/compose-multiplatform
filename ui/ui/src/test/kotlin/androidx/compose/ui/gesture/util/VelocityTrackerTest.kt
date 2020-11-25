@@ -55,7 +55,7 @@ class VelocityTrackerTest {
         var i = 0
         velocityEventData.forEach {
             if (it.down) {
-                tracker.addPosition(it.uptime!!, it.position!!)
+                tracker.addPosition(it.uptime, it.position)
             } else {
                 checkVelocity(tracker.calculateVelocity(), expected[i].first, expected[i].second)
                 tracker.resetTracking()
@@ -69,7 +69,7 @@ class VelocityTrackerTest {
         val tracker = VelocityTracker()
         interruptedVelocityEventData.forEach {
             if (it.down) {
-                tracker.addPosition(it.uptime!!, it.position!!)
+                tracker.addPosition(it.uptime, it.position)
             } else {
                 checkVelocity(
                     tracker.calculateVelocity(),
@@ -91,8 +91,8 @@ class VelocityTrackerTest {
     fun calculateVelocity_onePosition_returnsZero() {
         val tracker = VelocityTracker()
         tracker.addPosition(
-            velocityEventData[0].uptime!!,
-            velocityEventData[0].position!!
+            velocityEventData[0].uptime,
+            velocityEventData[0].position
         )
         assertThat(tracker.calculateVelocity()).isEqualTo(Velocity.Zero)
     }
@@ -101,8 +101,8 @@ class VelocityTrackerTest {
     fun resetTracking_resetsTracking() {
         val tracker = VelocityTracker()
         tracker.addPosition(
-            velocityEventData[0].uptime!!,
-            velocityEventData[0].position!!
+            velocityEventData[0].uptime,
+            velocityEventData[0].position
         )
 
         tracker.resetTracking()

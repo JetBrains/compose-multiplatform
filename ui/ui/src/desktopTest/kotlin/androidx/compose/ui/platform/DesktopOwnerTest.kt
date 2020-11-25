@@ -34,25 +34,22 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
-import androidx.compose.ui.test.initCompose
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -64,38 +61,6 @@ import org.junit.Test
 class DesktopOwnerTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/ui")
-
-    @Test
-    fun `single invalidate with multiple observers and single state change`() {
-        initCompose()
-
-        var invalidateCount = 0
-
-        val owners = DesktopOwners(
-            invalidate = {
-                invalidateCount++
-            }
-        )
-        val owner = DesktopOwner(owners)
-        val node = LayoutNode()
-        val state = mutableStateOf(2)
-
-        owner.observeLayoutModelReads(node) {
-            state.value
-        }
-
-        owner.observeLayoutModelReads(node) {
-            state.value
-        }
-
-        val oldInvalidateCount = invalidateCount
-
-        Snapshot.notifyObjectsInitialized()
-        state.value++
-        Snapshot.sendApplyNotifications()
-
-        assertEquals(1, invalidateCount - oldInvalidateCount)
-    }
 
     @Test(timeout = 5000)
     fun `rendering of Box state change`() = renderingTest(width = 40, height = 40) {
@@ -218,7 +183,7 @@ class DesktopOwnerTest {
         var translationX by mutableStateOf(10f)
         var offsetX by mutableStateOf(10.dp)
         setContent {
-            Box(Modifier.offset(x = offsetX).drawLayer(translationX = translationX)) {
+            Box(Modifier.offset(x = offsetX).graphicsLayer(translationX = translationX)) {
                 Box(Modifier.background(Color.Green).size(10.dp))
             }
         }
@@ -245,6 +210,7 @@ class DesktopOwnerTest {
     }
 
     @Test(timeout = 5000)
+    @Ignore("enable after we fix https://github.com/JetBrains/compose-jb/issues/137")
     fun `rendering of transition`() = renderingTest(width = 40, height = 40) {
         var targetValue by mutableStateOf(10f)
 
@@ -361,6 +327,7 @@ class DesktopOwnerTest {
     }
 
     @Test(timeout = 5000)
+    @Ignore("enable after we fix https://github.com/JetBrains/compose-jb/issues/137")
     fun `rendering, change state before first onRender`() = renderingTest(
         width = 40,
         height = 40

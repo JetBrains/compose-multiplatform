@@ -29,7 +29,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
 private const val DividerLengthInDegrees = 1.8f
@@ -67,7 +67,7 @@ fun AnimatedCircle(
     proportions: List<Float>,
     colors: List<Color>
 ) {
-    val stroke = Stroke(5.dp.value * DensityAmbient.current.density)
+    val stroke = Stroke(5.dp.value * AmbientDensity.current.density)
     val state = transition(definition = CircularTransition, initState = 0, toState = 1)
     Canvas(modifier) {
         val innerRadius = (size.minDimension - stroke.width) / 2

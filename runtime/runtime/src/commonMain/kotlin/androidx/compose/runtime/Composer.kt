@@ -359,9 +359,6 @@ class Composer<N>(
      */
     private val parentReference: CompositionReference
 ) {
-    init {
-        FrameManager.ensureStarted()
-    }
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = HashMap<
         CompositionLifecycleObserverHolder,
@@ -395,7 +392,6 @@ class Composer<N>(
         private set
     internal var isDisposed = false
         private set
-    internal var disposeHook: (() -> Unit)? = null
 
     private var reader: SlotReader = slotTable.openReader().also { it.close() }
 
@@ -836,7 +832,6 @@ class Composer<N>(
                 applier.clear()
             }
             isDisposed = true
-            disposeHook?.invoke()
         }
     }
 
@@ -1371,7 +1366,7 @@ class Composer<N>(
             if (collectKeySources)
                 recordSourceKeyInfo(key)
             when {
-                isNode -> writer.startNode(null)
+                isNode -> writer.startNode(EMPTY)
                 data != null -> writer.startData(key, objectKey ?: EMPTY, data)
                 else -> writer.startGroup(key, objectKey ?: EMPTY)
             }
@@ -1907,6 +1902,16 @@ class Composer<N>(
                 reader.groupObjectKey(group)?.hashCode() ?: 0
             else reader.groupKey(group)
             )
+    }
+
+    /**
+     * Invalidate all known RecomposeScopes. Used by [Recomposer] to bring known composers
+     * back into a known good state after a period of time when snapshot changes were not
+     * being observed.
+     */
+    @OptIn(InternalComposeApi::class)
+    internal fun invalidateAll() {
+        slotTable.slots.forEach { (it as? RecomposeScope)?.invalidate() }
     }
 
     @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
@@ -2470,12 +2475,22 @@ class Composer<N>(
         }
 
         override fun registerComposer(composer: Composer<*>) {
+            super.registerComposer(composer)
             composers.add(composer)
         }
 
         override fun unregisterComposer(composer: Composer<*>) {
             inspectionTables?.forEach { it.remove(composer.slotTable) }
             composers.remove(composer)
+            super.unregisterComposer(composer)
+        }
+
+        override fun registerComposerWithRoot(composer: Composer<*>) {
+            parentReference.registerComposerWithRoot(composer)
+        }
+
+        override fun unregisterComposerWithRoot(composer: Composer<*>) {
+            parentReference.unregisterComposerWithRoot(composer)
         }
 
         override val effectCoroutineContext: CoroutineContext

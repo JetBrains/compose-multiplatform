@@ -33,14 +33,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -57,7 +56,7 @@ val ComplexTouchInterop = DemoCategory(
 
 @Composable
 fun ComposeInAndroidInComposeEtcTargetingDemo() {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     Column {
         Text(
             "In this demo, from the inside out, we have a Compose Button, wrapped in 2 Android " +
@@ -84,21 +83,21 @@ fun ComposeInAndroidInComposeEtcTargetingDemo() {
                         setBackgroundColor(0xFF888888.toInt())
                         layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
                         addView(
-                            FrameLayout(context).apply {
+                            ComposeView(context).apply {
                                 setPadding(100, 100, 100, 100)
                                 setBackgroundColor(0xFF999999.toInt())
                                 layoutParams =
                                     RelativeLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
                                         addRule(RelativeLayout.CENTER_IN_PARENT)
                                     }
-                                setContent(Recomposer.current()) {
+                                setContent {
                                     Box(
                                         Modifier
                                             .background(color = Color(0xFFAAAAAA))
                                             .fillMaxSize()
                                             .wrapContentSize(Alignment.Center)
                                     ) {
-                                        colorButton()
+                                        ColorButton()
                                     }
                                 }
                             }
@@ -111,7 +110,7 @@ fun ComposeInAndroidInComposeEtcTargetingDemo() {
 }
 
 @Composable
-fun colorButton() {
+private fun ColorButton() {
     val state = remember { mutableStateOf(false) }
     val color =
         if (state.value) {

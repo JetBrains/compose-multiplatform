@@ -23,12 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
  * To modify these default style values used by text, use [ProvideTextStyle] or explicitly
  * pass a new [TextStyle] to your text.
  *
- * To manually retrieve the content color inside a surface, use [contentColor].
+ * To manually retrieve the content color inside a surface, use [AmbientContentColor].
  *
  * @param modifier Modifier to be applied to the layout corresponding to the surface
  * @param shape Defines the surface's shape as well its shadow. A shadow is only
@@ -91,7 +91,7 @@ fun Surface(
     elevation: Dp = 0.dp,
     content: @Composable () -> Unit
 ) {
-    val elevationPx = with(DensityAmbient.current) { elevation.toPx() }
+    val elevationPx = with(AmbientDensity.current) { elevation.toPx() }
     val elevationOverlay = AmbientElevationOverlay.current
     val absoluteElevation = AmbientAbsoluteElevation.current + elevation
     val backgroundColor = if (color == MaterialTheme.colors.surface && elevationOverlay != null) {
@@ -100,7 +100,7 @@ fun Surface(
         color
     }
     SurfaceLayout(
-        modifier.drawLayer(shadowElevation = elevationPx, shape = shape)
+        modifier.graphicsLayer(shadowElevation = elevationPx, shape = shape)
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .background(
                 color = backgroundColor,
@@ -111,7 +111,7 @@ fun Surface(
         Providers(
             AmbientContentColor provides contentColor,
             AmbientAbsoluteElevation provides absoluteElevation,
-            children = content
+            content = content
         )
     }
 }
@@ -133,8 +133,8 @@ val Colors.primarySurface: Color get() = if (isLight) primary else surface
  */
 // TODO("Andrey: Should be replaced with some basic layout implementation when we have it")
 @Composable
-private fun SurfaceLayout(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
-    Layout(children, modifier) { measurables, constraints ->
+private fun SurfaceLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(content, modifier) { measurables, constraints ->
         if (measurables.size > 1) {
             throw IllegalStateException("Surface can have only one direct measurable child!")
         }

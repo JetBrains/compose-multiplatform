@@ -16,14 +16,12 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.foundation.selection.ToggleableState
-import androidx.compose.foundation.semantics.FoundationSemanticsProperties
-import androidx.compose.foundation.text.TextSemanticsProperties
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastAny
 
@@ -46,52 +44,68 @@ fun isNotEnabled(): SemanticsMatcher =
 /**
  * Return whether the node is checkable.
  *
- * @see FoundationSemanticsProperties.ToggleableState
+ * @see SemanticsProperties.ToggleableState
  */
 fun isToggleable(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(FoundationSemanticsProperties.ToggleableState)
+    SemanticsMatcher.keyIsDefined(SemanticsProperties.ToggleableState)
 
 /**
  * Returns whether the node is toggled.
  *
- * @see FoundationSemanticsProperties.ToggleableState
+ * @see SemanticsProperties.ToggleableState
  */
 fun isOn(): SemanticsMatcher = SemanticsMatcher.expectValue(
-    FoundationSemanticsProperties.ToggleableState, ToggleableState.On
+    SemanticsProperties.ToggleableState, ToggleableState.On
 )
 
 /**
  * Returns whether the node is not toggled.
  *
- * @see FoundationSemanticsProperties.ToggleableState
+ * @see SemanticsProperties.ToggleableState
  */
 fun isOff(): SemanticsMatcher = SemanticsMatcher.expectValue(
-    FoundationSemanticsProperties.ToggleableState, ToggleableState.Off
+    SemanticsProperties.ToggleableState, ToggleableState.Off
 )
 
 /**
  * Return whether the node is selectable.
  *
- * @see FoundationSemanticsProperties.Selected
+ * @see SemanticsProperties.Selected
  */
 fun isSelectable(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(FoundationSemanticsProperties.Selected)
+    SemanticsMatcher.keyIsDefined(SemanticsProperties.Selected)
 
 /**
  * Returns whether the node is selected.
  *
- * @see FoundationSemanticsProperties.Selected
+ * @see SemanticsProperties.Selected
  */
 fun isSelected(): SemanticsMatcher =
-    SemanticsMatcher.expectValue(FoundationSemanticsProperties.Selected, true)
+    SemanticsMatcher.expectValue(SemanticsProperties.Selected, true)
 
 /**
  * Returns whether the node is not selected.
  *
- * @see FoundationSemanticsProperties.Selected
+ * @see SemanticsProperties.Selected
  */
 fun isNotSelected(): SemanticsMatcher =
-    SemanticsMatcher.expectValue(FoundationSemanticsProperties.Selected, false)
+    SemanticsMatcher.expectValue(SemanticsProperties.Selected, false)
+
+/**
+ * Return whether the node is able to receive focus
+ *
+ * @see SemanticsProperties.Focused
+ */
+fun isFocusable(): SemanticsMatcher =
+    SemanticsMatcher.keyIsDefined(SemanticsProperties.Focused)
+
+/**
+ * Return whether the node is not able to receive focus.
+ *
+ * @see SemanticsProperties.Focused
+ */
+fun isNotFocusable(): SemanticsMatcher =
+    SemanticsMatcher.keyNotDefined(SemanticsProperties.Focused)
 
 /**
  * Returns whether the node is focused.
@@ -225,12 +239,15 @@ fun hasTestTag(testTag: String): SemanticsMatcher =
     SemanticsMatcher.expectValue(SemanticsProperties.TestTag, testTag)
 
 /**
- * Verifies that the node is in a mutually exclusive group - that is,
- * that [FoundationSemanticsProperties.InMutuallyExclusiveGroup] is set to true
+ * Verifies that the node is in a mutually exclusive group.
  *
+ * @Deprecated Replaced with androidx.compose.ui.test.isSelectable
  */
-fun isInMutuallyExclusiveGroup(): SemanticsMatcher =
-    SemanticsMatcher.expectValue(FoundationSemanticsProperties.InMutuallyExclusiveGroup, true)
+@Deprecated(
+    "Replaced with androidx.compose.ui.test.isSelectable",
+    ReplaceWith("isSelectable()", "androidx.compose.ui.test")
+)
+fun isInMutuallyExclusiveGroup(): SemanticsMatcher = isSelectable()
 
 /**
  * Returns whether the node is hidden. A hidden node is a node that is not visible for
@@ -281,7 +298,7 @@ fun isPopup(): SemanticsMatcher =
  * @param actionType the action to match.
  */
 fun hasImeAction(actionType: ImeAction) =
-    SemanticsMatcher.expectValue(TextSemanticsProperties.ImeAction, actionType)
+    SemanticsMatcher.expectValue(SemanticsProperties.ImeAction, actionType)
 
 /**
  * Return whether the node supports input methods.
@@ -290,9 +307,24 @@ fun hasImeAction(actionType: ImeAction) =
  * able to accept input from it. This is however not enforced and relies on the nodes to
  * properly add this to semantics when they provide input. Note that this is not related to
  * gestures input but only to IME. This can be used to for instance filter out all text fields.
+ *
+ * @Deprecated Replaced with androidx.compose.ui.test.hasSetTextAction
  */
-fun hasInputMethodsSupport() =
-    SemanticsMatcher.keyIsDefined(TextSemanticsProperties.SupportsInputMethods)
+@Deprecated(
+    "Replaced with androidx.compose.ui.test.hasSetTextAction",
+    ReplaceWith("hasSetTextAction()", "androidx.compose.ui.test")
+)
+fun hasInputMethodsSupport() = hasSetTextAction()
+
+/**
+ * Returns whether the node defines semantics action to set text to it.
+ *
+ * This can be used to for instance filter out text fields.
+ *
+ * @see SemanticsActions.SetText
+ */
+fun hasSetTextAction() =
+    SemanticsMatcher.keyIsDefined(SemanticsActions.SetText)
 
 /**
  * Return whether the node is the root semantics node.

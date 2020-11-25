@@ -45,7 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -135,7 +135,7 @@ fun Button(
                         .padding(contentPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    children = content
+                    content = content
                 )
             }
         }
@@ -371,7 +371,7 @@ object ButtonConstants {
         // hovered: Dp = 4.dp,
         disabledElevation: Dp = 0.dp
     ): ButtonElevation {
-        val clock = AnimationClockAmbient.current.asDisposableClock()
+        val clock = AmbientAnimationClock.current.asDisposableClock()
         return remember(defaultElevation, pressedElevation, disabledElevation, clock) {
             DefaultButtonElevation(
                 defaultElevation = defaultElevation,

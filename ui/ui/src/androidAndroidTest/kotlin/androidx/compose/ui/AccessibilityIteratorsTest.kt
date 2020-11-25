@@ -24,7 +24,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.AccessibilityIterators
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -426,7 +425,7 @@ class AccessibilityIteratorsTest {
         var textLayoutResult: TextLayoutResult? = null
         rule.setContent {
             // TODO(yingleiw): use predefined DensityAmbient.current when b/163142237 is fixed.
-            with(DensityAmbient.current) {
+            with(AmbientDensity.current) {
                 BasicText(
                     style = TextStyle(
                         fontSize = fontSize,
@@ -450,7 +449,7 @@ class AccessibilityIteratorsTest {
         var textLayoutResult: TextLayoutResult? = null
         rule.setContent {
             ScrollableColumn {
-                val state = remember { mutableStateOf(TextFieldValue(text = InputText)) }
+                val state = remember { mutableStateOf(InputText) }
                 BasicTextField(
                     value = state.value,
                     onValueChange = { state.value = it },

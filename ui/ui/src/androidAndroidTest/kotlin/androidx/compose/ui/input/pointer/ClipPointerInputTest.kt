@@ -29,7 +29,7 @@ import androidx.compose.ui.gesture.MotionEvent
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -98,15 +98,15 @@ class ClipPointerInputTest {
             activity.setContent {
 
                 val children = @Composable {
-                    child(loggingPim1)
-                    child(loggingPim2)
-                    child(loggingPim3)
-                    child(loggingPim4)
+                    Child(loggingPim1)
+                    Child(loggingPim2)
+                    Child(loggingPim3)
+                    Child(loggingPim4)
                 }
 
                 val middle = @Composable {
                     Layout(
-                        children = children,
+                        content = children,
                         modifier = Modifier.clipToBounds()
                     ) { measurables, constraints ->
                         val placeables = measurables.map { m ->
@@ -121,7 +121,7 @@ class ClipPointerInputTest {
                     }
                 }
 
-                Layout(children = middle) { measurables, constraints ->
+                Layout(content = middle) { measurables, constraints ->
                     val placeables = measurables.map { m ->
                         m.measure(constraints)
                     }
@@ -224,18 +224,18 @@ class ClipPointerInputTest {
         rule.runOnUiThreadIR {
             activity.setContent {
 
-                with(DensityAmbient.current) {
+                with(AmbientDensity.current) {
 
                     val children = @Composable {
-                        child(Modifier.offset((-1f).toDp(), (-1f).toDp()).then(loggingPim1))
-                        child(Modifier.offset(2f.toDp(), (-1f).toDp()).then(loggingPim2))
-                        child(Modifier.offset((-1f).toDp(), 2f.toDp()).then(loggingPim3))
-                        child(Modifier.offset(2f.toDp(), 2f.toDp()).then(loggingPim4))
+                        Child(Modifier.offset((-1f).toDp(), (-1f).toDp()).then(loggingPim1))
+                        Child(Modifier.offset(2f.toDp(), (-1f).toDp()).then(loggingPim2))
+                        Child(Modifier.offset((-1f).toDp(), 2f.toDp()).then(loggingPim3))
+                        Child(Modifier.offset(2f.toDp(), 2f.toDp()).then(loggingPim4))
                     }
 
                     val middle = @Composable {
                         Layout(
-                            children = children,
+                            content = children,
                             modifier = Modifier.clipToBounds()
                         ) { measurables, constraints ->
                             val placeables = measurables.map { m ->
@@ -247,7 +247,7 @@ class ClipPointerInputTest {
                         }
                     }
 
-                    Layout(children = middle) { measurables, constraints ->
+                    Layout(content = middle) { measurables, constraints ->
                         val placeables = measurables.map { m ->
                             m.measure(constraints)
                         }
@@ -315,8 +315,8 @@ class ClipPointerInputTest {
     }
 
     @Composable
-    fun child(modifier: Modifier) {
-        Layout(children = emptyContent(), modifier = modifier) { _, _ ->
+    fun Child(modifier: Modifier) {
+        Layout(content = emptyContent(), modifier = modifier) { _, _ ->
             layout(2, 2) {}
         }
     }
@@ -333,7 +333,7 @@ class ClipPointerInputTest {
                 if (pass == PointerEventPass.Initial) {
                     pointerEvent.changes.forEach {
                         println("testtest, bounds: $bounds")
-                        log.add(it.current.position!!)
+                        log.add(it.current.position)
                     }
                 }
             }

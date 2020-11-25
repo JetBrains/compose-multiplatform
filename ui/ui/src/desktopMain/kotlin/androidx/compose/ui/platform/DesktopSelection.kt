@@ -28,14 +28,14 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.gesture.rawPressStartGestureFilter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.selection.AmbientSelectionRegistrar
 import androidx.compose.ui.selection.Selection
-import androidx.compose.ui.selection.SelectionRegistrarAmbient
 import androidx.compose.ui.selection.SelectionRegistrarImpl
 import kotlin.math.max
 
 @Composable
-private fun Wrap(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
-    Layout(modifier = modifier, children = children) { measurables, constraints ->
+private fun Wrap(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints)
         }
@@ -57,12 +57,12 @@ private fun Wrap(modifier: Modifier = Modifier, children: @Composable () -> Unit
 }
 
 @Composable
-internal fun DesktopSelectionContainer(children: @Composable () -> Unit) {
+internal fun DesktopSelectionContainer(content: @Composable () -> Unit) {
     val selection = remember { mutableStateOf<Selection?>(null) }
     DesktopSelectionContainer(
         selection = selection.value,
         onSelectionChange = { selection.value = it },
-        children = children
+        content = content
     )
 }
 
@@ -96,7 +96,7 @@ private class DragGlue(val observer: DragObserver) : DragObserver by observer {
 fun DesktopSelectionContainer(
     selection: Selection?,
     onSelectionChange: (Selection?) -> Unit,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val registrarImpl = remember { SelectionRegistrarImpl() }
     val manager = remember { DesktopSelectionManager(registrarImpl) }
@@ -118,9 +118,9 @@ fun DesktopSelectionContainer(
         }
     }
 
-    Providers(SelectionRegistrarAmbient provides registrarImpl) {
+    Providers(AmbientSelectionRegistrar provides registrarImpl) {
         Wrap(modifier) {
-            children()
+            content()
         }
     }
 }

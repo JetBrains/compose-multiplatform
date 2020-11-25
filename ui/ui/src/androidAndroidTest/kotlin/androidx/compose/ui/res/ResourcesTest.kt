@@ -18,10 +18,10 @@ package androidx.compose.ui.res
 
 import android.util.LruCache
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.imageFromResource
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -67,10 +67,10 @@ class ResourcesTest {
         val failedImage = imageFromResource(resource, R.drawable.failed_image)
 
         var uiThreadWork: (() -> Unit)? = null
-        var res: DeferredResource<ImageAsset>? = null
+        var res: DeferredResource<ImageBitmap>? = null
 
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 res = loadResourceInternal(
                     key = "random key string",
                     pendingResource = pendingImage,
@@ -130,10 +130,10 @@ class ResourcesTest {
         val failedImage = imageFromResource(resource, R.drawable.failed_image)
 
         var uiThreadWork: (() -> Unit)? = null
-        var res: DeferredResource<ImageAsset>? = null
+        var res: DeferredResource<ImageBitmap>? = null
 
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 res = loadResourceInternal(
                     key = "random key string",
                     pendingResource = pendingImage,

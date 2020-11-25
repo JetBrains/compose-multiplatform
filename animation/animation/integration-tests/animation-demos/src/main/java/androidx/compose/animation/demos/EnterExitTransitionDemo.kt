@@ -156,14 +156,14 @@ fun EnterExitTransitionDemo() {
                 Text("Bottom")
             }
 
-            alignmentOption(oppositeAlignment)
+            AlignmentOption(oppositeAlignment)
             FadeOptions(selectedOption, onOptionSelected)
         }
     }
 }
 
 @Composable
-fun alignmentOption(state: MutableState<Boolean>) {
+fun AlignmentOption(state: MutableState<Boolean>) {
     Row(
         Modifier.selectable(selected = state.value, onClick = { state.value = !state.value })
             .padding(10.dp)

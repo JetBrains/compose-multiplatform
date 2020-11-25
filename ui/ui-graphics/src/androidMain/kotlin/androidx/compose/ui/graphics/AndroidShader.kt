@@ -19,6 +19,7 @@ package androidx.compose.ui.graphics
 import android.graphics.BitmapShader
 import android.graphics.LinearGradient
 import android.graphics.RadialGradient
+import android.graphics.SweepGradient
 import androidx.compose.ui.geometry.Offset
 
 actual typealias Shader = android.graphics.Shader
@@ -60,8 +61,22 @@ internal actual fun ActualRadialGradientShader(
     )
 }
 
+internal actual fun ActualSweepGradientShader(
+    center: Offset,
+    colors: List<Color>,
+    colorStops: List<Float>?
+): Shader {
+    validateColorStops(colors, colorStops)
+    return SweepGradient(
+        center.x,
+        center.y,
+        colors.toIntArray(),
+        colorStops?.toFloatArray()
+    )
+}
+
 internal actual fun ActualImageShader(
-    image: ImageAsset,
+    image: ImageBitmap,
     tileModeX: TileMode,
     tileModeY: TileMode
 ): Shader {

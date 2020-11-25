@@ -28,7 +28,6 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,10 +46,10 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Align
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -116,7 +115,7 @@ class AndroidViewCompatTest {
             Align {
                 Layout(
                     modifier = Modifier.testTag("content"),
-                    children = @Composable {
+                    content = @Composable {
                         AndroidView(::ColoredSquareView) {
                             it.size = squareSize.value
                             it.ref = squareRef
@@ -175,7 +174,7 @@ class AndroidViewCompatTest {
         var expectedColor = Color.Blue
         rule.setContent {
             Align {
-                Container(Modifier.testTag("content").drawLayer()) {
+                Container(Modifier.testTag("content").graphicsLayer()) {
                     AndroidView(::ColoredSquareView) {
                         it.color = colorModel.value
                         it.ref = squareRef
@@ -366,7 +365,7 @@ class AndroidViewCompatTest {
         val constraintsHolder = mutableStateOf(Constraints.fixed(1234, 5678))
 
         rule.setContent {
-            Container(LayoutConstraints(constraintsHolder.value)) {
+            Container(Modifier.layoutConstraints(constraintsHolder.value)) {
                 AndroidView(::MeasureSpecSaverView) {
                     it.ref = viewRef
                     it.widthMeasureSpecRef = widthMeasureSpecRef
@@ -391,7 +390,7 @@ class AndroidViewCompatTest {
         val viewRef = Ref<MeasureSpecSaverView>()
         val constraintsHolder = mutableStateOf(Constraints())
         rule.setContent {
-            Container(LayoutConstraints(constraintsHolder.value)) {
+            Container(Modifier.layoutConstraints(constraintsHolder.value)) {
                 AndroidView(::MeasureSpecSaverView) { it.ref = viewRef }
             }
         }
@@ -410,8 +409,8 @@ class AndroidViewCompatTest {
     fun testRedrawing_onSubsequentRemeasuring() {
         var size by mutableStateOf(20)
         rule.setContent {
-            Box(Modifier.drawLayer().fillMaxSize()) {
-                val context = ContextAmbient.current
+            Box(Modifier.graphicsLayer().fillMaxSize()) {
+                val context = AmbientContext.current
                 val view = remember { View(context) }
                 AndroidView({ view }, Modifier.testTag("view"))
                 view.layoutParams = ViewGroup.LayoutParams(size, size)
@@ -439,9 +438,9 @@ class AndroidViewCompatTest {
 
         rule.setContent {
             Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
-                val paddingDp = with(DensityAmbient.current) { padding.toDp() }
+                val paddingDp = with(AmbientDensity.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
-                    AndroidView(::FrameLayout) {
+                    AndroidView(::ComposeView) {
                         it.setContent {
                             Box(
                                 Modifier.padding(paddingDp)
@@ -474,14 +473,14 @@ class AndroidViewCompatTest {
 
             topView = View(it)
             root.addView(topView, size, size)
-            val frameLayout = FrameLayout(it)
-            root.addView(frameLayout)
+            val view = ComposeView(it)
+            root.addView(view)
 
-            frameLayout.setContent {
+            view.setContent {
                 Box {
-                    val paddingDp = with(DensityAmbient.current) { padding.toDp() }
+                    val paddingDp = with(AmbientDensity.current) { padding.toDp() }
                     Box(Modifier.padding(paddingDp)) {
-                        AndroidView(::FrameLayout) {
+                        AndroidView(::ComposeView) {
                             it.setContent {
                                 Box(
                                     Modifier.padding(paddingDp)
@@ -581,7 +580,7 @@ class AndroidViewCompatTest {
         rule.setContent {
             if (composeContent) {
                 Box {
-                    AndroidView(::LinearLayout) {
+                    AndroidView(::ComposeView) {
                         it.setContent {
                             emit<LayoutNode, Applier<Any>>(
                                 ctor = LayoutEmitHelper.constructor,
@@ -758,24 +757,25 @@ class AndroidViewCompatTest {
         }
     }
 
-    fun LayoutConstraints(childConstraints: Constraints) = object : LayoutModifier {
-        override fun MeasureScope.measure(
-            measurable: Measurable,
-            constraints: Constraints
-        ): MeasureResult {
-            val placeable = measurable.measure(childConstraints)
-            return layout(placeable.width, placeable.height) {
-                placeable.place(0, 0)
+    fun Modifier.layoutConstraints(childConstraints: Constraints): Modifier =
+        this.then(object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val placeable = measurable.measure(childConstraints)
+                return layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
             }
-        }
-    }
+        })
 
     @Composable
     fun Container(
         modifier: Modifier = Modifier,
-        children: @Composable () -> Unit
+        content: @Composable () -> Unit
     ) {
-        Layout(children, modifier) { measurables, constraints ->
+        Layout(content, modifier) { measurables, constraints ->
             val placeable = measurables[0].measure(constraints)
             layout(placeable.width, placeable.height) {
                 placeable.place(0, 0)

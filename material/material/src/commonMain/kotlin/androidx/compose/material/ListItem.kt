@@ -78,7 +78,7 @@ fun ListItem(
     val styledOverlineText = applyTextStyle(typography.overline, ContentAlpha.high, overlineText)
     val styledTrailing = applyTextStyle(typography.caption, ContentAlpha.high, trailing)
 
-    val semanticsModifier = modifier.semantics(mergeAllDescendants = true) {}
+    val semanticsModifier = modifier.semantics(mergeDescendants = true) {}
 
     if (styledSecondaryText == null && styledOverlineText == null) {
         OneLine.ListItem(semanticsModifier, icon, styledText, styledTrailing)
@@ -142,14 +142,14 @@ private object OneLine {
                             top = IconVerticalPadding,
                             bottom = IconVerticalPadding
                         ),
-                    alignment = Alignment.CenterStart
+                    contentAlignment = Alignment.CenterStart
                 ) { icon() }
             }
             Box(
                 Modifier.weight(1f)
                     .align(Alignment.CenterVertically)
                     .padding(start = ContentLeftPadding, end = ContentRightPadding),
-                alignment = Alignment.CenterStart
+                contentAlignment = Alignment.CenterStart
             ) { text() }
             if (trailing != null) {
                 Box(
@@ -211,7 +211,7 @@ private object TwoLine {
                             top = IconVerticalPadding,
                             bottom = IconVerticalPadding
                         ),
-                    alignment = Alignment.TopStart
+                    contentAlignment = Alignment.TopStart
                 ) { icon() }
             }
 
@@ -255,7 +255,7 @@ private object TwoLine {
                         // TODO(popam): find way to center and wrap content without minHeight
                         Modifier.preferredHeightIn(min = minHeight)
                             .padding(end = TrailingRightPadding),
-                        alignment = Alignment.Center
+                        contentAlignment = Alignment.Center
                     ) { trailing() }
                 }
             }
@@ -303,7 +303,7 @@ private object ThreeLine {
                             top = IconThreeLineVerticalPadding,
                             bottom = IconThreeLineVerticalPadding
                         ),
-                    alignment = Alignment.CenterStart
+                    contentAlignment = Alignment.CenterStart
                 ) { icon() }
             }
             BaselinesOffsetColumn(
@@ -394,8 +394,11 @@ private fun OffsetToBaselineOrCenter(
             containerHeight = max(constraints.minHeight, y + placeable.height)
         } else {
             containerHeight = max(constraints.minHeight, placeable.height)
-            y = Alignment.Center
-                .align(IntSize(0, containerHeight - placeable.height)).y
+            y = Alignment.Center.align(
+                IntSize.Zero,
+                IntSize(0, containerHeight - placeable.height),
+                layoutDirection
+            ).y
         }
         layout(placeable.width, containerHeight) {
             placeable.placeRelative(0, y)

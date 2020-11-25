@@ -37,7 +37,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
@@ -50,7 +50,6 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.style.TextAlign
@@ -96,7 +95,7 @@ fun Tab(
 ) {
     val styledText = @Composable {
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
-        ProvideTextStyle(style, children = text)
+        ProvideTextStyle(style, content = text)
     }
     Tab(
         selected,
@@ -144,7 +143,7 @@ fun Tab(
     // The color of the Ripple should always the selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
     // provided by TabTransition.
-    val ripple = RippleIndication(bounded = false, color = selectedContentColor)
+    val ripple = rememberRippleIndication(bounded = false, color = selectedContentColor)
 
     TabTransition(selectedContentColor, unselectedContentColor, selected) {
         Column(
@@ -158,7 +157,7 @@ fun Tab(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            children = content
+            content = content
         )
     }
 }
@@ -300,7 +299,7 @@ private fun TabTransition(
     Providers(
         AmbientContentColor provides color.copy(alpha = 1f),
         AmbientContentAlpha provides color.alpha,
-        children = content
+        content = content
     )
 }
 
@@ -320,13 +319,13 @@ private fun TabBaselineLayout(
             Box(Modifier.layoutId("icon")) { icon() }
         }
     ) { measurables, constraints ->
-        val textPlaceable = measurables.first { it.id == "text" }.measure(
+        val textPlaceable = measurables.first { it.layoutId == "text" }.measure(
             // Measure with loose constraints for height as we don't want the text to take up more
             // space than it needs
             constraints.copy(minHeight = 0)
         )
 
-        val iconPlaceable = measurables.first { it.id == "icon" }.measure(constraints)
+        val iconPlaceable = measurables.first { it.layoutId == "icon" }.measure(constraints)
 
         val hasTextPlaceable =
             textPlaceable.width != 0 && textPlaceable.height != 0

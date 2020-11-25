@@ -167,16 +167,16 @@ private sealed class PaddingTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         val padding = remember { mutableStateOf(5.dp) }
         paddingState = padding
 
         FillerContainer {
-            emitPaddedContainer(padding.value) {
-                emitPaddedContainer(padding.value) {
-                    emitPaddedContainer(padding.value) {
-                        emitPaddedContainer(padding.value) {
-                            emitPaddedContainer(padding.value) {}
+            PaddedContainer(padding.value) {
+                PaddedContainer(padding.value) {
+                    PaddedContainer(padding.value) {
+                        PaddedContainer(padding.value) {
+                            PaddedContainer(padding.value) {}
                         }
                     }
                 }
@@ -185,12 +185,12 @@ private sealed class PaddingTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     @Composable
-    abstract fun emitPaddedContainer(padding: Dp, child: @Composable () -> Unit)
+    abstract fun PaddedContainer(padding: Dp, content: @Composable () -> Unit)
 }
 
 @Composable
-fun FillerContainer(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
-    Layout(children, modifier) { measurable, constraints ->
+fun FillerContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(content, modifier) { measurable, constraints ->
         val childConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         val placeable = measurable.firstOrNull()?.measure(childConstraints)
         val width =
@@ -210,17 +210,17 @@ fun FillerContainer(modifier: Modifier = Modifier, children: @Composable () -> U
 private class ModifierTestCase : PaddingTestCase() {
 
     @Composable
-    override fun emitPaddedContainer(padding: Dp, child: @Composable () -> Unit) {
-        FillerContainer(Modifier.padding(padding), child)
+    override fun PaddedContainer(padding: Dp, content: @Composable () -> Unit) {
+        FillerContainer(Modifier.padding(padding), content)
     }
 }
 
 private class NoModifierTestCase : PaddingTestCase() {
 
     @Composable
-    override fun emitPaddedContainer(padding: Dp, child: @Composable () -> Unit) {
+    override fun PaddedContainer(padding: Dp, content: @Composable () -> Unit) {
         FillerContainer {
-            Padding(all = padding, children = child)
+            Padding(all = padding, content = content)
         }
     }
 }
@@ -230,10 +230,10 @@ private class NoModifierTestCase : PaddingTestCase() {
 @Composable
 private fun Padding(
     all: Dp,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val padding = PaddingValues(all)
-    Layout(children) { measurables, constraints ->
+    Layout(content) { measurables, constraints ->
         val measurable = measurables.firstOrNull()
         if (measurable == null) {
             layout(constraints.minWidth, constraints.minHeight) { }

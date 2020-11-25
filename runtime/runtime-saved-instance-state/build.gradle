@@ -49,7 +49,7 @@ dependencies {
         testImplementation(ANDROIDX_TEST_RULES)
 
         androidTestImplementation project(':compose:ui:ui')
-        androidTestImplementation project(':ui:ui-test')
+        androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation "androidx.fragment:fragment:1.3.0-alpha05"
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_CORE)
@@ -96,7 +96,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation project(':compose:ui:ui')
-                implementation project(':ui:ui-test')
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation "androidx.fragment:fragment:1.3.0-alpha05"
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_CORE)
@@ -117,7 +117,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Saved Instance State support"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"
     description = "Compose components that allow saving and restoring the local ui state"

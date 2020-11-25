@@ -82,6 +82,7 @@ internal fun Spannable.setSpan(span: Any, start: Int, end: Int) {
     setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 }
 
+@Suppress("DEPRECATION")
 internal fun Spannable.setTextIndent(
     textIndent: TextIndent?,
     contextFontSize: Float,
@@ -89,19 +90,19 @@ internal fun Spannable.setTextIndent(
 ) {
     textIndent?.let { indent ->
         if (indent.firstLine == 0.sp && indent.restLine == 0.sp) return@let
-        if (indent.firstLine.isInherit || indent.restLine.isInherit) return@let
+        if (indent.firstLine.isUnspecified || indent.restLine.isUnspecified) return@let
         with(density) {
             val firstLine = when (indent.firstLine.type) {
                 TextUnitType.Sp -> indent.firstLine.toPx()
                 TextUnitType.Em -> indent.firstLine.value * contextFontSize
-                TextUnitType.Inherit -> {
+                TextUnitType.Unspecified, TextUnitType.Inherit -> {
                     0f
                 } // do nothing
             }
             val restLine = when (indent.restLine.type) {
                 TextUnitType.Sp -> indent.restLine.toPx()
                 TextUnitType.Em -> indent.restLine.value * contextFontSize
-                TextUnitType.Inherit -> {
+                TextUnitType.Unspecified, TextUnitType.Inherit -> {
                     0f
                 } // do nothing
             }
@@ -118,6 +119,7 @@ internal fun Spannable.setTextIndent(
 }
 
 @OptIn(InternalPlatformTextApi::class)
+@Suppress("DEPRECATION")
 internal fun Spannable.setLineHeight(
     lineHeight: TextUnit,
     contextFontSize: Float,
@@ -138,7 +140,7 @@ internal fun Spannable.setLineHeight(
                 length
             )
         }
-        TextUnitType.Inherit -> {
+        TextUnitType.Unspecified, TextUnitType.Inherit -> {
         } // Do nothing
     }
 }
@@ -216,6 +218,7 @@ private fun Spannable.setSpanStyle(
 }
 
 @OptIn(InternalPlatformTextApi::class)
+@Suppress("DEPRECATION")
 private fun createLetterSpacingSpan(
     letterSpacing: TextUnit,
     density: Density
@@ -227,7 +230,7 @@ private fun createLetterSpacingSpan(
         TextUnitType.Em -> {
             LetterSpacingSpanEm(letterSpacing.value)
         }
-        TextUnitType.Inherit -> {
+        TextUnitType.Unspecified, TextUnitType.Inherit -> {
             null
         }
     }
@@ -263,7 +266,7 @@ private fun Spannable.setShadow(shadow: Shadow?, start: Int, end: Int) {
     }
 }
 
-private fun Spannable.setBackground(color: Color, start: Int, end: Int) {
+internal fun Spannable.setBackground(color: Color, start: Int, end: Int) {
     if (color.isSpecified) {
         setSpan(
             BackgroundColorSpan(color.toArgb()),
@@ -329,7 +332,8 @@ private fun Spannable.setFontFeatureSettings(fontFeatureSettings: String?, start
     }
 }
 
-private fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: Int, end: Int) {
+@Suppress("DEPRECATION")
+internal fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: Int, end: Int) {
     when (fontSize.type) {
         TextUnitType.Sp -> with(density) {
             setSpan(
@@ -341,12 +345,12 @@ private fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: I
         TextUnitType.Em -> {
             setSpan(RelativeSizeSpan(fontSize.value), start, end)
         }
-        TextUnitType.Inherit -> {
+        TextUnitType.Unspecified, TextUnitType.Inherit -> {
         } // Do nothing
     }
 }
 
-private fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: Int, end: Int) {
+internal fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: Int, end: Int) {
     textDecoration?.let {
         if (TextDecoration.Underline in it) {
             setSpan(UnderlineSpan(), start, end)
@@ -357,7 +361,7 @@ private fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: 
     }
 }
 
-private fun Spannable.setColor(color: Color, start: Int, end: Int) {
+internal fun Spannable.setColor(color: Color, start: Int, end: Int) {
     if (color.isSpecified) {
         setSpan(ForegroundColorSpan(color.toArgb()), start, end)
     }

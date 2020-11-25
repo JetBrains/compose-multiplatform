@@ -79,7 +79,7 @@ class SendClickTest(private val config: TestConfig) {
         override val pointerInputFilter: PointerInputFilter = RecordingFilter { changes ->
             changes.forEach {
                 if (it.changedToUp()) {
-                    recordedClicks.add(ClickData(componentIndex, it.current.position!!))
+                    recordedClicks.add(ClickData(componentIndex, it.current.position))
                 }
             }
         }

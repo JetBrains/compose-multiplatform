@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.Placeable
@@ -34,7 +35,9 @@ internal class OuterMeasurablePlaceable(
     val lastConstraints: Constraints? get() = if (measuredOnce) measurementConstraints else null
     var lastPosition: IntOffset? = null
         private set
+    private var lastLayerBlock: (GraphicsLayerScope.() -> Unit)? = null
     private val lastProvidedAlignmentLines = mutableMapOf<AlignmentLine, Int>()
+    private var lastZIndex: Float = 0f
 
     /**
      * A local version of [Owner.measureIteration] to ensure that [MeasureBlocks.measure]
@@ -87,7 +90,7 @@ internal class OuterMeasurablePlaceable(
             measurementConstraints = constraints
             lastProvidedAlignmentLines.clear()
             lastProvidedAlignmentLines.putAll(layoutNode.providedAlignmentLines)
-            owner.observeMeasureModelReads(layoutNode) {
+            owner.snapshotObserver.observeMeasureSnapshotReads(layoutNode) {
                 outerWrapper.measure(constraints)
             }
             layoutNode.layoutState = LayoutState.NeedsRelayout
@@ -109,10 +112,20 @@ internal class OuterMeasurablePlaceable(
 
     override fun get(line: AlignmentLine): Int = outerWrapper[line]
 
-    override fun placeAt(position: IntOffset) {
+    override fun placeAt(
+        position: IntOffset,
+        zIndex: Float,
+        layerBlock: (GraphicsLayerScope.() -> Unit)?
+    ) {
         lastPosition = position
+        lastZIndex = zIndex
+        lastLayerBlock = layerBlock
         with(PlacementScope) {
-            outerWrapper.place(position)
+            if (layerBlock == null) {
+                outerWrapper.place(position, lastZIndex)
+            } else {
+                outerWrapper.placeWithLayer(position, lastZIndex, layerBlock)
+            }
         }
     }
 
@@ -120,7 +133,7 @@ internal class OuterMeasurablePlaceable(
      * Calls [placeAt] with the same position used during the last [placeAt] call
      */
     fun replace() {
-        placeAt(checkNotNull(lastPosition))
+        placeAt(checkNotNull(lastPosition), lastZIndex, lastLayerBlock)
     }
 
     override fun minIntrinsicWidth(height: Int): Int = outerWrapper.minIntrinsicWidth(height)

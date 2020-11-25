@@ -30,7 +30,7 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.input.key.Key.Companion.A
 import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.KeyEventType.KeyUp
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -67,7 +67,7 @@ class AndroidProcessKeyInputTest(val keyEventAction: Int) {
         lateinit var receivedKeyEvent: KeyEvent
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
-            ownerView = ViewAmbient.current
+            ownerView = AmbientView.current
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)

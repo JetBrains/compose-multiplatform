@@ -54,11 +54,11 @@ class SemanticsNode internal constructor(
      */
     internal val layoutNodeWrapper: SemanticsWrapper,
     /**
-     * mergingEnabled specifies whether mergeAllDescendants config has any effect.
+     * mergingEnabled specifies whether mergeDescendants config has any effect.
      *
-     * If true, then mergeAllDescendants nodes will merge up all properties from child
+     * If true, then mergeDescendants nodes will merge up all properties from child
      * semantics nodes and remove those children from "children", with the exception
-     * of nodes that themselves have mergeAllDescendants.  If false, then mergeAllDescendants
+     * of nodes that themselves have mergeDescendants.  If false, then mergeDescendants
      * has no effect.
      *
      * mergingEnabled is typically true or false consistently on every node of a SemanticsNode tree.
@@ -130,7 +130,7 @@ class SemanticsNode internal constructor(
      * The list of semantics properties of this node.
      *
      * This includes all properties attached as modifiers to the current layout node.
-     * In addition, if mergeAllDescendants and mergingEnabled are both true, then it
+     * In addition, if mergeDescendants and mergingEnabled are both true, then it
      * also includes the semantics properties of descendant nodes.
      */
     // TODO(aelias): This is too expensive for a val (full subtree recreation every call);
@@ -177,8 +177,8 @@ class SemanticsNode internal constructor(
 
     /** Contains the children in inverse hit test order (i.e. paint order).
      *
-     * Note that if mergingEnabled and mergeAllDescendants are both true, then there
-     * are no children (except those that are themselves mergeAllDescendants).
+     * Note that if mergingEnabled and mergeDescendants are both true, then there
+     * are no children (except those that are themselves mergeDescendants).
      */
     // TODO(aelias): This is too expensive for a val (full subtree recreation every call);
     //               optimize this when the merging algorithm is improved.

@@ -185,6 +185,23 @@ class DesktopPaintTest : DesktopGraphicsTest() {
     }
 
     @Test
+    fun sweepGradientShader() {
+        canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
+
+        canvas.drawRect(
+            left = 2f, top = 2f, right = 14f, bottom = 14f,
+            paint = Paint().apply {
+                shader = SweepGradientShader(
+                    center = Offset(4f, 8f),
+                    colors = listOf(Color.Blue, Color.Green)
+                )
+            }
+        )
+
+        screenshotRule.snap(surface)
+    }
+
+    @Test
     fun imageShader() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
 

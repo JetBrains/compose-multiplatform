@@ -21,7 +21,7 @@ import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.bottom
 import androidx.compose.ui.test.bottomCenter
@@ -120,7 +120,7 @@ class PositionsTest {
 
     private fun testPositionsInViewport(isVertical: Boolean, reverseScrollDirection: Boolean) {
         rule.setContent {
-            with(DensityAmbient.current) {
+            with(AmbientDensity.current) {
                 if (isVertical) {
                     ScrollableColumn(
                         Modifier.size(100.toDp(), 100.toDp()).testTag("viewport"),

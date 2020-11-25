@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawShadow
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -357,14 +357,14 @@ class BottomSheetScaffoldTest {
             Box(
                 Modifier
                     .size(10.dp, 20.dp)
-                    .semantics(mergeAllDescendants = true) {}
+                    .semantics(mergeDescendants = true) {}
                     .testTag("Scaffold")
             ) {
                 BottomSheetScaffold(
                     topBar = {
                         Box(
                             Modifier.size(10.dp)
-                                .drawShadow(4.dp)
+                                .shadow(4.dp)
                                 .zIndex(4f)
                                 .background(color = Color.White)
                         )

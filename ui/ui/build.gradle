@@ -79,7 +79,7 @@ dependencies {
             exclude group: 'org.mockito' // to keep control on the mockito version
         }
         testImplementation(ROBOLECTRIC)
-        testImplementation project(":ui:ui-test")
+        testImplementation project(":compose:ui:ui-test-junit4")
         testImplementation project(":compose:test-utils")
 
         androidTestImplementation "androidx.fragment:fragment:1.2.4"
@@ -99,11 +99,14 @@ dependencies {
         }
         androidTestImplementation project(":compose:foundation:foundation")
         androidTestImplementation project(":compose:foundation:foundation-layout")
-        androidTestImplementation project(":compose:foundation:foundation-text")
         androidTestImplementation project(":compose:test-utils")
         androidTestImplementation project(":compose:ui:ui-test-font")
-        androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation project(":compose:ui:ui-test-junit4")
+        androidTestImplementation project(":test-screenshot")
         androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
+
+        lintChecks project(":compose:ui:ui-lint")
+        lintPublish project(":compose:ui:ui-lint")
     }
 }
 
@@ -168,7 +171,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                     exclude group: 'org.mockito' // to keep control on the mockito version
                 }
                 implementation(ROBOLECTRIC)
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
                 implementation project(":compose:test-utils")
             }
 
@@ -190,10 +193,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 }
                 implementation project(":compose:foundation:foundation")
                 implementation project(":compose:foundation:foundation-layout")
-                implementation project(":compose:foundation:foundation-text")
                 implementation project(":compose:test-utils")
                 implementation project(":compose:ui:ui-test-font")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
+                implementation project(":test-screenshot")
                 implementation "androidx.recyclerview:recyclerview:1.1.0"
             }
 
@@ -206,7 +209,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 }
                 implementation(SKIKO_CURRENT_OS)
                 implementation project(":compose:foundation:foundation")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
             }
         }
     }
@@ -215,7 +218,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose UI primitives"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2019"
     description = "Compose UI primitives. This library contains the primitives that form the Compose UI Toolkit, such as drawing, measurement and layout."
@@ -248,6 +250,12 @@ android {
     buildTypes.all {
         consumerProguardFiles("proguard-rules.pro")
     }
+}
+
+// Screenshot tests related setup
+android {
+    sourceSets.androidTest.assets.srcDirs +=
+            project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
 }
 
 if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {

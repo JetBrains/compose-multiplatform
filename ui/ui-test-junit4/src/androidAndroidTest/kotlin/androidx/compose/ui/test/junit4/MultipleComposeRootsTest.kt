@@ -20,7 +20,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.TriStateCheckbox
@@ -30,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.onNodeWithTag

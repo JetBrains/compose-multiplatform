@@ -27,17 +27,17 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 
 /**
- * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor].
+ * Icon component that draws [imageVector] using [tint], defaulting to [AmbientContentColor].
  *
- * @param asset [VectorAsset] to draw inside this Icon
+ * @param imageVector [ImageVector] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
  * @param tint tint to be applied to [asset]. If [Color.Unspecified] is provided, then no
  *  tint is applied
@@ -48,24 +48,24 @@ import androidx.compose.ui.unit.dp
 )
 @Composable
 fun Icon(
-    asset: VectorAsset,
+    imageVector: ImageVector,
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current
 ) {
     @Suppress("DEPRECATION")
     Icon(
-        painter = rememberVectorPainter(asset),
+        painter = rememberVectorPainter(imageVector),
         modifier = modifier,
         tint = tint
     )
 }
 
 /**
- * Icon component that draws [asset] using [tint], defaulting to [AmbientContentColor].
+ * Icon component that draws [bitmap] using [tint], defaulting to [AmbientContentColor].
  *
- * @param asset [ImageAsset] to draw inside this Icon
+ * @param bitmap [ImageBitmap] to draw inside this Icon
  * @param modifier optional [Modifier] for this Icon
- * @param tint tint to be applied to [asset]. If [Color.Unspecified] is provided, then no
+ * @param tint tint to be applied to [bitmap]. If [Color.Unspecified] is provided, then no
  *  tint is applied
  */
 @Deprecated(
@@ -74,11 +74,11 @@ fun Icon(
 )
 @Composable
 fun Icon(
-    asset: ImageAsset,
+    bitmap: ImageBitmap,
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current
 ) {
-    val painter = remember(asset) { ImagePainter(asset) }
+    val painter = remember(bitmap) { ImagePainter(bitmap) }
     @Suppress("DEPRECATION")
     Icon(
         painter = painter,

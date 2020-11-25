@@ -18,11 +18,12 @@ package androidx.compose.material
 
 import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Indication
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
+import androidx.compose.ui.selection.AmbientTextSelectionColors
 
 /**
  * A MaterialTheme defines the styling principles from the Material design specification.
@@ -61,15 +62,19 @@ fun MaterialTheme(
         // we don't skip the updateColorsFrom call
         colors.copy()
     }.apply { updateColorsFrom(colors) }
-    val indicationFactory: @Composable () -> Indication = remember { { RippleIndication() } }
+    val indicationFactory: @Composable () -> Indication = remember {
+        { rememberRippleIndication() }
+    }
+    val selectionColors = rememberTextSelectionColors(rememberedColors)
     Providers(
         AmbientColors provides rememberedColors,
+        AmbientContentAlpha provides ContentAlpha.high,
         AmbientIndication provides indicationFactory,
-        AmbientTypography provides typography,
+        AmbientTextSelectionColors provides selectionColors,
         AmbientShapes provides shapes,
-        AmbientContentAlpha provides ContentAlpha.high
+        AmbientTypography provides typography
     ) {
-        ProvideTextStyle(value = typography.body1, children = content)
+        ProvideTextStyle(value = typography.body1, content = content)
     }
 }
 

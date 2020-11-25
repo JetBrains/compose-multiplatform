@@ -56,7 +56,7 @@ dependencies {
         androidTestImplementation project(":compose:foundation:foundation-layout")
         androidTestImplementation project(":compose:ui:ui")
         androidTestImplementation project(":test-screenshot")
-        androidTestImplementation project(":ui:ui-test")
+        androidTestImplementation project(":compose:ui:ui-test-junit4")
     }
 }
 
@@ -80,7 +80,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:foundation:foundation-layout")
                 implementation project(":compose:ui:ui")
                 implementation project(":test-screenshot")
-                implementation project(":ui:ui-test")
+                implementation project(":compose:ui:ui-test-junit4")
 
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
@@ -106,7 +106,6 @@ IconGenerationTask.registerExtendedIconProject(
 androidx {
     name = "Compose Material Icons Extended"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.MATERIAL
     // This module has a large number (5000+) of generated source files and so doc generation /
     // API tracking will simply take too long

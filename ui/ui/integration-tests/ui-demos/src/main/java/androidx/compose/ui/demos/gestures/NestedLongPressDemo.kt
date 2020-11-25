@@ -60,7 +60,7 @@ fun NestedLongPressDemo() {
 @Composable
 private fun LongPressableContainer(
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val defaultColor = DefaultBackgroundColor
     val pressedColor = PressedColor
@@ -84,6 +84,6 @@ private fun LongPressableContainer(
             .background(color)
             .border(BorderStroke(2.dp, BorderColor))
             .padding(2.dp),
-        alignment = Alignment.Center
-    ) { children() }
+        contentAlignment = Alignment.Center
+    ) { content() }
 }

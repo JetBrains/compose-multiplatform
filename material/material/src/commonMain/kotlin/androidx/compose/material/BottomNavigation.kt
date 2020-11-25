@@ -30,14 +30,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.LastBaseline
@@ -45,7 +45,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
@@ -100,7 +99,7 @@ fun BottomNavigation(
         Row(
             Modifier.fillMaxWidth().preferredHeight(BottomNavigationHeight),
             horizontalArrangement = Arrangement.SpaceBetween,
-            children = content
+            content = content
         )
     }
 }
@@ -149,12 +148,12 @@ fun BottomNavigationItem(
 ) {
     val styledLabel = @Composable {
         val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
-        ProvideTextStyle(style, children = label)
+        ProvideTextStyle(style, content = label)
     }
     // The color of the Ripple should always the selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
     // provided by BottomNavigationTransition.
-    val ripple = RippleIndication(bounded = false, color = selectedContentColor)
+    val ripple = rememberRippleIndication(bounded = false, color = selectedContentColor)
 
     // TODO This composable has magic behavior within a Row; reconsider this behavior later
     Box(
@@ -168,7 +167,7 @@ fun BottomNavigationItem(
                 )
                 .weight(1f)
         },
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         BottomNavigationTransition(
             selectedContentColor,
@@ -242,14 +241,14 @@ private fun BottomNavigationItemBaselineLayout(
             Box(
                 Modifier
                     .layoutId("label")
-                    .drawOpacity(iconPositionAnimationProgress)
+                    .alpha(iconPositionAnimationProgress)
                     .padding(horizontal = BottomNavigationItemHorizontalPadding)
             ) { label() }
         }
     ) { measurables, constraints ->
-        val iconPlaceable = measurables.first { it.id == "icon" }.measure(constraints)
+        val iconPlaceable = measurables.first { it.layoutId == "icon" }.measure(constraints)
 
-        val labelPlaceable = measurables.first { it.id == "label" }.measure(
+        val labelPlaceable = measurables.first { it.layoutId == "label" }.measure(
             // Measure with loose constraints for height as we don't want the label to take up more
             // space than it needs
             constraints.copy(minHeight = 0)

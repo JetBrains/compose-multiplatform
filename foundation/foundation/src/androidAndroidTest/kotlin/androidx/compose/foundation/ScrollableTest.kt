@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTesting
-import androidx.compose.ui.test.TestUiDispatcher
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -55,7 +54,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -106,7 +107,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
 
         val lastTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0)
@@ -119,7 +120,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
 
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
@@ -131,7 +132,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
         rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
         }
@@ -162,7 +163,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
 
         val lastTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0)
@@ -175,7 +176,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
 
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
@@ -187,7 +188,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
         rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
         }
@@ -231,7 +232,7 @@ class ScrollableTest {
             assertThat(startTrigger).isEqualTo(1)
             assertThat(stopTrigger).isEqualTo(0)
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
         // after wait we expect stop to trigger
         rule.runOnIdle {
             assertThat(startTrigger).isEqualTo(1)
@@ -266,7 +267,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
         val prevTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0f)
             enabled.value = false
@@ -279,7 +280,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
         rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal)
         }
@@ -379,7 +380,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTesting::class)
-    fun scrollable_cancel_callsDragStop() = runBlockingWithManualClock { clock ->
+    fun scrollable_cancel_callsDragStop() = runBlocking {
         var total by mutableStateOf(0f)
         var dragStopped = 0f
         val controller = ScrollableController(
@@ -388,7 +389,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             if (total < 20) {
@@ -418,7 +419,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTesting::class)
-    fun scrollable_snappingScrolling() = runBlockingWithManualClock(true) { clock ->
+    fun scrollable_snappingScrolling() = runBlocking {
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
@@ -426,33 +427,24 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             Modifier.scrollable(orientation = Orientation.Vertical, controller = controller)
         }
-        rule.runOnIdle {
-            assertThat(total).isEqualTo(0f)
-        }
-        rule.runOnIdle {
-            controller.smoothScrollBy(1000f)
-        }
-        advanceClockAndAwaitAnimation(clock)
-        rule.runOnIdle {
-            assertThat(total).isEqualTo(1000f)
-        }
-        rule.runOnIdle {
-            controller.smoothScrollBy(-200f)
-        }
-        advanceClockAndAwaitAnimation(clock)
-        rule.runOnIdle {
-            assertThat(total).isEqualTo(800f)
-        }
+        rule.awaitIdle()
+        assertThat(total).isEqualTo(0f)
+
+        controller.smoothScrollBy(1000f)
+        assertThat(total).isWithin(0.001f).of(1000f)
+
+        controller.smoothScrollBy(-200f)
+        assertThat(total).isWithin(0.001f).of(800f)
     }
 
     @Test
     @OptIn(ExperimentalTesting::class)
-    fun scrollable_explicitDisposal() = runBlockingWithManualClock(true) { clock ->
+    fun scrollable_explicitDisposal() = runBlockingWithManualClock { clock ->
         val disposed = mutableStateOf(false)
         var total = 0f
         val controller = ScrollableController(
@@ -471,25 +463,24 @@ class ScrollableTest {
                 Modifier
             }
         }
-        rule.runOnIdle {
+        launch {
             controller.smoothScrollBy(300f)
         }
-        advanceClockAndAwaitAnimation(clock)
-        rule.runOnIdle {
-            assertThat(total).isEqualTo(300f)
-        }
-        rule.runOnIdle {
+        advanceClockWhileAwaitersExist(clock)
+        assertThat(total).isEqualTo(300f)
+
+        launch {
             controller.smoothScrollBy(200f)
         }
         // don't advance clocks yet, toggle disposed value
-        rule.runOnUiThread {
-            disposed.value = true
-        }
-        advanceClockAndAwaitAnimation(clock)
+        disposed.value = true
+
+        // Modifier should now have been disposed and cancelled the scroll, advance clocks to
+        // confirm that it does not animate (checked in consumeScrollDelta)
+        advanceClockWhileAwaitersExist(clock)
+
         // still 300 and didn't fail in onScrollConsumptionRequested.. lambda
-        rule.runOnIdle {
-            assertThat(total).isEqualTo(300f)
-        }
+        assertThat(total).isEqualTo(300f)
     }
 
     @Test
@@ -518,7 +509,7 @@ class ScrollableTest {
         rule.setContent {
             Box {
                 Box(
-                    alignment = Alignment.Center,
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(scrollableBoxTag)
                         .preferredSize(300.dp)
@@ -550,8 +541,8 @@ class ScrollableTest {
             assertThat(outerDrag).isEqualTo(innerDrag)
             innerDrag
         }
-        advanceClockAndAwaitAnimation(clock)
-        advanceClockAndAwaitAnimation(clock)
+        advanceClockWhileAwaitersExist(clock)
+        advanceClockWhileAwaitersExist(clock)
         // and nothing should change as we don't do nested fling
         rule.runOnIdle {
             assertThat(outerDrag).isEqualTo(lastEqualDrag)
@@ -560,7 +551,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTesting::class)
-    fun scrollable_interactionState() = runBlockingWithManualClock { clock ->
+    fun scrollable_interactionState() = runBlocking {
         val interactionState = InteractionState()
         var total = 0f
         val controller = ScrollableController(
@@ -569,7 +560,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext),
             interactionState = interactionState
         )
 
@@ -606,7 +597,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTesting::class)
-    fun scrollable_interactionState_resetWhenDisposed() = runBlockingWithManualClock { clock ->
+    fun scrollable_interactionState_resetWhenDisposed() = runBlocking {
         val interactionState = InteractionState()
         var emitScrollableBox by mutableStateOf(true)
         var total = 0f
@@ -616,7 +607,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext),
             interactionState = interactionState
         )
 
@@ -697,10 +688,13 @@ class ScrollableTest {
     }
 
     @ExperimentalTesting
-    private suspend fun advanceClockAndAwaitAnimation(clock: ManualFrameClock) {
-        rule.waitForIdle()
-        withContext(TestUiDispatcher.Main) {
+    private suspend fun advanceClockWhileAwaitersExist(clock: ManualFrameClock) {
+        rule.awaitIdle()
+        yield()
+        while (clock.hasAwaiters) {
             clock.advanceClockMillis(5000L)
+            // Give awaiters the chance to await again
+            yield()
         }
     }
 }

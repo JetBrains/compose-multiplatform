@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.scrollorientationlocking.ScrollOrientationLocker
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Defines the callbacks associated with scrolling.
@@ -117,7 +118,15 @@ fun Modifier.scrollGestureFilter(
     orientation: Orientation,
     canDrag: ((Direction) -> Boolean)? = null,
     startDragImmediately: Boolean = false
-): Modifier = composed {
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "scrollGestureFilter"
+        properties["scrollCallback"] = scrollCallback
+        properties["orientation"] = orientation
+        properties["canDrag"] = canDrag
+        properties["startDragImmediately"] = startDragImmediately
+    }
+) {
     val coordinator = remember { ScrollGestureFilterCoordinator() }
     coordinator.scrollCallback = scrollCallback
     coordinator.orientation = orientation

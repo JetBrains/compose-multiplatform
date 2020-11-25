@@ -27,7 +27,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -48,7 +48,7 @@ const val RootGroupName = "VectorRootGroup"
  * paths are drawn on.
  *  This parameter is optional. Not providing it will use the [defaultHeight] converted to pixels
  * @param [name] optional identifier used to identify the root of this vector graphic
- * @param [children] Composable used to define the structure and contents of the vector graphic
+ * @param [content] Composable used to define the structure and contents of the vector graphic
  */
 @Composable
 fun rememberVectorPainter(
@@ -57,9 +57,9 @@ fun rememberVectorPainter(
     viewportWidth: Float = Float.NaN,
     viewportHeight: Float = Float.NaN,
     name: String = RootGroupName,
-    children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+    content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
-    val density = DensityAmbient.current
+    val density = AmbientDensity.current
     val widthPx = with(density) { defaultWidth.toPx() }
     val heightPx = with(density) { defaultHeight.toPx() }
 
@@ -70,7 +70,7 @@ fun rememberVectorPainter(
         // This assignment is thread safe as the internal Size parameter is
         // backed by a mutableState object
         size = Size(widthPx, heightPx)
-        composeInto(name, vpWidth, vpHeight, children)
+        RenderVector(name, vpWidth, vpHeight, content)
     }
 }
 
@@ -89,6 +89,7 @@ fun rememberVectorPainter(
  * @param [name] optional identifier used to identify the root of this vector graphic
  * @param [children] Composable used to define the structure and contents of the vector graphic
  */
+@Suppress("ComposableNaming")
 @Deprecated(
     "Use rememberVectorPainter instead as the composable implementation already invokes " +
         "remember to persist data across compositions and callers do not need to do so themselves",
@@ -117,11 +118,12 @@ fun VectorPainter(
     )
 
 /**
- * Create a [VectorPainter] with the given [VectorAsset]. This will create a
- * sub-composition of the vector hierarchy given the tree structure in [VectorAsset]
+ * Create a [VectorPainter] with the given [ImageVector]. This will create a
+ * sub-composition of the vector hierarchy given the tree structure in [ImageVector]
  *
- * @param [asset] VectorAsset used to create a vector graphic sub-composition
+ * @param [image] ImageVector used to create a vector graphic sub-composition
  */
+@Suppress("ComposableNaming")
 @Deprecated(
     "Use rememberVectorPainter instead as the composable implementation already invokes " +
         "remember to persist data across compositions and callers do not need to do so themselves",
@@ -131,36 +133,36 @@ fun VectorPainter(
     )
 )
 @Composable
-fun VectorPainter(asset: VectorAsset): VectorPainter =
+fun VectorPainter(image: ImageVector): VectorPainter =
     rememberVectorPainter(
-        defaultWidth = asset.defaultWidth,
-        defaultHeight = asset.defaultHeight,
-        viewportWidth = asset.viewportWidth,
-        viewportHeight = asset.viewportHeight,
-        name = asset.name,
-        children = { _, _ -> RenderVectorGroup(group = asset.root) }
+        defaultWidth = image.defaultWidth,
+        defaultHeight = image.defaultHeight,
+        viewportWidth = image.viewportWidth,
+        viewportHeight = image.viewportHeight,
+        name = image.name,
+        content = { _, _ -> RenderVectorGroup(group = image.root) }
     )
 
 /**
- * Create a [VectorPainter] with the given [VectorAsset]. This will create a
- * sub-composition of the vector hierarchy given the tree structure in [VectorAsset]
+ * Create a [VectorPainter] with the given [ImageVector]. This will create a
+ * sub-composition of the vector hierarchy given the tree structure in [ImageVector]
  *
- * @param [asset] VectorAsset used to create a vector graphic sub-composition
+ * @param [image] ImageVector used to create a vector graphic sub-composition
  */
 @Composable
-fun rememberVectorPainter(asset: VectorAsset) =
+fun rememberVectorPainter(image: ImageVector) =
     rememberVectorPainter(
-        defaultWidth = asset.defaultWidth,
-        defaultHeight = asset.defaultHeight,
-        viewportWidth = asset.viewportWidth,
-        viewportHeight = asset.viewportHeight,
-        name = asset.name,
-        children = { _, _ -> RenderVectorGroup(group = asset.root) }
+        defaultWidth = image.defaultWidth,
+        defaultHeight = image.defaultHeight,
+        viewportWidth = image.viewportWidth,
+        viewportHeight = image.viewportHeight,
+        name = image.name,
+        content = { _, _ -> RenderVectorGroup(group = image.root) }
     )
 
 /**
  * [Painter] implementation that abstracts the drawing of a Vector graphic.
- * This can be represented by either a [VectorAsset] or a programmatic
+ * This can be represented by either a [ImageVector] or a programmatic
  * composition of a vector
  */
 class VectorPainter internal constructor() : Painter() {
@@ -176,11 +178,11 @@ class VectorPainter internal constructor() : Painter() {
     private var isDirty by mutableStateOf(true)
 
     @Composable
-    internal fun composeInto(
+    internal fun RenderVector(
         name: String,
         viewportWidth: Float,
         viewportHeight: Float,
-        children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+        content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
     ) {
         vector.apply {
             this.name = name
@@ -190,7 +192,7 @@ class VectorPainter internal constructor() : Painter() {
         val composition = composeVector(
             vector,
             compositionReference(),
-            children
+            content
         )
 
         onDispose {
@@ -205,7 +207,7 @@ class VectorPainter internal constructor() : Painter() {
         get() = size
 
     override fun DrawScope.onDraw() {
-        with (vector) { draw(currentAlpha, currentColorFilter) }
+        with(vector) { draw(currentAlpha, currentColorFilter) }
         // This conditional is necessary to obtain invalidation callbacks as the state is
         // being read here which adds this callback to the snapshot observation
         if (isDirty) {

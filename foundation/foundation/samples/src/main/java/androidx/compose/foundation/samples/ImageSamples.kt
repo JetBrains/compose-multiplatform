@@ -27,7 +27,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
@@ -41,19 +41,19 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun ImageSample() {
-    val imageAsset = createTestImage()
-    // Lays out and draws an image sized to the dimensions of the ImageAsset
-    Image(asset = imageAsset)
+    val ImageBitmap = createTestImage()
+    // Lays out and draws an image sized to the dimensions of the ImageBitmap
+    Image(bitmap = ImageBitmap)
 }
 
 @Sampled
 @Composable
 fun ImagePainterSubsectionSample() {
-    val imageAsset = createTestImage()
-    // Lays out and draws an image sized to the rectangular subsection of the ImageAsset
+    val ImageBitmap = createTestImage()
+    // Lays out and draws an image sized to the rectangular subsection of the ImageBitmap
     Image(
         painter = ImagePainter(
-            imageAsset,
+            ImageBitmap,
             IntOffset(10, 12),
             IntSize(50, 60)
         )
@@ -62,11 +62,11 @@ fun ImagePainterSubsectionSample() {
 
 @Sampled
 @Composable
-fun ImageVectorAssetSample() {
-    val vectorAsset = loadVectorResource(R.drawable.ic_sample_vector)
-    vectorAsset.resource.resource?.let {
+fun ImageVectorSample() {
+    val imageVector = loadVectorResource(R.drawable.ic_sample_vector)
+    imageVector.resource.resource?.let {
         Image(
-            asset = it,
+            imageVector = it,
             modifier = Modifier.preferredSize(200.dp, 200.dp),
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(Color.Cyan)
@@ -93,13 +93,13 @@ fun ImagePainterSample() {
 }
 
 /**
- * Helper method to create an ImageAsset with some content in it
+ * Helper method to create an ImageBitmap with some content in it
  */
-private fun createTestImage(): ImageAsset {
-    val imageAsset = ImageAsset(100, 100)
-    Canvas(imageAsset).drawCircle(
+private fun createTestImage(): ImageBitmap {
+    val ImageBitmap = ImageBitmap(100, 100)
+    Canvas(ImageBitmap).drawCircle(
         Offset(50.0f, 50.0f), 50.0f,
         Paint().apply { this.color = Color.Cyan }
     )
-    return imageAsset
+    return ImageBitmap
 }

@@ -19,15 +19,11 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
@@ -49,9 +45,8 @@ import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
-import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
@@ -73,7 +68,7 @@ class DesktopOwner(
     val container: DesktopOwners,
     density: Density = Density(1f, 1f)
 ) : Owner {
-    private var size: IntSize = IntSize(0, 0)
+    internal var size by mutableStateOf(IntSize(0, 0))
 
     override var density by mutableStateOf(density)
 
@@ -82,7 +77,7 @@ class DesktopOwner(
 
     private val semanticsModifier = SemanticsModifierCore(
         id = SemanticsModifierCore.generateSemanticsId(),
-        mergeAllDescendants = false,
+        mergeDescendants = false,
         properties = {}
     )
 
@@ -90,17 +85,21 @@ class DesktopOwner(
     override val focusManager: FocusManager
         get() = _focusManager
 
+    // TODO: set/clear _windowManager.isWindowFocused when the window gains/loses focus.
+    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
+    override val windowManager: WindowManager
+        get() = _windowManager
+
     private val keyInputModifier = KeyInputModifier(null, null)
 
     override val root = LayoutNode().also {
         it.measureBlocks = RootMeasureBlocks
-        it.modifier = Modifier.drawLayer()
-            .then(semanticsModifier)
+        it.modifier = semanticsModifier
             .then(_focusManager.modifier)
             .then(keyInputModifier)
     }
 
-    private val snapshotObserver = SnapshotStateObserver { command ->
+    override val snapshotObserver = OwnerSnapshotObserver { command ->
         command()
     }
     private val pointerInputEventProcessor = PointerInputEventProcessor(root)
@@ -108,13 +107,13 @@ class DesktopOwner(
 
     init {
         container.register(this)
-        snapshotObserver.enableStateUpdatesObserving(true)
+        snapshotObserver.startObserving()
         root.attach(this)
         _focusManager.takeFocus()
     }
 
     fun dispose() {
-        snapshotObserver.enableStateUpdatesObserving(false)
+        snapshotObserver.stopObserving()
         container.unregister(this)
         // we don't need to call root.detach() because root will be garbage collected
     }
@@ -137,6 +136,8 @@ class DesktopOwner(
 
     override val autofill: Autofill? get() = null
 
+    override val viewConfiguration: ViewConfiguration = DesktopViewConfiguration(density)
+
     val keyboard: Keyboard?
         get() = container.keyboard
 
@@ -146,9 +147,6 @@ class DesktopOwner(
     }
 
     override var showLayoutBounds = false
-
-    override fun pauseModelReadObserveration(block: () -> Unit) =
-        snapshotObserver.pauseObservingReads(block)
 
     override fun requestFocus() = true
 
@@ -183,49 +181,17 @@ class DesktopOwner(
     override val hasPendingMeasureOrLayout
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
-    // Don't inline these variables into snapshotObserver.observeReads,
-    // because observeReads requires that onChanged should always be the same instance.
-    // Otherwise there will be a memory leak and FPS drop (see b/163905871)
-    private val onCommitAffectingLayout = ::onRequestRelayout
-    private val onCommitAffectingMeasure = ::onRequestMeasure
-    private val onCommitAffectingLayer = OwnedLayer::invalidate
-
-    override fun observeLayoutModelReads(node: LayoutNode, block: () -> Unit) {
-        snapshotObserver.observeReads(node, onCommitAffectingLayout, block)
-    }
-
-    override fun observeMeasureModelReads(node: LayoutNode, block: () -> Unit) {
-        snapshotObserver.observeReads(node, onCommitAffectingMeasure, block)
-    }
-
-    override fun <T : OwnerScope> observeReads(
-        target: T,
-        onChanged: (T) -> Unit,
-        block: () -> Unit
-    ) {
-        snapshotObserver.observeReads(target, onChanged, block)
-    }
-
-    private fun observeDrawModelReads(layer: SkijaLayer, block: () -> Unit) {
-        snapshotObserver.observeReads(layer, onCommitAffectingLayer, block)
-    }
-
     override fun createLayer(
-        drawLayerModifier: DrawLayerModifier,
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ) = SkijaLayer(
         this,
-        drawLayerModifier,
         invalidateParentLayer = {
             invalidateParentLayer()
             container.invalidate()
-        }
-    ) { canvas ->
-        observeDrawModelReads(this) {
-            drawBlock(canvas)
-        }
-    }
+        },
+        drawBlock = drawBlock
+    )
 
     override fun onSemanticsChange() = Unit
 

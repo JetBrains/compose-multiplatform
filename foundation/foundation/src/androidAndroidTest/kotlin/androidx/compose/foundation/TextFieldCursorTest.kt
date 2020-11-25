@@ -31,16 +31,16 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.hasInputMethodsSupport
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -54,7 +54,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @LargeTest
-@OptIn(ExperimentalFocus::class)
+@OptIn(ExperimentalFocus::class, ExperimentalTesting::class)
 class TextFieldCursorTest {
 
     @get:Rule
@@ -77,7 +77,7 @@ class TextFieldCursorTest {
         val latch = CountDownLatch(1)
         rule.setContent {
             BasicTextField(
-                value = TextFieldValue(),
+                value = "",
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White, background = Color.White),
                 modifier = Modifier
@@ -87,14 +87,14 @@ class TextFieldCursorTest {
                 cursorColor = Color.Red
             )
         }
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.waitForIdle()
 
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
-            rule.onNode(hasInputMethodsSupport())
+            rule.onNode(hasSetTextAction())
                 .captureToImage()
                 .assertCursor(2.dp, this)
         }
@@ -112,7 +112,7 @@ class TextFieldCursorTest {
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
                 BasicTextField(
-                    value = TextFieldValue(),
+                    value = "",
                     onValueChange = {},
                     textStyle = TextStyle(color = Color.White, background = Color.White),
                     modifier = Modifier
@@ -124,7 +124,7 @@ class TextFieldCursorTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.waitForIdle()
@@ -132,14 +132,14 @@ class TextFieldCursorTest {
         // cursor visible first 500 ms
         rule.clockTestRule.advanceClock(100)
         with(rule.density) {
-            rule.onNode(hasInputMethodsSupport())
+            rule.onNode(hasSetTextAction())
                 .captureToImage()
                 .assertCursor(2.dp, this)
         }
 
         // cursor invisible during next 500 ms
         rule.clockTestRule.advanceClock(700)
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -162,7 +162,7 @@ class TextFieldCursorTest {
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
                 BasicTextField(
-                    value = TextFieldValue(),
+                    value = "",
                     onValueChange = {},
                     textStyle = TextStyle(color = Color.White, background = Color.White),
                     modifier = Modifier
@@ -174,14 +174,14 @@ class TextFieldCursorTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
         rule.waitForIdle()
 
         // no cursor when usually shown
         rule.clockTestRule.advanceClock(100)
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -193,7 +193,7 @@ class TextFieldCursorTest {
 
         // no cursor when should be no cursor
         rule.clockTestRule.advanceClock(700)
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -215,7 +215,7 @@ class TextFieldCursorTest {
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
             Box(Modifier.padding(10.dp)) {
-                val text = remember { mutableStateOf(TextFieldValue("test")) }
+                val text = remember { mutableStateOf("test") }
                 BasicTextField(
                     value = text.value,
                     onValueChange = { text.value = it },
@@ -230,7 +230,7 @@ class TextFieldCursorTest {
             }
         }
 
-        rule.onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasSetTextAction()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
         rule.waitForIdle()
 
@@ -240,7 +240,7 @@ class TextFieldCursorTest {
         //  cursor position when sending a text
 
         // change text field value
-        rule.onNode(hasInputMethodsSupport())
+        rule.onNode(hasSetTextAction())
             .performTextReplacement("", true)
         rule.waitForIdle()
 
@@ -248,13 +248,13 @@ class TextFieldCursorTest {
         // To prevent blinking while typing we restart animation when new symbol is typed.
         rule.clockTestRule.advanceClock(400)
         with(rule.density) {
-            rule.onNode(hasInputMethodsSupport())
+            rule.onNode(hasSetTextAction())
                 .captureToImage()
                 .assertCursor(2.dp, this)
         }
     }
 
-    private fun ImageAsset.assertCursor(cursorWidth: Dp, density: Density) {
+    private fun ImageBitmap.assertCursor(cursorWidth: Dp, density: Density) {
         val cursorWidthPx = (with(density) { cursorWidth.toIntPx() })
         val width = width
         val height = height

@@ -20,23 +20,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.test.ExperimentalTesting
-import androidx.compose.ui.test.TestOwner
+import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
-import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.initCompose
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.delay
 import org.jetbrains.skija.Surface
 import org.junit.runner.Description
@@ -45,6 +45,7 @@ import java.util.LinkedList
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.FutureTask
 import javax.swing.SwingUtilities.invokeAndWait
+import javax.swing.SwingUtilities.isEventDispatchThread
 
 actual fun createComposeRule(): ComposeTestRule = DesktopComposeTestRule()
 
@@ -62,6 +63,7 @@ class DesktopComposeTestRule : ComposeTestRule {
     var owners: DesktopOwners? = null
     private var owner: DesktopOwner? = null
 
+    @ExperimentalTesting
     override val clockTestRule: AnimationClockTestRule = DesktopAnimationClockTestRule()
 
     override val density: Density
@@ -80,8 +82,10 @@ class DesktopComposeTestRule : ComposeTestRule {
             override fun evaluate() {
                 base.evaluate()
                 runExecutionQueue()
-                owner?.dispose()
-                owner = null
+                runOnUiThread {
+                    owner?.dispose()
+                    owner = null
+                }
             }
         }
     }
@@ -135,6 +139,22 @@ class DesktopComposeTestRule : ComposeTestRule {
         check(owner == null) {
             "Cannot call setContent twice per test!"
         }
+
+        if (isEventDispatchThread()) {
+            performSetContent(composable)
+        } else {
+            runOnUiThread {
+                performSetContent(composable)
+            }
+
+            // Only wait for idleness if not on the UI thread. If we are on the UI thread, the
+            // caller clearly wants to keep tight control over execution order, so don't go
+            // executing future tasks on the main thread.
+            waitForIdle()
+        }
+    }
+
+    private fun performSetContent(composable: @Composable() () -> Unit) {
         val surface = Surface.makeRasterN32Premul(displaySize.width, displaySize.height)
         val canvas = surface.canvas
         val owners = DesktopOwners(invalidate = {}).also {

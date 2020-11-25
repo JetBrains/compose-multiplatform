@@ -43,7 +43,7 @@ class CheckboxesInRowsTestCase(
     private val states = mutableListOf<MutableState<Boolean>>()
 
     @Composable
-    override fun emitContent() {
+    override fun Content() {
         MaterialTheme {
             Surface {
                 Column {

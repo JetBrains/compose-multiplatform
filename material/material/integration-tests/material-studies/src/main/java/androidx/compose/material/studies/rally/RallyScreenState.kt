@@ -18,10 +18,10 @@ package androidx.compose.material.studies.rally
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class RallyScreenState(
-    val icon: VectorAsset,
+    val icon: ImageVector,
     val body: @Composable () -> Unit
 ) {
     Overview(Icons.Filled.PieChart, { OverviewBody() }),

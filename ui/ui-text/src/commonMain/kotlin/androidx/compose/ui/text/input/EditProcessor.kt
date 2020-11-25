@@ -31,15 +31,17 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 @InternalTextApi
 class EditProcessor {
 
-    // The previous editor state we passed back to the user of this class.
+    // The last known state of the EditingBuffer
     @VisibleForTesting
-    internal var mPreviousState: TextFieldValue? = null
+    var mBufferState: TextFieldValue = TextFieldValue("", TextRange.Zero, null)
         private set
 
     // The editing buffer used for applying editor commands from IME.
     @VisibleForTesting
-    internal var mBuffer: EditingBuffer =
-        EditingBuffer(initialText = "", initialSelection = TextRange.Zero)
+    internal var mBuffer: EditingBuffer = EditingBuffer(
+        initialText = "",
+        initialSelection = TextRange.Zero
+    )
 
     /**
      * Must be called whenever new editor model arrives.
@@ -48,19 +50,28 @@ class EditProcessor {
      * This method may tell the IME about the selection offset changes or extracted text changes.
      */
     fun onNewState(
-        model: TextFieldValue,
+        value: TextFieldValue,
         textInputService: TextInputService?,
         token: InputSessionToken
     ) {
-        if (mPreviousState != model) {
+        if (mBufferState.text != value.text) {
             mBuffer = EditingBuffer(
-                initialText = model.text,
-                initialSelection = model.selection
+                initialText = value.text,
+                initialSelection = value.selection
             )
+        } else if (mBufferState.selection != value.selection) {
+            mBuffer.setSelection(value.selection.min, value.selection.max)
         }
 
-        mPreviousState = model
-        textInputService?.onStateUpdated(token, model)
+        if (value.composition == null) {
+            mBuffer.commitComposition()
+        } else if (!value.composition.collapsed) {
+            mBuffer.setComposition(value.composition.min, value.composition.max)
+        }
+
+        val oldValue = mBufferState
+        mBufferState = value
+        textInputService?.onStateUpdated(token, oldValue, value)
     }
 
     /**
@@ -82,7 +93,7 @@ class EditProcessor {
             }
         )
 
-        mPreviousState = newState
+        mBufferState = newState
         return newState
     }
 }

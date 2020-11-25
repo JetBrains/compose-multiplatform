@@ -39,11 +39,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AutofillAmbient
-import androidx.compose.ui.platform.AutofillTreeAmbient
+import androidx.compose.ui.platform.AmbientAutofill
+import androidx.compose.ui.platform.AmbientAutofillTree
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -53,16 +52,16 @@ import androidx.compose.ui.unit.dp
 )
 fun ExplicitAutofillTypesDemo() {
     Column {
-        val nameState = remember { mutableStateOf(TextFieldValue("Enter name here")) }
-        val emailState = remember { mutableStateOf(TextFieldValue("Enter email here")) }
-        val autofill = AutofillAmbient.current
+        val nameState = remember { mutableStateOf("Enter name here") }
+        val emailState = remember { mutableStateOf("Enter email here") }
+        val autofill = AmbientAutofill.current
         val labelStyle = MaterialTheme.typography.subtitle1
         val textStyle = MaterialTheme.typography.h6
 
         Text("Name", style = labelStyle)
         Autofill(
             autofillTypes = listOf(AutofillType.PersonFullName),
-            onFill = { nameState.value = TextFieldValue(it) }
+            onFill = { nameState.value = it }
         ) { autofillNode ->
             BasicTextField(
                 modifier = Modifier.focusObserver {
@@ -89,7 +88,7 @@ fun ExplicitAutofillTypesDemo() {
         Text("Email", style = labelStyle)
         Autofill(
             autofillTypes = listOf(AutofillType.EmailAddress),
-            onFill = { emailState.value = TextFieldValue(it) }
+            onFill = { emailState.value = it }
         ) { autofillNode ->
             BasicTextField(
                 modifier = Modifier.focusObserver {
@@ -117,11 +116,11 @@ fun ExplicitAutofillTypesDemo() {
 private fun Autofill(
     autofillTypes: List<AutofillType>,
     onFill: ((String) -> Unit),
-    children: @Composable (AutofillNode) -> Unit
+    content: @Composable (AutofillNode) -> Unit
 ) {
     val autofillNode = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
 
-    val autofillTree = AutofillTreeAmbient.current
+    val autofillTree = AmbientAutofillTree.current
     autofillTree += autofillNode
 
     Box(
@@ -129,7 +128,7 @@ private fun Autofill(
             autofillNode.boundingBox = it.boundingBox().toComposeRect()
         }
     ) {
-        children(autofillNode)
+        content(autofillNode)
     }
 }
 

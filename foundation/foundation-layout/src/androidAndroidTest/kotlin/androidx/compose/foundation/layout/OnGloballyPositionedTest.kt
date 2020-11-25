@@ -15,9 +15,7 @@
  */
 package androidx.compose.foundation.layout
 
-import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +27,7 @@ import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
@@ -129,7 +127,7 @@ class OnGloballyPositionedTest : LayoutTest() {
         val positionedLatch = CountDownLatch(1)
         activityTestRule.runOnUiThread(object : Runnable {
             override fun run() {
-                val frameLayout = FrameLayout(activity)
+                val frameLayout = ComposeView(activity)
                 frameLayout.setPadding(padding, padding, padding, padding)
                 activity.setContentView(frameLayout)
 
@@ -137,7 +135,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                 frameLayout.getLocationOnScreen(position)
                 frameGlobalPosition = Offset(position[0].toFloat(), position[1].toFloat())
 
-                frameLayout.setContent(Recomposer.current()) {
+                frameLayout.setContent {
                     Container(
                         Modifier.onGloballyPositioned {
                             realGlobalPosition = it.localToGlobal(localPosition)
@@ -148,7 +146,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                             positionedLatch.countDown()
                         },
                         expanded = true,
-                        children = emptyContent()
+                        content = emptyContent()
                     )
                 }
             }
@@ -193,7 +191,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                     }
                         .fillMaxSize()
                         .padding(start = left.value),
-                    children = emptyContent()
+                    content = emptyContent()
                 )
             }
         }
@@ -257,7 +255,7 @@ class OnGloballyPositionedTest : LayoutTest() {
                 Assert.assertEquals(lineValue, coordinates[line])
                 latch.countDown()
             }
-            Layout(modifier = onPositioned, children = { }) { _, _ ->
+            Layout(modifier = onPositioned, content = { }) { _, _ ->
                 layout(0, 0, mapOf(line to lineValue)) { }
             }
         }
@@ -265,9 +263,9 @@ class OnGloballyPositionedTest : LayoutTest() {
     }
 
     @Composable
-    private fun Offset(sizeModel: State<Dp>, children: @Composable () -> Unit) {
+    private fun Offset(sizeModel: State<Dp>, content: @Composable () -> Unit) {
         // simple copy of Padding which doesn't recompose when the size changes
-        Layout(children) { measurables, constraints ->
+        Layout(content) { measurables, constraints ->
             layout(constraints.maxWidth, constraints.maxHeight) {
                 measurables.first().measure(constraints)
                     .placeRelative(sizeModel.value.toPx().roundToInt(), 0)

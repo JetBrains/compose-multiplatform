@@ -23,7 +23,7 @@ import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -173,7 +173,7 @@ class RtlLayoutTest {
                         layout(100, 100) {}
                     }
                 }
-                Providers(LayoutDirectionAmbient provides direction.value) {
+                Providers(AmbientLayoutDirection provides direction.value) {
                     Layout(children) { measurables, constraints ->
                         layout(100, 100) {
                             measurables.first().measure(constraints).placeRelative(0, 0)
@@ -197,14 +197,32 @@ class RtlLayoutTest {
         absolutePositioning: Boolean,
         testLayoutDirection: LayoutDirection
     ) {
-        Providers(LayoutDirectionAmbient provides testLayoutDirection) {
+        Providers(AmbientLayoutDirection provides testLayoutDirection) {
             Layout(
-                children = @Composable {
-                    FixedSize(size, modifier = saveLayoutInfo(position[0], countDownLatch)) {
+                content = @Composable {
+                    FixedSize(
+                        size,
+                        modifier = Modifier.saveLayoutInfo(
+                            position[0],
+                            countDownLatch
+                        )
+                    ) {
                     }
-                    FixedSize(size, modifier = saveLayoutInfo(position[1], countDownLatch)) {
+                    FixedSize(
+                        size,
+                        modifier = Modifier.saveLayoutInfo(
+                            position[1],
+                            countDownLatch
+                        )
+                    ) {
                     }
-                    FixedSize(size, modifier = saveLayoutInfo(position[2], countDownLatch)) {
+                    FixedSize(
+                        size,
+                        modifier = Modifier.saveLayoutInfo(
+                            position[2],
+                            countDownLatch
+                        )
+                    ) {
                     }
                 }
             ) { measurables, constraints ->
@@ -212,27 +230,26 @@ class RtlLayoutTest {
                 val width = placeables.fold(0) { sum, p -> sum + p.width }
                 val height = placeables.fold(0) { sum, p -> sum + p.height }
                 layout(width, height) {
-                    var x = 0f
-                    var y = 0f
+                    var x = 0
+                    var y = 0
                     for (placeable in placeables) {
                         if (absolutePositioning) {
-                            placeable.place(Offset(x, y))
+                            placeable.place(x, y)
                         } else {
-                            placeable.placeRelative(Offset(x, y))
+                            placeable.placeRelative(x, y)
                         }
-                        x += placeable.width.toFloat()
-                        y += placeable.height.toFloat()
+                        x += placeable.width
+                        y += placeable.height
                     }
                 }
             }
         }
     }
 
-    @Composable
-    private fun saveLayoutInfo(
+    private fun Modifier.saveLayoutInfo(
         position: Ref<Offset>,
         countDownLatch: CountDownLatch
-    ): Modifier = Modifier.onGloballyPositioned {
+    ): Modifier = onGloballyPositioned {
         position.value = it.localToRoot(Offset(0f, 0f))
         countDownLatch.countDown()
     }

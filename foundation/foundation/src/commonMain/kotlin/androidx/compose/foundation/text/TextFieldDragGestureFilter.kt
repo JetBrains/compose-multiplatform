@@ -1,0 +1,92 @@
+/*
+ * Copyright 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.compose.foundation.text
+
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.DragObserver
+import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.ui.gesture.pressIndicatorGestureFilter
+
+/**
+ * Helper composable for tracking drag position.
+ */
+@Suppress("ModifierInspectorInfo")
+internal fun Modifier.dragPositionGestureFilter(
+    onPress: (Offset) -> Unit,
+    onRelease: (Offset) -> Unit
+): Modifier = composed {
+    val tracker = remember { DragEventTracker() }
+    // TODO(shepshapard): PressIndicator doesn't seem to be the right thing to use here.  It
+    //  actually may be functionally correct, but might mostly suggest that it should not
+    //  actually be called PressIndicator, but instead something else.
+    pressIndicatorGestureFilter(
+        onStart = {
+            tracker.init(it)
+            onPress(it)
+        },
+        onStop = {
+            onRelease(tracker.getPosition())
+        }
+    )
+        .dragGestureFilter(
+            dragObserver = object :
+                DragObserver {
+                override fun onDrag(dragDistance: Offset): Offset {
+                    tracker.onDrag(dragDistance)
+                    return Offset.Zero
+                }
+            }
+        )
+}
+
+/**
+ * Helper class for tracking dragging event.
+ */
+internal class DragEventTracker {
+    private var origin = Offset.Zero
+    private var distance = Offset.Zero
+
+    /**
+     * Restart the tracking from given origin.
+     *
+     * @param origin The origin of the drag gesture.
+     */
+    fun init(origin: Offset) {
+        this.origin = origin
+    }
+
+    /**
+     * Pass distance parameter called by DragGestureDetector$onDrag callback
+     *
+     * @param distance The distance from the origin of the drag origin.
+     */
+    fun onDrag(distance: Offset) {
+        this.distance = distance
+    }
+
+    /**
+     * Returns the current position.
+     *
+     * @return The position of the current drag point.
+     */
+    fun getPosition(): Offset {
+        return origin + distance
+    }
+}

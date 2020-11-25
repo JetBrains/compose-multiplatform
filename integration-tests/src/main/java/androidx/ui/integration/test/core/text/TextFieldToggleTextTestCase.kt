@@ -55,18 +55,16 @@ class TextFieldToggleTextTestCase(
 
     private val textInputService = TextInputService(TestPlatformTextInputService())
 
-    private val texts = mutableStateOf(
-        List(textNumber) {
-            textGenerator.nextParagraph(length = textLength)
-        }
-    )
+    private val texts = List(textNumber) {
+        mutableStateOf(textGenerator.nextParagraph(length = textLength))
+    }
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun emitMeasuredContent() {
-        for (text in texts.value) {
+    override fun MeasuredContent() {
+        for (text in texts) {
             BasicTextField(
-                value = TextFieldValue(text),
+                value = text.value,
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.Black, fontSize = fontSize),
                 modifier = Modifier.background(color = Color.Cyan).width(width)
@@ -76,7 +74,7 @@ class TextFieldToggleTextTestCase(
 
     @OptIn(InternalFoundationApi::class)
     @Composable
-    override fun emitContentWrappers(content: @Composable () -> Unit) {
+    override fun ContentWrappers(content: @Composable () -> Unit) {
         // Override IME input connection since we are not interested in it, and it might cause
         // flakiness
         @Suppress("DEPRECATION_ERROR")
@@ -95,8 +93,8 @@ class TextFieldToggleTextTestCase(
     }
 
     override fun toggleState() {
-        texts.value = List(textNumber) {
-            textGenerator.nextParagraph(length = textLength)
+        texts.forEach {
+            it.value = textGenerator.nextParagraph(length = textLength)
         }
     }
 
@@ -111,7 +109,9 @@ class TextFieldToggleTextTestCase(
         override fun stopInput() { /*do nothing*/ }
         override fun showSoftwareKeyboard() { /*do nothing*/ }
         override fun hideSoftwareKeyboard() { /*do nothing*/ }
-        override fun onStateUpdated(value: TextFieldValue) { /*do nothing*/ }
+        override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
+            /*do nothing*/
+        }
         override fun notifyFocusedRect(rect: Rect) { /*do nothing*/ }
     }
 }

@@ -23,9 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.test.R
 import java.util.concurrent.CountDownLatch
@@ -42,13 +42,13 @@ class VectorInvalidationTestCase(var latch: CountDownLatch) {
     var vectorSize: Int = 0
 
     @Composable
-    fun createTestVector() {
+    fun TestVector() {
         val state = remember { mutableStateOf(R.drawable.ic_triangle2) }
         vectorState = state
 
-        val vectorAsset = loadVectorResource(state.value)
-        with(DensityAmbient.current) {
-            vectorAsset.resource.resource?.let {
+        val imageVector = loadVectorResource(state.value)
+        with(AmbientDensity.current) {
+            imageVector.resource.resource?.let {
                 val width = it.defaultWidth
                 vectorSize = width.toIntPx()
                 AtLeastSize(

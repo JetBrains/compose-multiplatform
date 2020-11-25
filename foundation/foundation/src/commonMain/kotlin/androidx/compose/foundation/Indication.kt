@@ -22,7 +22,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawModifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color

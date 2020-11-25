@@ -32,7 +32,6 @@ import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -227,9 +226,9 @@ object SnackbarConstants {
 }
 
 @Composable
-private fun TextOnlySnackbar(text: @Composable () -> Unit) {
+private fun TextOnlySnackbar(content: @Composable () -> Unit) {
     Layout(
-        text,
+        content,
         modifier = Modifier.padding(
             start = HorizontalSpacing,
             end = HorizontalSpacing,
@@ -300,11 +299,11 @@ private fun OneRowSnackbar(
             bottom = SnackbarVerticalPadding
         )
     ) { measurables, constraints ->
-        val buttonPlaceable = measurables.first { it.id == actionTag }.measure(constraints)
+        val buttonPlaceable = measurables.first { it.layoutId == actionTag }.measure(constraints)
         val textMaxWidth =
             (constraints.maxWidth - buttonPlaceable.width - TextEndExtraSpacing.toIntPx())
                 .coerceAtLeast(constraints.minWidth)
-        val textPlaceable = measurables.first { it.id == textTag }.measure(
+        val textPlaceable = measurables.first { it.layoutId == textTag }.measure(
             constraints.copy(minHeight = 0, maxWidth = textMaxWidth)
         )
 

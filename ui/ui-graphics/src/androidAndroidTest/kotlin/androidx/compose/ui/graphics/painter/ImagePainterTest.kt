@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.toPixelMap
@@ -44,8 +44,8 @@ class ImagePainterTest {
     val white = Color.White
     private val srcSize = Size(100.0f, 100.0f)
 
-    private fun createTestSrcImage(): ImageAsset {
-        val src = ImageAsset(100, 100)
+    private fun createTestSrcImage(): ImageBitmap {
+        val src = ImageBitmap(100, 100)
         val canvas = Canvas(src)
         val paint = Paint().apply {
             this.color = Color.Blue
@@ -57,8 +57,8 @@ class ImagePainterTest {
         return src
     }
 
-    private fun createTestDstImage(): ImageAsset {
-        val dst = ImageAsset(200, 200)
+    private fun createTestDstImage(): ImageBitmap {
+        val dst = ImageBitmap(200, 200)
         val dstCanvas = Canvas(dst)
         val dstPaint = Paint().apply {
             this.color = Color.White
@@ -232,7 +232,7 @@ class ImagePainterTest {
                 IntOffset(0, 0),
                 IntSize(image.width + 1, 10)
             )
-            fail("Right bound must be less than ImageAsset width")
+            fail("Right bound must be less than ImageBitmap width")
         } catch (e: IllegalArgumentException) {
             // no-op
         }
@@ -247,7 +247,7 @@ class ImagePainterTest {
                 IntOffset(0, 0),
                 IntSize(10, image.height + 1)
             )
-            fail("Bottom bound must be less than ImageAsset height")
+            fail("Bottom bound must be less than ImageBitmap height")
         } catch (e: IllegalArgumentException) {
             // no-op
         }

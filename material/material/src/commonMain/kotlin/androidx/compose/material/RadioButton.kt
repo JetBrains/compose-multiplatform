@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -42,7 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -89,7 +89,10 @@ fun RadioButton(
                 onClick = onClick,
                 enabled = enabled,
                 interactionState = interactionState,
-                indication = RippleIndication(bounded = false, radius = RadioButtonRippleRadius)
+                indication = rememberRippleIndication(
+                    bounded = false,
+                    radius = RadioButtonRippleRadius
+                )
             )
             .wrapContentSize(Alignment.Center)
             .padding(RadioButtonPadding)
@@ -139,7 +142,7 @@ object RadioButtonConstants {
         unselectedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
         disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
     ): RadioButtonColors {
-        val clock = AnimationClockAmbient.current.asDisposableClock()
+        val clock = AmbientAnimationClock.current.asDisposableClock()
         return remember(
             selectedColor,
             unselectedColor,

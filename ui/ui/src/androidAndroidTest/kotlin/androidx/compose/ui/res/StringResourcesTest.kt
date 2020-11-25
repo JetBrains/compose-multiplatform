@@ -17,7 +17,7 @@
 package androidx.compose.ui.res
 
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -53,7 +53,7 @@ class StringResourcesTest {
     fun stringResource_not_localized_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 assertThat(stringResource(R.string.not_localized)).isEqualTo(NotLocalizedText)
             }
         }
@@ -70,7 +70,7 @@ class StringResourcesTest {
         )
 
         rule.setContent {
-            Providers(ContextAmbient provides spanishContext) {
+            Providers(AmbientContext provides spanishContext) {
                 assertThat(stringResource(R.string.not_localized)).isEqualTo(NotLocalizedText)
             }
         }
@@ -80,7 +80,7 @@ class StringResourcesTest {
     fun stringResource_localized_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 assertThat(stringResource(R.string.localized))
                     .isEqualTo(DefaultLocalizedText)
             }
@@ -98,7 +98,7 @@ class StringResourcesTest {
         )
 
         rule.setContent {
-            Providers(ContextAmbient provides spanishContext) {
+            Providers(AmbientContext provides spanishContext) {
                 assertThat(stringResource(R.string.localized))
                     .isEqualTo(SpanishLocalizedText)
             }
@@ -109,7 +109,7 @@ class StringResourcesTest {
     fun stringResource_not_localized_format_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 assertThat(stringResource(R.string.not_localized_format, FormatValue))
                     .isEqualTo(NotLocalizedFormatText)
             }
@@ -127,7 +127,7 @@ class StringResourcesTest {
         )
 
         rule.setContent {
-            Providers(ContextAmbient provides spanishContext) {
+            Providers(AmbientContext provides spanishContext) {
                 assertThat(stringResource(R.string.not_localized_format, FormatValue))
                     .isEqualTo(NotLocalizedFormatText)
             }
@@ -138,7 +138,7 @@ class StringResourcesTest {
     fun stringResource_localized_format_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 assertThat(stringResource(R.string.localized_format, FormatValue))
                     .isEqualTo(DefaultLocalizedFormatText)
             }
@@ -156,7 +156,7 @@ class StringResourcesTest {
         )
 
         rule.setContent {
-            Providers(ContextAmbient provides spanishContext) {
+            Providers(AmbientContext provides spanishContext) {
                 assertThat(stringResource(R.string.localized_format, FormatValue))
                     .isEqualTo(SpanishLocalizedFormatText)
             }
@@ -168,7 +168,7 @@ class StringResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(ContextAmbient provides context) {
+            Providers(AmbientContext provides context) {
                 assertThat(stringArrayResource(R.array.string_array))
                     .isEqualTo(arrayOf("string1", "string2"))
             }

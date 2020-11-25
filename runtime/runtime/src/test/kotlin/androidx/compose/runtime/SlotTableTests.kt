@@ -3014,6 +3014,39 @@ class SlotTableTests {
             }
         }
     }
+
+    @Test // regression b/173822943
+    fun testGroupInsertBoundaryCondition() {
+        // Test inserting when there is an empty gap.
+        SlotTable().also {
+            it.write { writer ->
+                writer.insert {
+                    writer.group(treeRoot) {
+                        repeat(7) { outer ->
+                            writer.group(100 + outer) {
+                                repeat(8) { inner ->
+                                    writer.group(200 + inner) { }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            it.verifyWellFormed()
+
+            it.write { writer ->
+                writer.group {
+                    repeat(3) { writer.skipGroup() }
+                    writer.insert {
+                        writer.group(300) { }
+                    }
+                    writer.verifyParentAnchors()
+                    writer.skipToGroupEnd()
+                }
+            }
+        }
+    }
 }
 
 @OptIn(InternalComposeApi::class)

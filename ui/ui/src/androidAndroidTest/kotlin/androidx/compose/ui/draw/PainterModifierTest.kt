@@ -41,11 +41,11 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
@@ -60,9 +60,9 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -113,7 +113,7 @@ class PainterModifierTest {
     @Test
     fun testPainterModifierColorFilter() {
         rule.setContent {
-            testPainter(colorFilter = ColorFilter(Color.Cyan, BlendMode.SrcIn))
+            TestPainter(colorFilter = ColorFilter(Color.Cyan, BlendMode.SrcIn))
         }
 
         rule.obtainScreenshotBitmap(
@@ -128,7 +128,7 @@ class PainterModifierTest {
     @Test
     fun testPainterModifierAlpha() {
         rule.setContent {
-            testPainter(alpha = 0.5f)
+            TestPainter(alpha = 0.5f)
         }
 
         rule.obtainScreenshotBitmap(
@@ -151,7 +151,7 @@ class PainterModifierTest {
     @Test
     fun testPainterModifierRtl() {
         rule.setContent {
-            testPainter(rtl = true)
+            TestPainter(rtl = true)
         }
 
         rule.obtainScreenshotBitmap(
@@ -494,8 +494,8 @@ class PainterModifierTest {
         var composableWidth = 0f
         var composableHeight = 0f
         rule.setContent {
-            composableWidth = composableWidthPx / DensityAmbient.current.density
-            composableHeight = composableHeightPx / DensityAmbient.current.density
+            composableWidth = composableWidthPx / AmbientDensity.current.density
+            composableHeight = composableHeightPx / AmbientDensity.current.density
             // Because the painter is told to fit inside the constraints, the width should
             // match that of the provided fixed width and the height should match that of the
             // composable as no scaling is being done
@@ -528,7 +528,7 @@ class PainterModifierTest {
         // height and width centered within the bounds of the composable
         val boxWidth = 600
         val boxHeight = 400
-        val srcImage = ImageAsset(100, 200)
+        val srcImage = ImageBitmap(100, 200)
         val canvas = Canvas(srcImage)
         val paint = Paint().apply { this.color = Color.Red }
         canvas.drawRect(0f, 0f, 400f, 200f, paint)
@@ -540,8 +540,8 @@ class PainterModifierTest {
                 modifier = Modifier
                     .testTag(testTag)
                     .background(color = Color.Gray)
-                    .width((boxWidth / DensityAmbient.current.density).dp)
-                    .height((boxHeight / DensityAmbient.current.density).dp)
+                    .width((boxWidth / AmbientDensity.current.density).dp)
+                    .height((boxHeight / AmbientDensity.current.density).dp)
                     .paint(ImagePainter(srcImage), contentScale = ContentScale.FillHeight)
             )
         }
@@ -568,12 +568,12 @@ class PainterModifierTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testImagePainterScalesNonUniformly() {
-        // The composable dimensions are larger than the ImageAsset. By not passing in
-        // a ContentScale parameter to the painter, the ImageAsset should be stretched
+        // The composable dimensions are larger than the ImageBitmap. By not passing in
+        // a ContentScale parameter to the painter, the ImageBitmap should be stretched
         // non-uniformly to fully occupy the bounds of the composable
         val boxWidth = 60
         val boxHeight = 40
-        val srcImage = ImageAsset(10, 20)
+        val srcImage = ImageBitmap(10, 20)
         val canvas = Canvas(srcImage)
         val paint = Paint().apply { this.color = Color.Red }
         canvas.drawRect(0f, 0f, 40f, 20f, paint)
@@ -585,13 +585,13 @@ class PainterModifierTest {
                 modifier = Modifier
                     .testTag(testTag)
                     .background(color = Color.Gray)
-                    .width((boxWidth / DensityAmbient.current.density).dp)
-                    .height((boxHeight / DensityAmbient.current.density).dp)
+                    .width((boxWidth / AmbientDensity.current.density).dp)
+                    .height((boxHeight / AmbientDensity.current.density).dp)
                     .paint(ImagePainter(srcImage), contentScale = ContentScale.FillBounds)
             )
         }
 
-        rule.obtainScreenshotBitmap(boxWidth, boxHeight).asImageAsset().assertPixels { Color.Red }
+        rule.obtainScreenshotBitmap(boxWidth, boxHeight).asImageBitmap().assertPixels { Color.Red }
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -608,17 +608,17 @@ class PainterModifierTest {
         val vectorWidth = 100
         val vectorHeight = 200
         rule.setContent {
-            val vectorWidthDp = (vectorWidth / DensityAmbient.current.density).dp
-            val vectorHeightDp = (vectorHeight / DensityAmbient.current.density).dp
+            val vectorWidthDp = (vectorWidth / AmbientDensity.current.density).dp
+            val vectorHeightDp = (vectorHeight / AmbientDensity.current.density).dp
             Box(
                 modifier = Modifier.background(color = Color.Gray)
-                    .width((boxWidth / DensityAmbient.current.density).dp)
-                    .height((boxHeight / DensityAmbient.current.density).dp)
+                    .width((boxWidth / AmbientDensity.current.density).dp)
+                    .height((boxHeight / AmbientDensity.current.density).dp)
                     .paint(
                         rememberVectorPainter(
                             defaultWidth = vectorWidthDp,
                             defaultHeight = vectorHeightDp,
-                            children = { viewportWidth, viewportHeight ->
+                            content = { viewportWidth, viewportHeight ->
                                 Path(
                                     fill = SolidColor(Color.Red),
                                     pathData = PathData {
@@ -672,14 +672,14 @@ class PainterModifierTest {
     }
 
     @Composable
-    private fun testPainter(
+    private fun TestPainter(
         alpha: Float = DefaultAlpha,
         colorFilter: ColorFilter? = null,
         rtl: Boolean = false
     ) {
         val p = TestPainter(containerWidth, containerHeight)
         val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-        Providers(LayoutDirectionAmbient provides layoutDirection) {
+        Providers(AmbientLayoutDirection provides layoutDirection) {
             AtLeastSize(
                 modifier = Modifier.background(Color.White)
                     .paint(p, alpha = alpha, colorFilter = colorFilter),
@@ -723,8 +723,8 @@ private class TestPainter(
  * before giving them to their child
  */
 @Composable
-fun NoMinSizeContainer(children: @Composable () -> Unit) {
-    Layout(children) { measurables, constraints ->
+fun NoMinSizeContainer(content: @Composable () -> Unit) {
+    Layout(content) { measurables, constraints ->
         val loosenedConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         val placeables = measurables.map { it.measure(loosenedConstraints) }
         val maxPlaceableWidth = placeables.maxByOrNull { it.width }?.width ?: 0
@@ -743,9 +743,9 @@ fun NoMinSizeContainer(children: @Composable () -> Unit) {
 @Composable
 fun NoIntrinsicSizeContainer(
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
-    Layout(children, modifier) { measurables, constraints ->
+    Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
         val width = max(
             placeables.maxByOrNull { it.width }?.width ?: 0,

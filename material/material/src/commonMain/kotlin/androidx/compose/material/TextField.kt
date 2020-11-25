@@ -30,7 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -38,13 +38,9 @@ import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -52,6 +48,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import kotlin.math.max
@@ -63,7 +60,7 @@ import kotlin.math.roundToInt
  *
  * If you are looking for an outlined version, see [OutlinedTextField].
  *
- * A simple example looks like:
+ * A simple single line text field looks like:
  *
  * @sample androidx.compose.material.samples.SimpleTextFieldSample
  *
@@ -116,8 +113,13 @@ import kotlin.math.roundToInt
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling
+ * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
+ * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
+ * maxLines attribute will be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
+ * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
+ * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
  * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
@@ -152,6 +154,7 @@ fun TextField(
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
@@ -163,26 +166,20 @@ fun TextField(
     shape: Shape =
         MaterialTheme.shapes.small.copy(bottomLeft = ZeroCornerSize, bottomRight = ZeroCornerSize)
 ) {
-    var selection by remember { mutableStateOf(TextRange.Zero) }
-    var composition by remember { mutableStateOf<TextRange?>(null) }
-    @OptIn(InternalTextApi::class)
-    val textFieldValue = TextFieldValue(
-        text = value,
-        selection = selection.constrain(0, value.length),
-        composition = composition?.constrain(0, value.length)
-    )
+    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+    val textFieldValue = textFieldValueState.copy(text = value)
 
     TextFieldImpl(
         type = TextFieldType.Filled,
         value = textFieldValue,
         onValueChange = {
-            selection = it.selection
-            composition = it.composition
+            textFieldValueState = it
             if (value != it.text) {
                 onValueChange(it.text)
             }
         },
         modifier = modifier,
+        singleLine = singleLine,
         textStyle = textStyle,
         label = label,
         placeholder = placeholder,
@@ -238,8 +235,13 @@ fun TextField(
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling
+ * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
+ * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
+ * maxLines attribute will be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
+ * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
+ * set to 1 if [singleLine] is set to true.
  * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
  * Note that the emitted IME action may be different from what you specified through the
  * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
@@ -274,6 +276,7 @@ fun TextField(
     isErrorValue: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
@@ -290,6 +293,7 @@ fun TextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
+        singleLine = singleLine,
         textStyle = textStyle,
         label = label,
         placeholder = placeholder,
@@ -365,12 +369,12 @@ private fun IconsWithTextFieldLayout(
     animationProgress: Float
 ) {
     Layout(
-        children = {
+        content = {
             if (leading != null) {
                 Box(Modifier.layoutId("leading").iconPadding(start = HorizontalIconPadding)) {
                     Decoration(
                         contentColor = leadingColor,
-                        children = leading
+                        content = leading
                     )
                 }
             }
@@ -378,7 +382,7 @@ private fun IconsWithTextFieldLayout(
                 Box(Modifier.layoutId("trailing").iconPadding(end = HorizontalIconPadding)) {
                     Decoration(
                         contentColor = trailingColor,
-                        children = trailing
+                        content = trailing
                     )
                 }
             }
@@ -408,13 +412,13 @@ private fun IconsWithTextFieldLayout(
         // measure leading icon
         val constraints = incomingConstraints.copy(minWidth = 0, minHeight = 0)
         val leadingPlaceable =
-            measurables.find { it.id == "leading" }?.measure(constraints)
+            measurables.find { it.layoutId == "leading" }?.measure(constraints)
         occupiedSpaceHorizontally += widthOrZero(
             leadingPlaceable
         )
 
         // measure trailing icon
-        val trailingPlaceable = measurables.find { it.id == "trailing" }
+        val trailingPlaceable = measurables.find { it.layoutId == "trailing" }
             ?.measure(constraints.offset(horizontal = -occupiedSpaceHorizontally))
         occupiedSpaceHorizontally += widthOrZero(
             trailingPlaceable
@@ -427,7 +431,7 @@ private fun IconsWithTextFieldLayout(
                 horizontal = -occupiedSpaceHorizontally
             )
         val labelPlaceable =
-            measurables.find { it.id == LabelId }?.measure(labelConstraints)
+            measurables.find { it.layoutId == LabelId }?.measure(labelConstraints)
         val lastBaseline = labelPlaceable?.get(LastBaseline)?.let {
             if (it != AlignmentLine.Unspecified) it else labelPlaceable.height
         } ?: 0
@@ -441,13 +445,13 @@ private fun IconsWithTextFieldLayout(
                 horizontal = -occupiedSpaceHorizontally
             )
         val textFieldPlaceable = measurables
-            .first { it.id == TextFieldId }
+            .first { it.layoutId == TextFieldId }
             .measure(textFieldConstraints)
 
         // measure placeholder
         val placeholderConstraints = textFieldConstraints.copy(minWidth = 0)
         val placeholderPlaceable = measurables
-            .find { it.id == PlaceholderId }
+            .find { it.layoutId == PlaceholderId }
             ?.measure(placeholderConstraints)
 
         val width = calculateWidth(
@@ -475,6 +479,7 @@ private fun IconsWithTextFieldLayout(
                 place(
                     width,
                     height,
+                    layoutDirection,
                     textFieldPlaceable,
                     labelPlaceable,
                     placeholderPlaceable,
@@ -546,6 +551,7 @@ private fun calculateHeight(
 private fun Placeable.PlacementScope.place(
     width: Int,
     height: Int,
+    layoutDirection: LayoutDirection,
     textfieldPlaceable: Placeable,
     labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
@@ -557,18 +563,17 @@ private fun Placeable.PlacementScope.place(
 ) {
     leadingPlaceable?.placeRelative(
         0,
-        Alignment.CenterVertically.align(height - leadingPlaceable.height)
+        Alignment.CenterVertically.align(leadingPlaceable.height, height)
     )
     trailingPlaceable?.placeRelative(
         width - trailingPlaceable.width,
-        Alignment.CenterVertically.align(height - trailingPlaceable.height)
+        Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
     if (labelPlaceable != null) {
         val labelCenterPosition = Alignment.CenterStart.align(
-            IntSize(
-                width - labelPlaceable.width,
-                height - labelPlaceable.height
-            )
+            IntSize(labelPlaceable.width, labelPlaceable.height),
+            IntSize(width, height),
+            layoutDirection
         )
         val labelDistance = labelCenterPosition.y - labelEndPosition
         val labelPositionY =
@@ -592,19 +597,19 @@ private fun Placeable.PlacementScope.placeWithoutLabel(
 ) {
     leadingPlaceable?.placeRelative(
         0,
-        Alignment.CenterVertically.align(height - leadingPlaceable.height)
+        Alignment.CenterVertically.align(leadingPlaceable.height, height)
     )
     trailingPlaceable?.placeRelative(
         width - trailingPlaceable.width,
-        Alignment.CenterVertically.align(height - trailingPlaceable.height)
+        Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
     textPlaceable.placeRelative(
         widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(height - textPlaceable.height)
+        Alignment.CenterVertically.align(textPlaceable.height, height)
     )
     placeholderPlaceable?.placeRelative(
         widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(height - placeholderPlaceable.height)
+        Alignment.CenterVertically.align(placeholderPlaceable.height, height)
     )
 }
 

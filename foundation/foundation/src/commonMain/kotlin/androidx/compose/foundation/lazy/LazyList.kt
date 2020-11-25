@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
 @Composable
@@ -40,16 +40,19 @@ internal fun LazyList(
     isVertical: Boolean,
     itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
-    val reverseDirection = LayoutDirectionAmbient.current == LayoutDirection.Rtl && !isVertical
+    val reverseDirection = AmbientLayoutDirection.current == LayoutDirection.Rtl && !isVertical
 
     val cachingItemContentFactory = remember { CachingItemContentFactory(itemContentFactory) }
     cachingItemContentFactory.itemContentFactory = itemContentFactory
 
-    SubcomposeLayout<DataIndex>(
+    val startContentPadding = if (isVertical) contentPadding.top else contentPadding.start
+    val endContentPadding = if (isVertical) contentPadding.bottom else contentPadding.end
+    SubcomposeLayout(
         modifier
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-                reverseDirection = reverseDirection,
+                // reverse scroll by default, to have "natural" gesture that goes reversed to layout
+                reverseDirection = !reverseDirection,
                 controller = state.scrollableController
             )
             .clipToBounds()
@@ -65,6 +68,8 @@ internal fun LazyList(
             isVertical,
             horizontalAlignment,
             verticalAlignment,
+            startContentPadding.toIntPx(),
+            endContentPadding.toIntPx(),
             itemsCount,
             cachingItemContentFactory
         )

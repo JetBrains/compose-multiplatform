@@ -50,7 +50,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -81,7 +80,7 @@ fun PopupDemo() {
 
             Box(
                 modifier = Modifier.weight(1f),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 val description: String = {
                     when (exampleIndex.value) {
@@ -215,7 +214,7 @@ private fun ColumnScope.PopupToggle() {
                 Popup(alignment = Alignment.Center) {
                     Box(
                         Modifier.preferredSize(70.dp).background(Color.Green, CircleShape),
-                        alignment = Alignment.Center
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "This is a popup!",
@@ -285,7 +284,7 @@ private fun ColumnScope.PopupWithChangingParent() {
     Column(Modifier.align(Alignment.CenterHorizontally)) {
         Box(
             Modifier.preferredSize(containerWidth, containerHeight),
-            alignment = parentAlignment.value
+            contentAlignment = parentAlignment.value
         ) {
             Box(
                 Modifier.preferredSize(parentWidth.value, parentHeight.value)
@@ -335,7 +334,7 @@ private fun ColumnScope.PopupAlignmentDemo() {
         val popupAlignment = remember { mutableStateOf(Alignment.TopStart) }
         Box(
             modifier = Modifier.preferredSize(widthSize, heightSize).background(Color.Red),
-            alignment = Alignment.BottomCenter
+            contentAlignment = Alignment.BottomCenter
         ) {
             Popup(popupAlignment.value) {
                 ClickableTextWithBackground(
@@ -519,7 +518,7 @@ private fun EditLine(
     initialText: String = "",
     color: Color = Color.White
 ) {
-    val state = remember { mutableStateOf(TextFieldValue(initialText)) }
+    val state = remember { mutableStateOf(initialText) }
     BasicTextField(
         value = state.value,
         modifier = modifier.background(color = color),
@@ -529,7 +528,7 @@ private fun EditLine(
         ),
         onValueChange = {
             state.value = it
-            onValueChange(it.text)
+            onValueChange(it)
         }
     )
 }

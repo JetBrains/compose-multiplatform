@@ -21,27 +21,27 @@ import androidx.compose.animation.animatedFloat
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onCommit
-import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 
 @Sampled
 @Composable
 fun ChangeOpacity() {
-    Text("Hello World", Modifier.drawLayer(alpha = 0.5f, clip = true))
+    Text("Hello World", Modifier.graphicsLayer(alpha = 0.5f, clip = true))
 }
 
 @Sampled
 @Composable
 fun AnimateFadeIn() {
-    val alpha = animatedFloat(initVal = 0f)
-    val layerModifier = object : DrawLayerModifier {
-        override val alpha: Float get() = alpha.value
-        override val clip: Boolean
-            get() = true
-    }
-    Text("Hello World", layerModifier)
+    val animatedAlpha = animatedFloat(initVal = 0f)
+    Text(
+        "Hello World",
+        Modifier.graphicsLayer {
+            alpha = animatedAlpha.value
+            clip = true
+        }
+    )
     onCommit {
-        alpha.animateTo(1f)
+        animatedAlpha.animateTo(1f)
     }
 }

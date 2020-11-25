@@ -18,6 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.rootAnimationClockFactory
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.test.espresso.IdlingResource
 import androidx.compose.ui.test.junit4.android.registerTestClock
@@ -42,6 +43,7 @@ import org.junit.runners.model.Statement
  * animations. Otherwise, built in steps that make sure the UI is stable when performing actions
  * or assertions will fail to work.
  */
+@ExperimentalTesting
 internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
 
     /** Backing property for [clock] */
@@ -54,26 +56,6 @@ internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
      * [registerTestClock].
      */
     override val clock: TestAnimationClock get() = _clock
-
-    /**
-     * Convenience property for calling [`clock.isPaused`][TestAnimationClock.isPaused]
-     */
-    override val isPaused: Boolean get() = clock.isPaused
-
-    /**
-     * Convenience method for calling [`clock.pauseClock()`][TestAnimationClock.pauseClock]
-     */
-    override fun pauseClock() = clock.pauseClock()
-
-    /**
-     * Convenience method for calling [`clock.resumeClock()`][TestAnimationClock.resumeClock]
-     */
-    override fun resumeClock() = clock.resumeClock()
-
-    /**
-     * Convenience method for calling [`clock.advanceClock()`][TestAnimationClock.advanceClock]
-     */
-    override fun advanceClock(milliseconds: Long) = clock.advanceClock(milliseconds)
 
     override fun apply(base: Statement, description: Description?): Statement {
         return AnimationClockStatement(base)
@@ -99,5 +81,6 @@ internal class AndroidAnimationClockTestRule : AnimationClockTestRule {
     }
 }
 
+@ExperimentalTesting
 actual fun createAnimationClockRule(): AnimationClockTestRule =
     AndroidAnimationClockTestRule()

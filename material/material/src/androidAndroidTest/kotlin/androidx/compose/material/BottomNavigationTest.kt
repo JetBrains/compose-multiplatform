@@ -33,7 +33,7 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.isInMutuallyExclusiveGroup
+import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -224,7 +224,7 @@ class BottomNavigationTest {
         }
 
         // Find all items and ensure there are 3
-        rule.onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isSelectable())
             .assertCountEquals(3)
             // Ensure semantics match for selected state of the items
             .apply {

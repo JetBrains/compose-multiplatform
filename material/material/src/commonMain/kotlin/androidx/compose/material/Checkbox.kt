@@ -34,9 +34,8 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.foundation.selection.triStateToggleable
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -53,7 +52,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 
@@ -141,7 +141,10 @@ fun TriStateCheckbox(
                 onClick = onClick,
                 enabled = enabled,
                 interactionState = interactionState,
-                indication = RippleIndication(bounded = false, radius = CheckboxRippleRadius)
+                indication = rememberRippleIndication(
+                    bounded = false,
+                    radius = CheckboxRippleRadius
+                )
             )
             .padding(CheckboxDefaultPadding),
         colors = colors
@@ -208,7 +211,7 @@ object CheckboxConstants {
         disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
         disabledIndeterminateColor: Color = checkedColor.copy(alpha = ContentAlpha.disabled)
     ): CheckboxColors {
-        val clock = AnimationClockAmbient.current.asDisposableClock()
+        val clock = AmbientAnimationClock.current.asDisposableClock()
         return remember(
             checkedColor,
             uncheckedColor,

@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.NativePathEffect
 import androidx.compose.ui.graphics.Paint
@@ -193,7 +193,7 @@ class CanvasDrawScope : DrawScope {
      * @see [DrawScope.drawImage]
      */
     override fun drawImage(
-        image: ImageAsset,
+        image: ImageBitmap,
         topLeft: Offset,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         style: DrawStyle,
@@ -209,7 +209,7 @@ class CanvasDrawScope : DrawScope {
      * @see [DrawScope.drawImage]
      */
     override fun drawImage(
-        image: ImageAsset,
+        image: ImageBitmap,
         srcOffset: IntOffset,
         srcSize: IntSize,
         dstOffset: IntOffset,

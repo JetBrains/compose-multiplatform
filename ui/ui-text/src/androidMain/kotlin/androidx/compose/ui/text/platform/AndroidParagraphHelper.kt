@@ -43,7 +43,7 @@ internal fun createCharSequence(
     if (spanStyles.isEmpty() &&
         placeholders.isEmpty() &&
         textIndent == TextIndent.None &&
-        lineHeight.isInherit
+        lineHeight.isUnspecified
     ) {
         return text
     }

@@ -21,7 +21,6 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -64,22 +63,22 @@ class LayoutIdTest {
             activity.setContent {
                 Layout(
                     {
-                        AtLeastSize(0, Modifier.layoutId("first"), children = emptyContent())
+                        AtLeastSize(0, Modifier.layoutId("first"), content = emptyContent())
                         Box(Modifier.layoutId("second")) {
                             AtLeastSize(
                                 0,
-                                children = emptyContent()
+                                content = emptyContent()
                             )
                         }
                         Box(Modifier.layoutId("third")) {
-                            AtLeastSize(0, children = emptyContent())
+                            AtLeastSize(0, content = emptyContent())
                         }
                     }
                 ) { measurables, _ ->
                     assertEquals(3, measurables.size)
-                    assertEquals("first", measurables[0].id)
-                    assertEquals("second", measurables[1].id)
-                    assertEquals("third", measurables[2].id)
+                    assertEquals("first", measurables[0].layoutId)
+                    assertEquals("second", measurables[1].layoutId)
+                    assertEquals("third", measurables[2].layoutId)
                     latch.countDown()
                     layout(0, 0) {}
                 }

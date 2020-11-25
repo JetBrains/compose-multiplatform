@@ -23,14 +23,19 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.ValueElement
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -80,7 +85,7 @@ class LongPressDragGestureFilterTest {
                                 setupLatch.countDown()
                             }
                         },
-                        children = emptyContent()
+                        content = emptyContent()
                     )
                 }
             }
@@ -92,6 +97,16 @@ class LongPressDragGestureFilterTest {
             "timed out waiting for setup completion",
             setupLatch.await(1000, TimeUnit.SECONDS)
         )
+    }
+
+    @Before
+    fun before() {
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     @Test
@@ -381,6 +396,20 @@ class LongPressDragGestureFilterTest {
             verify(longPressDragObserver).onCancel()
         }
         verifyNoMoreInteractions(longPressDragObserver)
+    }
+
+    @Test
+    fun testInspectorValue() {
+        val onLongPress: () -> Unit = {}
+        val observer = MyLongPressDragObserver(onLongPress)
+        activityTestRule.runOnUiThreadIR {
+            val modifier = Modifier.longPressDragGestureFilter(observer) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("longPressDragGestureFilter")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                ValueElement("longPressDragObserver", observer)
+            )
+        }
     }
 
     private fun waitForLongPress(block: () -> Unit) {
