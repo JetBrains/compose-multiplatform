@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -26,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -51,6 +53,7 @@ import androidx.compose.ui.unit.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
 import org.jetbrains.skija.Surface
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
@@ -223,6 +226,35 @@ class ScrollbarTest {
         }
     }
 
+    @Test(timeout = 3000)
+    fun `dynamically change content then drag slider to the end`() {
+        runBlocking(Dispatchers.Main) {
+            val isContentVisible = mutableStateOf(false)
+            rule.setContent {
+                TestBox(
+                    size = 100.dp,
+                    scrollbarWidth = 10.dp
+                ) {
+                    if (isContentVisible.value) {
+                        repeat(10) {
+                            Box(Modifier.size(20.dp).testTag("box$it"))
+                        }
+                    }
+                }
+            }
+            onFrame()
+
+            isContentVisible.value = true
+            onFrame()
+
+            rule.onNodeWithTag("scrollbar").performGesture {
+                swipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
+            }
+            onFrame()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
+        }
+    }
+
     @Suppress("SameParameterValue")
     @OptIn(ExperimentalFoundationApi::class)
     @Test(timeout = 3000)
@@ -327,6 +359,8 @@ class ScrollbarTest {
 
     // TODO(demin): move to DesktopComposeTestRule?
     private suspend fun onFrame() {
+        // TODO(demin): probably we don't need `yield` after we fix https://github.com/JetBrains/compose-jb/issues/137
+        yield()
         (rule as DesktopComposeTestRule).owners?.onFrame(canvas, 100, 100, 0)
         rule.awaitIdle()
     }
@@ -355,6 +389,31 @@ class ScrollbarTest {
                     Box(Modifier.size(childSize).testTag("box$it"))
                 }
             }
+
+            VerticalScrollbar(
+                adapter = rememberScrollbarAdapter(state),
+                modifier = Modifier
+                    .width(scrollbarWidth)
+                    .fillMaxHeight()
+                    .testTag("scrollbar")
+            )
+        }
+    }
+
+    @Composable
+    private fun TestBox(
+        size: Dp,
+        scrollbarWidth: Dp,
+        scrollableContent: @Composable ColumnScope.() -> Unit
+    ) = withTestEnvironment {
+        Box(Modifier.size(size)) {
+            val state = rememberScrollState()
+
+            ScrollableColumn(
+                Modifier.fillMaxSize().testTag("column"),
+                state,
+                content = scrollableContent
+            )
 
             VerticalScrollbar(
                 adapter = rememberScrollbarAdapter(state),
