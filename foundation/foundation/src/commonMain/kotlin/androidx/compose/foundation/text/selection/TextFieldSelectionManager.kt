@@ -406,20 +406,13 @@ internal class TextFieldSelectionManager() {
     }
 
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
-        return if (isStartHandle)
-            getSelectionHandleCoordinates(
-                textLayoutResult = state?.layoutResult!!,
-                offset = offsetMap.originalToTransformed(value.selection.start),
-                isStart = true,
-                areHandlesCrossed = value.selection.reversed
-            )
-        else
-            getSelectionHandleCoordinates(
-                textLayoutResult = state?.layoutResult!!,
-                offset = offsetMap.originalToTransformed(value.selection.end),
-                isStart = false,
-                areHandlesCrossed = value.selection.reversed
-            )
+        val offset = if (isStartHandle) value.selection.start else value.selection.end
+        return getSelectionHandleCoordinates(
+            textLayoutResult = state?.layoutResult!!,
+            offset = offsetMap.originalToTransformed(offset),
+            isStart = isStartHandle,
+            areHandlesCrossed = value.selection.reversed
+        )
     }
 
     /**
