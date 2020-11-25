@@ -19,7 +19,6 @@ package androidx.compose.ui.test
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.getAllSemanticsNodes
-import androidx.compose.ui.test.PersistingInputDispatcher.InputDispatcherState
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 

@@ -24,14 +24,14 @@ import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.unit.Uptime
 
-internal actual fun InputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
+internal actual fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
     return DesktopInputDispatcher(testContext, owner as DesktopOwner)
 }
 
 internal class DesktopInputDispatcher(
     testContext: TestContext,
     val owner: DesktopOwner
-) : PersistingInputDispatcher(testContext, owner) {
+) : InputDispatcher(testContext, owner) {
     companion object {
         var gesturePointerId = 0L
     }
