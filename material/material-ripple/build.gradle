@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
@@ -38,36 +37,17 @@ dependencies {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        api project(":compose:animation:animation-core")
         api project(":compose:foundation:foundation")
-        api project(":compose:material:material-icons-core")
-        api project(":compose:material:material-ripple")
         api project(":compose:runtime:runtime")
-        api project(":compose:ui:ui")
-        api project(":compose:ui:ui-text")
 
         implementation(KOTLIN_STDLIB_COMMON)
         implementation project(":compose:animation:animation")
-        implementation project(":compose:foundation:foundation-layout")
         implementation project(":compose:ui:ui-util")
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
         testImplementation(JUNIT)
         testImplementation(TRUTH)
-
-        androidTestImplementation project(":compose:material:material:material-samples")
-        androidTestImplementation project(":compose:test-utils")
-        androidTestImplementation project(":test-screenshot")
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(TRUTH)
-        androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-        androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-        androidTestImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
-        }
     }
 }
 
@@ -83,21 +63,11 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
-                api project(":compose:animation:animation-core")
                 api project(":compose:foundation:foundation")
-                api project(":compose:material:material-icons-core")
-                api project(":compose:material:material-ripple")
                 api project(":compose:runtime:runtime")
-                api project(":compose:ui:ui")
-                api project(":compose:ui:ui-text")
 
                 implementation project(":compose:animation:animation")
-                implementation project(":compose:foundation:foundation-layout")
                 implementation project(":compose:ui:ui-util")
-            }
-
-            androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
             }
 
             desktopMain.dependencies {
@@ -110,45 +80,22 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(JUNIT)
                 implementation(TRUTH)
             }
-
-            androidAndroidTest.dependencies {
-                implementation project(":compose:material:material:material-samples")
-                implementation project(":compose:test-utils")
-                implementation project(":test-screenshot")
-
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
-                implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-                implementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
-            }
         }
     }
 }
 
 androidx {
-    name = "Compose Material Components"
+    name = "Compose Material Ripple"
     publish = Publish.SNAPSHOT_AND_RELEASE
     mavenGroup = LibraryGroups.Compose.MATERIAL
-    inceptionYear = "2018"
-    description = "Compose Material Design Components library"
-    legacyDisableKotlinStrictApiMode = true
+    inceptionYear = "2020"
+    description = "Material ripple used to build interactive components"
 }
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         useIR = true
     }
-}
-
-// Screenshot tests related setup
-android {
-    sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/compose/material/material"
 }
 
 tasks.withType(KotlinCompile).configureEach {

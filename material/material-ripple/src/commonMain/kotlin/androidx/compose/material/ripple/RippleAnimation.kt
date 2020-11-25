@@ -41,19 +41,18 @@ import androidx.compose.ui.unit.milliseconds
 import kotlin.math.max
 
 /**
- * [RippleAnimation]s are drawn as part of [RippleIndication] as a visual indicator for an
- * [androidx.compose.foundation.Interaction.Pressed] state.
+ * [RippleAnimation]s are drawn as part of [Ripple] as a visual indicator for an
+ * different [androidx.compose.foundation.Interaction]s.
  *
  * Use [androidx.compose.foundation.clickable] or [androidx.compose.foundation.indication] to add a
- * [RippleIndication] to your component, which contains a RippleAnimation for pressed states, and
+ * ripple to your component, which contains a RippleAnimation for pressed states, and
  * a state layer for other states.
  *
  * This is a default implementation based on the Material Design specification.
  *
- * A circular ripple effect whose origin starts at the input touch point and
- * whose radius expands from 60% of the final value. The ripple origin
- * animates to the center of its target layout for the bounded version
- * and stays in the center for the unbounded one.
+ * Draws a circular ripple effect with an origin starting at the input touch point and with a
+ * radius expanding from 60% of the final value. The ripple origin animates to the center of its
+ * target layout for the bounded version and stays in the center for the unbounded one.
  *
  * @param size The size of the target layout.
  * @param startPosition The position the animation will start from.
