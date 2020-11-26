@@ -17,6 +17,7 @@
 package androidx.compose.integration.macrobenchmark
 
 import androidx.benchmark.macro.MacrobenchmarkRule
+import androidx.benchmark.macro.StartupMode
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Rule
@@ -37,13 +38,13 @@ class StartupDemosMacrobenchmark(
     @Test
     fun compiledColdStartup() = benchmarkRule.measureStartup(
         profileCompiled = true,
-        coldLaunch = true
+        startupMode = StartupMode.COLD
     )
 
     @Test
     fun uncompiledColdStartup() = benchmarkRule.measureStartup(
         profileCompiled = false,
-        coldLaunch = true
+        startupMode = StartupMode.COLD
     )
 
     companion object {
