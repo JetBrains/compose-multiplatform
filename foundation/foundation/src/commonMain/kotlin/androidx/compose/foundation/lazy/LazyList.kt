@@ -43,6 +43,8 @@ internal fun LazyList(
     state: LazyListState,
     /** The inner padding to be added for the whole content(nor for each individual item) */
     contentPadding: PaddingValues,
+    /** reverse the direction of scrolling and layout */
+    reverseLayout: Boolean,
     /** The layout orientation of the list */
     isVertical: Boolean,
     /** The alignment to align items horizontally. Required when isVertical is true */
@@ -56,7 +58,10 @@ internal fun LazyList(
     /** The factory defining the content for an item on the given position in the list */
     itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
-    val reverseDirection = AmbientLayoutDirection.current == LayoutDirection.Rtl && !isVertical
+    val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+    // reverse scroll by default, to have "natural" gesture that goes reversed to layout
+    // if rtl and horizontal, do not reverse to make it right-to-left
+    val reverseScrollDirection = if (!isVertical && isRtl) reverseLayout else !reverseLayout
 
     val cachingItemContentFactory = remember { CachingItemContentFactory(itemContentFactory) }
     cachingItemContentFactory.itemContentFactory = itemContentFactory
@@ -67,8 +72,7 @@ internal fun LazyList(
         modifier
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-                // reverse scroll by default, to have "natural" gesture that goes reversed to layout
-                reverseDirection = !reverseDirection,
+                reverseDirection = reverseScrollDirection,
                 controller = state.scrollableController
             )
             .clipToBounds()
@@ -129,7 +133,8 @@ internal fun LazyList(
             isVertical,
             verticalArrangement,
             horizontalArrangement,
-            measureResult
+            measureResult,
+            reverseLayout
         )
     }
 }

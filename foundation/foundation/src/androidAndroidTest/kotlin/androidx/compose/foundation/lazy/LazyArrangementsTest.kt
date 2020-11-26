@@ -271,6 +271,42 @@ class LazyArrangementsTest {
             .assertLeftPositionInRootIsEqualTo(itemSize * 2.5f)
     }
 
+    // with reverseLayout == true
+
+    @Test
+    fun column_defaultArrangementIsBottomWithReverseLayout() {
+        rule.setContent {
+            LazyColumn(
+                reverseLayout = true,
+                modifier = Modifier.size(containerSize)
+            ) {
+                items((0..1).toList()) {
+                    Box(Modifier.size(itemSize).testTag(it.toString()))
+                }
+            }
+        }
+
+        assertArrangementForTwoItems(Arrangement.Bottom, reversedItemsOrder = true)
+    }
+
+    @Test
+    fun row_defaultArrangementIsEndWithReverseLayout() {
+        rule.setContent {
+            LazyRow(
+                reverseLayout = true,
+                modifier = Modifier.size(containerSize)
+            ) {
+                items((0..1).toList()) {
+                    Box(Modifier.size(itemSize).testTag(it.toString()))
+                }
+            }
+        }
+
+        assertArrangementForTwoItems(
+            Arrangement.End, LayoutDirection.Ltr, reversedItemsOrder = true
+        )
+    }
+
     fun composeColumnWith(arrangement: Arrangement.Vertical) {
         rule.setContent {
             LazyColumn(
@@ -299,14 +335,18 @@ class LazyArrangementsTest {
         }
     }
 
-    fun assertArrangementForTwoItems(arrangement: Arrangement.Vertical) {
+    fun assertArrangementForTwoItems(
+        arrangement: Arrangement.Vertical,
+        reversedItemsOrder: Boolean = false
+    ) {
         with(rule.density) {
             val sizes = IntArray(2) { itemSize.toIntPx() }
             val outPositions = IntArray(2) { 0 }
             arrangement.arrange(containerSize.toIntPx(), sizes, this, outPositions)
 
             outPositions.forEachIndexed { index, position ->
-                rule.onNodeWithTag("$index")
+                val realIndex = if (reversedItemsOrder) if (index == 0) 1 else 0 else index
+                rule.onNodeWithTag("$realIndex")
                     .assertTopPositionInRootIsEqualTo(position.toDp())
             }
         }
@@ -314,7 +354,8 @@ class LazyArrangementsTest {
 
     fun assertArrangementForTwoItems(
         arrangement: Arrangement.Horizontal,
-        layoutDirection: LayoutDirection
+        layoutDirection: LayoutDirection,
+        reversedItemsOrder: Boolean = false
     ) {
         with(rule.density) {
             val sizes = IntArray(2) { itemSize.toIntPx() }
@@ -322,12 +363,13 @@ class LazyArrangementsTest {
             arrangement.arrange(containerSize.toIntPx(), sizes, layoutDirection, this, outPositions)
 
             outPositions.forEachIndexed { index, position ->
+                val realIndex = if (reversedItemsOrder) if (index == 0) 1 else 0 else index
                 val expectedPosition = if (layoutDirection == LayoutDirection.Ltr) {
                     position.toDp()
                 } else {
                     containerSize - position.toDp() - itemSize
                 }
-                rule.onNodeWithTag("$index")
+                rule.onNodeWithTag("$realIndex")
                     .assertLeftPositionInRootIsEqualTo(expectedPosition)
             }
         }

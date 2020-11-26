@@ -64,15 +64,19 @@ internal class LazyMeasuredItem(
      * and [layoutHeight] should be provided to not place placeables which are ended up outside of
      * the viewport (for example one item consist of 2 placeables, and the first one is not going
      * to be visible, so we don't place it as an optimization, but place the second one).
+     * If [reverseOrder] is true the inner placeables would be placed in the inverted order.
      */
     fun place(
         scope: Placeable.PlacementScope,
         layoutWidth: Int,
         layoutHeight: Int,
-        offset: Int
+        offset: Int,
+        reverseOrder: Boolean
     ) = with(scope) {
         var mainAxisOffset = offset
-        placeables.fastForEach {
+        val indices = if (reverseOrder) placeables.lastIndex downTo 0 else placeables.indices
+        for (index in indices) {
+            val it = placeables[index]
             if (isVertical) {
                 val x = requireNotNull(horizontalAlignment)
                     .align(it.width, layoutWidth, layoutDirection)

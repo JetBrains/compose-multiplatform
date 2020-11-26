@@ -231,7 +231,8 @@ internal fun MeasureScope.layoutLazyList(
     isVertical: Boolean,
     verticalArrangement: Arrangement.Vertical?,
     horizontalArrangement: Arrangement.Horizontal?,
-    measureResult: LazyListMeasureResult
+    measureResult: LazyListMeasureResult,
+    reverseLayout: Boolean
 ): MeasureResult {
     val layoutWidth = constraints.constrainWidth(
         if (isVertical) measureResult.crossAxisSize else measureResult.mainAxisSize
@@ -249,10 +250,11 @@ internal fun MeasureScope.layoutLazyList(
     return layout(layoutWidth, layoutHeight) {
         var currentMainAxis = measureResult.itemsScrollOffset
         if (hasSpareSpace) {
-            val sizes = IntArray(measureResult.items.size) { index ->
-                measureResult.items[index].let { it.mainAxisSize - it.extraMainAxisSize }
+            val items = if (reverseLayout) measureResult.items.reversed() else measureResult.items
+            val sizes = IntArray(items.size) { index ->
+                items[index].let { it.mainAxisSize - it.extraMainAxisSize }
             }
-            val positions = IntArray(measureResult.items.size) { 0 }
+            val positions = IntArray(items.size) { 0 }
             if (isVertical) {
                 requireNotNull(verticalArrangement)
                     .arrange(mainAxisLayoutSize, sizes, density, positions)
@@ -261,11 +263,16 @@ internal fun MeasureScope.layoutLazyList(
                     .arrange(mainAxisLayoutSize, sizes, layoutDirection, density, positions)
             }
             positions.forEachIndexed { index, position ->
-                measureResult.items[index].place(this, layoutWidth, layoutHeight, position)
+                items[index].place(this, layoutWidth, layoutHeight, position, reverseLayout)
             }
         } else {
             measureResult.items.fastForEach {
-                it.place(this, layoutWidth, layoutHeight, currentMainAxis)
+                val offset = if (reverseLayout) {
+                    mainAxisLayoutSize - currentMainAxis - (it.mainAxisSize - it.extraMainAxisSize)
+                } else {
+                    currentMainAxis
+                }
+                it.place(this, layoutWidth, layoutHeight, offset, reverseLayout)
                 currentMainAxis += it.mainAxisSize
             }
         }

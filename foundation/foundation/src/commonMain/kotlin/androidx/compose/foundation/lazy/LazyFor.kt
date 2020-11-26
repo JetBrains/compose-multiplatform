@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.dp
  * content after it has been clipped, which is not possible via [modifier] param. You can use it
  * to add a padding before the first item or after the last one. If you want to add a spacing
  * between each item use [verticalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the bottom to the top and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * we scrolled to the bottom.
  * @param verticalArrangement The vertical arrangement of the layout's children. This allows
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
@@ -57,7 +60,9 @@ fun <T> LazyColumnFor(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
@@ -66,7 +71,8 @@ fun <T> LazyColumnFor(
         state = state,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
-        verticalArrangement = verticalArrangement
+        verticalArrangement = verticalArrangement,
+        reverseLayout = reverseLayout
     ) {
         items(items, itemContent)
     }
@@ -89,6 +95,9 @@ fun <T> LazyColumnFor(
  * content after it has been clipped, which is not possible via [modifier] param. You can use it
  * to add a padding before the first item or after the last one. If you want to add a spacing
  * between each item use [verticalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the bottom to the top and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * we scrolled to the bottom.
  * @param verticalArrangement The vertical arrangement of the layout's children. This allows
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
@@ -107,7 +116,9 @@ fun <T> LazyColumnForIndexed(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
@@ -116,7 +127,8 @@ fun <T> LazyColumnForIndexed(
         state = state,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
-        verticalArrangement = verticalArrangement
+        verticalArrangement = verticalArrangement,
+        reverseLayout = reverseLayout
     ) {
         itemsIndexed(items, itemContent)
     }
@@ -137,6 +149,9 @@ fun <T> LazyColumnForIndexed(
  * content after it has been clipped, which is not possible via [modifier] param. You can use it
  * to add a padding before the first item or after the last one. If you want to add a spacing
  * between each item use [horizontalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the end to the start and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * the first item is located at the end.
  * @param horizontalArrangement The horizontal arrangement of the layout's children. This allows
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
@@ -154,7 +169,9 @@ fun <T> LazyRowFor(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
@@ -163,7 +180,8 @@ fun <T> LazyRowFor(
         state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
-        horizontalArrangement = horizontalArrangement
+        horizontalArrangement = horizontalArrangement,
+        reverseLayout = reverseLayout
     ) {
         items(items, itemContent)
     }
@@ -185,6 +203,9 @@ fun <T> LazyRowFor(
  * content after it has been clipped, which is not possible via [modifier] param. You can use it
  * to add a padding before the first item or after the last one. If you want to add a spacing
  * between each item use [horizontalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the end to the start and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * the first item is located at the end.
  * @param horizontalArrangement The horizontal arrangement of the layout's children. This allows
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
@@ -203,7 +224,9 @@ fun <T> LazyRowForIndexed(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
@@ -212,7 +235,8 @@ fun <T> LazyRowForIndexed(
         state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
-        horizontalArrangement = horizontalArrangement
+        horizontalArrangement = horizontalArrangement,
+        reverseLayout = reverseLayout
     ) {
         itemsIndexed(items, itemContent)
     }

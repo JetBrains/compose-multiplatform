@@ -56,7 +56,8 @@ internal fun LazyGrid(
         contentPadding = contentPadding,
         isVertical = true,
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Top,
+        reverseLayout = false
     ) { rowIndex ->
         {
             GridRow {

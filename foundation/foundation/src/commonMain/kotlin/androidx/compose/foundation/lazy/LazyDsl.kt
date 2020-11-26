@@ -175,6 +175,9 @@ internal class LazyListScopeImpl : LazyListScope {
  * content after it has been clipped, which is not possible via [modifier] param. You can use it
  * to add a padding before the first item or after the last one. If you want to add a spacing
  * between each item use [horizontalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the end to the start and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * the first item is located at the end.
  * @param horizontalArrangement The horizontal arrangement of the layout's children. This allows
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
@@ -188,7 +191,9 @@ fun LazyRow(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: LazyListScope.() -> Unit
 ) {
@@ -202,7 +207,8 @@ fun LazyRow(
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
         horizontalArrangement = horizontalArrangement,
-        isVertical = false
+        isVertical = false,
+        reverseLayout = reverseLayout
     ) { index ->
         scope.contentFor(index, this)
     }
@@ -222,6 +228,9 @@ fun LazyRow(
  * content after it has been clipped, which is not possible via [modifier] param. You can use it
  * to add a padding before the first item or after the last one. If you want to add a spacing
  * between each item use [verticalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the bottom to the top and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * we scrolled to the bottom.
  * @param verticalArrangement The vertical arrangement of the layout's children. This allows
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
@@ -235,7 +244,9 @@ fun LazyColumn(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: LazyListScope.() -> Unit
 ) {
@@ -249,7 +260,8 @@ fun LazyColumn(
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement,
-        isVertical = true
+        isVertical = true,
+        reverseLayout = reverseLayout
     ) { index ->
         scope.contentFor(index, this)
     }

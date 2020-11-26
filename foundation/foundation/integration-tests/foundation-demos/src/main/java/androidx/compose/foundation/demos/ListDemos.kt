@@ -42,6 +42,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyRowFor
 import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.AmbientContentColor
@@ -78,6 +79,7 @@ val LazyListDemos = listOf(
     ComposableDemo("LazyColumn DSL") { LazyColumnScope() },
     ComposableDemo("LazyRow DSL") { LazyRowScope() },
     ComposableDemo("Arrangements") { LazyListArrangements() },
+    ComposableDemo("Reverse scroll direction") { ReverseLayout() },
     PagingDemos
 )
 
@@ -368,3 +370,72 @@ private val Arrangements = listOf(
     Arrangement.spacedBy(40.dp),
     Arrangement.spacedBy(40.dp, Alignment.Bottom),
 )
+
+@Composable
+fun ReverseLayout() {
+    Column {
+        val scrollState = rememberScrollState()
+        val lazyState = rememberLazyListState()
+        var count by remember { mutableStateOf(3) }
+        var reverse by remember { mutableStateOf(true) }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Button(onClick = { count -= 5 }) {
+                Text("--")
+            }
+            Button(onClick = { count += 5 }) {
+                Text("++")
+            }
+            Button(onClick = { reverse = !reverse }) {
+                Text("=!")
+            }
+            Text("Scroll=${scrollState.value.toInt()}")
+            Text(
+                "Lazy=${lazyState.firstVisibleItemIndex}; " +
+                    "${lazyState.firstVisibleItemScrollOffset}"
+            )
+        }
+        Row {
+            val item1 = @Composable { index: Int ->
+                Text(
+                    "$index",
+                    Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .background(Color.Red)
+                        .border(1.dp, Color.Cyan)
+                )
+            }
+            val item2 = @Composable { index: Int ->
+                Text("After $index")
+            }
+            ScrollableColumn(
+                reverseScrollDirection = reverse,
+                verticalArrangement = if (reverse) Arrangement.Bottom else Arrangement.Top,
+                scrollState = scrollState,
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                if (reverse) {
+                    (count downTo 1).forEach {
+                        item2(it)
+                        item1(it)
+                    }
+                } else {
+                    (1..count).forEach {
+                        item1(it)
+                        item2(it)
+                    }
+                }
+            }
+            LazyColumn(
+                reverseLayout = reverse,
+                state = lazyState,
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                items((1..count).toList()) {
+                    item1(it)
+                    item2(it)
+                }
+            }
+        }
+    }
+}
