@@ -451,7 +451,7 @@ private class SliderAdapter(
     val containerSize: Int,
     val minHeight: Float
 ) {
-    private val contentSize = adapter.maxScrollOffset(containerSize) + containerSize
+    private val contentSize get() = adapter.maxScrollOffset(containerSize) + containerSize
     private val visiblePart get() = containerSize.toFloat() / contentSize
 
     val size
