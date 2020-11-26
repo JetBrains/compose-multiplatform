@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
@@ -23,6 +25,19 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
+}
+
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        sourceSets {
+            desktopMain.dependsOn jvmMain
+        }
+    }
 }
 
 androidx {
