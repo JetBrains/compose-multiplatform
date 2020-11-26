@@ -22,7 +22,6 @@ import androidx.compose.material.lightColors
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.tooling.test.R
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,10 +51,6 @@ class PreviewParameterTest {
                 parameterProvider = LoremIpsum::class.java,
                 debugViewInfos = true
             )
-        }
-
-        activityTestRule.runOnUiThread {
-            Assert.assertTrue(composeViewAdapter.viewInfos.isNotEmpty())
         }
     }
 
