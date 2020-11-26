@@ -15,25 +15,23 @@ You can add an application icon to the system tray. You can also send notificati
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onDispose
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.MenuItem
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.Modifier
 import java.awt.Color
-import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
 fun main() {
     val count = mutableStateOf(0)
     Window(
-		icon = getMyAppIcon()
-	) {
+        icon = getMyAppIcon()
+    ) {
         onActive {
             val tray = Tray().apply {
                 icon(getTrayIcon())
@@ -66,7 +64,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(text = "Value: ${count.value}")
         }
@@ -111,19 +109,18 @@ Notifier also has 3 types of notification:
 ```kotlin
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.ui.window.Notifier
 import java.awt.Color
-import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
 fun main() {
     val message = "Some message!"
     val notifier = Notifier()
     Window(
-		icon = getMyAppIcon()
-	) {
+        icon = getMyAppIcon()
+    ) {
         Column {
             Button(onClick = { notifier.notify("Notification.", message) }) {
                 Text(text = "Notify")
@@ -163,7 +160,7 @@ To create a common context menu for all the application windows, you need to con
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
@@ -176,6 +173,9 @@ import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuBar
 
 fun main() {
+    // To use Apple global menu.
+    System.setProperty("apple.laf.useScreenMenuBar", "true")
+    
     val action = mutableStateOf("Last action: None")
 
     AppManager.setMenu(
@@ -213,7 +213,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(text = action.value)
         }
@@ -228,7 +228,7 @@ You can create a MenuBar for a specific window, and have the other windows use t
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
@@ -244,6 +244,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 fun main() {
+    // To use Apple global menu.
+    System.setProperty("apple.laf.useScreenMenuBar", "true")
+
     val action = mutableStateOf("Last action: None")
 
     Window(
@@ -285,7 +288,7 @@ fun main() {
                     location = IntOffset(100, 100),
                     centered = false
                 ) {
-                    
+
                 }
             }
         ) {
@@ -293,7 +296,7 @@ fun main() {
         }
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(text = action.value)
         }

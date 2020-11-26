@@ -14,9 +14,9 @@ so code like this will work on both platforms:
 
 ```kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,25 +25,25 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 
 fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
-    var count = 0
-    Box(alignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+    var count = remember { mutableStateOf(0) }
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
         var text = remember { mutableStateOf("Click me!") }
         Text(
-                text = text.value,
-                fontSize = 50.sp,
-                modifier = Modifier
-                        .clickable(
-                            onClick = {
-                                text.value = "Click! ${count++}"
-                            },
-                            onDoubleClick = {
-                                text.value = "Double click! ${count++}"
-                            },
-                            onLongClick = {
-                                text.value = "Long click! ${count++}"
-                            }
-                        )
-                        .align(Alignment.Center)
+            text = text.value,
+            fontSize = 50.sp,
+            modifier = Modifier
+                .clickable(
+                    onClick = {
+                        text.value = "Click! ${count.value++}"
+                    },
+                    onDoubleClick = {
+                        text.value = "Double click! ${count.value++}"
+                    },
+                    onLongClick = {
+                        text.value = "Long click! ${count.value++}"
+                    }
+                )
+                .align(Alignment.Center)
         )
     }
 }
@@ -93,9 +93,9 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
 Compose for Desktop also supports pointer enter and exit handlers, like this:
 ```kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -111,23 +111,23 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
         repeat(10) { index ->
             var active = remember { mutableStateOf(false) }
             Text(
-                    modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = if (active.value) Color.Green else Color.White)
-                            .pointerMoveFilter(
-                                    onEnter = {
-                                        active.value = true
-                                        false
-                                    },
-                                    onExit = {
-                                        active.value = false
-                                        false
-                                    }
-                            ),
-                    fontSize = 30.sp,
-                    fontStyle = if (active.value) FontStyle.Italic else FontStyle.Normal,
-                    text = "Item $index"
-                )
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = if (active.value) Color.Green else Color.White)
+                    .pointerMoveFilter(
+                        onEnter = {
+                            active.value = true
+                            false
+                        },
+                        onExit = {
+                            active.value = false
+                            false
+                        }
+                    ),
+                fontSize = 30.sp,
+                fontStyle = if (active.value) FontStyle.Italic else FontStyle.Normal,
+                text = "Item $index"
+            )
         }
     }
 }

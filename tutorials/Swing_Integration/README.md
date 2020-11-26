@@ -11,8 +11,6 @@ ComposePanel lets you create a UI using Compose for Desktop in a Swing-based UI.
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.ComposePanel
-import androidx.compose.desktop.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +20,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Surface
@@ -39,7 +37,6 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JFrame
 import javax.swing.JButton
-import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 val northClicks = mutableStateOf(0)

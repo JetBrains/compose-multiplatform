@@ -19,7 +19,7 @@ fun main() = invokeLater {
 }
 ```
 
-Note that AppWindow should be created in AWT Event Thread. Instead of calling invokeLater explicitly you can use Window DSL:
+Note that AppWindow should be created in AWT Event Thread. Instead of calling `invokeLater()` explicitly you can use `Window` DSL:
 ```kotlin
 import androidx.compose.desktop.Window
 
@@ -55,7 +55,7 @@ fun main() {
 
         if (dialogState.value) {
             Dialog(
-                onDismissEvent = { dialogState.value = false }
+                onDismissRequest = { dialogState.value = false }
             ) {
                 // dialog's content
             }
@@ -84,7 +84,7 @@ An example of using window parameters in the creation step:
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -100,7 +100,6 @@ import androidx.compose.ui.window.KeyStroke
 import androidx.compose.ui.window.Menu
 import androidx.compose.ui.window.MenuBar
 import java.awt.Color
-import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
 fun main() {
@@ -140,7 +139,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Column {
                 Text(text = "Location: ${windowPos.value} Value: ${count.value}")
@@ -160,7 +159,7 @@ fun getMyAppIcon() : BufferedImage {
     val size = 256
     val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
     val graphics = image.createGraphics()
-    graphics.setColor(Color.orange)
+    graphics.color = Color.orange
     graphics.fillOval(0, 0, size, size)
     graphics.dispose()
     return image
@@ -200,10 +199,10 @@ import androidx.compose.ui.unit.IntOffset
 
 fun main() {
     val windowPos = mutableStateOf(IntOffset.Zero)
-    
+
     Window {
         val current = AppWindowAmbient.current
-        
+
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -231,7 +230,7 @@ fun main() {
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -248,7 +247,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Column {
                 Text(text = "Location: ${windowPos.value}")
@@ -281,19 +280,16 @@ Using the following methods, you can change the properties of the AppWindow:
 ```kotlin
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.material.Button
 
 fun main() {
     Window {
-        val current = AppWindowAmbient.current
 
         // content
         Button(
             onClick = {
-                if (current != null) {
-                    current.setWindowCentered()
-                }
+                AppWindowAmbient.current?.setWindowCentered()
             }
         ) {
             Text(text = "Center the window")
@@ -322,10 +318,9 @@ Actions can be assigned to the following window events:
 ```kotlin
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -334,7 +329,7 @@ import androidx.compose.ui.unit.IntSize
 fun main() {
     val windowSize = mutableStateOf(IntSize.Zero)
     val focused = mutableStateOf(false)
-    
+
     Window(
         events = WindowEvents(
             onFocusGet = { focused.value = true },
@@ -347,7 +342,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Text(text = "Size: ${windowSize.value} Focused: ${focused.value}")
         }
@@ -394,7 +389,7 @@ Compose for Desktop is tightly integrated with Swing at the top-level windows la
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -409,7 +404,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Column {
                 Button(
@@ -424,7 +419,7 @@ fun main() {
                 ) {
                     Text(text = "Check display scaling factor")
                 }
-                Text(text = "Scaling factor: ${scaleFactor.value}}")
+                Text(text = "Scaling factor: ${scaleFactor.value}")
             }
         }
     }

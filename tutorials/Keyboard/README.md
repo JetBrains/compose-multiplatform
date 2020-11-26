@@ -35,10 +35,10 @@ The most common use case is to define keyboard handlers for active controls like
 
 ``` kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.runtime.mutableStateOf
