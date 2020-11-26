@@ -18,15 +18,15 @@ function mavenDep {
   fi
 }
 
-PLATFORM=macos
-SKIKO_VERSION=0.1.16
+PLATFORM=macos-x64
+SKIKO_VERSION=0.1.18
 # __KOTLIN_COMPOSE_VERSION__
 KOTLIN_VERSION=1.4.20
 # __LATEST_COMPOSE_RELEASE_VERSION__
-COMPOSE_VERSION=0.2.0-build128
+COMPOSE_VERSION=0.2.0-build132
 COROUTINES_VERSION=1.3.6
 COLLECTIONS_VERSION=0.3
-SPACE_REPO="https://packages.jetbrains.team/maven/p/ui/dev"
+SPACE_REPO="https://public.jetbrains.space/p/compose/packages/maven/"
 MAVEN_CENTRAL="https://repo1.maven.org/maven2"
 BINTRAY_KOTLINX="https://dl.bintray.com/kotlin/kotlinx"
 
