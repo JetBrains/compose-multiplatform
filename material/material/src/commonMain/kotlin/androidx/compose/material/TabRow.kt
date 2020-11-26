@@ -16,6 +16,9 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -305,7 +308,7 @@ private class ScrollableTabData(
                 // Scrolls to the tab with [tabPosition], trying to place it in the center of the
                 // screen or as close to the center as possible.
                 val calculatedOffset = it.calculateTabOffset(density, edgeOffset, tabPositions)
-                scrollState.smoothScrollTo(calculatedOffset)
+                scrollState.smoothScrollTo(calculatedOffset, spec = ScrollableTabRowScrollSpec)
             }
         }
     }
@@ -334,3 +337,11 @@ private class ScrollableTabData(
 }
 
 private val ScrollableTabRowMinimumTabWidth = 90.dp
+
+/**
+ * [AnimationSpec] used when scrolling to a tab that is not fully visible.
+ */
+private val ScrollableTabRowScrollSpec: AnimationSpec<Float> = tween(
+    durationMillis = 250,
+    easing = FastOutSlowInEasing
+)
