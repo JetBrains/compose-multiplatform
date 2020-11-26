@@ -278,11 +278,11 @@ internal class DesktopParagraph(
         return null
     }
 
-    private fun getBoxBackwardByOffset(offset: Int): TextBox? {
+    private fun getBoxBackwardByOffset(offset: Int, end: Int = offset): TextBox? {
         var from = offset - 1
         while (from >= 0) {
             val box = para.getRectsForRange(
-                from, offset,
+                from, end,
                 RectHeightMode.STRUT, RectWidthMode.TIGHT
             ).firstOrNull()
             when {
@@ -314,8 +314,10 @@ internal class DesktopParagraph(
         return para.getGlyphPositionAtCoordinate(position.x, position.y).position
     }
 
-    override fun getBoundingBox(offset: Int) =
-        getBoxForwardByOffset(offset)!!.rect.toComposeRect()
+    override fun getBoundingBox(offset: Int): Rect {
+        val box = getBoxForwardByOffset(offset) ?: getBoxBackwardByOffset(offset, text.length)!!
+        return box.rect.toComposeRect()
+    }
 
     override fun getWordBoundary(offset: Int) = para.getWordBoundary(offset).let {
         TextRange(it.start, it.end)
@@ -554,6 +556,8 @@ internal class ParagraphBuilder(
 
             when (op) {
                 is Op.StyleAdd -> {
+                    // cached SkTextStyled could was loaded with a different font loader
+                    ensureFontsAreRegistered(fontLoader, op.style)
                     pb.pushStyle(makeSkTextStyle(op.style))
                 }
                 is Op.PutPlaceholder -> {
@@ -583,6 +587,12 @@ internal class ParagraphBuilder(
         }
 
         return pb.build()
+    }
+
+    private fun ensureFontsAreRegistered(fontLoader: FontLoader, style: ComputedStyle) {
+        style.fontFamily?.let {
+            fontLoader.ensureRegistered(it)
+        }
     }
 
     private sealed class Op {
