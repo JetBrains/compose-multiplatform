@@ -32,7 +32,7 @@ dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
 
     implementation(KOTLIN_STDLIB)
-    implementation project(":annotation:annotation-sampled")
+    compileOnly project(":annotation:annotation-sampled")
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime-rxjava3")
