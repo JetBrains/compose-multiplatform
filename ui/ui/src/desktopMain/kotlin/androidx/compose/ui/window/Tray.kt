@@ -23,6 +23,9 @@ import java.awt.SystemTray
 import java.awt.TrayIcon
 import java.awt.TrayIcon.MessageType
 
+/**
+ * Tray is class for working with the system tray.
+ */
 class Tray {
     private lateinit var trayIcon: TrayIcon
     private var init: Boolean = false
@@ -31,8 +34,16 @@ class Tray {
         init = SystemTray.isSupported()
     }
 
+    /**
+     * Constructs a Tray with the empty icon image.
+     */
     constructor() {}
 
+    /**
+     * Constructs a Tray with the given icon image.
+     *
+     * @param image Tray icon image.
+     */
     constructor(image: Image) {
         if (!init) {
             return
@@ -42,6 +53,12 @@ class Tray {
         trayIcon.setImageAutoSize(true)
     }
 
+    /**
+     * Constructs a Tray with the given icon image and tooltip.
+     *
+     * @param image Tray icon image.
+     * @param tooltip Tray icon tooltip.
+     */
     constructor(image: Image, tooltip: String) {
         if (!init) {
             return
@@ -51,6 +68,11 @@ class Tray {
         trayIcon.setImageAutoSize(true)
     }
 
+    /**
+     * Sets the Tray icon image.
+     *
+     * @param image Tray icon image.
+     */
     fun icon(image: Image) {
         if (!init) {
             return
@@ -63,6 +85,11 @@ class Tray {
         }
     }
 
+    /**
+     * Sets the Tray menu.
+     *
+     * @param item Menu items.
+     */
     fun menu(vararg item: MenuItem) {
         if (!init) {
             return
@@ -85,6 +112,12 @@ class Tray {
         }
     }
 
+    /**
+     * Sends a regular notification with the given title and message.
+     *
+     * @param title Notification title.
+     * @param message Notification message.
+     */
     fun notify(title: String, message: String) {
         if (!init) {
             return
@@ -92,6 +125,12 @@ class Tray {
         trayIcon.displayMessage(title, message, MessageType.INFO)
     }
 
+    /**
+     * Sends a warning notification with the given title and message.
+     *
+     * @param title Notification title.
+     * @param message Notification message.
+     */
     fun warn(title: String, message: String) {
         if (!init) {
             return
@@ -99,6 +138,12 @@ class Tray {
         trayIcon.displayMessage(title, message, MessageType.WARNING)
     }
 
+    /**
+     * Sends a error notification with the given title and message.
+     *
+     * @param title Notification title.
+     * @param message Notification message.
+     */
     fun error(title: String, message: String) {
         if (!init) {
             return
@@ -106,6 +151,9 @@ class Tray {
         trayIcon.displayMessage(title, message, MessageType.ERROR)
     }
 
+    /**
+     * Removes the tray icon from the system tray.
+     */
     fun remove() {
         try {
             SystemTray.getSystemTray().remove(trayIcon)
