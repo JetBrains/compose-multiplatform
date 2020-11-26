@@ -28,7 +28,7 @@ plugins {
 }
 
 dependencies {
-    implementation(compose.desktop.all)
+    implementation(compose.desktop.currentOS)
 }
 
 compose.desktop {
@@ -49,6 +49,9 @@ so the formats can only be built using the specific OS (e.g. to build `.dmg` you
 Tasks that are not compatible with the current OS are skipped by default.
 * `package` is a [lifecycle](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) task,
 aggregating all package tasks for an application.
+* `packageUberJarForCurrentOS` is used to create a single jar file, containing all dependencies for current OS. 
+The task is available starting from the M2 release.
+The task expects `compose.desktop.currentOS` to be used as a `compile`/`implementation`/`runtime` dependency.
 * `run` is used to run an app locally. You need to define a `mainClass` — an fq-name of a class, 
 containing the `main` function.
   

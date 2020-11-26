@@ -23,6 +23,7 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
+            version = "1.0"
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
         }
     }
