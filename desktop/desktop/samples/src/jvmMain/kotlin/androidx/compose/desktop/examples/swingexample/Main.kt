@@ -18,7 +18,6 @@ package androidx.compose.desktop.examples.swingexample
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.ComposePanel
-import androidx.compose.desktop.setContent
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

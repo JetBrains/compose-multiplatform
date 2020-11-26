@@ -16,12 +16,16 @@
 
 package androidx.compose.desktop
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopComponent
+import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.FrameDispatcher
+import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skiko.HardwareLayer
@@ -277,12 +281,36 @@ internal class ComposeLayer {
         isDisposed = true
     }
 
-    fun needRedrawLayer() {
+    internal fun needRedrawLayer() {
         check(!isDisposed)
         frameDispatcher.scheduleFrame()
     }
 
     interface Renderer {
         suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
+    }
+
+    internal fun setContent(
+        parent: Any? = null,
+        invalidate: () -> Unit = this::needRedrawLayer,
+        content: @Composable () -> Unit
+    ): Composition {
+        check(owners == null) {
+            "Cannot setContent twice."
+        }
+        val desktopOwners = DesktopOwners(wrapped, invalidate)
+        val desktopOwner = DesktopOwner(desktopOwners, density)
+
+        owners = desktopOwners
+        val composition = desktopOwner.setContent(content)
+
+        onDensityChanged(desktopOwner::density::set)
+
+        when (parent) {
+            is AppFrame -> parent.onDispose = desktopOwner::dispose
+            is ComposePanel -> parent.onDispose = desktopOwner::dispose
+        }
+
+        return composition
     }
 }
