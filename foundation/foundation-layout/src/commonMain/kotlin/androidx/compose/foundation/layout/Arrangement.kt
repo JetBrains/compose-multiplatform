@@ -27,14 +27,14 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
- * Used to specify the arrangement of the layout's children in [Row] or [Column] in the main axis
- * direction (horizontal and vertical, respectively).
+ * Used to specify the arrangement of the layout's children in layouts like [Row] or [Column] in
+ * the main axis direction (horizontal and vertical, respectively).
  */
 @Immutable
 @OptIn(InternalLayoutApi::class)
 object Arrangement {
     /**
-     * Used to specify the horizontal arrangement of the layout's children in a [Row].
+     * Used to specify the horizontal arrangement of the layout's children in layouts like [Row].
      */
     @InternalLayoutApi
     @Immutable
@@ -45,7 +45,7 @@ object Arrangement {
         val spacing get() = 0.dp
 
         /**
-         * Horizontally places the layout children inside the [Row].
+         * Horizontally places the layout children.
          *
          * @param totalSize Available space that can be occupied by the children.
          * @param size An array of sizes of all children.
@@ -64,7 +64,7 @@ object Arrangement {
     }
 
     /**
-     * Used to specify the vertical arrangement of the layout's children in a [Column].
+     * Used to specify the vertical arrangement of the layout's children in layouts like [Column].
      */
     @InternalLayoutApi
     @Immutable
@@ -75,7 +75,7 @@ object Arrangement {
         val spacing get() = 0.dp
 
         /**
-         * Vertically places the layout children inside the [Column].
+         * Vertically places the layout children.
          *
          * @param totalSize Available space that can be occupied by the children.
          * @param size An array of sizes of all children.
@@ -91,8 +91,9 @@ object Arrangement {
     }
 
     /**
-     * Used to specify the horizontal arrangement of the layout's children in a [Row], or
-     * the vertical arrangement of the layout's children in a [Column].
+     * Used to specify the horizontal arrangement of the layout's children in horizontal layouts
+     * like [Row], or the vertical arrangement of the layout's children in vertical layouts like
+     * [Column].
      */
     @InternalLayoutApi
     @Immutable

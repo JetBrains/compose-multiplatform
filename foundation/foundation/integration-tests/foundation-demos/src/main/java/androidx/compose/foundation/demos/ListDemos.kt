@@ -18,8 +18,11 @@ package androidx.compose.foundation.demos
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -28,6 +31,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
@@ -73,6 +77,7 @@ val LazyListDemos = listOf(
     ComposableDemo("Rtl list") { RtlListDemo() },
     ComposableDemo("LazyColumn DSL") { LazyColumnScope() },
     ComposableDemo("LazyRow DSL") { LazyRowScope() },
+    ComposableDemo("Arrangements") { LazyListArrangements() },
     PagingDemos
 )
 
@@ -185,7 +190,7 @@ private fun ListHoistedStateDemo() {
 }
 
 @Composable
-fun Button(modifier: Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
+fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         modifier
             .clickable(onClick = onClick)
@@ -298,3 +303,68 @@ private fun LazyRowScope() {
         }
     }
 }
+
+@Composable
+private fun LazyListArrangements() {
+    var count by remember { mutableStateOf(3) }
+    var arrangement by remember { mutableStateOf(6) }
+    Column {
+        Row {
+            Button(onClick = { count-- }) {
+                Text("--")
+            }
+            Button(onClick = { count++ }) {
+                Text("++")
+            }
+            Button(
+                onClick = {
+                    arrangement++
+                    if (arrangement == Arrangements.size) {
+                        arrangement = 0
+                    }
+                }
+            ) {
+                Text("Next")
+            }
+            Text("$arrangement ${Arrangements[arrangement]}")
+        }
+        Row {
+            val item = @Composable {
+                Box(
+                    Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .background(Color.Red)
+                        .border(1.dp, Color.Cyan)
+                )
+            }
+            ScrollableColumn(
+                verticalArrangement = Arrangements[arrangement],
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                (1..count).forEach {
+                    item()
+                }
+            }
+            LazyColumn(
+                verticalArrangement = Arrangements[arrangement],
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                items((1..count).toList()) {
+                    item()
+                }
+            }
+        }
+    }
+}
+
+private val Arrangements = listOf(
+    Arrangement.Center,
+    Arrangement.Top,
+    Arrangement.Bottom,
+    Arrangement.SpaceAround,
+    Arrangement.SpaceBetween,
+    Arrangement.SpaceEvenly,
+    Arrangement.spacedBy(40.dp),
+    Arrangement.spacedBy(40.dp, Alignment.Bottom),
+)

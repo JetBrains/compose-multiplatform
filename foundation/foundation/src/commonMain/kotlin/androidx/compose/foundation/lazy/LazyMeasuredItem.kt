@@ -28,11 +28,15 @@ import androidx.compose.ui.util.fastForEach
 internal class LazyMeasuredItem(
     private val placeables: List<Placeable>,
     private val isVertical: Boolean,
-    private val horizontalAlignment: Alignment.Horizontal,
-    private val verticalAlignment: Alignment.Vertical,
+    private val horizontalAlignment: Alignment.Horizontal?,
+    private val verticalAlignment: Alignment.Vertical?,
     private val layoutDirection: LayoutDirection,
     private val startContentPadding: Int,
-    private val endContentPadding: Int
+    private val endContentPadding: Int,
+    /**
+     * Extra size to be added to [mainAxisSize] aside from the sum of the [placeables] size.
+     */
+    val extraMainAxisSize: Int
 ) {
     /**
      * Sum of the main axis sizes of all the inner placeables.
@@ -45,7 +49,7 @@ internal class LazyMeasuredItem(
     val crossAxisSize: Int
 
     init {
-        var mainAxisSize = 0
+        var mainAxisSize = extraMainAxisSize
         var maxCrossAxis = 0
         placeables.fastForEach {
             mainAxisSize += if (isVertical) it.height else it.width
@@ -70,8 +74,8 @@ internal class LazyMeasuredItem(
         var mainAxisOffset = offset
         placeables.fastForEach {
             if (isVertical) {
-                val x =
-                    horizontalAlignment.align(it.width, layoutWidth, layoutDirection)
+                val x = requireNotNull(horizontalAlignment)
+                    .align(it.width, layoutWidth, layoutDirection)
                 if (mainAxisOffset + it.height > -startContentPadding &&
                     mainAxisOffset < layoutHeight + endContentPadding
                 ) {
@@ -79,7 +83,7 @@ internal class LazyMeasuredItem(
                 }
                 mainAxisOffset += it.height
             } else {
-                val y = verticalAlignment.align(it.height, layoutHeight)
+                val y = requireNotNull(verticalAlignment).align(it.height, layoutHeight)
                 if (mainAxisOffset + it.width > -startContentPadding &&
                     mainAxisOffset < layoutWidth + endContentPadding
                 ) {

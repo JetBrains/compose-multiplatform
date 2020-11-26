@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -170,17 +172,23 @@ internal class LazyListScopeImpl : LazyListScope {
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
  * @param contentPadding a padding around the whole content. This will add padding for the
- * content after it has been clipped, which is not possible via [modifier] param. Note that it is
- * **not** a padding applied for each item's content
+ * content after it has been clipped, which is not possible via [modifier] param. You can use it
+ * to add a padding before the first item or after the last one. If you want to add a spacing
+ * between each item use [horizontalArrangement].
+ * @param horizontalArrangement The horizontal arrangement of the layout's children. This allows
+ * to add a spacing between items and specify the arrangement of the items when we have not enough
+ * of them to fill the whole minimum size.
  * @param verticalAlignment the vertical alignment applied to the items
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
+@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyRow(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: LazyListScope.() -> Unit
 ) {
@@ -193,6 +201,7 @@ fun LazyRow(
         state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
+        horizontalArrangement = horizontalArrangement,
         isVertical = false
     ) { index ->
         scope.contentFor(index, this)
@@ -207,20 +216,26 @@ fun LazyRow(
  *
  * @sample androidx.compose.foundation.samples.LazyColumnSample
  *
- * @param modifier the modifier to apply to this layout
- * @param state the state object to be used to control or observe the list's state
- * @param contentPadding a padding around the whole content. This will add padding for the
- * content after it has been clipped, which is not possible via [modifier] param. Note that it is
- * **not** a padding applied for each item's content
- * @param horizontalAlignment the horizontal alignment applied to the items
+ * @param modifier the modifier to apply to this layout.
+ * @param state the state object to be used to control or observe the list's state.
+ * @param contentPadding a padding around the whole content. This will add padding for the.
+ * content after it has been clipped, which is not possible via [modifier] param. You can use it
+ * to add a padding before the first item or after the last one. If you want to add a spacing
+ * between each item use [verticalArrangement].
+ * @param verticalArrangement The vertical arrangement of the layout's children. This allows
+ * to add a spacing between items and specify the arrangement of the items when we have not enough
+ * of them to fill the whole minimum size.
+ * @param horizontalAlignment the horizontal alignment applied to the items.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
+@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyColumn(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: LazyListScope.() -> Unit
 ) {
@@ -233,6 +248,7 @@ fun LazyColumn(
         state = state,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
+        verticalArrangement = verticalArrangement,
         isVertical = true
     ) { index ->
         scope.contentFor(index, this)

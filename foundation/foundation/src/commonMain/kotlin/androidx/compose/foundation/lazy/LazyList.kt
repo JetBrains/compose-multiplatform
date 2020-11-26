@@ -18,6 +18,8 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -29,19 +31,29 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.constrainHeight
-import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.util.fastForEach
 
+@OptIn(InternalLayoutApi::class)
 @Composable
 internal fun LazyList(
+    /** The total size of the list */
     itemsCount: Int,
-    modifier: Modifier = Modifier,
+    /** Modifier to be applied for the inner layout */
+    modifier: Modifier,
+    /** State controlling the scroll position */
     state: LazyListState,
+    /** The inner padding to be added for the whole content(nor for each individual item) */
     contentPadding: PaddingValues,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    /** The layout orientation of the list */
     isVertical: Boolean,
+    /** The alignment to align items horizontally. Required when isVertical is true */
+    horizontalAlignment: Alignment.Horizontal? = null,
+    /** The vertical arrangement for items. Required when isVertical is true */
+    verticalArrangement: Arrangement.Vertical? = null,
+    /** The alignment to align items vertically. Required when isVertical is false */
+    verticalAlignment: Alignment.Vertical? = null,
+    /** The horizontal arrangement for items. Required when isVertical is false */
+    horizontalArrangement: Arrangement.Horizontal? = null,
+    /** The factory defining the content for an item on the given position in the list */
     itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
     val reverseDirection = AmbientLayoutDirection.current == LayoutDirection.Rtl && !isVertical
@@ -71,13 +83,22 @@ internal fun LazyList(
         val startContentPaddingPx = startContentPadding.toIntPx()
         val endContentPaddingPx = endContentPadding.toIntPx()
         val mainAxisMaxSize = (if (isVertical) constraints.maxHeight else constraints.maxWidth)
+        val spaceBetweenItemsDp = if (isVertical) {
+            requireNotNull(verticalArrangement).spacing
+        } else {
+            requireNotNull(horizontalArrangement).spacing
+        }
+        val spaceBetweenItems = spaceBetweenItemsDp.toIntPx()
 
         val itemProvider = LazyMeasuredItemProvider(
             constraints,
             isVertical,
             this,
             cachingItemContentFactory
-        ) { placeables ->
+        ) { index, placeables ->
+            // we add spaceBetweenItems as an extra size for all items apart from the last one so
+            // the lazy list measuring logic will take it into account.
+            val extraMainAxisSize = if (index.value == itemsCount - 1) 0 else spaceBetweenItems
             LazyMeasuredItem(
                 placeables = placeables,
                 isVertical = isVertical,
@@ -85,7 +106,8 @@ internal fun LazyList(
                 verticalAlignment = verticalAlignment,
                 layoutDirection = layoutDirection,
                 startContentPadding = startContentPaddingPx,
-                endContentPadding = endContentPaddingPx
+                endContentPadding = endContentPaddingPx,
+                extraMainAxisSize = extraMainAxisSize
             )
         }
 
@@ -102,18 +124,12 @@ internal fun LazyList(
 
         state.applyMeasureResult(measureResult)
 
-        val layoutWidth = constraints.constrainWidth(
-            if (isVertical) measureResult.crossAxisSize else measureResult.mainAxisSize
+        layoutLazyList(
+            constraints,
+            isVertical,
+            verticalArrangement,
+            horizontalArrangement,
+            measureResult
         )
-        val layoutHeight = constraints.constrainHeight(
-            if (isVertical) measureResult.mainAxisSize else measureResult.crossAxisSize
-        )
-        layout(layoutWidth, layoutHeight) {
-            var currentMainAxis = measureResult.itemsScrollOffset
-            measureResult.items.fastForEach {
-                it.place(this, layoutWidth, layoutHeight, currentMainAxis)
-                currentMainAxis += it.mainAxisSize
-            }
-        }
     }
 }

@@ -30,7 +30,7 @@ internal class LazyMeasuredItemProvider(
     isVertical: Boolean,
     private val scope: SubcomposeMeasureScope,
     private val itemContentFactory: (Int) -> @Composable () -> Unit,
-    private val measuredItemFactory: (List<Placeable>) -> LazyMeasuredItem
+    private val measuredItemFactory: (DataIndex, List<Placeable>) -> LazyMeasuredItem
 ) {
     // the constraints we will measure child with. the main axis is not restricted
     private val childConstraints = Constraints(
@@ -47,6 +47,6 @@ internal class LazyMeasuredItemProvider(
         val placeables = scope.subcompose(index, itemContentFactory(index.value)).fastMap {
             it.measure(childConstraints)
         }
-        return measuredItemFactory(placeables)
+        return measuredItemFactory(index, placeables)
     }
 }
