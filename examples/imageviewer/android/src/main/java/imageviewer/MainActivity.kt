@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
 
         val content = ContentState.applyContent(
             this@MainActivity,
-            "https://spvessel.com/iv/images/fetching.list"
+            "https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/fetching.list"
         )
         
         setContent {

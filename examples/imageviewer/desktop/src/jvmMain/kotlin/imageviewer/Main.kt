@@ -18,7 +18,7 @@ fun main() {
         icon = icAppRounded()
     ) {
         val content = ContentState.applyContent(
-            "https://spvessel.com/iv/images/fetching.list"
+            "https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/fetching.list"
         )
         MaterialTheme {
             DesktopTheme {
