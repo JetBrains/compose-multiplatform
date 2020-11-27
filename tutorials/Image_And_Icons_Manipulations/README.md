@@ -20,7 +20,7 @@ import androidx.compose.ui.res.imageResource
 fun main() {
     Window {
         Image(
-            asset = imageResource("images/sample.png"), // ImageAsset
+            bitmap = imageResource("sample.png"), // ImageBitmap
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -31,32 +31,31 @@ fun main() {
 
 ## Loading images from device storage
 
-To create an `ImageAsset` from a loaded image stored in the device memory you can use `org.jetbrains.skija.Image`:
+To create an `ImageBitmap` from a loaded image stored in the device memory you can use `org.jetbrains.skija.Image`:
 
 ```kotlin
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.asImageAsset
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.Modifier
-import java.io.File
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import org.jetbrains.skija.Image
+import java.io.File
 
 fun main() {
     Window {
         val image = remember { imageFromFile(File("sample.png")) }
         Image(
-            asset = image,
+            bitmap = image,
             modifier = Modifier.fillMaxSize()
         )
     }
 }
 
-fun imageFromFile(file: File): ImageAsset {
-    return Image.makeFromEncoded(file.readBytes()).asImageAsset()
+fun imageFromFile(file: File): ImageBitmap {
+    return Image.makeFromEncoded(file.readBytes()).asImageBitmap()
 }
 ```
 
@@ -71,17 +70,16 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.Modifier
+import org.jetbrains.skija.Bitmap
+import org.jetbrains.skija.ColorAlphaType
+import org.jetbrains.skija.IRect
+import org.jetbrains.skija.ImageInfo
 import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.imageio.ImageIO
-import org.jetbrains.skija.ColorAlphaType
-import org.jetbrains.skija.Bitmap
-import org.jetbrains.skija.ImageInfo
-import org.jetbrains.skija.IRect
 
 fun main() {
     Window {
@@ -157,14 +155,14 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.asImageAsset
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import org.jetbrains.skija.Image
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.imageio.ImageIO
-import org.jetbrains.skija.Image
 
 fun main() {
     val image = getWindowIcon()
@@ -173,7 +171,7 @@ fun main() {
     ) {
         val imageAsset = remember { asImageAsset(image) }
         Image(
-            asset = imageAsset,
+            bitmap = imageAsset,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -194,11 +192,11 @@ fun getWindowIcon(): BufferedImage {
     return image
 }
 
-fun asImageAsset(image: BufferedImage): ImageAsset {
+fun asImageAsset(image: BufferedImage): ImageBitmap {
     val baos = ByteArrayOutputStream()
     ImageIO.write(image, "png", baos)
-    
-    return Image.makeFromEncoded(baos.toByteArray()).asImageAsset()
+
+    return Image.makeFromEncoded(baos.toByteArray()).asImageBitmap()
 }
 ```
 
@@ -210,29 +208,26 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.asImageAsset
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import org.jetbrains.skija.Image
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.imageio.ImageIO
-import org.jetbrains.skija.Image
 
 fun main() {
     val image = getWindowIcon()
     Window {
         val imageAsset = remember { asImageAsset(image) }
         Image(
-            asset = imageAsset,
+            bitmap = imageAsset,
             modifier = Modifier.fillMaxSize()
         )
     }
 
-    val current = AppManager.focusedWindow
-    if (current != null) {
-        current.setIcon(image)
-    }
+    AppManager.focusedWindow?.setIcon(image)
 }
 
 fun getWindowIcon(): BufferedImage {
@@ -250,11 +245,11 @@ fun getWindowIcon(): BufferedImage {
     return image
 }
 
-fun asImageAsset(image: BufferedImage): ImageAsset {
+fun asImageAsset(image: BufferedImage): ImageBitmap {
     val baos = ByteArrayOutputStream()
     ImageIO.write(image, "png", baos)
-    
-    return Image.makeFromEncoded(baos.toByteArray()).asImageAsset()
+
+    return Image.makeFromEncoded(baos.toByteArray()).asImageBitmap()
 }
 ```
 
@@ -270,17 +265,16 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onDispose
-import androidx.compose.ui.graphics.asImageAsset
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.Tray
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.window.MenuItem
+import androidx.compose.ui.window.Tray
+import org.jetbrains.skija.Image
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.imageio.ImageIO
-import org.jetbrains.skija.Image
 
 fun main() {
     val image = getWindowIcon()
@@ -302,7 +296,7 @@ fun main() {
 
         val imageAsset = asImageAsset(image)
         Image(
-            asset = imageAsset,
+            bitmap = imageAsset,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -328,11 +322,11 @@ fun getWindowIcon(): BufferedImage {
     return image
 }
 
-fun asImageAsset(image: BufferedImage): ImageAsset {
+fun asImageAsset(image: BufferedImage): ImageBitmap {
     val baos = ByteArrayOutputStream()
     ImageIO.write(image, "png", baos)
-    
-    return Image.makeFromEncoded(baos.toByteArray()).asImageAsset()
+
+    return Image.makeFromEncoded(baos.toByteArray()).asImageBitmap()
 }
 ```
 
@@ -360,7 +354,7 @@ import androidx.compose.ui.res.vectorXmlResource
 fun main() {
     Window {
         Image(
-            vectorXmlResource("images/compose.xml"),
+            imageVector = vectorXmlResource("images/compose.xml"),
             modifier = Modifier.fillMaxSize()
         )
     }
