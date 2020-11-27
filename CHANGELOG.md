@@ -1,6 +1,6 @@
 # M2 (Dec 2020)
    * Swing interoperability support (Compose in Swing frame)
-   * Support of [XML vector images](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)
+   * Support [XML vector images](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)
    * [Support for Gradle 6.6 and 6.7](https://github.com/JetBrains/compose-jb/issues/66)
    * [Support macOS 10.13 and 10.14](https://github.com/JetBrains/compose-jb/issues/76)
    * Support Apple Silicon (am64) natively
