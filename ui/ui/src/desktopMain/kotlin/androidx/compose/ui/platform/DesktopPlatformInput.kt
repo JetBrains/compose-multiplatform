@@ -155,9 +155,17 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
         }
     }
 
-    fun onInputMethodTextChanged(event: InputMethodEvent) {
+    internal fun inputMethodCaretPositionChanged(
+        @Suppress("UNUSED_PARAMETER") event: InputMethodEvent
+    ) {
+        // Which OSes and which input method could produce such events? We need to have some
+        // specific cases in mind before implementing this
+        println("DesktopInputComponent.inputMethodCaretPositionChanged")
+    }
+
+    internal fun replaceInputMethodText(event: InputMethodEvent) {
         currentInput?.let { input ->
-            if (event.caret == null) {
+            if (event.text == null) {
                 return
             }
             val committed = event.text.toStringUntil(event.committedCharacterCount)
@@ -173,12 +181,15 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
                 ops.add(DeleteSurroundingTextInCodePointsEditOp(1, 0))
             }
 
+            // newCursorPosition == 1 leads to effectively ignoring of this parameter in EditOps
+            // processing. the cursor will be set after the inserted text.
             if (committed.isNotEmpty()) {
-                ops.add(CommitTextEditOp(committed, committed.length))
+                ops.add(CommitTextEditOp(committed, 1))
             }
             if (composing.isNotEmpty()) {
-                ops.add(SetComposingTextEditOp(composing, composing.length))
+                ops.add(SetComposingTextEditOp(composing, 1))
             }
+
             input.onEditCommand.invoke(ops)
         }
     }
