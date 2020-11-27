@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.ExperimentalRestorableStateHolder
+import androidx.compose.runtime.savedinstancestate.rememberRestorableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -56,15 +58,16 @@ internal fun LazyList(
     /** The horizontal arrangement for items. Required when isVertical is false */
     horizontalArrangement: Arrangement.Horizontal? = null,
     /** The factory defining the content for an item on the given position in the list */
-    itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
+    itemContent: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
     val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
     // reverse scroll by default, to have "natural" gesture that goes reversed to layout
     // if rtl and horizontal, do not reverse to make it right-to-left
     val reverseScrollDirection = if (!isVertical && isRtl) reverseLayout else !reverseLayout
 
-    val cachingItemContentFactory = remember { CachingItemContentFactory(itemContentFactory) }
-    cachingItemContentFactory.itemContentFactory = itemContentFactory
+    val restorableItemContent = wrapWithStateRestoration(itemContent)
+    val cachingItemContentFactory = remember { CachingItemContentFactory(restorableItemContent) }
+    cachingItemContentFactory.itemContentFactory = restorableItemContent
 
     val startContentPadding = if (isVertical) contentPadding.top else contentPadding.start
     val endContentPadding = if (isVertical) contentPadding.bottom else contentPadding.end
@@ -136,5 +139,25 @@ internal fun LazyList(
             measureResult,
             reverseLayout
         )
+    }
+}
+
+/**
+ * Converts item content factory to another one which adds auto state restoration functionality.
+ */
+@OptIn(ExperimentalRestorableStateHolder::class)
+@Composable
+internal fun wrapWithStateRestoration(
+    itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
+): LazyItemScope.(Int) -> @Composable () -> Unit {
+    val restorableStateHolder = rememberRestorableStateHolder<Any>()
+    return remember(itemContentFactory) {
+        { index ->
+            val content = itemContentFactory(index)
+            // we just wrap our original lambda with the one which auto restores the state
+            // currently we use index in the list as a key for the restoration, but in the future
+            // we will use the user provided key
+            (@Composable { restorableStateHolder.RestorableStateProvider(index, content) })
+        }
     }
 }

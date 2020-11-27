@@ -54,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,6 +81,7 @@ val LazyListDemos = listOf(
     ComposableDemo("LazyRow DSL") { LazyRowScope() },
     ComposableDemo("Arrangements") { LazyListArrangements() },
     ComposableDemo("Reverse scroll direction") { ReverseLayout() },
+    ComposableDemo("Nested lazy lists") { NestedLazyDemo() },
     PagingDemos
 )
 
@@ -436,6 +438,31 @@ fun ReverseLayout() {
                     item2(it)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun NestedLazyDemo() {
+    val item = @Composable { index: Int ->
+        Box(
+            Modifier.padding(16.dp).size(200.dp).background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            var state by savedInstanceState { 0 }
+            Button(onClick = { state++ }) {
+                Text("Index=$index State=$state")
+            }
+        }
+    }
+    LazyColumn {
+        item {
+            LazyRowFor(List(100) { it }) {
+                item(it)
+            }
+        }
+        items(List(100) { it }) {
+            item(it)
         }
     }
 }
