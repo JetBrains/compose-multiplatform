@@ -43,7 +43,10 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
@@ -59,6 +62,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.width
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -395,6 +399,8 @@ class SelectionContainerTest {
         rule.runOnIdle(block)
     }
 }
+
+private fun ComposeTestRule.rootWidth(): Dp = onRoot().getUnclippedBoundsInRoot().width
 
 private class PointerInputChangeLog : (PointerEvent, PointerEventPass) -> Unit {
 

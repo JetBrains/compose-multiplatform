@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,7 +42,7 @@ class DividerUiTest {
                 Divider()
             }
             .assertHeightIsEqualTo(defaultHeight)
-            .assertWidthFillsRoot()
+            .assertWidthIsEqualTo(rule.rootWidth())
     }
 
     @Test
@@ -51,7 +52,7 @@ class DividerUiTest {
             .setMaterialContentForSizeAssertions {
                 Divider(thickness = height)
             }
-            .assertWidthFillsRoot()
+            .assertWidthIsEqualTo(rule.rootWidth())
             .assertHeightIsEqualTo(height)
     }
 
@@ -65,6 +66,6 @@ class DividerUiTest {
                 Divider(startIndent = indent, thickness = height)
             }
             .assertHeightIsEqualTo(height)
-            .assertWidthFillsRoot()
+            .assertWidthIsEqualTo(rule.rootWidth())
     }
 }
