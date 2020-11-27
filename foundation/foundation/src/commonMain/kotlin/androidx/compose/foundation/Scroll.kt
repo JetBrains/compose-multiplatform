@@ -289,7 +289,6 @@ fun ScrollableColumn(
                 isScrollEnabled,
                 reverseScrolling = reverseScrollDirection
             )
-            .clipToBounds()
             .padding(contentPadding),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
@@ -334,7 +333,6 @@ fun ScrollableRow(
                 isScrollEnabled,
                 reverseScrolling = reverseScrollDirection
             )
-            .clipToBounds()
             .padding(contentPadding),
         horizontalArrangement = horizontalArrangement,
         verticalAlignment = verticalAlignment,
@@ -471,7 +469,7 @@ private data class ScrollingLayoutModifier(
             val absScroll = if (isReversed) scroll - side else -scroll
             val xOffset = if (isVertical) 0 else absScroll.roundToInt()
             val yOffset = if (isVertical) absScroll.roundToInt() else 0
-            placeable.placeRelative(xOffset, yOffset)
+            placeable.placeRelativeWithLayer(xOffset, yOffset)
         }
     }
 }
