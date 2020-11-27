@@ -32,6 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -48,6 +52,7 @@ import androidx.compose.ui.test.runBlockingWithManualClock
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.up
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -511,7 +516,6 @@ class ScrollableTest {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .testTag(scrollableBoxTag)
                         .preferredSize(300.dp)
                         .scrollable(
                             controller = outerState,
@@ -519,14 +523,88 @@ class ScrollableTest {
                         )
                 ) {
                     Box(
-                        modifier = Modifier.preferredSize(300.dp).scrollable(
-                            controller = innerState,
-                            orientation = Orientation.Horizontal
-                        )
+                        modifier = Modifier.testTag(scrollableBoxTag)
+                            .preferredSize(300.dp)
+                            .scrollable(
+                                controller = innerState,
+                                orientation = Orientation.Horizontal
+                            )
                     )
                 }
             }
         }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            this.swipeWithVelocity(
+                start = this.center,
+                end = Offset(this.center.x + 200f, this.center.y),
+                duration = 300.milliseconds,
+                endVelocity = 0f
+            )
+        }
+        val lastEqualDrag = rule.runOnIdle {
+            assertThat(innerDrag).isGreaterThan(0f)
+            assertThat(outerDrag).isGreaterThan(0f)
+            // we consumed half delta in child, so exactly half should go to the parent
+            assertThat(outerDrag).isEqualTo(innerDrag)
+            innerDrag
+        }
+        advanceClockWhileAwaitersExist(clock)
+        advanceClockWhileAwaitersExist(clock)
+        rule.runOnIdle {
+            // values should be the same since no fling
+            assertThat(innerDrag).isEqualTo(lastEqualDrag)
+            assertThat(outerDrag).isEqualTo(lastEqualDrag)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_nestedFling() = runBlockingWithManualClock { clock ->
+        var innerDrag = 0f
+        var outerDrag = 0f
+        val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+        val outerState = ScrollableController(
+            consumeScrollDelta = {
+                outerDrag += it
+                it
+            },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = animationClock
+        )
+        val innerState = ScrollableController(
+            consumeScrollDelta = {
+                innerDrag += it / 2
+                it / 2
+            },
+            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            animationClock = animationClock
+        )
+
+        rule.setContent {
+            Box {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .preferredSize(300.dp)
+                        .scrollable(
+                            controller = outerState,
+                            orientation = Orientation.Horizontal
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .testTag(scrollableBoxTag)
+                            .preferredSize(300.dp)
+                            .scrollable(
+                                controller = innerState,
+                                orientation = Orientation.Horizontal
+                            )
+                    )
+                }
+            }
+        }
+
+        // swipe again with velocity
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
@@ -541,13 +619,231 @@ class ScrollableTest {
             assertThat(outerDrag).isEqualTo(innerDrag)
             innerDrag
         }
+        // advance clocks, triggering fling
         advanceClockWhileAwaitersExist(clock)
         advanceClockWhileAwaitersExist(clock)
-        // and nothing should change as we don't do nested fling
         rule.runOnIdle {
-            assertThat(outerDrag).isEqualTo(lastEqualDrag)
+            assertThat(innerDrag).isGreaterThan(lastEqualDrag)
+            assertThat(outerDrag).isGreaterThan(lastEqualDrag)
         }
     }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_nestedScrollAbove_respectsPreConsumption() =
+        runBlockingWithManualClock { clock ->
+            var value = 0f
+            var lastReceivedPreScrollAvailable = 0f
+            val preConsumeFraction = 0.7f
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            val controller = ScrollableController(
+                consumeScrollDelta = {
+                    val expected = lastReceivedPreScrollAvailable * (1 - preConsumeFraction)
+                    assertThat(it - expected).isWithin(0.01f)
+                    value += it
+                    it
+                },
+                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                animationClock = animationClock
+            )
+            val preConsumingParent = object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    lastReceivedPreScrollAvailable = available.x
+                    return available * preConsumeFraction
+                }
+
+                override fun onPreFling(available: Velocity): Velocity {
+                    // consume all velocity
+                    return available
+                }
+            }
+
+            rule.setContent {
+                Box {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .preferredSize(300.dp)
+                            .nestedScroll(preConsumingParent)
+                    ) {
+                        Box(
+                            modifier = Modifier.preferredSize(300.dp)
+                                .testTag(scrollableBoxTag)
+                                .scrollable(
+                                    controller = controller,
+                                    orientation = Orientation.Horizontal
+                                )
+                        )
+                    }
+                }
+            }
+
+            rule.onNodeWithTag(scrollableBoxTag).performGesture {
+                this.swipe(
+                    start = this.center,
+                    end = Offset(this.center.x + 200f, this.center.y),
+                    duration = 300.milliseconds
+                )
+            }
+
+            val preFlingValue = rule.runOnIdle { value }
+            advanceClockWhileAwaitersExist(clock)
+            advanceClockWhileAwaitersExist(clock)
+            rule.runOnIdle {
+                // if scrollable respects prefling consumption, it should fling 0px since we
+                // preconsume all
+                assertThat(preFlingValue).isEqualTo(value)
+            }
+        }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_nestedScrollAbove_proxiesPostCycles() =
+        runBlockingWithManualClock { clock ->
+            var value = 0f
+            var expectedLeft = 0f
+            val velocityFlung = 5000f
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            val controller = ScrollableController(
+                consumeScrollDelta = {
+                    val toConsume = it * 0.345f
+                    value += toConsume
+                    expectedLeft = it - toConsume
+                    toConsume
+                },
+                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                animationClock = animationClock
+            )
+            val parent = object : NestedScrollConnection {
+                override fun onPostScroll(
+                    consumed: Offset,
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    // we should get in post scroll as much as left in controller callback
+                    assertThat(available.x).isEqualTo(expectedLeft)
+                    return available
+                }
+
+                override fun onPostFling(
+                    consumed: Velocity,
+                    available: Velocity,
+                    onFinished: (Velocity) -> Unit
+                ) {
+                    assertThat(available.pixelsPerSecond)
+                        .isEqualTo(
+                            Offset(x = velocityFlung, y = 0f) - consumed.pixelsPerSecond
+                        )
+                    onFinished.invoke(available)
+                }
+            }
+
+            rule.setContent {
+                Box {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .preferredSize(300.dp)
+                            .nestedScroll(parent)
+                    ) {
+                        Box(
+                            modifier = Modifier.preferredSize(300.dp)
+                                .testTag(scrollableBoxTag)
+                                .scrollable(
+                                    controller = controller,
+                                    orientation = Orientation.Horizontal
+                                )
+                        )
+                    }
+                }
+            }
+
+            rule.onNodeWithTag(scrollableBoxTag).performGesture {
+                this.swipeWithVelocity(
+                    start = this.center,
+                    end = Offset(this.center.x + 500f, this.center.y),
+                    duration = 300.milliseconds,
+                    endVelocity = velocityFlung
+                )
+            }
+
+            advanceClockWhileAwaitersExist(clock)
+            advanceClockWhileAwaitersExist(clock)
+
+            // all assertions in callback above
+        }
+
+    @Test
+    @OptIn(ExperimentalTesting::class)
+    fun scrollable_nestedScrollBelow_listensDispatches() =
+        runBlockingWithManualClock { clock ->
+            var value = 0f
+            var expectedConsumed = 0f
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            val controller = ScrollableController(
+                consumeScrollDelta = {
+                    expectedConsumed = it * 0.3f
+                    value += expectedConsumed
+                    expectedConsumed
+                },
+                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                animationClock = animationClock
+            )
+            val child = object : NestedScrollConnection {}
+            val dispatcher = NestedScrollDispatcher()
+
+            rule.setContent {
+                Box {
+                    Box(
+                        modifier = Modifier.preferredSize(300.dp)
+
+                            .scrollable(
+                                controller = controller,
+                                orientation = Orientation.Horizontal
+                            )
+                    ) {
+                        Box(
+                            Modifier.preferredSize(200.dp)
+                                .testTag(scrollableBoxTag)
+                                .nestedScroll(child, dispatcher)
+                        )
+                    }
+                }
+            }
+
+            val lastValueBeforeFling = rule.runOnIdle {
+                val preScrollConsumed = dispatcher
+                    .dispatchPreScroll(Offset(20f, 20f), NestedScrollSource.Drag)
+                // scrollable is not interested in pre scroll
+                assertThat(preScrollConsumed).isEqualTo(Offset.Zero)
+
+                val consumed = dispatcher.dispatchPostScroll(
+                    Offset(20f, 20f),
+                    Offset(50f, 50f),
+                    NestedScrollSource.Drag
+                )
+                assertThat(consumed.x - expectedConsumed).isWithin(0.001f)
+
+                val preFlingConsumed = dispatcher
+                    .dispatchPreFling(Velocity(Offset(50f, 50f)))
+                // scrollable won't participate in the pre fling
+                assertThat(preFlingConsumed).isEqualTo(Velocity.Zero)
+
+                dispatcher.dispatchPostFling(
+                    Velocity(Offset(1000f, 1000f)),
+                    Velocity(Offset(2000f, 2000f))
+                )
+                value
+            }
+
+            advanceClockWhileAwaitersExist(clock)
+            advanceClockWhileAwaitersExist(clock)
+
+            rule.runOnIdle {
+                // catch that scrollable caught our post fling and flung
+                assertThat(value).isGreaterThan(lastValueBeforeFling)
+            }
+        }
 
     @Test
     @OptIn(ExperimentalTesting::class)

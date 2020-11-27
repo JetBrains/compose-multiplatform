@@ -16,7 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -63,9 +64,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyColumnFor(
                     items = items,
@@ -94,9 +99,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyColumnFor(
                     items = items,
@@ -135,9 +144,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyColumnFor(
                     items = items,
@@ -166,9 +179,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyColumnFor(
                     items = items,
@@ -202,9 +219,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyRowFor(
                     items = items,
@@ -233,9 +254,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyRowFor(
                     items = items,
@@ -274,9 +299,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyRowFor(
                     items = items,
@@ -305,9 +334,13 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
                 LazyRowFor(
                     items = items,
