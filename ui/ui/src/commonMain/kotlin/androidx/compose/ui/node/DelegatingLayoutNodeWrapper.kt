@@ -137,6 +137,10 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         wrappedBy?.propagateFocusStateChange(focusState)
     }
 
+    override fun findPreviousNestedScrollWrapper() = wrappedBy?.findPreviousNestedScrollWrapper()
+
+    override fun findNextNestedScrollWrapper() = wrapped.findNextNestedScrollWrapper()
+
     override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
 
     override fun findNextKeyInputWrapper() = wrapped.findNextKeyInputWrapper()

@@ -17,13 +17,15 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.FocusObserverModifier
 import androidx.compose.ui.FocusRequesterModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -662,6 +664,9 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
                     }
                     if (mod is PointerInputModifier) {
                         wrapper = PointerInputDelegatingWrapper(wrapper, mod).assignChained(toWrap)
+                    }
+                    if (mod is NestedScrollModifier) {
+                        wrapper = NestedScrollDelegatingWrapper(wrapper, mod).assignChained(toWrap)
                     }
                     if (mod is LayoutModifier) {
                         wrapper = ModifiedLayoutNode(wrapper, mod).assignChained(toWrap)
