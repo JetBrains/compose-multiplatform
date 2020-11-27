@@ -26,7 +26,7 @@ import androidx.compose.runtime.SlotTable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import org.junit.Before
 import org.junit.Rule
@@ -81,9 +81,9 @@ open class ToolingTest {
             WeakHashMap<SlotTable, Boolean>()
         )
         activityTestRule.onUiThread {
-            AndroidOwner.onAndroidOwnerCreatedCallback = {
+            ViewRootForTest.onViewCreatedCallback = {
                 it.view.setTag(R.id.inspection_slot_table_set, map)
-                AndroidOwner.onAndroidOwnerCreatedCallback = null
+                ViewRootForTest.onViewCreatedCallback = null
             }
             activity.setContent {
                 Box(

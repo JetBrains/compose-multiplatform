@@ -29,7 +29,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
@@ -106,7 +106,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
         .pointerInteropFilter(this)
         .drawBehind {
             drawIntoCanvas { canvas ->
-                (layoutNode.owner as? AndroidOwner)
+                (layoutNode.owner as? AndroidComposeView)
                     ?.drawAndroidView(this@toLayoutNode, canvas.nativeCanvas)
             }
         }.onGloballyPositioned {
@@ -122,11 +122,11 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
 
     var viewRemovedOnDetach: View? = null
     layoutNode.onAttach = { owner ->
-        (owner as? AndroidOwner)?.addAndroidView(this, layoutNode)
+        (owner as? AndroidComposeView)?.addAndroidView(this, layoutNode)
         if (viewRemovedOnDetach != null) view = viewRemovedOnDetach
     }
     layoutNode.onDetach = { owner ->
-        (owner as? AndroidOwner)?.removeAndroidView(this)
+        (owner as? AndroidComposeView)?.removeAndroidView(this)
         viewRemovedOnDetach = view
         view = null
     }

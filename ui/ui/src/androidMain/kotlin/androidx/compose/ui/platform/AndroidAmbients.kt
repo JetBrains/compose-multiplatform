@@ -134,8 +134,8 @@ val AmbientViewModelStoreOwner = staticAmbientOf<ViewModelStoreOwner>()
 
 @Composable
 @OptIn(InternalAnimationApi::class)
-internal fun ProvideAndroidAmbients(owner: AndroidOwner, content: @Composable () -> Unit) {
-    val view = owner.view
+internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composable () -> Unit) {
+    val view = owner
     val context = view.context
     val scope = rememberCoroutineScope()
     val rootAnimationClock = remember(scope) {

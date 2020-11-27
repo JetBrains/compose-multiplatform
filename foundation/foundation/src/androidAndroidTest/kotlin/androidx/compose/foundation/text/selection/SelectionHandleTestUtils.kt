@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import android.view.View
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.window.isPopupLayout
 import androidx.test.espresso.Espresso
@@ -34,7 +34,7 @@ internal fun ComposeTestRule.doubleSelectionHandleMatches(
 ) {
     // Make sure that current measurement/drawing is finished
     runOnIdle { }
-    Espresso.onView(CoreMatchers.instanceOf(Owner::class.java))
+    Espresso.onView(CoreMatchers.instanceOf(ViewRootForTest::class.java))
         .inRoot(DoubleSelectionHandleMatcher(index))
         .check(ViewAssertions.matches(viewMatcher))
 }

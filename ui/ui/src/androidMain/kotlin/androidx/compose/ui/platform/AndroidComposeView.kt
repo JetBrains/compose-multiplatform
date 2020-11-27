@@ -64,6 +64,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -80,20 +81,25 @@ import androidx.compose.ui.viewinterop.AndroidViewHolder
 import androidx.compose.ui.viewinterop.InternalInteropApi
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 import android.view.KeyEvent as AndroidKeyEvent
 
-@SuppressLint("ViewConstructor")
+@SuppressLint("ViewConstructor", "VisibleForTests")
 @OptIn(
     ExperimentalComposeApi::class,
     ExperimentalFocus::class,
     ExperimentalKeyInput::class,
 )
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-internal class AndroidComposeView(context: Context) : ViewGroup(context), AndroidOwner {
+internal class AndroidComposeView(context: Context) :
+    ViewGroup(context), Owner, ViewRootForTest {
 
     override val view: View = this
 
@@ -145,10 +151,12 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     // TODO(mount): reinstate when coroutines are supported by IR compiler
     // private val ownerScope = CoroutineScope(Dispatchers.Main.immediate + Job())
 
-    // Used for updating the ConfigurationAmbient when configuration changes - consume the
-    // configuration ambient instead of changing this observer if you are writing a component that
-    // adapts to configuration changes.
-    override var configurationChangeObserver: (Configuration) -> Unit = {}
+    /**
+     * Used for updating the ConfigurationAmbient when configuration changes - consume the
+     * configuration ambient instead of changing this observer if you are writing a component
+     * that adapts to configuration changes.
+     */
+    var configurationChangeObserver: (Configuration) -> Unit = {}
 
     private val _autofill = if (autofillSupported()) AndroidAutofill(this, autofillTree) else null
 
@@ -228,10 +236,14 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
     // so that we don't have to continue using try/catch after fails once.
     private var isRenderNodeCompatible = true
 
-    override var viewTreeOwners: AndroidOwner.ViewTreeOwners? = null
+    /**
+     * Current [ViewTreeOwners]. Use [setOnViewTreeOwnersAvailable] if you want to
+     * execute your code when the object will be created.
+     */
+    var viewTreeOwners: ViewTreeOwners? = null
         private set
 
-    private var onViewTreeOwnersAvailable: ((AndroidOwner.ViewTreeOwners) -> Unit)? = null
+    private var onViewTreeOwnersAvailable: ((ViewTreeOwners) -> Unit)? = null
 
     // executed when the layout pass has been finished. as a result of it our view could be moved
     // inside the window (we are interested not only in the event when our parent positioned us
@@ -282,7 +294,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         isFocusableInTouchMode = true
         clipChildren = false
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
-        AndroidOwner.onAndroidOwnerCreatedCallback?.invoke(this)
+        ViewRootForTest.onViewCreatedCallback?.invoke(this)
         root.attach(this)
     }
 
@@ -331,20 +343,31 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
+    /**
+     * Called to inform the owner that a new Android [View] was [attached][Owner.onAttach]
+     * to the hierarchy.
+     */
     @OptIn(InternalInteropApi::class)
-    override fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
+    fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
         androidViewsHandler.layoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
     }
 
+    /**
+     * Called to inform the owner that an Android [View] was [detached][Owner.onDetach]
+     * from the hierarchy.
+     */
     @OptIn(InternalInteropApi::class)
-    override fun removeAndroidView(view: AndroidViewHolder) {
+    fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
         androidViewsHandler.layoutNode.remove(view)
     }
 
+    /**
+     * Called to ask the owner to draw a child Android [View] to [canvas].
+     */
     @OptIn(InternalInteropApi::class)
-    override fun drawAndroidView(view: AndroidViewHolder, canvas: android.graphics.Canvas) {
+    fun drawAndroidView(view: AndroidViewHolder, canvas: android.graphics.Canvas) {
         androidViewsHandler.drawView(view, canvas)
     }
 
@@ -503,7 +526,11 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         }
     }
 
-    override fun setOnViewTreeOwnersAvailable(callback: (AndroidOwner.ViewTreeOwners) -> Unit) {
+    /**
+     * The callback to be executed when [viewTreeOwners] is created and not-null anymore.
+     * Note that this callback will be fired inline when it is already available
+     */
+    fun setOnViewTreeOwnersAvailable(callback: (ViewTreeOwners) -> Unit) {
         val viewTreeOwners = viewTreeOwners
         if (viewTreeOwners != null) {
             callback(viewTreeOwners)
@@ -553,7 +580,7 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
                     "Composed into the View which doesn't propagate" +
                         "ViewTreeSavedStateRegistryOwner!"
                 )
-            val viewTreeOwners = AndroidOwner.ViewTreeOwners(
+            val viewTreeOwners = ViewTreeOwners(
                 lifecycleOwner = lifecycleOwner,
                 viewModelStoreOwner = viewModelStoreOwner,
                 savedStateRegistryOwner = savedStateRegistryOwner
@@ -645,6 +672,10 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
         return accessibilityDelegate.dispatchHoverEvent(event)
     }
 
+    override val isLifecycleInResumedState: Boolean
+        get() = viewTreeOwners?.lifecycleOwner
+            ?.lifecycle?.currentState == Lifecycle.State.RESUMED
+
     companion object {
         private var systemPropertiesClass: Class<*>? = null
         private var getBooleanMethod: Method? = null
@@ -665,6 +696,24 @@ internal class AndroidComposeView(context: Context) : ViewGroup(context), Androi
             false
         }
     }
+
+    /**
+     * Combines objects populated via ViewTree*Owner
+     */
+    class ViewTreeOwners(
+        /**
+         * The [LifecycleOwner] associated with this owner.
+         */
+        val lifecycleOwner: LifecycleOwner,
+        /**
+         * The [ViewModelStoreOwner] associated with this owner.
+         */
+        val viewModelStoreOwner: ViewModelStoreOwner,
+        /**
+         * The [SavedStateRegistryOwner] associated with this owner.
+         */
+        val savedStateRegistryOwner: SavedStateRegistryOwner
+    )
 }
 
 /**

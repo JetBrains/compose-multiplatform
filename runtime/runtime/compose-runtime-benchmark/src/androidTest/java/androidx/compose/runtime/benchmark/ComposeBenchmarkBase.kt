@@ -16,9 +16,6 @@
 
 package androidx.compose.runtime.benchmark
 
-import android.app.Activity
-import android.view.View
-import android.view.ViewGroup
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.Composable
@@ -32,7 +29,6 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
-import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
@@ -188,26 +184,4 @@ class RecomposeReceiver {
     fun update(block: () -> Unit) {
         updateModelCb = block
     }
-}
-
-// TODO(chuckj): Consider refacgtoring to use AndroidTestCaseRunner from UI
-// This code is copied from AndroidTestCaseRunner.kt
-private fun findComposeView(activity: Activity): AndroidOwner? {
-    return findComposeView(activity.findViewById(android.R.id.content) as ViewGroup)
-}
-
-private fun findComposeView(view: View): AndroidOwner? {
-    if (view is AndroidOwner) {
-        return view
-    }
-
-    if (view is ViewGroup) {
-        for (i in 0 until view.childCount) {
-            val composeView = findComposeView(view.getChildAt(i))
-            if (composeView != null) {
-                return composeView
-            }
-        }
-    }
-    return null
 }

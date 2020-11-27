@@ -1702,8 +1702,6 @@ private class MockOwner(
         layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
     }
 
-    override val hasPendingMeasureOrLayout = false
-
     override fun onAttach(node: LayoutNode) {
         onAttachParams += node
     }

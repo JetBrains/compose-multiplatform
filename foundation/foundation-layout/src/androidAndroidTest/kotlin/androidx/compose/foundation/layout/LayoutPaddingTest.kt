@@ -298,7 +298,7 @@ class LayoutPaddingTest : LayoutTest() {
             }
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val rootWidth = root.width
@@ -361,7 +361,7 @@ class LayoutPaddingTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootWidth = root.width
 
@@ -451,7 +451,7 @@ class LayoutPaddingTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val innerSize = (size - paddingPx * 2)
@@ -499,7 +499,7 @@ class LayoutPaddingTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val paddingLeft = left.toIntPx()
@@ -553,7 +553,7 @@ class LayoutPaddingTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(0, 0), childSize)

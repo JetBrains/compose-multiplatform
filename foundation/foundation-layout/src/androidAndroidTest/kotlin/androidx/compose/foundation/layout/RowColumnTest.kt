@@ -109,7 +109,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(size, size), childSize[0])
@@ -161,7 +161,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootWidth = root.width
 
@@ -218,7 +218,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(childrenWidth, childrenHeight), childSize[0])
@@ -263,7 +263,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(size, size), childSize[0])
@@ -315,7 +315,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootHeight = root.height
 
@@ -369,7 +369,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(childrenWidth, childrenHeight), childSize[0])
@@ -624,7 +624,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(size, root.height), childSize[0])
@@ -682,7 +682,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootHeight = root.height
 
@@ -755,7 +755,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootHeight = root.height
 
@@ -976,7 +976,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(root.width, size), childSize[0])
@@ -1035,7 +1035,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootWidth = root.width
 
@@ -1104,7 +1104,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootWidth = root.width
 
@@ -1286,7 +1286,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1316,7 +1316,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1355,7 +1355,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1385,7 +1385,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1415,7 +1415,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1448,7 +1448,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1490,7 +1490,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1523,7 +1523,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1556,7 +1556,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1589,7 +1589,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1638,7 +1638,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1756,7 +1756,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1786,7 +1786,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1825,7 +1825,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1855,7 +1855,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1885,7 +1885,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1918,7 +1918,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1960,7 +1960,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -1993,7 +1993,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -2026,7 +2026,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -2059,7 +2059,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -2109,7 +2109,7 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -2244,7 +2244,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(Offset(0f, 0f), childPosition[0])
@@ -2290,7 +2290,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(Offset((root.width - size.toFloat() * 3), 0f), childPosition[0])
@@ -2336,7 +2336,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val extraSpace = root.width - size * 3
@@ -2392,7 +2392,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width - size.toFloat() * 3f) / 4f
@@ -2447,7 +2447,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width - size.toFloat() * 3) / 2
@@ -2500,7 +2500,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width.toFloat() - size * 3) / 3
@@ -2705,7 +2705,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(Offset(0f, 0f), childPosition[0])
@@ -2751,7 +2751,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(Offset(0f, (root.height - size.toFloat() * 3)), childPosition[0])
@@ -2797,7 +2797,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val extraSpace = root.height - size * 3f
@@ -2856,7 +2856,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.height - size.toFloat() * 3) / 4
@@ -2920,7 +2920,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.height - size.toFloat() * 3f) / 2f
@@ -2973,7 +2973,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.height - size.toFloat() * 3f) / 3f
@@ -4047,7 +4047,7 @@ class RowColumnTest : LayoutTest() {
         }
 
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootWidth = root.width
 
@@ -4096,7 +4096,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val extraSpace = root.width - size * 3
@@ -4152,7 +4152,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width - size.toFloat() * 3f) / 4f
@@ -4207,7 +4207,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width - size.toFloat() * 3) / 2
@@ -4260,7 +4260,7 @@ class RowColumnTest : LayoutTest() {
 
         calculateChildPositions(childPosition, parentLayoutCoordinates, childLayoutCoordinates)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width.toFloat() - size * 3) / 3
@@ -4388,7 +4388,7 @@ class RowColumnTest : LayoutTest() {
         }
 
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootWidth = root.width
 
@@ -4475,7 +4475,7 @@ class RowColumnTest : LayoutTest() {
         }
 
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
         val rootWidth = root.width
 
@@ -4535,7 +4535,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(Offset(0f, 0f), childPosition[0])
@@ -4590,7 +4590,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(Offset(0f, 0f), childPosition[0])
@@ -4642,7 +4642,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -4703,7 +4703,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -4761,7 +4761,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val extraSpace = root.width - size * 3
@@ -4832,7 +4832,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val extraSpace = root.width - size * 3
@@ -4900,7 +4900,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width - size.toFloat() * 3f) / 4f
@@ -4969,7 +4969,7 @@ class RowColumnTest : LayoutTest() {
                 childLayoutCoordinates
             )
 
-            val root = findOwnerView()
+            val root = findComposeView()
             waitForDraw(root)
 
             val gap = (root.width - size.toFloat() * 3f) / 4f
@@ -5034,7 +5034,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width - size.toFloat() * 3) / 2
@@ -5101,7 +5101,7 @@ class RowColumnTest : LayoutTest() {
                 childLayoutCoordinates
             )
 
-            val root = findOwnerView()
+            val root = findComposeView()
             waitForDraw(root)
 
             val gap = (root.width - size.toFloat() * 3) / 2
@@ -5163,7 +5163,7 @@ class RowColumnTest : LayoutTest() {
             childLayoutCoordinates
         )
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         val gap = (root.width.toFloat() - size * 3) / 3
@@ -5233,7 +5233,7 @@ class RowColumnTest : LayoutTest() {
                 childLayoutCoordinates
             )
 
-            val root = findOwnerView()
+            val root = findComposeView()
             waitForDraw(root)
 
             val gap = (root.width.toFloat() - size * 3) / 3

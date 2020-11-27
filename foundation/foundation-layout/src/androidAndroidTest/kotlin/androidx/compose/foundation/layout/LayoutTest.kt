@@ -36,7 +36,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -95,22 +95,22 @@ open class LayoutTest {
         activityTestRule.runOnUiThread(runnable)
     }
 
-    internal fun findOwnerView(): View {
-        return findOwner(activity).view
+    internal fun findComposeView(): View {
+        return findViewRootForTest(activity).view
     }
 
-    internal fun findOwner(activity: Activity): AndroidOwner {
+    internal fun findViewRootForTest(activity: Activity): ViewRootForTest {
         val contentViewGroup = activity.findViewById<ViewGroup>(android.R.id.content)
-        return findOwner(contentViewGroup)!!
+        return findViewRootForTest(contentViewGroup)!!
     }
 
-    internal fun findOwner(parent: ViewGroup): AndroidOwner? {
+    internal fun findViewRootForTest(parent: ViewGroup): ViewRootForTest? {
         for (index in 0 until parent.childCount) {
             val child = parent.getChildAt(index)
-            if (child is AndroidOwner) {
+            if (child is ViewRootForTest) {
                 return child
             } else if (child is ViewGroup) {
-                val owner = findOwner(child)
+                val owner = findViewRootForTest(child)
                 if (owner != null) {
                     return owner
                 }

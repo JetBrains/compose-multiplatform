@@ -2049,7 +2049,6 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.focus.FocusManager getFocusManager();
     method public androidx.compose.ui.text.font.Font.ResourceLoader getFontLoader();
     method public androidx.compose.ui.hapticfeedback.HapticFeedback getHapticFeedBack();
-    method public boolean getHasPendingMeasureOrLayout();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public long getMeasureIteration();
     method public androidx.compose.ui.node.LayoutNode getRoot();
@@ -2075,7 +2074,6 @@ package androidx.compose.ui.node {
     property public abstract androidx.compose.ui.focus.FocusManager focusManager;
     property public abstract androidx.compose.ui.text.font.Font.ResourceLoader fontLoader;
     property public abstract androidx.compose.ui.hapticfeedback.HapticFeedback hapticFeedBack;
-    property public abstract boolean hasPendingMeasureOrLayout;
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
     property public abstract long measureIteration;
     property public abstract androidx.compose.ui.node.LayoutNode root;
@@ -2186,31 +2184,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class AndroidComposeViewKt {
-  }
-
-  public interface AndroidOwner extends androidx.compose.ui.node.Owner {
-    method public void addAndroidView(androidx.compose.ui.viewinterop.AndroidViewHolder view, androidx.compose.ui.node.LayoutNode layoutNode);
-    method public void drawAndroidView(androidx.compose.ui.viewinterop.AndroidViewHolder view, android.graphics.Canvas canvas);
-    method public kotlin.jvm.functions.Function1<android.content.res.Configuration,kotlin.Unit> getConfigurationChangeObserver();
-    method public android.view.View getView();
-    method public androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners? getViewTreeOwners();
-    method public void invalidateDescendants();
-    method public void removeAndroidView(androidx.compose.ui.viewinterop.AndroidViewHolder view);
-    method public void setConfigurationChangeObserver(kotlin.jvm.functions.Function1<? super android.content.res.Configuration,kotlin.Unit> p);
-    method public void setOnViewTreeOwnersAvailable(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners,kotlin.Unit> callback);
-    property public abstract kotlin.jvm.functions.Function1<android.content.res.Configuration,kotlin.Unit> configurationChangeObserver;
-    property public abstract android.view.View view;
-    property public abstract androidx.compose.ui.platform.AndroidOwner.ViewTreeOwners? viewTreeOwners;
-  }
-
-  public static final class AndroidOwner.ViewTreeOwners {
-    ctor public AndroidOwner.ViewTreeOwners(androidx.lifecycle.LifecycleOwner lifecycleOwner, androidx.lifecycle.ViewModelStoreOwner viewModelStoreOwner, androidx.savedstate.SavedStateRegistryOwner savedStateRegistryOwner);
-    method public androidx.lifecycle.LifecycleOwner getLifecycleOwner();
-    method public androidx.savedstate.SavedStateRegistryOwner getSavedStateRegistryOwner();
-    method public androidx.lifecycle.ViewModelStoreOwner getViewModelStoreOwner();
-    property public final androidx.lifecycle.LifecycleOwner lifecycleOwner;
-    property public final androidx.savedstate.SavedStateRegistryOwner savedStateRegistryOwner;
-    property public final androidx.lifecycle.ViewModelStoreOwner viewModelStoreOwner;
   }
 
   public final class AndroidUriHandler implements androidx.compose.ui.platform.UriHandler {
@@ -2344,6 +2317,23 @@ package androidx.compose.ui.platform {
     property public abstract long doubleTapTimeout;
     property public abstract long longPressTimeout;
     property public abstract float touchSlop;
+  }
+
+  @VisibleForTesting public interface ViewRootForTest extends androidx.compose.ui.node.Owner {
+    method public boolean getHasPendingMeasureOrLayout();
+    method public android.view.View getView();
+    method public void invalidateDescendants();
+    method public boolean isLifecycleInResumedState();
+    property public abstract boolean hasPendingMeasureOrLayout;
+    property public abstract boolean isLifecycleInResumedState;
+    property public abstract android.view.View view;
+    field public static final androidx.compose.ui.platform.ViewRootForTest.Companion Companion;
+  }
+
+  public static final class ViewRootForTest.Companion {
+    method public kotlin.jvm.functions.Function1<androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? getOnViewCreatedCallback();
+    method public void setOnViewCreatedCallback(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? p);
+    property public final kotlin.jvm.functions.Function1<androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? onViewCreatedCallback;
   }
 
   @androidx.compose.runtime.Stable public interface WindowManager {

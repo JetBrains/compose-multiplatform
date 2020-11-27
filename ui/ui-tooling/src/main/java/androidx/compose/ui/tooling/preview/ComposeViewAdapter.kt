@@ -40,9 +40,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
 import androidx.compose.ui.tooling.SlotTableRecord
@@ -461,7 +461,8 @@ internal class ComposeViewAdapter : FrameLayout {
                         // (an AndroidOwner) when setting the clock time to make sure the Compose
                         // Preview will animate when the states are read inside the draw scope.
                         val composeView = getChildAt(0) as ComposeView
-                        (composeView.getChildAt(0) as? AndroidOwner)?.invalidateDescendants()
+                        (composeView.getChildAt(0) as? ViewRootForTest)
+                            ?.invalidateDescendants()
                     }
                     Providers(AmbientAnimationClock provides clock) {
                         composable()

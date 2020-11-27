@@ -18,7 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.test.TestOwner
@@ -33,7 +33,7 @@ internal class AndroidTestOwner(
 
     @SuppressLint("DocumentExceptions")
     override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
-        val owner = node.layoutNode.owner as AndroidOwner
+        val owner = node.layoutNode.owner as ViewRootForTest
 
         @Suppress("DEPRECATION")
         runOnUiThread {
@@ -46,7 +46,7 @@ internal class AndroidTestOwner(
 
     @SuppressLint("DocumentExceptions")
     override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-        val owner = node.layoutNode.owner as AndroidOwner
+        val owner = node.layoutNode.owner as ViewRootForTest
 
         @Suppress("DEPRECATION")
         runOnUiThread {
@@ -66,7 +66,7 @@ internal class AndroidTestOwner(
         return composeIdlingResource.getOwners()
     }
 
-    private fun AndroidOwner.getTextInputServiceOrDie(): TextInputServiceForTests {
+    private fun ViewRootForTest.getTextInputServiceOrDie(): TextInputServiceForTests {
         return textInputService as? TextInputServiceForTests
             ?: throw IllegalStateException(
                 "Text input service wrapper not set up! Did you use ComposeTestRule?"
