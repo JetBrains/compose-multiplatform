@@ -28,19 +28,8 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.withRunningRecomposer
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.autofill.Autofill
-import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.ExperimentalPointerInput
-import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.ExperimentalKeyInput
-import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.ConsumedData
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -50,33 +39,15 @@ import androidx.compose.ui.input.pointer.PointerInputData
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.materialize
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.InternalCoreApi
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.OwnedLayer
-import androidx.compose.ui.node.Owner
-import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientViewConfiguration
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.semantics.SemanticsOwner
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.input.TextInputService
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.milliseconds
-import androidx.compose.ui.platform.WindowManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runBlockingTest
@@ -137,7 +108,6 @@ internal class SuspendingGestureTestUtil(
                     pointerInputFilter = currentComposer
                         .materialize(Modifier.pointerInput(gestureDetector)) as
                         PointerInputFilter
-                    LayoutNode(0, 0, width, height, pointerInputFilter!! as Modifier)
                 }
             }
             yield()
@@ -348,24 +318,6 @@ internal class SuspendingGestureTestUtil(
         }
     }
 
-    @Suppress("SameParameterValue")
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
-        LayoutNode().apply {
-            this.modifier = modifier
-            measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("not supported") {
-                override fun measure(
-                    measureScope: MeasureScope,
-                    measurables: List<Measurable>,
-                    constraints: Constraints
-                ): MeasureResult =
-                    measureScope.layout(x2 - x, y2 - y) {}
-            }
-            attach(MockOwner())
-            measure(Constraints.fixed(x2 - x, y2 - y))
-            place(x, y)
-        }
-
     internal class TestFrameClock : MonotonicFrameClock {
 
         private val frameCh = Channel<Long>()
@@ -377,130 +329,6 @@ internal class SuspendingGestureTestUtil(
 
         override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R =
             onFrame(frameCh.receive())
-    }
-
-    @OptIn(
-        ExperimentalFocus::class,
-        ExperimentalLayoutNodeApi::class,
-        InternalCoreApi::class
-    )
-    private class MockOwner(
-        val position: IntOffset = IntOffset.Zero,
-        override val root: LayoutNode = LayoutNode()
-    ) : Owner {
-        val onRequestMeasureParams = mutableListOf<LayoutNode>()
-        val onAttachParams = mutableListOf<LayoutNode>()
-        val onDetachParams = mutableListOf<LayoutNode>()
-
-        override val hapticFeedBack: HapticFeedback
-            get() = TODO("Not yet implemented")
-        override val clipboardManager: ClipboardManager
-            get() = TODO("Not yet implemented")
-        override val textToolbar: TextToolbar
-            get() = TODO("Not yet implemented")
-        override val autofillTree: AutofillTree
-            get() = TODO("Not yet implemented")
-        override val autofill: Autofill?
-            get() = TODO("Not yet implemented")
-        override val density: Density
-            get() = Density(1f)
-        override val semanticsOwner: SemanticsOwner
-            get() = TODO("Not yet implemented")
-        override val textInputService: TextInputService
-            get() = TODO("Not yet implemented")
-        override val focusManager: FocusManager
-            get() = TODO("Not yet implemented")
-        override val windowManager: WindowManager
-            get() = TODO("Not yet implemented")
-        override val fontLoader: Font.ResourceLoader
-            get() = TODO("Not yet implemented")
-        override val layoutDirection: LayoutDirection
-            get() = LayoutDirection.Ltr
-        override var showLayoutBounds: Boolean = false
-        override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
-
-        override fun onRequestMeasure(layoutNode: LayoutNode) {
-            onRequestMeasureParams += layoutNode
-        }
-
-        override fun onRequestRelayout(layoutNode: LayoutNode) {
-        }
-
-        override val hasPendingMeasureOrLayout = false
-
-        override fun onAttach(node: LayoutNode) {
-            onAttachParams += node
-        }
-
-        override fun onDetach(node: LayoutNode) {
-            onDetachParams += node
-        }
-
-        override fun calculatePosition(): IntOffset = position
-
-        override fun requestFocus(): Boolean = false
-
-        @ExperimentalKeyInput
-        override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
-
-        override fun measureAndLayout() {
-        }
-
-        override fun createLayer(
-            drawBlock: (Canvas) -> Unit,
-            invalidateParentLayer: () -> Unit
-        ): OwnedLayer {
-            return object : OwnedLayer {
-                override val layerId: Long
-                    get() = 0
-
-                override fun updateLayerProperties(
-                    scaleX: Float,
-                    scaleY: Float,
-                    alpha: Float,
-                    translationX: Float,
-                    translationY: Float,
-                    shadowElevation: Float,
-                    rotationX: Float,
-                    rotationY: Float,
-                    rotationZ: Float,
-                    cameraDistance: Float,
-                    transformOrigin: TransformOrigin,
-                    shape: Shape,
-                    clip: Boolean
-                ) {
-                }
-
-                override fun move(position: IntOffset) {
-                }
-
-                override fun resize(size: IntSize) {
-                }
-
-                override fun drawLayer(canvas: Canvas) {
-                    drawBlock(canvas)
-                }
-
-                override fun updateDisplayList() {
-                }
-
-                override fun invalidate() {
-                }
-
-                override fun destroy() {
-                }
-
-                override fun getMatrix(matrix: Matrix) {
-                }
-            }
-        }
-
-        override fun onSemanticsChange() {
-        }
-
-        override val measureIteration: Long = 0
-        override val viewConfiguration: ViewConfiguration
-            get() = TestViewConfiguration()
     }
 
     @OptIn(ExperimentalComposeApi::class)
