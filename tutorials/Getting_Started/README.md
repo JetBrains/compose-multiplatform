@@ -16,7 +16,23 @@ The following software has to be preinstalled:
 
 ## Creating a new project
 
-Kotlin plugin in IDEA has Compose new project wizard, but it is possible to create project manually.
+### New project wizard
+
+Kotlin support in IDEA IDE starting with the version 2020.3 comes with the new project wizard
+capable to create a Compose application automatically.
+
+Note that JDK must be at least JDK 11, and to use the native distribution
+packaging JDK 14 or later must be used.
+
+![Create new project 1](screen3.png)
+
+![Create new project 2](screen4.png)
+
+![Create new project 3](screen5.png)
+
+### Create new Compose project without the wizard
+
+It is also possible to create Compose project manually.
 
 The recommended way of building Compose for Desktop projects is by using Gradle.
 JetBrains provides a simple way of building Compose for Desktop projects
