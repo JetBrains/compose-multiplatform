@@ -42,7 +42,7 @@ import androidx.compose.foundation.layout.preferredWidthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SliderConstants.InactiveTrackColorAlpha
 import androidx.compose.material.SliderConstants.TickColorAlpha
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -262,7 +262,7 @@ private fun SliderImpl(
                     .focusable(interactionState = interactionState)
                     .indication(
                         interactionState = interactionState,
-                        indication = rememberRippleIndication(
+                        indication = rememberRipple(
                             bounded = false,
                             radius = ThumbRippleRadius
                         )

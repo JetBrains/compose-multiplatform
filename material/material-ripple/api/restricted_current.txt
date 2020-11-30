@@ -1,0 +1,35 @@
+// Signature format: 4.0
+package androidx.compose.material.ripple {
+
+  @kotlin.RequiresOptIn(message="This ripple API is experimental and is likely to change or to be removed in" + " the future.") public @interface ExperimentalRippleApi {
+  }
+
+  @androidx.compose.material.ripple.ExperimentalRippleApi public fun interface RippleAlpha {
+    method public float alphaForInteraction(androidx.compose.foundation.Interaction interaction);
+  }
+
+  public final class RippleAnimationKt {
+  }
+
+  public final class RippleKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.Indication rememberRipple-aOO63xs(optional boolean bounded, optional float radius, optional long color);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.foundation.Indication rememberRippleIndication-DudYJDg(optional boolean bounded, optional androidx.compose.ui.unit.Dp? radius, optional long color);
+  }
+
+  @androidx.compose.material.ripple.ExperimentalRippleApi public interface RippleTheme {
+    method @androidx.compose.runtime.Composable public long defaultColor-0d7_KjU();
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ripple.RippleAlpha rippleAlpha();
+    field public static final androidx.compose.material.ripple.RippleTheme.Companion Companion;
+  }
+
+  public static final class RippleTheme.Companion {
+    method @androidx.compose.material.ripple.ExperimentalRippleApi public androidx.compose.material.ripple.RippleAlpha defaultRippleAlpha-QZCes2I(long contentColor, boolean lightTheme);
+    method @androidx.compose.material.ripple.ExperimentalRippleApi public long defaultRippleColor-QZCes2I(long contentColor, boolean lightTheme);
+  }
+
+  public final class RippleThemeKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ripple.RippleTheme> getAmbientRippleTheme();
+  }
+
+}
+

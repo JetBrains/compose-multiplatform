@@ -18,9 +18,13 @@ package androidx.compose.material
 
 import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Indication
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.AmbientRippleTheme
+import androidx.compose.material.ripple.ExperimentalRippleApi
+import androidx.compose.material.ripple.RippleTheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
 import androidx.compose.ui.selection.AmbientTextSelectionColors
@@ -50,6 +54,7 @@ import androidx.compose.ui.selection.AmbientTextSelectionColors
  * @param typography A set of text styles to be used as this hierarchy's typography system
  * @param shapes A set of shapes to be used by the components in this hierarchy
  */
+@OptIn(ExperimentalRippleApi::class)
 @Composable
 fun MaterialTheme(
     colors: Colors = MaterialTheme.colors,
@@ -63,15 +68,16 @@ fun MaterialTheme(
         colors.copy()
     }.apply { updateColorsFrom(colors) }
     val indicationFactory: @Composable () -> Indication = remember {
-        { rememberRippleIndication() }
+        @Composable { rememberRipple() }
     }
     val selectionColors = rememberTextSelectionColors(rememberedColors)
     Providers(
         AmbientColors provides rememberedColors,
         AmbientContentAlpha provides ContentAlpha.high,
         AmbientIndication provides indicationFactory,
-        AmbientTextSelectionColors provides selectionColors,
+        AmbientRippleTheme provides MaterialRippleTheme,
         AmbientShapes provides shapes,
+        AmbientTextSelectionColors provides selectionColors,
         AmbientTypography provides typography
     ) {
         ProvideTextStyle(value = typography.body1, content = content)
@@ -110,4 +116,20 @@ object MaterialTheme {
     @ComposableContract(readonly = true)
     val shapes: Shapes
         get() = AmbientShapes.current
+}
+
+@OptIn(ExperimentalRippleApi::class)
+@Immutable
+private object MaterialRippleTheme : RippleTheme {
+    @Composable
+    override fun defaultColor() = RippleTheme.defaultRippleColor(
+        contentColor = AmbientContentColor.current,
+        lightTheme = MaterialTheme.colors.isLight
+    )
+
+    @Composable
+    override fun rippleAlpha() = RippleTheme.defaultRippleAlpha(
+        contentColor = AmbientContentColor.current,
+        lightTheme = MaterialTheme.colors.isLight
+    )
 }

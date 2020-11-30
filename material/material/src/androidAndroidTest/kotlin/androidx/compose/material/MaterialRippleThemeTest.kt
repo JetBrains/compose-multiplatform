@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.ripple
+package androidx.compose.material
 
 import android.os.Build
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.indication
@@ -26,12 +27,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.GOLDEN_MATERIAL
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.ripple.AmbientRippleTheme
+import androidx.compose.material.ripple.ExperimentalRippleApi
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
@@ -61,11 +61,15 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * Test for the [RippleTheme] provided by [MaterialTheme], to verify colors and opacity in
+ * different configurations.
+ */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTesting::class)
-class RippleIndicationTest {
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTesting::class, ExperimentalRippleApi::class)
+class MaterialRippleThemeTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -89,7 +93,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_bounded_light_highluminance_pressed",
+            "ripple_bounded_light_highluminance_pressed",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.24f)
         )
     }
@@ -110,7 +114,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_bounded_light_highluminance_dragged",
+            "ripple_bounded_light_highluminance_dragged",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.16f)
         )
     }
@@ -131,7 +135,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_bounded_light_lowluminance_pressed",
+            "ripple_bounded_light_lowluminance_pressed",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
         )
     }
@@ -152,7 +156,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_bounded_light_lowluminance_dragged",
+            "ripple_bounded_light_lowluminance_dragged",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.08f)
         )
     }
@@ -173,7 +177,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_bounded_dark_highluminance_pressed",
+            "ripple_bounded_dark_highluminance_pressed",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.10f)
         )
     }
@@ -194,7 +198,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_bounded_dark_highluminance_dragged",
+            "ripple_bounded_dark_highluminance_dragged",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.08f)
         )
     }
@@ -215,7 +219,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_bounded_dark_lowluminance_pressed",
+            "ripple_bounded_dark_lowluminance_pressed",
             // Low luminance content in dark theme should use a white ripple by default
             calculateResultingRippleColor(Color.White, rippleOpacity = 0.10f)
         )
@@ -237,7 +241,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_bounded_dark_lowluminance_dragged",
+            "ripple_bounded_dark_lowluminance_dragged",
             // Low luminance content in dark theme should use a white ripple by default
             calculateResultingRippleColor(Color.White, rippleOpacity = 0.08f)
         )
@@ -259,7 +263,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_unbounded_light_highluminance_pressed",
+            "ripple_unbounded_light_highluminance_pressed",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.24f)
         )
     }
@@ -280,7 +284,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_unbounded_light_highluminance_dragged",
+            "ripple_unbounded_light_highluminance_dragged",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.16f)
         )
     }
@@ -301,7 +305,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_unbounded_light_lowluminance_pressed",
+            "ripple_unbounded_light_lowluminance_pressed",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
         )
     }
@@ -322,7 +326,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_unbounded_light_lowluminance_dragged",
+            "ripple_unbounded_light_lowluminance_dragged",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.08f)
         )
     }
@@ -343,7 +347,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_unbounded_dark_highluminance_pressed",
+            "ripple_unbounded_dark_highluminance_pressed",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.10f)
         )
     }
@@ -364,7 +368,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_unbounded_dark_highluminance_dragged",
+            "ripple_unbounded_dark_highluminance_dragged",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.08f)
         )
     }
@@ -385,7 +389,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_unbounded_dark_lowluminance_pressed",
+            "ripple_unbounded_dark_lowluminance_pressed",
             // Low luminance content in dark theme should use a white ripple by default
             calculateResultingRippleColor(Color.White, rippleOpacity = 0.10f)
         )
@@ -407,7 +411,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_unbounded_dark_lowluminance_dragged",
+            "ripple_unbounded_dark_lowluminance_dragged",
             // Low luminance content in dark theme should use a white ripple by default
             calculateResultingRippleColor(Color.White, rippleOpacity = 0.08f)
         )
@@ -427,17 +431,15 @@ class RippleIndicationTest {
             override fun defaultColor() = rippleColor
 
             @Composable
-            override fun rippleOpacity() = object : RippleOpacity {
-                override fun opacityForInteraction(interaction: Interaction) = rippleAlpha
-            }
+            override fun rippleAlpha() = RippleAlpha { rippleAlpha }
         }
 
         rule.setContent {
-            Providers(AmbientRippleTheme provides rippleTheme) {
-                MaterialTheme {
+            MaterialTheme {
+                Providers(AmbientRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            RippleBox(interactionState, rememberRippleIndication())
+                            RippleBox(interactionState, rememberRipple())
                         }
                     }
                 }
@@ -449,7 +451,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Pressed,
-            "rippleindication_customtheme_pressed",
+            "ripple_customtheme_pressed",
             expectedColor
         )
     }
@@ -468,17 +470,15 @@ class RippleIndicationTest {
             override fun defaultColor() = rippleColor
 
             @Composable
-            override fun rippleOpacity() = object : RippleOpacity {
-                override fun opacityForInteraction(interaction: Interaction) = rippleAlpha
-            }
+            override fun rippleAlpha() = RippleAlpha { rippleAlpha }
         }
 
         rule.setContent {
-            Providers(AmbientRippleTheme provides rippleTheme) {
-                MaterialTheme {
+            MaterialTheme {
+                Providers(AmbientRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            RippleBox(interactionState, rememberRippleIndication())
+                            RippleBox(interactionState, rememberRipple())
                         }
                     }
                 }
@@ -490,7 +490,7 @@ class RippleIndicationTest {
         assertRippleMatches(
             interactionState,
             Interaction.Dragged,
-            "rippleindication_customtheme_dragged",
+            "ripple_customtheme_dragged",
             expectedColor
         )
     }
@@ -504,9 +504,7 @@ class RippleIndicationTest {
             override fun defaultColor() = color
 
             @Composable
-            override fun rippleOpacity() = object : RippleOpacity {
-                override fun opacityForInteraction(interaction: Interaction) = alpha
-            }
+            override fun rippleAlpha() = RippleAlpha { alpha }
         }
 
         val initialColor = Color.Red
@@ -515,11 +513,11 @@ class RippleIndicationTest {
         var rippleTheme by mutableStateOf(createRippleTheme(initialColor, initialAlpha))
 
         rule.setContent {
-            Providers(AmbientRippleTheme provides rippleTheme) {
-                MaterialTheme {
+            MaterialTheme {
+                Providers(AmbientRippleTheme provides rippleTheme) {
                     Surface(contentColor = Color.Black) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            RippleBox(interactionState, rememberRippleIndication())
+                            RippleBox(interactionState, rememberRipple())
                         }
                     }
                 }
@@ -616,14 +614,14 @@ class RippleIndicationTest {
 }
 
 /**
- * Generic Button like component that allows injecting a [RippleIndication] and also includes
+ * Generic Button like component that allows injecting an [Indication] and also includes
  * padding around the rippled surface, so screenshots will include some dead space for clarity.
  *
  * @param interactionState the [InteractionState] that is used to drive the ripple state
- * @param rippleIndication [RippleIndication] placed inside the surface
+ * @param ripple ripple [Indication] placed inside the surface
  */
 @Composable
-private fun RippleBox(interactionState: InteractionState, rippleIndication: RippleIndication) {
+private fun RippleBox(interactionState: InteractionState, ripple: Indication) {
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         Surface(
             Modifier.padding(25.dp),
@@ -632,7 +630,7 @@ private fun RippleBox(interactionState: InteractionState, rippleIndication: Ripp
             Box(
                 Modifier.preferredWidth(80.dp).preferredHeight(50.dp).indication(
                     interactionState = interactionState,
-                    indication = rippleIndication
+                    indication = ripple
                 )
             )
         }
@@ -659,7 +657,7 @@ private fun ComposeTestRule.setRippleContent(
         MaterialTheme(colors) {
             Surface(contentColor = contentColor) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    RippleBox(interactionState, rememberRippleIndication(bounded))
+                    RippleBox(interactionState, rememberRipple(bounded))
                 }
             }
         }
