@@ -91,7 +91,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             isCheckReleaseBuilds = false
 
             // Write output directly to the console (and nowhere else).
-            textOutput("stderr")
             textReport = true
             htmlReport = false
 
