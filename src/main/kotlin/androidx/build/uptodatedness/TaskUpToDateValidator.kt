@@ -47,8 +47,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "createArchive",
     "createDiffArchiveForAll",
     "createProjectZip",
-    "desugarPublicDebugFileDependencies",
-    "desugarTipOfTreeDebugFileDependencies",
     "externalNativeBuildDebug",
     "externalNativeBuildRelease",
     "generateJsonModelDebug",
@@ -107,10 +105,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
      */
     "relocateShadowJar",
     "stripArchiveForPartialDejetification",
-    "transformClassesWithDexBuilderForPublicDebug",
-    "transformClassesWithDexBuilderForTipOfTreeDebug",
     "verifyDependencyVersions",
-    "zipEcFiles",
     "zipTestConfigsWithApks",
 
     ":camera:integration-tests:camera-testapp-core:mergeLibDexDebug",
@@ -123,10 +118,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":camera:integration-tests:camera-testapp-view:GenerateTestConfigurationdebugAndroidTest",
     ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-view:packageDebug",
-
-    ":inspection:inspection-gradle-plugin:generatePomFileForInspectionPluginMarkerMavenPublication",
-    ":inspection:inspection-gradle-plugin:" +
-        "publishInspectionPluginMarkerMavenPublicationToMavenRepository"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
