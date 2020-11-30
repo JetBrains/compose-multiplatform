@@ -19,111 +19,73 @@ package androidx.compose.ui.node
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.Applier
+import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.viewinterop.AndroidViewHolder
 import androidx.compose.ui.viewinterop.InternalInteropApi
 import androidx.compose.ui.viewinterop.ViewBlockHolder
 
-// TODO: evaluate if this class is necessary or not
-private class Stack<T> {
-    private val backing = ArrayList<T>()
-
-    val size: Int get() = backing.size
-
-    fun push(value: T) = backing.add(value)
-    fun pop(): T = backing.removeAt(size - 1)
-    fun peek(): T = backing[size - 1]
-    fun isEmpty() = backing.isEmpty()
-    fun isNotEmpty() = !isEmpty()
-    fun clear() = backing.clear()
-}
-
-class UiApplier(
-    private val root: Any
-) : Applier<Any> {
-    private val stack = Stack<Any>()
-    private data class PendingInsert(val index: Int, val instance: Any)
-    // TODO(b/159073250): remove
-    private val pendingInserts = Stack<PendingInsert>()
-
+class UiApplier(root: Any) : AbstractApplier<Any>(root) {
     private fun invalidNode(node: Any): Nothing =
         error("Unsupported node type ${node.javaClass.simpleName}")
 
-    override var current: Any = root
-        private set
-
-    override fun down(node: Any) {
-        stack.push(current)
-        current = node
-    }
-
     override fun up() {
         val instance = current
-        val parent = stack.pop()
-        current = parent
-        // TODO(lmr): We should strongly consider removing this ViewAdapter concept
+        super.up()
+        val parent = current
+        if (parent is ViewGroup && instance is View) {
+            instance.getViewAdapterIfExists()?.didUpdate(instance, parent)
+        }
+    }
+
+    override fun insertTopDown(index: Int, instance: Any) {
+        // Ignored. Insert is performed in [insertBottomUp] to build the tree bottom-up to avoid
+        // duplicate notification when the child nodes enter the tree.
+    }
+
+    override fun insertBottomUp(index: Int, instance: Any) {
         val adapter = when (instance) {
             is View -> instance.getViewAdapterIfExists()
             else -> null
         }
-        if (pendingInserts.isNotEmpty()) {
-            val pendingInsert = pendingInserts.peek()
-            if (pendingInsert.instance == instance) {
-                val index = pendingInsert.index
-                pendingInserts.pop()
-                when (parent) {
-                    is ViewGroup ->
-                        when (instance) {
-                            is View -> {
-                                adapter?.willInsert(instance, parent)
-                                parent.addView(instance, index)
-                                adapter?.didInsert(instance, parent)
-                            }
-                            is LayoutNode -> {
-                                val composeView = AndroidComposeView(parent.context)
-                                parent.addView(composeView, index)
-                                composeView.root.insertAt(0, instance)
-                            }
-                            else -> invalidNode(instance)
-                        }
-                    is LayoutNode ->
-                        when (instance) {
-                            is View -> {
-                                // Wrap the instance in an AndroidViewHolder, unless the instance
-                                // itself is already one.
-                                @OptIn(InternalInteropApi::class)
-                                val androidViewHolder =
-                                    if (instance is AndroidViewHolder) {
-                                        instance
-                                    } else {
-                                        ViewBlockHolder<View>(instance.context).apply {
-                                            view = instance
-                                        }
-                                    }
-
-                                parent.insertAt(index, androidViewHolder.toLayoutNode())
-                            }
-                            is LayoutNode -> parent.insertAt(index, instance)
-                            else -> invalidNode(instance)
-                        }
-                    else -> invalidNode(parent)
+        when (val parent = current) {
+            is ViewGroup ->
+                when (instance) {
+                    is View -> {
+                        adapter?.willInsert(instance, parent)
+                        parent.addView(instance, index)
+                        adapter?.didInsert(instance, parent)
+                    }
+                    is LayoutNode -> {
+                        val composeView = AndroidComposeView(parent.context)
+                        parent.addView(composeView, index)
+                        composeView.root.insertAt(0, instance)
+                    }
+                    else -> invalidNode(instance)
                 }
-                return
-            }
-        }
-        if (parent is ViewGroup)
-            adapter?.didUpdate(instance as View, parent)
-    }
+            is LayoutNode ->
+                when (instance) {
+                    is View -> {
+                        // Wrap the instance in an AndroidViewHolder, unless the instance
+                        // itself is already one.
+                        @OptIn(InternalInteropApi::class)
+                        val androidViewHolder =
+                            if (instance is AndroidViewHolder) {
+                                instance
+                            } else {
+                                ViewBlockHolder<View>(instance.context).apply {
+                                    view = instance
+                                }
+                            }
 
-    override fun insert(index: Int, instance: Any) {
-        pendingInserts.push(
-            PendingInsert(
-                index,
-                instance
-            )
-        )
+                        parent.insertAt(index, androidViewHolder.toLayoutNode())
+                    }
+                    is LayoutNode -> parent.insertAt(index, instance)
+                    else -> invalidNode(instance)
+                }
+            else -> invalidNode(parent)
+        }
     }
 
     override fun remove(index: Int, count: Int) {
@@ -162,9 +124,7 @@ class UiApplier(
         }
     }
 
-    override fun clear() {
-        stack.clear()
-        current = root
+    override fun onClear() {
         when (root) {
             is ViewGroup -> root.removeAllViews()
             is LayoutNode -> root.removeAll()

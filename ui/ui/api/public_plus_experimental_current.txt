@@ -678,7 +678,8 @@ package androidx.compose.ui.graphics.vector {
 
   public final class VectorApplier extends androidx.compose.runtime.AbstractApplier<androidx.compose.ui.graphics.vector.VNode> {
     ctor public VectorApplier(androidx.compose.ui.graphics.vector.VNode root);
-    method public void insert(int index, androidx.compose.ui.graphics.vector.VNode instance);
+    method public void insertBottomUp(int index, androidx.compose.ui.graphics.vector.VNode instance);
+    method public void insertTopDown(int index, androidx.compose.ui.graphics.vector.VNode instance);
     method public void move(int from, int to, int count);
     method protected void onClear();
     method public void remove(int index, int count);
@@ -2079,16 +2080,13 @@ package androidx.compose.ui.node {
     property public final T? value;
   }
 
-  public final class UiApplier implements androidx.compose.runtime.Applier<java.lang.Object> {
+  public final class UiApplier extends androidx.compose.runtime.AbstractApplier<java.lang.Object> {
     ctor public UiApplier(Object root);
-    method public void clear();
-    method public void down(Object node);
-    method public Object getCurrent();
-    method public void insert(int index, Object instance);
+    method public void insertBottomUp(int index, Object instance);
+    method public void insertTopDown(int index, Object instance);
     method public void move(int from, int to, int count);
+    method protected void onClear();
     method public void remove(int index, int count);
-    method public void up();
-    property public Object current;
   }
 
   public final class ViewInteropKt {
