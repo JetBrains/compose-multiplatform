@@ -5,13 +5,12 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.TaskContainer
-import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
+import org.jetbrains.compose.desktop.application.tasks.AbstractRunDistributableTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
@@ -53,32 +52,47 @@ internal fun Project.configureFromMppPlugin(mainApplication: Application) {
 
 internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
     for (app in apps) {
-        configureRunTask(app)
-        configurePackagingTasks(app)
-        configurePackageUberJarForCurrentOS(app)
-    }
-}
+        val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
+            configureRunTask(app)
+        }
 
-internal fun Project.configurePackagingTasks(app: Application): TaskProvider<DefaultTask> {
-    val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
-        tasks.composeTask<AbstractJPackageTask>(
-            taskName("package", app, targetFormat.name),
-            args = listOf(targetFormat)
+        val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
+            tasks.composeTask<AbstractJPackageTask>(
+                taskName("package", app, targetFormat.name),
+                args = listOf(targetFormat)
+            ) {
+                configurePackagingTask(app)
+            }
+        }
+
+        val packageAll = tasks.composeTask<DefaultTask>(taskName("package", app)) {
+            dependsOn(packageFormats)
+        }
+
+        val packageUberJarForCurrentOS = project.tasks.composeTask<Jar>(taskName("package", app, "uberJarForCurrentOS")) {
+            configurePackageUberJarForCurrentOS(app)
+        }
+
+        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
+            taskName("createDistributable", app),
+            args = listOf(TargetFormat.AppImage)
         ) {
             configurePackagingTask(app)
         }
-    }
-    return tasks.composeTask<DefaultTask>(taskName("package", app)) {
-        dependsOn(packageFormats)
+
+        val runDistributable = project.tasks.composeTask<AbstractRunDistributableTask>(
+            taskName("runDistributable", app),
+            args = listOf(createDistributable)
+        )
     }
 }
 
-internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
+internal fun AbstractJPackageTask.configurePackagingTask(
+    app: Application
+) {
     enabled = targetFormat.isCompatibleWithCurrentOS
 
-    if (targetFormat != TargetFormat.AppImage) {
-        configurePlatformSettings(app)
-    }
+    configurePlatformSettings(app)
 
     app.nativeDistributions.let { executables ->
         packageName.set(app._packageNameProvider(project))
@@ -88,7 +102,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
         packageVersion.set(app._packageVersionInternal(project))
     }
 
-    destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
+    destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.outputDirName}") })
     javaHome.set(provider { app.javaHomeOrDefault() })
 
     launcherMainJar.set(app.mainJar.orNull)
@@ -147,33 +161,30 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
     }
 }
 
-private fun Project.configureRunTask(app: Application) {
-    project.tasks.composeTask<JavaExec>(taskName("run", app)) {
-        mainClass.set(provider { app.mainClass })
-        executable(javaExecutable(app.javaHomeOrDefault()))
-        jvmArgs = app.jvmArgs
-        args = app.args
+private fun JavaExec.configureRunTask(app: Application) {
+    mainClass.set(provider { app.mainClass })
+    executable(javaExecutable(app.javaHomeOrDefault()))
+    jvmArgs = app.jvmArgs
+    args = app.args
 
-        val cp = objects.fileCollection()
-        // adding a null value will cause future invocations of `from` to throw an NPE
-        app.mainJar.orNull?.let { cp.from(it) }
-        cp.from(app._fromFiles)
-        dependsOn(*app._dependenciesTaskNames.toTypedArray())
+    val cp = project.objects.fileCollection()
+    // adding a null value will cause future invocations of `from` to throw an NPE
+    app.mainJar.orNull?.let { cp.from(it) }
+    cp.from(app._fromFiles)
+    dependsOn(*app._dependenciesTaskNames.toTypedArray())
 
-        app._configurationSource?.let { configSource ->
-            dependsOn(configSource.jarTaskName)
-            cp.from(configSource.runtimeClasspath)
-        }
-
-        classpath = cp
+    app._configurationSource?.let { configSource ->
+        dependsOn(configSource.jarTaskName)
+        cp.from(configSource.runtimeClasspath)
     }
+
+    classpath = cp
 }
 
-private fun Project.configurePackageUberJarForCurrentOS(app: Application) =
-    project.tasks.composeTask<Jar>(taskName("package", app, "uberJarForCurrentOS")) {
+private fun Jar.configurePackageUberJarForCurrentOS(app: Application) {
         fun flattenJars(files: FileCollection): FileCollection =
             project.files({
-                files.map { if (it.isZipOrJar()) zipTree(it) else it }
+                files.map { if (it.isZipOrJar()) project.zipTree(it) else it }
             })
 
         // adding a null value will cause future invocations of `from` to throw an NPE
@@ -204,11 +215,6 @@ private fun File.isZipOrJar() =
 
 private fun Application.javaHomeOrDefault(): String =
     javaHome ?: System.getProperty("java.home")
-
-private fun javaExecutable(javaHome: String): String {
-    val executableName = if (currentOS == OS.Windows) "java.exe" else "java"
-    return File(javaHome).resolve("bin/$executableName").absolutePath
-}
 
 private inline fun <reified T : Task> TaskContainer.composeTask(
     name: String,
