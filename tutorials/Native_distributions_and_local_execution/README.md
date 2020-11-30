@@ -54,6 +54,11 @@ The task is available starting from the M2 release.
 The task expects `compose.desktop.currentOS` to be used as a `compile`/`implementation`/`runtime` dependency.
 * `run` is used to run an app locally. You need to define a `mainClass` — an fq-name of a class, 
 containing the `main` function.
+Note, that `run` starts a non-packaged JVM application with full runtime.
+This is faster and easier to debug, than creating a compact binary image with minified runtime.
+To run a final binary image, use `runDistributable` instead.
+* `createDistributable` is used to create a prepackaged application image a final application image without creating an installer. 
+* `runDistributable` is used to run a prepackaged application image. 
   
 Note, that the tasks are created only if the `application` block/property is used in a script.
 

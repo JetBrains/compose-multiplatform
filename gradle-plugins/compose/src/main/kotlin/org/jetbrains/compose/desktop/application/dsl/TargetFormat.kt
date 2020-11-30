@@ -19,6 +19,9 @@ enum class TargetFormat(
 
     internal fun isCompatibleWith(targetOS: OS): Boolean = targetOS in compatibleOSs
 
+    val outputDirName: String
+        get() = if (this == AppImage) "app" else id
+
     val fileExt: String
         get() {
             check(this != AppImage) { "$this cannot have a file extension" }

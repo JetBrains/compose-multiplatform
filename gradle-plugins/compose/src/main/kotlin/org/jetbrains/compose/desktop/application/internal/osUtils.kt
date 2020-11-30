@@ -1,5 +1,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
+import java.io.File
+
 internal enum class OS(val id: String) {
     Linux("linux"),
     Windows("windows"),
@@ -38,3 +40,9 @@ internal val currentOS: OS by lazy {
         else -> error("Unknown OS name: $os")
     }
 }
+
+internal fun executableName(nameWithoutExtension: String): String =
+    if (currentOS == OS.Windows) "$nameWithoutExtension.exe" else nameWithoutExtension
+
+internal fun javaExecutable(javaHome: String): String =
+    File(javaHome).resolve("bin/${executableName("java")}").absolutePath

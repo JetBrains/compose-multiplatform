@@ -19,11 +19,20 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     tasks.getByName("run").doFirst {
                         throw new StopExecutionException("Skip run task")
                     }
+                    
+                    tasks.getByName("runDistributable").doFirst {
+                        throw new StopExecutionException("Skip runDistributable task")
+                    }
                 }
             """.trimIndent()
         }
-        val result = gradle("run").build()
-        assertEquals(TaskOutcome.SUCCESS, result.task(":run")?.outcome)
+        gradle("run").build().let { result ->
+            assertEquals(TaskOutcome.SUCCESS, result.task(":run")?.outcome)
+        }
+        gradle("runDistributable").build().let { result ->
+            assertEquals(TaskOutcome.SUCCESS, result.task(":createDistributable")!!.outcome)
+            assertEquals(TaskOutcome.SUCCESS, result.task(":runDistributable")?.outcome)
+        }
     }
 
     @Test
