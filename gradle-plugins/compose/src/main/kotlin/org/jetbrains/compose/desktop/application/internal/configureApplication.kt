@@ -1,10 +1,14 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.*
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
@@ -51,6 +55,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
     for (app in apps) {
         configureRunTask(app)
         configurePackagingTasks(app)
+        configurePackageUberJarForCurrentOS(app)
     }
 }
 
@@ -76,14 +81,11 @@ internal fun AbstractJPackageTask.configurePackagingTask(app: Application) {
     }
 
     app.nativeDistributions.let { executables ->
-        packageName.set(provider { executables.packageName ?: project.name })
+        packageName.set(app._packageNameProvider(project))
         packageDescription.set(provider { executables.description })
         packageCopyright.set(provider { executables.copyright })
         packageVendor.set(provider { executables.vendor })
-        packageVersion.set(provider {
-                executables.version
-                    ?: project.version.toString().takeIf { it != "unspecified" }
-        })
+        packageVersion.set(app._packageVersionInternal(project))
     }
 
     destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.id}") })
@@ -167,6 +169,39 @@ private fun Project.configureRunTask(app: Application) {
     }
 }
 
+private fun Project.configurePackageUberJarForCurrentOS(app: Application) =
+    project.tasks.composeTask<Jar>(taskName("package", app, "uberJarForCurrentOS")) {
+        fun flattenJars(files: FileCollection): FileCollection =
+            project.files({
+                files.map { if (it.isZipOrJar()) zipTree(it) else it }
+            })
+
+        // adding a null value will cause future invocations of `from` to throw an NPE
+        app.mainJar.orNull?.let { from(it) }
+        from(flattenJars(app._fromFiles))
+        dependsOn(*app._dependenciesTaskNames.toTypedArray())
+
+        app._configurationSource?.let { configSource ->
+            dependsOn(configSource.jarTaskName)
+            from(flattenJars(configSource.runtimeClasspath))
+        }
+
+        app.mainClass?.let { manifest.attributes["Main-Class"] = it }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        archiveAppendix.set(currentTarget.id)
+        archiveBaseName.set(app._packageNameProvider(project))
+        archiveVersion.set(app._packageVersionInternal(project))
+        destinationDirectory.set(project.layout.buildDirectory.dir("compose/jars"))
+
+        doLast {
+            logger.lifecycle("The jar is written to ${archiveFile.get().asFile.canonicalPath}")
+        }
+    }
+
+private fun File.isZipOrJar() =
+    name.endsWith(".jar", ignoreCase = true)
+        || name.endsWith(".zip", ignoreCase = true)
+
 private fun Application.javaHomeOrDefault(): String =
     javaHome ?: System.getProperty("java.home")
 
@@ -185,6 +220,15 @@ private inline fun <reified T : Task> TaskContainer.composeTask(
         it.configureFn()
     }
 }
+
+internal fun Application._packageNameProvider(project: Project): Provider<String> =
+    project.provider { nativeDistributions.packageName ?: project.name }
+
+internal fun Application._packageVersionInternal(project: Project): Provider<String?> =
+    project.provider {
+        nativeDistributions.version
+            ?: project.version.toString().takeIf { it != "unspecified" }
+    }
 
 @OptIn(ExperimentalStdlibApi::class)
 private fun taskName(action: String, app: Application, suffix: String? = null): String =

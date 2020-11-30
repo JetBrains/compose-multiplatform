@@ -3,9 +3,12 @@ package org.jetbrains.compose
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
+import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.test.*
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.util.jar.JarFile
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -30,15 +33,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun packageJvm() = with(testProject(TestProjects.jvm)) {
-        testPackage()
+        testPackageNativeExecutables()
     }
 
     @Test
     fun packageMpp() = with(testProject(TestProjects.mpp)) {
-        testPackage()
+        testPackageNativeExecutables()
     }
 
-    private fun TestProject.testPackage() {
+    private fun TestProject.testPackageNativeExecutables() {
         val result = gradle(":package").build()
         val ext = when (currentOS) {
             OS.Linux -> "deb"
@@ -49,5 +52,33 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             .checkExists()
         assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.capitalize()}")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":package")?.outcome)
+    }
+
+    @Test
+    fun packageUberJarForCurrentOSJvm() = with(testProject(TestProjects.jvm)) {
+        testPackageNativeExecutables()
+    }
+
+    @Test
+    fun packageUberJarForCurrentOSMpp() = with(testProject(TestProjects.mpp)) {
+        testPackageNativeExecutables()
+    }
+
+    private fun TestProject.testPackageUberJarForCurrentOS() {
+        gradle(":packageUberJarForCurrentOS").build().let { result ->
+            assertEquals(TaskOutcome.SUCCESS, result.task(":packageUberJarForCurrentOS")?.outcome)
+
+            val resultJarFile = file("build/compose/jars/simple-${currentTarget.id}-1.0.jar")
+            resultJarFile.checkExists()
+
+            JarFile(resultJarFile).use { jar ->
+                val mainClass = jar.manifest.mainAttributes.getValue("Main-Class")
+                assertEquals("MainKt", mainClass, "Unexpected main class")
+
+                jar.entries().toList().mapTo(HashSet()) { it.name }.apply {
+                    checkContains("MainKt.class", "org/jetbrains/skiko/SkiaWindow.class")
+                }
+            }
+        }
     }
 }

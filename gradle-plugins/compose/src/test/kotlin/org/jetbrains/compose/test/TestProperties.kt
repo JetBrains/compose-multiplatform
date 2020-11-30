@@ -1,7 +1,8 @@
 package org.jetbrains.compose.test
 
 object TestProperties {
-    val kotlinVersion: String = "1.4.0"
+    // __KOTLIN_COMPOSE_VERSION__
+    val kotlinVersion: String = "1.4.20"
 
     val composeVersion: String
         get() = System.getProperty("compose.plugin.version")!!
