@@ -486,17 +486,17 @@ class AffectedModuleDetectorImpl constructor(
                 ":compose:material:material"
             ),
             setOf(
-                ":benchmark:integration-tests:macrobenchmark",
-                ":benchmark:integration-tests:macrobenchmark-target"
-            ),
-            setOf(
                 ":benchmark:benchmark-macro",
                 ":benchmark:integration-tests:macrobenchmark-target"
-            ),
+            ), // link benchmark-macro's correctness test and its target
+            setOf(
+                ":benchmark:integration-tests:macrobenchmark",
+                ":benchmark:integration-tests:macrobenchmark-target"
+            ), // link benchmark's macrobenchmark and its target
             setOf(
                 ":compose:integration-tests:macrobenchmark",
-                ":compose:integration-tests:demos"
-            ),
+                ":compose:integration-tests:macrobenchmark-target"
+            ), // link compose's macrobenchmark and its target
         )
     }
 }
