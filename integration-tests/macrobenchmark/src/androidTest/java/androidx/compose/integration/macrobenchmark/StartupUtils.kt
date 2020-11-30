@@ -16,12 +16,14 @@
 
 package androidx.compose.integration.macrobenchmark
 
+import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.MacrobenchmarkConfig
 import androidx.benchmark.macro.MacrobenchmarkRule
-import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
+
+const val TargetPackage = "androidx.compose.integration.demos"
 
 /**
  * Simplified interface for standardizing e.g. package,
@@ -29,22 +31,25 @@ import androidx.benchmark.macro.StartupTimingMetric
  */
 fun MacrobenchmarkRule.measureStartup(
     profileCompiled: Boolean,
-    coldLaunch: Boolean,
-    performStartup: MacrobenchmarkScope.() -> Unit = {
-        pressHome()
-        launchPackageAndWait()
-    }
+    startupMode: StartupMode,
+    iterations: Int = 5,
+    setupIntent: Intent.() -> Unit = {}
 ) = measureStartupRepeated(
     MacrobenchmarkConfig(
-        packageName = "androidx.compose.integration.demos",
+        packageName = TargetPackage,
         metrics = listOf(StartupTimingMetric()),
         compilationMode = if (profileCompiled) {
             CompilationMode.SpeedProfile(warmupIterations = 3)
         } else {
             CompilationMode.None
         },
-        iterations = 10
+        iterations = iterations
     ),
-    startupMode = if (coldLaunch) StartupMode.COLD else StartupMode.WARM,
-    performStartup
-)
+    startupMode = startupMode
+) {
+    pressHome()
+    val intent = Intent()
+    intent.setPackage(TargetPackage)
+    setupIntent(intent)
+    launchIntentAndWait(intent)
+}
