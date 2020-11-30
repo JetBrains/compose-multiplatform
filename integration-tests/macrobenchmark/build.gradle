@@ -40,4 +40,4 @@ dependencies {
 
 // Define a task dependency so the app is installed before we run macro benchmarks.
 tasks.getByPath(':compose:integration-tests:macrobenchmark:connectedCheck')
-    .dependsOn(tasks.getByPath(':compose:integration-tests:demos:installRelease'))
+    .dependsOn(tasks.getByPath(':compose:integration-tests:macrobenchmark-target:installRelease'))

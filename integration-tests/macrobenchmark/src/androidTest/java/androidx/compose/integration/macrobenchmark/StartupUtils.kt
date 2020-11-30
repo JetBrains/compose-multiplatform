@@ -23,7 +23,7 @@ import androidx.benchmark.macro.MacrobenchmarkRule
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 
-const val TargetPackage = "androidx.compose.integration.demos"
+const val TargetPackage = "androidx.compose.integration.macrobenchmark.target"
 
 /**
  * Simplified interface for standardizing e.g. package,
