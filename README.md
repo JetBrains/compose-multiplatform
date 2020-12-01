@@ -27,3 +27,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [Building native distribution](tutorials/Native_distributions_and_local_execution)
        * [Window control API](tutorials/Window_API)
        * [Swing interoperability](tutorials/Swing_Integration)
+       
+## Getting latest version of Compose for Desktop ##
+
+See https://github.com/JetBrains/compose-jb/tags for the latest build number.
