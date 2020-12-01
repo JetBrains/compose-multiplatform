@@ -476,8 +476,8 @@ object BackdropScaffoldConstants {
     /**
      * The default shape of the front layer.
      */
-    @Composable
     val DefaultFrontLayerShape: Shape
+        @Composable
         get() = MaterialTheme.shapes.large
             .copy(topLeft = CornerSize(16.dp), topRight = CornerSize(16.dp))
 
@@ -489,9 +489,8 @@ object BackdropScaffoldConstants {
     /**
      * The default color of the scrim applied to the front layer.
      */
-    @Composable
     val DefaultFrontLayerScrimColor: Color
-        get() = MaterialTheme.colors.surface.copy(alpha = 0.60f)
+        @Composable get() = MaterialTheme.colors.surface.copy(alpha = 0.60f)
 }
 
 private val AnimationSlideOffset = 20.dp

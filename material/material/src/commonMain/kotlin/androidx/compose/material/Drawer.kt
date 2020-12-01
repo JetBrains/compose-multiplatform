@@ -537,8 +537,8 @@ object DrawerConstants {
      */
     val DefaultElevation = 16.dp
 
-    @Composable
     val defaultScrimColor: Color
+        @Composable
         get() = MaterialTheme.colors.onSurface.copy(alpha = ScrimDefaultOpacity)
 
     /**

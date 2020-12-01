@@ -69,9 +69,10 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
      * @sample androidx.compose.runtime.samples.consumeAmbient
      */
     @OptIn(ComposeCompilerApi::class)
-    @ComposableContract(readonly = true)
-    @Composable
-    inline val current: T get() = currentComposer.consume(this)
+    inline val current: T
+        @ComposableContract(readonly = true)
+        @Composable
+        get() = currentComposer.consume(this)
 }
 
 /**

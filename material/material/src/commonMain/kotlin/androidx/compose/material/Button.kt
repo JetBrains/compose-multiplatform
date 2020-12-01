@@ -464,8 +464,8 @@ object ButtonConstants {
     /**
      * The default disabled content color used by all types of [Button]s
      */
-    @Composable
     val defaultOutlinedBorder: BorderStroke
+        @Composable
         get() = BorderStroke(
             OutlinedBorderSize, MaterialTheme.colors.onSurface.copy(alpha = OutlinedBorderOpacity)
         )

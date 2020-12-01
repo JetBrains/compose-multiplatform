@@ -332,7 +332,7 @@ object ModalBottomSheetConstants {
     /**
      * The default scrim color used by [ModalBottomSheetLayout].
      */
-    @Composable
     val DefaultScrimColor: Color
+        @Composable
         get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
 }

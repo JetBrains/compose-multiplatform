@@ -94,9 +94,9 @@ object MaterialTheme {
      *
      * @sample androidx.compose.material.samples.ThemeColorSample
      */
-    @Composable
-    @ComposableContract(readonly = true)
     val colors: Colors
+        @Composable
+        @ComposableContract(readonly = true)
         get() = AmbientColors.current
 
     /**
@@ -104,17 +104,17 @@ object MaterialTheme {
      *
      * @sample androidx.compose.material.samples.ThemeTextStyleSample
      */
-    @Composable
-    @ComposableContract(readonly = true)
     val typography: Typography
+        @Composable
+        @ComposableContract(readonly = true)
         get() = AmbientTypography.current
 
     /**
      * Retrieves the current [Shapes] at the call site's position in the hierarchy.
      */
-    @Composable
-    @ComposableContract(readonly = true)
     val shapes: Shapes
+        @Composable
+        @ComposableContract(readonly = true)
         get() = AmbientShapes.current
 }
 
