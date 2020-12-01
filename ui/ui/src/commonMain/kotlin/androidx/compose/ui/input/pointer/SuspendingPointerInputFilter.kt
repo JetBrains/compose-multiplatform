@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAll
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
@@ -335,7 +336,7 @@ internal class SuspendingPointerInputFilter(
     override suspend fun <R> handlePointerInput(
         handler: suspend HandlePointerInputScope.() -> R
     ): R = suspendCancellableCoroutine { continuation ->
-        val handlerCoroutine = PointerEventHandlerCoroutine(continuation, this)
+        val handlerCoroutine = PointerEventHandlerCoroutine(continuation)
         synchronized(pointerHandlers) {
             pointerHandlers += handlerCoroutine
 
@@ -354,6 +355,10 @@ internal class SuspendingPointerInputFilter(
             // without running too late due to dispatch.
             handler.createCoroutine(handlerCoroutine, handlerCoroutine).resume(Unit)
         }
+
+        // Restricted suspension handler coroutines can't propagate structured job cancellation
+        // automatically as the context must be EmptyCoroutineContext; do it manually instead.
+        continuation.invokeOnCancellation { handlerCoroutine.cancel(it) }
     }
 
     /**
@@ -366,16 +371,19 @@ internal class SuspendingPointerInputFilter(
      */
     private inner class PointerEventHandlerCoroutine<R>(
         private val completion: Continuation<R>,
-        private val pointerInputFilter: SuspendingPointerInputFilter,
-    ) : HandlePointerInputScope, Density by pointerInputFilter, Continuation<R> {
-        private var pointerAwaiter: Continuation<PointerEvent>? = null
-        private var customAwaiter: Continuation<CustomEvent>? = null
+    ) : HandlePointerInputScope, Density by this@SuspendingPointerInputFilter, Continuation<R> {
+        private var pointerAwaiter: CancellableContinuation<PointerEvent>? = null
+        private var customAwaiter: CancellableContinuation<CustomEvent>? = null
         private var awaitPass: PointerEventPass = PointerEventPass.Main
 
-        override val currentEvent: PointerEvent get() = pointerInputFilter.currentEvent!!
-        override val size: IntSize get() = pointerInputFilter.boundsSize
+        override val currentEvent: PointerEvent
+            get() = checkNotNull(this@SuspendingPointerInputFilter.currentEvent) {
+                "cannot access currentEvent outside of input dispatch"
+            }
+        override val size: IntSize
+            get() = this@SuspendingPointerInputFilter.boundsSize
         override val viewConfiguration: ViewConfiguration
-            get() = pointerInputFilter.viewConfiguration
+            get() = this@SuspendingPointerInputFilter.viewConfiguration
 
         fun offerPointerEvent(event: PointerEvent, pass: PointerEventPass) {
             if (pass == awaitPass) {
@@ -395,8 +403,16 @@ internal class SuspendingPointerInputFilter(
             }
         }
 
-        override val context: CoroutineContext =
-            EmptyCoroutineContext
+        // Called to run any finally blocks in the handlePointerInput block
+        fun cancel(cause: Throwable?) {
+            pointerAwaiter?.cancel(cause)
+            pointerAwaiter = null
+            customAwaiter?.cancel(cause)
+            customAwaiter = null
+        }
+
+        // context must be EmptyCoroutineContext for restricted suspension coroutines
+        override val context: CoroutineContext = EmptyCoroutineContext
 
         // Implementation of Continuation; clean up and resume our wrapped continuation.
         override fun resumeWith(result: Result<R>) {
