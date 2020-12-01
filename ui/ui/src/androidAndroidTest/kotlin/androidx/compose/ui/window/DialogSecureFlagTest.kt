@@ -74,7 +74,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnDialogToDisabled() {
         rule.setContent {
-            TestDialog(AndroidDialogProperties(SecureFlagPolicy.SecureOff))
+            TestDialog(AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOff))
         }
 
         // This tests that we also override the flag from the Activity
@@ -84,7 +84,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnDialogToEnabled() {
         rule.setContent {
-            TestDialog(AndroidDialogProperties(SecureFlagPolicy.SecureOn))
+            TestDialog(AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOn))
         }
 
         assertThat(isSecureFlagEnabledForDialog()).isTrue()
@@ -93,7 +93,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun toggleFlagOnDialog() {
         var properties: AndroidDialogProperties?
-        by mutableStateOf(AndroidDialogProperties(SecureFlagPolicy.SecureOff))
+        by mutableStateOf(AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOff))
 
         rule.setContent {
             TestDialog(properties)
@@ -102,11 +102,11 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
         assertThat(isSecureFlagEnabledForDialog()).isFalse()
 
         // Toggle flag
-        properties = AndroidDialogProperties(SecureFlagPolicy.SecureOn)
+        properties = AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOn)
         assertThat(isSecureFlagEnabledForDialog()).isTrue()
 
         // Set to inherit
-        properties = AndroidDialogProperties(SecureFlagPolicy.Inherit)
+        properties = AndroidDialogProperties(securePolicy = SecureFlagPolicy.Inherit)
         assertThat(isSecureFlagEnabledForDialog()).isEqualTo(setSecureFlagOnActivity)
     }
 
