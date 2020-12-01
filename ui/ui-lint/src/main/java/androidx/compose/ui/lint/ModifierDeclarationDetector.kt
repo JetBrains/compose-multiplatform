@@ -30,6 +30,7 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiType
 import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
@@ -41,6 +42,8 @@ import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtUserType
 import org.jetbrains.kotlin.psi.psiUtil.containingClass
 import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.toUElement
+import org.jetbrains.uast.tryResolve
 import java.util.EnumSet
 
 /**
@@ -207,15 +210,26 @@ private fun UMethod.checkReceiver(context: JavaContext) {
                 .build()
         )
     } else {
-        val receiverType = (receiverTypeReference.typeElement as KtUserType).referencedName
-        // A receiver that isn't Modifier
-        if (receiverType != ModifierShortName) {
+        val receiverType = (receiverTypeReference.typeElement as KtUserType)
+        val receiverShortName = receiverType.referencedName
+        // Try to resolve the class definition of the receiver
+        val receiverFqn = (
+            receiverType.referenceExpression.toUElement()?.tryResolve().toUElement() as? PsiClass
+            )?.qualifiedName
+        val hasModifierReceiver = if (receiverFqn != null) {
+            // If we could resolve the class, match fqn
+            receiverFqn == ModifierFqn
+        } else {
+            // Otherwise just try and match the short names
+            receiverShortName == ModifierShortName
+        }
+        if (!hasModifierReceiver) {
             report(
                 LintFix.create()
                     .replace()
                     .name("Change receiver to Modifier")
                     .range(context.getLocation(source))
-                    .text(receiverType)
+                    .text(receiverShortName)
                     .with(ModifierShortName)
                     .autoFix()
                     .build()
