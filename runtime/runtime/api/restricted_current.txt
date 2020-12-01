@@ -294,19 +294,6 @@ package androidx.compose.runtime {
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NoLiveLiterals {
   }
 
-  public final class ObserverMap<K, V> {
-    ctor public ObserverMap();
-    method public void add(K key, V value);
-    method public void clear();
-    method public void clearValues(kotlin.jvm.functions.Function1<? super V,java.lang.Boolean> predicate);
-    method public boolean contains(K key, V value);
-    method public operator java.util.List<V> get(Iterable<? extends K> keys);
-    method public java.util.List<V> getValueOf(K key);
-    method public void remove(K key);
-    method public void remove(K key, V value);
-    method public void removeValue(V value);
-  }
-
   @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.CompositionLifecycleObserver {
     ctor public PreCommitScopeImpl(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
