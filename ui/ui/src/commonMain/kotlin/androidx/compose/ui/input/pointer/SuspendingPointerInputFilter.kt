@@ -177,7 +177,7 @@ private val DownChangeConsumed = ConsumedData(downChange = true)
  * a LayoutNode.
  *
  * [SuspendingPointerInputFilter] implements the [PointerInputScope] used to offer the
- * [Modifier.pointerInput] DSL and carries the [Density] from [DensityAmbient] at the point of
+ * [Modifier.pointerInput] DSL and carries the [Density] from [AmbientDensity] at the point of
  * the modifier's materialization. Even if this value were returned to the [PointerInputFilter]
  * callbacks, we would still need the value at composition time in order for [Modifier.pointerInput]
  * to begin its internal [LaunchedEffect] for the provided code block.
@@ -236,6 +236,13 @@ internal class SuspendingPointerInputFilter(
     private var lastPointerEvent: PointerEvent? = null
 
     /**
+     * The size of the bounds of this input filter. Normally [PointerInputFilter.size] can
+     * be used, but for tests, it is better to not rely on something set to an `internal`
+     * method.
+     */
+    private var boundsSize: IntSize = IntSize.Zero
+
+    /**
      * Snapshot the current [pointerHandlers] and run [block] on each one.
      * May not be called reentrant or concurrent with itself.
      *
@@ -255,13 +262,9 @@ internal class SuspendingPointerInputFilter(
         try {
             when (pass) {
                 PointerEventPass.Initial, PointerEventPass.Final ->
-                    dispatchingPointerHandlers.forEach {
-                        block(it)
-                    }
+                    dispatchingPointerHandlers.forEach(block)
                 PointerEventPass.Main ->
-                    dispatchingPointerHandlers.forEachReversed {
-                        block(it)
-                    }
+                    dispatchingPointerHandlers.forEachReversed(block)
             }
         } finally {
             dispatchingPointerHandlers.clear()
@@ -286,6 +289,7 @@ internal class SuspendingPointerInputFilter(
         pass: PointerEventPass,
         bounds: IntSize
     ) {
+        boundsSize = bounds
         if (pass == PointerEventPass.Initial) {
             currentPointers.clear()
             pointerEvent.changes.fastMapTo(currentPointers) { it.current }
@@ -336,7 +340,7 @@ internal class SuspendingPointerInputFilter(
         val handlerCoroutine = PointerEventHandlerCoroutine(
             continuation,
             currentPointers,
-            size,
+            boundsSize,
             viewConfiguration,
             this
         )
