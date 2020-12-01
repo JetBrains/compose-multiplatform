@@ -95,6 +95,32 @@ inline fun <T : Any?, reified E : Applier<*>> emit(
     currentComposer.endNode()
 }
 
+/**
+ * Emits a node into the composition of type [T]. Nodes emitted inside of [content] will become
+ * children of the emitted node.
+ *
+ * This function will throw a runtime exception if [E] is not a subtype of the applier of the
+ * [currentComposer].
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param ctor A function which will create a new instance of [T]. This function is NOT
+ * guaranteed to be called in place.
+ * @param update A function to perform updates on the node. This will run every time emit is
+ * executed. This function is called in place and will be inlined.
+ * @param skippableUpdate A function to perform updates on the node. Unlike [update], this
+ * function is Composable and will therefore be skipped unless it has been invalidated by some
+ * other mechanism. This can be useful to perform expensive calculations for updating the node
+ * where the calculations are likely to have the same inputs over time, so the function's
+ * execution can be skipped.
+ * @param content the composable content that will emit the "children" of this node.
+ *
+ * @see Updater
+ * @see SkippableUpdater
+ * @see Applier
+ * @see emit
+ * @see compositionFor
+ */
 @Suppress("ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable @ComposableContract(readonly = true)
