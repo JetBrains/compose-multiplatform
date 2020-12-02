@@ -219,18 +219,19 @@ private class WrappedComposition(
 
     private var disposed = false
     private var addedToLifecycle: Lifecycle? = null
-    private var contentWaitingForCreated: @Composable () -> Unit = emptyContent()
+    private var lastContent: @Composable () -> Unit = emptyContent()
 
     @OptIn(InternalComposeApi::class)
     override fun setContent(content: @Composable () -> Unit) {
         owner.setOnViewTreeOwnersAvailable {
             if (!disposed) {
                 val lifecycle = it.lifecycleOwner.lifecycle
+                lastContent = content
                 if (addedToLifecycle == null) {
-                    lifecycle.addObserver(this)
                     addedToLifecycle = lifecycle
-                }
-                if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+                    // this will call ON_CREATE synchronously if we already created
+                    lifecycle.addObserver(this)
+                } else if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
                     original.setContent {
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
@@ -241,8 +242,6 @@ private class WrappedComposition(
                             ProvideAndroidAmbients(owner, content)
                         }
                     }
-                } else {
-                    contentWaitingForCreated = content
                 }
             }
         }
@@ -264,8 +263,7 @@ private class WrappedComposition(
             dispose()
         } else if (event == Lifecycle.Event.ON_CREATE) {
             if (!disposed) {
-                setContent(contentWaitingForCreated)
-                contentWaitingForCreated = emptyContent()
+                setContent(lastContent)
             }
         }
     }

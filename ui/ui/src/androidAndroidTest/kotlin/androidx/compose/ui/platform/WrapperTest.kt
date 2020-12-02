@@ -176,6 +176,7 @@ class WrapperTest {
         activityScenario.onActivity {
             var composed = false
             it.setContent {
+                check(!composed) { "the content is expected to be composed once" }
                 composed = true
             }
             assertTrue("setContent didn't compose the content synchronously", composed)
