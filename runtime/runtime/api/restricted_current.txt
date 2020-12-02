@@ -45,7 +45,8 @@ package androidx.compose.runtime {
     method public void clear();
     method public void down(N? node);
     method public N! getCurrent();
-    method public void insert(int index, N? instance);
+    method public void insertBottomUp(int index, N? instance);
+    method public void insertTopDown(int index, N? instance);
     method public void move(int from, int to, int count);
     method public default void onBeginChanges();
     method public default void onEndChanges();

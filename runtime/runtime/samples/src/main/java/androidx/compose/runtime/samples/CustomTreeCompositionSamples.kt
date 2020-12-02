@@ -41,8 +41,12 @@ fun CustomTreeComposition() {
     // We would implement an Applier class like the following, which would teach compose how to
     // manage a tree of Nodes.
     class NodeApplier(root: Node) : AbstractApplier<Node>(root) {
-        override fun insert(index: Int, instance: Node) {
+        override fun insertTopDown(index: Int, instance: Node) {
             current.children.add(index, instance)
+        }
+
+        override fun insertBottomUp(index: Int, instance: Node) {
+            // Ignored as the tree is built top-down.
         }
 
         override fun remove(index: Int, count: Int) {
