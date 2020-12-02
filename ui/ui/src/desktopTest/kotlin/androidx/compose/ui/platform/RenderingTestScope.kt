@@ -55,7 +55,7 @@ internal class RenderingTestScope(
         nanoTime = { currentTimeMillis * 1_000_000 }
     )
 
-    val surface: Surface = Surface.makeRasterN32Premul(width, height)
+    val surface: Surface = Surface.makeRasterN32Premul(width, height)!!
     val canvas: Canvas = surface.canvas
     val owners = DesktopOwners(
         invalidate = frameDispatcher::scheduleFrame

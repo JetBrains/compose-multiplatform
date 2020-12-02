@@ -159,7 +159,7 @@ class DesktopComposeTestRule : ComposeTestRule {
     }
 
     private fun performSetContent(composable: @Composable() () -> Unit) {
-        val surface = Surface.makeRasterN32Premul(displaySize.width, displaySize.height)
+        val surface = Surface.makeRasterN32Premul(displaySize.width, displaySize.height)!!
         val canvas = surface.canvas
         val owners = DesktopOwners(invalidate = {}).also {
             owners = it

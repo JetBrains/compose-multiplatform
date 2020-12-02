@@ -43,6 +43,8 @@ import java.awt.image.BufferedImage
  * @param menuBar Window menu bar. The menu bar can be displayed inside a window (Windows,
  * Linux) or at the top of the screen (Mac OS).
  * @param undecorated Removes the native window border if set to true. The default value is false.
+ * @param resizable Makes the window resizable if is set to true and unresizable if is set to
+ * false. The default value is true.
  * @param events Allows to describe events of the window.
  * Supported events: onOpen, onClose, onMinimize, onMaximize, onRestore, onFocusGet, onFocusLost,
  * onResize, onRelocate.
@@ -56,6 +58,7 @@ data class DesktopDialogProperties(
     val icon: BufferedImage? = null,
     val menuBar: MenuBar? = null,
     val undecorated: Boolean = false,
+    val resizable: Boolean = true,
     val events: WindowEvents = WindowEvents()
 ) : DialogProperties
 
@@ -86,6 +89,7 @@ internal actual fun ActualDialog(
             icon = desktopProperties.icon,
             menuBar = desktopProperties.menuBar,
             undecorated = desktopProperties.undecorated,
+            resizable = desktopProperties.resizable,
             events = desktopProperties.events,
             onDismissRequest = onDismissRequest
         )

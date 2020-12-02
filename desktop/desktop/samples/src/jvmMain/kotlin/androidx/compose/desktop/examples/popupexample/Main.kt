@@ -71,6 +71,7 @@ fun main() = SwingUtilities.invokeLater {
             ),
             Menu(
                 "About",
+                MenuItems.IsFullscreen,
                 MenuItems.About,
                 MenuItems.Update
             )

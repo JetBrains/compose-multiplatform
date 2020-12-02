@@ -114,6 +114,8 @@ class ComposePanel : JPanel {
     }
 
     override fun paint(g: Graphics?) {
+        super.paint(g)
+        layer?.reinit()
         needRedrawLayer()
     }
 }
