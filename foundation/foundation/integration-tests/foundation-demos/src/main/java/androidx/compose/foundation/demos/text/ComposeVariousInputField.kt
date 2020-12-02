@@ -16,13 +16,17 @@
 
 package androidx.compose.foundation.demos.text
 
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.LocaleList
@@ -231,6 +236,8 @@ fun VariousInputFieldDemo() {
                 style = TextStyle(fontSize = fontSize8)
             )
         }
+        TagLine(tag = "TextField InteractionState")
+        InteractionStateTextField()
     }
 }
 
@@ -273,5 +280,25 @@ private fun HintEditText(content: @Composable () -> Unit) {
         if (state.value.isEmpty()) {
             content()
         }
+    }
+}
+
+@Composable
+private fun InteractionStateTextField() {
+    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val interactionState = remember { InteractionState() }
+
+    Column(demoTextFieldModifiers) {
+        Text("Pressed?: ${interactionState.contains(Interaction.Pressed)}", fontSize = fontSize4)
+        Text("Focused?: ${interactionState.contains(Interaction.Focused)}", fontSize = fontSize4)
+        Text("Dragged?: ${interactionState.contains(Interaction.Dragged)}", fontSize = fontSize4)
+        BasicTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.value,
+            singleLine = true,
+            interactionState = interactionState,
+            onValueChange = { state.value = it },
+            textStyle = TextStyle(fontSize = fontSize8)
+        )
     }
 }

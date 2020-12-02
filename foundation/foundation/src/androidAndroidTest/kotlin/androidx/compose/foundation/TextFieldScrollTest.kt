@@ -112,6 +112,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -142,6 +143,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -172,6 +174,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -203,6 +206,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -231,6 +235,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -271,6 +276,7 @@ class TextFieldScrollTest {
                                 remember { scrollerPosition },
                                 value,
                                 VisualTransformation.None,
+                                remember { InteractionState() },
                                 textLayoutResultRef
                             )
                     )
@@ -316,6 +322,7 @@ class TextFieldScrollTest {
                                 remember { scrollerPosition },
                                 value,
                                 VisualTransformation.None,
+                                remember { InteractionState() },
                                 textLayoutResultRef
                             )
                     )
@@ -354,6 +361,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -398,6 +406,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -450,6 +459,7 @@ class TextFieldScrollTest {
                         scrollerPosition,
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -482,7 +492,12 @@ class TextFieldScrollTest {
         val value = TextFieldValue()
         rule.setContent {
             val modifier = Modifier.textFieldScroll(
-                orientation, position, value, VisualTransformation.None, Ref()
+                orientation,
+                position,
+                value,
+                VisualTransformation.None,
+                remember { InteractionState() },
+                Ref()
             ) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("textFieldScroll")
             assertThat(modifier.valueOverride).isNull()
@@ -491,6 +506,7 @@ class TextFieldScrollTest {
                 "scrollerPosition",
                 "textFieldValue",
                 "visualTransformation",
+                "interactionState",
                 "textLayoutResult"
             )
         }
@@ -532,6 +548,7 @@ class TextFieldScrollTest {
                             remember { textFieldScrollPosition },
                             value,
                             VisualTransformation.None,
+                            remember { InteractionState() },
                             textLayoutResultRef
                         ),
                     textStyle = TextStyle(fontSize = 20.sp)
