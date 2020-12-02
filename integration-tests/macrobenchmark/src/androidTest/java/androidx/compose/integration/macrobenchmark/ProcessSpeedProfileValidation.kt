@@ -56,7 +56,7 @@ class ProcessSpeedProfileValidation(
     }
 
     companion object {
-        private const val PACKAGE_NAME = "androidx.compose.integration.demos"
+        private const val PACKAGE_NAME = "androidx.compose.integration.macrobenchmark.target"
 
         @Parameterized.Parameters(name = "compilation_mode={0}, startup_mode={1}")
         @JvmStatic
