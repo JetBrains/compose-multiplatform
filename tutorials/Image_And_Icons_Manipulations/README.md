@@ -340,9 +340,9 @@ We implemented it on the desktop so we can use common resources in a cross-platf
 SVG files can be converted to XML with [Android Studio](https://developer.android.com/studio/write/vector-asset-studio#svg) or with [third-party tools](https://www.google.com/search?q=svg+to+xml).
 Suppose we have an XML image placed in the `resources/images` directory in our project.
 
-SVG example: ![SVG](compose.svg)
+[SVG example](../../artwork/compose-logo.svg)
 
-Converted XML: [compose.xml](compose.xml)
+[Converted XML](compose-logo.xml)
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -354,7 +354,7 @@ import androidx.compose.ui.res.vectorXmlResource
 fun main() {
     Window {
         Image(
-            imageVector = vectorXmlResource("images/compose.xml"),
+            imageVector = vectorXmlResource("images/compose-logo.xml"),
             modifier = Modifier.fillMaxSize()
         )
     }
