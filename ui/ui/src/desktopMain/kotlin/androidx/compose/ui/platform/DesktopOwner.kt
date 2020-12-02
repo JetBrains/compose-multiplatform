@@ -78,6 +78,7 @@ class DesktopOwner(
     private val semanticsModifier = SemanticsModifierCore(
         id = SemanticsModifierCore.generateSemanticsId(),
         mergeDescendants = false,
+        clearAndSetSemantics = false,
         properties = {}
     )
 

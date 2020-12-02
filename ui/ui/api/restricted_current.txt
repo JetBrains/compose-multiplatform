@@ -2667,12 +2667,13 @@ package androidx.compose.ui.semantics {
     method public operator <T> T! get(androidx.compose.ui.semantics.SemanticsPropertyKey<T> key);
     method public <T> T! getOrElse(androidx.compose.ui.semantics.SemanticsPropertyKey<T> key, kotlin.jvm.functions.Function0<? extends T> defaultValue);
     method public <T> T? getOrElseNullable(androidx.compose.ui.semantics.SemanticsPropertyKey<T> key, kotlin.jvm.functions.Function0<? extends T> defaultValue);
-    method public boolean isEmpty();
+    method public boolean isClearingSemantics();
     method public boolean isMergingSemanticsOfDescendants();
     method public java.util.Iterator<java.util.Map.Entry<androidx.compose.ui.semantics.SemanticsPropertyKey<?>,java.lang.Object>> iterator();
     method public <T> void set(androidx.compose.ui.semantics.SemanticsPropertyKey<T> key, T? value);
+    method public void setClearingSemantics(boolean p);
     method public void setMergingSemanticsOfDescendants(boolean p);
-    property public final boolean isEmpty;
+    property public final boolean isClearingSemantics;
     property public final boolean isMergingSemanticsOfDescendants;
   }
 
@@ -2688,6 +2689,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsModifierKt {
+    method public static androidx.compose.ui.Modifier clearAndSetSemantics(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.semantics.SemanticsPropertyReceiver,kotlin.Unit> properties);
     method public static androidx.compose.ui.Modifier semantics(androidx.compose.ui.Modifier, optional boolean mergeDescendants, kotlin.jvm.functions.Function1<? super androidx.compose.ui.semantics.SemanticsPropertyReceiver,kotlin.Unit> properties);
   }
 

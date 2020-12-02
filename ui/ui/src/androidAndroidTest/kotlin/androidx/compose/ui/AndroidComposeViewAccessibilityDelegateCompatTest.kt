@@ -114,7 +114,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val clickActionLabel = "click"
         val dismissActionLabel = "dismiss"
         val accessibilityValue = "checked"
-        val semanticsModifier = SemanticsModifierCore(1, true) {
+        val semanticsModifier = SemanticsModifierCore(1, true, false) {
             this.accessibilityValue = accessibilityValue
             onClick(clickActionLabel) { true }
             dismiss(dismissActionLabel) { true }
@@ -165,7 +165,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     fun testPopulateAccessibilityNodeInfoProperties_SeekBar() {
         val info = AccessibilityNodeInfoCompat.obtain()
         val setProgressActionLabel = "setProgress"
-        val semanticsModifier = SemanticsModifierCore(1, true) {
+        val semanticsModifier = SemanticsModifierCore(1, true, false) {
             accessibilityValueRange = AccessibilityRangeInfo(0.5f, 0f..1f, 6)
             setProgress(setProgressActionLabel) { true }
         }
@@ -201,7 +201,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val setSelectionActionLabel = "setSelection"
         val setTextActionLabel = "setText"
         val text = "hello"
-        val semanticsModifier = SemanticsModifierCore(1, true) {
+        val semanticsModifier = SemanticsModifierCore(1, true, false) {
             this.text = AnnotatedString(text)
             this.textSelectionRange = TextRange(1)
             this.focused = true
@@ -389,7 +389,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         mergeDescendants: Boolean,
         properties: (SemanticsPropertyReceiver.() -> Unit)
     ): SemanticsNode {
-        val semanticsModifier = SemanticsModifierCore(id, mergeDescendants, properties)
+        val semanticsModifier = SemanticsModifierCore(id, mergeDescendants, false, properties)
         return SemanticsNode(
             SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
             true
