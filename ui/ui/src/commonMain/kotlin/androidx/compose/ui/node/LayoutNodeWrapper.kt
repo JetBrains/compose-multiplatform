@@ -47,7 +47,6 @@ import androidx.compose.ui.util.annotation.CallSuper
 /**
  * Measurable and Placeable type that has a position.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal abstract class LayoutNodeWrapper(
     internal val layoutNode: LayoutNode
 ) : Placeable(), Measurable, LayoutCoordinates, OwnerScope, (Canvas) -> Unit {
@@ -193,7 +192,6 @@ internal abstract class LayoutNodeWrapper(
     protected abstract fun performDraw(canvas: Canvas)
 
     // implementation of draw block passed to the OwnedLayer
-    @ExperimentalLayoutNodeApi
     override fun invoke(canvas: Canvas) {
         if (layoutNode.isPlaced) {
             require(layoutNode.layoutState == LayoutNode.LayoutState.Ready) {
@@ -414,7 +412,6 @@ internal abstract class LayoutNodeWrapper(
         // which layer contained this one, but all layers in this modifier chain will be invalidated
         // in onModifierChanged(). Therefore the only possible layer that won't automatically be
         // invalidated is the parent's layer. We'll invalidate it here:
-        @OptIn(ExperimentalLayoutNodeApi::class)
         layoutNode.parent?.invalidateLayer()
     }
 

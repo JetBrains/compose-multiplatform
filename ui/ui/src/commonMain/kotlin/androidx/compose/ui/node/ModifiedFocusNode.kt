@@ -30,7 +30,6 @@ import androidx.compose.ui.util.fastForEach
 
 @OptIn(
     ExperimentalFocus::class,
-    ExperimentalLayoutNodeApi::class
 )
 internal class ModifiedFocusNode(
     wrapped: LayoutNodeWrapper,

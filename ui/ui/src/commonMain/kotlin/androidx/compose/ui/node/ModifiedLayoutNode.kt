@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class ModifiedLayoutNode(
     wrapped: LayoutNodeWrapper,
     modifier: LayoutModifier

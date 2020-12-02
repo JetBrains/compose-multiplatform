@@ -17,7 +17,6 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.unit.Density
 
@@ -249,8 +248,7 @@ internal actual fun <R> SemanticsNodeInteraction.withDensity(
     operation: Density.(SemanticsNode) -> R
 ): R {
     val node = fetchSemanticsNode("Failed to retrieve density for the node.")
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    val density = node.componentNode.owner!!.density
+    val density = node.layoutNode.owner!!.density
     return operation.invoke(density, node)
 }
 
@@ -258,8 +256,7 @@ internal actual fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
     assertion: Density.(Rect) -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    val density = node.componentNode.owner!!.density
+    val density = node.layoutNode.owner!!.density
 
     assertion.invoke(density, node.unclippedBoundsInRoot)
     return this

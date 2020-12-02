@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.tooling.inspector
 
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 
 /**
@@ -105,7 +104,6 @@ class RawParameter(val name: String, val value: Any?)
 /**
  * Mutable version of [InspectorNode].
  */
-@ExperimentalLayoutNodeApi
 internal class MutableInspectorNode {
     var id = 0L
     var layoutNodes = mutableListOf<LayoutNode>()

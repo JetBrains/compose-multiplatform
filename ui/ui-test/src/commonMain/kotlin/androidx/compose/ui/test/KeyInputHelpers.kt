@@ -18,7 +18,6 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 
 /**
  * Send the specified [KeyEvent] to the focused component.
@@ -28,8 +27,7 @@ import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 @OptIn(ExperimentalKeyInput::class)
 fun SemanticsNodeInteraction.performKeyPress(keyEvent: KeyEvent): Boolean {
     val semanticsNode = fetchSemanticsNode("Failed to send key Event (${keyEvent.key})")
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    val owner = semanticsNode.componentNode.owner
+    val owner = semanticsNode.layoutNode.owner
     requireNotNull(owner) { "Failed to find owner" }
     @OptIn(InternalTestingApi::class)
     return testContext.testOwner.runOnUiThread { owner.sendKeyEvent(keyEvent) }

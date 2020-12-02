@@ -27,8 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.NoInspectorInfo
@@ -57,7 +56,6 @@ import kotlin.math.max
  * @param content The content of the [Box].
  */
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class)
 inline fun Box(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
@@ -83,8 +81,7 @@ internal fun rememberMeasureBlocks(
     }
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
-internal val DefaultBoxMeasureBlocks: LayoutNode.MeasureBlocks =
+internal val DefaultBoxMeasureBlocks: MeasureBlocks =
     boxMeasureBlocks(Alignment.TopStart)
 
 internal fun boxMeasureBlocks(alignment: Alignment) =
@@ -189,12 +186,10 @@ private fun Placeable.PlacementScope.placeInBox(
  * @param modifier The modifier to be applied to the layout.
  */
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class)
 fun Box(modifier: Modifier) {
     Layout({}, measureBlocks = EmptyBoxMeasureBlocks, modifier = modifier)
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal val EmptyBoxMeasureBlocks = MeasuringIntrinsicsMeasureBlocks { _, constraints ->
     layout(constraints.minWidth, constraints.minHeight) {}
 }

@@ -23,7 +23,6 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
 import androidx.compose.ui.input.key.ExperimentalKeyInput
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 
 @OptIn(ExperimentalComposeApi::class, ExperimentalKeyInput::class)
@@ -64,7 +63,7 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
     }
 }
 
-@OptIn(ExperimentalComposeApi::class, ExperimentalLayoutNodeApi::class)
+@OptIn(ExperimentalComposeApi::class)
 internal actual fun actualSubcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,

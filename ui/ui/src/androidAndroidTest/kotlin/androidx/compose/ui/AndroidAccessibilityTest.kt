@@ -38,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.testTag
@@ -92,7 +91,6 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 @OptIn(
     ExperimentalFoundationApi::class,
-    ExperimentalLayoutNodeApi::class
 )
 class AndroidAccessibilityTest {
     @get:Rule

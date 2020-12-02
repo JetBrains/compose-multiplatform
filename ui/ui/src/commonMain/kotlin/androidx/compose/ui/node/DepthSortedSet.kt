@@ -28,7 +28,6 @@ import androidx.compose.ui.util.identityHashCode
  * as any of this modifications can break the comparator's contract which can cause
  * to not find the item in the tree set, which we previously added.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class DepthSortedSet(
     private val extraAssertions: Boolean = true
 ) {

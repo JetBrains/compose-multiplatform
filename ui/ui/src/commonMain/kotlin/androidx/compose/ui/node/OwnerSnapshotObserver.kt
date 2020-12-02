@@ -24,7 +24,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateObserver
  * automatically when the snapshot value has been changed.
  */
 // TODO make it internal once Owner is internal
-@OptIn(ExperimentalComposeApi::class, ExperimentalLayoutNodeApi::class)
+@OptIn(ExperimentalComposeApi::class)
 @Suppress("CallbackName") // TODO rename this and SnapshotStateObserver. b/173401548
 class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -> Unit) {
 

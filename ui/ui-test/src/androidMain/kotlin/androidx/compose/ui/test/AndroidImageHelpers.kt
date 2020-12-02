@@ -21,7 +21,6 @@ import android.view.View
 import android.view.Window
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.android.captureRegionToImage
@@ -54,8 +53,7 @@ fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
         )
     }
 
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    val view = (node.componentNode.owner as AndroidOwner).view
+    val view = (node.layoutNode.owner as AndroidOwner).view
 
     // If we are in dialog use its window to capture the bitmap
     val dialogParentNodeMaybe = node.findClosestParentNode(includeSelf = true) {

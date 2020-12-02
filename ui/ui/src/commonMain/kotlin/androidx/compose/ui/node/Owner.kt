@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.WindowManager
  * to Android [views][android.view.View] and all layout, draw, input, and accessibility is hooked
  * through them.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 interface Owner {
 
     /**

@@ -49,7 +49,6 @@ import androidx.compose.ui.graphics.colorspace.ColorModel
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -81,7 +80,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@ExperimentalLayoutNodeApi
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {

@@ -18,7 +18,6 @@
 package androidx.compose.runtime
 
 import android.widget.TextView
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.subcomposeInto
 import androidx.compose.ui.viewinterop.emitView
@@ -497,7 +496,6 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
-        @OptIn(ExperimentalLayoutNodeApi::class)
         val container = remember { LayoutNode() }
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)

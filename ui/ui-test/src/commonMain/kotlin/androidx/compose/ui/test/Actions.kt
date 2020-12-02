@@ -20,7 +20,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsPropertyKey
@@ -65,10 +64,8 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     // Figure out the (clipped) bounds of the viewPort in its direct parent's content area, in
     // root coordinates. We only want the clipping from the direct parent on the scrollable, not
     // from any other ancestors.
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    val viewPortInParent = scrollableNode.componentNode.coordinates.boundsInParent
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    val parentInRoot = scrollableNode.componentNode.coordinates.parentCoordinates
+    val viewPortInParent = scrollableNode.layoutNode.coordinates.boundsInParent
+    val parentInRoot = scrollableNode.layoutNode.coordinates.parentCoordinates
         ?.positionInRoot ?: Offset.Zero
 
     val viewPort = viewPortInParent.translate(parentInRoot)

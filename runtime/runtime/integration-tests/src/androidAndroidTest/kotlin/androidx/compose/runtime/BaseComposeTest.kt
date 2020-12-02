@@ -24,7 +24,6 @@ import android.view.Choreographer
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.setViewContent
@@ -117,7 +116,6 @@ abstract class BaseComposeTest {
 
     @Composable
     fun subCompose(block: @Composable () -> Unit) {
-        @OptIn(ExperimentalLayoutNodeApi::class)
         val container = remember { LayoutNode() }
         val reference = compositionReference()
         // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
