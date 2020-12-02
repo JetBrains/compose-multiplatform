@@ -29,7 +29,6 @@ import androidx.compose.ui.test.junit4.isOnUiThread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.junit.runners.model.Statement
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Register compose's idling check to Espresso.
@@ -114,12 +113,9 @@ internal class ComposeIdlingResource : IdlingResource {
     private var hadAnimationClocksIdle = true
     private var hadNoSnapshotChanges = true
     private var hadNoRecomposerChanges = true
-    private var lastCompositionAwaiters = 0
     private var hadNoPendingMeasureLayout = true
     // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
 //    private var hadNoPendingDraw = true
-
-    private var compositionAwaiters = AtomicInteger(0)
 
     /**
      * Returns whether or not Compose is idle now.
@@ -130,7 +126,6 @@ internal class ComposeIdlingResource : IdlingResource {
             hadNoSnapshotChanges = !Snapshot.current.hasPendingChanges()
             hadNoRecomposerChanges = !Recomposer.current().hasInvalidations()
             hadAnimationClocksIdle = areAllClocksIdle()
-            lastCompositionAwaiters = compositionAwaiters.get()
             val owners = androidOwnerRegistry.getUnfilteredOwners()
             hadNoPendingMeasureLayout = !owners.any { it.hasPendingMeasureOrLayout }
             // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
@@ -139,34 +134,13 @@ internal class ComposeIdlingResource : IdlingResource {
 //                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
 //            }
 
-            check(lastCompositionAwaiters >= 0) {
-                "More CompositionAwaiters were removed then added ($lastCompositionAwaiters)"
-            }
-
             return hadNoSnapshotChanges &&
                 hadNoRecomposerChanges &&
                 hadAnimationClocksIdle &&
-                lastCompositionAwaiters == 0 &&
                 // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
                 hadNoPendingMeasureLayout /*&&
                 hadNoPendingDraw*/
         }
-
-    /**
-     * Called by [CompositionAwaiter] to indicate that this [ComposeIdlingResource] should report
-     * busy to Espresso while that [CompositionAwaiter] is checking idleness.
-     */
-    internal fun addCompositionAwaiter() {
-        compositionAwaiters.incrementAndGet()
-    }
-
-    /**
-     * Called by [CompositionAwaiter] to indicate that this [ComposeIdlingResource] can report
-     * idle as far as the calling [CompositionAwaiter] is concerned.
-     */
-    internal fun removeCompositionAwaiter() {
-        compositionAwaiters.decrementAndGet()
-    }
 
     @OptIn(ExperimentalTesting::class)
     fun registerTestClock(clock: TestAnimationClock) {
@@ -193,14 +167,11 @@ internal class ComposeIdlingResource : IdlingResource {
         val hadSnapshotChanges = !hadNoSnapshotChanges
         val hadRecomposerChanges = !hadNoRecomposerChanges
         val hadRunningAnimations = !hadAnimationClocksIdle
-        val numCompositionAwaiters = lastCompositionAwaiters
-        val wasAwaitingCompositions = numCompositionAwaiters > 0
         val hadPendingMeasureLayout = !hadNoPendingMeasureLayout
         // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
 //        val hadPendingDraw = !hadNoPendingDraw
 
-        val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges &&
-            !hadRunningAnimations && !wasAwaitingCompositions
+        val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges && !hadRunningAnimations
 
         if (wasIdle) {
             return null
@@ -210,7 +181,7 @@ internal class ComposeIdlingResource : IdlingResource {
         if (hadRunningAnimations) {
             busyReasons.add("animations")
         }
-        val busyRecomposing = hadSnapshotChanges || hadRecomposerChanges || wasAwaitingCompositions
+        val busyRecomposing = hadSnapshotChanges || hadRecomposerChanges
         if (busyRecomposing) {
             busyReasons.add("pending recompositions")
         }
@@ -221,7 +192,6 @@ internal class ComposeIdlingResource : IdlingResource {
                 " infinite re-compositions happening in the tested code.\n"
             message += "- Debug: hadRecomposerChanges = $hadRecomposerChanges, "
             message += "hadSnapshotChanges = $hadSnapshotChanges, "
-            message += "numCompositionAwaiters = $numCompositionAwaiters, "
             message += "hadPendingMeasureLayout = $hadPendingMeasureLayout"
             // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
 //            message += ", hadPendingDraw = $hadPendingDraw"

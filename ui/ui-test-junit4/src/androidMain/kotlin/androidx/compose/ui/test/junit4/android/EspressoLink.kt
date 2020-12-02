@@ -56,13 +56,10 @@ internal class EspressoLink(private val registry: IdlingResourceRegistry) : Idli
 
 // TODO(b/168223213): Make the CompositionAwaiter a suspend fun, remove ComposeIdlingResource
 //  and blocking await Espresso.onIdle().
-internal fun ComposeIdlingResource.runEspressoOnIdle() {
-    val compositionAwaiter = CompositionAwaiter(this)
+internal fun runEspressoOnIdle() {
     try {
-        compositionAwaiter.start()
         Espresso.onIdle()
     } catch (e: Throwable) {
-        compositionAwaiter.cancel()
 
         // Happens on the global time out, usually when global idling time out is less
         // or equal to dynamic idling time out or when the timeout is not due to individual
