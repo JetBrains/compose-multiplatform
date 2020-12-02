@@ -38,6 +38,8 @@ class MultitouchGestureDetectorTest(val panZoomLock: Boolean) {
         @Parameterized.Parameters
         fun parameters() = arrayOf(false, true)
     }
+
+    private var centroid = Offset.Zero
     private var panned = false
     private var panAmount = Offset.Zero
     private var rotated = false
@@ -46,21 +48,21 @@ class MultitouchGestureDetectorTest(val panZoomLock: Boolean) {
     private var zoomAmount = 1f
 
     private val util = SuspendingGestureTestUtil {
-        detectMultitouchGestures(
-            panZoomLock = panZoomLock,
-            onRotate = {
+        detectMultitouchGestures(panZoomLock = panZoomLock) { c, pan, gestureZoom, gestureAngle ->
+            centroid = c
+            if (gestureAngle != 0f) {
                 rotated = true
-                rotateAmount += it
-            },
-            onZoom = {
-                zoomed = true
-                zoomAmount *= it
-            },
-            onPan = {
-                panned = true
-                panAmount += it
+                rotateAmount += gestureAngle
             }
-        )
+            if (gestureZoom != 1f) {
+                zoomed = true
+                zoomAmount *= gestureZoom
+            }
+            if (pan != Offset.Zero) {
+                panned = true
+                panAmount += pan
+            }
+        }
     }
 
     @Before
@@ -91,6 +93,8 @@ class MultitouchGestureDetectorTest(val panZoomLock: Boolean) {
         val move2 = move1.moveBy(Offset(0.1f, 0.1f))
         assertTrue(move2.anyPositionChangeConsumed())
 
+        assertEquals(17.7f, centroid.x, 0.1f)
+        assertEquals(17.7f, centroid.y, 0.1f)
         assertTrue(panned)
         assertFalse(zoomed)
         assertFalse(rotated)
@@ -129,6 +133,8 @@ class MultitouchGestureDetectorTest(val panZoomLock: Boolean) {
         // Now we've averaged enough movement
         assertTrue(moveB1.anyPositionChangeConsumed())
 
+        assertEquals((5f + 25f + 12.8f) / 2f, centroid.x, 0.1f)
+        assertEquals((5f + 25f + 12.8f) / 2f, centroid.y, 0.1f)
         assertTrue(panned)
         assertTrue(zoomed)
         assertFalse(rotated)
