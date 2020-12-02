@@ -14,13 +14,13 @@ package androidx.compose.material {
 
   public final class BackdropScaffoldConstants {
     method public float getDefaultFrontLayerElevation-D9Ej5fM();
-    method public long getDefaultFrontLayerScrimColor-0d7_KjU();
-    method public androidx.compose.ui.graphics.Shape getDefaultFrontLayerShape();
+    method @androidx.compose.runtime.Composable public long getDefaultFrontLayerScrimColor-0d7_KjU();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getDefaultFrontLayerShape();
     method public float getDefaultHeaderHeight-D9Ej5fM();
     method public float getDefaultPeekHeight-D9Ej5fM();
     property public final float DefaultFrontLayerElevation;
-    property public final long DefaultFrontLayerScrimColor;
-    property public final androidx.compose.ui.graphics.Shape DefaultFrontLayerShape;
+    property @androidx.compose.runtime.Composable public final long DefaultFrontLayerScrimColor;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape DefaultFrontLayerShape;
     property public final float DefaultHeaderHeight;
     property public final float DefaultPeekHeight;
     field public static final androidx.compose.material.BackdropScaffoldConstants INSTANCE;
@@ -141,7 +141,7 @@ package androidx.compose.material {
     method public float getDefaultIconSpacing-D9Ej5fM();
     method public float getDefaultMinHeight-D9Ej5fM();
     method public float getDefaultMinWidth-D9Ej5fM();
-    method public androidx.compose.foundation.BorderStroke getDefaultOutlinedBorder();
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.BorderStroke getDefaultOutlinedBorder();
     method public androidx.compose.foundation.layout.PaddingValues getDefaultTextContentPadding();
     method public float getOutlinedBorderSize-D9Ej5fM();
     property public final androidx.compose.foundation.layout.PaddingValues DefaultContentPadding;
@@ -151,7 +151,7 @@ package androidx.compose.material {
     property public final float DefaultMinWidth;
     property public final androidx.compose.foundation.layout.PaddingValues DefaultTextContentPadding;
     property public final float OutlinedBorderSize;
-    property public final androidx.compose.foundation.BorderStroke defaultOutlinedBorder;
+    property @androidx.compose.runtime.Composable public final androidx.compose.foundation.BorderStroke defaultOutlinedBorder;
     field public static final androidx.compose.material.ButtonConstants INSTANCE;
     field public static final float OutlinedBorderOpacity = 0.12f;
   }
@@ -224,12 +224,12 @@ package androidx.compose.material {
   }
 
   public final class ContentAlpha {
-    method public float getDisabled();
-    method public float getHigh();
-    method public float getMedium();
-    property public final float disabled;
-    property public final float high;
-    property public final float medium;
+    method @androidx.compose.runtime.Composable public float getDisabled();
+    method @androidx.compose.runtime.Composable public float getHigh();
+    method @androidx.compose.runtime.Composable public float getMedium();
+    property @androidx.compose.runtime.Composable public final float disabled;
+    property @androidx.compose.runtime.Composable public final float high;
+    property @androidx.compose.runtime.Composable public final float medium;
     field public static final androidx.compose.material.ContentAlpha INSTANCE;
   }
 
@@ -272,9 +272,9 @@ package androidx.compose.material {
 
   public final class DrawerConstants {
     method public float getDefaultElevation-D9Ej5fM();
-    method public long getDefaultScrimColor-0d7_KjU();
+    method @androidx.compose.runtime.Composable public long getDefaultScrimColor-0d7_KjU();
     property public final float DefaultElevation;
-    property public final long defaultScrimColor;
+    property @androidx.compose.runtime.Composable public final long defaultScrimColor;
     field public static final androidx.compose.material.DrawerConstants INSTANCE;
     field public static final float ScrimDefaultOpacity = 0.32f;
   }
@@ -335,12 +335,12 @@ package androidx.compose.material {
   }
 
   @Deprecated public interface EmphasisLevels {
-    method @Deprecated public androidx.compose.material.Emphasis getDisabled();
-    method @Deprecated public androidx.compose.material.Emphasis getHigh();
-    method @Deprecated public androidx.compose.material.Emphasis getMedium();
-    property public abstract androidx.compose.material.Emphasis disabled;
-    property public abstract androidx.compose.material.Emphasis high;
-    property public abstract androidx.compose.material.Emphasis medium;
+    method @Deprecated @androidx.compose.runtime.Composable public androidx.compose.material.Emphasis getDisabled();
+    method @Deprecated @androidx.compose.runtime.Composable public androidx.compose.material.Emphasis getHigh();
+    method @Deprecated @androidx.compose.runtime.Composable public androidx.compose.material.Emphasis getMedium();
+    property @androidx.compose.runtime.Composable public abstract androidx.compose.material.Emphasis disabled;
+    property @androidx.compose.runtime.Composable public abstract androidx.compose.material.Emphasis high;
+    property @androidx.compose.runtime.Composable public abstract androidx.compose.material.Emphasis medium;
   }
 
   @kotlin.RequiresOptIn(message="This material API is experimental and is likely to change or to be removed in" + " the future.") public @interface ExperimentalMaterialApi {
@@ -395,12 +395,12 @@ package androidx.compose.material {
   }
 
   public final class MaterialTheme {
-    method public androidx.compose.material.Colors getColors();
-    method public androidx.compose.material.Shapes getShapes();
-    method public androidx.compose.material.Typography getTypography();
-    property public final androidx.compose.material.Colors colors;
-    property public final androidx.compose.material.Shapes shapes;
-    property public final androidx.compose.material.Typography typography;
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public androidx.compose.material.Colors getColors();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public androidx.compose.material.Shapes getShapes();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public androidx.compose.material.Typography getTypography();
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final androidx.compose.material.Colors colors;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final androidx.compose.material.Shapes shapes;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final androidx.compose.material.Typography typography;
     field public static final androidx.compose.material.MaterialTheme INSTANCE;
   }
 
@@ -415,9 +415,9 @@ package androidx.compose.material {
 
   public final class ModalBottomSheetConstants {
     method public float getDefaultElevation-D9Ej5fM();
-    method public long getDefaultScrimColor-0d7_KjU();
+    method @androidx.compose.runtime.Composable public long getDefaultScrimColor-0d7_KjU();
     property public final float DefaultElevation;
-    property public final long DefaultScrimColor;
+    property @androidx.compose.runtime.Composable public final long DefaultScrimColor;
     field public static final androidx.compose.material.ModalBottomSheetConstants INSTANCE;
   }
 
@@ -536,10 +536,10 @@ package androidx.compose.material {
   }
 
   public final class SnackbarConstants {
-    method public long getDefaultActionPrimaryColor-0d7_KjU();
-    method public long getDefaultBackgroundColor-0d7_KjU();
-    property public final long defaultActionPrimaryColor;
-    property public final long defaultBackgroundColor;
+    method @androidx.compose.runtime.Composable public long getDefaultActionPrimaryColor-0d7_KjU();
+    method @androidx.compose.runtime.Composable public long getDefaultBackgroundColor-0d7_KjU();
+    property @androidx.compose.runtime.Composable public final long defaultActionPrimaryColor;
+    property @androidx.compose.runtime.Composable public final long defaultBackgroundColor;
     field public static final androidx.compose.material.SnackbarConstants INSTANCE;
   }
 

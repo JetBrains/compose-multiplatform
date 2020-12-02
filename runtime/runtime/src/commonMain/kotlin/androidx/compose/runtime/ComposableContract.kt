@@ -45,7 +45,8 @@ package androidx.compose.runtime
 @Retention(AnnotationRetention.BINARY)
 @Target(
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY,
+    AnnotationTarget.PROPERTY, // (DEPRECATED)
+    AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.TYPE
 )
 annotation class ComposableContract(

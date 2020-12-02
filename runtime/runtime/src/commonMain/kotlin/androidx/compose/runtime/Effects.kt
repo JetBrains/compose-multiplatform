@@ -197,8 +197,7 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  * An Effect to get the nearest invalidation lambda to the current point of composition. This can be used to
  * trigger an invalidation on the composition locally to cause a recompose.
  */
-@Composable
-val invalidate: () -> Unit get() {
+val invalidate: () -> Unit @Composable get() {
     val scope = currentComposer.currentRecomposeScope ?: error("no recompose scope found")
     scope.used = true
     return { scope.invalidate() }

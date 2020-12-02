@@ -189,8 +189,8 @@ object SnackbarConstants {
     /**
      * Default background color of the [Snackbar]
      */
-    @Composable
     val defaultBackgroundColor: Color
+        @Composable
         get() =
             MaterialTheme.colors.onSurface
                 .copy(alpha = SnackbarOverlayAlpha)
@@ -210,8 +210,8 @@ object SnackbarConstants {
      * [MaterialTheme.colors] to attempt to reduce the contrast, and when in a dark theme this
      * function uses [Colors.primaryVariant].
      */
-    @Composable
     val defaultActionPrimaryColor: Color
+        @Composable
         get() {
             val colors = MaterialTheme.colors
             return if (colors.isLight) {
