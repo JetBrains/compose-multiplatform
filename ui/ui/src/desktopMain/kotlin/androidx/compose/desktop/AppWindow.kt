@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.emptyContent
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -335,7 +334,6 @@ class AppWindow : AppFrame {
      *
      * @param content Composable content of the window.
      */
-    @OptIn(ExperimentalKeyInput::class)
     override fun show(content: @Composable () -> Unit) {
         if (invoker != null) {
             invoker!!.lockWindow()
@@ -387,6 +385,5 @@ class AppWindow : AppFrame {
     /**
      * Gets the Keyboard object of the window.
      */
-    @ExperimentalKeyInput
     val keyboard: Keyboard = Keyboard()
 }

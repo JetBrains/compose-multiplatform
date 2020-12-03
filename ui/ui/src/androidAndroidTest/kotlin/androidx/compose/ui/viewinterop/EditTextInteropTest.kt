@@ -20,7 +20,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.InternalTextApi
@@ -32,7 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
-@OptIn(ExperimentalFocus::class, InternalTextApi::class)
+@OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
 class EditTextInteropTest {
     @get:Rule

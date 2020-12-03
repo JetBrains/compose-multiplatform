@@ -23,7 +23,6 @@ import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.setFocusableContent
 import androidx.compose.ui.focusRequester
@@ -46,10 +45,6 @@ import android.view.KeyEvent as AndroidKeyEvent
  */
 @SmallTest
 @RunWith(Parameterized::class)
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalKeyInput::class
-)
 class AndroidProcessKeyInputTest(val keyEventAction: Int) {
     @get:Rule
     val rule = createComposeRule()

@@ -16,7 +16,6 @@
 
 package androidx.compose.ui
 
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
@@ -28,7 +27,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * @see FocusRequester
  */
-@ExperimentalFocus
 interface FocusRequesterModifier : Modifier.Element {
     /**
      * An instance of [FocusRequester], that can be used to request focus state changes.
@@ -36,7 +34,6 @@ interface FocusRequesterModifier : Modifier.Element {
     val focusRequester: FocusRequester
 }
 
-@OptIn(ExperimentalFocus::class)
 internal class FocusRequesterModifierImpl(
     override val focusRequester: FocusRequester,
     inspectorInfo: InspectorInfo.() -> Unit
@@ -45,7 +42,6 @@ internal class FocusRequesterModifierImpl(
 /**
  * Add this modifier to a component to observe changes to focus state.
  */
-@ExperimentalFocus
 fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier {
     return this.then(
         FocusRequesterModifierImpl(

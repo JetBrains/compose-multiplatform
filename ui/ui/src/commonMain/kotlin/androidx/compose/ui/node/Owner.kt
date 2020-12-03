@@ -15,13 +15,12 @@
  */
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -67,11 +66,13 @@ interface Owner {
      *  TODO(ralu): Replace with SemanticsTree. This is a temporary hack until we have a semantics
      *  tree implemented.
      */
+    @ExperimentalComposeUiApi
     val autofillTree: AutofillTree
 
     /**
      * The [Autofill] class can be used to perform autofill operations. It is used as an ambient.
      */
+    @ExperimentalComposeUiApi
     val autofill: Autofill?
 
     val density: Density
@@ -83,7 +84,6 @@ interface Owner {
     /**
      * Provide a focus manager that controls focus within Compose.
      */
-    @ExperimentalFocus
     val focusManager: FocusManager
 
     /**
@@ -145,7 +145,6 @@ interface Owner {
      *
      * @return true if the event was consumed. False otherwise.
      */
-    @ExperimentalKeyInput
     fun sendKeyEvent(keyEvent: KeyEvent): Boolean
 
     /**

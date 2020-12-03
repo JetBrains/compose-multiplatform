@@ -23,7 +23,6 @@ import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.gesture.TapGestureFilter
 
-@ExperimentalFocus
 interface FocusManager {
     /**
      * Call this function to clear focus from the currently focused component, and set the focus to
@@ -41,7 +40,6 @@ interface FocusManager {
  *
  * @param focusModifier The modifier that will be used as the root focus modifier.
  */
-@ExperimentalFocus
 internal class FocusManagerImpl(
     private val focusModifier: FocusModifier = FocusModifier(Inactive)
 ) : FocusManager {

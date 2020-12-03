@@ -17,7 +17,6 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -132,7 +131,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         return lastFocusWrapper
     }
 
-    @OptIn(ExperimentalFocus::class)
     override fun propagateFocusStateChange(focusState: FocusState) {
         wrappedBy?.propagateFocusStateChange(focusState)
     }

@@ -19,7 +19,6 @@ package androidx.compose.ui.input.key
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.setFocusableContent
 import androidx.compose.ui.focusRequester
@@ -38,10 +37,6 @@ import org.junit.runner.RunWith
 @Suppress("DEPRECATION")
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalKeyInput::class
-)
 class ProcessKeyInputTest {
     @get:Rule
     val rule = createComposeRule()

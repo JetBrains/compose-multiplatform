@@ -18,7 +18,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
@@ -549,7 +548,6 @@ internal abstract class LayoutNodeWrapper(
      * that wraps it. The focus state change must be propagated to the parents until we reach
      * another [focus node][ModifiedFocusNode].
      */
-    @OptIn(ExperimentalFocus::class)
     abstract fun propagateFocusStateChange(focusState: FocusState)
 
     /**

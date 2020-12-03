@@ -17,7 +17,6 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.TextFieldState
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -54,10 +53,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 @RunWith(JUnit4::class)
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalFocus::class
-)
+@OptIn(InternalTextApi::class)
 class TextFieldSelectionManagerTest {
     private val text = "Hello World"
     private val density = Density(density = 1f)

@@ -32,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
@@ -134,7 +133,6 @@ import kotlin.math.roundToInt
  */
 @Composable
 @OptIn(
-    ExperimentalFocus::class,
     ExperimentalTextApi::class,
     MouseTemporaryApi::class
 )

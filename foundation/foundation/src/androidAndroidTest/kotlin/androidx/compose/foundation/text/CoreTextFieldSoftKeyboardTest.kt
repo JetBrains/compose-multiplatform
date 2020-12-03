@@ -23,7 +23,6 @@ import android.view.WindowInsetsAnimation
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
@@ -47,10 +46,7 @@ import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(
-    ExperimentalFocus::class,
-    InternalTextApi::class
-)
+@OptIn(InternalTextApi::class)
 class CoreTextFieldSoftKeyboardTest {
 
     @get:Rule

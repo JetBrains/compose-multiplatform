@@ -132,26 +132,29 @@ package androidx.compose.ui {
     method @Deprecated public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.ContentDrawScope,kotlin.Unit> onDraw);
   }
 
-  public final class FocusModifierKt {
-    method @androidx.compose.ui.focus.ExperimentalFocus public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
+  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") public @interface ExperimentalComposeUiApi {
   }
 
-  @androidx.compose.ui.focus.ExperimentalFocus public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
+  public final class FocusModifierKt {
+    method public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
+  }
+
+  public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
     method public kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> getOnFocusChange();
     property public abstract kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange;
   }
 
   public final class FocusObserverModifierKt {
-    method @androidx.compose.ui.focus.ExperimentalFocus public static androidx.compose.ui.Modifier focusObserver(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange);
+    method public static androidx.compose.ui.Modifier focusObserver(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange);
   }
 
-  @androidx.compose.ui.focus.ExperimentalFocus public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
+  public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
     method public androidx.compose.ui.focus.FocusRequester getFocusRequester();
     property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
   }
 
   public final class FocusRequesterModifierKt {
-    method @androidx.compose.ui.focus.ExperimentalFocus public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
+    method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
   }
 
   @androidx.compose.runtime.Stable public interface Modifier {
@@ -194,17 +197,17 @@ package androidx.compose.ui.autofill {
   public final class AndroidAutofillTypeKt {
   }
 
-  public interface Autofill {
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface Autofill {
     method public void cancelAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
     method public void requestAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
   }
 
-  public final class AutofillNode {
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class AutofillNode {
     ctor public AutofillNode(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
     method public java.util.List<androidx.compose.ui.autofill.AutofillType> component1();
     method public androidx.compose.ui.geometry.Rect? component2();
     method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? component3();
-    method public androidx.compose.ui.autofill.AutofillNode copy(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.autofill.AutofillNode copy(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
     method public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
     method public androidx.compose.ui.geometry.Rect? getBoundingBox();
     method public int getId();
@@ -216,7 +219,7 @@ package androidx.compose.ui.autofill {
     property public final kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? onFill;
   }
 
-  public final class AutofillTree {
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class AutofillTree {
     ctor public AutofillTree();
     method public java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> getChildren();
     method public kotlin.Unit? performAutofill(int id, String value);
@@ -224,7 +227,7 @@ package androidx.compose.ui.autofill {
     property public final java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> children;
   }
 
-  public enum AutofillType {
+  @androidx.compose.ui.ExperimentalComposeUiApi public enum AutofillType {
     enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressAuxiliaryDetails;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressCountry;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressLocality;
@@ -328,17 +331,14 @@ package androidx.compose.ui.draw {
 
 package androidx.compose.ui.focus {
 
-  @kotlin.RequiresOptIn(message="The Focus API is experimental and is likely to change in the future.") public @interface ExperimentalFocus {
-  }
-
-  @androidx.compose.ui.focus.ExperimentalFocus public interface FocusManager {
+  public interface FocusManager {
     method public void clearFocus(optional boolean forcedClear);
   }
 
   public final class FocusNodeUtilsKt {
   }
 
-  @androidx.compose.ui.focus.ExperimentalFocus public final class FocusRequester {
+  public final class FocusRequester {
     ctor public FocusRequester();
     method public boolean captureFocus();
     method public boolean freeFocus();
@@ -348,7 +348,7 @@ package androidx.compose.ui.focus {
   public final class FocusRequesterKt {
   }
 
-  @androidx.compose.ui.focus.ExperimentalFocus public enum FocusState {
+  public enum FocusState {
     enum_constant public static final androidx.compose.ui.focus.FocusState Active;
     enum_constant public static final androidx.compose.ui.focus.FocusState ActiveParent;
     enum_constant public static final androidx.compose.ui.focus.FocusState Captured;
@@ -840,16 +840,13 @@ package androidx.compose.ui.hapticfeedback {
 
 package androidx.compose.ui.input.key {
 
-  @Deprecated @androidx.compose.ui.input.key.ExperimentalKeyInput public interface Alt {
+  @Deprecated public interface Alt {
     method @Deprecated public boolean isLeftAltPressed();
     method @Deprecated public default boolean isPressed();
     method @Deprecated public boolean isRightAltPressed();
     property public abstract boolean isLeftAltPressed;
     property public default boolean isPressed;
     property public abstract boolean isRightAltPressed;
-  }
-
-  @kotlin.RequiresOptIn(message="The Key Input API is experimental and is likely to change in the future.") public @interface ExperimentalKeyInput {
   }
 
   public final inline class Key {
@@ -1445,7 +1442,7 @@ package androidx.compose.ui.input.key {
     property public final int ZoomOut;
   }
 
-  @androidx.compose.ui.input.key.ExperimentalKeyInput public interface KeyEvent {
+  public interface KeyEvent {
     method @Deprecated public androidx.compose.ui.input.key.Alt getAlt();
     method public int getKey-EK5gGoQ();
     method public androidx.compose.ui.input.key.KeyEventType getType();
@@ -1464,15 +1461,15 @@ package androidx.compose.ui.input.key {
     property public abstract int utf16CodePoint;
   }
 
-  @androidx.compose.ui.input.key.ExperimentalKeyInput public enum KeyEventType {
+  public enum KeyEventType {
     enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyDown;
     enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyUp;
     enum_constant public static final androidx.compose.ui.input.key.KeyEventType Unknown;
   }
 
   public final class KeyInputModifierKt {
-    method @androidx.compose.ui.input.key.ExperimentalKeyInput public static androidx.compose.ui.Modifier keyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onKeyEvent);
-    method @androidx.compose.ui.input.key.ExperimentalKeyInput public static androidx.compose.ui.Modifier previewKeyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
+    method public static androidx.compose.ui.Modifier keyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onKeyEvent);
+    method public static androidx.compose.ui.Modifier previewKeyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
   }
 
 }
@@ -2120,7 +2117,7 @@ package androidx.compose.ui.node {
     method public void onRequestRelayout(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onSemanticsChange();
     method public boolean requestFocus();
-    method @androidx.compose.ui.input.key.ExperimentalKeyInput public boolean sendKeyEvent(androidx.compose.ui.input.key.KeyEvent keyEvent);
+    method public boolean sendKeyEvent(androidx.compose.ui.input.key.KeyEvent keyEvent);
     property public abstract androidx.compose.ui.autofill.Autofill? autofill;
     property public abstract androidx.compose.ui.autofill.AutofillTree autofillTree;
     property public abstract androidx.compose.ui.platform.ClipboardManager clipboardManager;
@@ -2207,8 +2204,6 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getAmbientViewConfiguration();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowManager> getAmbientWindowManager();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable>! getAnimationClockAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill>! getAutofillAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree>! getAutofillTreeAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager>! getClipboardManagerAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density>! getDensityAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager>! getFocusManagerAmbient();
