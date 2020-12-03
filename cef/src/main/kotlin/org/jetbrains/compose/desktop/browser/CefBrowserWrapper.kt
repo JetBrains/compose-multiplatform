@@ -26,7 +26,7 @@ import org.cef.handler.CefFocusHandlerAdapter
 import org.jetbrains.skija.Bitmap
 import org.jetbrains.skiko.HardwareLayer
 
-open class ComposeBrowserWrapper {
+class CefBrowserWrapper {
     private var offset = IntOffset(0, 0)
     private var isFocused = false
     private var cefFocus = true
@@ -67,30 +67,35 @@ open class ComposeBrowserWrapper {
 
         layer.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(event: MouseEvent) {
-                if (isInLayer(event))
+                if (isInLayer(event)) {
                     browser.onMouseEvent(event)
+                }
             }
             override fun mouseReleased(event: MouseEvent) {
-                if (isInLayer(event))
+                if (isInLayer(event)) {
                     browser.onMouseEvent(event)
+                }
             }
         })
 
         layer.addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseMoved(event: MouseEvent) {
-                if (isInLayer(event))
+                if (isInLayer(event)) {
                     browser.onMouseEvent(event)
+                }
             }
             override fun mouseDragged(event: MouseEvent) {
-                if (isInLayer(event))
+                if (isInLayer(event)) {
                     browser.onMouseEvent(event)
+                }
             }
         })
 
         layer.addMouseWheelListener(object : MouseWheelListener {
             override fun mouseWheelMoved(event: MouseWheelEvent) {
-                if (isInLayer(event))
+                if (isInLayer(event)) {
                     browser.onMouseScrollEvent(event)
+                }
             }
         })
     

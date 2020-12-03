@@ -3,3 +3,4 @@
 
 # Ignore Gradle build output directory
 build
+third_party/java-cef

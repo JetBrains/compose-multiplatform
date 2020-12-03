@@ -1,7 +1,10 @@
 package org.jetbrains.compose.desktop
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.desktop.Window
+import androidx.compose.desktop.WindowEvents
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,22 +26,31 @@ import org.jetbrains.compose.desktop.browser.BrowserState
 import org.jetbrains.compose.desktop.browser.CefView
 
 fun main() {
-    Window("CEF-compose", IntSize(800, 800)) {
+    val browser = BrowserState()
+    val url = mutableStateOf("https://www.google.com")
+
+    Window(
+        title = "CEF-compose",
+        size = IntSize(800, 800),
+        events = WindowEvents(
+            onFocusGet = { browser.loadURL(url.value) }
+        )
+    ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = Color.DarkGray
         ) {
             Column {
-                AddressBar()
+                AddressBar(browser, url)
                 Spacer(Modifier.height(10.dp))
-                WebView()
+                WebView(browser)
             }
         }
     }
 }
 
 @Composable
-private fun AddressBar() {
+private fun AddressBar(browser: BrowserState, url: MutableState<String>) {
     Surface(
         color = Color.Transparent,
         modifier = Modifier
@@ -50,9 +62,9 @@ private fun AddressBar() {
                 backgroundColor = Color.White,
                 activeColor = Color.DarkGray,
                 inactiveColor = Color.DarkGray,
-                value = BrowserState.url.value,
+                value = url.value,
                 onValueChange = {
-                    BrowserState.url.value = it 
+                    url.value = it 
                 },
                 modifier = Modifier.weight(1f),
                 shape = CircleShape,
@@ -62,7 +74,7 @@ private fun AddressBar() {
             Button(
                 modifier = Modifier.preferredHeight(48.dp),
                 shape = CircleShape,
-                onClick = { BrowserState.loadURL(BrowserState.url.value) }
+                onClick = { browser.loadURL(url.value) }
             ) {
                 Text(text = "Go!")
             }
@@ -71,13 +83,11 @@ private fun AddressBar() {
 }
 
 @Composable
-private fun WebView() {
+private fun WebView(browser: BrowserState) {
     Surface(
         color = Color.Gray,
         modifier = Modifier.fillMaxSize().padding(10.dp)
     ) {
-        if (BrowserState.isReady()) {
-            CefView()
-        }
+        CefView(browser)
     }
 }
