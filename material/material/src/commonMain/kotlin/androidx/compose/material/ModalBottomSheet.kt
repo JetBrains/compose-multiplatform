@@ -23,9 +23,9 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
@@ -130,6 +131,8 @@ class ModalBottomSheetState(
             }
         )
     }
+
+    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 
     companion object {
         /**
@@ -230,6 +233,7 @@ fun ModalBottomSheetLayout(
         Surface(
             Modifier
                 .fillMaxWidth()
+                .nestedScroll(sheetState.nestedScrollConnection)
                 .offset(y = { sheetState.offset.value }),
             shape = sheetShape,
             elevation = sheetElevation,
