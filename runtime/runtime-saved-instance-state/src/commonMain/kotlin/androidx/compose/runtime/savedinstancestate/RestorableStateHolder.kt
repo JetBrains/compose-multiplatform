@@ -104,7 +104,7 @@ private class RestorableStateHolderImpl<T : Any>(
                 content = content
             )
             onActive {
-                require(key !in registryHolders)
+                require(key !in registryHolders) { "Key $key was used multiple times " }
                 savedStates -= key
                 registryHolders[key] = registryHolder
                 onDispose {

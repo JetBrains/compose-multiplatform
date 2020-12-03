@@ -18,8 +18,11 @@ package androidx.compose.foundation.demos
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -28,6 +31,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
@@ -38,6 +42,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyRowFor
 import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.AmbientContentColor
@@ -49,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +79,9 @@ val LazyListDemos = listOf(
     ComposableDemo("Rtl list") { RtlListDemo() },
     ComposableDemo("LazyColumn DSL") { LazyColumnScope() },
     ComposableDemo("LazyRow DSL") { LazyRowScope() },
+    ComposableDemo("Arrangements") { LazyListArrangements() },
+    ComposableDemo("Reverse scroll direction") { ReverseLayout() },
+    ComposableDemo("Nested lazy lists") { NestedLazyDemo() },
     PagingDemos
 )
 
@@ -185,7 +194,7 @@ private fun ListHoistedStateDemo() {
 }
 
 @Composable
-fun Button(modifier: Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
+fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         modifier
             .clickable(onClick = onClick)
@@ -295,6 +304,165 @@ private fun LazyRowScope() {
             ) {
                 Text("$index", fontSize = 30.sp)
             }
+        }
+    }
+}
+
+@Composable
+private fun LazyListArrangements() {
+    var count by remember { mutableStateOf(3) }
+    var arrangement by remember { mutableStateOf(6) }
+    Column {
+        Row {
+            Button(onClick = { count-- }) {
+                Text("--")
+            }
+            Button(onClick = { count++ }) {
+                Text("++")
+            }
+            Button(
+                onClick = {
+                    arrangement++
+                    if (arrangement == Arrangements.size) {
+                        arrangement = 0
+                    }
+                }
+            ) {
+                Text("Next")
+            }
+            Text("$arrangement ${Arrangements[arrangement]}")
+        }
+        Row {
+            val item = @Composable {
+                Box(
+                    Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .background(Color.Red)
+                        .border(1.dp, Color.Cyan)
+                )
+            }
+            ScrollableColumn(
+                verticalArrangement = Arrangements[arrangement],
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                (1..count).forEach {
+                    item()
+                }
+            }
+            LazyColumn(
+                verticalArrangement = Arrangements[arrangement],
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                items((1..count).toList()) {
+                    item()
+                }
+            }
+        }
+    }
+}
+
+private val Arrangements = listOf(
+    Arrangement.Center,
+    Arrangement.Top,
+    Arrangement.Bottom,
+    Arrangement.SpaceAround,
+    Arrangement.SpaceBetween,
+    Arrangement.SpaceEvenly,
+    Arrangement.spacedBy(40.dp),
+    Arrangement.spacedBy(40.dp, Alignment.Bottom),
+)
+
+@Composable
+fun ReverseLayout() {
+    Column {
+        val scrollState = rememberScrollState()
+        val lazyState = rememberLazyListState()
+        var count by remember { mutableStateOf(3) }
+        var reverse by remember { mutableStateOf(true) }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Button(onClick = { count -= 5 }) {
+                Text("--")
+            }
+            Button(onClick = { count += 5 }) {
+                Text("++")
+            }
+            Button(onClick = { reverse = !reverse }) {
+                Text("=!")
+            }
+            Text("Scroll=${scrollState.value.toInt()}")
+            Text(
+                "Lazy=${lazyState.firstVisibleItemIndex}; " +
+                    "${lazyState.firstVisibleItemScrollOffset}"
+            )
+        }
+        Row {
+            val item1 = @Composable { index: Int ->
+                Text(
+                    "$index",
+                    Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .background(Color.Red)
+                        .border(1.dp, Color.Cyan)
+                )
+            }
+            val item2 = @Composable { index: Int ->
+                Text("After $index")
+            }
+            ScrollableColumn(
+                reverseScrollDirection = reverse,
+                verticalArrangement = if (reverse) Arrangement.Bottom else Arrangement.Top,
+                scrollState = scrollState,
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                if (reverse) {
+                    (count downTo 1).forEach {
+                        item2(it)
+                        item1(it)
+                    }
+                } else {
+                    (1..count).forEach {
+                        item1(it)
+                        item2(it)
+                    }
+                }
+            }
+            LazyColumn(
+                reverseLayout = reverse,
+                state = lazyState,
+                modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                items((1..count).toList()) {
+                    item1(it)
+                    item2(it)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NestedLazyDemo() {
+    val item = @Composable { index: Int ->
+        Box(
+            Modifier.padding(16.dp).size(200.dp).background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            var state by savedInstanceState { 0 }
+            Button(onClick = { state++ }) {
+                Text("Index=$index State=$state")
+            }
+        }
+    }
+    LazyColumn {
+        item {
+            LazyRowFor(List(100) { it }) {
+                item(it)
+            }
+        }
+        items(List(100) { it }) {
+            item(it)
         }
     }
 }

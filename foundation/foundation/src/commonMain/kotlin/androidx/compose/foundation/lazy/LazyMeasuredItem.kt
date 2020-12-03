@@ -28,11 +28,15 @@ import androidx.compose.ui.util.fastForEach
 internal class LazyMeasuredItem(
     private val placeables: List<Placeable>,
     private val isVertical: Boolean,
-    private val horizontalAlignment: Alignment.Horizontal,
-    private val verticalAlignment: Alignment.Vertical,
+    private val horizontalAlignment: Alignment.Horizontal?,
+    private val verticalAlignment: Alignment.Vertical?,
     private val layoutDirection: LayoutDirection,
     private val startContentPadding: Int,
-    private val endContentPadding: Int
+    private val endContentPadding: Int,
+    /**
+     * Extra size to be added to [mainAxisSize] aside from the sum of the [placeables] size.
+     */
+    val extraMainAxisSize: Int
 ) {
     /**
      * Sum of the main axis sizes of all the inner placeables.
@@ -45,7 +49,7 @@ internal class LazyMeasuredItem(
     val crossAxisSize: Int
 
     init {
-        var mainAxisSize = 0
+        var mainAxisSize = extraMainAxisSize
         var maxCrossAxis = 0
         placeables.fastForEach {
             mainAxisSize += if (isVertical) it.height else it.width
@@ -60,18 +64,22 @@ internal class LazyMeasuredItem(
      * and [layoutHeight] should be provided to not place placeables which are ended up outside of
      * the viewport (for example one item consist of 2 placeables, and the first one is not going
      * to be visible, so we don't place it as an optimization, but place the second one).
+     * If [reverseOrder] is true the inner placeables would be placed in the inverted order.
      */
     fun place(
         scope: Placeable.PlacementScope,
         layoutWidth: Int,
         layoutHeight: Int,
-        offset: Int
+        offset: Int,
+        reverseOrder: Boolean
     ) = with(scope) {
         var mainAxisOffset = offset
-        placeables.fastForEach {
+        val indices = if (reverseOrder) placeables.lastIndex downTo 0 else placeables.indices
+        for (index in indices) {
+            val it = placeables[index]
             if (isVertical) {
-                val x =
-                    horizontalAlignment.align(it.width, layoutWidth, layoutDirection)
+                val x = requireNotNull(horizontalAlignment)
+                    .align(it.width, layoutWidth, layoutDirection)
                 if (mainAxisOffset + it.height > -startContentPadding &&
                     mainAxisOffset < layoutHeight + endContentPadding
                 ) {
@@ -79,7 +87,7 @@ internal class LazyMeasuredItem(
                 }
                 mainAxisOffset += it.height
             } else {
-                val y = verticalAlignment.align(it.height, layoutHeight)
+                val y = requireNotNull(verticalAlignment).align(it.height, layoutHeight)
                 if (mainAxisOffset + it.width > -startContentPadding &&
                     mainAxisOffset < layoutWidth + endContentPadding
                 ) {
