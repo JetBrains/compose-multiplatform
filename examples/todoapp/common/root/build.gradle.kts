@@ -1,11 +1,7 @@
 plugins {
     id("multiplatform-setup")
     id("multiplatform-compose-setup")
-    id("kotlin-android-extensions")
-}
-
-androidExtensions {
-    features = setOf("parcelize")
+    id("kotlin-parcelize")
 }
 
 kotlin {
