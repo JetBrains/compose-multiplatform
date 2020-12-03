@@ -10,6 +10,7 @@ import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.observeOn
 import com.badoo.reaktive.scheduler.mainScheduler
+import example.todo.common.main.TodoItem
 import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.common.main.store.TodoMainStore.State
 

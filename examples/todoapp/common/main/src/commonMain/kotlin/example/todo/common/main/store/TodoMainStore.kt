@@ -1,6 +1,7 @@
 package example.todo.common.main.store
 
 import com.arkivanov.mvikotlin.core.store.Store
+import example.todo.common.main.TodoItem
 import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.common.main.store.TodoMainStore.State
 

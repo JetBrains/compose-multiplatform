@@ -1,13 +1,15 @@
 package example.todo.common.edit.integration
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.operator.map
 import example.todo.common.edit.TodoEdit
 import example.todo.common.edit.TodoEdit.Dependencies
+import example.todo.common.edit.TodoEdit.Model
+import example.todo.common.edit.TodoEdit.Output
+import example.todo.common.edit.store.TodoEditStore.Intent
 import example.todo.common.edit.store.TodoEditStoreProvider
-import example.todo.common.edit.ui.TodoEditUi
-import example.todo.common.utils.composeState
+import example.todo.common.utils.asValue
 import example.todo.common.utils.getStore
 
 internal class TodoEditImpl(
@@ -24,14 +26,17 @@ internal class TodoEditImpl(
             ).provide()
         }
 
-    @Composable
-    override fun invoke() {
-        val state by store.composeState
+    override val models: Value<Model> = store.asValue().map(stateToModel)
 
-        TodoEditUi(
-            state = state,
-            output = editOutput,
-            intents = store::accept
-        )
+    override fun onTextChanged(text: String) {
+        store.accept(Intent.SetText(text = text))
+    }
+
+    override fun onDoneChanged(isDone: Boolean) {
+        store.accept(Intent.SetDone(isDone = isDone))
+    }
+
+    override fun onCloseClicked() {
+        editOutput.onNext(Output.Finished)
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -28,38 +29,34 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.badoo.reaktive.base.Consumer
-import example.todo.common.main.TodoMain.Output
-import example.todo.common.main.store.TodoItem
-import example.todo.common.main.store.TodoMainStore.Intent
-import example.todo.common.main.store.TodoMainStore.State
+import com.arkivanov.decompose.extensions.compose.jetbrains.asState
+import example.todo.common.main.TodoItem
+import example.todo.common.main.TodoMain
 import example.todo.common.utils.compose.MARGIN_SCROLLBAR
 import example.todo.common.utils.compose.VerticalScrollbar
 import example.todo.common.utils.compose.rememberScrollbarAdapter
 import example.todo.common.utils.onKeyUp
 
 @Composable
-internal fun TodoMainUi(
-    state: State,
-    output: Consumer<Output>,
-    intents: (Intent) -> Unit
-) {
+fun TodoMainContent(component: TodoMain) {
+    val model by component.models.asState()
+
     Column {
         TopAppBar(title = { Text(text = "Todo List") })
 
         Box(Modifier.weight(1F)) {
             TodoList(
-                items = state.items,
-                onItemClicked = { output.onNext(Output.Selected(id = it)) },
-                onDoneChanged = { id, isDone -> intents(Intent.SetItemDone(id = id, isDone = isDone)) },
-                onDeleteItemClicked = { intents(Intent.DeleteItem(id = it)) }
+                items = model.items,
+                onItemClicked = component::onItemClicked,
+                onDoneChanged = component::onItemDoneChanged,
+                onDeleteItemClicked = component::onItemDeleteClicked
             )
         }
 
         TodoInput(
-            text = state.text,
-            onAddClicked = { intents(Intent.AddItem) },
-            onTextChanged = { intents(Intent.SetText(text = it)) }
+            text = model.text,
+            onAddClicked = component::onAddItemClicked,
+            onTextChanged = component::onInputTextChanged
         )
     }
 }

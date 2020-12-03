@@ -1,6 +1,6 @@
-package example.todo.common.main.store
+package example.todo.common.main
 
-internal data class TodoItem(
+data class TodoItem(
     val id: Long = 0L,
     val order: Long = 0L,
     val text: String = "",

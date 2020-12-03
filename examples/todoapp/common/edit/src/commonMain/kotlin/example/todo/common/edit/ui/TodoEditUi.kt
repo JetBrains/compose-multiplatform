@@ -15,35 +15,32 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.badoo.reaktive.base.Consumer
-import example.todo.common.edit.TodoEdit.Output
-import example.todo.common.edit.store.TodoEditStore.Intent
-import example.todo.common.edit.store.TodoEditStore.State
+import com.arkivanov.decompose.extensions.compose.jetbrains.asState
+import example.todo.common.edit.TodoEdit
 
 @Composable
-internal fun TodoEditUi(
-    state: State,
-    output: Consumer<Output>,
-    intents: (Intent) -> Unit
-) {
+fun TodoEditContent(component: TodoEdit) {
+    val model by component.models.asState()
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         TopAppBar(
             title = { Text("Edit todo") },
             navigationIcon = {
-                IconButton(onClick = { output.onNext(Output.Finished) }) {
+                IconButton(onClick = component::onCloseClicked) {
                     Icon(Icons.Default.ArrowBack)
                 }
             }
         )
 
         TextField(
-            value = state.text,
+            value = model.text,
             modifier = Modifier.weight(1F).fillMaxWidth().padding(8.dp),
             label = { Text("Todo text") },
-            onValueChange = { intents(Intent.SetText(text = it)) }
+            onValueChange = component::onTextChanged
         )
 
         Row(modifier = Modifier.padding(8.dp)) {
@@ -52,8 +49,8 @@ internal fun TodoEditUi(
             Spacer(modifier = Modifier.width(8.dp))
 
             Checkbox(
-                checked = state.isDone,
-                onCheckedChange = { intents(Intent.SetDone(isDone = it)) }
+                checked = model.isDone,
+                onCheckedChange = component::onDoneChanged
             )
         }
     }

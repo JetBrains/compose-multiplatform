@@ -1,20 +1,23 @@
 package example.todo.common.utils
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
-import androidx.compose.runtime.remember
+import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.ValueObserver
 import com.arkivanov.mvikotlin.core.store.Store
-import com.arkivanov.mvikotlin.extensions.reaktive.states
-import com.badoo.reaktive.observable.subscribe
+import com.arkivanov.mvikotlin.rx.Disposable
 
-@Composable
-val <T : Any> Store<*, T, *>.composeState: State<T>
-    get() {
-        val composeState = remember(this) { mutableStateOf(state) }
-        val disposable = remember(this) { states.subscribe(onNext = { composeState.value = it }) }
-        onDispose(disposable::dispose)
+fun <T : Any> Store<*, T, *>.asValue(): Value<T> =
+    object : Value<T>() {
+        override val value: T get() = state
+        private var disposables = emptyMap<ValueObserver<T>, Disposable>()
 
-        return composeState
+        override fun subscribe(observer: ValueObserver<T>) {
+            val disposable = states(com.arkivanov.mvikotlin.rx.observer(onNext = observer))
+            this.disposables += observer to disposable
+        }
+
+        override fun unsubscribe(observer: ValueObserver<T>) {
+            val disposable = disposables[observer] ?: return
+            this.disposables -= observer
+            disposable.dispose()
+        }
     }

@@ -28,6 +28,7 @@ object Deps {
     object ArkIvanov {
         object MVIKotlin {
             private const val VERSION = "2.0.0"
+            const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
             const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
             const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
             const val mvikotlinLogging = "com.arkivanov.mvikotlin:mvikotlin-logging:$VERSION"
@@ -36,7 +37,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.1.1"
+            private const val VERSION = "0.1.3"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
         }

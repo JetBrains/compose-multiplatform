@@ -3,6 +3,7 @@ package example.todo.common.main.store
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.badoo.reaktive.scheduler.overrideSchedulers
 import com.badoo.reaktive.test.scheduler.TestScheduler
+import example.todo.common.main.TodoItem
 import example.todo.common.main.store.TodoMainStore.Intent
 import kotlin.test.BeforeTest
 import kotlin.test.Test

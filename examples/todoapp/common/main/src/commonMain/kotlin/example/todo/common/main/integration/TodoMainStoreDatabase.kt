@@ -10,7 +10,7 @@ import com.squareup.sqldelight.Query
 import example.todo.common.database.TodoDatabaseQueries
 import example.todo.common.database.TodoItemEntity
 import example.todo.common.database.asObservable
-import example.todo.common.main.store.TodoItem
+import example.todo.common.main.TodoItem
 import example.todo.common.main.store.TodoMainStoreProvider
 
 internal class TodoMainStoreDatabase(
