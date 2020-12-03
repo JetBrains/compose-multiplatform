@@ -58,6 +58,7 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert
@@ -302,6 +303,7 @@ class ImageTest {
     }
 
     @Test
+    @LargeTest
     fun testImageScalesNonuniformly() {
         val imageComposableWidth = imageWidth * 3
         val imageComposableHeight = imageHeight * 7
@@ -524,6 +526,7 @@ class ImageTest {
     }
 
     @Test
+    @LargeTest
     fun testPainterResourceWithImage() {
         val testTag = "testTag"
         var imageColor = Color.Black
