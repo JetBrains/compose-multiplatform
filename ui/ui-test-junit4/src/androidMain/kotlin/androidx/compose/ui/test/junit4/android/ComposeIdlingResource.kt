@@ -114,8 +114,7 @@ internal class ComposeIdlingResource : IdlingResource {
     private var hadNoSnapshotChanges = true
     private var hadNoRecomposerChanges = true
     private var hadNoPendingMeasureLayout = true
-    // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//    private var hadNoPendingDraw = true
+    private var hadNoPendingDraw = true
 
     /**
      * Returns whether or not Compose is idle now.
@@ -126,20 +125,18 @@ internal class ComposeIdlingResource : IdlingResource {
             hadNoSnapshotChanges = !Snapshot.current.hasPendingChanges()
             hadNoRecomposerChanges = !Recomposer.current().hasInvalidations()
             hadAnimationClocksIdle = areAllClocksIdle()
-            val owners = androidOwnerRegistry.getUnfilteredOwners()
+            val owners = androidOwnerRegistry.getOwners()
             hadNoPendingMeasureLayout = !owners.any { it.hasPendingMeasureOrLayout }
-            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//            hadNoPendingDraw = !owners.any {
-//                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
-//                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
-//            }
+            hadNoPendingDraw = !owners.any {
+                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
+                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
+            }
 
             return hadNoSnapshotChanges &&
                 hadNoRecomposerChanges &&
                 hadAnimationClocksIdle &&
-                // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-                hadNoPendingMeasureLayout /*&&
-                hadNoPendingDraw*/
+                hadNoPendingMeasureLayout &&
+                hadNoPendingDraw
         }
 
     @OptIn(ExperimentalTesting::class)
@@ -168,8 +165,7 @@ internal class ComposeIdlingResource : IdlingResource {
         val hadRecomposerChanges = !hadNoRecomposerChanges
         val hadRunningAnimations = !hadAnimationClocksIdle
         val hadPendingMeasureLayout = !hadNoPendingMeasureLayout
-        // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//        val hadPendingDraw = !hadNoPendingDraw
+        val hadPendingDraw = !hadNoPendingDraw
 
         val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges && !hadRunningAnimations
 
@@ -192,9 +188,8 @@ internal class ComposeIdlingResource : IdlingResource {
                 " infinite re-compositions happening in the tested code.\n"
             message += "- Debug: hadRecomposerChanges = $hadRecomposerChanges, "
             message += "hadSnapshotChanges = $hadSnapshotChanges, "
-            message += "hadPendingMeasureLayout = $hadPendingMeasureLayout"
-            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//            message += ", hadPendingDraw = $hadPendingDraw"
+            message += "hadPendingMeasureLayout = $hadPendingMeasureLayout, "
+            message += "hadPendingDraw = $hadPendingDraw"
         }
         return message
     }
