@@ -25,6 +25,12 @@ object Deps {
         }
     }
 
+    object AndroidX {
+        object AppCompat {
+            const val appCompat = "androidx.appcompat:appcompat:1.1.0"
+        }
+    }
+
     object ArkIvanov {
         object MVIKotlin {
             private const val VERSION = "2.0.0"

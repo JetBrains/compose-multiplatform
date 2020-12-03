@@ -15,7 +15,7 @@ import com.badoo.reaktive.coroutinesinterop.asScheduler
 import com.badoo.reaktive.scheduler.overrideSchedulers
 import example.todo.common.database.TodoDatabaseDriver
 import example.todo.common.root.TodoRoot
-import example.todo.common.root.ui.TodoRootContent
+import example.todo.common.ui.TodoRootContent
 import example.todo.database.TodoDatabase
 import kotlinx.coroutines.Dispatchers
 

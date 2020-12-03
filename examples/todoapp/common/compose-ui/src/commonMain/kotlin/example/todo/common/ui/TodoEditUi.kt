@@ -1,4 +1,4 @@
-package example.todo.common.edit.ui
+package example.todo.common.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

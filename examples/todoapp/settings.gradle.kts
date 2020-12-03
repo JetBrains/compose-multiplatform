@@ -4,6 +4,7 @@ include(
     ":common:main",
     ":common:edit",
     ":common:root",
+    ":common:compose-ui",
     ":android",
     ":desktop"
 )

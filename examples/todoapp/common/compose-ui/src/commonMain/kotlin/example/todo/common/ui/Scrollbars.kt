@@ -1,4 +1,4 @@
-package example.todo.common.utils.compose
+package example.todo.common.ui
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable

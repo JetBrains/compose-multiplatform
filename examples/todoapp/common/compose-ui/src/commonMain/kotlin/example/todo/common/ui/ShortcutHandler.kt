@@ -1,4 +1,4 @@
-package example.todo.common.utils
+package example.todo.common.ui
 
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent

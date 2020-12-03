@@ -1,4 +1,4 @@
-package example.todo.common.main.ui
+package example.todo.common.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -32,10 +32,6 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.jetbrains.asState
 import example.todo.common.main.TodoItem
 import example.todo.common.main.TodoMain
-import example.todo.common.utils.compose.MARGIN_SCROLLBAR
-import example.todo.common.utils.compose.VerticalScrollbar
-import example.todo.common.utils.compose.rememberScrollbarAdapter
-import example.todo.common.utils.onKeyUp
 
 @Composable
 fun TodoMainContent(component: TodoMain) {
