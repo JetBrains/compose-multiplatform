@@ -23,8 +23,10 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.Owner
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
@@ -66,9 +68,20 @@ class SemanticsNode internal constructor(
     val id: Int = layoutNodeWrapper.modifier.id
 
     /**
+     * The [LayoutInfo] that this is associated with.
+     */
+    val layoutInfo: LayoutInfo = layoutNodeWrapper.layoutNode
+
+    /**
+     * The [Owner] this node is attached to.
+     */
+    // TODO(b/174747742) Stop using Owner in tests and use RootForTest instead
+    val owner: Owner? get() = layoutNode.owner
+
+    /**
      * The [LayoutNode] that this is associated with.
      */
-    val layoutNode: LayoutNode = layoutNodeWrapper.layoutNode
+    internal val layoutNode: LayoutNode = layoutNodeWrapper.layoutNode
 
     // GEOMETRY
 

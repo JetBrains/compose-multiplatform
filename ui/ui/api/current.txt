@@ -1771,6 +1771,22 @@ package androidx.compose.ui.layout {
     property public abstract Object layoutId;
   }
 
+  public interface LayoutInfo {
+    method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
+    method public int getHeight();
+    method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
+    method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
+    method public int getWidth();
+    method public boolean isAttached();
+    method public boolean isPlaced();
+    property public abstract androidx.compose.ui.layout.LayoutCoordinates coordinates;
+    property public abstract int height;
+    property public abstract boolean isAttached;
+    property public abstract boolean isPlaced;
+    property public abstract androidx.compose.ui.layout.LayoutInfo? parentInfo;
+    property public abstract int width;
+  }
+
   public final class LayoutKt {
     method @androidx.compose.runtime.Composable public static void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicHeightMeasureBlock, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
     method @androidx.compose.runtime.Composable public static void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
@@ -1824,6 +1840,16 @@ package androidx.compose.ui.layout {
     method public static int getWidth-impl(androidx.compose.ui.layout.Placeable! $this);
     method public static inline int hashCode-impl(androidx.compose.ui.layout.Placeable! p);
     method public static inline String! toString-impl(androidx.compose.ui.layout.Placeable! p);
+  }
+
+  public final class ModifierInfo {
+    ctor public ModifierInfo(androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.LayoutCoordinates coordinates, Object? extra);
+    method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
+    method public Object? getExtra();
+    method public androidx.compose.ui.Modifier getModifier();
+    property public final androidx.compose.ui.layout.LayoutCoordinates coordinates;
+    property public final Object? extra;
+    property public final androidx.compose.ui.Modifier modifier;
   }
 
   public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
@@ -1955,25 +1981,20 @@ package androidx.compose.ui.node {
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalCoreApi {
   }
 
-  public final class LayoutNode implements androidx.compose.ui.layout.Measurable androidx.compose.ui.node.OwnerScope androidx.compose.ui.layout.Remeasurement {
+  public final class LayoutNode implements androidx.compose.ui.layout.LayoutInfo androidx.compose.ui.layout.Measurable androidx.compose.ui.node.OwnerScope androidx.compose.ui.layout.Remeasurement {
     ctor public LayoutNode();
-    method public void attach(androidx.compose.ui.node.Owner owner);
-    method public void detach();
     method public void forceRemeasure();
-    method @Deprecated public boolean getCanMultiMeasure();
     method public java.util.List<androidx.compose.ui.node.LayoutNode> getChildren();
     method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
-    method public androidx.compose.ui.unit.Density getDensity();
-    method public int getDepth();
     method public int getHeight();
-    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
-    method public androidx.compose.ui.node.MeasureBlocks getMeasureBlocks();
     method public androidx.compose.ui.Modifier getModifier();
-    method public java.util.List<androidx.compose.ui.node.ModifierInfo> getModifierInfo();
+    method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
     method public androidx.compose.ui.node.Owner? getOwner();
     method public androidx.compose.ui.node.LayoutNode? getParent();
     method public Object? getParentData();
+    method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
     method public int getWidth();
+    method public boolean isAttached();
     method public boolean isPlaced();
     method public boolean isValid();
     method public int maxIntrinsicHeight(int width);
@@ -1981,28 +2002,19 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.layout.Placeable measure-BRTryo0(long constraints);
     method public int minIntrinsicHeight(int width);
     method public int minIntrinsicWidth(int height);
-    method public void place(int x, int y);
-    method @Deprecated public void setCanMultiMeasure(boolean p);
-    method public void setDensity(androidx.compose.ui.unit.Density p);
-    method public void setDepth(int p);
-    method public void setLayoutDirection(androidx.compose.ui.unit.LayoutDirection value);
-    method public void setMeasureBlocks(androidx.compose.ui.node.MeasureBlocks value);
     method public void setModifier(androidx.compose.ui.Modifier value);
-    property @Deprecated public final boolean canMultiMeasure;
     property public final java.util.List<androidx.compose.ui.node.LayoutNode> children;
-    property public final androidx.compose.ui.layout.LayoutCoordinates coordinates;
-    property public final androidx.compose.ui.unit.Density density;
-    property public final int depth;
-    property public final int height;
-    property public final boolean isPlaced;
+    property public androidx.compose.ui.layout.LayoutCoordinates coordinates;
+    property public int height;
+    property public boolean isAttached;
+    property public boolean isPlaced;
     property public boolean isValid;
-    property public final androidx.compose.ui.unit.LayoutDirection layoutDirection;
-    property public final androidx.compose.ui.node.MeasureBlocks measureBlocks;
     property public final androidx.compose.ui.Modifier modifier;
     property public final androidx.compose.ui.node.Owner? owner;
     property public final androidx.compose.ui.node.LayoutNode? parent;
     property public Object? parentData;
-    property public final int width;
+    property public androidx.compose.ui.layout.LayoutInfo? parentInfo;
+    property public int width;
   }
 
   public final class LayoutNodeKt {
@@ -2014,16 +2026,6 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.layout.MeasureResult measure-8A2P9vY(androidx.compose.ui.layout.MeasureScope measureScope, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables, long constraints);
     method public int minIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope intrinsicMeasureScope, java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable> measurables, int w);
     method public int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope intrinsicMeasureScope, java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable> measurables, int h);
-  }
-
-  public final class ModifierInfo {
-    ctor public ModifierInfo(androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.LayoutCoordinates coordinates, Object? extra);
-    method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
-    method public Object? getExtra();
-    method public androidx.compose.ui.Modifier getModifier();
-    property public final androidx.compose.ui.layout.LayoutCoordinates coordinates;
-    property public final Object? extra;
-    property public final androidx.compose.ui.Modifier modifier;
   }
 
   public interface OwnedLayer {
@@ -2631,8 +2633,9 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.geometry.Rect getGlobalBounds();
     method public long getGlobalPosition-F1C5BW0();
     method public int getId();
-    method public androidx.compose.ui.node.LayoutNode getLayoutNode();
+    method public androidx.compose.ui.layout.LayoutInfo getLayoutInfo();
     method public boolean getMergingEnabled();
+    method public androidx.compose.ui.node.Owner? getOwner();
     method public androidx.compose.ui.semantics.SemanticsNode? getParent();
     method public long getPositionInRoot-F1C5BW0();
     method public long getSize-YbymL2g();
@@ -2644,8 +2647,9 @@ package androidx.compose.ui.semantics {
     property public final long globalPosition;
     property public final int id;
     property public final boolean isRoot;
-    property public final androidx.compose.ui.node.LayoutNode layoutNode;
+    property public final androidx.compose.ui.layout.LayoutInfo layoutInfo;
     property public final boolean mergingEnabled;
+    property public final androidx.compose.ui.node.Owner? owner;
     property public final androidx.compose.ui.semantics.SemanticsNode? parent;
     property public final long positionInRoot;
     property public final long size;

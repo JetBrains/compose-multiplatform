@@ -106,7 +106,7 @@ class GestureScope(node: SemanticsNode, testContext: TestContext) {
         }
 
     // Convenience property
-    private val owner get() = semanticsNode.layoutNode.owner
+    private val owner get() = semanticsNode.owner
 
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _inputDispatcher: InputDispatcher? =
@@ -285,7 +285,7 @@ fun GestureScope.percentOffset(
  * @param position A position in local coordinates
  */
 private fun GestureScope.localToGlobal(position: Offset): Offset {
-    return position + semanticsNode.layoutNode.coordinates.globalBounds.topLeft
+    return position + semanticsNode.layoutInfo.coordinates.globalBounds.topLeft
 }
 
 /**

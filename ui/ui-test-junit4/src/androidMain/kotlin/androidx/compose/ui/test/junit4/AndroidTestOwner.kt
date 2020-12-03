@@ -33,7 +33,7 @@ internal class AndroidTestOwner(
 
     @SuppressLint("DocumentExceptions")
     override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
-        val owner = node.layoutNode.owner as ViewRootForTest
+        val owner = node.owner as ViewRootForTest
 
         @Suppress("DEPRECATION")
         runOnUiThread {
@@ -46,7 +46,7 @@ internal class AndroidTestOwner(
 
     @SuppressLint("DocumentExceptions")
     override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-        val owner = node.layoutNode.owner as ViewRootForTest
+        val owner = node.owner as ViewRootForTest
 
         @Suppress("DEPRECATION")
         runOnUiThread {

@@ -27,7 +27,7 @@ import androidx.compose.ui.input.key.KeyEvent
 @OptIn(ExperimentalKeyInput::class)
 fun SemanticsNodeInteraction.performKeyPress(keyEvent: KeyEvent): Boolean {
     val semanticsNode = fetchSemanticsNode("Failed to send key Event (${keyEvent.key})")
-    val owner = semanticsNode.layoutNode.owner
+    val owner = semanticsNode.owner
     requireNotNull(owner) { "Failed to find owner" }
     @OptIn(InternalTestingApi::class)
     return testContext.testOwner.runOnUiThread { owner.sendKeyEvent(keyEvent) }

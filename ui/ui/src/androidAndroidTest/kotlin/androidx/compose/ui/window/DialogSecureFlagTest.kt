@@ -124,7 +124,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     private fun isSecureFlagEnabledForDialog(): Boolean {
         val owner = rule
             .onNode(isDialog())
-            .fetchSemanticsNode("").layoutNode.owner as View
+            .fetchSemanticsNode("").owner as View
         return (owner.rootView.layoutParams as WindowManager.LayoutParams).flags and
             WindowManager.LayoutParams.FLAG_SECURE != 0
     }
