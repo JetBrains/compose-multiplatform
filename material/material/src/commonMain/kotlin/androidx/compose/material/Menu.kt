@@ -74,7 +74,8 @@ import kotlin.math.min
  * the [toggle], and then screen end-aligned. Vertically, it will try to expand to the bottom
  * of the [toggle], then from the top of the [toggle], and then screen top-aligned. A
  * [dropdownOffset] can be provided to adjust the positioning of the menu for cases when the
- * layout bounds of the [toggle] do not coincide with its visual bounds.
+ * layout bounds of the [toggle] do not coincide with its visual bounds. Note the offset will be
+ * applied in the direction in which the menu will decide to expand.
  *
  * Example usage:
  * @sample androidx.compose.material.samples.MenuSample
@@ -305,8 +306,8 @@ internal data class DropdownMenuPositionProvider(
         val contentOffsetY = with(density) { contentOffset.y.toIntPx() }
 
         // Compute horizontal position.
-        val toRight = parentGlobalBounds.right + contentOffsetX
-        val toLeft = parentGlobalBounds.left - contentOffsetX - popupContentSize.width
+        val toRight = parentGlobalBounds.left + contentOffsetX
+        val toLeft = parentGlobalBounds.right - contentOffsetX - popupContentSize.width
         val toDisplayRight = windowGlobalBounds.width - popupContentSize.width
         val toDisplayLeft = 0
         val x = if (layoutDirection == LayoutDirection.Ltr) {
