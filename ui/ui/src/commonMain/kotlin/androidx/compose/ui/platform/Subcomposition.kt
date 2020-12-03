@@ -18,20 +18,12 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.util.annotation.MainThread
 
-internal expect fun actualSubcomposeInto(
+@MainThread
+internal expect fun subcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,
     composable: @Composable () -> Unit
 ): Composition
-
-@OptIn(ExperimentalComposeApi::class)
-@MainThread
-fun subcomposeInto(
-    container: LayoutNode,
-    parent: CompositionReference,
-    composable: @Composable () -> Unit
-): Composition = actualSubcomposeInto(container, parent, composable)

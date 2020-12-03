@@ -64,7 +64,7 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
 }
 
 @OptIn(ExperimentalComposeApi::class)
-internal actual fun actualSubcomposeInto(
+internal actual fun subcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,
     composable: @Composable () -> Unit

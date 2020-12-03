@@ -21,13 +21,13 @@ import android.app.Activity
 import android.os.Bundle
 import android.os.Looper
 import android.view.Choreographer
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.setViewContent
-import androidx.compose.ui.platform.subcomposeInto
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
@@ -116,15 +116,18 @@ abstract class BaseComposeTest {
 
     @Composable
     fun subCompose(block: @Composable () -> Unit) {
-        val container = remember { LayoutNode() }
+        val container = remember { View(activity) }
         val reference = compositionReference()
         // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
         @OptIn(ExperimentalComposeApi::class)
-        subcomposeInto(
+        compositionFor(
             container,
+            UiApplier(container),
             reference
-        ) @ComposableContract(tracked = false) {
-            block()
+        ).apply {
+            setContent @ComposableContract(tracked = false) {
+                block()
+            }
         }
     }
 }
