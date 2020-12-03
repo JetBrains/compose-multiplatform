@@ -17,7 +17,6 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.HandlePointerInputScope
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -86,7 +85,6 @@ private val NoPressGesture: suspend PressGestureScope.(Offset) -> Unit = { }
  * the gestures are considered canceled. [onDoubleTap], [onLongPress], and [onTap] will not be
  * called after a gesture has been canceled.
  */
-@ExperimentalPointerInput
 suspend fun PointerInputScope.detectTapGestures(
     onDoubleTap: (() -> Unit)? = null,
     onLongPress: (() -> Unit)? = null,
@@ -186,7 +184,6 @@ suspend fun PointerInputScope.detectTapGestures(
  * Reads events until the first down is received. If [requireUnconsumed] is `true` and the first
  * down is consumed in the [PointerEventPass.Main] pass, that gesture is ignored.
  */
-@ExperimentalPointerInput
 suspend fun HandlePointerInputScope.awaitFirstDown(
     requireUnconsumed: Boolean = true
 ): PointerInputChange {
@@ -208,7 +205,6 @@ suspend fun HandlePointerInputScope.awaitFirstDown(
  * pass. If the gesture was not canceled, the final up change is returned or `null` if the
  * event was canceled.
  */
-@ExperimentalPointerInput
 suspend fun HandlePointerInputScope.waitForUpOrCancellation(): PointerInputChange? {
     while (true) {
         val event = awaitPointerEvent(PointerEventPass.Main)
@@ -233,7 +229,6 @@ suspend fun HandlePointerInputScope.waitForUpOrCancellation(): PointerInputChang
 /**
  * Consumes all event changes in the [PointerEventPass.Initial] until all pointers are up.
  */
-@ExperimentalPointerInput
 private suspend fun PointerInputScope.consumeAllEventsUntilUp() {
     handlePointerInput {
         if (!allPointersUp()) {
@@ -251,7 +246,6 @@ private suspend fun PointerInputScope.consumeAllEventsUntilUp() {
  * not detected within [ViewConfiguration.doubleTapTimeout] of [upTime], `null` is returned.
  * Otherwise, the down event is returned.
  */
-@ExperimentalPointerInput
 private suspend fun PointerInputScope.detectSecondTapDown(
     upTime: Uptime
 ): PointerInputChange? {

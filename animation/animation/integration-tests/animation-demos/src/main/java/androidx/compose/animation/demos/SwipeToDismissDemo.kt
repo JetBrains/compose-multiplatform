@@ -42,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -80,7 +79,6 @@ fun SwipeToDismissDemo() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
     val mutatorMutex = remember { MutatorMutex() }
     var alpha by remember { mutableStateOf(1f) }

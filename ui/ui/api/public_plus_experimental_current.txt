@@ -410,9 +410,6 @@ package androidx.compose.ui.gesture {
     method public static androidx.compose.ui.Modifier dragSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onDragSlopExceeded, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
   }
 
-  @kotlin.RequiresOptIn(message="This pointer input API is experimental and is likely to change before becoming " + "stable.") public @interface ExperimentalPointerInput {
-  }
-
   public final class GestureUtilsKt {
     method public static boolean anyPointersInBounds-5eFHUEc(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>, long bounds);
   }
@@ -493,11 +490,11 @@ package androidx.compose.ui.gesture {
 
 package androidx.compose.ui.gesture.customevents {
 
-  @androidx.compose.ui.gesture.ExperimentalPointerInput public final class DelayUpEvent implements androidx.compose.ui.input.pointer.CustomEvent {
+  public final class DelayUpEvent implements androidx.compose.ui.input.pointer.CustomEvent {
     ctor public DelayUpEvent(androidx.compose.ui.gesture.customevents.DelayUpMessage message, java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointers);
     method public androidx.compose.ui.gesture.customevents.DelayUpMessage component1();
     method public java.util.Set<androidx.compose.ui.input.pointer.PointerId> component2();
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public androidx.compose.ui.gesture.customevents.DelayUpEvent copy(androidx.compose.ui.gesture.customevents.DelayUpMessage message, java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointers);
+    method public androidx.compose.ui.gesture.customevents.DelayUpEvent copy(androidx.compose.ui.gesture.customevents.DelayUpMessage message, java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointers);
     method public androidx.compose.ui.gesture.customevents.DelayUpMessage getMessage();
     method public java.util.Set<androidx.compose.ui.input.pointer.PointerId> getPointers();
     method public void setMessage(androidx.compose.ui.gesture.customevents.DelayUpMessage p);
@@ -505,7 +502,7 @@ package androidx.compose.ui.gesture.customevents {
     property public final java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointers;
   }
 
-  @androidx.compose.ui.gesture.ExperimentalPointerInput public enum DelayUpMessage {
+  public enum DelayUpMessage {
     enum_constant public static final androidx.compose.ui.gesture.customevents.DelayUpMessage DelayUp;
     enum_constant public static final androidx.compose.ui.gesture.customevents.DelayUpMessage DelayedUpConsumed;
     enum_constant public static final androidx.compose.ui.gesture.customevents.DelayUpMessage DelayedUpNotConsumed;
@@ -524,7 +521,7 @@ package androidx.compose.ui.gesture.scrollorientationlocking {
     enum_constant public static final androidx.compose.ui.gesture.scrollorientationlocking.Orientation Vertical;
   }
 
-  @androidx.compose.ui.gesture.ExperimentalPointerInput public final class ScrollOrientationLocker {
+  public final class ScrollOrientationLocker {
     ctor public ScrollOrientationLocker(androidx.compose.ui.input.pointer.CustomEventDispatcher customEventDispatcher);
     method public void attemptToLockPointers(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation);
     method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> getPointersFor(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation);
@@ -1473,7 +1470,7 @@ package androidx.compose.ui.input.pointer {
     method public void retainHitPaths(java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointerIds);
   }
 
-  @androidx.compose.ui.gesture.ExperimentalPointerInput @kotlin.coroutines.RestrictsSuspension public interface HandlePointerInputScope extends androidx.compose.ui.unit.Density {
+  @kotlin.coroutines.RestrictsSuspension public interface HandlePointerInputScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitCustomEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.CustomEvent> p);
     method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent> p);
     method public androidx.compose.ui.input.pointer.PointerEvent getCurrentEvent();
@@ -1601,7 +1598,7 @@ package androidx.compose.ui.input.pointer {
     property public abstract androidx.compose.ui.input.pointer.PointerInputFilter pointerInputFilter;
   }
 
-  @androidx.compose.ui.gesture.ExperimentalPointerInput public interface PointerInputScope extends androidx.compose.ui.unit.Density {
+  public interface PointerInputScope extends androidx.compose.ui.unit.Density {
     method public androidx.compose.ui.input.pointer.CustomEventDispatcher getCustomEventDispatcher();
     method public long getSize-YbymL2g();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
@@ -1627,7 +1624,7 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class SuspendingPointerInputFilterKt {
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
   }
 
 }

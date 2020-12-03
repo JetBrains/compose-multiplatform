@@ -17,7 +17,6 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
@@ -48,7 +47,6 @@ import kotlin.math.atan2
  * Example Usage:
  * @sample androidx.compose.foundation.samples.DetectMultitouchGestures
  */
-@ExperimentalPointerInput
 suspend fun PointerInputScope.detectMultitouchGestures(
     panZoomLock: Boolean = false,
     onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float) -> Unit
