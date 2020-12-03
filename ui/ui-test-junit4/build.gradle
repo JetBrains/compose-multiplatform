@@ -123,7 +123,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 android {
     tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
-            freeCompilerArgs += ["-XXLanguage:-NewInference"]
             useIR = true
         }
     }
