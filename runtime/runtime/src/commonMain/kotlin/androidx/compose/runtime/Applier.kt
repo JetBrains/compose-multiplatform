@@ -30,7 +30,6 @@ package androidx.compose.runtime
  * @see Composer
  * @see emit
  */
-@ExperimentalComposeApi
 interface Applier<N> {
     /**
      * The node that operations will be applied on at any given time. It is expected that the
@@ -190,7 +189,6 @@ interface Applier<N> {
  * @see Composer
  * @see emit
  */
-@ExperimentalComposeApi
 abstract class AbstractApplier<T>(val root: T) : Applier<T> {
     private val stack = mutableListOf<T>()
     override var current: T = root
