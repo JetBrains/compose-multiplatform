@@ -39,7 +39,7 @@ class ToStringLogger(
     ).also {
         it.level = LogLevel.DEBUG
         it.setOutputEventListener {
-            stringBuilder.appendln(it.toString())
+            stringBuilder.append(it.toString() + "\n")
         }
     },
     Clock {
