@@ -53,6 +53,8 @@ class TodoMainTest {
             main = { TestScheduler() },
             io = { TestScheduler() }
         )
+
+        queries.clear()
     }
 
     @Test
@@ -143,7 +145,7 @@ class TodoMainTest {
     private fun firstItem(): TodoItem = model.items[0]
 
     private fun lastInsertItem(): TodoItemEntity {
-        val lastInsertId = queries.getLastInsertId().executeAsOne()
+        val lastInsertId = queries.transactionWithResult<Long> { queries.getLastInsertId().executeAsOne() }
 
         return queries.select(id = lastInsertId).executeAsOne()
     }

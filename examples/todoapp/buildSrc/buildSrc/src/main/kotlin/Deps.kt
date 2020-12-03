@@ -37,6 +37,8 @@ object Deps {
             const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
             const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
             const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
+            const val mvikotlinMainIosX64 = "com.arkivanov.mvikotlin:mvikotlin-main-iosx64:$VERSION"
+            const val mvikotlinMainIosArm64 = "com.arkivanov.mvikotlin:mvikotlin-main-iosarm64:$VERSION"
             const val mvikotlinLogging = "com.arkivanov.mvikotlin:mvikotlin-logging:$VERSION"
             const val mvikotlinTimeTravel = "com.arkivanov.mvikotlin:mvikotlin-timetravel:$VERSION"
             const val mvikotlinExtensionsReaktive = "com.arkivanov.mvikotlin:mvikotlin-extensions-reaktive:$VERSION"
@@ -45,6 +47,8 @@ object Deps {
         object Decompose {
             private const val VERSION = "0.1.3"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
+            const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
+            const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
             const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
         }
     }
@@ -66,6 +70,7 @@ object Deps {
             const val gradlePlugin = "com.squareup.sqldelight:gradle-plugin:$VERSION"
             const val androidDriver = "com.squareup.sqldelight:android-driver:$VERSION"
             const val sqliteDriver = "com.squareup.sqldelight:sqlite-driver:$VERSION"
+            const val nativeDriver = "com.squareup.sqldelight:native-driver:$VERSION"
         }
     }
 }

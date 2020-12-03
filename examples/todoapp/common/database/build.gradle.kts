@@ -30,5 +30,11 @@ kotlin {
                 implementation(Deps.Squareup.SQLDelight.sqliteDriver)
             }
         }
+
+        iosMain {
+            dependencies {
+                implementation(Deps.Squareup.SQLDelight.nativeDriver)
+            }
+        }
     }
 }

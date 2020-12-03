@@ -34,3 +34,6 @@ WHERE id = :id;
 
 getLastInsertId:
 SELECT last_insert_rowid();
+
+clear:
+DELETE FROM TodoItemEntity;

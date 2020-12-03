@@ -40,11 +40,6 @@ internal class TodoMainStoreDatabase(
             .subscribeOn(ioScheduler)
 
     override fun add(text: String): Completable =
-        completableFromFunction {
-            queries.transactionWithResult {
-                queries.add(text = text)
-                val lastId = queries.getLastInsertId().executeAsOne()
-                queries.select(id = lastId).executeAsOne()
-            }
-        }.subscribeOn(ioScheduler)
+        completableFromFunction { queries.add(text = text) }
+            .subscribeOn(ioScheduler)
 }
