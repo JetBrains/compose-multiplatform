@@ -60,9 +60,7 @@ configurations {
     cacheableImplementation {
         extendsFrom(project.configurations.cacheableApi)
     }
-    cacheableRuntime {
-        extendsFrom(project.configurations.cacheableImplementation)
-    }
+    cacheableRuntimeOnly
 }
 
 dependencies {
@@ -79,7 +77,7 @@ dependencies {
     cacheableImplementation "com.github.jengelman.gradle.plugins:shadow:5.2.0"
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
-    cacheableRuntime build_libs.hilt_plugin
+    cacheableRuntimeOnly build_libs.hilt_plugin
     // dependencies whose resolutions we don't need to cache
     compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
     implementation project("jetpad-integration") // Doesn't have a .pom, so not slow to load
@@ -168,7 +166,7 @@ def loadConfigurationQuicklyInto(fromConf, toConf) {
 
 loadConfigurationQuicklyInto(configurations.cacheableApi, configurations.api)
 loadConfigurationQuicklyInto(configurations.cacheableImplementation, configurations.implementation)
-loadConfigurationQuicklyInto(configurations.cacheableRuntime, configurations.runtime)
+loadConfigurationQuicklyInto(configurations.cacheableRuntimeOnly, configurations.runtimeOnly)
 
 project.tasks.withType(Jar) { task ->
     task.reproducibleFileOrder = true
