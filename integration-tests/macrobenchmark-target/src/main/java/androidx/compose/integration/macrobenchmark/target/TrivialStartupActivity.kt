@@ -28,7 +28,5 @@ class TrivialStartupActivity : ComponentActivity() {
         setContent {
             Text("Compose Macrobenchmark Target")
         }
-
-        reportFullyDrawn()
     }
 }
