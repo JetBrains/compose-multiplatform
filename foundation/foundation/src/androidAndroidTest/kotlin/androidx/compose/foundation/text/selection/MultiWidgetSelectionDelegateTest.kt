@@ -25,6 +25,7 @@ import androidx.compose.ui.selection.Selectable
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextDelegate
@@ -60,7 +61,10 @@ val BASIC_MEASURE_FONT = font(
     style = FontStyle.Normal
 )
 
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class MultiWidgetSelectionDelegateTest {

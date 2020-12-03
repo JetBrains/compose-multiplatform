@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.length
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.subSequence
@@ -42,6 +43,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@OptIn(ExperimentalTextApi::class)
 @RunWith(JUnit4::class)
 class SelectionManagerTest {
     private val selectionRegistrar = spy(SelectionRegistrarImpl())

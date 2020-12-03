@@ -2426,7 +2426,7 @@ package androidx.compose.ui.res {
 
 package androidx.compose.ui.selection {
 
-  public interface Selectable {
+  @androidx.compose.ui.text.ExperimentalTextApi public interface Selectable {
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public long getHandlePosition-F1C5BW0(androidx.compose.ui.selection.Selection selection, boolean isStartHandle);
     method public androidx.compose.ui.layout.LayoutCoordinates? getLayoutCoordinates();
@@ -2476,9 +2476,11 @@ package androidx.compose.ui.selection {
   public final class SelectionManagerKt {
   }
 
-  public interface SelectionRegistrar {
-    method public void onPositionChange();
-    method public void onUpdateSelection-rULFVbc(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition, long endPosition);
+  @androidx.compose.ui.text.ExperimentalTextApi public interface SelectionRegistrar {
+    method public void notifyPositionChange();
+    method public void notifySelectionUpdate-rULFVbc(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition, long endPosition);
+    method public void notifySelectionUpdateEnd();
+    method public void notifySelectionUpdateStart-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition);
     method public androidx.compose.ui.selection.Selectable subscribe(androidx.compose.ui.selection.Selectable selectable);
     method public void unsubscribe(androidx.compose.ui.selection.Selectable selectable);
   }
