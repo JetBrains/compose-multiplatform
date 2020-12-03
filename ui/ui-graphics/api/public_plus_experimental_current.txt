@@ -31,6 +31,7 @@ package androidx.compose.ui.graphics {
     method public androidx.compose.ui.graphics.ColorFilter? getColorFilter();
     method public androidx.compose.ui.graphics.FilterQuality getFilterQuality();
     method public android.graphics.PathEffect? getNativePathEffect();
+    method public androidx.compose.ui.graphics.PathEffect? getPathEffect();
     method public android.graphics.Shader? getShader();
     method public androidx.compose.ui.graphics.StrokeCap getStrokeCap();
     method public androidx.compose.ui.graphics.StrokeJoin getStrokeJoin();
@@ -45,6 +46,7 @@ package androidx.compose.ui.graphics {
     method public void setColorFilter(androidx.compose.ui.graphics.ColorFilter? value);
     method public void setFilterQuality(androidx.compose.ui.graphics.FilterQuality value);
     method public void setNativePathEffect(android.graphics.PathEffect? value);
+    method public void setPathEffect(androidx.compose.ui.graphics.PathEffect? value);
     method public void setShader(android.graphics.Shader? value);
     method public void setStrokeCap(androidx.compose.ui.graphics.StrokeCap value);
     method public void setStrokeJoin(androidx.compose.ui.graphics.StrokeJoin value);
@@ -58,6 +60,7 @@ package androidx.compose.ui.graphics {
     property public androidx.compose.ui.graphics.FilterQuality filterQuality;
     property public boolean isAntiAlias;
     property public android.graphics.PathEffect? nativePathEffect;
+    property public androidx.compose.ui.graphics.PathEffect? pathEffect;
     property public android.graphics.Shader? shader;
     property public androidx.compose.ui.graphics.StrokeCap strokeCap;
     property public androidx.compose.ui.graphics.StrokeJoin strokeJoin;
@@ -102,6 +105,11 @@ package androidx.compose.ui.graphics {
     property public final android.graphics.Path internalPath;
     property public boolean isConvex;
     property public boolean isEmpty;
+  }
+
+  public final class AndroidPathEffectKt {
+    method public static android.graphics.PathEffect asAndroidPathEffect(androidx.compose.ui.graphics.PathEffect);
+    method public static androidx.compose.ui.graphics.PathEffect toComposePathEffect(android.graphics.PathEffect);
   }
 
   public final class AndroidPathKt {
@@ -430,7 +438,8 @@ package androidx.compose.ui.graphics {
     method public long getColor-0d7_KjU();
     method public androidx.compose.ui.graphics.ColorFilter? getColorFilter();
     method public androidx.compose.ui.graphics.FilterQuality getFilterQuality();
-    method public android.graphics.PathEffect? getNativePathEffect();
+    method @Deprecated public android.graphics.PathEffect? getNativePathEffect();
+    method public androidx.compose.ui.graphics.PathEffect? getPathEffect();
     method public android.graphics.Shader? getShader();
     method public androidx.compose.ui.graphics.StrokeCap getStrokeCap();
     method public androidx.compose.ui.graphics.StrokeJoin getStrokeJoin();
@@ -444,7 +453,8 @@ package androidx.compose.ui.graphics {
     method public void setColor-8_81llA(long p);
     method public void setColorFilter(androidx.compose.ui.graphics.ColorFilter? p);
     method public void setFilterQuality(androidx.compose.ui.graphics.FilterQuality p);
-    method public void setNativePathEffect(android.graphics.PathEffect? p);
+    method @Deprecated public void setNativePathEffect(android.graphics.PathEffect? p);
+    method public void setPathEffect(androidx.compose.ui.graphics.PathEffect? p);
     method public void setShader(android.graphics.Shader? p);
     method public void setStrokeCap(androidx.compose.ui.graphics.StrokeCap p);
     method public void setStrokeJoin(androidx.compose.ui.graphics.StrokeJoin p);
@@ -457,7 +467,8 @@ package androidx.compose.ui.graphics {
     property public abstract androidx.compose.ui.graphics.ColorFilter? colorFilter;
     property public abstract androidx.compose.ui.graphics.FilterQuality filterQuality;
     property public abstract boolean isAntiAlias;
-    property public abstract android.graphics.PathEffect? nativePathEffect;
+    property @Deprecated public abstract android.graphics.PathEffect? nativePathEffect;
+    property public abstract androidx.compose.ui.graphics.PathEffect? pathEffect;
     property public abstract android.graphics.Shader? shader;
     property public abstract androidx.compose.ui.graphics.StrokeCap strokeCap;
     property public abstract androidx.compose.ui.graphics.StrokeJoin strokeJoin;
@@ -509,6 +520,17 @@ package androidx.compose.ui.graphics {
 
   public static final class Path.Companion {
     method public androidx.compose.ui.graphics.Path combine(androidx.compose.ui.graphics.PathOperation operation, androidx.compose.ui.graphics.Path path1, androidx.compose.ui.graphics.Path path2);
+  }
+
+  public interface PathEffect {
+    field public static final androidx.compose.ui.graphics.PathEffect.Companion Companion;
+  }
+
+  public static final class PathEffect.Companion {
+    method public androidx.compose.ui.graphics.PathEffect chainPathEffect(androidx.compose.ui.graphics.PathEffect outer, androidx.compose.ui.graphics.PathEffect inner);
+    method public androidx.compose.ui.graphics.PathEffect cornerPathEffect(float radius);
+    method public androidx.compose.ui.graphics.PathEffect dashPathEffect(float[] intervals, optional float phase);
+    method public androidx.compose.ui.graphics.PathEffect stampedPathEffect(androidx.compose.ui.graphics.Path shape, float advance, float phase, androidx.compose.ui.graphics.StampedPathEffectStyle style);
   }
 
   public enum PathFillType {
@@ -610,6 +632,12 @@ package androidx.compose.ui.graphics {
     method public void applyTo(androidx.compose.ui.graphics.Paint p, float alpha);
     method public long getValue-0d7_KjU();
     property public final long value;
+  }
+
+  public enum StampedPathEffectStyle {
+    enum_constant public static final androidx.compose.ui.graphics.StampedPathEffectStyle Morph;
+    enum_constant public static final androidx.compose.ui.graphics.StampedPathEffectStyle Rotate;
+    enum_constant public static final androidx.compose.ui.graphics.StampedPathEffectStyle Translate;
   }
 
   public enum StrokeCap {
@@ -860,14 +888,14 @@ package androidx.compose.ui.graphics.drawscope {
     method public void drawCircle-m-UMHxE(androidx.compose.ui.graphics.Brush brush, float radius, long center, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawImage-JUiai_k(androidx.compose.ui.graphics.ImageBitmap image, long topLeft, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawImage-Yc2aOMw(androidx.compose.ui.graphics.ImageBitmap image, long srcOffset, long srcSize, long dstOffset, long dstSize, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawLine-1-s4MmQ(long color, long start, long end, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, android.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawLine-IQGCKvc(androidx.compose.ui.graphics.Brush brush, long start, long end, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, android.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawLine-QXZmVdc(long color, long start, long end, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawLine-UXw4dv4(androidx.compose.ui.graphics.Brush brush, long start, long end, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawOval-0a6MmAQ(androidx.compose.ui.graphics.Brush brush, long topLeft, long size, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawOval-IdEHoqk(long color, long topLeft, long size, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawPath(androidx.compose.ui.graphics.Path path, androidx.compose.ui.graphics.Brush brush, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawPath-tilSWAQ(androidx.compose.ui.graphics.Path path, long color, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawPoints(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, androidx.compose.ui.graphics.Brush brush, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, android.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawPoints-8s8raUw(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, long color, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, android.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawPoints(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, androidx.compose.ui.graphics.Brush brush, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawPoints-Aqy9O-k(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, long color, float strokeWidth, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.PathEffect? pathEffect, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawRect-0a6MmAQ(androidx.compose.ui.graphics.Brush brush, long topLeft, long size, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawRect-IdEHoqk(long color, long topLeft, long size, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.drawscope.DrawStyle style, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawRoundRect-fNghmuc(long color, long topLeft, long size, long cornerRadius, androidx.compose.ui.graphics.drawscope.DrawStyle style, @FloatRange(from=0.0, to=1.0) float alpha, androidx.compose.ui.graphics.ColorFilter? colorFilter, androidx.compose.ui.graphics.BlendMode blendMode);
@@ -906,14 +934,14 @@ package androidx.compose.ui.graphics.drawscope {
     method public void drawCircle-m-UMHxE(androidx.compose.ui.graphics.Brush brush, optional float radius, optional long center, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawImage-JUiai_k(androidx.compose.ui.graphics.ImageBitmap image, optional long topLeft, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawImage-Yc2aOMw(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawLine-1-s4MmQ(long color, long start, long end, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional android.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawLine-IQGCKvc(androidx.compose.ui.graphics.Brush brush, long start, long end, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional android.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawLine-QXZmVdc(long color, long start, long end, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawLine-UXw4dv4(androidx.compose.ui.graphics.Brush brush, long start, long end, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawOval-0a6MmAQ(androidx.compose.ui.graphics.Brush brush, optional long topLeft, optional long size, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawOval-IdEHoqk(long color, optional long topLeft, optional long size, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawPath(androidx.compose.ui.graphics.Path path, androidx.compose.ui.graphics.Brush brush, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawPath-tilSWAQ(androidx.compose.ui.graphics.Path path, long color, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawPoints(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, androidx.compose.ui.graphics.Brush brush, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional android.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
-    method public void drawPoints-8s8raUw(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, long color, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional android.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawPoints(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, androidx.compose.ui.graphics.Brush brush, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
+    method public void drawPoints-Aqy9O-k(java.util.List<androidx.compose.ui.geometry.Offset> points, androidx.compose.ui.graphics.PointMode pointMode, long color, optional float strokeWidth, optional androidx.compose.ui.graphics.StrokeCap cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawRect-0a6MmAQ(androidx.compose.ui.graphics.Brush brush, optional long topLeft, optional long size, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawRect-IdEHoqk(long color, optional long topLeft, optional long size, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
     method public void drawRoundRect-fNghmuc(long color, optional long topLeft, optional long size, optional long cornerRadius, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional @FloatRange(from=0.0, to=1.0) float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional androidx.compose.ui.graphics.BlendMode blendMode);
@@ -982,23 +1010,23 @@ package androidx.compose.ui.graphics.drawscope {
   }
 
   public final class Stroke extends androidx.compose.ui.graphics.drawscope.DrawStyle {
-    ctor public Stroke(float width, float miter, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.StrokeJoin join, android.graphics.PathEffect? pathEffect);
+    ctor public Stroke(float width, float miter, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.StrokeJoin join, androidx.compose.ui.graphics.PathEffect? pathEffect);
     ctor public Stroke();
     method public float component1();
     method public float component2();
     method public androidx.compose.ui.graphics.StrokeCap component3();
     method public androidx.compose.ui.graphics.StrokeJoin component4();
-    method public android.graphics.PathEffect? component5();
-    method public androidx.compose.ui.graphics.drawscope.Stroke copy(float width, float miter, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.StrokeJoin join, android.graphics.PathEffect? pathEffect);
+    method public androidx.compose.ui.graphics.PathEffect? component5();
+    method public androidx.compose.ui.graphics.drawscope.Stroke copy(float width, float miter, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.StrokeJoin join, androidx.compose.ui.graphics.PathEffect? pathEffect);
     method public androidx.compose.ui.graphics.StrokeCap getCap();
     method public androidx.compose.ui.graphics.StrokeJoin getJoin();
     method public float getMiter();
-    method public android.graphics.PathEffect? getPathEffect();
+    method public androidx.compose.ui.graphics.PathEffect? getPathEffect();
     method public float getWidth();
     property public final androidx.compose.ui.graphics.StrokeCap cap;
     property public final androidx.compose.ui.graphics.StrokeJoin join;
     property public final float miter;
-    property public final android.graphics.PathEffect? pathEffect;
+    property public final androidx.compose.ui.graphics.PathEffect? pathEffect;
     property public final float width;
     field public static final androidx.compose.ui.graphics.drawscope.Stroke.Companion Companion;
     field public static final float DefaultMiter = 4.0f;

@@ -22,6 +22,10 @@ import androidx.compose.ui.geometry.RoundRect
 
 expect fun Path(): Path
 
+@Deprecated(
+    "Use PathEffect instead",
+    ReplaceWith("PathEffect", "androidx.compose.ui.graphics.PathEffect")
+)
 expect class NativePathEffect
 
 /* expect class */ interface Path {

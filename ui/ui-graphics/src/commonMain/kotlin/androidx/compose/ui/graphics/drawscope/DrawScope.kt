@@ -26,9 +26,9 @@ import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.NativePathEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -327,7 +327,7 @@ interface DrawScope : Density {
         end: Offset,
         strokeWidth: Float = Stroke.HairlineWidth,
         cap: StrokeCap = Stroke.DefaultCap,
-        pathEffect: NativePathEffect? = null,
+        pathEffect: PathEffect? = null,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
@@ -354,7 +354,7 @@ interface DrawScope : Density {
         end: Offset,
         strokeWidth: Float = Stroke.HairlineWidth,
         cap: StrokeCap = Stroke.DefaultCap,
-        pathEffect: NativePathEffect? = null,
+        pathEffect: PathEffect? = null,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
@@ -745,7 +745,7 @@ interface DrawScope : Density {
         color: Color,
         strokeWidth: Float = Stroke.HairlineWidth,
         cap: StrokeCap = StrokeCap.Butt,
-        pathEffect: NativePathEffect? = null,
+        pathEffect: PathEffect? = null,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
@@ -773,7 +773,7 @@ interface DrawScope : Density {
         brush: Brush,
         strokeWidth: Float = Stroke.HairlineWidth,
         cap: StrokeCap = StrokeCap.Butt,
-        pathEffect: NativePathEffect? = null,
+        pathEffect: PathEffect? = null,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
@@ -837,7 +837,7 @@ data class Stroke(
     /**
      * Effect to apply to the stroke, null indicates a solid stroke line is to be drawn
      */
-    val pathEffect: NativePathEffect? = null
+    val pathEffect: PathEffect? = null
 ) : DrawStyle() {
     companion object {
 
