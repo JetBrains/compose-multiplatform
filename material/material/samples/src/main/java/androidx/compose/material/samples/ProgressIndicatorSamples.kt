@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.OutlinedButton
-import androidx.compose.material.ProgressIndicatorConstants
+import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,7 +41,7 @@ fun LinearProgressIndicatorSample() {
     var progress by remember { mutableStateOf(0.1f) }
     val animatedProgress = animate(
         target = progress,
-        animSpec = ProgressIndicatorConstants.DefaultProgressAnimationSpec
+        animSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
     )
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -63,7 +63,7 @@ fun CircularProgressIndicatorSample() {
     var progress by remember { mutableStateOf(0.1f) }
     val animatedProgress = animate(
         target = progress,
-        animSpec = ProgressIndicatorConstants.DefaultProgressAnimationSpec
+        animSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
     )
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {

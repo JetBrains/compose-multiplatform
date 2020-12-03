@@ -25,10 +25,10 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.draggable
-import androidx.compose.material.SwipeableConstants.DefaultAnimationSpec
-import androidx.compose.material.SwipeableConstants.DefaultVelocityThreshold
-import androidx.compose.material.SwipeableConstants.StandardResistanceFactor
-import androidx.compose.material.SwipeableConstants.defaultResistanceConfig
+import androidx.compose.material.SwipeableDefaults.AnimationSpec
+import androidx.compose.material.SwipeableDefaults.VelocityThreshold
+import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
+import androidx.compose.material.SwipeableDefaults.resistanceConfig
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -73,7 +73,7 @@ import kotlin.math.sin
 open class SwipeableState<T>(
     initialValue: T,
     clock: AnimationClockObservable,
-    internal val animationSpec: AnimationSpec<Float> = DefaultAnimationSpec,
+    internal val animationSpec: AnimationSpec<Float> = AnimationSpec,
     internal val confirmStateChange: (newValue: T) -> Boolean = { true }
 ) {
     /**
@@ -333,7 +333,7 @@ data class SwipeProgress<T>(
 @ExperimentalMaterialApi
 fun <T : Any> rememberSwipeableState(
     initialValue: T,
-    animationSpec: AnimationSpec<Float> = DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = AnimationSpec,
     confirmStateChange: (newValue: T) -> Boolean = { true }
 ): SwipeableState<T> {
     val clock = AmbientAnimationClock.current.asDisposableClock()
@@ -367,7 +367,7 @@ fun <T : Any> rememberSwipeableState(
 internal fun <T : Any> rememberSwipeableStateFor(
     value: T,
     onValueChange: (T) -> Unit,
-    animationSpec: AnimationSpec<Float> = DefaultAnimationSpec
+    animationSpec: AnimationSpec<Float> = AnimationSpec
 ): SwipeableState<T> {
     val swipeableState = rememberSwipeableState(
         initialValue = value,
@@ -433,8 +433,8 @@ fun <T> Modifier.swipeable(
     reverseDirection: Boolean = false,
     interactionState: InteractionState? = null,
     thresholds: (from: T, to: T) -> ThresholdConfig = { _, _ -> FixedThreshold(56.dp) },
-    resistance: ResistanceConfig? = defaultResistanceConfig(anchors.keys),
-    velocityThreshold: Dp = DefaultVelocityThreshold
+    resistance: ResistanceConfig? = resistanceConfig(anchors.keys),
+    velocityThreshold: Dp = VelocityThreshold
 ) = composed(
     inspectorInfo = debugInspectorInfo {
         name = "swipeable"
@@ -548,10 +548,10 @@ data class FractionalThreshold(
  *
  * The resistance basis is usually either the size of the component which [swipeable] is applied
  * to, or the distance between the minimum and maximum anchors. For a constructor in which the
- * resistance basis defaults to the latter, consider using [defaultResistanceConfig].
+ * resistance basis defaults to the latter, consider using [resistanceConfig].
  *
  * You may specify different resistance factors for each bound. Consider using one of the default
- * resistance factors in [SwipeableConstants]: `StandardResistanceFactor` to convey that the user
+ * resistance factors in [SwipeableDefaults]: `StandardResistanceFactor` to convey that the user
  * has run out of things to see, and `StiffResistanceFactor` to convey that the user cannot swipe
  * this right now. Also, you can set either factor to 0 to disable resistance at that bound.
  *
@@ -673,6 +673,13 @@ private fun <T> Map<Float, T>.getOffset(state: T): Float? {
 /**
  * Contains useful constants for [swipeable] and [SwipeableState].
  */
+@Deprecated(
+    "SwipeableConstants has been replaced with SwipeableDefaults",
+    ReplaceWith(
+        "SwipeableDefaults",
+        "androidx.compose.material.SwipeableDefaults"
+    )
+)
 object SwipeableConstants {
     /**
      * The default animation used by [SwipeableState].
@@ -701,6 +708,50 @@ object SwipeableConstants {
      * a [ResistanceConfig] with the resistance basis equal to the distance between the two bounds.
      */
     fun defaultResistanceConfig(
+        anchors: Set<Float>,
+        factorAtMin: Float = StandardResistanceFactor,
+        factorAtMax: Float = StandardResistanceFactor
+    ): ResistanceConfig? {
+        return if (anchors.size <= 1) {
+            null
+        } else {
+            val basis = anchors.maxOrNull()!! - anchors.minOrNull()!!
+            ResistanceConfig(basis, factorAtMin, factorAtMax)
+        }
+    }
+}
+
+/**
+ * Contains useful defaults for [swipeable] and [SwipeableState].
+ */
+object SwipeableDefaults {
+    /**
+     * The default animation used by [SwipeableState].
+     */
+    val AnimationSpec = SpringSpec<Float>()
+
+    /**
+     * The default velocity threshold (1.8 dp per millisecond) used by [swipeable].
+     */
+    val VelocityThreshold = 125.dp
+
+    /**
+     * A stiff resistance factor which indicates that swiping isn't available right now.
+     */
+    const val StiffResistanceFactor = 20f
+
+    /**
+     * A standard resistance factor which indicates that the user has run out of things to see.
+     */
+    const val StandardResistanceFactor = 10f
+
+    /**
+     * The default resistance config used by [swipeable].
+     *
+     * This returns `null` if there is one anchor. If there are at least two anchors, it returns
+     * a [ResistanceConfig] with the resistance basis equal to the distance between the two bounds.
+     */
+    fun resistanceConfig(
         anchors: Set<Float>,
         factorAtMin: Float = StandardResistanceFactor,
         factorAtMax: Float = StandardResistanceFactor

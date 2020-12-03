@@ -200,7 +200,7 @@ fun DropdownMenuItem(
     }
 }
 
-// Size constants.
+// Size defaults.
 private val MenuElevation = 8.dp
 private val MenuVerticalMargin = 32.dp
 private val DropdownMenuHorizontalPadding = 16.dp

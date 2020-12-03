@@ -46,7 +46,7 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
@@ -133,7 +133,7 @@ private fun App() {
                     IconButton(
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Menu, Modifier.size(ButtonConstants.DefaultIconSize))
+                        Icon(Icons.Filled.Menu, Modifier.size(ButtonDefaults.IconSize))
                     }
                 }
             },
