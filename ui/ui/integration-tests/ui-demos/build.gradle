@@ -18,6 +18,7 @@ dependencies {
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:integration-tests:demos:common")
+    implementation project(":compose:ui:ui:ui-samples")
     implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:runtime:runtime-livedata")
