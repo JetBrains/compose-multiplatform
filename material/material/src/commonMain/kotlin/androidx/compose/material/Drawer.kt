@@ -342,10 +342,10 @@ fun ModalDrawerLayout(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     gesturesEnabled: Boolean = true,
     drawerShape: Shape = MaterialTheme.shapes.large,
-    drawerElevation: Dp = DrawerConstants.DefaultElevation,
+    drawerElevation: Dp = DrawerDefaults.Elevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    scrimColor: Color = DrawerConstants.defaultScrimColor,
+    scrimColor: Color = DrawerDefaults.scrimColor,
     bodyContent: @Composable () -> Unit
 ) {
     WithConstraints(modifier.fillMaxSize()) {
@@ -445,10 +445,10 @@ fun BottomDrawerLayout(
     drawerState: BottomDrawerState = rememberBottomDrawerState(BottomDrawerValue.Closed),
     gesturesEnabled: Boolean = true,
     drawerShape: Shape = MaterialTheme.shapes.large,
-    drawerElevation: Dp = DrawerConstants.DefaultElevation,
+    drawerElevation: Dp = DrawerDefaults.Elevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    scrimColor: Color = DrawerConstants.defaultScrimColor,
+    scrimColor: Color = DrawerDefaults.scrimColor,
     bodyContent: @Composable () -> Unit
 ) {
     WithConstraints(modifier.fillMaxSize()) {
@@ -530,6 +530,13 @@ fun BottomDrawerLayout(
 /**
  * Object to hold default values for [ModalDrawerLayout] and [BottomDrawerLayout]
  */
+@Deprecated(
+    "DrawerConstants has been replaced with DrawerDefaults",
+    ReplaceWith(
+        "DrawerDefaults",
+        "androidx.compose.material.DrawerDefaults"
+    )
+)
 object DrawerConstants {
 
     /**
@@ -545,6 +552,26 @@ object DrawerConstants {
      * Default alpha for scrim color
      */
     const val ScrimDefaultOpacity = 0.32f
+}
+
+/**
+ * Object to hold default values for [ModalDrawerLayout] and [BottomDrawerLayout]
+ */
+object DrawerDefaults {
+
+    /**
+     * Default Elevation for drawer sheet as specified in material specs
+     */
+    val Elevation = 16.dp
+
+    val scrimColor: Color
+        @Composable
+        get() = MaterialTheme.colors.onSurface.copy(alpha = ScrimOpacity)
+
+    /**
+     * Default alpha for scrim color
+     */
+    const val ScrimOpacity = 0.32f
 }
 
 private fun calculateFraction(a: Float, b: Float, pos: Float) =

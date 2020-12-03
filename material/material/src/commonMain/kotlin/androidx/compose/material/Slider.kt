@@ -40,8 +40,8 @@ import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.SliderConstants.InactiveTrackColorAlpha
-import androidx.compose.material.SliderConstants.TickColorAlpha
+import androidx.compose.material.SliderDefaults.InactiveTrackColorAlpha
+import androidx.compose.material.SliderDefaults.TickColorAlpha
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -196,7 +196,29 @@ fun Slider(
 /**
  * Object to hold constants used by the [Slider]
  */
+@Deprecated(
+    "SliderConstants has been replaced with SliderDefaults",
+    ReplaceWith(
+        "SliderDefaults",
+        "androidx.compose.material.SliderDefaults"
+    )
+)
 object SliderConstants {
+    /**
+     * Default alpha of the inactive part of the track
+     */
+    const val InactiveTrackColorAlpha = 0.24f
+
+    /**
+     * Default alpha of the ticks that are drawn on top of the track
+     */
+    const val TickColorAlpha = 0.54f
+}
+
+/**
+ * Object to hold defaults used by [Slider]
+ */
+object SliderDefaults {
     /**
      * Default alpha of the inactive part of the track
      */

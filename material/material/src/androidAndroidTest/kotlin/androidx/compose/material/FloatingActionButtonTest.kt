@@ -182,7 +182,7 @@ class FloatingActionButtonTest {
                     FloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},
-                        elevation = FloatingActionButtonConstants.defaultElevation(
+                        elevation = FloatingActionButtonDefaults.elevation(
                             defaultElevation = 0.dp
                         )
                     ) {
@@ -219,7 +219,7 @@ class FloatingActionButtonTest {
                     ExtendedFloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},
-                        elevation = FloatingActionButtonConstants.defaultElevation(
+                        elevation = FloatingActionButtonDefaults.elevation(
                             defaultElevation = 0.dp
                         ),
                         text = { Box(Modifier.preferredSize(10.dp, 50.dp)) }

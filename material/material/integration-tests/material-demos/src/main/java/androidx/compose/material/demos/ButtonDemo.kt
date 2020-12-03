@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
@@ -78,7 +78,7 @@ private fun Buttons() {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         Button(
             onClick = {},
-            colors = ButtonConstants.defaultButtonColors(
+            colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.secondary
             )
         ) {
@@ -135,7 +135,7 @@ private fun CustomShapeButton() {
         onClick = {},
         modifier = Modifier.preferredSize(110.dp),
         shape = TriangleShape,
-        colors = ButtonConstants.defaultOutlinedButtonColors(
+        colors = ButtonDefaults.outlinedButtonColors(
             backgroundColor = Color.Yellow
         ),
         border = BorderStroke(width = 2.dp, color = Color.Black)

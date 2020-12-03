@@ -65,7 +65,7 @@ import androidx.compose.ui.unit.dp
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this Switch in different [Interaction]s.
  * @param colors [SwitchColors] that will be used to determine the color of the thumb and track
- * in different states. See [SwitchConstants.defaultColors].
+ * in different states. See [SwitchDefaults.colors].
  */
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
@@ -75,7 +75,7 @@ fun Switch(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    colors: SwitchColors = SwitchConstants.defaultColors()
+    colors: SwitchColors = SwitchDefaults.colors()
 ) {
     val minBound = 0f
     val maxBound = with(AmbientDensity.current) { ThumbPathLength.toPx() }
@@ -117,7 +117,7 @@ fun Switch(
 /**
  * Represents the colors used by a [Switch] in different states
  *
- * See [SwitchConstants.defaultColors] for the default implementation that follows Material
+ * See [SwitchDefaults.colors] for the default implementation that follows Material
  * specifications.
  */
 @ExperimentalMaterialApi
@@ -208,6 +208,13 @@ private val ThumbPressedElevation = 6.dp
 /**
  * Contains the default values used by [Switch]
  */
+@Deprecated(
+    "SwitchConstants has been replaced with SwitchDefaults",
+    ReplaceWith(
+        "SwitchDefaults",
+        "androidx.compose.material.SwitchDefaults"
+    )
+)
 object SwitchConstants {
     /**
      * Creates a [SwitchColors] that represents the different colors used in a [Switch] in
@@ -228,7 +235,71 @@ object SwitchConstants {
      */
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
+    @Deprecated(
+        "SwitchConstants has been replaced with SwitchDefaults",
+        ReplaceWith(
+            "SwitchDefaults.colors(checkedThumbColor, checkedTrackColor, checkedTrackAlpha, " +
+                "uncheckedThumbColor, uncheckedTrackColor, uncheckedTrackAlpha, " +
+                "disabledCheckedThumbColor, disabledCheckedTrackColor, " +
+                "disabledUncheckedThumbColor, disabledUncheckedTrackColor)",
+            "androidx.compose.material.SwitchDefaults"
+        )
+    )
     fun defaultColors(
+        checkedThumbColor: Color = MaterialTheme.colors.secondaryVariant,
+        checkedTrackColor: Color = checkedThumbColor,
+        checkedTrackAlpha: Float = 0.54f,
+        uncheckedThumbColor: Color = MaterialTheme.colors.surface,
+        uncheckedTrackColor: Color = MaterialTheme.colors.onSurface,
+        uncheckedTrackAlpha: Float = 0.38f,
+        disabledCheckedThumbColor: Color = checkedThumbColor
+            .copy(alpha = ContentAlpha.disabled)
+            .compositeOver(MaterialTheme.colors.surface),
+        disabledCheckedTrackColor: Color = checkedTrackColor
+            .copy(alpha = ContentAlpha.disabled)
+            .compositeOver(MaterialTheme.colors.surface),
+        disabledUncheckedThumbColor: Color = uncheckedThumbColor
+            .copy(alpha = ContentAlpha.disabled)
+            .compositeOver(MaterialTheme.colors.surface),
+        disabledUncheckedTrackColor: Color = uncheckedTrackColor
+            .copy(alpha = ContentAlpha.disabled)
+            .compositeOver(MaterialTheme.colors.surface)
+    ): SwitchColors = DefaultSwitchColors(
+        checkedThumbColor = checkedThumbColor,
+        checkedTrackColor = checkedTrackColor.copy(alpha = checkedTrackAlpha),
+        uncheckedThumbColor = uncheckedThumbColor,
+        uncheckedTrackColor = uncheckedTrackColor.copy(alpha = uncheckedTrackAlpha),
+        disabledCheckedThumbColor = disabledCheckedThumbColor,
+        disabledCheckedTrackColor = disabledCheckedTrackColor.copy(alpha = checkedTrackAlpha),
+        disabledUncheckedThumbColor = disabledUncheckedThumbColor,
+        disabledUncheckedTrackColor = disabledUncheckedTrackColor.copy(alpha = uncheckedTrackAlpha)
+    )
+}
+
+/**
+ * Contains the default values used by [Switch]
+ */
+object SwitchDefaults {
+    /**
+     * Creates a [SwitchColors] that represents the different colors used in a [Switch] in
+     * different states.
+     *
+     * @param checkedThumbColor the color used for the thumb when enabled and checked
+     * @param checkedTrackColor the color used for the track when enabled and checked
+     * @param checkedTrackAlpha the alpha applied to [checkedTrackColor] and
+     * [disabledCheckedTrackColor]
+     * @param uncheckedThumbColor the color used for the thumb when enabled and unchecked
+     * @param uncheckedTrackColor the color used for the track when enabled and unchecked
+     * @param uncheckedTrackAlpha the alpha applied to [uncheckedTrackColor] and
+     * [disabledUncheckedTrackColor]
+     * @param disabledCheckedThumbColor the color used for the thumb when disabled and checked
+     * @param disabledCheckedTrackColor the color used for the track when disabled and checked
+     * @param disabledUncheckedThumbColor the color used for the thumb when disabled and unchecked
+     * @param disabledUncheckedTrackColor the color used for the track when disabled and unchecked
+     */
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    fun colors(
         checkedThumbColor: Color = MaterialTheme.colors.secondaryVariant,
         checkedTrackColor: Color = checkedThumbColor,
         checkedTrackAlpha: Float = 0.54f,

@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
@@ -58,8 +58,8 @@ fun TextButtonSample() {
 @Composable
 fun ButtonWithIconSample() {
     Button(onClick = { /* Do something! */ }) {
-        Icon(Icons.Filled.Favorite, Modifier.size(ButtonConstants.DefaultIconSize))
-        Spacer(Modifier.size(ButtonConstants.DefaultIconSpacing))
+        Icon(Icons.Filled.Favorite, Modifier.size(ButtonDefaults.IconSize))
+        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Text("Like")
     }
 }

@@ -79,7 +79,7 @@ enum class ModalBottomSheetValue {
 class ModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     clock: AnimationClockObservable,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ) : SwipeableState<ModalBottomSheetValue>(
     initialValue = initialValue,
@@ -167,7 +167,7 @@ class ModalBottomSheetState(
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     clock: AnimationClockObservable = AmbientAnimationClock.current,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ): ModalBottomSheetState {
     val disposableClock = clock.asDisposableClock()
@@ -219,10 +219,10 @@ fun ModalBottomSheetLayout(
     sheetState: ModalBottomSheetState =
         rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     sheetShape: Shape = MaterialTheme.shapes.large,
-    sheetElevation: Dp = ModalBottomSheetConstants.DefaultElevation,
+    sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
     sheetBackgroundColor: Color = MaterialTheme.colors.surface,
     sheetContentColor: Color = contentColorFor(sheetBackgroundColor),
-    scrimColor: Color = ModalBottomSheetConstants.DefaultScrimColor,
+    scrimColor: Color = ModalBottomSheetDefaults.scrimColor,
     content: @Composable () -> Unit
 ) = BottomSheetStack(
     modifier = modifier,
@@ -322,6 +322,13 @@ private enum class BottomSheetStackSlot { SheetContent, Content }
 /**
  * Contains useful constants for [ModalBottomSheetLayout].
  */
+@Deprecated(
+    "ModalBottomSheetConstants has been replaced with ModalBottomSheetDefaults",
+    ReplaceWith(
+        "ModalBottomSheetDefaults",
+        "androidx.compose.material.ModalBottomSheetDefaults"
+    )
+)
 object ModalBottomSheetConstants {
 
     /**
@@ -333,6 +340,24 @@ object ModalBottomSheetConstants {
      * The default scrim color used by [ModalBottomSheetLayout].
      */
     val DefaultScrimColor: Color
+        @Composable
+        get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
+}
+
+/**
+ * Contains useful Defaults for [ModalBottomSheetLayout].
+ */
+object ModalBottomSheetDefaults {
+
+    /**
+     * The default elevation used by [ModalBottomSheetLayout].
+     */
+    val Elevation = 16.dp
+
+    /**
+     * The default scrim color used by [ModalBottomSheetLayout].
+     */
+    val scrimColor: Color
         @Composable
         get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
 }

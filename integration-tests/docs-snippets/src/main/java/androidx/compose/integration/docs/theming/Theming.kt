@@ -26,7 +26,7 @@ import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Colors
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -250,7 +250,7 @@ private object ThemingSnippet17 {
         content: @Composable RowScope.() -> Unit
     ) {
         Button(
-            colors = ButtonConstants.defaultButtonColors(
+            colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.secondary
             ),
             onClick = onClick,

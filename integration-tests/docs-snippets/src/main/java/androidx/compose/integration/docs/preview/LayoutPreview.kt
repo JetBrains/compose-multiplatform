@@ -21,7 +21,7 @@
 package androidx.compose.integration.docs.preview
 
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants.defaultButtonColors
+import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -78,7 +78,7 @@ private object PreviewSnippet5 {
     fun Counter(count: Int, updateCount: (Int) -> Unit) {
         Button(
             onClick = { updateCount(count + 1) },
-            colors = defaultButtonColors(
+            colors = buttonColors(
                 backgroundColor = if (count > 5) Color.Green else Color.White
             )
         ) {

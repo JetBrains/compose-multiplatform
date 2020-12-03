@@ -59,7 +59,7 @@ import kotlin.math.max
  *
  * @param modifier modifiers for the the Snackbar layout
  * @param action action / button component to add as an action to the snackbar. Consider using
- * [SnackbarConstants.defaultActionPrimaryColor] as the color for the action, if you do not
+ * [SnackbarDefaults.primaryActionColor] as the color for the action, if you do not
  * have a predefined color you wish to use instead.
  * @param actionOnNewLine whether or not action should be put on the separate line. Recommended
  * for action with long action text
@@ -79,7 +79,7 @@ fun Snackbar(
     action: @Composable (() -> Unit)? = null,
     actionOnNewLine: Boolean = false,
     shape: Shape = MaterialTheme.shapes.small,
-    backgroundColor: Color = SnackbarConstants.defaultBackgroundColor,
+    backgroundColor: Color = SnackbarDefaults.backgroundColor,
     contentColor: Color = MaterialTheme.colors.surface,
     elevation: Dp = 6.dp,
     text: @Composable () -> Unit
@@ -147,16 +147,16 @@ fun Snackbar(
     modifier: Modifier = Modifier,
     actionOnNewLine: Boolean = false,
     shape: Shape = MaterialTheme.shapes.small,
-    backgroundColor: Color = SnackbarConstants.defaultBackgroundColor,
+    backgroundColor: Color = SnackbarDefaults.backgroundColor,
     contentColor: Color = MaterialTheme.colors.surface,
-    actionColor: Color = SnackbarConstants.defaultActionPrimaryColor,
+    actionColor: Color = SnackbarDefaults.primaryActionColor,
     elevation: Dp = 6.dp
 ) {
     val actionLabel = snackbarData.actionLabel
     val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
         {
             TextButton(
-                colors = ButtonConstants.defaultTextButtonColors(contentColor = actionColor),
+                colors = ButtonDefaults.textButtonColors(contentColor = actionColor),
                 onClick = { snackbarData.performAction() },
                 content = { Text(actionLabel) }
             )
@@ -179,6 +179,13 @@ fun Snackbar(
 /**
  * Object to hold constants used by the [Snackbar]
  */
+@Deprecated(
+    "SnackbarConstants has been replaced with SnackbarDefaults",
+    ReplaceWith(
+        "SnackbarDefaults",
+        "androidx.compose.material.SnackbarDefaults"
+    )
+)
 object SnackbarConstants {
 
     /**
@@ -211,6 +218,55 @@ object SnackbarConstants {
      * function uses [Colors.primaryVariant].
      */
     val defaultActionPrimaryColor: Color
+        @Composable
+        get() {
+            val colors = MaterialTheme.colors
+            return if (colors.isLight) {
+                val primary = colors.primary
+                val overlayColor = colors.surface.copy(alpha = 0.6f)
+
+                overlayColor.compositeOver(primary)
+            } else {
+                colors.primaryVariant
+            }
+        }
+}
+
+/**
+ * Object to hold defaults used by [Snackbar]
+ */
+object SnackbarDefaults {
+
+    /**
+     * Default alpha of the overlay applied to the [backgroundColor]
+     */
+    private const val SnackbarOverlayAlpha = 0.8f
+
+    /**
+     * Default background color of the [Snackbar]
+     */
+    val backgroundColor: Color
+        @Composable
+        get() =
+            MaterialTheme.colors.onSurface
+                .copy(alpha = SnackbarOverlayAlpha)
+                .compositeOver(MaterialTheme.colors.surface)
+
+    /**
+     * Provides a best-effort 'primary' color to be used as the primary color inside a [Snackbar].
+     * Given that [Snackbar]s have an 'inverted' theme, i.e in a light theme they appear dark, and
+     * in a dark theme they appear light, just using [Colors.primary] will not work, and has
+     * incorrect contrast.
+     *
+     * If your light theme has a corresponding dark theme, you should instead directly use
+     * [Colors.primary] from the dark theme when in a light theme, and use
+     * [Colors.primaryVariant] from the dark theme when in a dark theme.
+     *
+     * When in a light theme, this function applies a color overlay to [Colors.primary] from
+     * [MaterialTheme.colors] to attempt to reduce the contrast, and when in a dark theme this
+     * function uses [Colors.primaryVariant].
+     */
+    val primaryActionColor: Color
         @Composable
         get() {
             val colors = MaterialTheme.colors
