@@ -27,6 +27,10 @@ import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Density
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.SkiaLayer
@@ -46,10 +50,14 @@ import java.awt.im.InputMethodRequests
 internal class ComposeLayer {
     private var isDisposed = false
 
+    private val coroutineScope = CoroutineScope(Dispatchers.Swing)
+    // TODO(demin): maybe pass CoroutineScope into AWTDebounceEventQueue and get rid of [cancel]
+    //  method?
     private val events = AWTDebounceEventQueue()
 
     internal val wrapped = Wrapped()
     internal val owners: DesktopOwners = DesktopOwners(
+        coroutineScope,
         wrapped,
         wrapped::needRedraw
     )
@@ -223,6 +231,7 @@ internal class ComposeLayer {
         composition?.dispose()
         owner?.dispose()
         events.cancel()
+        coroutineScope.cancel()
         wrapped.dispose()
         isDisposed = true
     }
