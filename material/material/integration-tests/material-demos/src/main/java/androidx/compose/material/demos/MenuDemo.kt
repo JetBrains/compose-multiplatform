@@ -85,7 +85,7 @@ fun MenuInstance(modifier: Modifier = Modifier) {
         expanded = expanded,
         onDismissRequest = { expanded = false },
         toggle = iconButton,
-        dropdownOffset = Position(-12.dp, -12.dp),
+        dropdownOffset = Position(24.dp, 0.dp),
         toggleModifier = modifier
     ) {
         options.forEach {
