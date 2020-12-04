@@ -32,7 +32,7 @@ const val TargetPackage = "androidx.compose.integration.macrobenchmark.target"
 fun MacrobenchmarkRule.measureStartup(
     profileCompiled: Boolean,
     startupMode: StartupMode,
-    iterations: Int = 3,
+    iterations: Int = 5,
     setupIntent: Intent.() -> Unit = {}
 ) = measureStartupRepeated(
     MacrobenchmarkConfig(
