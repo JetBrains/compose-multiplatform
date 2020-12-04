@@ -21,8 +21,7 @@ import android.os.Looper
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.SlotTable
+import androidx.compose.runtime.CompositionData
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -73,12 +72,11 @@ open class ToolingTest {
         activityTestRule.onUiThread { }
     }
 
-    @OptIn(InternalComposeApi::class)
-    internal fun showAndRecord(content: @Composable () -> Unit): MutableSet<SlotTable>? {
+    internal fun showAndRecord(content: @Composable () -> Unit): MutableSet<CompositionData>? {
 
         positionedLatch = CountDownLatch(1)
-        val map: MutableSet<SlotTable> = Collections.newSetFromMap(
-            WeakHashMap<SlotTable, Boolean>()
+        val map: MutableSet<CompositionData> = Collections.newSetFromMap(
+            WeakHashMap<CompositionData, Boolean>()
         )
         activityTestRule.onUiThread {
             ViewRootForTest.onViewCreatedCallback = {

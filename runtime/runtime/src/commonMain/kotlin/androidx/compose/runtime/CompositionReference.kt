@@ -41,7 +41,7 @@ abstract class CompositionReference internal constructor() {
     internal abstract fun composeInitial(composer: Composer<*>, composable: @Composable () -> Unit)
     internal abstract fun invalidate(composer: Composer<*>)
 
-    internal open fun recordInspectionTable(table: MutableSet<SlotTable>) {}
+    internal open fun recordInspectionTable(table: MutableSet<CompositionData>) {}
     internal open fun registerComposer(composer: Composer<*>) {
         registerComposerWithRoot(composer)
     }

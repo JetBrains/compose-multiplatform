@@ -351,11 +351,6 @@ private fun ambientMapOf(values: Array<out ProvidedValue<*>>, parentScope: Ambie
  */
 class Composer<N>(
     /**
-     * Backing storage for the composition
-     */
-    val slotTable: SlotTable,
-
-    /**
      * An adapter that applies changes to the tree using the Applier abstraction.
      */
     @PublishedApi internal val applier: Applier<N>,
@@ -365,6 +360,7 @@ class Composer<N>(
      */
     private val parentReference: CompositionReference
 ) {
+    private val slotTable: SlotTable = SlotTable()
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = HashMap<
         CompositionLifecycleObserverHolder,
@@ -670,6 +666,31 @@ class Composer<N>(
             if (scope.invalidate() == InvalidationResult.IMMINENT) {
                 // If we process this during recordWriteOf, ignore it when recording modifications
                 observationsProcessed.insertIfMissing(value, scope)
+            }
+        }
+    }
+
+    /**
+     * Throw a diagnostic exception if the internal tracking tables are inconsistent.
+     */
+    @InternalComposeApi
+    fun verifyConsistent() {
+        if (!isComposing) {
+            slotTable.verifyWellFormed()
+            insertTable.verifyWellFormed()
+            validateRecomposeScopeAnchors(slotTable)
+        }
+    }
+
+    private fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
+        val scopes = slotTable.slots.map { it as? RecomposeScope }.filterNotNull()
+        for (scope in scopes) {
+            scope.anchor?.let { anchor ->
+                check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
+                    val dataIndex = slotTable.slots.indexOf(scope)
+                    "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
+                        "$dataIndex"
+                }
             }
         }
     }
@@ -1146,6 +1167,9 @@ class Composer<N>(
             }
         }
     }
+
+    @InternalComposeApi
+    val compositionData: CompositionData get() = slotTable
 
     /**
      * Schedule a side effect to run when we apply composition changes.
@@ -2448,7 +2472,7 @@ class Composer<N>(
         override val collectingKeySources: Boolean,
         override val collectingParameterInformation: Boolean
     ) : CompositionReference() {
-        var inspectionTables: MutableSet<MutableSet<SlotTable>>? = null
+        var inspectionTables: MutableSet<MutableSet<CompositionData>>? = null
         val composers = mutableSetOf<Composer<*>>()
 
         fun dispose() {
@@ -2518,9 +2542,9 @@ class Composer<N>(
             return ambientScopeAt(scope.anchor?.toIndexFor(slotTable) ?: 0)
         }
 
-        override fun recordInspectionTable(table: MutableSet<SlotTable>) {
+        override fun recordInspectionTable(table: MutableSet<CompositionData>) {
             (
-                inspectionTables ?: HashSet<MutableSet<SlotTable>>().also {
+                inspectionTables ?: HashSet<MutableSet<CompositionData>>().also {
                     inspectionTables = it
                 }
                 ).add(table)

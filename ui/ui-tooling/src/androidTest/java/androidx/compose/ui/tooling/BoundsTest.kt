@@ -55,7 +55,7 @@ class BoundsTest : ToolingTest() {
 
     @Test
     fun testBounds() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
                 Box {
@@ -98,7 +98,7 @@ class BoundsTest : ToolingTest() {
 
     @Test
     fun testBoundWithConstraints() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
                 WithConstraints {
@@ -131,7 +131,7 @@ class BoundsTest : ToolingTest() {
     @Test
     @LargeTest
     fun testDisposeWithComposeTables() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         var value by mutableStateOf(0)
         var latch = CountDownLatch(1)
         show {
