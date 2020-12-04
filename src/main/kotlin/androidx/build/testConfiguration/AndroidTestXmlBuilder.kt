@@ -20,7 +20,7 @@ class ConfigBuilder {
     var appApkName: String? = null
     lateinit var applicationId: String
     var isBenchmark: Boolean = false
-    var isFullTest: Boolean = true
+    var isPostsubmit: Boolean = true
     lateinit var minSdk: String
     var tag: String = "androidx_unit_tests"
     lateinit var testApkName: String
@@ -29,7 +29,7 @@ class ConfigBuilder {
     fun appApkName(appApkName: String) = apply { this.appApkName = appApkName }
     fun applicationId(applicationId: String) = apply { this.applicationId = applicationId }
     fun isBenchmark(isBenchmark: Boolean) = apply { this.isBenchmark = isBenchmark }
-    fun isFullTest(isFullTest: Boolean) = apply { this.isFullTest = isFullTest }
+    fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
     fun tag(tag: String) = apply { this.tag = tag }
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
@@ -44,7 +44,7 @@ class ConfigBuilder {
             .append(MODULE_METADATA_TAG_OPTION.replace("APPLICATION_ID", applicationId))
             .append(WIFI_DISABLE_OPTION)
         if (isBenchmark) {
-            if (isFullTest) {
+            if (isPostsubmit) {
                 sb.append(BENCHMARK_POSTSUBMIT_OPTIONS)
             } else {
                 sb.append(BENCHMARK_PRESUBMIT_OPTION)
@@ -59,7 +59,7 @@ class ConfigBuilder {
             .append(TEST_BLOCK_OPEN)
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
-        if (isFullTest)
+        if (isPostsubmit)
             sb.append(TEST_BLOCK_CLOSE)
         else {
             sb.append(SMALL_TEST_OPTIONS)
@@ -79,7 +79,7 @@ class MediaConfigBuilder {
     lateinit var clientApkName: String
     lateinit var clientApplicationId: String
     var isClientPrevious: Boolean = true
-    var isFullTest: Boolean = true
+    var isPostsubmit: Boolean = true
     var isServicePrevious: Boolean = true
     lateinit var minSdk: String
     lateinit var serviceApkName: String
@@ -90,7 +90,7 @@ class MediaConfigBuilder {
     fun clientApkName(clientApkName: String) = apply { this.clientApkName = clientApkName }
     fun clientApplicationId(clientApplicationId: String) =
         apply { this.clientApplicationId = clientApplicationId }
-    fun isFullTest(isFullTest: Boolean) = apply { this.isFullTest = isFullTest }
+    fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun isClientPrevious(isClientPrevious: Boolean) = apply {
         this.isClientPrevious = isClientPrevious
     }
@@ -141,7 +141,7 @@ class MediaConfigBuilder {
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", clientApplicationId))
             .append(mediaInstrumentationArgs())
-        if (isFullTest)
+        if (isPostsubmit)
             sb.append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
                 .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
